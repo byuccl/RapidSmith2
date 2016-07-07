@@ -1,0 +1,26 @@
+digraph graphname {
+  BUFG -> BUFGCTRL;
+  FIFO36E1 -> RAMBFIFO36E1;
+  IOB -> IOBM;
+  IOB -> IOBS;
+  IPAD -> IOBM;
+  IPAD -> IOBS;
+  ISERDESE1 -> ILOGICE1;
+  OSERDESE1 -> OLOGICE1;
+  RAMB18E1 -> FIFO18E1;
+  RAMB36E1 -> RAMBFIFO36E1;
+  SLICEL -> SLICEM;
+
+  BUFGCTRL -> BUFG [style=dotted]
+  FIFO18E1 -> RAMB18E1 [style=dotted]
+  ILOGICE1 -> ISERDESE1 [style=dotted]
+  IOBM -> IOB [style=dotted]
+  IOBM -> IPAD [style=dotted]
+  IOBS -> IOB [style=dotted]
+  IOBS -> IPAD [style=dotted]
+  OLOGICE1 -> OSERDESE1 [style=dotted]
+  RAMBFIFO36E1 -> FIFO36E1 [style=dotted]
+  RAMBFIFO36E1 -> RAMB36E1 [style=dotted]
+  SLICEM -> SLICEL [style=dotted]
+
+}

@@ -1,0 +1,49 @@
+This file summarizes the architecture of the placer.
+
+
+PlacementGroup (abstract class)
+ The atomic unit of placement. It is composed of one or more Instance objects. If
+ it has more than one Instance, the placement arrangement between the instances is fixed.
+ Each placement group has an anchor that must be placed. When the anchor is placed, all
+ instances in the group are placed. 
+ Related classes:
+  - SingleInstancePlacementGroup (a placement group with one instance - 99% of the groups)
+  - MultipleInstancePlacementGroup (allows multiple instances in a group)
+ 
+DesignPlacementGroups
+ Represents all of the placement groups of a design. It is responsible for identifying all
+ of the placement groups that can be placed. This is created from a Design. It does not
+ contain any Placement state.
+ TODO: this class name is not ideal. Potential names: PlaceableDesign
+ 
+TypeSiteCoordinates
+ Represents the coordinate system for a specific type. It provides a convenient way
+ to access the x,y PrimitiveSite for a specific type. This coordinate system is unconstrained
+ meaning it represents all valid sites in the device for the particular primitive type.
+
+AreaPlacementConstraint
+ Represents a constraint for a specific TypeSiteCoordinates object. This object constrains
+ the locations where PlacementGroups can be placed. 
+ Related Classes:
+  - SquareAreaConstraint
+
+PlacerState
+ Contains the actual state of the placement (i.e., where the PlacementGroup objects are
+ currently placed). This is a dynamic structure that changes during placement. It also
+ contains the current constraints used for a device.
+
+DefaultFinalGroupPlacement
+ This class stores the placement of a design as a single object. After placement, this
+ object can be created. This object is immutable meaning that the placement does not
+ change. It is also easy to serialize. The PlacerState object contains the placement but
+ the PlacerState class manages the dynamic placement of the design. The DefaultFinalGroupPlacement 
+ class is used to store the placement state in much less memory and without the ability to change it.
+ 
+
+BasicPlacer
+InitialPlacer
+BasicPlacer
+RandomInitialPlacer
+
+SimulatedAnnealingPlacer
+NetRectangleCostFunction

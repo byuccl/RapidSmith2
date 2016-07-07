@@ -1,0 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>edu.byu.ece.bitstreamTools.bitstream package</title>
+</head>
+<body bgcolor="white">
+
+This package is used to represent a Xilinx FPGA bitstream file. The 
+details on how a bitstream is organized can be found in the following
+Xilinx documents:
+<ul>
+<li> <a href="http://www.xilinx.com/support/documentation/user_guides/ug071.pdf">Xilinx V4 COnfiguration Guide</a>
+ 
+</ul>
+
+
+This package
+does NOT represent the bitstream as it exists on the FPGA but rather how the
+bitstream is represented in a file and as it would be loaded into the FPGA.
+The purpose of this package is as follows:
+<ul>
+<li> Represent bitstream files in a data structure that has already
+     parsed the bitstream in a useable manner
+<li> Provide support for creating new bitstreams by simplifying the
+     process of creating bitstream packets.
+<li> Provide support for parsing the bitstream from a file (a variety of formats)
+<li> Provide support for writing out the bitstream in a variety of formats
+</ul>
+
+</body>
+</html>

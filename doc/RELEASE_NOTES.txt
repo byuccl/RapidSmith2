@@ -1,0 +1,95 @@
+Release Notes for BYU RapidSmith Tools
+=== Version 0.5.2 (26 AUG 2013) ===
+ + Adds preliminary support for Artix 7 and Zynq devices.
+ + Adds preliminary support for the inout pin type found in Zynq
+ device / XDL files.
+ + A few other bugs were fixed.  See SVN commit log for more details.
+ 
+=== Version 0.5.1 (29 APR 2011) ===
+ + Added new methods to the design package for more convenient handling of XDL 
+   designs.
+ + Added a hashmap for attributes in Instances to facilitate access to 
+   attributes.
+ + Added a net reference in the Pin class.
+ + Rewrote some of the router infrastructure.
+ + Several other bugs were fixed.  See SVN commit log for more details.
+
+ 
+=== Version 0.5.0 (30 MAR 2011) ===
+ + Device database files are now included for all supported Xilinx parts! Users
+   no longer have to go through the lengthy compile themselves. 
+ + Virtex 7 and Kintex 7 preliminary support
+ + New custom WireHashMap which accelerates routing speed, device load times 
+   and heap memory usage
+ + Several bug fixes for Virtex 5 in StaticSourceHandler (routing fixes)
+ + Instances now contain a map of all their used pins for rapid access to its
+   connections 
+ + The Design Explorer can now display routes from timing report files  
+ + Adds an environment variable that can allow RapidSmith to use current and
+   legacy versions of Xilinx ISE tools (for working on both legacy and current
+   parts in the same program)
+ + Re-factored the device.Wire class to device.WireConnection to make the name
+   more meaningful
+ + Improved the gui package template classes
+ + Fixed a variety of other bugs which can be seen in the SVN commit messages
+
+=== Version 0.4.0 (26 FEB 2011) ===
+This release of RapidSmith contains a major update in that it supports 
+parsing bitstream packets and frames for Virtex 4, Virtex 5 and Virtex 6 
+architectures. It removed the old Virtex 5 patch for BRAMs and has a complete
+integrated solution for primitive site pin mappings for all devices supported.
+It includes several bug fixes and new methods for PartNameTools.  
+ModuleInstance contains several placement bug fixes.
+
+=== Version 0.3.0 (29 JAN 2011) ===
+This is a major update for RapidSmith.  The device files need to be rebuilt
+in this version, this is due to adding support for several Xilinx legacy
+devices (spartan2, spartan2e, spartan3, spartan3a, spartan 3adsp, spartan3e,
+virtex, virtexe, virtex2, and virtex2p).  It also includes a new enum type
+called FamilyType with a helper class called PartNameTools to help convert
+Xilinx partnames to and from the FamilyType. An experimental timing report
+(TWR) parser has been added.  The Design Explorer can load timing reports
+using the new TWR parser and has been updated to show more information
+about Nets.  Several bug fixes in the StaticSourceHandler when routing
+Virtex 5 devices are included.  New packages: gui, tests and timing.
+ 
+=== Version 0.2.2 (29 NOV 2010) ===
+Added several features including a hard macro generator, a design explorer,
+a device browser, and basic support for Spartan 6 devices.  Fixed a few bugs
+in the basic router.  Added a class to merge static nets.  Added better 
+support/documentation for Mac OS X users.
+
+=== Version 0.2.1 (21 OCT 2010) ===
+This version has a few big bug fixes to it.  First, the XDL design parser
+has been completely rewritten and no longer uses JavaCC.  It is a custom
+parser and loads designs 20-30% faster than the previous parser.  This
+revision also contains a fix in the StaticSourceHandler which affects
+the routers.  It was erroneously putting GND pins on VCC nets.  This 
+version also adds a new deterministic XDL export method to compare XDL
+files sanely.
+
+=== Version 0.2.0 (8 OCT 2010) ===
+This is a major revision upgrade as preliminary support for Virtex 6 parts
+has been added.  An abstract router class as well as an example basic 
+router has been added to the router package.  Although it is a full design
+router, it still is quite basic and unoptimized.  A few fixes have been
+made to the PartTileBrowser to work with Virtex 6 parts and how the scene
+is rendered.  Fixed a bug with used primitive sites in the Design class.
+
+=== Version 0.1.6 (30 SEP 2010) ===
+Fixed a few more bugs. Upgraded to a newer version of Qt Jambi (4.6.3).
+Fixed an XDL parser bug that would not parse XDL files without a 'cfg ""' 
+entry in the design. Added a few more diagrams to the documentation.
+Moved all license files to /doc/ folder and includes the NSF disclaimer
+in the installer with a prompt for the user to agree to the license with
+RapidSmith.
+
+=== Version 0.1.5 (25 AUG 2010) ===
+A few minor bug fixes such as device files now no longer are loaded
+repetitively for the same device (this saves a significant amount of
+time when loading several designs).  Device files no longer include
+speed grade.  Added a recursive delete folder function in the
+FileTools class.  The documentation format is better in this release.
+
+=== Version 0.1.4 (19 AUG 2010) ===
+The initial public release.
