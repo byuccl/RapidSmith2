@@ -5,6 +5,7 @@ import edu.byu.ece.rapidSmith.util.FamilyType;
 import edu.byu.ece.rapidSmith.util.FileTools;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
+import edu.byu.ece.rapidSmith.util.EnvironmentException;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
@@ -51,6 +52,7 @@ public class RapidSmithEnv {
 			devicePath = Paths.get(property, "devices");
 			sourcePath = Paths.get(property);
 		}
+		else throw new EnvironmentException("RAPIDSMITH_PATH environment variable is not set.");
 	}
 
 	public RapidSmithEnv(Map<String, Path> variables) {
