@@ -61,9 +61,6 @@ public final class PrimitiveSite implements Serializable{
 	 */
 	private Map<PrimitiveType, Map<Integer, SitePinTemplate>> externalWireToPinNameMap;
 
-	private static int nextID = 0 ;
-	private int uniqueID;
-	
 	/**
 	 * Constructor unnamed, tileless primitive site.
 	 */
@@ -72,7 +69,6 @@ public final class PrimitiveSite implements Serializable{
 		tile = null;
 		instanceX = -1;
 		instanceY = -1;
-		uniqueID = nextID++;
 	}
 	
 	/**
@@ -649,19 +645,11 @@ public final class PrimitiveSite implements Serializable{
 	 * @param otherType The primitive type to try to place on this site.
 	 * @return True if otherType can be placed at this primitive site, false otherwise.
 	 */
-	public boolean isCompatiblePrimitiveType(PrimitiveType otherType) {
+	public boolean isCompatiblePrimitiveType(PrimitiveType otherType){
 		for (PrimitiveType compat : getCompatibleTypes())
 			if (compat == otherType)
 				return true;
 		return false;
-	}
-	
-	/**
-	 * Returns the unique ID associated with the primitive site
-	 * @return Unique integer ID
-	 */
-	public int getUniqueID() {
-		return this.uniqueID;
 	}
 	
 	/**
@@ -671,7 +659,7 @@ public final class PrimitiveSite implements Serializable{
 	 * @param otherSite The other site to see if its type is compatible with this site.
 	 * @return True if compatible, false otherwise.
 	 */
-	public boolean isCompatiblePrimitiveType(PrimitiveSite otherSite) {
+	public boolean isCompatiblePrimitiveType(PrimitiveSite otherSite){
 		return isCompatiblePrimitiveType(otherSite.getType());
 	}
 
