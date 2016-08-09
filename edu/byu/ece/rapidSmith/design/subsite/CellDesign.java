@@ -29,7 +29,7 @@ public class CellDesign extends AbstractDesign {
 	/** Map of properties of this design. */
 	private Map<Object, Property> propertyMap;
 
-	private HashMap<PrimitiveSite, HashSet<Integer>> usedSitePipsAtSite;
+	private HashMap<PrimitiveSite, HashSet<Integer>> usedSitePipsMap;
 
 	/**
 	 * Constructor which initializes all member data structures. Sets name and
@@ -56,7 +56,7 @@ public class CellDesign extends AbstractDesign {
 		cellMap = new HashMap<>();
 		placementMap = new HashMap<>();
 		netMap = new HashMap<>();
-		usedSitePipsAtSite = new HashMap<>();
+		usedSitePipsMap = new HashMap<>();
 	}
 
 	/**
@@ -505,11 +505,11 @@ public class CellDesign extends AbstractDesign {
 	}
 
 	public void setUsedSitePipsAtSite(PrimitiveSite ps, HashSet<Integer> usedWires) {
-		this.usedSitePipsAtSite.put(ps, usedWires);
+		this.usedSitePipsMap.put(ps, usedWires);
 	}
 
 	public  HashSet<Integer> getUsedSitePipsAtSite(PrimitiveSite ps) {
-		return this.usedSitePipsAtSite.get(ps);
+		return this.usedSitePipsMap.get(ps);
 	}
 
 	/**
