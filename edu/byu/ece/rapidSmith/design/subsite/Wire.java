@@ -1,6 +1,6 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
-import edu.byu.ece.rapidSmith.device.PrimitiveSite;
+import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.Tile;
 
 import java.io.Serializable;
@@ -19,7 +19,7 @@ public interface Wire extends Serializable {
 		return getTile().getDevice().getWireEnumerator().getWireName(getWireEnum());
 	}
 	Tile getTile();
-	PrimitiveSite getSite();
+	Site getSite();
 
 	/**
 	 * Returns a stream comprised of wire, pin and terminal connections.

@@ -11,16 +11,16 @@ import java.util.stream.Stream;
  *
  */
 public class SiteWire implements Wire, Serializable {
-	private PrimitiveSite site;
+	private Site site;
 	private int wire;
 
-	public SiteWire(PrimitiveSite site, int wire) {
+	public SiteWire(Site site, int wire) {
 		this.site = site;
 		this.wire = wire;
 	}
 
 	@Override
-	public PrimitiveSite getSite() {
+	public Site getSite() {
 		return site;
 	}
 

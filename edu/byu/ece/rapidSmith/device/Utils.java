@@ -42,8 +42,8 @@ public class Utils{
 	 * @param s The string to be converted to an enum type
 	 * @return The PrimitiveType corresponding to the string s, null if none exists.
 	 */
-	public static PrimitiveType createPrimitiveType(String s){
-		return PrimitiveType.valueOf(s.toUpperCase());
+	public static SiteType createPrimitiveType(String s){
+		return SiteType.valueOf(s.toUpperCase());
 	}
 
 	/**

@@ -30,9 +30,9 @@ public class ExtendedDeviceInfo implements Serializable {
 	private transient final HashPool<WireHashMap> whmPool = new HashPool<>();
 
 	private Map<String, WireHashMap> reversedWireHashMap = new HashMap<>(); // tile names to wirehashmap
-	private Map<PrimitiveType, WireHashMap> reversedSubsiteRouting = new HashMap<>();
-	private Map<PrimitiveType, Set<String>> pinsDrivingFabric = new HashMap<>(); // site template -> pin names
-	private Map<PrimitiveType, Set<String>> pinsDrivenByFabric = new HashMap<>(); // site template -> pin names
+	private Map<SiteType, WireHashMap> reversedSubsiteRouting = new HashMap<>();
+	private Map<SiteType, Set<String>> pinsDrivingFabric = new HashMap<>(); // site template -> pin names
+	private Map<SiteType, Set<String>> pinsDrivenByFabric = new HashMap<>(); // site template -> pin names
 
 	public void buildExtendedInfo(Device device) {
 		System.out.println("started at " + new Date());
@@ -157,14 +157,14 @@ public class ExtendedDeviceInfo implements Serializable {
 	}
 
 	private void buildDrivesGeneralFabric(Device device) {
-		for (PrimitiveSite site : device.getPrimitiveSites().values()) {
+		for (Site site : device.getPrimitiveSites().values()) {
 			threadPool.execute(() -> buildDrivesForSite(device, site));
 		}
 	}
 
-	private void buildDrivesForSite(Device device, PrimitiveSite site) {
-		Map<PrimitiveType, Set<String>> map = pinsDrivingFabric;
-		for (PrimitiveType type : site.getPossibleTypes()) {
+	private void buildDrivesForSite(Device device, Site site) {
+		Map<SiteType, Set<String>> map = pinsDrivingFabric;
+		for (SiteType type : site.getPossibleTypes()) {
 			synchronized (map) {
 				map.putIfAbsent(type, new HashSet<>());
 			}
@@ -243,14 +243,14 @@ public class ExtendedDeviceInfo implements Serializable {
 	}
 
 	private void buildDrivenByGeneralFabric(Device device) {
-		for (PrimitiveSite site : device.getPrimitiveSites().values()) {
+		for (Site site : device.getPrimitiveSites().values()) {
 			threadPool.execute(() -> buildDrivenByForSite(device, site));
 		}
 	}
 
-	private void buildDrivenByForSite(Device device, PrimitiveSite site) {
-		Map<PrimitiveType, Set<String>> map = pinsDrivenByFabric;
-		for (PrimitiveType type : site.getPossibleTypes()) {
+	private void buildDrivenByForSite(Device device, Site site) {
+		Map<SiteType, Set<String>> map = pinsDrivenByFabric;
+		for (SiteType type : site.getPossibleTypes()) {
 			Set<String> pinSet;
 			synchronized (map) {
 				pinSet = map.computeIfAbsent(type, k -> new HashSet<>());
@@ -326,12 +326,12 @@ public class ExtendedDeviceInfo implements Serializable {
 			tile.setReverseWireConnections(info.reversedWireHashMap.get(tile.getName()));
 		}
 
-		for (PrimitiveType type : info.reversedSubsiteRouting.keySet()) {
+		for (SiteType type : info.reversedSubsiteRouting.keySet()) {
 			SiteTemplate template = device.getSiteTemplate(type);
 			template.setReverseWireConnections(info.reversedSubsiteRouting.get(type));
 		}
 
-		for (PrimitiveType type : info.pinsDrivingFabric.keySet()) {
+		for (SiteType type : info.pinsDrivingFabric.keySet()) {
 			SiteTemplate template = device.getSiteTemplate(type);
 			Set<String> pinsDrivingFabric = info.pinsDrivingFabric.get(type);
 			for (String pinName : pinsDrivingFabric) {
@@ -343,7 +343,7 @@ public class ExtendedDeviceInfo implements Serializable {
 			}
 		}
 
-		for (PrimitiveType type : info.pinsDrivenByFabric.keySet()) {
+		for (SiteType type : info.pinsDrivenByFabric.keySet()) {
 			SiteTemplate template = device.getSiteTemplate(type);
 			Set<String> pinsDrivenByFabric = info.pinsDrivenByFabric.get(type);
 			for (String pinName : pinsDrivenByFabric) {

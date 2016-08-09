@@ -2,7 +2,7 @@ package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.device.BelId;
 import edu.byu.ece.rapidSmith.device.PinDirection;
-import edu.byu.ece.rapidSmith.device.PrimitiveType;
+import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -41,14 +41,14 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		}
 
 		Element cellsEl = doc.getRootElement().getChild("cells");
-		Map<PrimitiveType, Map<String, SiteProperty>> sitePropertiesMap = new HashMap<>();
+		Map<SiteType, Map<String, SiteProperty>> sitePropertiesMap = new HashMap<>();
 		for (Element cellEl : cellsEl.getChildren("cell")) {
 			loadCellFromXml(cellEl, sitePropertiesMap);
 		}
 	}
 
 	private void loadCellFromXml(
-			Element cellEl, Map<PrimitiveType, Map<String, SiteProperty>> sitePropertiesMap
+			Element cellEl, Map<SiteType, Map<String, SiteProperty>> sitePropertiesMap
 	) {
 		String type = cellEl.getChildText("type");
 		SimpleLibraryCell libCell = new SimpleLibraryCell(type);
@@ -92,7 +92,7 @@ public class CellLibrary implements Iterable<LibraryCell> {
 
 	private void loadPossibleBelsFromXml(
 			SimpleLibraryCell libCell, Element cellEl,
-			Map<PrimitiveType, Map<String, SiteProperty>> sitePropertiesMap
+			Map<SiteType, Map<String, SiteProperty>> sitePropertiesMap
 	) {
 		List<BelId> compatibleBels = new ArrayList<>();
 		Map<BelId, Map<String, SiteProperty>> sharedSitePropertiesMap = new HashMap<>();
@@ -100,7 +100,7 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		for (Element belEl : belsEl.getChildren("bel")) {
 			Element id = belEl.getChild("id");
 			BelId belId = new BelId(
-					PrimitiveType.valueOf(id.getChildText("primitive_type")),
+					SiteType.valueOf(id.getChildText("primitive_type")),
 					id.getChildText("name")
 			);
 			compatibleBels.add(belId);

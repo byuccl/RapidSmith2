@@ -33,7 +33,7 @@ package edu.byu.ece.rapidSmith.device;
  * This enum enumerates all of the Primitive types of the following FPGA families: 
  *   kintex7 spartan2 spartan2e spartan3 spartan3a spartan3adsp spartan3e spartan6 virtex virtex2 virtex2p virtex4 virtex5 virtex6 virtex7 virtexe 
  */
-public enum PrimitiveType{
+public enum SiteType{
 	ADC,
 	BLOCKRAM,
 	BSCAN,

@@ -1,6 +1,6 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
-import edu.byu.ece.rapidSmith.device.PrimitiveSite;
+import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.SitePin;
 import edu.byu.ece.rapidSmith.device.Tile;
 import edu.byu.ece.rapidSmith.device.WireConnection;
@@ -35,7 +35,7 @@ public class TileWire implements Wire, Serializable {
 	 * Always returns null.
 	 */
 	@Override
-	public PrimitiveSite getSite() {
+	public Site getSite() {
 		return null;
 	}
 

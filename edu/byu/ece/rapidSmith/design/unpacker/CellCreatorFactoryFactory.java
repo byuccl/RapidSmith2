@@ -3,7 +3,7 @@ package edu.byu.ece.rapidSmith.design.unpacker;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
 import edu.byu.ece.rapidSmith.device.BelId;
-import edu.byu.ece.rapidSmith.device.PrimitiveType;
+import edu.byu.ece.rapidSmith.device.SiteType;
 import org.jdom2.Document;
 import org.jdom2.Element;
 
@@ -25,7 +25,7 @@ public class CellCreatorFactoryFactory {
 		for ( Element belEl : unpackerEl.getChildren("bel")) {
 			Element idEl = belEl.getChild("id");
 			BelId id = new BelId(
-					PrimitiveType.valueOf(idEl.getChildText("primitive_type")),
+					SiteType.valueOf(idEl.getChildText("primitive_type")),
 					idEl.getChildText("name"));
 
 			String mode = belEl.getChildText("mode");
