@@ -1,7 +1,7 @@
 package edu.byu.ece.rapidSmith.device.creation;
 
 import edu.byu.ece.rapidSmith.device.PinDirection;
-import edu.byu.ece.rapidSmith.device.PrimitiveType;
+import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.primitiveDefs.*;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -161,7 +161,7 @@ public class PrimitiveDefsCorrector {
 
 	}
 
-	private static Element getPrimitiveTypeEl(Document deviceInfo, PrimitiveType type) {
+	private static Element getPrimitiveTypeEl(Document deviceInfo, SiteType type) {
 		Element primitiveTypesEl = deviceInfo.getRootElement().getChild("primitive_types");
 		for (Element primitiveTypeEl : primitiveTypesEl.getChildren("primitive_type")) {
 			if (primitiveTypeEl.getChildText("name").equals(type.name()))

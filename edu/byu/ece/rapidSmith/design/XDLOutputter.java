@@ -1,6 +1,6 @@
 package edu.byu.ece.rapidSmith.design;
 
-import edu.byu.ece.rapidSmith.device.PrimitiveType;
+import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.util.FileTools;
 
 import java.io.IOException;
@@ -241,7 +241,7 @@ public class XDLOutputter {
 			int bramCount = 0;
 			int dspCount = 0;
 			for (Instance instance : design.getInstances()) {
-				PrimitiveType type = instance.getType();
+				SiteType type = instance.getType();
 				if (Design.sliceTypes.contains(type)) {
 					sliceCount++;
 				} else if (Design.dspTypes.contains(type)) {
@@ -270,7 +270,7 @@ public class XDLOutputter {
 			out.append("# =======================================================" + nl);
 			out.append("# MACRO SUMMARY" + nl);
 			out.append("# Number of Module Insts: " + Integer.toString(mod.getInstances().size()) + nl);
-			Map<PrimitiveType, Integer> instTypeCount = new HashMap<>();
+			Map<SiteType, Integer> instTypeCount = new HashMap<>();
 			for (Instance inst : mod.getInstances()) {
 				Integer count = instTypeCount.get(inst.getType());
 				if (count == null) {
@@ -281,9 +281,9 @@ public class XDLOutputter {
 				}
 			}
 
-			List<PrimitiveType> types = new ArrayList<>(instTypeCount.keySet());
+			List<SiteType> types = new ArrayList<>(instTypeCount.keySet());
 			Collections.sort(types, (o1, o2) -> o1.name().compareTo(o2.name()));
-			for (PrimitiveType type : types) {
+			for (SiteType type : types) {
 				out.append("#   Number of " + type.toString() + "s: " + Integer.toString(instTypeCount.get(type)) + nl);
 			}
 			out.append("# Number of Module Ports: " + mod.getPorts().size() + nl);

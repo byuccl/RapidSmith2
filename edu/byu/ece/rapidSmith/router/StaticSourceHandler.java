@@ -791,7 +791,7 @@ public class StaticSourceHandler{
 							ps.useSLICE.add(ss);
 							continue;
 						}
-					}else if(ss.pin.getInstance().getPrimitiveSite().getType().equals(PrimitiveType.DSP48E) && ss.pin.getName().contains("CEP")){
+					}else if(ss.pin.getInstance().getPrimitiveSite().getType().equals(SiteType.DSP48E) && ss.pin.getName().contains("CEP")){
 						Node nn = new Node(inst.getTile(), we.getWireEnum("CTRL1"), null, 0);
 						if(!addReservedGNDVCCNode(nn, ss.pin)){
 							// we need to use a SLICE 
@@ -1012,8 +1012,8 @@ public class StaticSourceHandler{
 			}
 			currentTile = dev.getTile(row, column);
 			if(currentTile != null && currentTile.getPrimitiveSites() != null){
-				for(PrimitiveSite site : currentTile.getPrimitiveSites()){
-					if(site.getType().equals(PrimitiveType.SLICEL) || site.getType().equals(PrimitiveType.SLICEM)){
+				for(Site site : currentTile.getPrimitiveSites()){
+					if(site.getType().equals(SiteType.SLICEL) || site.getType().equals(SiteType.SLICEM)){
 						if(!router.design.getUsedPrimitiveSites().contains(site)){
 							Instance returnMe = new Instance();
 							HashMap<String, Attribute> attributeMap = new HashMap<>();
@@ -1022,7 +1022,7 @@ public class StaticSourceHandler{
 							attributeMap.put(srcTypeString, new Attribute(srcTypeString,"",slicePin));
 							
 							returnMe.place(site);
-							returnMe.setType(PrimitiveType.SLICEL);
+							returnMe.setType(SiteType.SLICEL);
 							returnMe.setAttributes(attributeMap);
 							returnMe.setName("XDL_DUMMY_" + returnMe.getTile() + "_" + site.getName());
 							currStaticSourcePin = null;
@@ -1079,7 +1079,7 @@ public class StaticSourceHandler{
 		else{
 			currInst = new Instance();
 			currInst.place(router.dev.getPrimitiveSite("TIEOFF" + tileSuffix));
-			currInst.setType(PrimitiveType.TIEOFF);
+			currInst.setType(SiteType.TIEOFF);
 			currInst.setName(instName);
 			currInst.addAttribute(noUserLogicAttr);
 			if(net.getType().equals(NetType.VCC)){

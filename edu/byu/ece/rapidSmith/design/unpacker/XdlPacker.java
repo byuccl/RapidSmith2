@@ -68,7 +68,7 @@ public class XdlPacker {
 			Map<BelId, Map<String, String>> valueMap = new HashMap<>();
 			for (Element belEl : cellEl.getChildren("bel")) {
 				Element idEl = belEl.getChild("id");
-				BelId belId = new BelId(PrimitiveType.valueOf(idEl.getChildText("primitive_type")),
+				BelId belId = new BelId(SiteType.valueOf(idEl.getChildText("primitive_type")),
 						idEl.getChildText("name"));
 				Map<String, String> attrsMap = new HashMap<>();
 				Map<String, String> valueUpdateMap = new HashMap<>();
@@ -110,11 +110,11 @@ public class XdlPacker {
 	}
 
 	private void setPrimitiveTypes(CellDesign design) {
-		for (PrimitiveSite site : design.getUsedSites()) {
-			PrimitiveType type = null;
+		for (Site site : design.getUsedSites()) {
+			SiteType type = null;
 			for (Cell cell : design.getCellsAtSite(site)) {
 				Bel bel = cell.getAnchor();
-				PrimitiveType belType = bel.getSite().getType();
+				SiteType belType = bel.getSite().getType();
 				if (type == null) {
 					type = belType;
 					site.setType(type);
@@ -128,7 +128,7 @@ public class XdlPacker {
 	private void buildInstances(CellDesign cellDesign) {
 		// Since instance map to primitive sites, we'll build the instance by
 		// collecting all the BELs at each site
-		for (PrimitiveSite site : cellDesign.getUsedSites()) {
+		for (Site site : cellDesign.getUsedSites()) {
 			Instance inst = new Instance();
 			// guaranteed to be unique but it will probably not be identical to
 			// the original XDL
@@ -289,7 +289,7 @@ public class XdlPacker {
 
 	// find the site pin sourcing the net
 	private NetBooleanPair traverseSourceSite(CellNet cellNet, Wire sourceWire) {
-		PrimitiveSite site = sourceWire.getSite();
+		Site site = sourceWire.getSite();
 		Instance inst = packedDesign.getInstanceAtPrimitiveSite(site);
 		int numNets = 0;
 		NetBooleanPair preferredNet = null;
@@ -364,7 +364,7 @@ public class XdlPacker {
 		}
 	}
 
-	private Net connectToSitePin(CellNet cellNet, PrimitiveSite site,
+	private Net connectToSitePin(CellNet cellNet, Site site,
 			Instance inst, SitePin sitePin)
 	{
 		Net net = new Net();
@@ -447,12 +447,12 @@ public class XdlPacker {
 	}
 
 	private static boolean isSliceCarrySource(SitePin sourcePin) {
-		PrimitiveSite site = sourcePin.getSite();
+		Site site = sourcePin.getSite();
 		FamilyType family = site.getTile().getDevice().getFamilyType();
 		switch (family) {
 			case VIRTEX6:
-				PrimitiveType siteType = site.getType();
-				if (siteType == PrimitiveType.SLICEL || siteType == PrimitiveType.SLICEM) {
+				SiteType siteType = site.getType();
+				if (siteType == SiteType.SLICEL || siteType == SiteType.SLICEM) {
 					return sourcePin.getName().equals("COUT");
 				}
 		}
@@ -466,7 +466,7 @@ public class XdlPacker {
 	private boolean traverseSinkSite(Wire sourceWire) {
 		wiresUsedInRoute.add(sourceWire);
 
-		PrimitiveSite site = sourceWire.getSite();
+		Site site = sourceWire.getSite();
 		// find the instance of this site
 		Instance inst = packedDesign.getInstanceAtPrimitiveSite(site);
 		assert inst != null;
