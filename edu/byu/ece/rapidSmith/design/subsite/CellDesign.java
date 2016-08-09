@@ -2,7 +2,7 @@ package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.design.AbstractDesign;
 import edu.byu.ece.rapidSmith.device.Bel;
-import edu.byu.ece.rapidSmith.device.PrimitiveSite;
+import edu.byu.ece.rapidSmith.device.Site;
 
 import java.util.*;
 
@@ -23,13 +23,13 @@ public class CellDesign extends AbstractDesign {
 	/** This is a list of all the cells in the design */
 	private Map<String, Cell> cellMap;
 	/** A map used to keep track of all used primitive sites used by the design */
-	private Map<PrimitiveSite, Map<Bel, Cell>> placementMap;
+	private Map<Site, Map<Bel, Cell>> placementMap;
 	/** This is a list of all the nets in the design */
 	private Map<String, CellNet> netMap;
 	/** Map of properties of this design. */
 	private Map<Object, Property> propertyMap;
 
-	private HashMap<PrimitiveSite, HashSet<Integer>> usedSitePipsAtSite;
+	private HashMap<Site, HashSet<Integer>> usedSitePipsAtSite;
 
 	/**
 	 * Constructor which initializes all member data structures. Sets name and
@@ -375,7 +375,7 @@ public class CellDesign extends AbstractDesign {
 	 * @param site the site of the desired cells
 	 * @return the instance at site, or null if the primitive site is unoccupied
 	 */
-	public Collection<Cell> getCellsAtSite(PrimitiveSite site) {
+	public Collection<Cell> getCellsAtSite(Site site) {
 		Objects.requireNonNull(site);
 
 		Map<Bel, Cell> sitePlacementMap = placementMap.get(site);
@@ -404,14 +404,14 @@ public class CellDesign extends AbstractDesign {
 	 * @param site the site to test
 	 * @return true if this design uses any BELs in site, else false
 	 */
-	public boolean isSiteUsed(PrimitiveSite site) {
+	public boolean isSiteUsed(Site site) {
 		Objects.requireNonNull(site);
 
 		Map<Bel, Cell> sitePlacementMap = placementMap.get(site);
 		return sitePlacementMap != null && !sitePlacementMap.isEmpty();
 	}
 
-	public Collection<PrimitiveSite> getUsedSites() {
+	public Collection<Site> getUsedSites() {
 		return placementMap.keySet();
 	}
 
@@ -484,7 +484,7 @@ public class CellDesign extends AbstractDesign {
 		assert cell.getDesign() == this;
 		assert cell.isPlaced();
 
-		PrimitiveSite site = cell.getAnchorSite();
+		Site site = cell.getAnchorSite();
 		Map<Bel, Cell> sitePlacementMap = placementMap.get(site);
 		sitePlacementMap.remove(cell.getAnchor());
 		if (sitePlacementMap.size() == 0)
@@ -504,11 +504,11 @@ public class CellDesign extends AbstractDesign {
 		}
 	}
 
-	public void setUsedSitePipsAtSite(PrimitiveSite ps, HashSet<Integer> usedWires) {
+	public void setUsedSitePipsAtSite(Site ps, HashSet<Integer> usedWires) {
 		this.usedSitePipsAtSite.put(ps, usedWires);
 	}
 
-	public  HashSet<Integer> getUsedSitePipsAtSite(PrimitiveSite ps) {
+	public  HashSet<Integer> getUsedSitePipsAtSite(Site ps) {
 		return this.usedSitePipsAtSite.get(ps);
 	}
 

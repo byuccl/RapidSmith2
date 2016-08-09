@@ -12,17 +12,17 @@ import java.util.Objects;
  *  are created on demand through different getPin methods in the
  *  PrimitiveSite class.
  *
- *  @see edu.byu.ece.rapidSmith.device.PrimitiveSite
+ *  @see edu.byu.ece.rapidSmith.device.Site
  */
 public final class SitePin implements Serializable {
 	// The site this pin resides on
-	private PrimitiveSite site;
+	private Site site;
 	// The template that describes this pin
 	private SitePinTemplate template;
 	// the tile wire that connects to this pin
 	private int externalWire;
 
-	SitePin(PrimitiveSite site, SitePinTemplate template, int externalWire) {
+	SitePin(Site site, SitePinTemplate template, int externalWire) {
 		this.site = site;
 		this.template = template;
 		this.externalWire = externalWire;
@@ -42,7 +42,7 @@ public final class SitePin implements Serializable {
 	 * site's type may have been updated since this pin was created.
 	 * @return the PrimitiveType of the site this pin was created for
 	 */
-	public PrimitiveType getPrimitiveType() {
+	public SiteType getPrimitiveType() {
 		return template.getPrimitiveType();
 	}
 
@@ -50,7 +50,7 @@ public final class SitePin implements Serializable {
 	 * Returns the site this pin exists on.
 	 * @return the site this pin exists on
 	 */
-	public PrimitiveSite getSite() {
+	public Site getSite() {
 		return site;
 	}
 

@@ -1,4 +1,4 @@
-package edu.byu.ece.rapidSmith.design.subsite;
+package edu.byu.ece.rapidSmith.interfaces.vivado;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -43,8 +43,8 @@ import edu.byu.ece.rapidSmith.design.subsite.Wire;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.PrimitiveSite;
-import edu.byu.ece.rapidSmith.device.PrimitiveType;
+import edu.byu.ece.rapidSmith.device.Site;
+import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.device.SitePin;
 import edu.byu.ece.rapidSmith.device.Tile;
 import edu.byu.ece.rapidSmith.device.WireConnection;
@@ -300,13 +300,13 @@ public final class VivadoInterface {
 				Cell c = design.getCell(cname);
 				cellsInOrder.add(c);
 				
-				PrimitiveSite ps = device.getPrimitiveSite(sname);
+				Site ps = device.getPrimitiveSite(sname);
 				
 				if (ps == null)
 					MessageGenerator.briefError("[Warning] Site: " + sname + " not found, skipping placement of " + cname);
 				else {
 					String stype = toks[3]; 
-					ps.setType(PrimitiveType.valueOf(stype));
+					ps.setType(SiteType.valueOf(stype));
 
 					String bname = toks[4];
 					Bel b = ps.getBel(bname);
@@ -375,7 +375,7 @@ public final class VivadoInterface {
 			
 			//handle intrasite routing
 			if(toks[0].equals("SITE_PIPS")) {			
-				PrimitiveSite ps = device.getPrimitiveSite(toks[1]);
+				Site ps = device.getPrimitiveSite(toks[1]);
 				
 				if(ps == null) {
 					MessageGenerator.briefError("[Warning] Unable to find Primitive Site \"" + toks[1] + "\" in current device. Cannot create intrasite routing structure.\n"
@@ -437,7 +437,7 @@ public final class VivadoInterface {
 	/*
 	 * Read the used site pips for the given primitive site, and store the information in a HashSet
 	 */
-	private static HashSet<Integer> readUsedSitePips(PrimitiveSite ps, String[] toks, LineNumberReader br, String fname) {
+	private static HashSet<Integer> readUsedSitePips(Site ps, String[] toks, LineNumberReader br, String fname) {
 		HashSet<Integer> usedSitePips = new HashSet<Integer>();
 		
 		String namePrefix = "intrasite:" + ps.getType() + "/";
@@ -747,7 +747,7 @@ public final class VivadoInterface {
 		//TODO: Assuming that the logical design has not been modified
 		for(Cell cell : cellsInOrder) {
 			if(cell.isPlaced()) {
-				PrimitiveSite ps = cell.getAnchorSite();
+				Site ps = cell.getAnchorSite();
 				Bel b = cell.getAnchor();
 				String cellname = cell.getName();
 				
@@ -960,7 +960,7 @@ public final class VivadoInterface {
 	 * TODO: Somehow incorporate the internal nets into each primitive site
 	 */
 	@SuppressWarnings("unused")
-	private static void createPrimitiveSiteRouteTrees(PrimitiveSite ps) {
+	private static void createPrimitiveSiteRouteTrees(Site ps) {
 		pinToRT = new HashMap<String, RouteTree>();	
 		for(Bel b: ps.getBels()) {
 			for(BelPin bp: b.getSources()) {

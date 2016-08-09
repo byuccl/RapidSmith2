@@ -32,7 +32,7 @@ import java.util.Objects;
  */
 public class PIPRouteThrough implements Serializable{
 	/** The type of primitive where a route through exists */
-	private PrimitiveType type;
+	private SiteType type;
 	/** The input pin of the route through */
 	private String inPin;
 	/** The output pin of the route through */
@@ -44,7 +44,7 @@ public class PIPRouteThrough implements Serializable{
 	 * @param inPin The input wire.
 	 * @param outPin The output wire.
 	 */
-	public PIPRouteThrough(PrimitiveType type, String inPin, String outPin){
+	public PIPRouteThrough(SiteType type, String inPin, String outPin){
 		this.type = type;
 		this.inPin = inPin;
 		this.outPin = outPin;
@@ -80,7 +80,7 @@ public class PIPRouteThrough implements Serializable{
 	 * Returns the primitive type where this route through is found.
 	 * @return the primitive type of this route through.
 	 */
-	public PrimitiveType getType(){
+	public SiteType getType(){
 		return type;
 	}
 
@@ -88,7 +88,7 @@ public class PIPRouteThrough implements Serializable{
 	 * Sets the type of primitive for this route through.
 	 * @param type the type to set.
 	 */
-	public void setType(PrimitiveType type){
+	public void setType(SiteType type){
 		this.type = type;
 	}
 

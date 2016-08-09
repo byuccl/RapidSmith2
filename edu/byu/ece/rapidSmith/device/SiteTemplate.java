@@ -12,11 +12,11 @@ import java.util.*;
  */
 public final class SiteTemplate implements Serializable {
 	// The type of this site template
-	private PrimitiveType type;
+	private SiteType type;
 	// The templates for the BELs in this site template
 	private Map<String, BelTemplate> belTemplates;
 	// Primitive types that can be placed on sites of this type
-	private PrimitiveType[] compatibleTypes;
+	private SiteType[] compatibleTypes;
 	// The intrasite routing graph structure
 	private WireHashMap routing;
 	private WireHashMap reverseWireConnections;
@@ -31,11 +31,11 @@ public final class SiteTemplate implements Serializable {
 	// Map of XDL attributes that should be created for each PIP
 	private Map<Integer, Map<Integer, Attribute>> pipAttributes;
 
-	public PrimitiveType getType() {
+	public SiteType getType() {
 		return type;
 	}
 
-	public void setType(PrimitiveType type) {
+	public void setType(SiteType type) {
 		this.type = type;
 	}
 
@@ -47,11 +47,11 @@ public final class SiteTemplate implements Serializable {
 		this.belTemplates = belTemplates;
 	}
 
-	public PrimitiveType[] getCompatibleTypes() {
+	public SiteType[] getCompatibleTypes() {
 		return compatibleTypes;
 	}
 
-	public void setCompatibleTypes(PrimitiveType[] compatibleTypes) {
+	public void setCompatibleTypes(SiteType[] compatibleTypes) {
 		this.compatibleTypes = compatibleTypes;
 	}
 
@@ -171,9 +171,9 @@ public final class SiteTemplate implements Serializable {
 
 	// for hessian compression
 	private static class SiteTemplateReplace implements Serializable  {
-		private PrimitiveType type;
+		private SiteType type;
 		private Collection<BelTemplate> belTemplates;
-		private PrimitiveType[] compatibleTypes;
+		private SiteType[] compatibleTypes;
 		private WireHashMap routing;
 		private Collection<SitePinTemplate> sources;
 		private Collection<SitePinTemplate> sinks;

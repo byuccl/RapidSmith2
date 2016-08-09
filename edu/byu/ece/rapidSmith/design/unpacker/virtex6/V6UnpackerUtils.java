@@ -5,7 +5,7 @@ import edu.byu.ece.rapidSmith.design.Instance;
 import edu.byu.ece.rapidSmith.design.Net;
 import edu.byu.ece.rapidSmith.design.Pin;
 import edu.byu.ece.rapidSmith.design.unpacker.UnpackerUtils;
-import edu.byu.ece.rapidSmith.device.PrimitiveType;
+import edu.byu.ece.rapidSmith.device.SiteType;
 
 /**
  *

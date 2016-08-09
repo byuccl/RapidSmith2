@@ -190,12 +190,12 @@ public class ModuleInstance{
 	 * location.
 	 * @return A list of valid anchor sites for the module instance to be placed.
 	 */
-	public ArrayList<PrimitiveSite> getAllValidPlacements(){
-		ArrayList<PrimitiveSite> validSites = new ArrayList<PrimitiveSite>();
-		PrimitiveSite originalSite = getAnchor().getPrimitiveSite();
+	public ArrayList<Site> getAllValidPlacements(){
+		ArrayList<Site> validSites = new ArrayList<Site>();
+		Site originalSite = getAnchor().getPrimitiveSite();
 		Design design = getDesign();
-		PrimitiveSite[] sites = design.getDevice().getAllCompatibleSites(getAnchor().getType());
-		for(PrimitiveSite newAnchorSite : sites){
+		Site[] sites = design.getDevice().getAllCompatibleSites(getAnchor().getType());
+		for(Site newAnchorSite : sites){
 			if(place(newAnchorSite, design.getDevice())){
 				validSites.add(newAnchorSite);
 				unplace();
@@ -216,16 +216,16 @@ public class ModuleInstance{
 	 * @param dev The device on which the module instance is being placed.
 	 * @return True if placement was successful, false otherwise.
 	 */
-	public boolean place(PrimitiveSite newAnchorSite, Device dev){
+	public boolean place(Site newAnchorSite, Device dev){
 		// Check if parameters are null
 		if(newAnchorSite == null || dev == null){
 			return false;
 		}
 		
 		// Do some error checking on the newAnchorSite
-		PrimitiveSite p = module.getAnchor().getPrimitiveSite();
+		Site p = module.getAnchor().getPrimitiveSite();
 		Tile t = newAnchorSite.getTile();
-		PrimitiveSite newValidSite = Device.getCorrespondingPrimitiveSite(p, t);
+		Site newValidSite = Device.getCorrespondingPrimitiveSite(p, t);
 		if(!newAnchorSite.equals(newValidSite)){
 			//MessageGenerator.briefError("New anchor site (" + newAnchorSite.getName() +
 			//		") is incorrect.  Should be " + newValidSite.getName());
@@ -234,16 +234,16 @@ public class ModuleInstance{
 		}
 		
 		// save original placement in case new placement is invalid
-		HashMap<Instance, PrimitiveSite> originalSites;
-		originalSites = isPlaced() ? new HashMap<Instance, PrimitiveSite>() : null;
+		HashMap<Instance, Site> originalSites;
+		originalSites = isPlaced() ? new HashMap<Instance, Site>() : null;
 
 		//=======================================================//
 		/* Place instances at new location                       */
 		//=======================================================//
 		for(Instance inst : instances){
-			PrimitiveSite templateSite = inst.getModuleTemplateInstance().getPrimitiveSite();
+			Site templateSite = inst.getModuleTemplateInstance().getPrimitiveSite();
 			Tile newTile = module.getCorrespondingTile(templateSite.getTile(), newAnchorSite.getTile(), dev);
-			PrimitiveSite newSite = Device.getCorrespondingPrimitiveSite(templateSite, newTile);
+			Site newSite = Device.getCorrespondingPrimitiveSite(templateSite, newTile);
 
 			if(newSite == null){
 				//MessageGenerator.briefError("ERROR: No matching primitive site found." +

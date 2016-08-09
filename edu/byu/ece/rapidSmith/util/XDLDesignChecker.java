@@ -31,7 +31,7 @@ import edu.byu.ece.rapidSmith.design.Design;
 import edu.byu.ece.rapidSmith.design.Instance;
 import edu.byu.ece.rapidSmith.design.Net;
 import edu.byu.ece.rapidSmith.design.PIP;
-import edu.byu.ece.rapidSmith.device.PrimitiveSite;
+import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.router.Node;
 
 /**
@@ -147,7 +147,7 @@ public class XDLDesignChecker{
 		
 		// Check for unique placement of primitives
 		MessageGenerator.printHeader("CHECKING FOR UNIQUE PRIMITIVE PLACEMENTS ... ");
-		HashMap<PrimitiveSite, Instance> usedSites = new HashMap<PrimitiveSite, Instance>();
+		HashMap<Site, Instance> usedSites = new HashMap<Site, Instance>();
 		for(Instance inst : design.getInstances()){
 			if(inst.getPrimitiveSite() == null){
 				System.out.println("Warning: " + inst.getName() +" is unplaced.");

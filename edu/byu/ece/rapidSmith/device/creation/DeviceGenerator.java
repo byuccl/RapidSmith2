@@ -87,7 +87,7 @@ public final class DeviceGenerator {
 	private Map<Tile, Map<Integer, Integer>> wireSourcesCount;
 
 	private HashPool<Map<String, Integer>> externalWiresPool;
-	private HashPool<Map<PrimitiveType, Map<String, Integer>>> externalWiresMapPool;
+	private HashPool<Map<SiteType, Map<String, Integer>>> externalWiresMapPool;
 	private HashPool<AlternativeTypes> alternativeTypesPool;
 
 	/**
@@ -191,7 +191,7 @@ public final class DeviceGenerator {
 		device.setIOBTypes(new HashSet<>(4));
 
 		for (Element ptEl : rootElement.getChild("primitive_types").getChildren("primitive_type")) {
-			PrimitiveType type = PrimitiveType.valueOf(ptEl.getChildText("name"));
+			SiteType type = SiteType.valueOf(ptEl.getChildText("name"));
 			if (ptEl.getChild("is_slice") != null)
 				device.getSliceTypes().add(type);
 			if (ptEl.getChild("is_bram") != null)
@@ -209,8 +209,8 @@ public final class DeviceGenerator {
 	 * Creates the templates for the primitive sites with information from the
 	 * primitive defs and device information file.
 	 */
-	private Map<PrimitiveType, SiteTemplate> createSiteTemplates() {
-		Map<PrimitiveType, SiteTemplate> siteTemplates = new HashMap<>();
+	private Map<SiteType, SiteTemplate> createSiteTemplates() {
+		Map<SiteType, SiteTemplate> siteTemplates = new HashMap<>();
 
 		// Create a template for each primitive type
 		for (PrimitiveDef def : device.getPrimitiveDefs()) {
@@ -224,11 +224,11 @@ public final class DeviceGenerator {
 
 			Element compatTypesEl = ptEl.getChild("compatible_types");
 			if (compatTypesEl != null) {
-				List<PrimitiveType> compatibleTypes = compatTypesEl.getChildren("compatible_type").stream()
-						.map(compatTypeEl -> PrimitiveType.valueOf(compatTypeEl.getText()))
+				List<SiteType> compatibleTypes = compatTypesEl.getChildren("compatible_type").stream()
+						.map(compatTypeEl -> SiteType.valueOf(compatTypeEl.getText()))
 						.collect(Collectors.toList());
 				template.setCompatibleTypes(compatibleTypes.toArray(
-						new PrimitiveType[compatibleTypes.size()]));
+						new SiteType[compatibleTypes.size()]));
 			}
 
 			siteTemplates.put(def.getType(), template);
@@ -504,7 +504,7 @@ public final class DeviceGenerator {
 	 * @param type the type of the element to retrieve
 	 * @return the JDOM element for the requested primitive type
 	 */
-	private Element getPrimitiveTypeEl(PrimitiveType type) {
+	private Element getPrimitiveTypeEl(SiteType type) {
 		Element primitiveTypesEl = familyInfo.getRootElement().getChild("primitive_types");
 		for (Element primitiveTypeEl : primitiveTypesEl.getChildren("primitive_type")) {
 			if (primitiveTypeEl.getChild("name").getText().equals(type.name()))
@@ -813,7 +813,7 @@ public final class DeviceGenerator {
 	}
 
 	private static String getIntrasiteWireName(
-			PrimitiveType type, String element, String pinName) {
+			SiteType type, String element, String pinName) {
 		return "intrasite:" + type.name() + "/" + element + "." + pinName;
 	}
 
@@ -824,7 +824,7 @@ public final class DeviceGenerator {
 		private Set<String> inpinSet = new HashSet<>(PIN_SET_CAPACITY);
 		private Set<String> outpinSet = new HashSet<>(PIN_SET_CAPACITY);
 
-		private PrimitiveType currType;
+		private SiteType currType;
 		private String currElement;
 
 		@Override
@@ -857,7 +857,7 @@ public final class DeviceGenerator {
 
 		@Override
 		protected void enterPrimitiveDef(List<String> tokens) {
-			currType = PrimitiveType.valueOf(tokens.get(1));
+			currType = SiteType.valueOf(tokens.get(1));
 		}
 
 		@Override
@@ -906,7 +906,7 @@ public final class DeviceGenerator {
 	}
 
 	private final class TileAndSiteGeneratorListener extends XDLRCParserListener {
-		private ArrayList<PrimitiveSite> tileSites;
+		private ArrayList<Site> tileSites;
 
 		private Tile currTile;
 
@@ -937,25 +937,25 @@ public final class DeviceGenerator {
 
 		@Override
 		protected void enterPrimitiveSite(List<String> tokens) {
-			PrimitiveSite site = new PrimitiveSite();
+			Site site = new Site();
 			site.setTile(currTile);
 			site.setName(tokens.get(1));
 			site.setIndex(tileSites.size());
 			site.setBondedType(BondedType.valueOf(tokens.get(3).toUpperCase()));
 
-			List<PrimitiveType> alternatives = new ArrayList<>();
-			PrimitiveType type = PrimitiveType.valueOf(tokens.get(2));
+			List<SiteType> alternatives = new ArrayList<>();
+			SiteType type = SiteType.valueOf(tokens.get(2));
 			alternatives.add(type);
 
 			Element ptEl = getPrimitiveTypeEl(type);
 			Element alternativesEl = ptEl.getChild("alternatives");
 			if (alternativesEl != null) {
 				alternatives.addAll(alternativesEl.getChildren("alternative").stream()
-						.map(alternativeEl -> PrimitiveType.valueOf(alternativeEl.getChildText("name")))
+						.map(alternativeEl -> SiteType.valueOf(alternativeEl.getChildText("name")))
 						.collect(Collectors.toList()));
 			}
 
-			PrimitiveType[] arr = alternatives.toArray(new PrimitiveType[alternatives.size()]);
+			SiteType[] arr = alternatives.toArray(new SiteType[alternatives.size()]);
 			arr = alternativeTypesPool.add(new AlternativeTypes(arr)).types;
 			site.setPossibleTypes(arr);
 
@@ -967,7 +967,7 @@ public final class DeviceGenerator {
 			// Create an array of primitive sites (more compact than ArrayList)
 			if (tileSites.size() > 0) {
 				currTile.setPrimitiveSites(tileSites.toArray(
-						new PrimitiveSite[tileSites.size()]));
+						new Site[tileSites.size()]));
 			} else {
 				currTile.setPrimitiveSites(null);
 			}
@@ -1043,7 +1043,7 @@ public final class DeviceGenerator {
 				endWireName = tokens.get(4);
 				Integer endWireEnum = we.getWireEnum(endWireName);
 				wc = wirePool.add(new WireConnection(endWireEnum, 0, 0, true));
-				PrimitiveType type = PrimitiveType.valueOf(tokens.get(6).substring(0, tokens.get(6).length() - 2));
+				SiteType type = SiteType.valueOf(tokens.get(6).substring(0, tokens.get(6).length() - 2));
 
 				String[] parts = tokens.get(5).split("-");
 				String inPin = parts[1];
@@ -1059,7 +1059,7 @@ public final class DeviceGenerator {
 
 	private final class SourceAndSinkListener extends XDLRCParserListener {
 		private Tile currTile;
-		private PrimitiveSite currSite;
+		private Site currSite;
 		private Set<Integer> tileSources;
 		private Map<String, Integer> externalPinWires;
 
@@ -1113,14 +1113,14 @@ public final class DeviceGenerator {
 
 		@Override
 		protected void exitPrimitiveSite(List<String> tokens) {
-			Map<PrimitiveType, Map<String, Integer>> externalPinWiresMap =
+			Map<SiteType, Map<String, Integer>> externalPinWiresMap =
 					new HashMap<>();
 			externalPinWiresMap.put(currSite.getPossibleTypes()[0], externalWiresPool.add(externalPinWires));
 
-			PrimitiveType[] alternativeTypes = currSite.getPossibleTypes();
+			SiteType[] alternativeTypes = currSite.getPossibleTypes();
 			for (int i = 1; i < alternativeTypes.length; i++) {
 				Map<String, Integer> altExternalPinWires = new HashMap<>();
-				PrimitiveType altType = alternativeTypes[i];
+				SiteType altType = alternativeTypes[i];
 				SiteTemplate site = device.getSiteTemplate(altType);
 				for (String sitePin : site.getSources().keySet()) {
 					Integer wire = getExternalWireForSitePin(altType, sitePin);
@@ -1144,7 +1144,7 @@ public final class DeviceGenerator {
 
 		}
 
-		private Integer getExternalWireForSitePin(PrimitiveType altType, String sitePin) {
+		private Integer getExternalWireForSitePin(SiteType altType, String sitePin) {
 			Element pinEl = getPinmapElement(altType, sitePin);
 
 			String connectedPin = sitePin;
@@ -1155,7 +1155,7 @@ public final class DeviceGenerator {
 			return externalPinWires.get(connectedPin);
 		}
 
-		private Element getPinmapElement(PrimitiveType altType, String sitePin) {
+		private Element getPinmapElement(SiteType altType, String sitePin) {
 			Element ptEl = getPrimitiveTypeEl(currSite.getPossibleTypes()[0]);
 			Element alternativesEl = ptEl.getChild("alternatives");
 			Element altEl = null;
@@ -1195,7 +1195,7 @@ public final class DeviceGenerator {
 		protected void enterPrimitiveDef(List<String> tokens) {
 			currDef = new PrimitiveDef();
 			String name = tokens.get(1).toUpperCase();
-			currDef.setType(PrimitiveType.valueOf(name));
+			currDef.setType(SiteType.valueOf(name));
 
 			pins = new ArrayList<>(Integer.parseInt(tokens.get(2)));
 			elements = new ArrayList<>(Integer.parseInt(tokens.get(3)));
