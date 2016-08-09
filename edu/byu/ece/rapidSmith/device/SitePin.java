@@ -1,8 +1,5 @@
 package edu.byu.ece.rapidSmith.device;
 
-import edu.byu.ece.rapidSmith.design.subsite.SiteWire;
-import edu.byu.ece.rapidSmith.design.subsite.TileWire;
-
 import java.io.Serializable;
 import java.util.Objects;
 
