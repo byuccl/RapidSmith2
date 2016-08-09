@@ -23,7 +23,6 @@ package edu.byu.ece.rapidSmith.device;
 import edu.byu.ece.rapidSmith.RapidSmithEnv;
 import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.design.Pin;
-import edu.byu.ece.rapidSmith.design.subsite.TileWire;
 import edu.byu.ece.rapidSmith.device.helper.HashPool;
 import edu.byu.ece.rapidSmith.primitiveDefs.PrimitiveDefList;
 import edu.byu.ece.rapidSmith.router.Node;
