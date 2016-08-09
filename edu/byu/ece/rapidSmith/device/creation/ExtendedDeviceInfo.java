@@ -4,8 +4,6 @@ import com.caucho.hessian.io.Hessian2Input;
 import com.caucho.hessian.io.Hessian2Output;
 import edu.byu.ece.rapidSmith.RapidSmithEnv;
 import edu.byu.ece.rapidSmith.design.subsite.Connection;
-import edu.byu.ece.rapidSmith.design.subsite.TileWire;
-import edu.byu.ece.rapidSmith.design.subsite.Wire;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.device.helper.HashPool;
 import edu.byu.ece.rapidSmith.device.helper.WireArray;

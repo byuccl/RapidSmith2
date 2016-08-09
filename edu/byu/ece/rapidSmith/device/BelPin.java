@@ -1,7 +1,5 @@
 package edu.byu.ece.rapidSmith.device;
 
-import edu.byu.ece.rapidSmith.design.subsite.SiteWire;
-
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;

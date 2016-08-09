@@ -1,6 +1,7 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.design.PIP;
+import edu.byu.ece.rapidSmith.device.Wire;
 
 import java.util.*;
 

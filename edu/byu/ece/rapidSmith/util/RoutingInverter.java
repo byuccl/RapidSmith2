@@ -1,6 +1,5 @@
 package edu.byu.ece.rapidSmith.util;
 
-import edu.byu.ece.rapidSmith.design.subsite.Wire;
 import edu.byu.ece.rapidSmith.device.*;
 
 import java.util.HashMap;
