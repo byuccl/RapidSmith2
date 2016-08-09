@@ -1,4 +1,4 @@
-package edu.byu.ece.rapidSmith.design.subsite;
+package edu.byu.ece.rapidSmith.interfaces.vivado;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
