@@ -1,5 +1,6 @@
-package edu.byu.ece.rapidSmith.design.subsite;
+package edu.byu.ece.rapidSmith.device;
 
+import edu.byu.ece.rapidSmith.design.subsite.Connection;
 import edu.byu.ece.rapidSmith.device.*;
 
 import java.io.Serializable;

@@ -1,11 +1,10 @@
-package edu.byu.ece.rapidSmith.design.subsite;
-
-import edu.byu.ece.rapidSmith.device.Site;
-import edu.byu.ece.rapidSmith.device.Tile;
+package edu.byu.ece.rapidSmith.device;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.stream.Stream;
+
+import edu.byu.ece.rapidSmith.design.subsite.Connection;
 
 /**
  * Wires represent a piece of metal on a device.  Wires are composed of two
