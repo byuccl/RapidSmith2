@@ -198,7 +198,7 @@ public class XDLRCOutputter {
 				(tile.getPrimitiveSites() == null ? "0" : tile.getPrimitiveSites().length) + nl);
 		int numPinWires = 0;
 		if (tile.getPrimitiveSites() != null) {
-			for (PrimitiveSite site : tile.getPrimitiveSites()) {
+			for (Site site : tile.getPrimitiveSites()) {
 				writeSite(site, writeWires);
 				numPinWires += site.getSourcePins().size() + site.getSinkPins().size();
 			}
@@ -294,7 +294,7 @@ public class XDLRCOutputter {
 		return isBidir;
 	}
 
-	private void writeSite(PrimitiveSite site, boolean writeWires) throws IOException {
+	private void writeSite(Site site, boolean writeWires) throws IOException {
 		out.append(ind + ind + "(primitive_site " + site.getName() + " ");
 		out.append("" + site.getDefaultType());
 		out.append(" " + site.getBondedType() + " ");

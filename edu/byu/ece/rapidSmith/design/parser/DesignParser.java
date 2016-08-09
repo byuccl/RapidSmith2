@@ -39,8 +39,8 @@ import edu.byu.ece.rapidSmith.design.Pin;
 import edu.byu.ece.rapidSmith.design.PinType;
 import edu.byu.ece.rapidSmith.design.Port;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.PrimitiveSite;
-import edu.byu.ece.rapidSmith.device.PrimitiveType;
+import edu.byu.ece.rapidSmith.device.Site;
+import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.device.Tile;
 import edu.byu.ece.rapidSmith.device.Utils;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
@@ -323,7 +323,7 @@ public class DesignParser{
 				state = ParserState.INSTANCE_TYPE;
 				break;
 			case INSTANCE_TYPE:
-				  PrimitiveType t = Utils.createPrimitiveType(token);
+				  SiteType t = Utils.createPrimitiveType(token);
 				  if(t == null){
 				    MessageGenerator.briefErrorAndExit("XDL Design Parser Error in file: "+ fileName +", Failed parsing Instance type: \"" + token + "\"");
 				  }
@@ -344,7 +344,7 @@ public class DesignParser{
 				state = ParserState.INSTANCE_SITE;
 				break;
 			case INSTANCE_SITE:
-				PrimitiveSite site = dev.getPrimitiveSite(token);
+				Site site = dev.getPrimitiveSite(token);
 				if(site == null){
 					MessageGenerator.briefErrorAndExit("XDL Design Parser Error in file: "+ fileName +", Invalid primitive site " +
 							token + " on line " + lineNumber);

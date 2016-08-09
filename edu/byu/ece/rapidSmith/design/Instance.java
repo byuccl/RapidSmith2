@@ -23,8 +23,8 @@ package edu.byu.ece.rapidSmith.design;
 import java.io.Serializable;
 import java.util.*;
 
-import edu.byu.ece.rapidSmith.device.PrimitiveSite;
-import edu.byu.ece.rapidSmith.device.PrimitiveType;
+import edu.byu.ece.rapidSmith.device.Site;
+import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.device.Tile;
 
 /**
@@ -41,7 +41,7 @@ public class Instance implements Serializable{
 	/** Unique name of this instance */
 	private String name;
 	/** Type of the instance (e.g. "SLICEM" or "SLICEL") */
-	private PrimitiveType type;
+	private SiteType type;
 	/** When an instance is unplaced, it might be bonded (true) or unbonded (false) */
 	private Boolean bonded;
 	/** The XDL Design this instance belongs to,
@@ -50,7 +50,7 @@ public class Instance implements Serializable{
 	/** All of the attributes in this instance */
 	private Map<String, Attribute> attributes;
 	/** This is a site of where the primitive will reside */
-	private PrimitiveSite site;
+	private Site site;
 	/** A list of nets to which this instance is connected */
 	private HashSet<Net> netList;
 	/** A list of all pins on this instance which are connected in nets */
@@ -88,7 +88,7 @@ public class Instance implements Serializable{
 	 * @param name name of the new Instance
 	 * @param type the type of the new instance
 	 */
-	public Instance(String name, PrimitiveType type){
+	public Instance(String name, SiteType type){
 		this.name = name;
 		this.type = type;
 		
@@ -125,7 +125,7 @@ public class Instance implements Serializable{
 	 * Returns the type of this instance (such as "SLICEL" or "SLICEM")
 	 * @return the PrimitiveType of this instance
 	 */
-	public PrimitiveType getType(){
+	public SiteType getType(){
 		return type;
 	}
 
@@ -133,7 +133,7 @@ public class Instance implements Serializable{
 	 * Sets the type of this instance.
 	 * @param type the PrimitiveType for this instance
 	 */
-	public void setType(PrimitiveType type){
+	public void setType(SiteType type){
 		this.type = type;
 	}
 
@@ -351,7 +351,7 @@ public class Instance implements Serializable{
 	 * Returns the PrimitiveSite for this instance.
 	 * @return the PrimitiveSite or null if it is not placed.
 	 */
-	public PrimitiveSite getPrimitiveSite(){
+	public Site getPrimitiveSite(){
 		return site;
 	}
 
@@ -390,7 +390,7 @@ public class Instance implements Serializable{
 	 * instance is also cleared.
 	 * @param site the site where the instance will reside
 	 */
-	public void place(PrimitiveSite site){
+	public void place(Site site){
 		if(this.site != null && design != null){
 			design.releasePrimitiveSite(this.site);
 		}
@@ -401,9 +401,9 @@ public class Instance implements Serializable{
 
 	/**
 	 * This method is used for Module creation only.  DO NOT use.
-	 * @see #place(PrimitiveSite)
+	 * @see #place(Site)
 	 */
-	public void setSite(PrimitiveSite site){
+	public void setSite(Site site){
 		this.site = site;
 	}
 
@@ -417,7 +417,7 @@ public class Instance implements Serializable{
 	}
 
 	// sets the site and updates the design if set
-	private void setPrimitiveSite(PrimitiveSite site){
+	private void setPrimitiveSite(Site site){
 		if(site != null){
 			this.site = site;
 			if(design != null) design.setPrimitiveSiteUsed(site, this);

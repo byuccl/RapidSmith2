@@ -20,7 +20,7 @@
  */
 package edu.byu.ece.rapidSmith.primitiveDefs;
 
-import edu.byu.ece.rapidSmith.device.PrimitiveType;
+import edu.byu.ece.rapidSmith.device.SiteType;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ import java.util.List;
 
 public class PrimitiveDef implements Serializable {
 	private static final long serialVersionUID = 6507494629635884224L;
-	private PrimitiveType type;
+	private SiteType type;
 	private List<PrimitiveDefPin> pins;
 	private List<PrimitiveElement> elements;
 
@@ -46,10 +46,10 @@ public class PrimitiveDef implements Serializable {
 	}
 	
 	// Setters and Getters
-	public void setType(PrimitiveType type) {
+	public void setType(SiteType type) {
 		this.type = type;
 	}
-	public PrimitiveType getType() {
+	public SiteType getType() {
 		return type;
 	}
 	public List<PrimitiveDefPin> getPins() {

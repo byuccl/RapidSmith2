@@ -25,7 +25,7 @@ public class XdlUnpacker {
 	private CellDesign cellDesign;
 	private boolean preserveRouting;
 
-	private Map<PrimitiveType, PrimitiveSite> siteTemplates;
+	private Map<SiteType, Site> siteTemplates;
 	private Map<Cell, CellCreator> cellCreators;
 
 	private Map<Net, CellNet> netMap;
@@ -71,8 +71,8 @@ public class XdlUnpacker {
 
 	private void loadSiteTemplates() {
 		siteTemplates = new HashMap<>();
-		for (PrimitiveSite site : device.getPrimitiveSites().values()) {
-			for (PrimitiveType possible : site.getPossibleTypes()) {
+		for (Site site : device.getPrimitiveSites().values()) {
+			for (SiteType possible : site.getPossibleTypes()) {
 				siteTemplates.put(possible, site);
 			}
 		}
@@ -158,7 +158,7 @@ public class XdlUnpacker {
 		Set<Wire> visited = new HashSet<>();
 
 		if (sourcePin != null && sourcePin.getInstance().isPlaced()) {
-			PrimitiveSite site = sourcePin.getInstance().getPrimitiveSite();
+			Site site = sourcePin.getInstance().getPrimitiveSite();
 			Wire wire = site.getSitePin(sourcePin.getName()).getExternalWire();
 			traverseRoute(wire, pipSet, routeTreeMap, visited);
 		}
@@ -232,7 +232,7 @@ public class XdlUnpacker {
 	private void createAndAddCells(Instance inst) {
 		// We'll work off of the BEL templates in the site to distinguish which
 		// attributes are actually BELs
-		PrimitiveSite siteTemplate = siteTemplates.get(inst.getType());
+		Site siteTemplate = siteTemplates.get(inst.getType());
 		if (inst.isPlaced())
 			siteTemplate = inst.getPrimitiveSite();
 		siteTemplate.setType(inst.getType());
@@ -265,7 +265,7 @@ public class XdlUnpacker {
 				continue;
 
 			cellNet = netMap.get(pin.getNet());
-			PrimitiveSite siteTemplate = siteTemplates.get(inst.getType());
+			Site siteTemplate = siteTemplates.get(inst.getType());
 			if (inst.isPlaced())
 				siteTemplate = inst.getPrimitiveSite();
 			SiteWire siteWire = siteTemplate.getSitePin(pin.getName()).getInternalWire();
@@ -333,7 +333,7 @@ public class XdlUnpacker {
 			}
 
 			// find and add all of its sinks of this net
-			PrimitiveSite siteTemplate = siteTemplates.get(inst.getType());
+			Site siteTemplate = siteTemplates.get(inst.getType());
 			if (inst.isPlaced())
 				siteTemplate = inst.getPrimitiveSite();
 			SiteWire sourceWire = new SiteWire(siteTemplate, belPin.getWire().getWireEnum());
@@ -372,7 +372,7 @@ public class XdlUnpacker {
 	}
 
 	private RouteTree findSinks(SiteWire sourceWire, Instance inst) {
-		PrimitiveSite siteTemplate = sourceWire.getSite();
+		Site siteTemplate = sourceWire.getSite();
 		RouteTree rt = null;
 
 		// recursively follow this wire until sinks are found

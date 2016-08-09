@@ -11,14 +11,14 @@ import java.util.stream.Stream;
  *
  *  As BELs do not have unique names, they are identified by their unique
  *  (site, name) pair.  Due to the number of BELs in a device, BELs are created
- *  upon request using the {@link edu.byu.ece.rapidSmith.device.PrimitiveSite#getBel(java.lang.String)}
+ *  upon request using the {@link edu.byu.ece.rapidSmith.device.Site#getBel(java.lang.String)}
  *  method on the site of the desired BEL.
  */
 public final class Bel implements Serializable {
 	// The backing template for this BEL
 	private BelTemplate template;
 	// The site the BEL exists in
-	private PrimitiveSite site;
+	private Site site;
 
 	// BelPins all have to be uniquely created for each BEL.  While most BELs do
 	// not have many pins, I don't want to be constantly recreating these pin
@@ -33,7 +33,7 @@ public final class Bel implements Serializable {
 	 *
 	 * Use PrimitiveSite.getBel to create a new BEL
 	 */
-	Bel(PrimitiveSite site, BelTemplate template) {
+	Bel(Site site, BelTemplate template) {
 		assert site != null;
 		assert template != null;
 
@@ -46,7 +46,7 @@ public final class Bel implements Serializable {
 	 *
 	 * @return the site this BEL exists in
 	 */
-	public PrimitiveSite getSite() {
+	public Site getSite() {
 		return site;
 	}
 
