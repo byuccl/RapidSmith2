@@ -7,23 +7,37 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
+import edu.byu.ece.edif.core.BooleanTypedValue;
 import edu.byu.ece.edif.core.EdifCell;
 import edu.byu.ece.edif.core.EdifCellInstance;
+import edu.byu.ece.edif.core.EdifCellInterface;
+import edu.byu.ece.edif.core.EdifDesign;
 import edu.byu.ece.edif.core.EdifEnvironment;
+import edu.byu.ece.edif.core.EdifLibrary;
+import edu.byu.ece.edif.core.EdifLibraryManager;
 import edu.byu.ece.edif.core.EdifNameConflictException;
+import edu.byu.ece.edif.core.EdifNameable;
 import edu.byu.ece.edif.core.EdifNet;
+import edu.byu.ece.edif.core.EdifPort;
 import edu.byu.ece.edif.core.EdifPortRef;
+import edu.byu.ece.edif.core.EdifPrintWriter;
+import edu.byu.ece.edif.core.EdifSingleBitPort;
 import edu.byu.ece.edif.core.EdifTypedValue;
+import edu.byu.ece.edif.core.IntegerTypedValue;
 import edu.byu.ece.edif.core.InvalidEdifNameException;
 import edu.byu.ece.edif.core.PropertyList;
-import edu.byu.ece.edif.tools.flatten.FlattenedEdifCell;
+import edu.byu.ece.edif.core.RenamedObject;
+import edu.byu.ece.edif.core.StringTypedValue;
 import edu.byu.ece.edif.util.parse.EdifParser;
 import edu.byu.ece.edif.util.parse.ParseException;
 import edu.byu.ece.rapidSmith.RapidSmithEnv;
@@ -35,6 +49,7 @@ import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
 import edu.byu.ece.rapidSmith.design.subsite.Connection;
 import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
+import edu.byu.ece.rapidSmith.design.subsite.LibraryPin;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
 import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
@@ -43,12 +58,12 @@ import edu.byu.ece.rapidSmith.design.subsite.Wire;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.device.PinDirection;
 import edu.byu.ece.rapidSmith.device.PrimitiveSite;
 import edu.byu.ece.rapidSmith.device.PrimitiveType;
 import edu.byu.ece.rapidSmith.device.SitePin;
 import edu.byu.ece.rapidSmith.device.Tile;
 import edu.byu.ece.rapidSmith.device.WireConnection;
-import edu.byu.ece.rapidSmith.device.WireEnumerator;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 /**
@@ -68,10 +83,10 @@ public final class VivadoInterface {
 	private static CellLibrary libCells;
 	private static Device device;
 	
-	//variables used to reconstruct the sub-site route trees
-	//currently, sub-site route trees are not being used (a HashMap of
-	//used wires in the each primitive site is used instead) 
-	//but, they may be needed in the future, so leave these here for now 
+	// variables used to reconstruct the sub-site route trees
+	// currently, sub-site route trees are not being used (a HashMap of
+	// used wires in the each primitive site is used instead) 
+	// but, they may be needed in the future, so leave these here for now 
 	private static boolean isInternalNet = false;
 	private static boolean routesToBelPin = false;
 	private static boolean routesToSitePin = false;
@@ -91,8 +106,9 @@ public final class VivadoInterface {
 	 */
 	public static CellDesign loadTCP (String tcp) throws IOException, ParseException {
 	
-		if(tcp.endsWith("/") || tcp.endsWith("\\"))
+		if(tcp.endsWith("/") || tcp.endsWith("\\")) {
 			tcp = tcp.substring(0, tcp.length()-1);
+		}
 		
 		//check to make sure the specified directory is a TINCR checkpoint
 		if (!tcp.endsWith(".tcp")) {
@@ -112,17 +128,7 @@ public final class VivadoInterface {
 
 		//Populate the Cell Design in RS2 by importing the netlist, placement, and routing information
 		EdifEnvironment edifTop = EdifParser.translate(edifFile);
-		FlattenedEdifCell flattened = null;
-		CellDesign design = null;
-		
-		try {
-			flattened = new FlattenedEdifCell(edifTop.getTopCell(), "_flat", null);
-			edifTop.setTopCell(flattened);
-			design = processEdif(edifTop);
-		} catch (EdifNameConflictException | InvalidEdifNameException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
+		CellDesign design = processEdif(edifTop);
 			
 		//re-create the placement and routing information
 		applyPlacement(design, placementFile);
@@ -171,7 +177,8 @@ public final class VivadoInterface {
 		EdifCell tcell = top.getTopCell();
 			
 		CellDesign des= new CellDesign(top.getTopDesign().getName(), partname);	
-
+		des.updateProperties(createCellProperties(tcell.getPropertyList()));
+		
 		// Go through each cell of this design...
 		if (tcell.getCellInstanceList() != null) { 
 			for(EdifCellInstance eci : tcell.getCellInstanceList()) {
@@ -184,40 +191,14 @@ public final class VivadoInterface {
 				
 				// Add properties to the cell 
 				// TODO: when macros are added, we will need to update this
-				PropertyList pl = eci.getPropertyList();
-
-				if (pl != null) {
-					for (String s : pl.keySet()) {
-						String propName = pl.get(s).getName(); 
-						EdifTypedValue etv = pl.get(s).getValue(); 
-						Property tmp = new Property(propName, PropertyType.USER, etv);
-						/*
-						//TODO: add support for other types...currently however the EDIF data structure only really supports these types
-						if (etv instanceof IntegerTypedValue) {
-							tmp.setDataType("int");
-						}
-						else if (etv instanceof StringTypedValue) {
-							tmp.setDataType("string");
-						}
-						else if (etv instanceof BooleanTypedValue) {
-							tmp.setDataType("bool");
-						}
-						
-						//check for user defined properties...right now I am assuming that these will be lower case...this is a hack
-						if (!propName.equals(propName.toUpperCase())) {
-							//System.out.println(s);
-							tmp.setType(PropertyType.USER);
-						}
-						*/
-						newcell.updateProperty(tmp);
-					}
-				}
+				newcell.updateProperties(createCellProperties(eci.getPropertyList()));
 			}
 		}
 
 		// Now, go through the cell's nets and hook up inputs and outputs 
 		if(tcell.getNetList() != null) {
 			for(EdifNet net : tcell.getNetList()) {
+				
 				//create a new net
 				//NOTE: we are using the old name here, make sure when we go back to EDIF, we use a supported EDIF name
 				CellNet cn = new CellNet(net.getOldName(), NetType.WIRE); 
@@ -238,14 +219,48 @@ public final class VivadoInterface {
 				// Add all the sink connections to the net
 				shouldAddNet &= processNetConnections(net.getSinkPortRefs(false, true), des, cn);
 								
-				//only add nets that don't connect to a top-level port
-				//TODO: should we keep a list of top-level ports? For importing back in to Vivado?
-				if (shouldAddNet) 
+				// only add nets that don't connect to a top-level port
+				// TODO: should we keep a list of top-level ports? For importing back in to Vivado?
+				if (shouldAddNet) { 
 					des.addNet(cn);
+					cn.updateProperties(createCellProperties(net.getPropertyList()));
+				} 
 			}
 		}
 		
 		return des;
+	}
+	
+	/*
+	 * Function to create a list of cell properties from an edif property list
+	 */
+	private static List<Property> createCellProperties(PropertyList edifPropertyList) {
+		List<Property> cellProperties = new ArrayList<Property>();
+		
+		if (edifPropertyList != null) {
+			for (String keyName : edifPropertyList.keySet()) {
+				edu.byu.ece.edif.core.Property property = edifPropertyList.getProperty(keyName);
+				Property prop = new Property(property.getName(), PropertyType.USER, getValueFromEdifType(property.getValue()));
+				cellProperties.add(prop);
+			}
+		}
+		
+		return cellProperties;
+	}
+	
+	private static Object getValueFromEdifType(EdifTypedValue typedValue) {
+		
+		Object value = null; 
+		if (typedValue instanceof IntegerTypedValue) {
+			value = ((IntegerTypedValue)typedValue).getIntegerValue();
+		}
+		else if (typedValue instanceof BooleanTypedValue) {
+			value = ((BooleanTypedValue)typedValue).getBooleanValue();
+		}
+		else  { // default is string type
+			value = ((StringTypedValue)typedValue).getStringValue();
+		}
+		return value;
 	}
 	
 	/*
@@ -279,6 +294,7 @@ public final class VivadoInterface {
 				}						
 			}
 		}
+		
 		return true;
 	}
 	
@@ -298,6 +314,9 @@ public final class VivadoInterface {
 				String cname = toks[1]; 
 				String sname = toks[2];
 				Cell c = design.getCell(cname);
+				
+				Objects.requireNonNull(c, "Null cell found in design! This should never happen.");
+				
 				cellsInOrder.add(c);
 				
 				PrimitiveSite ps = device.getPrimitiveSite(sname);
@@ -323,11 +342,11 @@ public final class VivadoInterface {
 							List<BelPin> bpl = cp.getPossibleBelPins();
 							
 							//special case for the CIN pin
-							if(b.getName().equals("CARRY4") && cp.getName().equals("CI") ) {
+							if (b.getName().equals("CARRY4") && cp.getName().equals("CI") ) {
 								cp.setBelPin("CIN");
 							}
 							//TODO: may have to update this with startwith FIFO as well as RAMB
-							else if(bpl.size() == 1 || b.getName().startsWith("RAMB")) {
+							else if (bpl.size() == 1 || b.getName().startsWith("RAMB")) {
 								if(bpl.get(0) != null)
 									cp.setBelPin(bpl.get(0));
 								else {
@@ -383,7 +402,6 @@ public final class VivadoInterface {
 					continue;
 				}
 				
-				
 				//ps.setUsedSitePips(readUsedSitePips(ps, toks, br, fname));
 				
 				design.setUsedSitePipsAtSite(ps, readUsedSitePips(ps, toks, br, fname));
@@ -391,19 +409,19 @@ public final class VivadoInterface {
 				//createPrimitiveSiteRouteTrees(ps);
 				//siteToRTs.put(ps.getName(), pinToRT);
 			}
-			//handle intersite (between sites) routing
+			// handle intersite (between sites) routing
 			else if(toks[0].equals("ROUTE")) {
 				String netname = toks[1]; 
 				CellNet net = design.getNet(netname); //net to add the route tree to
 				
-				//make sure the net is in the design
+				// make sure the net is in the design
 				if (net == null) {
 					MessageGenerator.briefErrorAndExit("[ERROR] Unable to find net \"" + netname + "\" in cell design\n"
 							+ "\tLine " + br.getLineNumber() + " of " + fname);
 				}
 				
-				//Vivado nets always have to have a source pin to be valid...skip nets with no source
-				//Should I throw an error here?
+				// Vivado nets always have to have a source pin to be valid...skip nets with no source
+				// Should I throw an error here?
 				if(net.getSourcePin() == null) {
 					MessageGenerator.briefError("[Warning] Net " + netname + " is not sourced. Cannot apply routing information.\n"
 							+ "\tLine " + br.getLineNumber() + " of " + fname);
@@ -415,12 +433,12 @@ public final class VivadoInterface {
 						createIntersiteRouteTree(start, 4, toks);
 						net.addRouteTree(start.getFirstSource());
 					}					
-					else { //if its not a wire, then its a ground or VCC net
+					else { // if its not a wire, then its a ground or VCC net
 						int index = 4; 
 						
 						while(index < toks.length) {
-							//TODO: Could have another RouteTree pointer point to start
-							//so that I don't have to call getFirstSource for larger nets
+							// TODO: Could have another RouteTree pointer point to start
+							// so that I don't have to call getFirstSource for larger nets
 							RouteTree start = initializeGlobalLogicRouteTree(toks[index++]);
 							index = createIntersiteRouteTree(start, index, toks);
 							net.addRouteTree(start.getFirstSource());
@@ -732,20 +750,26 @@ public final class VivadoInterface {
 	 * @param tcpDirectory TINCR checkpoint directory to write XDC files to
 	 * @param design CellDesign to convert to a TINCR checkpoint
 	 * @throws IOException
+	 * @throws InvalidEdifNameException 
+	 * @throws EdifNameConflictException 
 	 */
-	public static void writeTCP(String tcpDirectory, CellDesign design) throws IOException {
+	public static void writeTCP(String tcpDirectory, CellDesign design) throws IOException, EdifNameConflictException, InvalidEdifNameException {
+		// Files.createDirectory(Paths.get(tcpDirectory));
+		new File(tcpDirectory).mkdir();
 		writePlacementXDC(tcpDirectory, design);
 		writeRoutingXDC(tcpDirectory, design);
+		writeEdif(tcpDirectory, design);
 	}
 	
 	/*
 	 * Function to write the placement.xdc file of a TINCR checkpoint
 	 */
 	private static void writePlacementXDC(String tcpDirectory, CellDesign design) throws IOException {
-		BufferedWriter fileout = new BufferedWriter (new FileWriter(tcpDirectory + File.separator + "placement.xdc"));
+		Path outPath = Paths.get(tcpDirectory, "placement.xdc");
+		BufferedWriter fileout = new BufferedWriter (new FileWriter(outPath.toString()));
 		
-		//TODO: Assuming that the logical design has not been modified
-		for(Cell cell : cellsInOrder) {
+		//TODO: Assuming that the logical design has not been modified...can no longer assume this with insertion/deletion
+		for (Cell cell : cellsInOrder) {
 			if(cell.isPlaced()) {
 				PrimitiveSite ps = cell.getAnchorSite();
 				Bel b = cell.getAnchor();
@@ -775,7 +799,8 @@ public final class VivadoInterface {
 	 * Function to write the routing.xdc file of a TINCR checkpoint
 	 */
 	private static void writeRoutingXDC(String tcpDirectory, CellDesign design) throws IOException {
-		BufferedWriter fileout = new BufferedWriter (new FileWriter(tcpDirectory + File.separator + "routing.xdc"));
+		Path outPath = Paths.get(tcpDirectory, "routing.xdc");
+		BufferedWriter fileout = new BufferedWriter (new FileWriter(outPath.toString()));
 		
 		//write the routing information to the TCL script...assumes one final route tree has been created
 		for(CellNet net : design.getNets()) {
@@ -832,6 +857,7 @@ public final class VivadoInterface {
 	 * Creates and formats the route tree into a string that Vivado understands and can be applied to a Vivado net
 	 */
 	private static String createVivadoRoutingString (RouteTree rt) {
+		
 		RouteTree currentRoute = rt; 
 		String routeString = "{ ";
 			
@@ -867,6 +893,237 @@ public final class VivadoInterface {
 		return routeString + "} ";
 	}
 	
+	// TODO: Create an EdifConversion class for this
+	private static void writeEdif(String tcpDirectory, CellDesign design) throws EdifNameConflictException, InvalidEdifNameException, IOException {
+		
+		// TODO: copy old edif environment properties into new edif environment properties
+		EdifEnvironment edifEnvironment = new EdifEnvironment(createEdifNameable(design.getName()));
+		edifEnvironment.setAuthor("BYU CCL");
+		edifEnvironment.setProgram("RapidSmith2");
+		edifEnvironment.setVersion("1.0.0"); // TODO: replace this with the current RS2 version
+		EdifLibraryManager libManager = edifEnvironment.getLibraryManager();
+		
+		edifEnvironment.setDateWithCurrentTime();
+		
+		// create the edif cell library...I am assuming that the library in Vivado always has the same name
+		EdifLibrary edifPrimitiveLibrary = new EdifLibrary(libManager, "hdi_primitives");
+		
+		HashMap<LibraryCell, EdifCell> cellMap = new HashMap<LibraryCell, EdifCell>();	
+		
+		for (LibraryCell libCell : getUniqueLibraryCellsInDesign(design)) {
+			EdifCell edifCell = createEdifLibraryCell(libCell, edifPrimitiveLibrary); 
+			edifPrimitiveLibrary.addCell(edifCell);
+			cellMap.put(libCell, edifCell);
+		}
+		
+		edifEnvironment.addLibrary(edifPrimitiveLibrary);
+		
+		//create top level library
+		//TODO: do not assume the default name...is the default name an issue? 
+		EdifLibrary topCellLibrary = new EdifLibrary(libManager, "work");
+		EdifCell topCell = createEdifTopLevelCell(design, topCellLibrary, cellMap);
+		topCellLibrary.addCell(topCell);
+		edifEnvironment.addLibrary(topCellLibrary);
+		
+		// create the top level edif design
+		EdifDesign topDesign = new EdifDesign(edifEnvironment.getEdifNameable());
+		EdifCellInstance eci = new EdifCellInstance(edifEnvironment.getEdifNameable(), topCell, topCell);
+		topDesign.setTopCellInstance(eci);
+		topDesign.addProperty(new edu.byu.ece.edif.core.Property("part", design.getPartName()));
+		edifEnvironment.setTopDesign(topDesign);
+		
+		// write edif
+		Path edifPath = Paths.get(tcpDirectory, "netlist.edf");
+		EdifPrintWriter edifOut = new EdifPrintWriter(edifPath.toString());
+		edifEnvironment.toEdif(edifOut);
+	}
+	
+	private static HashSet<LibraryCell> getUniqueLibraryCellsInDesign(CellDesign design) {
+		
+		HashSet<LibraryCell> uniqueLibraryCells = new HashSet<LibraryCell>();
+		
+		for (Cell c : design.getCells()) {			
+			uniqueLibraryCells.add(c.getLibCell());
+		}
+		
+		return uniqueLibraryCells;
+	}
+	
+	private static EdifCell createEdifTopLevelCell(CellDesign design, EdifLibrary library, HashMap<LibraryCell, EdifCell> cellMap) throws EdifNameConflictException, InvalidEdifNameException {	
+		
+		EdifCell topLevelCell = new EdifCell(library, createEdifNameable(design.getName()));
+		
+		// TODO: add the interface
+		EdifCellInterface cellInterface = createTopLevelInterface(design, topLevelCell);
+		topLevelCell.setInterface(cellInterface);
+		
+		// create the cell instances
+		for (Cell cell : design.getCells()) {
+			EdifCell edifLibCell = cellMap.get(cell.getLibCell());
+			Objects.requireNonNull(edifLibCell, String.format("[Error]: Edif Library cell \"%s\" not found. Edif not generated.", cell.getLibCell().getName()));
+			
+			topLevelCell.addSubCell( createEdifCellInstance(cell, topLevelCell, edifLibCell) );
+		}
+		
+		// create the net instances
+		for (CellNet net : design.getNets()) {
+		 	topLevelCell.addNet(createEdifNet(net, topLevelCell));
+		}
+			
+		topLevelCell.addPropertyList(createEdifPropertyList(design.getProperties()));
+		return topLevelCell; 
+	}
+	
+	/*
+	 * This is only guaranteed to work with netlists imported from Vivado...
+	 */
+	private static EdifCellInterface createTopLevelInterface(CellDesign design, EdifCell topLevelEdifCell) throws EdifNameConflictException, InvalidEdifNameException {
+		
+		EdifCellInterface cellInterface = new EdifCellInterface(topLevelEdifCell);
+		
+		HashMap<String, Integer> portWidthMap = new HashMap<String, Integer>();
+		HashMap<String, Integer> portDirectionMap = new HashMap<String, Integer>();
+		
+		for (Cell cell : design.getCells()) {
+			String libCellName = cell.getLibCell().getName();
+			boolean isIbuf = libCellName.equals("IBUF");
+			
+			if (isIbuf || libCellName.equals("OBUF")) {
+				String cellName = cell.getName().split("\\[")[0];
+				Integer count = portWidthMap.getOrDefault(cellName, 0);
+				portWidthMap.put(cellName, count + 1);
+				
+				if (count == 0) {
+					portDirectionMap.put(cellName, (isIbuf) ? EdifPort.IN : EdifPort.OUT);
+				}
+			}			
+		}
+		
+		for (String portNameExtended : portWidthMap.keySet()) {
+			
+			Integer portDirection = portDirectionMap.get(portNameExtended); 
+			String portName = (portDirection == EdifPort.IN) ? portNameExtended.split("_IBUF")[0] : portNameExtended.split("_OBUF")[0];
+			
+			int portWidth = portWidthMap.get(portNameExtended);		
+			EdifNameable edifPortName = (portWidth == 1) ? 
+									createEdifNameable(portName) : 
+									new RenamedObject(portName, String.format("%s[%d:0]", portName, portWidth-1));
+			cellInterface.addPort(edifPortName, portWidth, portDirection);
+		}
+		
+		return cellInterface;
+	}
+	
+	private static EdifCellInstance createEdifCellInstance(Cell cell, EdifCell parent, EdifCell edifLibCell) {
+		
+		Objects.requireNonNull(edifLibCell);
+		EdifCellInstance cellInstance = new EdifCellInstance(createEdifNameable(cell.getName()), parent, edifLibCell);
+	
+		// create an equivalent edif property for each RS2 property
+		cellInstance.addPropertyList(createEdifPropertyList(cell.getProperties()));
+				
+		return cellInstance;
+	}
+	
+	private static EdifNet createEdifNet(CellNet cellNet, EdifCell parent) {
+		EdifNet edifNet = new EdifNet(createEdifNameable(cellNet.getName()), parent);
+		
+		// create the port refs
+		for (CellPin cellPin : cellNet.getPins()) {
+			
+			EdifCellInstance cellInstance = parent.getCellInstance(getEdifName(cellPin.getCell().getName()));
+			EdifCell libCell = cellInstance.getCellType();
+			
+			String[] toks = cellPin.getName().split("\\["); 
+			
+			assert(toks.length == 1 || toks.length == 2);
+			
+			String portName = toks[0]; 
+			
+			int busMember = 1;
+			if (toks.length == 2) {
+				busMember = Integer.parseInt(toks[1].substring(0, toks[1].length()-1));
+			}
+						
+			EdifPort port = libCell.getPort(portName); 
+			int reversedIndex = port.getWidth() - 1 - busMember;  
+			EdifSingleBitPort singlePort = new EdifSingleBitPort(port, reversedIndex);
+			edifNet.addPortConnection(new EdifPortRef(edifNet, singlePort, cellInstance));
+		}
+					
+		return edifNet;
+	}
+	
+	private static PropertyList createEdifPropertyList (Collection<Property> properties) {
+		PropertyList edifProperties = new PropertyList();
+		
+		for (Property prop : properties) {
+			// The key and value of the property need sensible toString() methods when exporting to EDIF
+			// this function is for creating properties for printing only!
+			// TODO: make sure to inform the user of this 
+			edu.byu.ece.edif.core.Property edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), prop.getValue().toString());
+			edifProperties.addProperty(edifProperty);
+		}
+		
+		return edifProperties;
+	}
+	
+	private static EdifCell createEdifLibraryCell(LibraryCell cell, EdifLibrary library) throws EdifNameConflictException, InvalidEdifNameException {
+		// this will print a cell with the "view PRIM" ... vivado prints them with "view netlist" this shouldn't be a problem
+		EdifCell edifCell = new EdifCell(library, createEdifNameable(cell.getName()), true);
+		
+		EdifCellInterface edifInterface = new EdifCellInterface(edifCell);
+		edifCell.setInterface(edifInterface);
+		
+		HashMap<String, Integer> pinWidthMap = new HashMap<String, Integer>();
+		HashMap<String, Integer> pinDirectionMap = new HashMap<String, Integer>();
+		
+		// Assumption: Vivado pinnames are a series of alphanumberic characters, followed by an optional number within brackets (for busses)
+		// Examples: pin1, pin[2], name
+		for (LibraryPin pin : cell.getLibraryPins()) {
+			String pinname = pin.getName().split("\\[")[0];
+			Integer count = pinWidthMap.getOrDefault(pinname, 0);
+			pinWidthMap.put(pinname, count + 1); 
+			
+			if (count == 0) {
+				pinDirectionMap.put(pinname, getEdifPinDirection(pin.getDirection()));
+			}
+		}
+		
+		// add the library cell ports to the interface
+		for (String pinname : pinWidthMap.keySet()) {
+			int width = pinWidthMap.get(pinname);		
+			EdifNameable edifPortName = (width == 1) ? 
+									createEdifNameable(pinname) : 
+									new RenamedObject(pinname, String.format("%s[%d:0]", pinname, width-1));
+			edifInterface.addPort(edifPortName, width, pinDirectionMap.get(pinname));
+		}
+		
+		return edifCell;
+	}
+	
+	private static EdifNameable createEdifNameable(String name) {
+		
+		return RenamedObject.createValidEdifNameable(name);
+	}
+	
+	private static String getEdifName(String originalName){
+		return RenamedObject.createValidEdifString(originalName);
+	}
+	
+	private static int getEdifPinDirection(PinDirection direction) {	
+		switch(direction) {
+			case IN:
+				return EdifPort.IN;
+			case OUT:
+				return EdifPort.OUT;
+			case INOUT:
+				return EdifPort.INOUT;
+			default: // if we reach here, then thrown a new exception
+				throw new IllegalStateException("Invalid Pin Direction!");
+		}
+	}
+	
    	/* **************************************
    	 * 			Exporter Code End
    	 ***************************************/
@@ -877,6 +1134,7 @@ public final class VivadoInterface {
 	
 	/*
 	 * Debug method that will print a RouteTree
+	 * TODO: add this to a utility class
 	 */	
 	@SuppressWarnings("unused")
 	private static void printRouteTree(RouteTree rt, int level) {
@@ -1052,6 +1310,36 @@ for (EdifPort ep: tcell.getInterface().getPortList()) {
 	}
 	else {
 		p = new Port(ep.getName(), portDirection);
+	}
+}
+
+PropertyList pl = eci.getPropertyList();
+
+if (pl != null) {
+	for (String s : pl.keySet()) {
+		String propName = pl.get(s).getName(); 
+		EdifTypedValue etv = pl.get(s).getValue(); 
+		Property tmp = new Property(propName, PropertyType.USER, etv);
+		
+		
+		//TODO: add support for other types...currently however the EDIF data structure only really supports these types
+		if (etv instanceof IntegerTypedValue) {
+			tmp.setDataType("int");
+		}
+		else if (etv instanceof StringTypedValue) {
+			tmp.setDataType("string");
+		}
+		else if (etv instanceof BooleanTypedValue) {
+			tmp.setDataType("bool");
+		}
+		
+		//check for user defined properties...right now I am assuming that these will be lower case...this is a hack
+		if (!propName.equals(propName.toUpperCase())) {
+			//System.out.println(s);
+			tmp.setType(PropertyType.USER);
+		}
+		
+		newcell.updateProperty(tmp);
 	}
 }
 */

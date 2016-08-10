@@ -109,6 +109,18 @@ public class CellDesign extends AbstractDesign {
 			this.propertyMap = new HashMap<>();
 		this.propertyMap.put(property.getKey(), property);
 	}
+	
+	/**
+	 * Updates or adds the properties in the provided collection to the properties
+	 * of this cell.
+	 *
+	 * @param properties the properties to add or update
+	 */
+	public void updateProperties(Collection<Property> properties) {
+		Objects.requireNonNull(properties);
+
+		properties.forEach(this::updateProperty);
+	}
 
 	/**
 	 * Updates the value of the property in this cell with the specified name or
