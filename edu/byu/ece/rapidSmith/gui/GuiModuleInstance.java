@@ -39,7 +39,7 @@ import edu.byu.ece.rapidSmith.design.Instance;
 import edu.byu.ece.rapidSmith.design.ModuleInstance;
 import edu.byu.ece.rapidSmith.design.Net;
 import edu.byu.ece.rapidSmith.design.PIP;
-import edu.byu.ece.rapidSmith.device.PrimitiveType;
+import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.device.Tile;
 import edu.byu.ece.rapidSmith.device.TileType;
 import edu.byu.ece.rapidSmith.gui.TileScene;
@@ -110,7 +110,7 @@ public class GuiModuleInstance extends QGraphicsPolygonItem {
 
 		for (Instance inst : instances) {
 			Tile tile = inst.getTile();
-			if(inst.getType().equals(PrimitiveType.SLICEM)){
+			if(inst.getType().equals(SiteType.SLICEM)){
 				tilesWithSLICEM.add(tile);
 			}
 			if (!occupiedTiles.contains(tile)) {

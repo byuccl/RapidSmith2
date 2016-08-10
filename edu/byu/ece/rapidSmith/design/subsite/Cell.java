@@ -3,7 +3,7 @@ package edu.byu.ece.rapidSmith.design.subsite;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelId;
 import edu.byu.ece.rapidSmith.device.BondedType;
-import edu.byu.ece.rapidSmith.device.PrimitiveSite;
+import edu.byu.ece.rapidSmith.device.Site;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -166,7 +166,7 @@ public class Cell  {
 	 *
 	 * @return the site this cell resides
 	 */
-	public final PrimitiveSite getAnchorSite() {
+	public final Site getAnchorSite() {
 		return anchor == null ? null : anchor.getSite();
 	}
 

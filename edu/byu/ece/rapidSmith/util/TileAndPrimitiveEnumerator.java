@@ -21,7 +21,7 @@
 package edu.byu.ece.rapidSmith.util;
 
 import edu.byu.ece.rapidSmith.RapidSmithEnv;
-import edu.byu.ece.rapidSmith.device.PrimitiveType;
+import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.device.TileType;
 import edu.byu.ece.rapidSmith.device.creation.*;
 
@@ -112,7 +112,7 @@ public class TileAndPrimitiveEnumerator{
 			tileSet.add(tileType.name());
 		}
 
-		for (PrimitiveType primitiveType : PrimitiveType.values()) {
+		for (SiteType primitiveType : SiteType.values()) {
 			primitiveSet.add(primitiveType.name());
 		}
 	}

@@ -1,5 +1,6 @@
-package edu.byu.ece.rapidSmith.design.subsite;
+package edu.byu.ece.rapidSmith.device;
 
+import edu.byu.ece.rapidSmith.design.subsite.Connection;
 import edu.byu.ece.rapidSmith.device.*;
 
 import java.io.Serializable;
@@ -11,16 +12,16 @@ import java.util.stream.Stream;
  *
  */
 public class SiteWire implements Wire, Serializable {
-	private PrimitiveSite site;
+	private Site site;
 	private int wire;
 
-	public SiteWire(PrimitiveSite site, int wire) {
+	public SiteWire(Site site, int wire) {
 		this.site = site;
 		this.wire = wire;
 	}
 
 	@Override
-	public PrimitiveSite getSite() {
+	public Site getSite() {
 		return site;
 	}
 

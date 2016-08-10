@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.PrimitiveSite;
+import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.Tile;
 import edu.byu.ece.rapidSmith.device.TileType;
 
@@ -58,7 +58,7 @@ public class Module implements Serializable{
 	/** Provides a catch-all map to store information about hard macro */
 	private HashMap<String, ArrayList<String>> metaDataMap;
 	
-	private ArrayList<PrimitiveSite> validPlacements;
+	private ArrayList<Site> validPlacements;
 
 	/**
 	 * Empty constructor, strings are null, everything else is initialized
@@ -70,7 +70,7 @@ public class Module implements Serializable{
 		portMap = new HashMap<String, Port>();
 		instanceMap = new HashMap<String,Instance>();
 		netMap = new HashMap<String,Net>();
-		validPlacements = new ArrayList<PrimitiveSite>();
+		validPlacements = new ArrayList<Site>();
 	}
 	
 	/**
@@ -365,11 +365,11 @@ public class Module implements Serializable{
 	 * can be placed.
 	 * @return A list of valid anchor sites for the module to be placed.
 	 */
-	public ArrayList<PrimitiveSite> calculateAllValidPlacements(Device dev){
+	public ArrayList<Site> calculateAllValidPlacements(Device dev){
 		if(getAnchor() == null) return null;
-		ArrayList<PrimitiveSite> validSites = new ArrayList<PrimitiveSite>();
-		PrimitiveSite[] sites = dev.getAllCompatibleSites(getAnchor().getType());
-		for(PrimitiveSite newAnchorSite : sites){
+		ArrayList<Site> validSites = new ArrayList<Site>();
+		Site[] sites = dev.getAllCompatibleSites(getAnchor().getType());
+		for(Site newAnchorSite : sites){
 			if(isValidPlacement(newAnchorSite, dev)){
 				validSites.add(newAnchorSite);
 			}
@@ -382,20 +382,20 @@ public class Module implements Serializable{
 	 * Gets the previously calculated valid placement locations for this particular module.
 	 * @return A list of anchor primitive sites which are valid for this module.
 	 */
-	public ArrayList<PrimitiveSite> getAllValidPlacements(){
+	public ArrayList<Site> getAllValidPlacements(){
 		return this.validPlacements;
 	}
 	
-	public boolean isValidPlacement(PrimitiveSite proposedAnchorSite, Device dev){
+	public boolean isValidPlacement(Site proposedAnchorSite, Device dev){
 		// Check if parameters are null
 		if(proposedAnchorSite == null || dev == null){
 			return false;
 		}
 
 		// Do some error checking on the newAnchorSite
-		PrimitiveSite p = anchor.getPrimitiveSite();
+		Site p = anchor.getPrimitiveSite();
 		Tile t = proposedAnchorSite.getTile();
-		PrimitiveSite newValidSite = Device.getCorrespondingPrimitiveSite(p, t);
+		Site newValidSite = Device.getCorrespondingPrimitiveSite(p, t);
 		if(!proposedAnchorSite.equals(newValidSite)){
 			return false;
 		}
@@ -404,7 +404,7 @@ public class Module implements Serializable{
 		/* Check instances at proposed location                  */
 		//=======================================================//
 		for(Instance inst : getInstances()){
-			PrimitiveSite templateSite = inst.getPrimitiveSite();
+			Site templateSite = inst.getPrimitiveSite();
 			Tile newTile = getCorrespondingTile(templateSite.getTile(), proposedAnchorSite.getTile(), dev);
 			if(newTile == null){
 				return false;

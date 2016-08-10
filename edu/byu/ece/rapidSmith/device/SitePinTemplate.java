@@ -8,13 +8,13 @@ import java.util.Objects;
  */
 public final class SitePinTemplate implements Serializable {
 	private String name;
-	private PrimitiveType primitiveType;
+	private SiteType primitiveType;
 	private PinDirection direction;
 	private int internalWire;
 	private boolean drivesGeneralFabric;
 	private boolean drivenByGeneralFabric;
 
-	public SitePinTemplate(String name, PrimitiveType primitiveType) {
+	public SitePinTemplate(String name, SiteType primitiveType) {
 		this.name = name;
 		this.primitiveType = primitiveType;
 	}
@@ -23,7 +23,7 @@ public final class SitePinTemplate implements Serializable {
 		return name;
 	}
 
-	public PrimitiveType getPrimitiveType() {
+	public SiteType getPrimitiveType() {
 		return primitiveType;
 	}
 

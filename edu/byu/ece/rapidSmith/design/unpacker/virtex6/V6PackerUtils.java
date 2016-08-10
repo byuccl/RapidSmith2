@@ -125,7 +125,7 @@ public class V6PackerUtils implements PackerUtils {
 			for (PIP pip : net.getPIPs()) {
 				RouteThrough rt = getRouteThrough(device, pip);
 				if (rt != null) {
-					PrimitiveSite site = rt.site;
+					Site site = rt.site;
 					Instance inst = design.getInstanceAtPrimitiveSite(site);
 					if (inst == null) {
 						inst = new Instance("XDL_DUMMY_" + site.getTile().getName() +
@@ -147,7 +147,7 @@ public class V6PackerUtils implements PackerUtils {
 	private RouteThrough getRouteThrough(Device device, PIP pip) {
 		if (device.isRouteThrough(pip)) {
 			PIPRouteThrough rt = device.getRouteThrough(pip);
-			for (PrimitiveSite site : pip.getTile().getPrimitiveSites()) {
+			for (Site site : pip.getTile().getPrimitiveSites()) {
 				for (SitePin sitePin : site.getSourcePins()) {
 					if (sitePin.getExternalWire().getWireEnum() == pip.getEndWire()) {
 						return new RouteThrough(site, rt);
@@ -186,7 +186,7 @@ public class V6PackerUtils implements PackerUtils {
 	}
 
 	private boolean sharesCarryChainWithDMUX(Instance inst) {
-		if (inst.getType() == PrimitiveType.SLICEL || inst.getType() == PrimitiveType.SLICEM) {
+		if (inst.getType() == SiteType.SLICEL || inst.getType() == SiteType.SLICEM) {
 			Pin coutPin = inst.getPin("COUT");
 			if (coutPin != null && coutPin.getNet() != null) {
 				Pin dmuxPin = inst.getPin("DMUX");
@@ -201,10 +201,10 @@ public class V6PackerUtils implements PackerUtils {
 	}
 
 	private static class RouteThrough {
-		public PrimitiveSite site;
+		public Site site;
 		public PIPRouteThrough rt;
 
-		public RouteThrough(PrimitiveSite site, PIPRouteThrough rt) {
+		public RouteThrough(Site site, PIPRouteThrough rt) {
 			this.site = site;
 			this.rt = rt;
 		}
