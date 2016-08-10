@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  * XDL 'inst') can reside.
  * @author Chris Lavin
  */
-public final class PrimitiveSite implements Serializable{
+public final class Site implements Serializable{
 	/** Name of the primitive site with X and Y coordinates (ie. SLICE_X0Y0) */
 	private String name;
 	/** The index in the tile's list of PrimitiveSites */
@@ -49,22 +49,22 @@ public final class PrimitiveSite implements Serializable{
 	/** Stores the template of the type that has been assigned to this site. */
 	private SiteTemplate template;
 	/** List of possible types for this site. */
-	private PrimitiveType[] possibleTypes;
+	private SiteType[] possibleTypes;
 	/**
 	 * A map of the external wire each pin connects to for each primitive type this
 	 * site can be represented as.
 	 */
-	private Map<PrimitiveType, Map<String, Integer>> externalWires;
+	private Map<SiteType, Map<String, Integer>> externalWires;
 	/**
 	 * Map of the site pin each wire connecting to the site connects to for each
 	 * primitive type this site can be represented as.
 	 */
-	private Map<PrimitiveType, Map<Integer, SitePinTemplate>> externalWireToPinNameMap;
+	private Map<SiteType, Map<Integer, SitePinTemplate>> externalWireToPinNameMap;
 
 	/**
 	 * Constructor unnamed, tileless primitive site.
 	 */
-	public PrimitiveSite(){
+	public Site(){
 		name = null;
 		tile = null;
 		instanceX = -1;
@@ -157,7 +157,7 @@ public final class PrimitiveSite implements Serializable{
 	 * Returns the current type of this primitive site.
 	 * @return the current type of this primitive site
 	 */
-	public PrimitiveType getType(){
+	public SiteType getType(){
 		return getTemplate().getType();
 	}
 
@@ -170,7 +170,7 @@ public final class PrimitiveSite implements Serializable{
 	 * site must already exist in a tile which exists in a device.
 	 * @param type the new primitive type for this site
 	 */
-	public void setType(PrimitiveType type) {
+	public void setType(SiteType type) {
 		template = getTile().getDevice().getSiteTemplate(type);
 	}
 
@@ -180,7 +180,7 @@ public final class PrimitiveSite implements Serializable{
 	 *
 	 * @return the default type of this site
 	 */
-	public PrimitiveType getDefaultType() {
+	public SiteType getDefaultType() {
 		if (possibleTypes == null)
 			return template.getType();
 		return possibleTypes[0];
@@ -192,7 +192,7 @@ public final class PrimitiveSite implements Serializable{
 	 *
 	 * @return the possible types for this site
 	 */
-	public PrimitiveType[] getPossibleTypes() {
+	public SiteType[] getPossibleTypes() {
 		return possibleTypes;
 	}
 
@@ -202,7 +202,7 @@ public final class PrimitiveSite implements Serializable{
 	 * This method does not update the type of the site.
 	 * @param possibleTypes the possible types for this site
 	 */
-	public void setPossibleTypes(PrimitiveType[] possibleTypes) {
+	public void setPossibleTypes(SiteType[] possibleTypes) {
 		this.possibleTypes = possibleTypes;
 	}
 
@@ -215,7 +215,7 @@ public final class PrimitiveSite implements Serializable{
 		return template;
 	}
 
-	SiteTemplate getTemplate(PrimitiveType type) {
+	SiteTemplate getTemplate(SiteType type) {
 		if (getType() == type)
 			return getTemplate();
 
@@ -251,7 +251,7 @@ public final class PrimitiveSite implements Serializable{
 		return getBelNames(getTemplate());
 	}
 
-	public Set<String> getBelNames(PrimitiveType type) {
+	public Set<String> getBelNames(SiteType type) {
 		return getBelNames(getTemplate(type));
 	}
 
@@ -269,7 +269,7 @@ public final class PrimitiveSite implements Serializable{
 		return getBels(getTemplate());
 	}
 
-	public Set<Bel> getBels(PrimitiveType type) {
+	public Set<Bel> getBels(SiteType type) {
 		return getBels(getTemplate(type));
 	}
 
@@ -313,7 +313,7 @@ public final class PrimitiveSite implements Serializable{
 	 *
 	 * @return PrimitiveTypes that are compatible with the default site type
 	 */
-	public PrimitiveType[] getCompatibleTypes() {
+	public SiteType[] getCompatibleTypes() {
 		return getDefaultTemplate().getCompatibleTypes();
 	}
 
@@ -330,7 +330,7 @@ public final class PrimitiveSite implements Serializable{
 		return getWires(getTemplate());
 	}
 
-	public Set<Integer> getWires(PrimitiveType type) {
+	public Set<Integer> getWires(SiteType type) {
 		return getWires(getTemplate(type));
 	}
 
@@ -348,7 +348,7 @@ public final class PrimitiveSite implements Serializable{
 		return getWireConnections(getTemplate(), wire);
 	}
 
-	public WireConnection[] getWireConnections(PrimitiveType type, int wire) {
+	public WireConnection[] getWireConnections(SiteType type, int wire) {
 		return getWireConnections(getTemplate(type), wire);
 	}
 
@@ -360,7 +360,7 @@ public final class PrimitiveSite implements Serializable{
 		return getReverseConnections(getTemplate(), wire);
 	}
 
-	public WireConnection[] getReverseConnections(PrimitiveType type, int wire) {
+	public WireConnection[] getReverseConnections(SiteType type, int wire) {
 		return getReverseConnections(getTemplate(type), wire);
 	}
 
@@ -372,7 +372,7 @@ public final class PrimitiveSite implements Serializable{
 		return getPipAttribute(getTemplate(), sourceWire, sinkWire);
 	}
 
-	public Attribute getPipAttribute(PrimitiveType type, int sourceWire, int sinkWire) {
+	public Attribute getPipAttribute(SiteType type, int sourceWire, int sinkWire) {
 		return getPipAttribute(getTemplate(type), sourceWire, sinkWire);
 	}
 
@@ -384,7 +384,7 @@ public final class PrimitiveSite implements Serializable{
 		return getPipAttribute(getTemplate(), sitePip);
 	}
 
-	public Attribute getPipAttribute(PrimitiveType type, SitePip sitePip) {
+	public Attribute getPipAttribute(SiteType type, SitePip sitePip) {
 		return getPipAttribute(getTemplate(type), sitePip);
 	}
 
@@ -402,7 +402,7 @@ public final class PrimitiveSite implements Serializable{
 		return getSourcePinNames(getTemplate());
 	}
 
-	public Set<String> getSourcePinNames(PrimitiveType type) {
+	public Set<String> getSourcePinNames(SiteType type) {
 		return getSourcePinNames(getTemplate(type));
 	}
 
@@ -419,7 +419,7 @@ public final class PrimitiveSite implements Serializable{
 		return getSourcePins(getTemplate());
 	}
 
-	public List<SitePin> getSourcePins(PrimitiveType type) {
+	public List<SitePin> getSourcePins(SiteType type) {
 		return getSourcePins(getTemplate(type));
 	}
 
@@ -443,7 +443,7 @@ public final class PrimitiveSite implements Serializable{
 		return getSourcePin(getTemplate(), pinName);
 	}
 
-	public SitePin getSourcePin(PrimitiveType type, String pinName) {
+	public SitePin getSourcePin(SiteType type, String pinName) {
 		return getSourcePin(getTemplate(type), pinName);
 	}
 
@@ -465,7 +465,7 @@ public final class PrimitiveSite implements Serializable{
 		return getSinkPinNames(getTemplate());
 	}
 
-	public Set<String> getSinkPinNames(PrimitiveType type) {
+	public Set<String> getSinkPinNames(SiteType type) {
 		return getSinkPinNames(getTemplate(type));
 	}
 
@@ -482,7 +482,7 @@ public final class PrimitiveSite implements Serializable{
 		return getSinkPins(getTemplate());
 	}
 
-	public List<SitePin> getSinkPins(PrimitiveType type) {
+	public List<SitePin> getSinkPins(SiteType type) {
 		return getSinkPins(getTemplate(type));
 	}
 
@@ -506,7 +506,7 @@ public final class PrimitiveSite implements Serializable{
 		return getSinkPin(getTemplate(), pinName);
 	}
 
-	public SitePin getSinkPin(PrimitiveType type, String pinName) {
+	public SitePin getSinkPin(SiteType type, String pinName) {
 		return getSinkPin(getTemplate(type), pinName);
 	}
 
@@ -526,7 +526,7 @@ public final class PrimitiveSite implements Serializable{
 		return getSitePin(getTemplate(), pinName);
 	}
 
-	public SitePin getSitePin(PrimitiveType type, String pinName) {
+	public SitePin getSitePin(SiteType type, String pinName) {
 		return getSitePin(getTemplate(type), pinName);
 	}
 
@@ -546,7 +546,7 @@ public final class PrimitiveSite implements Serializable{
 	 * @return the pin on the site which connects to the specified external wire or
 	 *   null if the wire connects to no pins on this site
 	 */
-	SitePin getSitePinOfExternalWire(PrimitiveType type, int wire) {
+	SitePin getSitePinOfExternalWire(SiteType type, int wire) {
 		SitePinTemplate pinTemplate = externalWireToPinNameMap.get(type).get(wire);
 		if (pinTemplate == null)
 			return null;
@@ -564,7 +564,7 @@ public final class PrimitiveSite implements Serializable{
 		return getSitePinOfInternalWire(getTemplate(), wire);
 	}
 
-	public SitePin getSitePinOfInternalWire(PrimitiveType type, int wire) {
+	public SitePin getSitePinOfInternalWire(SiteType type, int wire) {
 		return getSitePinOfInternalWire(getTemplate(type), wire);
 	}
 
@@ -577,7 +577,7 @@ public final class PrimitiveSite implements Serializable{
 
 	// Returns the wire which connects externally to the pin.  Needed to get from
 	// inside the site back to the tile routing
-	private int getExternalWire(PrimitiveType type, String pinName) {
+	private int getExternalWire(SiteType type, String pinName) {
 		return externalWires.get(type).get(pinName);
 	}
 
@@ -590,7 +590,7 @@ public final class PrimitiveSite implements Serializable{
 		return getBelPinOfWire(getTemplate(), wire);
 	}
 
-	public BelPin getBelPinOfWire(PrimitiveType type, int wire) {
+	public BelPin getBelPinOfWire(SiteType type, int wire) {
 		return getBelPinOfWire(getTemplate(type), wire);
 	}
 
@@ -608,7 +608,7 @@ public final class PrimitiveSite implements Serializable{
 	 * Used for device creation
 	 * @param externalWires the mapping of pin names to externally connected wires
 	 */
-	public void setExternalWires(Map<PrimitiveType, Map<String, Integer>> externalWires) {
+	public void setExternalWires(Map<SiteType, Map<String, Integer>> externalWires) {
 		this.externalWires = externalWires;
 	}
 
@@ -617,11 +617,11 @@ public final class PrimitiveSite implements Serializable{
 	 * possible primitive type this site can take.
 	 * @return the mapping of pin names to externally connected wires
 	 */
-	public Map<PrimitiveType, Map<String, Integer>> getExternalWires() {
+	public Map<SiteType, Map<String, Integer>> getExternalWires() {
 		return externalWires;
 	}
 
-	public Map<PrimitiveType, Map<Integer, SitePinTemplate>> getExternalWireToPinNameMap() {
+	public Map<SiteType, Map<Integer, SitePinTemplate>> getExternalWireToPinNameMap() {
 		return externalWireToPinNameMap;
 	}
 
@@ -631,7 +631,7 @@ public final class PrimitiveSite implements Serializable{
 	 * @param externalWireToPinNameMap the mapping of wires to pin names
 	 */
 	public void setExternalWireToPinNameMap(
-			Map<PrimitiveType, Map<Integer, SitePinTemplate>> externalWireToPinNameMap) {
+			Map<SiteType, Map<Integer, SitePinTemplate>> externalWireToPinNameMap) {
 		this.externalWireToPinNameMap = externalWireToPinNameMap;
 	}
 
@@ -645,8 +645,8 @@ public final class PrimitiveSite implements Serializable{
 	 * @param otherType The primitive type to try to place on this site.
 	 * @return True if otherType can be placed at this primitive site, false otherwise.
 	 */
-	public boolean isCompatiblePrimitiveType(PrimitiveType otherType){
-		for (PrimitiveType compat : getCompatibleTypes())
+	public boolean isCompatiblePrimitiveType(SiteType otherType){
+		for (SiteType compat : getCompatibleTypes())
 			if (compat == otherType)
 				return true;
 		return false;
@@ -659,7 +659,7 @@ public final class PrimitiveSite implements Serializable{
 	 * @param otherSite The other site to see if its type is compatible with this site.
 	 * @return True if compatible, false otherwise.
 	 */
-	public boolean isCompatiblePrimitiveType(PrimitiveSite otherSite){
+	public boolean isCompatiblePrimitiveType(Site otherSite){
 		return isCompatiblePrimitiveType(otherSite.getType());
 	}
 
@@ -893,13 +893,13 @@ public final class PrimitiveSite implements Serializable{
 	private static class PrimitiveSiteReplace implements Serializable {
 		/** Name of the primitive site with X and Y coordinates (ie. SLICE_X0Y0) */
 		private String name;
-		private PrimitiveType[] possibleTypes;
-		private Map<PrimitiveType, Map<String, Integer>> externalWires;
+		private SiteType[] possibleTypes;
+		private Map<SiteType, Map<String, Integer>> externalWires;
 		private BondedType bondedType;
 
 		@SuppressWarnings("UnusedDeclaration")
-		private PrimitiveSite readResolve() {
-			PrimitiveSite site = new PrimitiveSite();
+		private Site readResolve() {
+			Site site = new Site();
 			site.setName(name);
 			site.possibleTypes = possibleTypes;
 			site.externalWires = externalWires;

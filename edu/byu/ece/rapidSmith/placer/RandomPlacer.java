@@ -37,7 +37,7 @@ public class RandomPlacer{
     // Place all unplaced instances
     for(Instance i : design.getInstances()){
 	    if(i.isPlaced()) continue;
-	    PrimitiveSite[] sites = design.getDevice().getAllCompatibleSites(i.getType());
+	    Site[] sites = design.getDevice().getAllCompatibleSites(i.getType());
 	    int idx = rng.nextInt(sites.length);
 	    int watchDog = 0;
 	    // Find a free primitive site

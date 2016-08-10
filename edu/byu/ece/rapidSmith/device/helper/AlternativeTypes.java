@@ -1,6 +1,6 @@
 package edu.byu.ece.rapidSmith.device.helper;
 
-import edu.byu.ece.rapidSmith.device.PrimitiveType;
+import edu.byu.ece.rapidSmith.device.SiteType;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -13,13 +13,13 @@ public class AlternativeTypes {
 	/**
 	 * Sources of the tile
 	 */
-	public PrimitiveType[] types;
-	private Set<PrimitiveType> set;
+	public SiteType[] types;
+	private Set<SiteType> set;
 	private Integer hash = null;
 
-	public AlternativeTypes(PrimitiveType[] types) {
+	public AlternativeTypes(SiteType[] types) {
 		if (types == null)
-			types = new PrimitiveType[0];
+			types = new SiteType[0];
 		this.types = types;
 		set = new HashSet<>(Arrays.asList(types));
 	}

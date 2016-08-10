@@ -20,15 +20,15 @@
  */
 package edu.byu.ece.rapidSmith.primitiveDefs;
 
-import edu.byu.ece.rapidSmith.device.PrimitiveType;
+import edu.byu.ece.rapidSmith.device.SiteType;
 
 import java.util.HashMap;
 import java.util.Iterator;
 
 public class PrimitiveDefList
-		extends HashMap<PrimitiveType, PrimitiveDef>
+		extends HashMap<SiteType, PrimitiveDef>
 		implements Iterable<PrimitiveDef> {
-	public PrimitiveDef getPrimitiveDef(PrimitiveType type){
+	public PrimitiveDef getPrimitiveDef(SiteType type){
 		return get(type);
 	}
 	

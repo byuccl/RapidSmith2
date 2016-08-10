@@ -1,14 +1,11 @@
-package edu.byu.ece.rapidSmith.design.subsite;
-
-import edu.byu.ece.rapidSmith.device.PrimitiveSite;
-import edu.byu.ece.rapidSmith.device.SitePin;
-import edu.byu.ece.rapidSmith.device.Tile;
-import edu.byu.ece.rapidSmith.device.WireConnection;
+package edu.byu.ece.rapidSmith.device;
 
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import edu.byu.ece.rapidSmith.design.subsite.Connection;
 
 /**
  * A wire inside a tile but outside a site.  This is part of the general
@@ -35,7 +32,7 @@ public class TileWire implements Wire, Serializable {
 	 * Always returns null.
 	 */
 	@Override
-	public PrimitiveSite getSite() {
+	public Site getSite() {
 		return null;
 	}
 
