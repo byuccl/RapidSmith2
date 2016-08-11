@@ -3,6 +3,8 @@ package edu.byu.ece.rapidSmith.examples2;
 import java.io.IOException;
 
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
+import edu.byu.ece.edif.core.EdifNameConflictException;
+import edu.byu.ece.edif.core.InvalidEdifNameException;
 import edu.byu.ece.edif.util.parse.ParseException;
 import edu.byu.ece.rapidSmith.RapidSmithEnv;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
@@ -28,7 +30,7 @@ public class ImportExportExample {
 	}
 	
 	
-	public static void main(String[] args) throws IOException, ParseException {
+	public static void main(String[] args) throws IOException, ParseException, EdifNameConflictException, InvalidEdifNameException {
 		// Load device file
 		System.out.println("Loading Device...");
 		classSetup();
