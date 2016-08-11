@@ -7,24 +7,16 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
-import edu.byu.ece.edif.core.EdifCell;
-import edu.byu.ece.edif.core.EdifCellInstance;
-import edu.byu.ece.edif.core.EdifEnvironment;
 import edu.byu.ece.edif.core.EdifNameConflictException;
-import edu.byu.ece.edif.core.EdifNet;
-import edu.byu.ece.edif.core.EdifPortRef;
-import edu.byu.ece.edif.core.EdifTypedValue;
 import edu.byu.ece.edif.core.InvalidEdifNameException;
-import edu.byu.ece.edif.core.PropertyList;
-import edu.byu.ece.edif.tools.flatten.FlattenedEdifCell;
-import edu.byu.ece.edif.util.parse.EdifParser;
 import edu.byu.ece.edif.util.parse.ParseException;
 import edu.byu.ece.rapidSmith.RapidSmithEnv;
 import edu.byu.ece.rapidSmith.design.NetType;
@@ -34,21 +26,16 @@ import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
 import edu.byu.ece.rapidSmith.design.subsite.Connection;
-import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
-import edu.byu.ece.rapidSmith.design.subsite.Property;
-import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
+import edu.byu.ece.rapidSmith.device.TileWire;
+import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.SiteType;
-import edu.byu.ece.rapidSmith.device.SitePin;
 import edu.byu.ece.rapidSmith.device.Tile;
-import edu.byu.ece.rapidSmith.device.TileWire;
-import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.device.WireConnection;
-import edu.byu.ece.rapidSmith.device.WireEnumerator;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 /**
@@ -68,18 +55,8 @@ public final class VivadoInterface {
 	private static CellLibrary libCells;
 	private static Device device;
 	
-	//variables used to reconstruct the sub-site route trees
-	//currently, sub-site route trees are not being used (a HashMap of
-	//used wires in the each primitive site is used instead) 
-	//but, they may be needed in the future, so leave these here for now 
-	private static boolean isInternalNet = false;
-	private static boolean routesToBelPin = false;
-	private static boolean routesToSitePin = false;
-	private static HashSet<String> usedPips = new HashSet<String>();
-	private static HashMap<String, RouteTree> pinToRT = new HashMap<String, RouteTree>();		
-	private static HashMap<String, HashMap<String, RouteTree>> siteToRTs = new HashMap<String, HashMap<String, RouteTree>> ();
-	
-	//list which holds the cells in the order they were read into Vivado
+	// list which holds the cells in the order they were read into Vivado
+	// TODO: create a sorting algorithm to sort the cells of a design for Vivado import order
 	private static ArrayList<Cell> cellsInOrder = new ArrayList<Cell>();
 	
 	/**
@@ -91,42 +68,33 @@ public final class VivadoInterface {
 	 */
 	public static CellDesign loadTCP (String tcp) throws IOException, ParseException {
 	
-		if(tcp.endsWith("/") || tcp.endsWith("\\"))
+		if (tcp.endsWith("/") || tcp.endsWith("\\")) {
 			tcp = tcp.substring(0, tcp.length()-1);
-		
-		//check to make sure the specified directory is a TINCR checkpoint
-		if (!tcp.endsWith(".tcp")) {
-			MessageGenerator.briefErrorAndExit("[ERROR] Specified directory is not a TINCR checkpoint."
-											+ " Expecting a directory ending in .tcp");
 		}
 		
+		// check to make sure the specified directory is a TINCR checkpoint
+		if (!tcp.endsWith(".tcp")) {
+			MessageGenerator.briefErrorAndExit("[ERROR] Specified directory is not a TINCR checkpoint. "
+											+ "Expecting a directory name ending in .tcp");
+		}
+		
+		// TODO: remove this
 		cellsInOrder.clear();
 		
-		//setup the cell library and the device based on the part in the TCP file
+		// setup the cell library and the device based on the part in the TCP file
 		partname = parseInfoFile(tcp);
 		initializeDevice(partname);
-
-		String edifFile = tcp + File.separator + "netlist.edf";
-		String placementFile = tcp + File.separator + "placement.txt";
-		String routingFile =  tcp + File.separator + "routing.txt";
-
-		//Populate the Cell Design in RS2 by importing the netlist, placement, and routing information
-		EdifEnvironment edifTop = EdifParser.translate(edifFile);
-		FlattenedEdifCell flattened = null;
-		CellDesign design = null;
 		
-		try {
-			flattened = new FlattenedEdifCell(edifTop.getTopCell(), "_flat", null);
-			edifTop.setTopCell(flattened);
-			design = processEdif(edifTop);
-		} catch (EdifNameConflictException | InvalidEdifNameException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
+		// create the RS2 netlist 
+		String edifFile = Paths.get(tcp, "netlist.edf").toString();
+		CellDesign design = EdifInterface.parseEdif(edifFile, libCells);
 			
-		//re-create the placement and routing information
-		applyPlacement(design, placementFile);
-		applyRouting(design, routingFile);
+		// re-create the placement and routing information
+		String placementXdc = Paths.get(tcp, "placement.xdc").toString();
+		applyPlacement(design, placementXdc);
+
+		String routingXdc = Paths.get(tcp, "routing.xdc").toString();
+		applyRouting(design, routingXdc);
 			
 		return design;
 	}
@@ -165,124 +133,6 @@ public final class VivadoInterface {
 	}
 	
 	/*
-	 * Parses the Edif netlist into a RapidSmith2 CellDesign data structure
-	 */
-	private static CellDesign processEdif(EdifEnvironment top) {
-		EdifCell tcell = top.getTopCell();
-			
-		CellDesign des= new CellDesign(top.getTopDesign().getName(), partname);	
-
-		// Go through each cell of this design...
-		if (tcell.getCellInstanceList() != null) { 
-			for(EdifCellInstance eci : tcell.getCellInstanceList()) {
-				// create the corresponding RS2 cell
-				LibraryCell lcType = libCells.get(eci.getType());
-				if (lcType == null) { 
-					MessageGenerator.briefErrorAndExit("[ERROR] Cannot find library cell of type: " + eci.getType() + ", exiting...");
-				}
-				Cell newcell = des.addCell(new Cell(eci.getOldName(), lcType));
-				
-				// Add properties to the cell 
-				// TODO: when macros are added, we will need to update this
-				PropertyList pl = eci.getPropertyList();
-
-				if (pl != null) {
-					for (String s : pl.keySet()) {
-						String propName = pl.get(s).getName(); 
-						EdifTypedValue etv = pl.get(s).getValue(); 
-						Property tmp = new Property(propName, PropertyType.USER, etv);
-						/*
-						//TODO: add support for other types...currently however the EDIF data structure only really supports these types
-						if (etv instanceof IntegerTypedValue) {
-							tmp.setDataType("int");
-						}
-						else if (etv instanceof StringTypedValue) {
-							tmp.setDataType("string");
-						}
-						else if (etv instanceof BooleanTypedValue) {
-							tmp.setDataType("bool");
-						}
-						
-						//check for user defined properties...right now I am assuming that these will be lower case...this is a hack
-						if (!propName.equals(propName.toUpperCase())) {
-							//System.out.println(s);
-							tmp.setType(PropertyType.USER);
-						}
-						*/
-						newcell.updateProperty(tmp);
-					}
-				}
-			}
-		}
-
-		// Now, go through the cell's nets and hook up inputs and outputs 
-		if(tcell.getNetList() != null) {
-			for(EdifNet net : tcell.getNetList()) {
-				//create a new net
-				//NOTE: we are using the old name here, make sure when we go back to EDIF, we use a supported EDIF name
-				CellNet cn = new CellNet(net.getOldName(), NetType.WIRE); 
-				boolean shouldAddNet = true;
-				
-				//process the sources of the net... are these the correct arguments for getSourcePortRefs?
-				Collection<EdifPortRef> sources = net.getSourcePortRefs(false, true);
-				
-				if (sources.size() == 0) {
-					MessageGenerator.briefError("[Warning] No sources for net " + net.getOldName());
-					continue;
-				}
-				else {
-					// Add all the source connections to the net
-					shouldAddNet = processNetConnections(sources, des, cn);
-				}
-								
-				// Add all the sink connections to the net
-				shouldAddNet &= processNetConnections(net.getSinkPortRefs(false, true), des, cn);
-								
-				//only add nets that don't connect to a top-level port
-				//TODO: should we keep a list of top-level ports? For importing back in to Vivado?
-				if (shouldAddNet) 
-					des.addNet(cn);
-			}
-		}
-		
-		return des;
-	}
-	
-	/*
-	 * Helper function to the processEdif function. Returns true if 
-	 * we should add the specified CellNet to the design
-	 */
-	private static boolean processNetConnections(Collection<EdifPortRef> ports, CellDesign des, CellNet cn) {
-		
-		for (EdifPortRef port: ports) {  
-		
-			String pinname = port.isSingleBitPortRef() ? port.getPort().getName() 
-							 : port.getPort().getName() + "[" + (port.getPort().getWidth() - 1 - port.getBusMember()) + "]";
-			
-			//TODO: update this part of the code once (if) top level ports in RS2 are supported...
-			if (port.isTopLevelPortRef()) {
-				return false; 
-			}
-			else {
-				Cell node = des.getCell(port.getCellInstance().getOldName()); 
-				if (node == null) 
-					MessageGenerator.briefErrorAndExit("[ERROR] Trying to connect net " + cn.getName() + " to cell " 
-									+ port.getCellInstance().getOldName() + ", but specified cell does not exist");
-				else {
-					//Mark GND and VCC nets 
-					//TODO: fix this workaround so we can use the function calls node.isVCCSource() and node.isGNDSource()
-					if (node.getLibCell().getName().equals("VCC"))
-						cn.setType(NetType.VCC);
-					else if (node.getLibCell().getName().equals("GND"))
-						cn.setType(NetType.GND);
-					cn.connectToPin(node.getPin(pinname));
-				}						
-			}
-		}
-		return true;
-	}
-	
-	/*
 	 * Applies the placement constraints from the TINCR checkpoint files
 	 * to the RapidSmith2 Cell Design.  
 	 * TODO: update this function once MACRO cells are supported
@@ -298,6 +148,9 @@ public final class VivadoInterface {
 				String cname = toks[1]; 
 				String sname = toks[2];
 				Cell c = design.getCell(cname);
+				
+				Objects.requireNonNull(c, "Null cell found in design! This should never happen.");
+				
 				cellsInOrder.add(c);
 				
 				Site ps = device.getPrimitiveSite(sname);
@@ -323,11 +176,11 @@ public final class VivadoInterface {
 							List<BelPin> bpl = cp.getPossibleBelPins();
 							
 							//special case for the CIN pin
-							if(b.getName().equals("CARRY4") && cp.getName().equals("CI") ) {
+							if (b.getName().equals("CARRY4") && cp.getName().equals("CI") ) {
 								cp.setBelPin("CIN");
 							}
 							//TODO: may have to update this with startwith FIFO as well as RAMB
-							else if(bpl.size() == 1 || b.getName().startsWith("RAMB")) {
+							else if (bpl.size() == 1 || b.getName().startsWith("RAMB")) {
 								if(bpl.get(0) != null)
 									cp.setBelPin(bpl.get(0));
 								else {
@@ -383,27 +236,26 @@ public final class VivadoInterface {
 					continue;
 				}
 				
-				
 				//ps.setUsedSitePips(readUsedSitePips(ps, toks, br, fname));
 				
 				design.setUsedSitePipsAtSite(ps, readUsedSitePips(ps, toks, br, fname));
 				
-				//createPrimitiveSiteRouteTrees(ps);
+				//createSiteRouteTrees(ps);
 				//siteToRTs.put(ps.getName(), pinToRT);
 			}
-			//handle intersite (between sites) routing
+			// handle intersite (between sites) routing
 			else if(toks[0].equals("ROUTE")) {
 				String netname = toks[1]; 
 				CellNet net = design.getNet(netname); //net to add the route tree to
 				
-				//make sure the net is in the design
+				// make sure the net is in the design
 				if (net == null) {
 					MessageGenerator.briefErrorAndExit("[ERROR] Unable to find net \"" + netname + "\" in cell design\n"
 							+ "\tLine " + br.getLineNumber() + " of " + fname);
 				}
 				
-				//Vivado nets always have to have a source pin to be valid...skip nets with no source
-				//Should I throw an error here?
+				// Vivado nets always have to have a source pin to be valid...skip nets with no source
+				// Should I throw an error here?
 				if(net.getSourcePin() == null) {
 					MessageGenerator.briefError("[Warning] Net " + netname + " is not sourced. Cannot apply routing information.\n"
 							+ "\tLine " + br.getLineNumber() + " of " + fname);
@@ -415,12 +267,12 @@ public final class VivadoInterface {
 						createIntersiteRouteTree(start, 4, toks);
 						net.addRouteTree(start.getFirstSource());
 					}					
-					else { //if its not a wire, then its a ground or VCC net
+					else { // if its not a wire, then its a ground or VCC net
 						int index = 4; 
 						
 						while(index < toks.length) {
-							//TODO: Could have another RouteTree pointer point to start
-							//so that I don't have to call getFirstSource for larger nets
+							// TODO: Could have another RouteTree pointer point to start
+							// so that I don't have to call getFirstSource for larger nets
 							RouteTree start = initializeGlobalLogicRouteTree(toks[index++]);
 							index = createIntersiteRouteTree(start, index, toks);
 							net.addRouteTree(start.getFirstSource());
@@ -732,20 +584,26 @@ public final class VivadoInterface {
 	 * @param tcpDirectory TINCR checkpoint directory to write XDC files to
 	 * @param design CellDesign to convert to a TINCR checkpoint
 	 * @throws IOException
+	 * @throws InvalidEdifNameException 
+	 * @throws EdifNameConflictException 
 	 */
-	public static void writeTCP(String tcpDirectory, CellDesign design) throws IOException {
+	public static void writeTCP(String tcpDirectory, CellDesign design) throws IOException, EdifNameConflictException, InvalidEdifNameException {
+		new File(tcpDirectory).mkdir();
 		writePlacementXDC(tcpDirectory, design);
 		writeRoutingXDC(tcpDirectory, design);
+		String edifOut = Paths.get(tcpDirectory, "netlist.edf").toString();
+		EdifInterface.writeEdif(edifOut, design);
 	}
 	
 	/*
 	 * Function to write the placement.xdc file of a TINCR checkpoint
 	 */
 	private static void writePlacementXDC(String tcpDirectory, CellDesign design) throws IOException {
-		BufferedWriter fileout = new BufferedWriter (new FileWriter(tcpDirectory + File.separator + "placement.xdc"));
+		Path outPath = Paths.get(tcpDirectory, "placement.xdc");
+		BufferedWriter fileout = new BufferedWriter (new FileWriter(outPath.toString()));
 		
-		//TODO: Assuming that the logical design has not been modified
-		for(Cell cell : cellsInOrder) {
+		//TODO: Assuming that the logical design has not been modified...can no longer assume this with insertion/deletion
+		for (Cell cell : cellsInOrder) {
 			if(cell.isPlaced()) {
 				Site ps = cell.getAnchorSite();
 				Bel b = cell.getAnchor();
@@ -775,7 +633,8 @@ public final class VivadoInterface {
 	 * Function to write the routing.xdc file of a TINCR checkpoint
 	 */
 	private static void writeRoutingXDC(String tcpDirectory, CellDesign design) throws IOException {
-		BufferedWriter fileout = new BufferedWriter (new FileWriter(tcpDirectory + File.separator + "routing.xdc"));
+		Path outPath = Paths.get(tcpDirectory, "routing.xdc");
+		BufferedWriter fileout = new BufferedWriter (new FileWriter(outPath.toString()));
 		
 		//write the routing information to the TCL script...assumes one final route tree has been created
 		for(CellNet net : design.getNets()) {
@@ -801,7 +660,6 @@ public final class VivadoInterface {
 		fileout.close();
 	}
 	
-	
 	/**
 	 * Creates the Vivado equivalent route string for the RouteTree object of the specified net.
 	 * Can be used to incrementally update the ROUTE property of a net in Vivado. 
@@ -814,11 +672,11 @@ public final class VivadoInterface {
 		String routeString = null;
 		if (routes.size() > 0) {
 			if (net.getType().equals(NetType.WIRE)) {
-				//a signal net should only have one route tree object associated with it...up to the user to ensure this
+				// a signal net should only have one route tree object associated with it...up to the user to ensure this
 				RouteTree route = routes.iterator().next(); 
 				routeString = createVivadoRoutingString(route.getFirstSource());
 			}
-			else { //net is a GND or VCC net
+			else { // net is a GND or VCC net
 				routeString = "{ ";
 				for(RouteTree rt: routes)
 					routeString += "( " + createVivadoRoutingString(rt.getFirstSource()) + ") ";
@@ -832,6 +690,7 @@ public final class VivadoInterface {
 	 * Creates and formats the route tree into a string that Vivado understands and can be applied to a Vivado net
 	 */
 	private static String createVivadoRoutingString (RouteTree rt) {
+		
 		RouteTree currentRoute = rt; 
 		String routeString = "{ ";
 			
@@ -866,170 +725,6 @@ public final class VivadoInterface {
 		
 		return routeString + "} ";
 	}
-	
-   	/* **************************************
-   	 * 			Exporter Code End
-   	 ***************************************/
-	
-	/* **************************************
-   	 * 		   Debug Methods
-   	 ***************************************/	
-	
-	/*
-	 * Debug method that will print a RouteTree
-	 */	
-	@SuppressWarnings("unused")
-	private static void printRouteTree(RouteTree rt, int level) {
-		Wire w = rt.getWire();
-		System.out.println(w.getTile() + "/" + w.getWireName() + "--> " + level);
-			
-		level++;
-		for(RouteTree r: rt.getSinkTrees()) {
-			printRouteTree(r, level);
-		}
-		level--; 
-		return;
-	}
-	
-	/*
-	 * Debug method that creates a TCL command that can be run in Vivado
-	 * to highlight all of the wires in a RouteTree. Used to visually
-	 * verify the RouteTree data structure for a specific net.
-	 * TODO: Pass a net parameter to this function instead
-	 */
-	@SuppressWarnings("unused")
-	private static void printWiresInRoute(CellNet net) {
-
-		String cmd = "select [get_wires {";
-		
-		for(RouteTree rt : net.getRouteTrees()) {
-			Iterator<RouteTree> it = rt.getFirstSource().iterator();
-			System.out.println(rt.getFirstSource().getWire());
-			while (it.hasNext()) {
-				Wire w = it.next().getWire();
-				cmd += w.getTile().getName() + "/" + w.getWireName() + " "; 
-			}
-		}
-		cmd += "}]";
-		System.out.println(cmd);
-	}
-		
-	/* **************************************
-   	 * 		   Debug End
-   	 ***************************************/	
-
-	/* **************************************
-   	 * 	Functions that were used to create 
-   	 * 	Sub-site route tree data structures
-   	 ***************************************/	
-	
-	/*
-	 * 
-	 */
-	private static void createSubsiteRouteTree(RouteTree rt, boolean top) {
-		Wire currentWire = rt.getWire();
-		
-		//this code prevents loops. If we reach a terminal, then return unless the terminal is the place we are starting the route tree
-		if (rt.getWire().getTerminals().size() > 0 && !top) {
-			routesToBelPin = true;
-			return;
-		}
-		
-		//this will execute at most one time because each site pin has only one internal wire connecting to it.
-		for (Connection c: currentWire.getPinConnections()) {
-			pinToRT.put(c.getSitePin().getName(), rt);
-			routesToSitePin = true;
-			return;
-		}	
-		
-		for(Connection c: rt.getWire().getWireConnections()) {
-			//only continue along a PIP connection if it is being used in the site
-			if(c.isPip()) {	
-				if(!usedPips.contains(currentWire.getWireName())) {
-					rt.getSourceTree().removeConnection(rt.getConnection());
-					return;
-				}
-				isInternalNet = true; //a net is internal if a used site pip is on its path
-			}
-			createSubsiteRouteTree(rt.addConnection(c), false);
-		}
-		return;
-	}
-		
-	/*
-	 * TODO: Somehow incorporate the internal nets into each primitive site
-	 */
-	@SuppressWarnings("unused")
-	private static void createPrimitiveSiteRouteTrees(Site ps) {
-		pinToRT = new HashMap<String, RouteTree>();	
-		for(Bel b: ps.getBels()) {
-			for(BelPin bp: b.getSources()) {
-				isInternalNet = false;
-				routesToSitePin = false;
-				RouteTree tmp = new RouteTree(bp.getWire()); 
-				createSubsiteRouteTree(tmp, true);
-		
-				if(isInternalNet | routesToSitePin)
-					pinToRT.put(bp.getName(), tmp);
-			}
-		}
-		
-		//TODO: Look at the clock pin input...it looks like there is a bug here
-		for(SitePin sp: ps.getSinkPins()) {
-			isInternalNet = false;
-			routesToBelPin = false;
-			RouteTree tmp = new RouteTree(sp.getInternalWire());
-			createSubsiteRouteTree(tmp,true);
-							
-			if (isInternalNet | routesToBelPin)
-				pinToRT.put(sp.getName(), tmp);
-		}
-		return;
-	}
-	
-	/* Original version of readUsedSitePips...I don't even think this is what I actually want
-	private static void readUsedSitePips(PrimitiveSite ps, String[] toks, LineNumberReader br, String fname){
-		String namePrefix = "intrasite:" + ps.getType() + "/";
-		
-		//list of site pip wires that are used...
-		usedPips = new HashSet<String>();
-		for(int i = 2; i <toks.length; i++) {
-			String pipWireName = (namePrefix + toks[i].replace(":", "."));
-			Integer wireEnum = device.getWireEnumerator().getWireEnum(pipWireName);
-			
-			if(wireEnum == null) {
-				MessageGenerator.briefError("[Warning] Unknown PIP wire \"" + pipWireName + "\" in current device.\n"
-						+ "        Line " + br.getLineNumber() + " of " + fname);
-				continue;
-			}
-			//add the input and output pip wires (there are two of these in RS2)
-			usedPips.add(pipWireName); 	
-			usedPips.add(pipWireName.split("\\.")[0] + ".OUT");
-		}	
-	}
-	*/
-	
-	/*
-	 * Merges the intersite RouteTree ending on a site pin with the intrasite RouteTree
-	 * starting on the same site pin and ending on the belpin that corresponds to a sink 
-	 * pin of the net. 
-	 */
-	@SuppressWarnings("unused")
-	private static void connectSitePinRouteTree(RouteTree rt) {
-		for(Connection c: rt.getWire().getPinConnections()) {
-			SitePin sp = c.getSitePin();
-			try { //look for a route tree to connect to 
- 				rt.addConnection(c, siteToRTs.get(sp.getSite().getName()).get(sp.getName()));
-			}
-			catch (NullPointerException e) {
-				rt = rt.addConnection(c);
-				for(Connection c2: rt.getWire().getWireConnections()) {
-					rt.addConnection(c2);
-				}
-			}
-		}
-	}
-	
 	
 } // END CLASS 
 

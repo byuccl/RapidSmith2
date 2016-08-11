@@ -6,7 +6,6 @@ import edu.byu.ece.rapidSmith.device.PinDirection;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 /**
@@ -153,6 +152,18 @@ public class CellNet implements Serializable {
 		Objects.requireNonNull(value);
 
 		updateProperty(new Property(propertyKey, type, value));
+	}
+	
+	/**
+	 * Updates or adds the properties in the provided collection to the properties
+	 * of this cell.
+	 *
+	 * @param properties the properties to add or update
+	 */
+	public void updateProperties(Collection<Property> properties) {
+		Objects.requireNonNull(properties);
+
+		properties.forEach(this::updateProperty);
 	}
 
 	/**
