@@ -54,11 +54,7 @@ public final class VivadoInterface {
 	private static String partname;
 	private static CellLibrary libCells;
 	private static Device device;
-	
-	// list which holds the cells in the order they were read into Vivado
-	// TODO: create a sorting algorithm to sort the cells of a design for Vivado import order
-	private static ArrayList<Cell> cellsInOrder = new ArrayList<Cell>();
-	
+		
 	/**
 	 * Parses a TINCR checkpoint, and creates an equivalent RapidSmith 2 design.
 	 * 
@@ -77,10 +73,7 @@ public final class VivadoInterface {
 			MessageGenerator.briefErrorAndExit("[ERROR] Specified directory is not a TINCR checkpoint. "
 											+ "Expecting a directory name ending in .tcp");
 		}
-		
-		// TODO: remove this
-		cellsInOrder.clear();
-		
+			
 		// setup the cell library and the device based on the part in the TCP file
 		partname = parseInfoFile(tcp);
 		initializeDevice(partname);
@@ -90,12 +83,12 @@ public final class VivadoInterface {
 		CellDesign design = EdifInterface.parseEdif(edifFile, libCells);
 			
 		// re-create the placement and routing information
-		String placementXdc = Paths.get(tcp, "placement.xdc").toString();
-		applyPlacement(design, placementXdc);
+		String placementFile = Paths.get(tcp, "placement.txt").toString();
+		applyPlacement(design, placementFile);
 
-		String routingXdc = Paths.get(tcp, "routing.xdc").toString();
-		applyRouting(design, routingXdc);
-			
+		String routingFile = Paths.get(tcp, "routing.txt").toString();
+		applyRouting(design, routingFile);
+					
 		return design;
 	}
 		
@@ -150,9 +143,7 @@ public final class VivadoInterface {
 				Cell c = design.getCell(cname);
 				
 				Objects.requireNonNull(c, "Null cell found in design! This should never happen.");
-				
-				cellsInOrder.add(c);
-				
+								
 				Site ps = device.getPrimitiveSite(sname);
 				
 				if (ps == null)
@@ -471,8 +462,7 @@ public final class VivadoInterface {
 			case RIGHT:
 				return device.getTile(tile.getRow(), tile.getColumn() + 1);
 			default: 
-				assert(false); // should never reach here
-				return null;
+				throw new IllegalStateException("Invalid Tile Direction"); // should never reach here
 		}
 	}
 	
@@ -519,7 +509,7 @@ public final class VivadoInterface {
 		
 		if(!tmp.isPip()) {
 			if (connections.length == 1) {
-				current = addConnectionToRouteTree(current, tmp); //current.addConnection(tmp);
+				current = addConnectionToRouteTree(current, tmp); // current.addConnection(tmp);
 			}
 			else { //search for the first wire in the branch, and add the missing wire connections if necessary 
 				outerLoop : for(Connection c : connections) {
@@ -568,19 +558,12 @@ public final class VivadoInterface {
 		}
 	}
 	
-	/* **************************************
-   	 * 		   Exporter Code Start
-   	 ***************************************/	
+	/* *******************************
+   	 * 		   Exporter Code
+   	 ********************************/
 	/**
 	 * Export the RapidSmith2 design into an existing TINCR checkpoint file. 
-	 * Currently assumes the cells of the design has been unmodified so that
-	 * it can write cells to the checkpoint file in the order that they were
-	 * read in. 
-	 * 
-	 * TODO: add support for changed designs...writing the EDIF out and constraint file
-	 * TODO: Create a java comparator class that can sort cells to be in the correct
-	 * 		 order for Vivado
-	 *  
+	 *   
 	 * @param tcpDirectory TINCR checkpoint directory to write XDC files to
 	 * @param design CellDesign to convert to a TINCR checkpoint
 	 * @throws IOException
@@ -603,7 +586,7 @@ public final class VivadoInterface {
 		BufferedWriter fileout = new BufferedWriter (new FileWriter(outPath.toString()));
 		
 		//TODO: Assuming that the logical design has not been modified...can no longer assume this with insertion/deletion
-		for (Cell cell : cellsInOrder) {
+		for (Cell cell : sortCellsForXdcExport(design)) {
 			if(cell.isPlaced()) {
 				Site ps = cell.getAnchorSite();
 				Bel b = cell.getAnchor();
@@ -726,27 +709,55 @@ public final class VivadoInterface {
 		return routeString + "} ";
 	}
 	
-} // END CLASS 
-
-/* ***********
- * Possible future code/utility functions that are currently un-needed
- * ************/
-//future code to create top level ports (if this functionality is added to RapidSmith
-//probably have to first check for null before iterating through the portlist that is returned
-/*
-for (EdifPort ep: tcell.getInterface().getPortList()) {
-	Port p;
-	int portDirection = (ep.isInputOnly()) ? 0 : ( ep.isOutputOnly() ? 1 : 2);
-	msg("Top Level Port: " + ep.getName());
-	if (ep.isBus()){
-		for (EdifSingleBitPort single: ep.getSingleBitPortList()) {
-			//p = new Port(single.getPortName(), portDirection);
-			msg("\tchild: " + single.getPortName());
-			//des.addTopLevelPort(p);
+	/*
+	 * Sorts the cells of the design in the order required for TINCR export. 
+	 * Uses a bin sorting algorithm to have a complexity of O(n). 
+	 * 
+	 * TODO: Add <is_lut>, <is_carry>, and <is_ff> tags to cell library
+	 */
+	public static Collection<Cell> sortCellsForXdcExport(CellDesign design) {
+		
+		// cell bins
+		ArrayList<Cell> sorted = new ArrayList<Cell>(design.getCells().size());
+		ArrayList<Cell> lutCells = new ArrayList<Cell>();
+		ArrayList<Cell> carryCells = new ArrayList<Cell>();
+		ArrayList<Cell> ffCells = new ArrayList<Cell>();
+		ArrayList<Cell> ff5Cells = new ArrayList<Cell>();
+		
+		// traverse the cells and drop them in the correct bin
+		for (Cell cell : design.getCells()) {
+			
+			// only add cells that are placed to the list
+			if( !cell.isPlaced() ) {
+				continue;
+			}
+			
+			String libCellName = cell.getLibCell().getName();
+			String belName = cell.getAnchor().getName();
+			
+			if (belName.endsWith("LUT")) {
+				lutCells.add(cell); 
+			}
+			else if (libCellName.startsWith("CARRY")) {
+				carryCells.add(cell);
+			}
+			else if (belName.endsWith("5FF")) {
+				ff5Cells.add(cell);
+			}
+			else if (belName.endsWith("FF")) {
+				ffCells.add(cell);
+			}
+			else {
+				sorted.add(cell);
+			}
 		}
+				
+		// append all other cells in the correct order
+		sorted.addAll(lutCells);
+		sorted.addAll(ffCells);
+		sorted.addAll(carryCells);		
+		sorted.addAll(ff5Cells);
+	
+		return sorted;
 	}
-	else {
-		p = new Port(ep.getName(), portDirection);
-	}
-}
-*/
+} // END CLASS 

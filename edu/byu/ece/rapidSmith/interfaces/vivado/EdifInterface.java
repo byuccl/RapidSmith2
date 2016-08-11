@@ -505,3 +505,26 @@ public final class EdifInterface {
 		}
 	}
 }
+
+/* ***********
+ * Possible future code/utility functions that are currently un-needed
+ * ************/
+//future code to create top level ports (if this functionality is added to RapidSmith
+//probably have to first check for null before iterating through the portlist that is returned
+/*
+for (EdifPort ep: tcell.getInterface().getPortList()) {
+	Port p;
+	int portDirection = (ep.isInputOnly()) ? 0 : ( ep.isOutputOnly() ? 1 : 2);
+	msg("Top Level Port: " + ep.getName());
+	if (ep.isBus()){
+		for (EdifSingleBitPort single: ep.getSingleBitPortList()) {
+			//p = new Port(single.getPortName(), portDirection);
+			msg("\tchild: " + single.getPortName());
+			//des.addTopLevelPort(p);
+		}
+	}
+	else {
+		p = new Port(ep.getName(), portDirection);
+	}
+}
+*/
