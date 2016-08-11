@@ -21,6 +21,7 @@
 package edu.byu.ece.rapidSmith.design;
 
 import edu.byu.ece.rapidSmith.device.Tile;
+import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.device.WireConnection;
 import edu.byu.ece.rapidSmith.device.WireEnumerator;
 
@@ -38,21 +39,15 @@ import java.util.Objects;
 public class PIP implements Comparable<PIP>, Serializable {
 
 	private static final long serialVersionUID = 122367735864726588L;
-	/** The tile where this PIP is located */
-	private Tile tile;
-
-	private int startWire;
-	private int endWire;
+	private Wire startWire;
+	private Wire endWire;
 
 	/**
 	 * Constructs an empty PIP.
 	 */
-	public PIP() {
-
-	}
+	public PIP() { }
 
 	public PIP(PIP other) {
-		this.tile = other.tile;
 		this.startWire = other.startWire;
 		this.endWire = other.endWire;
 	}
@@ -60,14 +55,12 @@ public class PIP implements Comparable<PIP>, Serializable {
 	/**
 	 * Constructs a new PIP.
 	 *
-	 * @param tile the tile of this PIP
 	 * @param startWire the start wire of this PIP
 	 * @param endWire the end wire of this PIP
 	 */
-	public PIP(Tile tile, int startWire, int endWire) {
+	public PIP(Wire startWire, Wire endWire) {
 		this.startWire = startWire;
 		this.endWire = endWire;
-		this.tile = tile;
 	}
 
 	/**
@@ -75,7 +68,7 @@ public class PIP implements Comparable<PIP>, Serializable {
 	 *
 	 * @return the start wire enumeration
 	 */
-	public int getStartWire() {
+	public Wire getStartWire() {
 		return startWire;
 	}
 
@@ -85,14 +78,14 @@ public class PIP implements Comparable<PIP>, Serializable {
 	 * @return the name of the start wire of this PIP
 	 */
 	public String getStartWireName() {
-		return tile.getDevice().getWireEnumerator().getWireName(startWire);
+		return startWire.getWireName();
 	}
 
 	/**
 	 * Sets the start wire of this PIP.
 	 * @param wire the enumeration of the start wire of this PIP
 	 */
-	public void setStartWire(int wire) {
+	public void setStartWire(Wire wire) {
 		this.startWire = wire;
 	}
 
@@ -101,7 +94,7 @@ public class PIP implements Comparable<PIP>, Serializable {
 	 *
 	 * @return the end wire of this PIP
 	 */
-	public int getEndWire() {
+	public Wire getEndWire() {
 		return endWire;
 	}
 
@@ -111,14 +104,14 @@ public class PIP implements Comparable<PIP>, Serializable {
 	 * @return the name of the end wire of this PIP
 	 */
 	public String getEndWireName() {
-		return tile.getDevice().getWireEnumerator().getWireName(endWire);
+		return endWire.getWireName();
 	}
 
 	/**
 	 * Sets the end wire of this PIP.
 	 * @param wire the enumeration of the end wire of this PIP
 	 */
-	public void setEndWire(int wire) {
+	public void setEndWire(Wire wire) {
 		this.endWire = wire;
 	}
 
@@ -128,32 +121,12 @@ public class PIP implements Comparable<PIP>, Serializable {
 	 * @return the tile where this PIP resides
 	 */
 	public Tile getTile() {
-		return tile;
-	}
-
-	/**
-	 * Sets the tile of this PIP.
-	 * @param tile the new tile for this PIP
-	 */
-	public void setTile(Tile tile) {
-		this.tile = tile;
-	}
-
-	/**
-	 * Returns an array of all possible wire connections that
-	 * can be made from the start wire of this PIP.  Keep in mind that some
-	 * of the wire connections that leave the tile are not PIPs.
-	 *
-	 * @return An array of all possible end wire connections from this PIP's
-	 * start wire
-	 */
-	public WireConnection[] getAllPossibleEndWires() {
-		return getTile().getWireConnections(getStartWire());
+		return startWire.getTile();
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(getEndWire() + getStartWire(), getTile());
+		return Objects.hash(getEndWire(), getStartWire());
 	}
 
 	@Override
@@ -178,8 +151,8 @@ public class PIP implements Comparable<PIP>, Serializable {
 
 	@Deprecated
 	public int compareTo(PIP pip) throws ClassCastException {
-		return (this.tile.getName() + this.getStartWire() + this.getEndWire())
-				.compareTo(pip.tile.getName() + pip.getStartWire() + pip.getEndWire());
+		return ("" + this.getStartWire() + this.getEndWire())
+				.compareTo("" + pip.getStartWire() + pip.getEndWire());
 	}
 
 	/**
@@ -189,8 +162,7 @@ public class PIP implements Comparable<PIP>, Serializable {
 	 * @return An XDL-compatible string of this PIP
 	 */
 	public String toString() {
-		WireEnumerator we = tile.getDevice().getWireEnumerator();
-		return "pip " + tile.getName() + " " + we.getWireName(getStartWire()) +
-				" -> " + we.getWireName(getEndWire());
+		return "pip " + getTile().getName() + " " + getStartWireName() +
+				" -> " + getEndWireName();
 	}
 }

@@ -38,11 +38,7 @@ import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.design.Pin;
 import edu.byu.ece.rapidSmith.design.PinType;
 import edu.byu.ece.rapidSmith.design.Port;
-import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.Site;
-import edu.byu.ece.rapidSmith.device.SiteType;
-import edu.byu.ece.rapidSmith.device.Tile;
-import edu.byu.ece.rapidSmith.device.Utils;
+import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import edu.byu.ece.rapidSmith.util.StringPool;
 
@@ -79,7 +75,8 @@ public class DesignParser{
 	public static String PIP3 = "==";
 	
 	private Design design;
-	
+	private Tile pipTile = new Tile();
+
 	/**
 	 * @return the design
 	 */
@@ -207,6 +204,7 @@ public class DesignParser{
 	 */
 	private void parseToken(String token){
 		//System.out.println(lineNumber + "<" + token + ">");
+
 		switch(state){
 			case BEGIN_DESIGN:
 				expect(DESIGN, token, ParserState.BEGIN_DESIGN);
@@ -508,12 +506,11 @@ public class DesignParser{
 				state = ParserState.NET_STATEMENT;
 				break;
 			case PIP_TILE:
-				Tile pipTile = dev.getTile(token);
+				pipTile = dev.getTile(token);
 				if(pipTile == null){
 					MessageGenerator.briefErrorAndExit("Invalid tile " +
 							token + " on line " + lineNumber);
 				}
-				currPIP.setTile(pipTile);
 				state = ParserState.PIP_WIRE0;
 				break;
 			case PIP_WIRE0:
@@ -522,7 +519,7 @@ public class DesignParser{
 					MessageGenerator.briefErrorAndExit("ERROR: Invalid wire: " +
 							token + " found on line " + lineNumber);
 				}
-				currPIP.setStartWire(wire0);
+				currPIP.setStartWire(new TileWire(pipTile, wire0));
 				state = ParserState.PIP_CONN_TYPE;
 				break;
 			case PIP_CONN_TYPE:
@@ -539,7 +536,8 @@ public class DesignParser{
 					MessageGenerator.briefErrorAndExit("XDL Design Parser Error in file: "+ fileName +", Invalid wire: " +
 							token + " found on line " + lineNumber);
 				}
-				currPIP.setEndWire(wire1);
+				currPIP.setEndWire(new TileWire(pipTile, wire1));
+				pipTile = null;
 				state = ParserState.NET_STATEMENT; 
 				break;
 			case MODULE_NAME:

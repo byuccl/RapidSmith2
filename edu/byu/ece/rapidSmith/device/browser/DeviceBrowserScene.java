@@ -36,12 +36,10 @@ import com.trolltech.qt.gui.QGraphicsSceneMouseEvent;
 import com.trolltech.qt.gui.QMenu;
 import com.trolltech.qt.gui.QPen;
 
-import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.Tile;
-import edu.byu.ece.rapidSmith.device.WireConnection;
+import edu.byu.ece.rapidSmith.design.subsite.Connection;
+import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.gui.NumberedHighlightedTile;
 import edu.byu.ece.rapidSmith.gui.TileScene;
-import edu.byu.ece.rapidSmith.router.Node;
 
 /**
  * This class was written specifically for the DeviceBrowser class.  It
@@ -60,7 +58,7 @@ public class DeviceBrowserScene extends TileScene{
 	private Tile reachabilityTile;
 	/**	 */
 	private ArrayList<NumberedHighlightedTile> currentTiles = new ArrayList<NumberedHighlightedTile>();
-	
+
 	
 	public DeviceBrowserScene(Device device, boolean hideTiles, boolean drawPrimitives, DeviceBrowser browser){
 		super(device, hideTiles, drawPrimitives);
@@ -87,58 +85,62 @@ public class DeviceBrowserScene extends TileScene{
 		currLines.clear();
 	}
 	
-	public void drawWire(Tile src, int wireSrc, Tile dst, int wireDst){
+	public void drawWire(Wire src, Wire dst){
 		double enumSize = we.getWires().length;
-		double x1 = (double) tileXMap.get(src)*tileSize  + (wireSrc%tileSize);
-		double y1 = (double) tileYMap.get(src)*tileSize  + (wireSrc*tileSize)/enumSize;
-		double x2 = (double) tileXMap.get(dst)*tileSize  + (wireDst%tileSize);
-		double y2 = (double) tileYMap.get(dst)*tileSize  + (wireDst*tileSize)/enumSize;
-		WireConnectionLine line = new WireConnectionLine(x1,y1,x2,y2, this, dst, wireDst);
-		line.setToolTip(src.getName() + " " + we.getWireName(wireSrc) + " -> " +
-				dst.getName() + " " + we.getWireName(wireDst));
+		Tile srcTile = src.getTile();
+		int srcEnum = src.getWireEnum();
+		double x1 = (double) tileXMap.get(srcTile)*tileSize  + (srcEnum %tileSize);
+		double y1 = (double) tileYMap.get(srcTile)*tileSize  + (srcEnum *tileSize)/enumSize;
+
+		Tile dstTile = dst.getTile();
+		int dstEnum = dst.getWireEnum();
+		double x2 = (double) tileXMap.get(dstTile)*tileSize  + (dstEnum %tileSize);
+		double y2 = (double) tileYMap.get(dstTile)*tileSize  + (dstEnum *tileSize)/enumSize;
+
+		WireConnectionLine line = new WireConnectionLine(x1,y1,x2,y2, this, dst);
+		line.setToolTip(src + " -> " + dst);
 		line.setPen(wirePen);
 		line.setAcceptHoverEvents(true);
 		addItem(line);
 		currLines.add(line);
 	}
 
-	public void drawConnectingWires(Tile tile, int wire){
+	public void drawConnectingWires(Wire wire){
 		clearCurrentLines();
-		if(tile == null) return;
-		if(tile.getWireConnections(wire) == null) return;
-		for(WireConnection w : tile.getWireConnections(wire)){
-			drawWire(tile, wire, w.getTile(tile), w.getWire());
+		for(Connection w : wire.getWireConnections()) {
+			drawWire(wire, w.getSinkWire());
 		}
 	}
 
 	private HashMap<Tile, Integer> findReachability(Tile t, Integer hops){
 		HashMap<Tile, Integer> reachabilityMap = new HashMap<Tile, Integer>();
-		
-		Queue<Node> queue = new LinkedList<Node>();
-		for(Integer wire : t.getWires()){
-			WireConnection[] connections = t.getWireConnections(wire);
-			if(connections == null) continue;
-			for(WireConnection wc : connections){
-				queue.add(wc.createNode(t));
+		HashMap<Wire, Integer> level = new HashMap<>();
+
+		Queue<Wire> queue = new LinkedList<Wire>();
+		for(Wire wire : t.getWires()){
+			for(Connection c : wire.getWireConnections()) {
+				Wire w = c.getSinkWire();
+				queue.add(w);
+				level.put(w, 0);
 			}
 		}
 		
 		while(!queue.isEmpty()){
-			Node currNode = queue.poll();
-			Integer i = reachabilityMap.get(currNode.getTile());
+			Wire currWire = queue.poll();
+			Integer i = reachabilityMap.get(currWire.getTile());
 			if(i == null){
 				i = 1;
-				reachabilityMap.put(currNode.getTile(), i);
+				reachabilityMap.put(currWire.getTile(), i);
 			}
 			else{
-				reachabilityMap.put(currNode.getTile(), i+1);						
+				reachabilityMap.put(currWire.getTile(), i+1);
 			}
-			if(currNode.getLevel() < hops-1){
-				WireConnection[] connections = currNode.getConnections();
-				if(connections != null){
-					for(WireConnection wc : connections){
-						queue.add(wc.createNode(currNode));
-					}
+			int curLevel = level.get(currWire);
+			if(curLevel < hops-1){
+				for (Connection c : currWire.getWireConnections()) {
+					Wire sink = c.getSinkWire();
+					queue.add(sink);
+					level.put(sink, curLevel + 1);
 				}
 			}
 		}

@@ -60,10 +60,10 @@ public class DesignTileScene extends TileScene {
 		QPainterPath path = new QPainterPath();
 		
 		for(Connection conn : conns){
-			double x1 = (double) tileXMap.get(conn.startTile)*tileSize  + (conn.startWire%tileSize);
-			double y1 = (double) tileYMap.get(conn.startTile)*tileSize  + (conn.startWire*tileSize)/enumSize;
-			double x2 = (double) tileXMap.get(conn.endTile)*tileSize  + (conn.endWire%tileSize);
-			double y2 = (double) tileYMap.get(conn.endTile)*tileSize  + (conn.endWire*tileSize)/enumSize;
+			double x1 = (double) tileXMap.get(conn.getStartTile())*tileSize  + (conn.getStartWire().getWireEnum()%tileSize);
+			double y1 = (double) tileYMap.get(conn.getStartTile())*tileSize  + (conn.getStartWire().getWireEnum()*tileSize)/enumSize;
+			double x2 = (double) tileXMap.get(conn.getEndTile())*tileSize  + (conn.getEndWire().getWireEnum()%tileSize);
+			double y2 = (double) tileYMap.get(conn.getEndTile())*tileSize  + (conn.getEndWire().getWireEnum()*tileSize)/enumSize;
 
 			path.moveTo(x1, y1);
 			path.lineTo(x2, y2);

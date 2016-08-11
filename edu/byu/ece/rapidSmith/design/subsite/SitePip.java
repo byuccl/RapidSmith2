@@ -2,6 +2,7 @@ package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.device.Site;
+import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.device.WireEnumerator;
 
 import java.util.Objects;
@@ -10,15 +11,12 @@ import java.util.Objects;
  * A PIP in a site.
  */
 public final class SitePip extends PIP {
-	private Site site;
-
-	public SitePip(Site site, int startWire, int endWire) {
-		super(site.getTile(), startWire, endWire);
-		this.site = site;
+	public SitePip(Wire startWire, Wire endWire) {
+		super(startWire, endWire);
 	}
 
 	public Site getSite() {
-		return site;
+		return getStartWire().getSite();
 	}
 
 	@Override
@@ -44,8 +42,7 @@ public final class SitePip extends PIP {
 
 	@Override
 	public String toString() {
-		WireEnumerator we = site.getTile().getDevice().getWireEnumerator();
-		return "pip " + site.getName() + " " + we.getWireName(getStartWire()) +
-				" -> " + we.getWireName(getEndWire());
+		return "pip " + getSite().getName() + " " + getStartWireName() +
+				" -> " + getEndWireName();
 	}
 }

@@ -15,7 +15,7 @@ import edu.byu.ece.rapidSmith.design.subsite.Connection;
 public interface Wire extends Serializable {
 	int getWireEnum();
 	default String getWireName() {
-		return getTile().getDevice().getWireEnumerator().getWireName(getWireEnum());
+		return getWireEnumerator().getWireName(getWireEnum());
 	}
 	Tile getTile();
 	Site getSite();
@@ -62,4 +62,16 @@ public interface Wire extends Serializable {
 	 * Returns the sources (BelPins) which drive this wire.
 	 */
 	Collection<Connection> getSources();
+
+	default WireType getType() {
+		return getWireEnumerator().getWireType(getWireEnum());
+	}
+
+	default WireDirection getDirection() {
+		return getWireEnumerator().getWireDirection(getWireEnum());
+	}
+
+	default WireEnumerator getWireEnumerator() {
+		return getTile().getDevice().getWireEnumerator();
+	}
 }

@@ -251,6 +251,7 @@ public class Tile implements Serializable {
 	 *
 	 * @return The wires HashMap for this tile.
 	 */
+	@Deprecated
 	public WireHashMap getWireHashMap() {
 		return wireConnections;
 	}
@@ -271,6 +272,7 @@ public class Tile implements Serializable {
 	 * @param src  The wire (or key) of the HashMap to add.
 	 * @param dest The actual wire to add to the value or Wire[] in the HashMap.
 	 */
+	@Deprecated
 	public void addConnection(int src, WireConnection dest) {
 		// Add the wire if it doesn't already exist
 		if (this.wireConnections.get(src) == null) {
@@ -289,10 +291,13 @@ public class Tile implements Serializable {
 		}
 	}
 
-	public Set<Integer> getWires() {
+	public List<Wire> getWires() {  // TODO should this be made into a stream? list?
 		if (wireConnections == null)
-			return Collections.emptySet();
-		return wireConnections.keySet();
+			return Collections.emptyList();
+		List<Wire> ret = new ArrayList<>();
+		for (Integer wireEnum : wireConnections.keySet())
+			ret.add(new TileWire(this, wireEnum));
+		return ret;
 	}
 
 	/**
@@ -302,17 +307,18 @@ public class Tile implements Serializable {
 	 * @param wire A wire in this tile to query its potential connections.
 	 * @return An array of wires which connect to the given wire.
 	 */
-	public WireConnection[] getWireConnections(int wire) {
+	WireConnection[] getWireConnections(int wire) {
 		if (wireConnections == null)
 			return new WireConnection[0];
 		return wireConnections.get(wire);
 	}
 
+	@Deprecated
 	public WireHashMap getReverseWireHashMap() {
 		return reverseWireConnections;
 	}
 
-	public WireConnection[] getReverseConnections(int wire) {
+	WireConnection[] getReverseConnections(int wire) {
 		if (reverseWireConnections == null)
 			return new WireConnection[0];
 		return reverseWireConnections.get(wire);
@@ -330,7 +336,9 @@ public class Tile implements Serializable {
 	 * @return True if the connection exists in this tile, false otherwise.
 	 */
 	public boolean hasPIP(PIP pip) {
-		return hasConnection(pip.getStartWire(), pip.getEndWire());
+		if (pip.getTile() != this)
+			return false;
+		return hasConnection(pip.getStartWire().getWireEnum(), pip.getEndWire().getWireEnum());
 	}
 
 	private boolean hasConnection(int startWire, int endWire) {
@@ -359,7 +367,9 @@ public class Tile implements Serializable {
 		for (Integer startWire : wireConnections.keySet()) {
 			for (WireConnection endWire : wireConnections.get(startWire)) {
 				if (endWire.isPIP()) {
-					pips.add(new PIP(this, startWire, endWire.getWire()));
+					TileWire start = new TileWire(this, startWire);
+					TileWire end = new TileWire(this, endWire.getWire());
+					pips.add(new PIP(start, end));
 				}
 			}
 		}
@@ -374,16 +384,6 @@ public class Tile implements Serializable {
 	 */
 	public void addSink(int sink) {
 		sinks.put(sink, UNCONNECTED_SINKPIN);
-	}
-
-	/**
-	 * Gets and returns the HashMap containing the sinks for this tile.  The keys are
-	 * the actual sink wires and the values are the SinkPin objects.
-	 *
-	 * @return The HashMap of sink wire mappings in this tile.
-	 */
-	public HashMap<Integer, SinkPin> getSinks() {
-		return sinks;
 	}
 
 	/**
@@ -408,30 +408,19 @@ public class Tile implements Serializable {
 	 * @param sink the sink wire of interest
 	 * @return the furthest wire that is the sole source of the sink
 	 */
-	public SinkPin getSinkPin(Integer sink) {
-		return sinks == null ? null : sinks.get(sink);
+	public SinkPin getSinkPin(Wire sink) {
+		return sinks == null ? null : sinks.get(sink.getWireEnum());
 	}
 
-	/**
-	 * Used to compile the sources for this tile during parsing, should not be called
-	 * during normal usage.
-	 *
-	 * @param source The new source to add.
-	 */
-	public void addSource(int source) {
-		if (this.sources == null) {
-			int[] tmp = new int[1];
-			tmp[0] = source;
-			this.sources = tmp;
-		} else {
-			int i;
-			int[] tmp = new int[this.sources.length + 1];
-			for (i = 0; i < this.sources.length; i++) {
-				tmp[i] = sources[i];
-			}
-			tmp[i] = source;
-			this.sources = tmp;
-		}
+	public List<Wire> getSinks() {
+		List<Wire> list = new ArrayList<>(sinks.size());
+		for (Integer s : sinks.keySet())
+			list.add(new TileWire(this, s));
+		return list;
+	}
+
+	public HashMap<Integer, SinkPin> getSinksMap() {
+		return sinks;
 	}
 
 	/**
@@ -439,7 +428,14 @@ public class Tile implements Serializable {
 	 *
 	 * @return The source wires found in this tile.
 	 */
-	public int[] getSources() {
+	public List<Wire> getSources() {
+		List<Wire> list = new ArrayList<>(sources.length);
+		for (int s : sources)
+			list.add(new TileWire(this, s));
+		return list;
+	}
+
+	public int[] getSourcesArray() {
 		return sources;
 	}
 
@@ -458,29 +454,27 @@ public class Tile implements Serializable {
 	 * @param wire the wire of interest
 	 * @return the site pin the specified wire connects to
 	 */
-	public SitePin getSitePinOfWire(Integer wire) {
-		if (wireSites == null || !wireSites.containsKey(wire))
+	public SitePin getSitePinOfWire(Wire wire) {
+		int wireEnum = wire.getWireEnum();
+		if (wire.getTile() != this || wireSites == null || !wireSites.containsKey(wireEnum))
 			return null;
-		Integer siteIndex = wireSites.get(wire);
+		Integer siteIndex = wireSites.get(wireEnum);
 		Site site = getPrimitiveSites()[siteIndex];
-		return site.getSitePinOfExternalWire(site.getType(), wire);
+		return site.getSitePinOfExternalWire(site.getType(), wire.getWireEnum());
 	}
 
-	public SitePin getSitePinOfWire(SiteType siteType, Integer wire) {
-		if (wireSites == null || !wireSites.containsKey(wire))
+	public SitePin getSitePinOfWire(SiteType siteType, Wire wire) {
+		int wireEnum = wire.getWireEnum();
+		if (wireSites == null || !wireSites.containsKey(wireEnum))
 			return null;
-		Integer siteIndex = wireSites.get(wire);
+		Integer siteIndex = wireSites.get(wireEnum);
 		Site site = getPrimitiveSites()[siteIndex];
-		return site.getSitePinOfExternalWire(siteType, wire);
+		return site.getSitePinOfExternalWire(siteType, wire.getWireEnum());
 	}
 
 	// Used by device.constructSiteExternalConnections
 	public void setWireSites(Map<Integer, Integer> wireSites) {
 		this.wireSites = wireSites;
-	}
-
-	public Map<Integer, Integer> getWireSites() {
-		return wireSites;
 	}
 
 	/**

@@ -29,36 +29,28 @@ import java.io.Serializable;
  */
 public class SinkPin implements Serializable{
 	/** Keeps track of the wire which drives this sink from the nearest switch matrix */
-	public int switchMatrixSinkWire;
+	private final int sinkWireEnum;
 	
 	/** Keeps track of the switch matrix which drives this sink
 	 * &lt;31-16: X Tile Offset, 15-0: Y Tile Offset&gt; */
-	public int switchMatrixTileOffset;
+	private final int switchMatrixTileOffset;
 
 	/**
 	 * Constructs a new SinkPin object.
-	 * @param switchMatrixSinkWire the wire sourcing the sink
+	 * @param sinkWireEnum the wire sourcing the sink
 	 * @param xOffset the tile offset in the X direction
 	 * @param yOffset the tile offset in the Y direction
 	 */
-	public SinkPin(int switchMatrixSinkWire, int xOffset, int yOffset) {
-		this.switchMatrixSinkWire = switchMatrixSinkWire;
+	public SinkPin(int sinkWireEnum, int xOffset, int yOffset) {
+		this.sinkWireEnum = sinkWireEnum;
 		this.switchMatrixTileOffset = xOffset << 16 | (yOffset & 0xFFFF);
 	}
 	
-	/**
-	 * Returns the X offset of the switch matrix tile
-	 * @return the X offset of the switch matrix tile
-	 */
-	public int getXSwitchMatrixTileOffset() {
+	private int getXSwitchMatrixTileOffset() {
 		return switchMatrixTileOffset >> 16;
 	}
 	
-	/**
-	 * Returns the Y offset of the switch matrix tile
-	 * @return the Y offset of the switch matrix tile
-	 */
-	public int getYSwitchMatrixTileOffset() {
+	private int getYSwitchMatrixTileOffset() {
 		// The Y tile offset is the lowest 16 bits. 
 		// This needs to be trimmed and signed extended
 		return (switchMatrixTileOffset << 16) >> 16;
@@ -76,6 +68,10 @@ public class SinkPin implements Serializable{
 		return dev.getTile(tileRow, tileColumn);
 	}
 
+	public Wire getSinkWire(Tile tile) {
+		return new TileWire(getSwitchMatrixTile(tile), sinkWireEnum);
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -83,7 +79,7 @@ public class SinkPin implements Serializable{
 	public int hashCode(){
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + switchMatrixSinkWire;
+		result = prime * result + sinkWireEnum;
 		result = prime * result + switchMatrixTileOffset;
 		return result;
 	}
@@ -99,7 +95,7 @@ public class SinkPin implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		SinkPin other = (SinkPin) obj;
-		if (switchMatrixSinkWire != other.switchMatrixSinkWire)
+		if (sinkWireEnum != other.sinkWireEnum)
 			return false;
 		if (switchMatrixTileOffset != other.switchMatrixTileOffset)
 			return false;
@@ -107,6 +103,6 @@ public class SinkPin implements Serializable{
 	}
 	
 	public String toString(){
-		return ""; // we.getWireName(switchMatrixSinkWire) + " " + switchMatrixTileOffset;
+		return ""; // we.getWireName(sinkWireEnum) + " " + switchMatrixTileOffset;
 	}
 }

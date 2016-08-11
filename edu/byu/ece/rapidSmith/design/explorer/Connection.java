@@ -22,91 +22,53 @@ package edu.byu.ece.rapidSmith.design.explorer;
 
 import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.device.Tile;
+import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.device.WireEnumerator;
 
 public class Connection {
 	
-	Tile startTile;
-	
-	Tile endTile;
-	
-	int startWire;
-	
-	int endWire;
+	private final Wire startWire;
+	private final Wire endWire;
 
 	public Connection(PIP p){
-		this.startTile = p.getTile();
-		this.endTile = p.getTile();
 		this.startWire = p.getStartWire();
 		this.endWire = p.getEndWire();
 	}
 	
-	public Connection(Tile startTile, Tile endTile, int startWire, int endWire){
-		this.startTile = startTile;
-		this.endTile = endTile;
+	public Connection(Wire startWire, Wire endWire){
 		this.startWire = startWire;
 		this.endWire = endWire;
 	}
-	
+
 	/**
 	 * @return the startTile
 	 */
 	public Tile getStartTile() {
-		return startTile;
-	}
-
-	/**
-	 * @param startTile the startTile to set
-	 */
-	public void setStartTile(Tile startTile) {
-		this.startTile = startTile;
+		return startWire.getTile();
 	}
 
 	/**
 	 * @return the endTile
 	 */
 	public Tile getEndTile() {
-		return endTile;
-	}
-
-	/**
-	 * @param endTile the endTile to set
-	 */
-	public void setEndTile(Tile endTile) {
-		this.endTile = endTile;
+		return endWire.getTile();
 	}
 
 	/**
 	 * @return the startWire
 	 */
-	public int getStartWire() {
+	public Wire getStartWire() {
 		return startWire;
-	}
-
-	/**
-	 * @param startWire the startWire to set
-	 */
-	public void setStartWire(int startWire) {
-		this.startWire = startWire;
 	}
 
 	/**
 	 * @return the endWire
 	 */
-	public int getEndWire() {
+	public Wire getEndWire() {
 		return endWire;
 	}
 
-	/**
-	 * @param endWire the endWire to set
-	 */
-	public void setEndWire(int endWire) {
-		this.endWire = endWire;
-	}
-
 	public String toString(){
-		WireEnumerator we = endTile.getDevice().getWireEnumerator();
-		return startTile + " " + we.getWireName(startWire) +
-				" --> "  + endTile + " " + we.getWireName(endWire);
+		return startWire + " --> "  + endWire;
 	}
 }

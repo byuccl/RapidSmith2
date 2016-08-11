@@ -1,6 +1,7 @@
 package edu.byu.ece.rapidSmith.util;
 
 import edu.byu.ece.rapidSmith.design.Attribute;
+import edu.byu.ece.rapidSmith.design.subsite.Connection;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.primitiveDefs.PrimitiveConnection;
 import edu.byu.ece.rapidSmith.primitiveDefs.PrimitiveDef;
@@ -205,59 +206,57 @@ public class XDLRCOutputter {
 		}
 
 		if (writeWires) {
-			List<String> wireNames = tile.getWires().stream()
-					.map(we::getWireName)
-					.collect(Collectors.toCollection(ArrayList<String>::new));
+			List<Wire> wires = tile.getWires();
 			if (forceOrdering)
-				Collections.sort(wireNames);
+				Collections.sort(wires, Comparator.comparing(Wire::getWireName));
 
-			for (String wireName : wireNames) {
-				int wire = we.getWireEnum(wireName);
+			for (Wire wire : wires) {
 				out.append(ind + ind + "(wire ");
-				out.append(wireName + " ");
+				out.append(wire.getWireName() + " ");
 
-				List<WireConnection> nonPips = new ArrayList<>();
-				for (WireConnection wc : tile.getWireConnections(wire)) {
-					if (!wc.isPIP())
-						nonPips.add(wc);
+				List<Connection> nonPips = new ArrayList<>();
+				for (Connection c : wire.getWireConnections()) {
+					if (!c.isPip())
+						nonPips.add(c);
 				}
-				if (forceOrdering)
-					Collections.sort(nonPips, new WireConnectionComparator());
+				if (forceOrdering) {
+					Collections.sort(nonPips, wireComparator);
+				}
 
 				out.append("" + nonPips.size());
 				if (nonPips.size() == 0) {
 					out.append(")" + nl);
 				} else {
 					out.append(nl);
-					for (WireConnection wc : nonPips) {
+					for (Connection c : nonPips) {
+						Wire sinkWire = c.getSinkWire();
 						out.append(ind + ind + ind + "(conn ");
-						out.append(wc.getTile(tile).getName() + " ");
-						out.append(we.getWireName(wc.getWire()) + ")" + nl);
+						out.append(sinkWire.getTile().getName() + " ");
+						out.append(sinkWire.getWireName() + ")" + nl);
 					}
 					out.append(ind + ind + ")" + nl);
 				}
 			}
 
 			int numPips = 0;
-			for (String wireName : wireNames) {
-				int sourceWire = we.getWireEnum(wireName);
-
-				List<WireConnection> pips = new ArrayList<>();
-				for (WireConnection wc : tile.getWireConnections(sourceWire)) {
-					if (wc.isPIP())
-						pips.add(wc);
+			for (Wire wire : wires) {
+				List<Connection> pips = new ArrayList<>();
+				for (Connection c : wire.getWireConnections()) {
+					if (c.isPip())
+						pips.add(c);
 				}
 				if (forceOrdering)
-					Collections.sort(pips, new WireConnectionComparator());
+					Collections.sort(pips, wireComparator);
 
-				for (WireConnection wc : pips) {
+				for (Connection c : pips) {
+					Wire sinkWire = c.getSinkWire();
 					out.append(ind + ind + "(pip ");
 					out.append(tile.getName() + " ");
-					out.append(wireName + " ");
-					out.append(isBidirectionalPip(tile, sourceWire, wc) ? "=- " : "-> ");
-					out.append(we.getWireName(wc.getWire()));
+					out.append(wire.getWireName() + " ");
+					out.append(isBidirectionalPip(wire, c) ? "=- " : "-> ");
+					out.append(sinkWire.getWireName());
 
-					PIPRouteThrough rt = tile.getDevice().getRouteThrough(sourceWire, wc.getWire());
+					PIPRouteThrough rt = tile.getDevice().getRouteThrough(wire, sinkWire);
 					if (rt != null) {
 						out.append(" (_ROUTETHROUGH-" + rt.getInPin() + "-");
 						out.append(rt.getOutPin() + " ");
@@ -279,19 +278,13 @@ public class XDLRCOutputter {
 		out.append(ind + ")" + nl);
 	}
 
-	private boolean isBidirectionalPip(Tile tile, int wire, WireConnection fwd) {
-		boolean isBidir = false;
-		WireConnection[] wcs = fwd.getTile(tile).getWireConnections(fwd.getWire());
-		if (wcs == null)
-			return false;
-		for (WireConnection rev : wcs) {
-			if (rev.getTile(fwd.getTile(tile)).equals(tile) &&
-					rev.getWire() == wire) {
-				isBidir = true;
-				break;
+	private boolean isBidirectionalPip(Wire wire, Connection fwd) {
+		for (Connection rev : fwd.getWireConnections()) {
+			if (wire.equals(rev.getSinkWire())) {
+				return true;
 			}
 		}
-		return isBidir;
+		return false;
 	}
 
 	private void writeSite(Site site, boolean writeWires) throws IOException {
@@ -773,13 +766,6 @@ public class XDLRCOutputter {
 		}
 	}
 
-	private class WireConnectionComparator implements Comparator<WireConnection> {
-		@Override
-		public int compare(WireConnection o1, WireConnection o2) {
-			return Comparator.comparing(WireConnection::getRowOffset)
-					.thenComparing(WireConnection::getColumnOffset)
-					.thenComparing(o -> we.getWireName(o.getWire()))
-					.compare(o1, o2);
-		}
-	}
+	private Comparator<Connection> wireComparator =
+			Comparator.comparing(o -> o.getSinkWire().getWireName());
 }

@@ -99,14 +99,15 @@ public class ExtendedDeviceInfo implements Serializable {
 		Map<Integer, List<WireConnection>> reverseMap = new HashMap<>();
 		for (Tile[] srcArr : device.getTiles()) {
 			for (Tile srcTile : srcArr) {
-				for (int srcWire : srcTile.getWires()) {
-					for (WireConnection c : srcTile.getWireConnections(srcWire)) {
-						if (c.getTile(srcTile) == tile) {
+				for (Wire srcWire : srcTile.getWires()) {
+					for (Connection c : srcWire.getWireConnections()) {
+						WireConnection wc = c.getBackingConnection();
+						if (c.getSinkWire().getTile() == tile) {
 							WireConnection reverse = new WireConnection(
-									srcWire, -c.getRowOffset(),
-									-c.getColumnOffset(), c.isPIP());
+									srcWire.getWireEnum(), -wc.getRowOffset(),
+									-wc.getColumnOffset(), wc.isPIP());
 							WireConnection pooled = connPool.add(reverse);
-							reverseMap.computeIfAbsent(c.getWire(), k -> new ArrayList<>())
+							reverseMap.computeIfAbsent(wc.getWire(), k -> new ArrayList<>())
 									.add(pooled);
 						}
 					}
@@ -302,7 +303,7 @@ public class ExtendedDeviceInfo implements Serializable {
 	}
 
 	private Iterable<Connection> getReverseConnection(Wire wire) {
-		WireConnection[] cs = wire.getTile().getReverseConnections(wire.getWireEnum());
+		WireConnection[] cs = wire.getTile().getReverseWireHashMap().get(wire.getWireEnum());
 		if (cs == null)
 			return Collections.emptyList();
 		ArrayList<Connection> reversed = new ArrayList<>();

@@ -166,7 +166,7 @@ public class XdlUnpacker {
 		// Handle any remaining PIPs, these PIPs are source-less
 		while (!pipSet.isEmpty()) {
 			PIP pip = pipSet.iterator().next();
-			Wire sourceWire = new TileWire(pip.getTile(), pip.getStartWire());
+			Wire sourceWire = pip.getStartWire();
 			traverseRoute(sourceWire, pipSet, routeTreeMap, visited);
 		}
 
@@ -380,7 +380,7 @@ public class XdlUnpacker {
 			Wire sinkWire = c.getSinkWire();
 			if (c.isTerminal())
 				continue;
-			BelPin belPin = siteTemplate.getBelPinOfWire(sinkWire.getWireEnum());
+			BelPin belPin = siteTemplate.getBelPinOfWire(sinkWire);
 			if (belPin != null) {
 				rt = connectToBel(sourceWire, rt, c, belPin);
 			} else if (c.isPinConnection()) {
@@ -480,8 +480,7 @@ public class XdlUnpacker {
 	}
 
 	private boolean pipUsedInInstances(SiteWire sourceWire, Wire sinkWire, Instance inst) {
-		Attribute pipAttr = sourceWire.getSite().getPipAttribute(
-				sourceWire.getWireEnum(), sinkWire.getWireEnum());
+		Attribute pipAttr = sourceWire.getSite().getPipAttribute(sourceWire, sinkWire);
 		Attribute attr = inst.getAttribute(pipAttr.getPhysicalName());
 		return attr != null && attr.getValue().equals(pipAttr.getValue());
 	}

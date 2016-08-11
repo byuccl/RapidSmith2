@@ -80,7 +80,7 @@ public abstract class Connection implements Serializable {
 		@Override
 		public boolean isRouteThrough() {
 			Device device = sourceWire.getTile().getDevice();
-			return device.isRouteThrough(sourceWire.getWireEnum(), wc.getWire());
+			return device.isRouteThrough(sourceWire, getSinkWire());
 		}
 
 		@Override
@@ -95,7 +95,9 @@ public abstract class Connection implements Serializable {
 
 		@Override
 		public PIP getPip() {
-			return new PIP(sourceWire.getTile(), sourceWire.getWireEnum(), wc.getWire());
+			if (!isPip())
+				return null;
+			return new PIP(sourceWire, getSinkWire());
 		}
 
 		@Override
@@ -155,7 +157,7 @@ public abstract class Connection implements Serializable {
 		@Override
 		public boolean isRouteThrough() {
 			Device device = sourceWire.getTile().getDevice();
-			return device.isRouteThrough(wc.getWire(), sourceWire.getWireEnum());
+			return device.isRouteThrough(getSinkWire(), sourceWire);
 		}
 
 		@Override
@@ -170,7 +172,9 @@ public abstract class Connection implements Serializable {
 
 		@Override
 		public PIP getPip() {
-			return new PIP(sourceWire.getTile(), sourceWire.getWireEnum(), wc.getWire());
+			if (!isPip())
+				return null;
+			return new PIP(getSinkWire(), sourceWire);
 		}
 
 		@Override
@@ -244,10 +248,9 @@ public abstract class Connection implements Serializable {
 
 		@Override
 		public PIP getPip() {
-			if (!wc.isPIP())
-				throw new DesignAssemblyException("Attempting to create PIP " +
-						"of non-PIP connection");
-			return new SitePip(sourceWire.getSite(), sourceWire.getWireEnum(), wc.getWire());
+			if (!isPip())
+				return null;
+			return new SitePip(sourceWire, getSinkWire());
 		}
 
 		@Override

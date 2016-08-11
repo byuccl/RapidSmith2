@@ -28,6 +28,7 @@ import com.trolltech.qt.gui.QGraphicsSceneMouseEvent;
 import com.trolltech.qt.gui.QPen;
 
 import edu.byu.ece.rapidSmith.device.Tile;
+import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.gui.TileScene;
 
 /**
@@ -43,10 +44,8 @@ public class WireConnectionLine extends QGraphicsLineItem{
 	private static QPen unHighlighted = new QPen(QColor.yellow, 0.25, PenStyle.SolidLine);
 	/** The current DeviceBrowser scene */
 	private TileScene scene;
-	/** The current tile */
-	private Tile tile;
 	/** The current wire */
-	private int wire;
+	private Wire wire;
 	
 	/** 
 	 * Creates a new wire connection line.
@@ -55,14 +54,12 @@ public class WireConnectionLine extends QGraphicsLineItem{
 	 * @param x2 Ending X coordinate.
 	 * @param y2 Ending Y coordinate.
 	 * @param scene The DeviceBrowser scene.
-	 * @param tile The tile.
 	 * @param wire The wire.
 	 */
 	public WireConnectionLine(double x1, double y1, double x2, double y2, 
-			TileScene scene, Tile tile, int wire){
+			TileScene scene, Wire wire){
 		super(x1, y1, x2, y2);
 		this.scene = scene;
-		this.tile = tile;
 		this.wire = wire;
 		highlighted = new QPen(QColor.red, 0.25, PenStyle.SolidLine);
 	}
@@ -80,7 +77,7 @@ public class WireConnectionLine extends QGraphicsLineItem{
 	@Override
 	public void mousePressEvent(QGraphicsSceneMouseEvent event){
 		if(scene.getClass().equals(DeviceBrowserScene.class)){
-			((DeviceBrowserScene)scene).drawConnectingWires(tile, wire);			
+			((DeviceBrowserScene)scene).drawConnectingWires(wire);
 		}
 	}
 

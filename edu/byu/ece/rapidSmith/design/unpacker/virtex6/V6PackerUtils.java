@@ -149,7 +149,7 @@ public class V6PackerUtils implements PackerUtils {
 			PIPRouteThrough rt = device.getRouteThrough(pip);
 			for (Site site : pip.getTile().getPrimitiveSites()) {
 				for (SitePin sitePin : site.getSourcePins()) {
-					if (sitePin.getExternalWire().getWireEnum() == pip.getEndWire()) {
+					if (sitePin.getExternalWire().equals(pip.getEndWire())) {
 						return new RouteThrough(site, rt);
 					}
 				}

@@ -25,7 +25,6 @@ import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.design.Pin;
 import edu.byu.ece.rapidSmith.device.helper.HashPool;
 import edu.byu.ece.rapidSmith.primitiveDefs.PrimitiveDefList;
-import edu.byu.ece.rapidSmith.router.Node;
 import edu.byu.ece.rapidSmith.util.FamilyType;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
 
@@ -258,10 +257,11 @@ public class Device implements Serializable {
 		return isRouteThrough(pip.getStartWire(), pip.getEndWire());
 	}
 
-	public boolean isRouteThrough(Integer startWire, Integer endWire) {
-		if (!routeThroughMap.containsKey(endWire))
+	public boolean isRouteThrough(Wire startWire, Wire endWire) {
+		if (!routeThroughMap.containsKey(endWire.getWireEnum()))
 			return false;
-		return routeThroughMap.get(endWire).containsKey(startWire);
+		Map<Integer, PIPRouteThrough> rtsOfSink = routeThroughMap.get(endWire.getWireEnum());
+		return rtsOfSink.containsKey(startWire.getWireEnum());
 	}
 
 	/**
@@ -283,11 +283,12 @@ public class Device implements Serializable {
 	 * @return the PIPRouteThrough object or null if the pip is not a
 	 *   route through
 	 */
-	public PIPRouteThrough getRouteThrough(Integer startWire, Integer endWire) {
-		Map<Integer, PIPRouteThrough> sourceMap = routeThroughMap.get(endWire);
+	public PIPRouteThrough getRouteThrough(Wire startWire, Wire endWire) {
+		int sinkEnum = endWire.getWireEnum();
+		Map<Integer, PIPRouteThrough> sourceMap = routeThroughMap.get(sinkEnum);
 		if (sourceMap == null)
 			return null;
-		return sourceMap.get(startWire);
+		return sourceMap.get(startWire.getWireEnum());
 	}
 
 
@@ -355,26 +356,6 @@ public class Device implements Serializable {
 	 */
 	public TileWire getPrimitiveExternalPin(Pin pin) {
 		return pin.getInstance().getPrimitiveSite().getSitePin(pin.getName()).getExternalWire();
-	}
-
-	/**
-	 * This will take a sink Pin from a design net and determine the
-	 * final switch matrix and node or wire which the signal must be routed
-	 * through in order to reach the sink pin.
-	 *
-	 * @param pin The sink pin to find a switch matrix for.
-	 * @return A node (a unique tile and wire) of where the signal must be
-	 * routed to reach the sink pin. Returns null, if none exists.
-	 */
-	public Node getSwitchMatrixSink(Pin pin) {
-		TileWire extPin = getPrimitiveExternalPin(pin);
-		Tile tile = pin.getInstance().getTile();
-		SinkPin sp = tile.getSinks().get(extPin.getWireEnum());
-		if (sp == null) return null;
-		int y = sp.switchMatrixTileOffset;
-		int x = y >> 16;
-		y = (y << 16) >> 16;
-		return new Node(getTile(tile.getRow() + y, tile.getColumn() + x), sp.switchMatrixSinkWire, null, 0);
 	}
 
 	public void setSwitchMatrixTypes(HashSet<TileType> types) {
@@ -736,10 +717,6 @@ public class Device implements Serializable {
 
 			tile.setWireSites(wireSitesPool.add(wireSites));
 		}
-	}
-
-	public Map<Integer, Map<Integer, PIPRouteThrough>> getRouteThroughMap() {
-		return routeThroughMap;
 	}
 
 	public void setRouteThroughMap(Map<Integer, Map<Integer, PIPRouteThrough>> routeThroughMap) {

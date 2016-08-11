@@ -313,7 +313,7 @@ public class XdlPacker {
 				inst.addAttribute(new Attribute(template.getPipAttribute(sitePip)));
 			}
 
-			SitePin sitePin = site.getSitePinOfInternalWire(sinkWire.getWireEnum());
+			SitePin sitePin = site.getSitePinOfInternalWire(sinkWire);
 			if (sitePin != null) {
 				Net net = connectToSitePin(cellNet, site, inst, sitePin);
 
@@ -428,7 +428,7 @@ public class XdlPacker {
 			}
 
 			// Checks if this wire connection connects to a sink pin
-			SitePin sinkPin = sinkWire.getTile().getSitePinOfWire(sinkWire.getWireEnum());
+			SitePin sinkPin = sinkWire.getTile().getSitePinOfWire(sinkWire);
 			if (sinkPin != null) {
 				// Only continue if the sink pin is on a used site
 				Instance inst = packedDesign.getInstanceAtPrimitiveSite(sinkPin.getSite());
@@ -473,7 +473,7 @@ public class XdlPacker {
 
 		boolean reachesSiteSink = false;
 
-		BelPin belPin = site.getBelPinOfWire(sourceWire.getWireEnum());
+		BelPin belPin = site.getBelPinOfWire(sourceWire);
 		if (belPin != null) {
 			if (pinSet.remove(belPin)) {
 				reachesSiteSink = true;

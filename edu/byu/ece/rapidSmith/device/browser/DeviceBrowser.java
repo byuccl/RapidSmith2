@@ -21,6 +21,7 @@
 package edu.byu.ece.rapidSmith.device.browser;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.trolltech.qt.core.QModelIndex;
@@ -38,6 +39,7 @@ import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.gui.QDockWidget.DockWidgetFeature;
 
 import edu.byu.ece.rapidSmith.RapidSmithEnv;
+import edu.byu.ece.rapidSmith.design.subsite.Connection;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.gui.TileView;
 import edu.byu.ece.rapidSmith.gui.WidgetMaker;
@@ -193,11 +195,13 @@ public class DeviceBrowser extends QMainWindow{
 		scene.clearCurrentLines();
 		if(currTile == null) return;
 		if(index.column() != 0) return;
-		int currWire = we.getWireEnum(index.data().toString());
-		if(currWire < 0) return;
-		if(currTile.getWireConnections(we.getWireEnum(index.data().toString())) == null) return;
-		for(WireConnection wire : currTile.getWireConnections(we.getWireEnum(index.data().toString()))){
-			scene.drawWire(currTile, currWire, wire.getTile(currTile), wire.getWire());
+		String wireName = index.data().toString();
+		Integer wireEnum = we.getWireEnum(wireName);
+		if(wireEnum < 0) return;
+		Wire currWire = new TileWire(currTile, wireEnum);
+		Collection<Connection> conns = currWire.getWireConnections();
+		for(Connection conn : conns){
+			scene.drawWire(currWire, conn.getSinkWire());
 		}
 	}
 	
@@ -232,12 +236,12 @@ public class DeviceBrowser extends QMainWindow{
 	 */
 	protected void updateWireList(){
 		wireList.clear();
-		if(currTile == null || currTile.getWireHashMap() == null) return;
-		for(Integer wire : currTile.getWireHashMap().keySet()) {
+		if(currTile == null) return;
+		for(Wire wire : currTile.getWires()) {
 			QTreeWidgetItem treeItem = new QTreeWidgetItem();
-			treeItem.setText(0, we.getWireName(wire));
-			WireConnection[] connections = currTile.getWireConnections(wire);
-			treeItem.setText(1, String.format("%3d", connections == null ? 0 : connections.length));
+			treeItem.setText(0, wire.getWireName());
+			Collection<Connection> conns = wire.getWireConnections();
+			treeItem.setText(1, String.format("%3d", conns.size()));
 			wireList.insertTopLevelItem(0, treeItem);
 		}
 		wireList.sortByColumn(0, SortOrder.AscendingOrder);

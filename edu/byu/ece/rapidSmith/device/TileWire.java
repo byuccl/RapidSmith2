@@ -60,7 +60,7 @@ public class TileWire implements Wire, Serializable {
 	 */
 	@Override
 	public Collection<Connection> getPinConnections() {
-		SitePin sitePin = tile.getSitePinOfWire(this.wire);
+		SitePin sitePin = tile.getSitePinOfWire(this);
 		if (sitePin != null && sitePin.isInput()) {
 			return Collections.singletonList(Connection.getTileToSiteConnection(sitePin));
 		} else {
@@ -104,7 +104,7 @@ public class TileWire implements Wire, Serializable {
 	 */
 	@Override
 	public Collection<Connection> getReversePinConnections() {
-		SitePin sitePin = tile.getSitePinOfWire(this.wire);
+		SitePin sitePin = tile.getSitePinOfWire(this);
 		if (sitePin != null && sitePin.isOutput()) {
 			return Collections.singletonList(Connection.getTileToSiteConnection(sitePin));
 		} else {
@@ -154,7 +154,7 @@ public class TileWire implements Wire, Serializable {
 
 	@Override
 	public String toString() {
-		return tile.getName() + " " + tile.getDevice().getWireEnumerator().getWireName(wire);
+		return tile.getName() + " " + getWireEnumerator().getWireName(wire);
 	}
 
 }

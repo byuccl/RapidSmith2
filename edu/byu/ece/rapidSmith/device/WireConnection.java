@@ -22,8 +22,6 @@ package edu.byu.ece.rapidSmith.device;
 
 import java.io.Serializable;
 
-import edu.byu.ece.rapidSmith.router.Node;
-
 /**		
  * A Wire is describes simply as an integer representing the wire and
  * a row/column tile offset from the source wire. It makes little sense
@@ -72,19 +70,7 @@ public class WireConnection implements Serializable, Comparable<WireConnection>{
 	public int getWire() {
 		return wire;
 	}
-	
-	public Node createNode(Node srcNode){
-		return new Node(getTile(srcNode.getTile()), wire, srcNode, srcNode.getLevel()+1, isPIP);
-	}
-	
-	public Node createNode(Tile currTile){
-		return new Node(getTile(currTile), wire, null, 0, isPIP);
-	}
-	
-	public Node createNode(Tile currTile, Node parent){
-		return new Node(getTile(currTile), wire, parent, 0, isPIP);
-	}
-	
+
 	/**
 	 * Returns the sink tile of this wire connection relative to the specified
 	 * source tile.
@@ -94,15 +80,7 @@ public class WireConnection implements Serializable, Comparable<WireConnection>{
 	public Tile getTile(Tile currTile) {
 		return currTile.getDevice().getTile(currTile.getRow()-this.rowOffset, currTile.getColumn()-this.columnOffset);
 	}
-		
-	
-	public Tile getWireCacheTile(Device dev, Tile currTile){
-		String name = currTile.getName().substring(0, currTile.getName().lastIndexOf("_")+1) +
-				"X" + (currTile.getTileXCoordinate()+this.columnOffset) +
-				"Y" + (currTile.getTileYCoordinate()+this.rowOffset); 
-		return dev.getTile(name);
-	}
-	
+
 	public int getRowOffset() {
 		return rowOffset;
 	}

@@ -48,7 +48,7 @@ public class SiteWire implements Wire, Serializable {
 
 	@Override
 	public Collection<Connection> getPinConnections() {
-		SitePin sitePin = site.getSitePinOfInternalWire(this.wire);
+		SitePin sitePin = site.getSitePinOfInternalWire(this);
 		if (sitePin != null && sitePin.isOutput()) {
 			return Collections.singletonList(Connection.getSiteToTileConnection(sitePin));
 		} else {
@@ -58,7 +58,7 @@ public class SiteWire implements Wire, Serializable {
 
 	@Override
 	public Collection<Connection> getTerminals() {
-		BelPin belPin = site.getBelPinOfWire(wire);
+		BelPin belPin = site.getBelPinOfWire(this);
 		if (belPin != null && belPin.isInput()) {
 			return Collections.singletonList(Connection.getTerminalConnection(belPin));
 		} else {
@@ -79,7 +79,7 @@ public class SiteWire implements Wire, Serializable {
 
 	@Override
 	public Collection<Connection> getReversePinConnections() {
-		SitePin sitePin = site.getSitePinOfInternalWire(this.wire);
+		SitePin sitePin = site.getSitePinOfInternalWire(this);
 		if (sitePin != null && sitePin.isInput()) {
 			return Collections.singletonList(Connection.getSiteToTileConnection(sitePin)); // TODO reversed Site2TileConn?
 		} else {
@@ -89,7 +89,7 @@ public class SiteWire implements Wire, Serializable {
 
 	@Override
 	public Collection<Connection> getSources() {
-		BelPin belPin = site.getBelPinOfWire(wire);
+		BelPin belPin = site.getBelPinOfWire(this);
 		if (belPin != null && belPin.isOutput()) {
 			return Collections.singletonList(Connection.getTerminalConnection(belPin));
 		} else {
