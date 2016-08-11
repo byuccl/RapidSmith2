@@ -587,25 +587,21 @@ public final class VivadoInterface {
 		
 		//TODO: Assuming that the logical design has not been modified...can no longer assume this with insertion/deletion
 		for (Cell cell : sortCellsForXdcExport(design)) {
-			if(cell.isPlaced()) {
-				Site ps = cell.getAnchorSite();
-				Bel b = cell.getAnchor();
-				String cellname = cell.getName();
+			
+			Site ps = cell.getAnchorSite();
+			Bel b = cell.getAnchor();
+			String cellname = cell.getName();
+			
+			fileout.write(String.format("set_property BEL %s.%s [get_cells {%s}]\n", ps.getType().toString(), b.getName(), cellname));
+			fileout.write(String.format("set_property LOC %s [get_cells {%s}]\n", ps.getName(), cellname));
+								
+			//TODO: Update this function when more cells with LOCK_PINS are discovered
+			if(cell.getLibCell().getName().startsWith("LUT")) {
+				fileout.write("set_property LOCK_PINS { ");
+				for(CellPin cp: cell.getInputPins()) 
+					fileout.write(String.format("%s:%s ", cp.getName(), cp.getBelPin().getName()));
 				
-				fileout.write(String.format("set_property BEL %s.%s [get_cells {%s}]\n", ps.getType().toString(), b.getName(), cellname));
-				fileout.write(String.format("set_property LOC %s [get_cells {%s}]\n", ps.getName(), cellname));
-									
-				//TODO: Update this function when more cells with LOCK_PINS are discovered
-				if(cell.getLibCell().getName().startsWith("LUT")) {
-					fileout.write("set_property LOCK_PINS { ");
-					for(CellPin cp: cell.getInputPins()) 
-						fileout.write(String.format("%s:%s ", cp.getName(), cp.getBelPin().getName()));
-					
-					fileout.write("} [get_cells {" + cellname + "}]\n");
-				}
-			}
-			else {
-				System.out.println(cell.getLibCell().getName());
+				fileout.write("} [get_cells {" + cellname + "}]\n");
 			}
 		}
 		
