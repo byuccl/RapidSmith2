@@ -1,6 +1,6 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
-import edu.byu.ece.rapidSmith.device.PrimitiveType;
+import edu.byu.ece.rapidSmith.device.SiteType;
 
 import java.util.Objects;
 
@@ -8,15 +8,15 @@ import java.util.Objects;
  *
  */
 public class SiteProperty {
-	private PrimitiveType siteType;
+	private SiteType siteType;
 	private String propertyName;
 
-	public SiteProperty(PrimitiveType siteType, String propertyName) {
+	public SiteProperty(SiteType siteType, String propertyName) {
 		this.siteType = siteType;
 		this.propertyName = propertyName;
 	}
 
-	public PrimitiveType getSiteType() {
+	public SiteType getSiteType() {
 		return siteType;
 	}
 

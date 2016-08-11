@@ -24,7 +24,7 @@ import edu.byu.ece.rapidSmith.RapidSmithEnv;
 import edu.byu.ece.rapidSmith.design.parser.DesignParser;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.PrimitiveSite;
+import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.WireEnumerator;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
@@ -62,7 +62,7 @@ public class Design extends AbstractDesign {
 	/** This is a list of all the instances of primitives and macros in the design */
 	private HashMap<String,Instance> instances;
 	/** A map used to keep track of all used primitive sites used by the design */
-	private HashMap<PrimitiveSite,Instance> usedPrimitiveSites;
+	private HashMap<Site,Instance> usedPrimitiveSites;
 	/** This is a list of all the nets in the design */
 	private HashMap<String,Net> nets;
 	/** A flag designating if this is a design or hard macro */
@@ -609,7 +609,7 @@ public class Design extends AbstractDesign {
 	 * @param site the site to check for
 	 * @return true if this design uses the specified primitive site
 	 */
-	public boolean isPrimitiveSiteUsed(PrimitiveSite site){
+	public boolean isPrimitiveSiteUsed(Site site){
 		return usedPrimitiveSites.containsKey(site);
 	}
 
@@ -618,7 +618,7 @@ public class Design extends AbstractDesign {
 	 * @param site the site of the desired instance
 	 * @return the instance at the specified site, or null if the site is unoccupied
 	 */
-	public Instance getInstanceAtPrimitiveSite(PrimitiveSite site){
+	public Instance getInstanceAtPrimitiveSite(Site site){
 		return usedPrimitiveSites.get(site);
 	}
 
@@ -627,7 +627,7 @@ public class Design extends AbstractDesign {
 	 * design's instances and module instances.
 	 * @return the set of used primitive sites in this design
 	 */
-	public Set<PrimitiveSite> getUsedPrimitiveSites(){
+	public Set<Site> getUsedPrimitiveSites(){
 		return usedPrimitiveSites.keySet();
 	}
 
@@ -638,7 +638,7 @@ public class Design extends AbstractDesign {
 	 * is null
 	 * @return the instance previously at the specified site
 	 */
-	Instance setPrimitiveSiteUsed(PrimitiveSite site, Instance inst){
+	Instance setPrimitiveSiteUsed(Site site, Instance inst){
 		if(site == null) return null;
 		return usedPrimitiveSites.put(site, inst);
 	}
@@ -648,7 +648,7 @@ public class Design extends AbstractDesign {
 	 * @param site the site to free
 	 * @return the instance previously at the specified site
 	 */
-	Instance releasePrimitiveSite(PrimitiveSite site){
+	Instance releasePrimitiveSite(Site site){
 		return usedPrimitiveSites.remove(site);
 	}
 

@@ -1,7 +1,7 @@
 package edu.byu.ece.rapidSmith.design;
 
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.device.PrimitiveType;
+import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.util.FamilyType;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
 
@@ -14,13 +14,13 @@ import java.util.*;
 public abstract class AbstractDesign implements Serializable {
 	private static final long serialVersionUID = 6284690406230426968L;
 	/**  Keeps track of all slice primitive types, initialized statically */
-	public static Set<PrimitiveType> sliceTypes;
+	public static Set<SiteType> sliceTypes;
 	/**  Keeps track of all DSP48 primitive types, initialized statically */
-	public static Set<PrimitiveType> dspTypes;
+	public static Set<SiteType> dspTypes;
 	/**  Keeps track of all BRAM primitive types, initialized statically */
-	public static Set<PrimitiveType> bramTypes;
+	public static Set<SiteType> bramTypes;
 	/**  Keeps track of all IOB primitive types, initialized statically */
-	public static Set<PrimitiveType> iobTypes;
+	public static Set<SiteType> iobTypes;
 	/**  Name of the design */
 	protected String name;
 	// use partName instead of device here to allow speed grade to be specified
@@ -127,55 +127,55 @@ public abstract class AbstractDesign implements Serializable {
 
 	static {
 		sliceTypes = new HashSet<>();
-		sliceTypes.add(PrimitiveType.SLICE);
-		sliceTypes.add(PrimitiveType.SLICEL);
-		sliceTypes.add(PrimitiveType.SLICEM);
-		sliceTypes.add(PrimitiveType.SLICEX);
+		sliceTypes.add(SiteType.SLICE);
+		sliceTypes.add(SiteType.SLICEL);
+		sliceTypes.add(SiteType.SLICEM);
+		sliceTypes.add(SiteType.SLICEX);
 
 		dspTypes = new HashSet<>();
-		dspTypes.add(PrimitiveType.DSP48);
-		dspTypes.add(PrimitiveType.DSP48A);
-		dspTypes.add(PrimitiveType.DSP48A1);
-		dspTypes.add(PrimitiveType.DSP48E);
-		dspTypes.add(PrimitiveType.DSP48E1);
-		dspTypes.add(PrimitiveType.MULT18X18);
-		dspTypes.add(PrimitiveType.MULT18X18SIO);
+		dspTypes.add(SiteType.DSP48);
+		dspTypes.add(SiteType.DSP48A);
+		dspTypes.add(SiteType.DSP48A1);
+		dspTypes.add(SiteType.DSP48E);
+		dspTypes.add(SiteType.DSP48E1);
+		dspTypes.add(SiteType.MULT18X18);
+		dspTypes.add(SiteType.MULT18X18SIO);
 
 		bramTypes = new HashSet<>();
-		bramTypes.add(PrimitiveType.BLOCKRAM);
-		bramTypes.add(PrimitiveType.FIFO16);
-		bramTypes.add(PrimitiveType.FIFO18E1);
-		bramTypes.add(PrimitiveType.FIFO36_72_EXP);
-		bramTypes.add(PrimitiveType.FIFO36_EXP);
-		bramTypes.add(PrimitiveType.FIFO36E1);
-		bramTypes.add(PrimitiveType.RAMB16);
-		bramTypes.add(PrimitiveType.RAMB16BWE);
-		bramTypes.add(PrimitiveType.RAMB16BWER);
-		bramTypes.add(PrimitiveType.RAMB18E1);
-		bramTypes.add(PrimitiveType.RAMB18X2);
-		bramTypes.add(PrimitiveType.RAMB18X2SDP);
-		bramTypes.add(PrimitiveType.RAMB36_EXP);
-		bramTypes.add(PrimitiveType.RAMB36E1);
-		bramTypes.add(PrimitiveType.RAMB36SDP_EXP);
-		bramTypes.add(PrimitiveType.RAMB8BWER);
-		bramTypes.add(PrimitiveType.RAMBFIFO18);
-		bramTypes.add(PrimitiveType.RAMBFIFO18_36);
-		bramTypes.add(PrimitiveType.RAMBFIFO36);
-		bramTypes.add(PrimitiveType.RAMBFIFO36E1);
+		bramTypes.add(SiteType.BLOCKRAM);
+		bramTypes.add(SiteType.FIFO16);
+		bramTypes.add(SiteType.FIFO18E1);
+		bramTypes.add(SiteType.FIFO36_72_EXP);
+		bramTypes.add(SiteType.FIFO36_EXP);
+		bramTypes.add(SiteType.FIFO36E1);
+		bramTypes.add(SiteType.RAMB16);
+		bramTypes.add(SiteType.RAMB16BWE);
+		bramTypes.add(SiteType.RAMB16BWER);
+		bramTypes.add(SiteType.RAMB18E1);
+		bramTypes.add(SiteType.RAMB18X2);
+		bramTypes.add(SiteType.RAMB18X2SDP);
+		bramTypes.add(SiteType.RAMB36_EXP);
+		bramTypes.add(SiteType.RAMB36E1);
+		bramTypes.add(SiteType.RAMB36SDP_EXP);
+		bramTypes.add(SiteType.RAMB8BWER);
+		bramTypes.add(SiteType.RAMBFIFO18);
+		bramTypes.add(SiteType.RAMBFIFO18_36);
+		bramTypes.add(SiteType.RAMBFIFO36);
+		bramTypes.add(SiteType.RAMBFIFO36E1);
 
 		iobTypes = new HashSet<>();
-		iobTypes.add(PrimitiveType.IOB);
-		iobTypes.add(PrimitiveType.IOB18);
-		iobTypes.add(PrimitiveType.IOB18M);
-		iobTypes.add(PrimitiveType.IOB18S);
-		iobTypes.add(PrimitiveType.IOB33);
-		iobTypes.add(PrimitiveType.IOB33M);
-		iobTypes.add(PrimitiveType.IOB33S);
-		iobTypes.add(PrimitiveType.IOB_USB);
-		iobTypes.add(PrimitiveType.IOBLR);
-		iobTypes.add(PrimitiveType.IOBM);
-		iobTypes.add(PrimitiveType.IOBS);
-		iobTypes.add(PrimitiveType.LOWCAPIOB);
+		iobTypes.add(SiteType.IOB);
+		iobTypes.add(SiteType.IOB18);
+		iobTypes.add(SiteType.IOB18M);
+		iobTypes.add(SiteType.IOB18S);
+		iobTypes.add(SiteType.IOB33);
+		iobTypes.add(SiteType.IOB33M);
+		iobTypes.add(SiteType.IOB33S);
+		iobTypes.add(SiteType.IOB_USB);
+		iobTypes.add(SiteType.IOBLR);
+		iobTypes.add(SiteType.IOBM);
+		iobTypes.add(SiteType.IOBS);
+		iobTypes.add(SiteType.LOWCAPIOB);
 	}
 
 }

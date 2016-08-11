@@ -31,7 +31,7 @@ import java.util.Objects;
  *  primitive site type.  BelId objects are immutable.
  */
 public final class BelId implements Serializable {
-	private PrimitiveType primitiveType;
+	private SiteType primitiveType;
 	private String name;
 
 	/**
@@ -40,7 +40,7 @@ public final class BelId implements Serializable {
 	 * @param primitiveType the primitive type of the BEL id
 	 * @param name the name of the BEL within the site
 	 */
-	public BelId(PrimitiveType primitiveType, String name) {
+	public BelId(SiteType primitiveType, String name) {
 		this.primitiveType = primitiveType;
 		this.name = name;
 	}
@@ -50,7 +50,7 @@ public final class BelId implements Serializable {
 	 *
 	 * @return the primitive type
 	 */
-	public PrimitiveType getPrimitiveType() {
+	public SiteType getPrimitiveType() {
 		return primitiveType;
 	}
 

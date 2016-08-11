@@ -148,13 +148,13 @@ public class DeviceDiffer {
 	private void diffPrimitiveSites(Tile gold, Tile test) {
 		if (gold.getPrimitiveSites() == null) {
 			if (test.getPrimitiveSites() != null) {
-				for (PrimitiveSite site : test.getPrimitiveSites()) {
+				for (Site site : test.getPrimitiveSites()) {
 					differences.add("primitive_site", "none", site.getName());
 				}
 			}
 		} else {
 			if (test.getPrimitiveSites() == null) {
-				for (PrimitiveSite site : gold.getPrimitiveSites()) {
+				for (Site site : gold.getPrimitiveSites()) {
 					differences.add("primitive_site", site.getName(), "none");
 				}
 			} else {
@@ -162,8 +162,8 @@ public class DeviceDiffer {
 				int numTestSites = test.getPrimitiveSites().length;
 				int i, j;
 				for (i = 0, j = 0; i < numGoldSites && j < numTestSites; i++, j++) {
-					PrimitiveSite goldSite = gold.getPrimitiveSites()[i];
-					PrimitiveSite testSite = test.getPrimitiveSites()[j];
+					Site goldSite = gold.getPrimitiveSites()[i];
+					Site testSite = test.getPrimitiveSites()[j];
 					if (!goldSite.getName().equals(testSite.getName())) {
 						boolean matched = false;
 						int m = i, n = j;
@@ -269,7 +269,7 @@ public class DeviceDiffer {
 		}
 	}
 
-	private void diffPrimitiveSite(PrimitiveSite gold, PrimitiveSite test) {
+	private void diffPrimitiveSite(Site gold, Site test) {
 		String siteName = gold.getName();
 		differences.down("primitive site", siteName);
 
