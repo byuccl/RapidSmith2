@@ -47,7 +47,7 @@ public class HelloWorld{
 		// Create a new instance
 		Instance myInstance = new Instance();
 		myInstance.setName("Bob");
-		myInstance.setType(PrimitiveType.SLICEL);
+		myInstance.setType(SiteType.SLICEL);
 		// We need to add the instance to the design so it knows about it
 		design.addInstance(myInstance);
 		// Make the F LUT an Inverter Gate
@@ -60,8 +60,8 @@ public class HelloWorld{
 		Instance bob = design.getInstance("Bob");
 		
 		// Let's find a primitive site for our instance Bob
-		Map<String, PrimitiveSite> primitiveSites = design.getDevice().getPrimitiveSites();
-		for(PrimitiveSite site : primitiveSites.values()){
+		Map<String, Site> primitiveSites = design.getDevice().getPrimitiveSites();
+		for(Site site : primitiveSites.values()){
 			// Some primitive sites can have more than one type reside at the site, such as SLICEM 
 			// sites which can also have SLICELs placed there.  Checking if the site is compatible
 			// makes sure you get the best possible chance of finding a place for bob to live.
@@ -77,8 +77,8 @@ public class HelloWorld{
 		}
 		
 		// Another way to find valid primitive sites if we want to use an exclusive site type
-		PrimitiveSite[] allSitesOfTypeSLICEL = design.getDevice().getAllSitesOfType(bob.getType());
-		for(PrimitiveSite site : allSitesOfTypeSLICEL){
+		Site[] allSitesOfTypeSLICEL = design.getDevice().getAllSitesOfType(bob.getType());
+		for(Site site : allSitesOfTypeSLICEL){
 			// Let's also make sure we don't place bob on a site that is already used
 			if(!design.isPrimitiveSiteUsed(site)){
 				bob.place(site);
@@ -91,7 +91,7 @@ public class HelloWorld{
 		// Let's create an IOB to drive our Inverter gate in Bob's LUT
 		Instance myIOB = new Instance();
 		myIOB.setName("input");
-		myIOB.setType(PrimitiveType.IOB);
+		myIOB.setType(SiteType.IOB);
 		design.addInstance(myIOB);
 		// These are typical attributes that need to be set to configure the IOB
 		// the way you like it

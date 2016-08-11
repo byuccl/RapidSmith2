@@ -124,7 +124,7 @@ public class BrowseDevice{
 							System.out.println(t.getName() + " has no primitive sites.");
 						}
 						else{
-							for(PrimitiveSite p : t.getPrimitiveSites()){
+							for(Site p : t.getPrimitiveSites()){
 								System.out.println("  " + p.getName());
 							}
 						}
@@ -133,7 +133,7 @@ public class BrowseDevice{
 					case 6:
 						System.out.println("Enter tile name: ");
 						String siteName = br.readLine().trim();
-						PrimitiveSite site = dev.getPrimitiveSite(siteName);
+						Site site = dev.getPrimitiveSite(siteName);
 						if(site == null){
 							System.out.println("No primitive site called \"" + siteName +  "\" exists.");
 						}

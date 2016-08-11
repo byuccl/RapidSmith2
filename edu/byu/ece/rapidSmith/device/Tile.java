@@ -54,7 +54,7 @@ public class Tile implements Serializable {
 	/** This is the X coordinate in the tile name (ex: 0 in INT_X0Y5) */
 	private int tileXCoordinate;
 	/** An array of primitiveSites located within the tile (null if none) */
-	private PrimitiveSite[] primitiveSites;
+	private Site[] primitiveSites;
 	/** This variable holds all the wires and their connections within the tile */
 	private WireHashMap wireConnections;
 
@@ -227,11 +227,11 @@ public class Tile implements Serializable {
 	 *
 	 * @return An array of primitive sites present in this tile.
 	 */
-	public PrimitiveSite[] getPrimitiveSites() {
+	public Site[] getPrimitiveSites() {
 		return primitiveSites;
 	}
 
-	public PrimitiveSite getPrimitiveSite(int siteIndex) {
+	public Site getPrimitiveSite(int siteIndex) {
 		return getPrimitiveSites()[siteIndex];
 	}
 
@@ -241,7 +241,7 @@ public class Tile implements Serializable {
 	 *
 	 * @param primitiveSites The new primitive sites.
 	 */
-	public void setPrimitiveSites(PrimitiveSite[] primitiveSites) {
+	public void setPrimitiveSites(Site[] primitiveSites) {
 		this.primitiveSites = primitiveSites;
 	}
 
@@ -462,15 +462,15 @@ public class Tile implements Serializable {
 		if (wireSites == null || !wireSites.containsKey(wire))
 			return null;
 		Integer siteIndex = wireSites.get(wire);
-		PrimitiveSite site = getPrimitiveSites()[siteIndex];
+		Site site = getPrimitiveSites()[siteIndex];
 		return site.getSitePinOfExternalWire(site.getType(), wire);
 	}
 
-	public SitePin getSitePinOfWire(PrimitiveType siteType, Integer wire) {
+	public SitePin getSitePinOfWire(SiteType siteType, Integer wire) {
 		if (wireSites == null || !wireSites.containsKey(wire))
 			return null;
 		Integer siteIndex = wireSites.get(wire);
-		PrimitiveSite site = getPrimitiveSites()[siteIndex];
+		Site site = getPrimitiveSites()[siteIndex];
 		return site.getSitePinOfExternalWire(siteType, wire);
 	}
 
@@ -509,7 +509,7 @@ public class Tile implements Serializable {
 	private static class TileReplace implements Serializable {
 		private String name;
 		private TileType type;
-		private PrimitiveSite[] primitiveSites;
+		private Site[] primitiveSites;
 		private WireHashMap wireConnections;
 		private WireHashMap reverseConnections;
 		private HashMap<Integer, SinkPin> sinks;

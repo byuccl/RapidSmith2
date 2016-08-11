@@ -218,7 +218,7 @@ public class DeviceBrowser extends QMainWindow{
 	protected void updatePrimitiveList(){
 		primitiveList.clear();
 		if(currTile == null || currTile.getPrimitiveSites() == null) return;
-		for(PrimitiveSite ps : currTile.getPrimitiveSites()){
+		for(Site ps : currTile.getPrimitiveSites()){
 			QTreeWidgetItem treeItem = new QTreeWidgetItem();
 			treeItem.setText(0, ps.getName());
 			treeItem.setText(1, ps.getType().toString());

@@ -23,7 +23,6 @@ package edu.byu.ece.rapidSmith.device;
 import edu.byu.ece.rapidSmith.RapidSmithEnv;
 import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.design.Pin;
-import edu.byu.ece.rapidSmith.design.subsite.TileWire;
 import edu.byu.ece.rapidSmith.device.helper.HashPool;
 import edu.byu.ece.rapidSmith.primitiveDefs.PrimitiveDefList;
 import edu.byu.ece.rapidSmith.router.Node;
@@ -64,11 +63,11 @@ public class Device implements Serializable {
 	/** A Map between a tile name (string) and its actual reference */
 	private HashMap<String, Tile> tileMap;
 	/** Keeps track of all the primitive instances on the device */
-	private HashMap<String, PrimitiveSite> primitiveSites;
+	private HashMap<String, Site> primitiveSites;
 	/** Keeps track of which Wire objects have a corresponding PIPRouteThrough */
 	private Map<Integer, Map<Integer, PIPRouteThrough>> routeThroughMap;
 	/** Templates for each primitive type in the device */
-	private Map<PrimitiveType, SiteTemplate> siteTemplates;
+	private Map<SiteType, SiteTemplate> siteTemplates;
 	/** The wire enumerator for this device */
 	private WireEnumerator we;
 	/** Primitive defs in the device for reference */
@@ -78,15 +77,15 @@ public class Device implements Serializable {
 	// Objects that are Populated After Parsing
 	//========================================================================//
 	/** Created on demand when user calls getPrimitiveSiteIndex(), where the ArrayList index is the ordinal of the PrimitiveType */
-	private List<PrimitiveSite[]> primitiveSiteIndex;
+	private List<Site[]> primitiveSiteIndex;
 	/** A set of all TileTypes that have switch matrices in them */
 	private HashSet<TileType> switchMatrixTypes;
 
-	private Set<PrimitiveType> sliceTypes;
-	private Set<PrimitiveType> bramTypes;
-	private Set<PrimitiveType> fifoTypes;
-	private Set<PrimitiveType> dspTypes;
-	private Set<PrimitiveType> iobTypes;
+	private Set<SiteType> sliceTypes;
+	private Set<SiteType> bramTypes;
+	private Set<SiteType> fifoTypes;
+	private Set<SiteType> dspTypes;
+	private Set<SiteType> iobTypes;
 
 	/**
 	 * Constructor, initializes all objects to null
@@ -230,7 +229,7 @@ public class Device implements Serializable {
 	 *
 	 * @return the map of site name to primitive sites for this device
 	 */
-	public Map<String, PrimitiveSite> getPrimitiveSites() {
+	public Map<String, Site> getPrimitiveSites() {
 		return primitiveSites;
 	}
 
@@ -241,7 +240,7 @@ public class Device implements Serializable {
 	 * @return the primitive site with the name, or null if no site with the name
 	 *   exists in the device
 	 */
-	public PrimitiveSite getPrimitiveSite(String name) {
+	public Site getPrimitiveSite(String name) {
 		return this.primitiveSites.get(name);
 	}
 
@@ -392,43 +391,43 @@ public class Device implements Serializable {
 		return switchMatrixTypes;
 	}
 
-	public Set<PrimitiveType> getSliceTypes() {
+	public Set<SiteType> getSliceTypes() {
 		return sliceTypes;
 	}
 
-	public void setSliceTypes(Set<PrimitiveType> sliceTypes) {
+	public void setSliceTypes(Set<SiteType> sliceTypes) {
 		this.sliceTypes = sliceTypes;
 	}
 
-	public Set<PrimitiveType> getBramTypes() {
+	public Set<SiteType> getBramTypes() {
 		return bramTypes;
 	}
 
-	public void setBramTypes(Set<PrimitiveType> bramTypes) {
+	public void setBramTypes(Set<SiteType> bramTypes) {
 		this.bramTypes = bramTypes;
 	}
 
-	public Set<PrimitiveType> getFifoTypes() {
+	public Set<SiteType> getFifoTypes() {
 		return fifoTypes;
 	}
 
-	public void setFifoTypes(Set<PrimitiveType> fifoTypes) {
+	public void setFifoTypes(Set<SiteType> fifoTypes) {
 		this.fifoTypes = fifoTypes;
 	}
 
-	public Set<PrimitiveType> getDspTypes() {
+	public Set<SiteType> getDspTypes() {
 		return dspTypes;
 	}
 
-	public void setDspTypes(Set<PrimitiveType> dspTypes) {
+	public void setDspTypes(Set<SiteType> dspTypes) {
 		this.dspTypes = dspTypes;
 	}
 
-	public Set<PrimitiveType> getIOBTypes() {
+	public Set<SiteType> getIOBTypes() {
 		return iobTypes;
 	}
 
-	public void setIOBTypes(Set<PrimitiveType> iobTypes) {
+	public void setIOBTypes(Set<SiteType> iobTypes) {
 		this.iobTypes = iobTypes;
 	}
 
@@ -439,7 +438,7 @@ public class Device implements Serializable {
 	 *
 	 * @return the site templates for this device
 	 */
-	public Map<PrimitiveType, SiteTemplate> getSiteTemplates() {
+	public Map<SiteType, SiteTemplate> getSiteTemplates() {
 		return siteTemplates;
 	}
 
@@ -450,11 +449,11 @@ public class Device implements Serializable {
 	 * @param type the primitive type of the site to get
 	 * @return the site template for the specified primitive type
 	 */
-	public SiteTemplate getSiteTemplate(PrimitiveType type) {
+	public SiteTemplate getSiteTemplate(SiteType type) {
 		return siteTemplates.get(type);
 	}
 
-	public void setSiteTemplates(Map<PrimitiveType, SiteTemplate> primitiveTemplates) {
+	public void setSiteTemplates(Map<SiteType, SiteTemplate> primitiveTemplates) {
 		this.siteTemplates = primitiveTemplates;
 	}
 
@@ -498,7 +497,7 @@ public class Device implements Serializable {
 	 * @param newSiteTile The tile of the new proposed site.
 	 * @return The corresponding site in tile newSite, or null if no corresponding site exists.
 	 */
-	public static PrimitiveSite getCorrespondingPrimitiveSite(PrimitiveSite current, Tile newSiteTile) {
+	public static Site getCorrespondingPrimitiveSite(Site current, Tile newSiteTile) {
 		if (newSiteTile == null) {
 			//MessageGenerator.briefError("ERROR: Bad input to Device.getCorrespondingPrimitiveSite(), newSiteTile==null");
 			return null;
@@ -507,7 +506,7 @@ public class Device implements Serializable {
 			return null;
 		}
 
-		PrimitiveSite[] sites = newSiteTile.getPrimitiveSites();
+		Site[] sites = newSiteTile.getPrimitiveSites();
 		return sites[current.getIndex()];
 	}
 
@@ -522,7 +521,7 @@ public class Device implements Serializable {
 	 * @return The data structure which stores all of the primitive sites
 	 * separated by type.
 	 */
-	private List<PrimitiveSite[]> getPrimitiveSiteIndex() {
+	private List<Site[]> getPrimitiveSiteIndex() {
 		if (primitiveSiteIndex == null) {
 			createPrimitiveSiteIndex();
 		}
@@ -539,18 +538,18 @@ public class Device implements Serializable {
 	 * @return An array of compatible sites suitable for placement of a
 	 * primitive of type type.
 	 */
-	public PrimitiveSite[] getAllCompatibleSites(PrimitiveType type) {
+	public Site[] getAllCompatibleSites(SiteType type) {
 		// Check if there are sites of the given type
-		List<PrimitiveSite> compatibleList = new ArrayList<>();
-		PrimitiveSite[] match = getAllSitesOfType(type);
+		List<Site> compatibleList = new ArrayList<>();
+		Site[] match = getAllSitesOfType(type);
 		if (match != null) {
 			compatibleList.addAll(Arrays.asList(match));
 		}
 
 		// Check for other compatible site types
-		PrimitiveType[] compatibleTypes = getSiteTemplate(type).getCompatibleTypes();
+		SiteType[] compatibleTypes = getSiteTemplate(type).getCompatibleTypes();
 		if (compatibleTypes != null) {
-			for (PrimitiveType compatibleType : compatibleTypes) {
+			for (SiteType compatibleType : compatibleTypes) {
 				match = getAllSitesOfType(compatibleType);
 				if (match != null) {
 					compatibleList.addAll(Arrays.asList(match));
@@ -562,7 +561,7 @@ public class Device implements Serializable {
 		if (compatibleList.size() == 0) {
 			return null;
 		}
-		return compatibleList.toArray(new PrimitiveSite[compatibleList.size()]);
+		return compatibleList.toArray(new Site[compatibleList.size()]);
 	}
 
 	/**
@@ -571,7 +570,7 @@ public class Device implements Serializable {
 	 * @param type The primitive type of the site to get.
 	 * @return An array of all primitive sites in the device with primitive type type.
 	 */
-	public PrimitiveSite[] getAllSitesOfType(PrimitiveType type) {
+	public Site[] getAllSitesOfType(SiteType type) {
 		return getPrimitiveSiteIndex().get(type.ordinal());
 	}
 
@@ -612,27 +611,27 @@ public class Device implements Serializable {
 	 * each type of primitive site.
 	 */
 	private void createPrimitiveSiteIndex() {
-		List<List<PrimitiveSite>> tmp = new ArrayList<>(PrimitiveType.values().length);
-		for (int i = 0; i < PrimitiveType.values().length; i++) {
+		List<List<Site>> tmp = new ArrayList<>(SiteType.values().length);
+		for (int i = 0; i < SiteType.values().length; i++) {
 			tmp.add(new ArrayList<>());
 		}
 
 		for (int i = 0; i < this.rows; i++) {
 			for (int j = 0; j < this.columns; j++) {
-				PrimitiveSite[] sites = tiles[i][j].getPrimitiveSites();
+				Site[] sites = tiles[i][j].getPrimitiveSites();
 				if (sites == null) continue;
-				for (PrimitiveSite site : sites) {
+				for (Site site : sites) {
 					tmp.get(site.getDefaultType().ordinal()).add(site);
 				}
 			}
 		}
 
-		List<PrimitiveSite[]> index = new ArrayList<>();
-		for (List<PrimitiveSite> list : tmp) {
+		List<Site[]> index = new ArrayList<>();
+		for (List<Site> list : tmp) {
 			if (list.size() == 0) {
 				index.add(null);
 			} else {
-				PrimitiveSite[] tmpArray = new PrimitiveSite[list.size()];
+				Site[] tmpArray = new Site[list.size()];
 				index.add(list.toArray(tmpArray));
 			}
 		}
@@ -659,7 +658,7 @@ public class Device implements Serializable {
 				tileMap.put(tile.getName(), tile);
 				if (tile.getPrimitiveSites() == null)
 					continue;
-				for (PrimitiveSite ps : tile.getPrimitiveSites())
+				for (Site ps : tile.getPrimitiveSites())
 					primitiveSites.put(ps.getName(), ps);
 			}
 		}
@@ -685,7 +684,7 @@ public class Device implements Serializable {
 	 * alternatives list.
 	 */
 	private void setPrimitiveSiteTypes() {
-		for (PrimitiveSite site : primitiveSites.values()) {
+		for (Site site : primitiveSites.values()) {
 			site.setType(site.getPossibleTypes()[0]);
 		}
 	}
@@ -699,17 +698,17 @@ public class Device implements Serializable {
 		// These pools help to reuse instances to reduce memory
 		HashPool<Map<Integer, Integer>> wireSitesPool = new HashPool<>();
 		HashPool<Map<Integer, SitePinTemplate>> sitePinMapPool = new HashPool<>();
-		HashPool<Map<PrimitiveType, Map<Integer, SitePinTemplate>>> extConnPool = new HashPool<>();
+		HashPool<Map<SiteType, Map<Integer, SitePinTemplate>>> extConnPool = new HashPool<>();
 		for (Tile tile : tileMap.values()) {
 			Map<Integer, Integer> wireSites = new HashMap<>();
 			if (tile.getPrimitiveSites() == null)
 				continue;
 
-			for (PrimitiveSite site : tile.getPrimitiveSites()) {
-				Map<PrimitiveType, Map<String, Integer>> externalWiresMap = site.getExternalWires();
-				Map<PrimitiveType, Map<Integer, SitePinTemplate>> extConns = new HashMap<>();
+			for (Site site : tile.getPrimitiveSites()) {
+				Map<SiteType, Map<String, Integer>> externalWiresMap = site.getExternalWires();
+				Map<SiteType, Map<Integer, SitePinTemplate>> extConns = new HashMap<>();
 
-				for (PrimitiveType siteType : site.getPossibleTypes()) {
+				for (SiteType siteType : site.getPossibleTypes()) {
 					SiteTemplate siteTemplate = getSiteTemplate(siteType);
 					Map<String, Integer> externalWires = externalWiresMap.get(siteType);
 
@@ -759,11 +758,11 @@ public class Device implements Serializable {
 		private WireEnumerator we;
 		private PrimitiveDefList primitiveDefs;
 		private HashSet<TileType> switchMatrixTypes;
-		private Set<PrimitiveType> sliceTypes;
-		private Set<PrimitiveType> bramTypes;
-		private Set<PrimitiveType> fifoTypes;
-		private Set<PrimitiveType> dspTypes;
-		private Set<PrimitiveType> iobTypes;
+		private Set<SiteType> sliceTypes;
+		private Set<SiteType> bramTypes;
+		private Set<SiteType> fifoTypes;
+		private Set<SiteType> dspTypes;
+		private Set<SiteType> iobTypes;
 
 		public void readResolve(Device device) {
 			device.partName = partName;

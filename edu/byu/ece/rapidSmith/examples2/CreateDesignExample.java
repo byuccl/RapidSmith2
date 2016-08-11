@@ -59,11 +59,24 @@ public class CreateDesignExample {
 		CellNet clknet = design.addNet(new CellNet("clknet", NetType.WIRE));
 		clknet.connectToPin(clkbufcell.getPin("O"));
 		clknet.connectToPin(ffcell.getPin("C"));
+		
+		// Let's place some of the cells into a slice
+		// Get the first SLICEL in the device
+		Site slice = device.getAllSitesOfType(SiteType.SLICEL)[0];
+		
+		// Let's place the invcell on the A5LUT
+		design.placeCell(invcell, slice.getBel("A5LUT"));
+
+		// Let's place the ffcell on the AFF
+		design.placeCell(ffcell, slice.getBel("AFF"));
 
 		// Now, prettyprint what we have created
 		for (Cell c : design.getCells()) {
-			System.out.println("Cell: " + c.getName() + " " + 
+			System.out.print("Cell: " + c.getName() + " " + 
 					c.getLibCell().getName());
+			if (c.isPlaced())
+				System.out.println("  <<<Placed on: " + c.getAnchor() + ">>>");
+			else System.out.println();
 			for (CellPin cp : c.getPins()) {
 				System.out.println("  Pin: " + cp.getName() + " " + 
 						cp.getDirection() + " " + 
@@ -76,3 +89,4 @@ public class CreateDesignExample {
 		}
 	}
 }
+	
