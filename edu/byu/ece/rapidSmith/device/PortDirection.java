@@ -47,7 +47,7 @@ public enum PortDirection {
 		return ((PortDirection)portCell.getProperty("Dir").getValue()) == PortDirection.INOUT;
 	}
 	
-	public static void checkIsValidPort(Cell portCell) {
+	private static void checkIsValidPort(Cell portCell) {
 		
 		if (!portCell.isPort()) {
 			throw new UnsupportedOperationException("Attempting to get a Port direction for a cell that is not a port!");
