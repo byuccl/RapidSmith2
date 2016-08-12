@@ -116,6 +116,13 @@ public class Cell  {
 	}
 
 	/**
+	 * Returns true if this cell is a top-level port of the design
+	 */
+	public boolean isPort() {
+		return getLibCell().isPort();
+	}
+	
+	/**
 	 * Returns the bondedness of this cell.  IO are either BONDED or UNBONDED,
 	 * all others INTERNAL.
 	 */

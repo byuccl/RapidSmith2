@@ -14,17 +14,24 @@ import edu.byu.ece.rapidSmith.device.Wire;
  *
  */
 public final class RapidSmithDebug {
-	
-	/*
+		
+	/**
 	 * Debug method that will print a RouteTree in the following format
 	 * 
 	 * Wire 1 --> 0
 	 * Wire 2 --> 1
 	 * Wire 3 --> 2
 	 *  
-	 * TODO: print using tabs for levels?  
-	 */	
-	@SuppressWarnings("unused")
+	 * TODO: print using tabs for levels? 
+	 * @param rt RouteTree to print
+	 */
+	public static void printRouteTree(RouteTree rt) {
+		printRouteTree(rt, 0);
+	}
+	
+	/*
+	 * Recursive method to print a RouteTree data structure
+	 */
 	private static void printRouteTree(RouteTree rt, int level) {
 		Wire w = rt.getWire();
 		System.out.println(w.getTile() + "/" + w.getWireName() + "--> " + level);
@@ -36,14 +43,14 @@ public final class RapidSmithDebug {
 		level--; 
 		return;
 	}
-	
-	/*
+		
+	/**
 	 * Debug method that creates a TCL command that can be run in Vivado
 	 * to highlight all of the wires in a RouteTree. Used to visually
 	 * verify the RouteTree data structure for a specific net.
+	 * @param net
 	 */
-	@SuppressWarnings("unused")
-	private static void printWiresInRoute(CellNet net) {
+	public static void createHighlighWiresTclCommand(CellNet net) {
 
 		String cmd = "select [get_wires {";
 		
