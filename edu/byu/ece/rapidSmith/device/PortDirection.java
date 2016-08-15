@@ -19,7 +19,7 @@ public enum PortDirection {
 			case IN: return PortDirection.OUT;
 			case OUT: return PortDirection.IN;
 			case INOUT: return PortDirection.INOUT;
-			default : throw new UnsupportedOperationException("Undefined PinDirection");
+			default : throw new AssertionError("Undefined PinDirection");
 		}
 	}
 	
@@ -50,7 +50,7 @@ public enum PortDirection {
 	private static void checkIsValidPort(Cell portCell) {
 		
 		if (!portCell.isPort()) {
-			throw new UnsupportedOperationException("Attempting to get a Port direction for a cell that is not a port!");
+			throw new AssertionError("Attempting to get a Port direction for a cell that is not a port!");
 		}
 	}
 }
