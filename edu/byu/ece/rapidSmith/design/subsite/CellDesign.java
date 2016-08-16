@@ -29,7 +29,7 @@ public class CellDesign extends AbstractDesign {
 	/** Map of properties of this design. */
 	private Map<Object, Property> propertyMap;
 
-	private HashMap<Site, HashSet<Integer>> usedSitePipsAtSite;
+	private HashMap<Site, HashSet<Integer>> usedSitePipsMap;
 
 	/**
 	 * Constructor which initializes all member data structures. Sets name and
@@ -56,7 +56,7 @@ public class CellDesign extends AbstractDesign {
 		cellMap = new HashMap<>();
 		placementMap = new HashMap<>();
 		netMap = new HashMap<>();
-		usedSitePipsAtSite = new HashMap<>();
+		usedSitePipsMap = new HashMap<>();
 	}
 
 	/**
@@ -108,6 +108,18 @@ public class CellDesign extends AbstractDesign {
 		if (this.propertyMap == null)
 			this.propertyMap = new HashMap<>();
 		this.propertyMap.put(property.getKey(), property);
+	}
+	
+	/**
+	 * Updates or adds the properties in the provided collection to the properties
+	 * of this cell.
+	 *
+	 * @param properties the properties to add or update
+	 */
+	public void updateProperties(Collection<Property> properties) {
+		Objects.requireNonNull(properties);
+
+		properties.forEach(this::updateProperty);
 	}
 
 	/**
@@ -505,11 +517,11 @@ public class CellDesign extends AbstractDesign {
 	}
 
 	public void setUsedSitePipsAtSite(Site ps, HashSet<Integer> usedWires) {
-		this.usedSitePipsAtSite.put(ps, usedWires);
+		this.usedSitePipsMap.put(ps, usedWires);
 	}
 
 	public  HashSet<Integer> getUsedSitePipsAtSite(Site ps) {
-		return this.usedSitePipsAtSite.get(ps);
+		return this.usedSitePipsMap.get(ps);
 	}
 
 	/**
