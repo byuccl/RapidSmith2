@@ -32,7 +32,8 @@ import edu.byu.ece.rapidSmith.design.Instance;
 import edu.byu.ece.rapidSmith.design.Net;
 import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.device.Site;
-import edu.byu.ece.rapidSmith.router.Node;
+import edu.byu.ece.rapidSmith.device.TileWire;
+import edu.byu.ece.rapidSmith.device.Wire;
 
 /**
  * This class is meant to debug problem with XDL files.  It
@@ -183,11 +184,11 @@ public class XDLDesignChecker{
 		}
 		
 		// Checking for duplicate PIP sinks
-		HashMap<Node,Net> pipSinks = new HashMap<Node, Net>();
+		HashMap<Wire, Net> pipSinks = new HashMap<Wire, Net>();
 		MessageGenerator.printHeader("CHECKING FOR DUPLICATE PIP SINKS ... ");
 		for(Net net : design.getNets()){
 			for(PIP pip : net.getPIPs()){
-				Node n = new Node(pip.getTile(), pip.getEndWire(), null, 0);
+				Wire n = new TileWire(pip.getTile(), pip.getEndWire());
 				Net tmp = pipSinks.get(n);
 				if(tmp == null){
 					pipSinks.put(n, net);

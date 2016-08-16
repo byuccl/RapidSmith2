@@ -21,7 +21,8 @@
 package edu.byu.ece.rapidSmith.design.explorer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.trolltech.qt.core.QSize;
 import com.trolltech.qt.core.Qt.AspectRatioMode;
@@ -38,11 +39,13 @@ import edu.byu.ece.rapidSmith.design.Design;
 import edu.byu.ece.rapidSmith.design.ModuleInstance;
 import edu.byu.ece.rapidSmith.design.Net;
 import edu.byu.ece.rapidSmith.design.PIP;
+import edu.byu.ece.rapidSmith.design.subsite.Connection;
 import edu.byu.ece.rapidSmith.device.Tile;
+import edu.byu.ece.rapidSmith.device.TileWire;
+import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.device.WireConnection;
 import edu.byu.ece.rapidSmith.gui.GuiModuleInstance;
 import edu.byu.ece.rapidSmith.gui.TileView;
-import edu.byu.ece.rapidSmith.router.Node;
 import edu.byu.ece.rapidSmith.timing.PathDelay;
 import edu.byu.ece.rapidSmith.timing.PathElement;
 import edu.byu.ece.rapidSmith.timing.RoutingPathElement;
@@ -137,7 +140,7 @@ public class TileWindow extends QWidget{
 	public void drawCriticalPaths(ArrayList<PathDelay> pathDelays){
 		DesignTileScene scn = (DesignTileScene) scene;
 		for(PathDelay pd : pathDelays){
-			ArrayList<Connection> conns = new ArrayList<Connection>();
+			ArrayList<WiresConnection> conns = new ArrayList<WiresConnection>();
 			for(PathElement pe : pd.getMaxDataPath()){
 				if(pe.getType().equals("net")){
 					if(pe.getClass().equals(RoutingPathElement.class)){
@@ -157,37 +160,33 @@ public class TileWindow extends QWidget{
 		scn.sortPaths();
 	}
 	
-	public ArrayList<Connection> getAllConnections(Net net){
-		ArrayList<Connection> conns = new ArrayList<Connection>();
-		HashMap<Node, Node> nodeMap = new HashMap<Node, Node>();
+	public ArrayList<WiresConnection> getAllConnections(Net net){
+		ArrayList<WiresConnection> conns = new ArrayList<WiresConnection>();
+		Set<Wire> wireSet = new HashSet<Wire>();
 		for(PIP p : net.getPIPs()){
 			
 			if(scene.tileXMap.get(p.getTile()) != null && scene.tileYMap.get(p.getTile()) != null){
-				conns.add(new Connection(p));
+				conns.add(new WiresConnection(p));
 			}
 			
-			Node start = new Node(p.getTile(), p.getStartWire(), null, 0);
-			Node end = new Node(p.getTile(), p.getEndWire(), null, 0);
-			nodeMap.put(start, start);
-			nodeMap.put(end, end);
+			Wire start = new TileWire(p.getTile(), p.getStartWire());
+			Wire end = new TileWire(p.getTile(), p.getEndWire());
+			wireSet.add(start);
+			wireSet.add(end);
 		}
-		Node tmp = new Node();
-		Node tmp2 = new Node();
-		Node tmp3 = new Node();
 		for(PIP p : net.getPIPs()){
-			tmp.setTileAndWire(p.getTile(), p.getEndWire());
+			Wire tmp = new TileWire(p.getTile(), p.getEndWire());
 			//System.out.println("  " + tmp.toString(scene.getWireEnumerator()));
-			if(tmp.getConnections() == null) continue;
-			for(WireConnection w : tmp.getConnections()){
-				tmp2.setTileAndWire(w.getTile(tmp.getTile()), w.getWire());
+			for(Connection w : tmp.getWireConnections()){
+				Wire tmp2 = w.getSinkWire();
 				//System.out.println("    " + tmp2.toString(scene.getWireEnumerator()));
-				if(!tmp2.getTile().equals(tmp.getTile()) && tmp2.getConnections() != null){
-					for(WireConnection w2 : tmp2.getConnections()){
-						tmp3.setTileAndWire(w2.getTile(tmp2.getTile()), w2.getWire());
+				if(!tmp2.getTile().equals(tmp.getTile())){
+					for(Connection w2 : tmp2.getWireConnections()){
+						Wire tmp3 = w2.getSinkWire();
 						//System.out.println("      " + tmp3.toString(scene.getWireEnumerator()));
-						if(nodeMap.get(tmp3) != null){
+						if(wireSet.contains(tmp3)){
 							if(scene.tileXMap.get(tmp.getTile()) != null && scene.tileYMap.get(tmp2.getTile()) != null){
-								Connection conn = new Connection(tmp.getTile(), tmp2.getTile(), tmp.getWire(), tmp2.getWire()); 
+								WiresConnection conn = new WiresConnection(tmp, tmp2);
 								conns.add(conn);
 								//System.out.println("* " + conn.toString(scene.getWireEnumerator()));
 							}
@@ -196,8 +195,7 @@ public class TileWindow extends QWidget{
 				}
 			}
 		}
-		
-		
+
 		return conns;
 	}
 }

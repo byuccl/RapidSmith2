@@ -25,7 +25,6 @@ import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.design.Pin;
 import edu.byu.ece.rapidSmith.device.helper.HashPool;
 import edu.byu.ece.rapidSmith.primitiveDefs.PrimitiveDefList;
-import edu.byu.ece.rapidSmith.router.Node;
 import edu.byu.ece.rapidSmith.util.FamilyType;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
 
@@ -355,26 +354,6 @@ public class Device implements Serializable {
 	 */
 	public TileWire getPrimitiveExternalPin(Pin pin) {
 		return pin.getInstance().getPrimitiveSite().getSitePin(pin.getName()).getExternalWire();
-	}
-
-	/**
-	 * This will take a sink Pin from a design net and determine the
-	 * final switch matrix and node or wire which the signal must be routed
-	 * through in order to reach the sink pin.
-	 *
-	 * @param pin The sink pin to find a switch matrix for.
-	 * @return A node (a unique tile and wire) of where the signal must be
-	 * routed to reach the sink pin. Returns null, if none exists.
-	 */
-	public Node getSwitchMatrixSink(Pin pin) {
-		TileWire extPin = getPrimitiveExternalPin(pin);
-		Tile tile = pin.getInstance().getTile();
-		SinkPin sp = tile.getSinks().get(extPin.getWireEnum());
-		if (sp == null) return null;
-		int y = sp.switchMatrixTileOffset;
-		int x = y >> 16;
-		y = (y << 16) >> 16;
-		return new Node(getTile(tile.getRow() + y, tile.getColumn() + x), sp.switchMatrixSinkWire, null, 0);
 	}
 
 	public void setSwitchMatrixTypes(HashSet<TileType> types) {
