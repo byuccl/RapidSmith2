@@ -24,6 +24,7 @@ import edu.byu.ece.rapidSmith.RapidSmithEnv;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.creation.DeviceFilesCreator;
 import edu.byu.ece.rapidSmith.device.creation.ISE_XDLRCRetriever;
+import edu.byu.ece.rapidSmith.device.creation.Vivado_XDLRCRetriever;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -53,6 +54,7 @@ public class Installer {
 		OptionParser parser = new OptionParser();
 		parser.acceptsAll(Arrays.asList("out", "o"), "Output directory for generated device files").withRequiredArg();
 		parser.acceptsAll(Arrays.asList("force", "f"), "Overwrite existing device files");
+		parser.acceptsAll(Arrays.asList("ise"), "Generate XDLRC using ISE. Otherwise, it will use an existing XDLRC");
 		parser.accepts("ignore_disclaimer", "Ignores the disclaimer");
 		parser.nonOptions("<device or family> ...");
 
@@ -71,6 +73,7 @@ public class Installer {
 		if (options.has("out"))
 			env.setDevicePath(Paths.get((String) options.valueOf("out")));
 		boolean forceRebuild = options.has("force");
+		boolean generateFromISE = options.has("ise");
 
 		if (options.nonOptionArguments().size() < 1) {
 			try {
@@ -124,7 +127,14 @@ public class Installer {
 					}
 				}
 				System.out.println("Creating files for " + partName);
-				DeviceFilesCreator creator = new DeviceFilesCreator(new ISE_XDLRCRetriever(), env);
+				
+				DeviceFilesCreator creator;
+				if (generateFromISE) {
+					creator = new DeviceFilesCreator(new ISE_XDLRCRetriever(), env);
+				} else { 
+					creator = new DeviceFilesCreator(new Vivado_XDLRCRetriever(), env);
+				}
+				
 				creator.createDevice(partName);
 			}
 		}
