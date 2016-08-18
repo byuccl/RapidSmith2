@@ -135,7 +135,7 @@ public final class RouteTree implements
 
 		return !sinkTrees.isEmpty() || terminals.contains(this);
 	}
-
+	
 	@Override
 	public Iterator<RouteTree> iterator() {
 		return prefixIterator();

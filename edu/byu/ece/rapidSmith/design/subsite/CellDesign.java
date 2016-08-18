@@ -28,7 +28,7 @@ public class CellDesign extends AbstractDesign {
 	private Map<String, CellNet> netMap;
 	/** Map of properties of this design. */
 	private Map<Object, Property> propertyMap;
-
+	
 	private HashMap<Site, HashSet<Integer>> usedSitePipsMap;
 
 	/**
@@ -150,7 +150,7 @@ public class CellDesign extends AbstractDesign {
 			return null;
 		return propertyMap.remove(propertyKey);
 	}
-
+	
 	public boolean hasCell(String fullName) {
 		Objects.requireNonNull(fullName);
 

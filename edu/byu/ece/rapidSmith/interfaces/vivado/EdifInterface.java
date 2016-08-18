@@ -43,6 +43,7 @@ import edu.byu.ece.rapidSmith.design.subsite.LibraryPin;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
 import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
 import edu.byu.ece.rapidSmith.device.PinDirection;
+import edu.byu.ece.rapidSmith.device.PortDirection;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 /**
@@ -77,14 +78,51 @@ public final class EdifInterface {
 		
 		// create RS2 cell design
 		String partName = ((StringTypedValue)top.getTopDesign().getProperty("part").getValue()).getStringValue();
-		CellDesign des= new CellDesign(top.getTopDesign().getName(), partName);	
-		des.updateProperties(createCellProperties(topLevelCell.getPropertyList()));
+		CellDesign design= new CellDesign(top.getTopDesign().getName(), partName);	
+		design.updateProperties(createCellProperties(topLevelCell.getPropertyList()));
 		
 		// add all the cells and nets to the design
-		processEdifCells(des, topLevelCell.getCellInstanceList(), libCells);
-		processEdifNets(des, topLevelCell.getNetList());
+		processTopLevelEdifPorts(design, topLevelCell.getInterface(), libCells);
+		processEdifCells(design, topLevelCell.getCellInstanceList(), libCells);
+		processEdifNets(design, topLevelCell.getNetList());
 		
-		return des;
+		return design;
+	}
+	
+	/*
+	 * Converts EDIF top level ports to equivalent RapidSmith port cells and adds them to the design
+	 */
+	private static void processTopLevelEdifPorts (CellDesign design, EdifCellInterface topInterface, CellLibrary libCells) {
+		
+		for ( EdifPort port : topInterface.getPortList() ) {
+			
+			String libraryPortType = port.isInput() ? "IPORT" : "OPORT";
+		
+			// TODO: See if inout ports are supported in RS2, and if not what needs to be updated to support them 
+			if (port.isInOut()) {
+				throw new UnsupportedOperationException("Inout port functionality not yet implemented! Cannot load EDIF");
+			}
+			
+			for (EdifSingleBitPort busMember : port.getSingleBitPortList() ) {
+				
+				LibraryCell libCell = libCells.get(libraryPortType);
+				Objects.requireNonNull(libCell, "Library cell: " + libraryPortType + " not found in the cell library!");
+				
+				Cell portCell = new Cell(renameEdifPort(busMember), libCell);
+				portCell.updateProperty(new Property("Dir", PropertyType.USER, PortDirection.getPortDirectionForImport(portCell)));
+				design.addCell(portCell);
+			}
+		}
+	}
+	
+	/*
+	 * Renames an edifPort to be consistent with RapidSmith bus naming conventions.
+	 * Specifically, caret characters ('<','>') are replaced with brackets ('[',']')
+	 * Example: testPort<2> --> testPort[2]
+	 */
+	private static String renameEdifPort(EdifSingleBitPort edifPort) {
+		
+		return edifPort.getPortName().replace('<', '[').replace('>', ']');
 	}
 	
 	/*
@@ -117,8 +155,8 @@ public final class EdifInterface {
 	 */
 	private static void processEdifNets(CellDesign design, Collection<EdifNet> edifNets) {
 		 
-		if(edifNets == null || edifNets.size() == 0) {
-			MessageGenerator.generalError("[Warning] No nets found in the edif netlist");
+		if (edifNets == null || edifNets.size() == 0) {
+			MessageGenerator.briefError("[Warning] No nets found in the edif netlist");
 			return;
 		}
 		
@@ -126,31 +164,21 @@ public final class EdifInterface {
 		for(EdifNet net : edifNets) {
 			
 			//create a new net
-			//NOTE: we are using the old name here, make sure when we go back to EDIF, we use a supported EDIF name
 			CellNet cn = new CellNet(net.getOldName(), NetType.WIRE); 
-			boolean shouldAddNet = true;
 			
-			//process the sources of the net... are these the correct arguments for getSourcePortRefs?
+			// Add all the source and sink connections to the net
 			Collection<EdifPortRef> sources = net.getSourcePortRefs(false, true);
 			
 			if (sources.size() == 0) {
 				MessageGenerator.briefError("[Warning] No source for net " + net.getOldName());
 				continue;
 			}
-			else {
-				// Add all the source connections to the net
-				shouldAddNet = processNetConnections(sources, design, cn);
-			}
+			
+			processNetConnections(sources, design, cn);
+			processNetConnections(net.getSinkPortRefs(false, true), design, cn);
 							
-			// Add all the sink connections to the net
-			shouldAddNet &= processNetConnections(net.getSinkPortRefs(false, true), design, cn);
-							
-			// only add nets that don't connect to a top-level port
-			// TODO: should we keep a list of top-level ports? For importing back in to Vivado?
-			if (shouldAddNet) { 
-				design.addNet(cn);
-				cn.updateProperties(createCellProperties(net.getPropertyList()));
-			} 
+			design.addNet(cn);
+			cn.updateProperties(createCellProperties(net.getPropertyList()));
 		}
 	}
 	
@@ -160,35 +188,41 @@ public final class EdifInterface {
 	 * 
 	 * TODO: update this once top-level ports are added
 	 */
-	private static boolean processNetConnections(Collection<EdifPortRef> ports, CellDesign design, CellNet net) {
-		
-		for (EdifPortRef port: ports) {  
-		
-			String pinname = port.isSingleBitPortRef() ? port.getPort().getName() 
-							 : port.getPort().getName() + "[" + reverseBusIndex(port.getPort().getWidth(), port.getBusMember()) + "]";
+	private static void processNetConnections(Collection<EdifPortRef> ports, CellDesign design, CellNet net) {
 			
-			//TODO: update this part of the code once (if) top level ports in RS2 are supported...
+		for (EdifPortRef port: ports) {  
+				
+			// Connects to a top-level port
 			if (port.isTopLevelPortRef()) {
-				return false; 
+				
+				String portname = port.isSingleBitPortRef() ? port.getPort().getName()
+								  : String.format("%s[%d]", port.getPort().getName(), port.getBusMember());
+				
+				//TODO: add a check for null and throw a meaningful exception if this is the case
+				Cell portCell = design.getCell(portname);
+				net.connectToPin(portCell.getPin("PAD"));
+								
+				continue; 
 			}
-			else {
-				Cell node = design.getCell(port.getCellInstance().getOldName()); 
-				if (node == null) 
-					MessageGenerator.briefErrorAndExit("[ERROR] Trying to connect net " + net.getName() + " to cell " 
-									+ port.getCellInstance().getOldName() + ", but specified cell does not exist");
-				else {
-					//Mark GND and VCC nets 
-					//TODO: fix this workaround so we can use the function calls node.isVCCSource() and node.isGNDSource()
-					if (node.getLibCell().getName().equals("VCC"))
-						net.setType(NetType.VCC);
-					else if (node.getLibCell().getName().equals("GND"))
-						net.setType(NetType.GND);
-					net.connectToPin(node.getPin(pinname));
-				}						
+			
+			// Connects to a cell pin
+			String pinname = port.isSingleBitPortRef() ? port.getPort().getName() 
+					 : port.getPort().getName() + "[" + reverseBusIndex(port.getPort().getWidth(), port.getBusMember()) + "]";
+			
+			Cell node = design.getCell(port.getCellInstance().getOldName()); 
+			if (node == null) {
+				MessageGenerator.briefErrorAndExit("[ERROR] Trying to connect net " + net.getName() + " to cell " 
+								+ port.getCellInstance().getOldName() + ", but specified cell does not exist");
 			}
-		}
-		
-		return true;
+			
+			// Mark GND and VCC nets 
+			if (node.isVccSource())
+				net.setType(NetType.VCC);
+			else if (node.isGndSource())
+				net.setType(NetType.GND);
+			
+			net.connectToPin(node.getPin(pinname));						
+		}		
 	}
 		
 	/*
@@ -200,7 +234,7 @@ public final class EdifInterface {
 		if (edifPropertyList != null) {
 			for (String keyName : edifPropertyList.keySet()) {
 				edu.byu.ece.edif.core.Property property = edifPropertyList.getProperty(keyName);
-				Property prop = new Property(property.getName(), PropertyType.USER, getValueFromEdifType(property.getValue()));
+				Property prop = new Property(property.getName(), PropertyType.EDIF, getValueFromEdifType(property.getValue()));
 				cellProperties.add(prop);
 			}
 		}
@@ -297,7 +331,8 @@ public final class EdifInterface {
 		HashSet<LibraryCell> uniqueLibraryCells = new HashSet<LibraryCell>();
 		
 		for (Cell c : design.getCells()) {			
-			uniqueLibraryCells.add(c.getLibCell());
+			if (!c.isPort())
+				uniqueLibraryCells.add(c.getLibCell());
 		}
 		
 		return uniqueLibraryCells;
@@ -316,9 +351,11 @@ public final class EdifInterface {
 		
 		// create the cell instances
 		for (Cell cell : design.getCells()) {
-			EdifCell edifLibCell = cellMap.get(cell.getLibCell());
-			Objects.requireNonNull(edifLibCell, String.format("[Error]: Edif Library cell \"%s\" not found. Edif not generated.", cell.getLibCell().getName()));
 			
+			if (cell.isPort())
+				continue;
+			
+			EdifCell edifLibCell = cellMap.get(cell.getLibCell());	
 			topLevelCell.addSubCell( createEdifCellInstance(cell, topLevelCell, edifLibCell) );
 		}
 		
@@ -345,30 +382,25 @@ public final class EdifInterface {
 		HashMap<String, Integer> portDirectionMap = new HashMap<String, Integer>();
 		
 		for (Cell cell : design.getCells()) {
-			String libCellName = cell.getLibCell().getName();
-			boolean isIbuf = libCellName.equals("IBUF");
 			
-			if (isIbuf || libCellName.equals("OBUF")) {
-				String cellName = cell.getName().split("\\[")[0];
-				Integer count = portWidthMap.getOrDefault(cellName, 0);
-				portWidthMap.put(cellName, count + 1);
+			if (cell.isPort()) {
+				String portName = cell.getName().split("\\[")[0];
+				Integer count = portWidthMap.getOrDefault(portName, 0);
+				portWidthMap.put(portName, count + 1);
 				
 				if (count == 0) {
-					portDirectionMap.put(cellName, (isIbuf) ? EdifPort.IN : EdifPort.OUT);
+					portDirectionMap.put(portName, PortDirection.isInputPort(cell) ? EdifPort.IN : EdifPort.OUT);
 				}
 			}			
 		}
 		
-		for (String portNameExtended : portWidthMap.keySet()) {
-			
-			Integer portDirection = portDirectionMap.get(portNameExtended); 
-			String portName = (portDirection == EdifPort.IN) ? portNameExtended.split("_IBUF")[0] : portNameExtended.split("_OBUF")[0];
-			
-			int portWidth = portWidthMap.get(portNameExtended);		
+		for (String portName : portWidthMap.keySet()) {
+						
+			int portWidth = portWidthMap.get(portName);		
 			EdifNameable edifPortName = (portWidth == 1) ? 
 									createEdifNameable(portName) : 
 									new RenamedObject(portName, String.format("%s[%d:0]", portName, portWidth-1));
-			cellInterface.addPort(edifPortName, portWidth, portDirection);
+			cellInterface.addPort(edifPortName, portWidth, portDirectionMap.get(portName));
 		}
 		
 		return cellInterface;
@@ -391,33 +423,68 @@ public final class EdifInterface {
 	/*
 	 * Creates an EDIF net from a corresponding RapidSmith net
 	 */
-	private static EdifNet createEdifNet(CellNet cellNet, EdifCell parent) {
-		EdifNet edifNet = new EdifNet(createEdifNameable(cellNet.getName()), parent);
+	private static EdifNet createEdifNet(CellNet cellNet, EdifCell edifParentCell) {
+		EdifNet edifNet = new EdifNet(createEdifNameable(cellNet.getName()), edifParentCell);
 		
-		// create the port refs
+		// create the port references for the edif net
 		for (CellPin cellPin : cellNet.getPins()) {
 			
-			EdifCellInstance cellInstance = parent.getCellInstance(getEdifName(cellPin.getCell().getName()));
-			EdifCell libCell = cellInstance.getCellType();
+			Cell parentCell = cellPin.getCell();
 			
-			String[] toks = cellPin.getName().split("\\["); 
+			EdifPortRef portRef = parentCell.isPort() ?
+									createEdifPortRefFromPort(parentCell, edifParentCell, edifNet) : 
+									createEdifPortRefFromCellPin(cellPin, edifParentCell, edifNet) ;
 			
-			assert(toks.length == 1 || toks.length == 2);
-			
-			String portName = toks[0]; 
-			
-			int busMember = 1;
-			if (toks.length == 2) {
-				busMember = Integer.parseInt(toks[1].substring(0, toks[1].length()-1));
-			}
-						
-			EdifPort port = libCell.getPort(portName); 
-			int reversedIndex = reverseBusIndex(port.getWidth(), busMember);  
-			EdifSingleBitPort singlePort = new EdifSingleBitPort(port, reversedIndex);
-			edifNet.addPortConnection(new EdifPortRef(edifNet, singlePort, cellInstance));
+			edifNet.addPortConnection(portRef);
 		}
 					
 		return edifNet;
+	}
+	
+	/*
+	 * Creates a port reference (connection) for an EDIF net from a top-level port cell.
+	 */
+	private static EdifPortRef createEdifPortRefFromPort(Cell port, EdifCell edifParent, EdifNet edifNet) {
+		
+		String[] toks = port.getName().split("\\[");
+		
+		assert(toks.length == 1 || toks.length == 2);
+		
+		EdifPort edifPort = edifParent.getPort(toks[0]);
+		
+		int portIndex = 1; 
+		if (toks.length == 2) {
+			portIndex = Integer.parseInt(toks[1].substring(0, toks[1].length()-1));
+		}
+		EdifSingleBitPort singlePort = new EdifSingleBitPort(edifPort, portIndex);
+		return new EdifPortRef(edifNet, singlePort, null);	
+	}
+	
+	/*
+	 * Creates a port reference (connection) for an EDIF net from a cell pin. 
+	 * This is different than the port implementation because it needs to add a cell instance
+	 * to the connection.
+	 */
+	private static EdifPortRef createEdifPortRefFromCellPin(CellPin cellPin, EdifCell edifParent, EdifNet edifNet) {
+		
+		EdifCellInstance cellInstance = edifParent.getCellInstance(getEdifName(cellPin.getCell().getName()));
+		EdifCell libCell = cellInstance.getCellType();
+		
+		String[] toks = cellPin.getName().split("\\["); 
+		
+		assert(toks.length == 1 || toks.length == 2);
+		
+		String portName = toks[0];
+		
+		int busMember = 1;
+		if (toks.length == 2) {
+			busMember = Integer.parseInt(toks[1].substring(0, toks[1].length()-1));
+		}
+					
+		EdifPort port = libCell.getPort(portName); 
+		int reversedIndex = reverseBusIndex(port.getWidth(), busMember);  
+		EdifSingleBitPort singlePort = new EdifSingleBitPort(port, reversedIndex);
+		return new EdifPortRef(edifNet, singlePort, cellInstance);
 	}
 	
 	/*
@@ -430,7 +497,21 @@ public final class EdifInterface {
 			// The key and value of the property need sensible toString() methods when exporting to EDIF
 			// this function is for creating properties for printing only!
 			// TODO: make sure to inform the user of this 
-			edu.byu.ece.edif.core.Property edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), prop.getValue().toString());
+			
+			edu.byu.ece.edif.core.Property edifProperty;
+			
+			Object value = prop.getValue(); 
+			
+			if (value instanceof Boolean) {
+				edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), (Boolean) value);
+			}
+			else if (value instanceof Integer) {
+				edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), (Integer) value);
+			}
+			else {	
+				edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), prop.getValue().toString());
+			}
+			
 			edifProperties.addProperty(edifProperty);
 		}
 		
@@ -485,7 +566,7 @@ public final class EdifInterface {
 	/*
 	 * Returns the valid EDIF name for the specified input
 	 */
-	private static String getEdifName(String originalName){
+	private static String getEdifName(String originalName) {
 		return RenamedObject.createValidEdifString(originalName);
 	}
 	
@@ -501,30 +582,7 @@ public final class EdifInterface {
 			case INOUT:
 				return EdifPort.INOUT;
 			default: // if we reach here, then thrown a new exception
-				throw new IllegalStateException("Invalid Pin Direction!");
+				throw new UnsupportedOperationException("Invalid Pin Direction!");
 		}
 	}
 }
-
-/* ***********
- * Possible future code/utility functions that are currently un-needed
- * ************/
-//future code to create top level ports (if this functionality is added to RapidSmith
-//probably have to first check for null before iterating through the portlist that is returned
-/*
-for (EdifPort ep: tcell.getInterface().getPortList()) {
-	Port p;
-	int portDirection = (ep.isInputOnly()) ? 0 : ( ep.isOutputOnly() ? 1 : 2);
-	msg("Top Level Port: " + ep.getName());
-	if (ep.isBus()){
-		for (EdifSingleBitPort single: ep.getSingleBitPortList()) {
-			//p = new Port(single.getPortName(), portDirection);
-			msg("\tchild: " + single.getPortName());
-			//des.addTopLevelPort(p);
-		}
-	}
-	else {
-		p = new Port(ep.getName(), portDirection);
-	}
-}
-*/
