@@ -15,8 +15,6 @@ import edu.byu.ece.rapidSmith.design.subsite.Connection;
 public class TileWire implements Wire, Serializable {
 	private Tile tile;
 	private int wire;
-
-	// private Collection<Connection> connections = null;
 	
 	public TileWire(Tile tile, int wire) {
 		assert tile != null;
@@ -47,12 +45,7 @@ public class TileWire implements Wire, Serializable {
 	 * Returns all sink connections within and between tiles.
 	 */
 	@Override
-	public Collection<Connection> getWireConnections() {
-		
-		// if (connections != null) {
-		// 	return connections;
-		// }
-		
+	public Collection<Connection> getWireConnections() {	
 		WireConnection[] wireConnections = tile.getWireConnections(wire);
 		if (wireConnections == null)
 			return Collections.emptyList();
