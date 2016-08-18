@@ -59,8 +59,6 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		if (lutType != null) {
 			String strInputs = lutType.getChildText("num_inputs");
 			libCell.setNumLutInputs(Integer.parseInt(strInputs));
-			// property example
-			// libCell.updateProperty(new Property("num_inputs", PropertyType.USER, Integer.parseInt(strInputs)));
 		}
 
 		if (libCell.isVccSource())

@@ -11,7 +11,7 @@ import java.util.Objects;
 /**
  *  Provides a template of possible cells for a design.
  */
-public abstract class LibraryCell extends PropertyObject implements Serializable {
+public abstract class LibraryCell extends PropertyList implements Serializable {
 	private String name;
 
 	public LibraryCell(String name) {

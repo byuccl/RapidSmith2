@@ -135,6 +135,21 @@ public final class RouteTree implements
 
 		return !sinkTrees.isEmpty() || terminals.contains(this);
 	}
+	
+	public boolean prune (Set<RouteTree> terminals, Set<RouteTree> skip) {
+		for (Iterator<RouteTree> iterator = sinkTrees.iterator(); iterator.hasNext(); ) {
+			RouteTree rt = iterator.next();
+			
+			if (skip.contains(rt)) {
+				continue;
+			}
+			
+			if (!rt.pruneChildren(terminals))
+				iterator.remove();
+		}
+
+		return true;
+	}
 
 	@Override
 	public Iterator<RouteTree> iterator() {

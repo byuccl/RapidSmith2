@@ -16,6 +16,8 @@ public class TileWire implements Wire, Serializable {
 	private Tile tile;
 	private int wire;
 
+	// private Collection<Connection> connections = null;
+	
 	public TileWire(Tile tile, int wire) {
 		assert tile != null;
 
@@ -46,10 +48,15 @@ public class TileWire implements Wire, Serializable {
 	 */
 	@Override
 	public Collection<Connection> getWireConnections() {
+		
+		// if (connections != null) {
+		// 	return connections;
+		// }
+		
 		WireConnection[] wireConnections = tile.getWireConnections(wire);
 		if (wireConnections == null)
 			return Collections.emptyList();
-
+		
 		return Arrays.asList(wireConnections).stream()
 				.map(wc -> Connection.getTileWireConnection(this, wc))
 				.collect(Collectors.toList());

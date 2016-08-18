@@ -1,7 +1,7 @@
 package edu.byu.ece.rapidSmith.design;
 
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.design.subsite.PropertyObject;
+import edu.byu.ece.rapidSmith.design.subsite.PropertyList;
 import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.util.FamilyType;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
@@ -12,7 +12,7 @@ import java.util.*;
 /**
  *
  */
-public abstract class AbstractDesign extends PropertyObject implements Serializable {
+public abstract class AbstractDesign implements Serializable {
 	private static final long serialVersionUID = 6284690406230426968L;
 	/**  Keeps track of all slice primitive types, initialized statically */
 	public static Set<SiteType> sliceTypes;
