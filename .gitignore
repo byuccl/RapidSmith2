@@ -3,3 +3,7 @@
 /.classpath
 **/*.class
 /.gitignore.orig
+/.gradle/
+/.idea/
+/*.iml
+/build/
