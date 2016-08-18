@@ -52,7 +52,6 @@ public class PropertyList {
 	public Collection<Property> getProperties() {
 		if (properties == null) {
 			properties = new HashMap<>();
-			return properties.values();
 		}
 		return properties.values();
 	}
