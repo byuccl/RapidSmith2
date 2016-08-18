@@ -30,6 +30,7 @@ import com.trolltech.qt.gui.QPainterPath;
 import com.trolltech.qt.gui.QPen;
 
 import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.gui.TileScene;
 import edu.byu.ece.rapidSmith.timing.PathDelay;
 
@@ -55,15 +56,17 @@ public class DesignTileScene extends TileScene {
 	}
 	
 	
-	public void drawPath(ArrayList<Connection> conns, PathDelay pd){
+	public void drawPath(ArrayList<WiresConnection> conns, PathDelay pd){
 		double enumSize = we.getWires().length;
 		QPainterPath path = new QPainterPath();
 		
-		for(Connection conn : conns){
-			double x1 = (double) tileXMap.get(conn.startTile)*tileSize  + (conn.startWire%tileSize);
-			double y1 = (double) tileYMap.get(conn.startTile)*tileSize  + (conn.startWire*tileSize)/enumSize;
-			double x2 = (double) tileXMap.get(conn.endTile)*tileSize  + (conn.endWire%tileSize);
-			double y2 = (double) tileYMap.get(conn.endTile)*tileSize  + (conn.endWire*tileSize)/enumSize;
+		for(WiresConnection conn : conns){
+			Wire startWire = conn.getStartWire();
+			Wire endWire = conn.getEndWire();
+			double x1 = (double) tileXMap.get(startWire.getTile())*tileSize  + (startWire.getWireEnum()%tileSize);
+			double y1 = (double) tileYMap.get(startWire.getTile())*tileSize  + (startWire.getWireEnum()*tileSize)/enumSize;
+			double x2 = (double) tileXMap.get(endWire.getTile())*tileSize  + (endWire.getWireEnum()%tileSize);
+			double y2 = (double) tileYMap.get(endWire.getTile())*tileSize  + (endWire.getWireEnum()*tileSize)/enumSize;
 
 			path.moveTo(x1, y1);
 			path.lineTo(x2, y2);

@@ -36,12 +36,10 @@ import com.trolltech.qt.gui.QGraphicsSceneMouseEvent;
 import com.trolltech.qt.gui.QMenu;
 import com.trolltech.qt.gui.QPen;
 
-import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.Tile;
-import edu.byu.ece.rapidSmith.device.WireConnection;
+import edu.byu.ece.rapidSmith.design.subsite.Connection;
+import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.gui.NumberedHighlightedTile;
 import edu.byu.ece.rapidSmith.gui.TileScene;
-import edu.byu.ece.rapidSmith.router.Node;
 
 /**
  * This class was written specifically for the DeviceBrowser class.  It
@@ -112,33 +110,36 @@ public class DeviceBrowserScene extends TileScene{
 	}
 
 	private HashMap<Tile, Integer> findReachability(Tile t, Integer hops){
+		HashMap<Wire, Integer> level = new HashMap<>();
 		HashMap<Tile, Integer> reachabilityMap = new HashMap<Tile, Integer>();
 		
-		Queue<Node> queue = new LinkedList<Node>();
+		Queue<Wire> queue = new LinkedList<Wire>();
 		for(Integer wire : t.getWires()){
 			WireConnection[] connections = t.getWireConnections(wire);
 			if(connections == null) continue;
 			for(WireConnection wc : connections){
-				queue.add(wc.createNode(t));
+				Wire w = new TileWire(wc.getTile(t), wc.getWire());
+				queue.add(w);
+				level.put(w, 0);
 			}
 		}
 		
 		while(!queue.isEmpty()){
-			Node currNode = queue.poll();
-			Integer i = reachabilityMap.get(currNode.getTile());
+			Wire currWire = queue.poll();
+			Integer i = reachabilityMap.get(currWire.getTile());
 			if(i == null){
 				i = 1;
-				reachabilityMap.put(currNode.getTile(), i);
+				reachabilityMap.put(currWire.getTile(), i);
 			}
 			else{
-				reachabilityMap.put(currNode.getTile(), i+1);						
+				reachabilityMap.put(currWire.getTile(), i+1);
 			}
-			if(currNode.getLevel() < hops-1){
-				WireConnection[] connections = currNode.getConnections();
-				if(connections != null){
-					for(WireConnection wc : connections){
-						queue.add(wc.createNode(currNode));
-					}
+			Integer lev = level.get(currWire);
+			if(lev < hops-1){
+				for(Connection c : currWire.getWireConnections()){
+					Wire w = c.getSinkWire();
+					queue.add(w);
+					level.put(w, lev);
 				}
 			}
 		}
