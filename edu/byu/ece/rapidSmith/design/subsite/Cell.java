@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  *  are immutable.  Pins on the cell are initialized upon cell creation based upon
  *  the cell's type.
  */
-public class Cell  {
+public class Cell {
 	/** Unique name of this instance */
 	private String name;
 	/** The CellDesign this cell exists in */
@@ -26,7 +26,7 @@ public class Cell  {
 	private BondedType bonded;
 	/** BEL in the device this site is placed on */
 	private Bel anchor;
-	/** Properties of the cell */
+	/** Properties of the cell */		
 	private Map<Object, Property> properties;
 	/** Mapping of pin names to CellPin objects of this cell */
 	private Map<String, CellPin> pinMap;
@@ -48,7 +48,7 @@ public class Cell  {
 		this.design = null;
 		this.anchor = null;
 		this.properties = null;
-
+		
 		this.pinMap = new HashMap<>();
 		for (LibraryPin pin : libCell.getLibraryPins()) {
 			this.pinMap.put(pin.getName(), new CellPin(this, pin));
@@ -115,6 +115,13 @@ public class Cell  {
 		return getLibCell().isGndSource();
 	}
 
+	/**
+	 * Returns true if this cell is a top-level port of the design
+	 */
+	public boolean isPort() {
+		return getLibCell().isPort();
+	}
+	
 	/**
 	 * Returns the bondedness of this cell.  IO are either BONDED or UNBONDED,
 	 * all others INTERNAL.
@@ -299,7 +306,7 @@ public class Cell  {
 		Property property = getProperty(propertyKey);
 		return property == null ? null : property.getValue();
 	}
-
+	
 	public Map<SiteProperty, Object> getSharedSiteProperties() {
 		return getSharedSiteProperties(anchor.getId());
 	}
@@ -411,7 +418,7 @@ public class Cell  {
 
 		Cell cellCopy = cellFactory.apply(name, libCell);
 		cellCopy.setBonded(getBonded());
-		properties.values().forEach(p ->
+		getProperties().forEach(p ->
 				cellCopy.updateProperty(copyAttribute(getLibCell(), libCell, p))
 		);
 		return cellCopy;

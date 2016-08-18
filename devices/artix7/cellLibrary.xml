@@ -15439,6 +15439,9 @@
 
     <cell>
       <type>LUT1</type>
+	  <is_lut>
+		<num_inputs>1</num_inputs>
+	  </is_lut> 
       <level>LEAF</level>
       <pins>
         <pin>
@@ -15784,6 +15787,9 @@
 
     <cell>
       <type>LUT2</type>
+	  <is_lut>
+		<num_inputs>2</num_inputs>
+	  </is_lut> 
       <level>LEAF</level>
       <pins>
         <pin>
@@ -16269,6 +16275,9 @@
 
     <cell>
       <type>LUT3</type>
+	  <is_lut>
+		<num_inputs>3</num_inputs>
+	  </is_lut> 
       <level>LEAF</level>
       <pins>
         <pin>
@@ -16894,6 +16903,9 @@
 
     <cell>
       <type>LUT4</type>
+	  <is_lut>
+		<num_inputs>4</num_inputs>
+	  </is_lut> 
       <level>LEAF</level>
       <pins>
         <pin>
@@ -17659,6 +17671,9 @@
 
     <cell>
       <type>LUT5</type>
+	  <is_lut>
+		<num_inputs>5</num_inputs>
+	  </is_lut> 
       <level>LEAF</level>
       <pins>
         <pin>
@@ -18564,6 +18579,9 @@
 
     <cell>
       <type>LUT6</type>
+	  <is_lut>
+		<num_inputs>6</num_inputs>
+	  </is_lut> 
       <level>LEAF</level>
       <pins>
         <pin>
@@ -45227,6 +45245,114 @@
         </pin>
       </pins>
       <bels>
+      </bels>
+    </cell>
+	
+	<cell>
+      <type>IPORT</type>
+	  <is_port/>
+      <level>LEAF</level>
+      <pins>
+        <pin>
+          <name>PAD</name>
+          <direction>output</direction>
+        </pin>
+      </pins>
+      <bels>
+        <bel>
+          <id>
+            <primitive_type>IOB33</primitive_type>
+            <name>PAD</name>
+          </id>
+        </bel>
+        <bel>
+          <id> 
+            <primitive_type>IOB33S</primitive_type>
+            <name>PAD</name>
+          </id>
+        </bel>
+        <bel>
+          <id>
+            <primitive_type>IOB33M</primitive_type>
+            <name>PAD</name>
+          </id>
+        </bel>
+        <bel>
+          <id>
+            <primitive_type>IPAD</primitive_type>
+            <name>PAD</name>
+          </id>
+        </bel>
+      </bels>
+    </cell>
+	
+	<cell>
+      <type>OPORT</type>
+	  <is_port/>
+      <level>LEAF</level>
+      <pins>
+        <pin>
+          <name>PAD</name>
+          <direction>input</direction>
+        </pin>
+      </pins>
+      <bels>
+        <bel>
+          <id>
+            <primitive_type>IOB33</primitive_type>
+            <name>PAD</name>
+          </id>
+        </bel>
+        <bel>
+          <id> 
+            <primitive_type>IOB33S</primitive_type>
+            <name>PAD</name>
+          </id>
+        </bel>
+        <bel>
+          <id>
+            <primitive_type>IOB33M</primitive_type>
+            <name>PAD</name>
+          </id>
+        </bel>
+        <bel>
+          <id>
+            <primitive_type>OPAD</primitive_type>
+            <name>PAD</name>
+          </id>
+        </bel>
+      </bels>
+    </cell>
+	
+	<cell>
+      <type>IOPORT</type>
+	  <is_port/>
+      <level>LEAF</level>
+      <pins>
+        <pin>
+          <name>PAD</name>
+          <direction>inout</direction>
+        </pin>
+      </pins>
+      <bels>
+        <bel>
+          <id>
+            <primitive_type>IOB33</primitive_type>
+            <name>PAD</name>
+          </id>
+        </bel>
+        <bel>
+          <id> 
+            <primitive_type>IOB33S</primitive_type>
+            <name>PAD</name>
+          </id>
+        </bel>
+        <bel>
+          <id>
+            <primitive_type>IOB33M</primitive_type>
+            <name>PAD</name>
+          </id>
+        </bel>
       </bels>
     </cell>
 

@@ -87,7 +87,7 @@ public class CellNet implements Serializable {
 	void setDesign(CellDesign design) {
 		this.design = design;
 	}
-
+	
 	/**
 	 * Returns true if this cell contains a property with the specified name.
 	 *
@@ -179,7 +179,7 @@ public class CellNet implements Serializable {
 			return null;
 		return propertyMap.remove(propertyKey);
 	}
-
+	
 	/**
 	 * Returns the pins (source and sinks) of this net.  This structure should not
 	 * be modified by the user.
@@ -326,7 +326,7 @@ public class CellNet implements Serializable {
 		// net
 		Collection<CellPin> cellPins = getPins();
 		for (CellPin p : cellPins) {
-			if (p.getName().contains("CK") || p.getName().contains("CLK")) {
+			if (p.getName().contains("CK") || p.getName().contains("CLK") || p.getName().equals("C") ) {
 				return true;
 			}
 		}

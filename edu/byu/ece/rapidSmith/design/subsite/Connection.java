@@ -48,18 +48,26 @@ public abstract class Connection implements Serializable {
 
 	public abstract boolean isWireConnection();
 
+	// TODO: Update this to have a cache of created wires?
 	private final static class TileWireConnection extends Connection {
 		private TileWire sourceWire;
 		private WireConnection wc;
-
+		private TileWire sinkWire;
+		
 		public TileWireConnection(TileWire sourceWire, WireConnection wc) {
 			this.sourceWire = sourceWire;
 			this.wc = wc;
+			this.sinkWire = null;
 		}
 
 		@Override
 		public TileWire getSinkWire() {
-			return new TileWire(wc.getTile(sourceWire.getTile()), wc.getWire());
+		
+			if (sinkWire == null) {				
+				sinkWire = new TileWire(wc.getTile(sourceWire.getTile()), wc.getWire());
+			}
+			
+			return sinkWire;
 		}
 
 		@Override

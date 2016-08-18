@@ -54,6 +54,7 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		SimpleLibraryCell libCell = new SimpleLibraryCell(type);
 		libCell.setVccSource(cellEl.getChild("vcc_source") != null);
 		libCell.setGndSource(cellEl.getChild("gnd_source") != null);
+		libCell.setIsPort(cellEl.getChild("is_port") != null); 
 		Element lutType = cellEl.getChild("is_lut");
 		if (lutType != null) {
 			String strInputs = lutType.getChildText("num_inputs");

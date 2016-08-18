@@ -27,6 +27,7 @@ public abstract class LibraryCell implements Serializable {
 	abstract public boolean isVccSource();
 	abstract public boolean isGndSource();
 	abstract public boolean isLut();
+	abstract public boolean isPort();
 	abstract public Integer getNumLutInputs();
 	abstract public List<LibraryPin> getLibraryPins();
 	abstract public List<BelId> getPossibleAnchors();

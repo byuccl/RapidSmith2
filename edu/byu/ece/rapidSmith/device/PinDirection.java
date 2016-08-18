@@ -12,4 +12,26 @@ public enum PinDirection {
 		else
 			return IN;
 	}
+	
+	public static PinDirection reverse(PinDirection dir) {
+		
+		switch (dir) {
+			case IN: return PinDirection.OUT;
+			case OUT: return PinDirection.IN;
+			case INOUT: return PinDirection.INOUT;
+			default : throw new AssertionError("Invalid Pin Direction");
+		}
+	}
+	
+	public static boolean isInput(PinDirection dir) {
+		return dir == PinDirection.IN;
+	}
+	
+	public static boolean isOutput(PinDirection dir) {
+		return dir == PinDirection.OUT;
+	}
+	
+	public static boolean isInout(PinDirection dir) {
+		return dir == PinDirection.INOUT;
+	}
 }

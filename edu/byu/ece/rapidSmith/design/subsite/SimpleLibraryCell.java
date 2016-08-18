@@ -21,6 +21,7 @@ public class SimpleLibraryCell extends LibraryCell {
 	private boolean isVccSource;
 	private boolean isGndSource;
 	private Integer numLutInputs = null;
+	private boolean isPort;
 
 	public SimpleLibraryCell(String name) {
 		super(name);
@@ -31,6 +32,11 @@ public class SimpleLibraryCell extends LibraryCell {
 		return false;
 	}
 
+	@Override
+	public boolean isPort() {
+		return isPort;
+	}
+	
 	@Override
 	public boolean isVccSource() {
 		return isVccSource;
@@ -45,6 +51,10 @@ public class SimpleLibraryCell extends LibraryCell {
 		return isGndSource;
 	}
 
+	public void setIsPort(boolean isPort) {
+		this.isPort = isPort;
+	}
+	
 	public void setGndSource(boolean isGndSource) {
 		this.isGndSource = isGndSource;
 	}
