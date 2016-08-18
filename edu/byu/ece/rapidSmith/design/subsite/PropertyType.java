@@ -15,6 +15,8 @@ public class PropertyType {
 	public static final PropertyType USER = registerType("USER");
 	/** XDL BELPROP properties */
 	public static final PropertyType BELPROP = registerType("BELPROP");
+	/** EDIF Properties */
+	public static final PropertyType EDIF = registerType("EDIF");
 
 	private String name;
 

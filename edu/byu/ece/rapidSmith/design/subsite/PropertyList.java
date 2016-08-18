@@ -1,7 +1,6 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -12,7 +11,7 @@ import java.util.Objects;
  * 
  * @author Thomas Townsend
  */
-public class PropertyObject {
+public class PropertyList {
 	
 	/** Properties of the cell */
 	private Map<Object, Property> properties = null;
@@ -51,8 +50,10 @@ public class PropertyObject {
 	 * @return the properties of this cell
 	 */
 	public Collection<Property> getProperties() {
-		if (properties == null)
-			return Collections.emptyList();
+		if (properties == null) {
+			properties = new HashMap<>();
+			return properties.values();
+		}
 		return properties.values();
 	}
 

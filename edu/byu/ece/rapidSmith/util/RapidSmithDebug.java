@@ -45,12 +45,13 @@ public final class RapidSmithDebug {
 	}
 		
 	/**
-	 * Debug method that creates a TCL command that can be run in Vivado
-	 * to highlight all of the wires in a RouteTree. Used to visually
+	 * Debug method that creates a TCL command that can be run in Vivado <br>
+	 * to highlight all of the wires in a RouteTree. Used to visually <br>
 	 * verify the RouteTree data structure for a specific net.
+	 * 
 	 * @param net
 	 */
-	public static void createHighlighWiresTclCommand(CellNet net) {
+	public static String createHighlighWiresTclCommand(CellNet net) {
 
 		String cmd = "select [get_wires {";
 		
@@ -63,6 +64,7 @@ public final class RapidSmithDebug {
 			}
 		}
 		cmd += "}]";
-		System.out.println(cmd);
+		
+		return cmd;
 	}
 }
