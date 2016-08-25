@@ -18,7 +18,7 @@ import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.SiteType;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
+import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
 
 /**
  * This class is used for parsing and writing placement XDC files in a TINCR checkpoint. <br>
@@ -54,54 +54,69 @@ public class XdcPlacementInterface {
 								
 				Site ps = device.getPrimitiveSite(sname);
 				
-				if (ps == null)
-					MessageGenerator.briefError("[Warning] Site: " + sname + " not found, skipping placement of " + cname);
-				else {
-					String stype = toks[3]; 
-					ps.setType(SiteType.valueOf(stype));
-
-					String bname = toks[4];
-					Bel b = ps.getBel(bname);
-					
-					if (b == null)
-						MessageGenerator.briefError("[Warning] Bel: " + sname + "/" + bname + " not found, skipping placement of cell " + c.getName()); 
-					else {
-						design.placeCell(c, b);
-
-						// Now, map all the cell pins to bel pins
-						// TODO: Add a special case for mapping BRAM cell pins that can map to multiple bel pins
-						//		it seems that this has something to do with 
-						for (CellPin cp : c.getPins()) {
-							List<BelPin> bpl = cp.getPossibleBelPins();
-							
-							//special case for the CIN pin
-							if (b.getName().equals("CARRY4") && cp.getName().equals("CI") ) {
-								cp.setBelPin("CIN");
-							}
-							//TODO: may have to update this with startwith FIFO as well as RAMB
-							else if (bpl.size() == 1 || b.getName().startsWith("RAMB")) {
-								if(bpl.get(0) != null)
-									cp.setBelPin(bpl.get(0));
-								else {
-									MessageGenerator.briefErrorAndExit("Pin Error: " + c.getLibCell().getName() + " / " + cp.getName());
-								}
-							}
-							else if (bpl.size() == 0) {
-								MessageGenerator.briefError("[Warning]: Unknown cellpin to belpin mapping for cellpin: " + cp.getName());
-							}
-						}
-					}
+				if (ps == null) {
+					br.close();
+					throw new ParseException(String.format("Site: %s not found in the current device!", sname));
 				}
+				
+				String stype = toks[3]; 
+				ps.setType(SiteType.valueOf(stype));
+
+				String bname = toks[4];
+				Bel b = ps.getBel(bname);
+				
+				if (b == null) {
+					br.close();
+					throw new ParseException(String.format("Bel: %s not found in site: %s.", bname, sname));
+				}
+				
+				design.placeCell(c, b);
+
+				// Now, map all the cell pins to bel pins
+				// TODO: Add a special case for mapping BRAM cell pins that can map to multiple bel pins
+				//		it seems that this has something to do with 
+				for (CellPin cp : c.getPins()) {
+					List<BelPin> bpl = cp.getPossibleBelPins();
+					
+					//special case for the CIN pin ... TODO: update cell library instead of doing this
+					if (b.getName().equals("CARRY4") && cp.getName().equals("CI") ) {
+						cp.setBelPin("CIN");
+					}
+					//TODO: may have to update this with startwith FIFO as well as RAMB
+					else if (bpl.size() == 1 || b.getName().startsWith("RAMB")) {
+						cp.setBelPin(bpl.get(0));
+					}
+					else if (bpl.size() == 0) {
+						br.close();
+						throw new ParseException(String.format("Uknown cellpin to belpin mapping for cellpin: %s. Update CellLibrary.xml.", cp.getName()));
+					}
+				}				
 			}
 			//LOCK_PINS MAP1 MAP2 ... CELL
 			else if (toks[0].equals("LOCK_PINS")) {
-				Cell cell = design.getCell(toks[toks.length-1]); 
-								
+				String cellName = toks[toks.length-1];
+				Cell cell = design.getCell(cellName); 
+				
+				if (cell == null) {
+					br.close();
+					throw new ParseException(String.format("Cell %s does not exist in the design!", cellName));
+				}
+				
 				//extract the actual cell to bel pin mappings for LUTs
 				for(int i = 1; i < toks.length-1; i++){
 					String[] pins = toks[i].split(":");
 					cell.getPin(pins[0]).setBelPin(pins[1]);
 				}
+			}
+			// pins (ports)
+			else if (toks[0].equals("PACKAGE_PIN")) {
+				String siteName = toks[1];
+				String cellName = toks[2];
+				
+				Bel bel = device.getPrimitiveSite(siteName).getBel("PAD");
+				Cell cell = design.getCell(cellName); 
+				design.placeCell(cell, bel);
+				cell.getPin("PAD").setBelPin(bel.getBelPin("PAD"));
 			}
 		}
 		br.close();
