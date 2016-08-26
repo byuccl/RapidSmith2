@@ -136,16 +136,22 @@ public class XdcPlacementInterface {
 		
 		//TODO: Assuming that the logical design has not been modified...can no longer assume this with insertion/deletion
 		for (Cell cell : sortCellsForXdcExport(design)) {
-			
+						
 			Site ps = cell.getAnchorSite();
 			Bel b = cell.getAnchor();
 			String cellname = cell.getName();
+			
+			// ports need a package pin reference, and aren't placed in Vivado
+			if (cell.isPort()) {
+				fileout.write(String.format("set_property PACKAGE_PIN %s [get_ports {%s}]\n", ps.getName(), cellname));
+				continue;
+			}
 			
 			fileout.write(String.format("set_property BEL %s.%s [get_cells {%s}]\n", ps.getType().toString(), b.getName(), cellname));
 			fileout.write(String.format("set_property LOC %s [get_cells {%s}]\n", ps.getName(), cellname));
 								
 			//TODO: Update this function when more cells with LOCK_PINS are discovered
-			if(cell.getLibCell().getName().startsWith("LUT")) {
+			if(cell.getLibCell().isLut()) { //.getName().startsWith("LUT")) {
 				fileout.write("set_property LOCK_PINS { ");
 				for(CellPin cp: cell.getInputPins()) 
 					fileout.write(String.format("%s:%s ", cp.getName(), cp.getBelPin().getName()));

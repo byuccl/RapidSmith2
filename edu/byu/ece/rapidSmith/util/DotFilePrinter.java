@@ -29,76 +29,64 @@ import edu.byu.ece.rapidSmith.device.SiteType;
  */
 public class DotFilePrinter {
 
-	private static HashMap<String, Integer> nodeIds;
-	private static StringBuilder dotBuilder;
-	private static BufferedWriter outputStream; 
-	private static final Map<String,String> defaultDotProperties; 
-	
-	// initialize default dot properties
-	static 
-	{
-		defaultDotProperties = new HashMap<String,String>();
-		defaultDotProperties.put("rankdir", "LR");
-		defaultDotProperties.put("concentrate", "true");
-	}
+	private HashMap<String, Integer> nodeIds;
+	private StringBuilder dotBuilder;
+	private BufferedWriter outputStream; 
+	private final Map<String,String> dotProperties; 
+	private CellDesign design;
 	
 	/**
-	 * Prints a DOT file of the design netlist with some default dot settings. <br> 
-	 * In order to view the generated dot file, an external tool such as GraphViz <br>
-	 * will need to be installed.
+	 * Creates a new DotFilePrinter for the specified CellDesign
 	 * 
-	 * @param design CellDesign 
-	 * @param outputFile Output .dot location (C:/example.dot)
-	 * @throws IOException
+	 * @param design CellDesign
 	 */
-	public static void printNetlistDotFile(CellDesign design, String outputFile) throws IOException {
+	public DotFilePrinter(CellDesign design) {
+		this.design = design;
 		
-		printNetlistDotFile(design, defaultDotProperties, outputFile);
+		// initialize dot configuration with default options
+		dotProperties = new HashMap<String,String>();
+		dotProperties.put("rankdir", "LR");
+		dotProperties.put("concentrate", "true");
 	}
 	
 	/**
-	 * Prints a DOT file of the design netlist with the specified dot properties. <br>
-	 * Only use this function if you are familiar with DOT file formats.
+	 * Creates a new DotFilePrinter for the specified CellDesign and top-level graph <br>
+	 * properties. Only use this function if you are familiar with DOT file formats
 	 * 
-	 * @param design CellDesign 
-	 * @param dotProperties A map of top level graph properties for the dot file
+	 * @param design CellDesign
+	 * @param dotProperties Map of top-level graph properties for the DOT file
+	 */
+	public DotFilePrinter(CellDesign design, Map<String,String> dotProperties) {
+		this.design = design;
+		this.dotProperties = dotProperties;
+	}
+		
+	/**
+	 * Prints a DOT file of the design netlist with the configured dot properties. <br>
+	 * 
 	 * @param outputFile Output .dot location (C:/example.dot)
 	 * @throws IOException
 	 */
-	public static void printNetlistDotFile(CellDesign design, Map<String,String> dotProperties, String outputFile) throws IOException {
+	public void printNetlistDotFile(String outputFile) throws IOException {
 		
 		outputStream = new BufferedWriter(new FileWriter(outputFile));
-		outputStream.write(getNetlistDotString(design, dotProperties));
+		outputStream.write(getNetlistDotString());
 		outputStream.close();
 	}
-	
-	/**
-	 * Create a DOT string of the design netlist with some default dot settings. <br>
-	 * 
-	 * @param design CellDesign
-	 * @return a DOT string
-	 */
-	public static String getNetlistDotString(CellDesign design) {
 		
-		return getNetlistDotString(design, defaultDotProperties);
-	}
-	
 	/**
-	 * Create a DOT string of the design netlist with the specified DOT properties. <br>
-	 * Only use this function if you are familiar with DOT file formats.
+	 * Create a DOT string of the design netlist with the configured DOT properties. <br>
 	 * 
-	 * @param design CellDesign
-	 * @param dotProperties A map of top level graph properties for the dot file
 	 * @return a DOT string
 	 */
-	public static String getNetlistDotString(CellDesign design, Map<String,String> dotProperties) {
+	public String getNetlistDotString() {
 	
 		nodeIds = new HashMap<String, Integer>();
 		dotBuilder = new StringBuilder();
 			
 		// add the dot file header
 		dotBuilder.append("digraph " + design.getName() + "{\n");
-		formatGraphProperties(dotProperties);
+		formatGraphProperties();
 		
 		// add cells to the dot file
 		for (Cell cell: design.getCells()) {
@@ -121,49 +109,22 @@ public class DotFilePrinter {
 		
 		return dotBuilder.toString();
 	}
-	
-	/**
-	 * Prints a DOT file that represents a placed netlist of the design. <br>
-	 * Cells placed in the same site are clustered together, and a set of <br>
-	 * default DOT properties are used.
-	 * 
-	 * @param design CellDesign 
-	 * @param outputFile Output .dot location (C:/example.dot)
-	 * @throws IOException
-	 */
-	public static void printPlacementDotFile(CellDesign design, String outputFile) throws IOException {
 		
-		printPlacementDotFile(design, defaultDotProperties, outputFile);
-	}
-	
 	/**
 	 * Prints a DOT file that represents a placed netlist of the design with <br>
 	 * the specified DOT properties. Cells placed in the same site are clustered <br>
-	 * together. Only use this function if you are familiar with DOT file formats.
+	 * together.
 	 * 
 	 * @param design CellDesign 
 	 * @param dotProperties A map of top level graph properties for the dot file
 	 * @param outputFile Output .dot location (C:/example.dot)
 	 * @throws IOException
 	 */
-	public static void printPlacementDotFile(CellDesign design, Map<String,String> dotProperties, String outputFile) throws IOException {
+	public void printPlacementDotFile(String outputFile) throws IOException {
 		
 		outputStream = new BufferedWriter(new FileWriter(outputFile));
-		outputStream.write(getPlacementDotString(design, dotProperties));
+		outputStream.write(getPlacementDotString());
 		outputStream.close();
-	}
-	
-	/**
-	 * Creates a DOT string that represents a placed netlist of the design. <br>
-	 * Cells placed in the same site are clustered together. A set of default <br>
-	 * dot properties are used while creating the dot String
-	 * 
-	 * @param design CellDesign
-	 * @return a DOT string
-	 */
-	public static String getPlacementDotString(CellDesign design) {
-		
-		return getPlacementDotString(design, defaultDotProperties);
 	}
 	
 	/**
@@ -174,17 +135,17 @@ public class DotFilePrinter {
 	 * @param dotProperties A map of top level graph properties for the dot file
 	 * @return
 	 */
-	public static String getPlacementDotString(CellDesign design, Map<String,String> dotProperties) {
+	public String getPlacementDotString() {
 		
 		nodeIds = new HashMap<String, Integer>();
 		dotBuilder = new StringBuilder();
 			
 		// add the dot file header
 		dotBuilder.append("digraph " + design.getName() + "{\n");
-		formatGraphProperties(dotProperties);
+		formatGraphProperties();
 		
 		for (Site site : design.getUsedSites()) {
-			formatSiteCluster(design, site);
+			formatSiteCluster(site);
 		}
 		
 		// add nets to the dot file
@@ -208,7 +169,7 @@ public class DotFilePrinter {
 	 * Formats the top-level graph properties
 	 * Example: rankDir=LR;
 	 */
-	private static void formatGraphProperties(Map<String,String> dotProperties) {
+	private void formatGraphProperties() {
 		
 		for(String key : dotProperties.keySet()) {
 			String value = dotProperties.get(key);
@@ -219,7 +180,7 @@ public class DotFilePrinter {
 	/*
 	 * Formats the cell into a DOT record node
 	 */
-	private static void formatCell(Cell c, StringBuilder builder, String startSpace) {
+	private void formatCell(Cell c, StringBuilder builder, String startSpace) {
 
 		int cellId = nodeIds.size();
 		builder.append(startSpace + cellId + " [shape=record, label=\"{");
@@ -247,7 +208,7 @@ public class DotFilePrinter {
 	/*
 	 * Formats a list of cell pins for the corresponding cell record node
 	 */
-	private static void formatCellPins(Collection<CellPin> cellPins, StringBuilder builder, String start, String finish) {
+	private void formatCellPins(Collection<CellPin> cellPins, StringBuilder builder, String start, String finish) {
 		
 		builder.append(start);
 		
@@ -267,7 +228,7 @@ public class DotFilePrinter {
 	/*
 	 * Formats a net into an edge list for the dot file
 	 */
-	private static void formatNet(CellNet net) {
+	private void formatNet(CellNet net) {
 		
 		CellPin source = net.getSourcePin(); 		
 		dotBuilder.append(String.format("  %d:%d:e->", nodeIds.get(source.getCell().getName()), nodeIds.get(source.getFullName())));
@@ -286,7 +247,7 @@ public class DotFilePrinter {
 	/*
 	 * Formats the site into a dot subgraph with all the cells placed at that site
 	 */
-	private static void formatSiteCluster(CellDesign design, Site site) {
+	private void formatSiteCluster(Site site) {
 		
 		dotBuilder.append("  subgraph cluster" + site.getName() + "{\n");
 		dotBuilder.append("    label=" + site.getName() + ";\n");
@@ -306,7 +267,7 @@ public class DotFilePrinter {
 		dotBuilder.append("  }\n");
 	}
 	
-	private static void formatSliceCluster(Site site, Collection<Cell> cellsAtSite) {
+	private void formatSliceCluster(Site site, Collection<Cell> cellsAtSite) {
 		
 		StringBuilder lutBuilder = new StringBuilder();
 		StringBuilder cellBuilder = new StringBuilder();
