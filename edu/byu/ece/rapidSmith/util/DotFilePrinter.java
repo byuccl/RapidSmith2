@@ -5,7 +5,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
@@ -165,6 +167,110 @@ public class DotFilePrinter {
 		return dotBuilder.toString();
 	}
 	
+	
+	public void printSiteDotString(String outputFile, Site site) throws IOException {
+		outputStream = new BufferedWriter(new FileWriter(outputFile));
+		outputStream.write(getSiteDotString(site));
+		outputStream.close();
+	}
+	
+	/**
+	 * TODO: clean this up, but committing it to get it to Dr. Nelson for FPL demo
+	 * @param site Site to print dot string for
+	 * @return
+	 */
+	public String getSiteDotString(Site site) {
+		
+		nodeIds = new HashMap<String, Integer>();
+		dotBuilder = new StringBuilder();
+				
+		// add the dot file header
+		dotBuilder.append("digraph " + design.getName() + "{\n");
+		formatGraphProperties();
+		
+		// create blank nodes
+		for (Cell cell: design.getCellsAtSite(site)) {
+			for (CellNet net : cell.getNetList()) {
+				CellPin source = net.getSourcePin();
+				
+				if (source.getCell().isVccSource() || source.getCell().isGndSource() || net.getSinkPins().size() == 0 || net.getSinkPins().size() > 10) {
+					continue;
+				}
+				
+				if (!isCellPinInSite(source, site) && !nodeIds.containsKey(source.getFullName())) {
+					int id = nodeIds.size();
+					nodeIds.put(source.getFullName(), id);
+					dotBuilder.append("  " + id + " [style=invis];\n");
+				}
+				
+				for (CellPin cellPin : net.getSinkPins()) {
+					if (!isCellPinInSite(cellPin, site) && !nodeIds.containsKey(cellPin.getFullName())) {
+						int id = nodeIds.size();
+						nodeIds.put(cellPin.getFullName(), id);
+						dotBuilder.append("  " + id + " [style=invis];\n");
+					}
+				}
+			}
+		}
+				
+		formatSiteCluster(site);
+
+		HashSet<CellNet> processedNets = new HashSet<CellNet>();
+		
+		for (Cell cell: design.getCellsAtSite(site)) {
+			
+			if (cell.isVccSource() || cell.isGndSource()) {
+				continue;
+			}
+			
+			for (CellNet net: cell.getNetList()) {
+				
+				boolean sourceInSite = false;
+				
+				if (processedNets.contains(net) || net.getSinkPins().size() == 0 || net.getSinkPins().size() > 10) {
+					continue;
+				}
+								
+				CellPin source = net.getSourcePin();
+				
+				if (source == null || source.getCell().isVccSource() || source.getCell().isGndSource()) {
+					continue;
+				}
+				
+				if (!isCellPinInSite(source, site)) {
+					dotBuilder.append(String.format("  %d:e->", nodeIds.get(source.getFullName())));
+				}
+				else {
+					sourceInSite = true; 
+					dotBuilder.append(String.format("  %d:%d:e->", nodeIds.get(source.getCell().getName()), 
+															   nodeIds.get(source.getFullName())));
+				}
+				
+				StringJoiner joiner = new StringJoiner(",");
+				for (CellPin sinkPin : net.getSinkPins()) {
+					if (sinkPin.getCell().getAnchorSite().equals(site)) {
+						joiner.add(String.format("%d:%d", nodeIds.get(sinkPin.getCell().getName()), 
+														  nodeIds.get(sinkPin.getFullName())));
+					}
+					else if (sourceInSite) {
+						joiner.add(nodeIds.get(sinkPin.getFullName()).toString() + ":w");
+					}
+				}
+				
+				dotBuilder.append(joiner.toString() + ";\n");
+				processedNets.add(net);
+			}
+		}
+		
+		dotBuilder.append("}");
+		
+		return dotBuilder.toString();
+	}
+	
+	private boolean isCellPinInSite(CellPin pin, Site site) { 
+		return (pin == null) ? false : pin.getCell().getAnchorSite().equals(site);
+	}
+	
 	/*
 	 * Formats the top-level graph properties
 	 * Example: rankDir=LR;
@@ -195,7 +301,7 @@ public class DotFilePrinter {
 		
 		// add cell info
 		String lutString = (c.getLibCell().isLut() ? "\\n" + c.getProperty("INIT").getValue() : "");
-		builder.append(String.format(" { <%d>%s%s\\n(%s) } ", cellId, c.getName(), lutString, c.getLibCell().getName()));
+		builder.append(String.format(" { <%d>%s%s\\n%s\\n(%s) } ", cellId, c.getName(), lutString, c.getAnchor().getName(), c.getLibCell().getName()));
 		
 		// add output pin info
 		if (c.getOutputPins().size() > 0) {
@@ -262,7 +368,7 @@ public class DotFilePrinter {
 				formatCell(cell, dotBuilder, "    ");
 			}
 		}
-		
+			
 		// end of subgraph
 		dotBuilder.append("  }\n");
 	}

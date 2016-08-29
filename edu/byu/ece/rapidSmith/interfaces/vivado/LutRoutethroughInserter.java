@@ -83,7 +83,7 @@ public class LutRoutethroughInserter {
 	 * 
 	 */
 	public void insertLutRoutethroughs() {
-		
+				
 		for (Site site : design.getUsedSites()) {
 			
 			if (!isSiteQualified(site) ) {
@@ -139,9 +139,9 @@ public class LutRoutethroughInserter {
 		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "S[2]", null, "C6LUT"));
 		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "S[3]", null, "D6LUT"));
 		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "DI[0]", "intrasite:SLICEL/ACY0.O5", "A5LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "DI[1]", "intrasite:SLICEL/ACY0.O5", "B5LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "DI[2]", "intrasite:SLICEL/ACY0.O5", "C5LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "DI[3]", "intrasite:SLICEL/ACY0.O5", "D5LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "DI[1]", "intrasite:SLICEL/BCY0.O5", "B5LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "DI[2]", "intrasite:SLICEL/CCY0.O5", "C5LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "DI[3]", "intrasite:SLICEL/DCY0.O5", "D5LUT"));
 		
 		return configsSliceL;
 	}
@@ -176,9 +176,9 @@ public class LutRoutethroughInserter {
 		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "S[2]", null, "C6LUT"));
 		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "S[3]", null, "D6LUT"));
 		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "DI[0]", "intrasite:SLICEM/ACY0.O5", "A5LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "DI[1]", "intrasite:SLICEM/ACY0.O5", "B5LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "DI[2]", "intrasite:SLICEM/ACY0.O5", "C5LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "DI[3]", "intrasite:SLICEM/ACY0.O5", "D5LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "DI[1]", "intrasite:SLICEM/BCY0.O5", "B5LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "DI[2]", "intrasite:SLICEM/CCY0.O5", "C5LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "DI[3]", "intrasite:SLICEM/DCY0.O5", "D5LUT"));
 		
 		return configsSliceM;
 	}
