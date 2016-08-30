@@ -334,6 +334,22 @@ public class CellNet implements Serializable {
 	}
 
 	/**
+	 * Returns true if the net is a VCC (logic high) net
+	 */
+	public boolean isVCCNet() {
+
+		return type.equals(NetType.VCC);
+	}
+
+	/**
+	 * Returns true if the net is a GND (logic low) net
+	 */
+	public boolean isGNDNet() {
+
+		return type.equals(NetType.GND);
+	}
+
+	/**
 	 * Returns the PIPs (routing resources) used by this net.
 	 *
 	 * @return the PIPs used by this net
@@ -353,6 +369,16 @@ public class CellNet implements Serializable {
 	}
 
 	/**
+	 * Sets the route trees of the net to the specified list of RouteTrees
+	 *
+	 * @param rts List of RouteTree objects to add to the net
+	 */
+	public void setRouteTrees(List<RouteTree> rts) {
+		// TODO remove this.  I don't want nets potentially sharing route trees.
+		routeTrees = rts;
+	}
+
+	/**
 	 * This removes all PIPs from this net, causing it to be in an unrouted state.
 	 * PIPs from placed relatively-routed molecules are preserved.
 	 */
@@ -361,7 +387,8 @@ public class CellNet implements Serializable {
 	}
 
 	public boolean isRouted() {
-		return routeTrees != null;
+		// TODO The routeTrees.size() > 0 was added but shouldn't be needed.
+		return routeTrees != null && routeTrees.size() > 0;
 	}
 
 	public CellNet deepCopy() {

@@ -45,6 +45,7 @@ import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
 import edu.byu.ece.rapidSmith.device.PinDirection;
 import edu.byu.ece.rapidSmith.device.PortDirection;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
+import edu.byu.ece.rapidSmith.util.Exceptions;
 
 /**
  * This class is used to interface RapidSmith and EDIF files generated from Vivado. <br>
@@ -102,29 +103,26 @@ public final class EdifInterface {
 			if (port.isInOut()) {
 				throw new UnsupportedOperationException("Inout port functionality not yet implemented! Cannot load EDIF");
 			}
+
+			String portSuffix = port.getOldName();
+			if (port.isBus()) {
+				portSuffix = getPortNameSuffix(portSuffix);
+			}
 			
 			for (EdifSingleBitPort busMember : port.getSingleBitPortList() ) {
 				
 				LibraryCell libCell = libCells.get(libraryPortType);
-				Objects.requireNonNull(libCell, "Library cell: " + libraryPortType + " not found in the cell library!");
 				
-				Cell portCell = new Cell(renameEdifPort(busMember), libCell);
+				String portName = port.isBus() ?
+									String.format("%s[%d]", portSuffix, reverseBusIndex(port.getWidth(), busMember.bitPosition())) :
+									portSuffix;
+				Cell portCell = new Cell(portName, libCell);
 				portCell.updateProperty(new Property("Dir", PropertyType.USER, PortDirection.getPortDirectionForImport(portCell)));
 				design.addCell(portCell);
 			}
 		}
 	}
-	
-	/*
-	 * Renames an edifPort to be consistent with RapidSmith bus naming conventions.
-	 * Specifically, caret characters ('<','>') are replaced with brackets ('[',']')
-	 * Example: testPort<2> --> testPort[2]
-	 */
-	private static String renameEdifPort(EdifSingleBitPort edifPort) {
 		
-		return edifPort.getPortName().replace('<', '[').replace('>', ']');
-	}
-	
 	/*
 	 * Converts EDIF cell instances to equivalent RapidSmith cells and adds them to the design
 	 */
@@ -139,8 +137,8 @@ public final class EdifInterface {
 		for(EdifCellInstance eci : edifCellInstances) {
 			// create the corresponding RS2 cell
 			LibraryCell lcType = libCells.get(eci.getType());
-			if (lcType == null) { 
-				MessageGenerator.briefErrorAndExit("[ERROR] Cannot find library cell of type: " + eci.getType() + ", exiting...");
+			if (lcType == null) {
+				throw new Exceptions.ParseException("Unable to find library cell of type: " + eci.getType());
 			}
 			Cell newcell = design.addCell(new Cell(eci.getOldName(), lcType));
 			
@@ -188,41 +186,59 @@ public final class EdifInterface {
 	 * 
 	 * TODO: update this once top-level ports are added
 	 */
-	private static void processNetConnections(Collection<EdifPortRef> ports, CellDesign design, CellNet net) {
+	private static void processNetConnections(Collection<EdifPortRef> portRefs, CellDesign design, CellNet net) {
 			
-		for (EdifPortRef port: ports) {  
-				
+		for (EdifPortRef portRef: portRefs) {  
+			
+			EdifPort port = portRef.getPort(); 
+			
 			// Connects to a top-level port
-			if (port.isTopLevelPortRef()) {
+			if (portRef.isTopLevelPortRef()) {
+								
+				String portname = portRef.isSingleBitPortRef() ? port.getOldName() : 
+				 				  String.format("%s[%d]", getPortNameSuffix(port.getName()), reverseBusIndex(port.getWidth(), portRef.getBusMember()));
 				
-				String portname = port.isSingleBitPortRef() ? port.getPort().getName()
-								  : String.format("%s[%d]", port.getPort().getName(), port.getBusMember());
-				
-				//TODO: add a check for null and throw a meaningful exception if this is the case
 				Cell portCell = design.getCell(portname);
+				
+				if (portCell == null) {
+					throw new Exceptions.ParseException("Cell " + portname + " does not exist in the design!");
+				}
+				
 				net.connectToPin(portCell.getPin("PAD"));
 								
 				continue; 
 			}
 			
 			// Connects to a cell pin
-			String pinname = port.isSingleBitPortRef() ? port.getPort().getName() 
-					 : port.getPort().getName() + "[" + reverseBusIndex(port.getPort().getWidth(), port.getBusMember()) + "]";
+			// TODO: take a closer look at this...I am using the edif name of a cell pin name which should be ok, but be aware
+			String pinname = portRef.isSingleBitPortRef() ? port.getName() 
+					 : String.format("%s[%d]", port.getName(), reverseBusIndex(port.getWidth(), portRef.getBusMember()));
 			
-			Cell node = design.getCell(port.getCellInstance().getOldName()); 
+			Cell node = design.getCell(portRef.getCellInstance().getOldName()); 
 			if (node == null) {
-				MessageGenerator.briefErrorAndExit("[ERROR] Trying to connect net " + net.getName() + " to cell " 
-								+ port.getCellInstance().getOldName() + ", but specified cell does not exist");
+				throw new Exceptions.ParseException("Cell: " + portRef.getCellInstance().getOldName()  + " does not exist in the design!");
 			}
 			
 			// Mark GND and VCC nets 
-			if (node.isVccSource())
+			if (node.isVccSource()) {
 				net.setType(NetType.VCC);
-			else if (node.isGndSource())
+			}
+			else if (node.isGndSource()) {
 				net.setType(NetType.GND);
+			}
 			
 			net.connectToPin(node.getPin(pinname));						
 		}		
+	}
+	
+	/*
+	 * Vivado ports that are buses are named portName[15:0]
+	 * This function will return the "portName" portion of the bus name
+	 */
+	private static String getPortNameSuffix(String portName) {
+		
+		int bracketIndex = portName.indexOf("[");
+		return bracketIndex == -1 ? portName : portName.substring(0, bracketIndex);
 	}
 		
 	/*
@@ -391,7 +407,7 @@ public final class EdifInterface {
 				if (count == 0) {
 					portDirectionMap.put(portName, PortDirection.isInputPort(cell) ? EdifPort.IN : EdifPort.OUT);
 				}
-			}			
+			}
 		}
 		
 		for (String portName : portWidthMap.keySet()) {
@@ -454,7 +470,7 @@ public final class EdifInterface {
 		
 		int portIndex = 1; 
 		if (toks.length == 2) {
-			portIndex = Integer.parseInt(toks[1].substring(0, toks[1].length()-1));
+			portIndex = reverseBusIndex(edifPort.getWidth(), Integer.parseInt(toks[1].substring(0, toks[1].length()-1)));
 		}
 		EdifSingleBitPort singlePort = new EdifSingleBitPort(edifPort, portIndex);
 		return new EdifPortRef(edifNet, singlePort, null);	
@@ -582,7 +598,7 @@ public final class EdifInterface {
 			case INOUT:
 				return EdifPort.INOUT;
 			default: // if we reach here, then thrown a new exception
-				throw new UnsupportedOperationException("Invalid Pin Direction!");
+				throw new AssertionError("Invalid Pin Direction!");
 		}
 	}
 }
