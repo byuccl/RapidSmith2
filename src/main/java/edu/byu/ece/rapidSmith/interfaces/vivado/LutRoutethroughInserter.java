@@ -43,7 +43,8 @@ public class LutRoutethroughInserter {
 	private WireEnumerator wireEnumerator;
 	private CellLibrary libCells;
 	
-	private Collection<RoutethroughConfiguration> configs;
+	private Collection<RoutethroughConfiguration> configsSliceL;
+	private Collection<RoutethroughConfiguration> configsSliceM;
 	
 	private HashSet<SiteType> qualifiedSiteTypes;
 	
@@ -56,11 +57,18 @@ public class LutRoutethroughInserter {
 		nextUniqueID++;
 	}
 	
+	/**
+	 * 
+	 * @param design
+	 * @param device
+	 * @param libCells
+	 */
 	public LutRoutethroughInserter(CellDesign design, Device device, CellLibrary libCells) {
 		this.design = design;
 		this.wireEnumerator = device.getWireEnumerator();
 		this.libCells = libCells;
-		this.configs = null;
+		this.configsSliceL = null;
+		this.configsSliceM = null;
 		
 		// add to the qualifitedSiteTypes as needed
 		this.qualifiedSiteTypes = new HashSet<SiteType>( 
@@ -75,7 +83,7 @@ public class LutRoutethroughInserter {
 	 * 
 	 */
 	public void insertLutRoutethroughs() {
-		
+				
 		for (Site site : design.getUsedSites()) {
 			
 			if (!isSiteQualified(site) ) {
@@ -95,45 +103,84 @@ public class LutRoutethroughInserter {
 	}
 	
 	private Collection<RoutethroughConfiguration> getRoutethroughConfigurations(Site site) {
-		return getSLICELRoutethroughConfigurations();
+		return site.getType() == SiteType.SLICEL ? 
+					getSliceLRoutethroughConfigurations() :
+					getSliceMRoutethroughConfigurations();
 	}
 	
 	// TODO: add SLICEM connections as well
-	private Collection<RoutethroughConfiguration> getSLICELRoutethroughConfigurations() {
+	private Collection<RoutethroughConfiguration> getSliceLRoutethroughConfigurations() {
 		
 		// lazy initialization
-		if (configs != null) {
-			return configs;
+		if (configsSliceL != null) {
+			return configsSliceL;
 		}
 		
 		// create a new configuration for SLICEL
-		configs = new ArrayList<RoutethroughConfiguration>();
+		configsSliceL = new ArrayList<RoutethroughConfiguration>();
 		
 		// Flip Flop routethrough configs
-		configs.add(new RoutethroughConfiguration("AFF", "D", "intrasite:SLICEL/AFFMUX.O6", "A6LUT"));
-		configs.add(new RoutethroughConfiguration("AFF", "D", "intrasite:SLICEL/AFFMUX.O5", "A5LUT"));
-		configs.add(new RoutethroughConfiguration("A5FF", "D", "intrasite:SLICEL/A5FFMUX.IN_A", "A5LUT"));
-		configs.add(new RoutethroughConfiguration("BFF", "D", "intrasite:SLICEL/BFFMUX.O6", "B6LUT"));
-		configs.add(new RoutethroughConfiguration("BFF", "D", "intrasite:SLICEL/BFFMUX.O5", "B5LUT"));
-		configs.add(new RoutethroughConfiguration("B5FF", "D", "intrasite:SLICEL/B5FFMUX.IN_A", "B5LUT"));
-		configs.add(new RoutethroughConfiguration("CFF", "D", "intrasite:SLICEL/CFFMUX.O6", "C6LUT"));
-		configs.add(new RoutethroughConfiguration("CFF", "D", "intrasite:SLICEL/CFFMUX.O5", "C5LUT"));
-		configs.add(new RoutethroughConfiguration("C5FF", "D", "intrasite:SLICEL/C5FFMUX.IN_A", "C5LUT"));
-		configs.add(new RoutethroughConfiguration("DFF", "D", "intrasite:SLICEL/DFFMUX.O6", "D6LUT"));
-		configs.add(new RoutethroughConfiguration("DFF", "D", "intrasite:SLICEL/DFFMUX.O5", "D5LUT"));
-		configs.add(new RoutethroughConfiguration("D5FF", "D", "intrasite:SLICEL/D5FFMUX.IN_A", "D5LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("AFF", "D", "intrasite:SLICEL/AFFMUX.O6", "A6LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("AFF", "D", "intrasite:SLICEL/AFFMUX.O5", "A5LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("A5FF", "D", "intrasite:SLICEL/A5FFMUX.IN_A", "A5LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("BFF", "D", "intrasite:SLICEL/BFFMUX.O6", "B6LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("BFF", "D", "intrasite:SLICEL/BFFMUX.O5", "B5LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("B5FF", "D", "intrasite:SLICEL/B5FFMUX.IN_A", "B5LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("CFF", "D", "intrasite:SLICEL/CFFMUX.O6", "C6LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("CFF", "D", "intrasite:SLICEL/CFFMUX.O5", "C5LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("C5FF", "D", "intrasite:SLICEL/C5FFMUX.IN_A", "C5LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("DFF", "D", "intrasite:SLICEL/DFFMUX.O6", "D6LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("DFF", "D", "intrasite:SLICEL/DFFMUX.O5", "D5LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("D5FF", "D", "intrasite:SLICEL/D5FFMUX.IN_A", "D5LUT"));
 		
 		// Carry routethrough configs
-		configs.add(new RoutethroughConfiguration("CARRY4", "S[0]", null, "A6LUT"));
-		configs.add(new RoutethroughConfiguration("CARRY4", "S[1]", null, "B6LUT"));
-		configs.add(new RoutethroughConfiguration("CARRY4", "S[2]", null, "C6LUT"));
-		configs.add(new RoutethroughConfiguration("CARRY4", "S[3]", null, "D6LUT"));
-		configs.add(new RoutethroughConfiguration("CARRY4", "DI[0]", "intrasite:SLICEL/ACY0.O5", "A5LUT"));
-		configs.add(new RoutethroughConfiguration("CARRY4", "DI[1]", "intrasite:SLICEL/ACY0.O5", "B5LUT"));
-		configs.add(new RoutethroughConfiguration("CARRY4", "DI[2]", "intrasite:SLICEL/ACY0.O5", "C5LUT"));
-		configs.add(new RoutethroughConfiguration("CARRY4", "DI[3]", "intrasite:SLICEL/ACY0.O5", "D5LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "S[0]", null, "A6LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "S[1]", null, "B6LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "S[2]", null, "C6LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "S[3]", null, "D6LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "DI[0]", "intrasite:SLICEL/ACY0.O5", "A5LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "DI[1]", "intrasite:SLICEL/BCY0.O5", "B5LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "DI[2]", "intrasite:SLICEL/CCY0.O5", "C5LUT"));
+		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "DI[3]", "intrasite:SLICEL/DCY0.O5", "D5LUT"));
 		
-		return configs;
+		return configsSliceL;
+	}
+	
+	private Collection<RoutethroughConfiguration> getSliceMRoutethroughConfigurations() {
+		
+		// lazy initialization
+		if (configsSliceL != null) {
+			return configsSliceM;
+		}
+		
+		// create a new configuration for SLICEL
+		configsSliceM = new ArrayList<RoutethroughConfiguration>();
+		
+		// Flip Flop routethrough configs
+		configsSliceM.add(new RoutethroughConfiguration("AFF", "D", "intrasite:SLICEM/AFFMUX.O6", "A6LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("AFF", "D", "intrasite:SLICEM/AFFMUX.O5", "A5LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("A5FF", "D", "intrasite:SLICEM/A5FFMUX.IN_A", "A5LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("BFF", "D", "intrasite:SLICEM/BFFMUX.O6", "B6LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("BFF", "D", "intrasite:SLICEM/BFFMUX.O5", "B5LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("B5FF", "D", "intrasite:SLICEM/B5FFMUX.IN_A", "B5LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("CFF", "D", "intrasite:SLICEM/CFFMUX.O6", "C6LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("CFF", "D", "intrasite:SLICEM/CFFMUX.O5", "C5LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("C5FF", "D", "intrasite:SLICEM/C5FFMUX.IN_A", "C5LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("DFF", "D", "intrasite:SLICEM/DFFMUX.O6", "D6LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("DFF", "D", "intrasite:SLICEM/DFFMUX.O5", "D5LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("D5FF", "D", "intrasite:SLICEM/D5FFMUX.IN_A", "D5LUT"));
+		
+		// Carry routethrough configs
+		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "S[0]", null, "A6LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "S[1]", null, "B6LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "S[2]", null, "C6LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "S[3]", null, "D6LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "DI[0]", "intrasite:SLICEM/ACY0.O5", "A5LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "DI[1]", "intrasite:SLICEM/BCY0.O5", "B5LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "DI[2]", "intrasite:SLICEM/CCY0.O5", "C5LUT"));
+		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "DI[3]", "intrasite:SLICEM/DCY0.O5", "D5LUT"));
+		
+		return configsSliceM;
 	}
 		
 	// TODO: put this in its own class file so that I can have a static WireEnumerator that I can set once
