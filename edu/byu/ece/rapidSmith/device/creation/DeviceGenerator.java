@@ -624,7 +624,7 @@ public final class DeviceGenerator {
 	private Set<Integer> getSourceWiresOfTile(Tile tile) {
 		Set<Integer> sourceWires = new HashSet<>();
 		for (Integer wire : tile.getWires()) {
-			if (we.getWireType(wire) == WireType.SITE_SOURCE)
+			if (we.getWireType(wire) == WireType.get("SITE_SOURCE"))
 				sourceWires.add(wire);
 			for (WireConnection wc : tile.getWireConnections(wire)) {
 				if (wc.isPIP()) {
@@ -639,7 +639,7 @@ public final class DeviceGenerator {
 	// the wire type check is easier and should be sufficient or the wire is the source of
 	// a PIP.
 	private boolean wireIsSink(Tile tile, Integer wire) {
-		if (we.getWireType(wire) == WireType.SITE_SINK)
+		if (we.getWireType(wire) == WireType.get("SITE_SINK"))
 			return true;
 		if (tile.getWireHashMap() == null || tile.getWireConnections(wire) == null)
 			return false;
@@ -886,11 +886,11 @@ public final class DeviceGenerator {
 				wireMap.put(wire, i);
 
 				if (inpinSet.contains(wire)) {
-					wireTypes[i] = WireType.SITE_SINK;
-					wireDirections[i] = WireDirection.EXTERNAL;
+					wireTypes[i] = WireType.get("SITE_SINK");
+					wireDirections[i] = WireDirection.get("EXTERNAL");
 				} else if (outpinSet.contains(wire)) {
-					wireTypes[i] = WireType.SITE_SOURCE;
-					wireDirections[i] = WireDirection.EXTERNAL;
+					wireTypes[i] = WireType.get("SITE_SOURCE");
+					wireDirections[i] = WireDirection.get("EXTERNAL");
 				} else {
 					wireTypes[i] = wireExp.getWireType(wire);
 					wireDirections[i] = wireExp.getWireDirection(wire);
@@ -1004,7 +1004,7 @@ public final class DeviceGenerator {
 			String wireName = tokens.get(1);
 			currTileWire = we.getWireEnum(wireName);
 			currTileWireIsSource =
-					we.getWireType(currTileWire) == WireType.SITE_SOURCE ||
+					we.getWireType(currTileWire) == WireType.get("SITE_SOURCE") ||
 							pipSinks.contains(wireName);
 		}
 
@@ -1017,7 +1017,7 @@ public final class DeviceGenerator {
 		protected void enterConn(List<String> tokens) {
 			String currWireName = tokens.get(2).substring(0, tokens.get(2).length() - 1);
 			int currWire = we.getWireEnum(currWireName);
-			boolean currWireIsSiteSink = we.getWireType(currWire) == WireType.SITE_SINK;
+			boolean currWireIsSiteSink = we.getWireType(currWire) == WireType.get("SITE_SINK");
 			boolean currWireIsPIPSource = pipSources.contains(currWireName);
 			boolean currWireIsSink = currWireIsSiteSink || currWireIsPIPSource;
 			if (currTileWireIsSource || currWireIsSink) {

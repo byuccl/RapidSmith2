@@ -449,10 +449,10 @@ public class XdlPacker {
 	private static boolean isSliceCarrySource(SitePin sourcePin) {
 		Site site = sourcePin.getSite();
 		FamilyType family = site.getTile().getDevice().getFamilyType();
-		switch (family) {
-			case VIRTEX6:
+		switch (family.name()) {
+			case "VIRTEX6":
 				SiteType siteType = site.getType();
-				if (siteType == SiteType.SLICEL || siteType == SiteType.SLICEM) {
+				if (siteType == SiteType.get("SLICEL") || siteType == SiteType.get("SLICEM")) {
 					return sourcePin.getName().equals("COUT");
 				}
 		}

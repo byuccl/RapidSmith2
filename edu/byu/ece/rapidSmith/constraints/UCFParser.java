@@ -198,9 +198,9 @@ public class UCFParser {
 		
 		//TODO: Will have to expand this at some point in the future
 		if(range_type_string.equals("RAMB18"))
-			range_type = SiteType.RAMB18E1;
+			range_type = SiteType.get("RAMB18E1");
 		else if(range_type_string.equals("RAMB36"))
-			range_type = SiteType.RAMB36E1;
+			range_type = SiteType.get("RAMB36E1");
 		else
 			range_type = SiteType.valueOf(range_type_string);
 		new_constraint.addAreaGroupRange(new AreaGroupRange(group_name, range_type, ll_x, ll_y, ur_x, ur_y));

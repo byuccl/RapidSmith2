@@ -64,7 +64,7 @@ public class BasicRouter extends AbstractRouter{
 		if(y < 0) y = -y;
 
 		// Favor clock wires when routing the clock tree
-		if(isCurrSinkAClkWire && we.getWireDirection(node.wire).equals(WireDirection.CLK) && !isRouteThrough){
+		if(isCurrSinkAClkWire && we.getWireDirection(node.wire).equals(WireDirection.get("CLK")) && !isRouteThrough){
 			node.cost = ((x + y + node.level) * 2) - 1000 + node.history;
 		}
 		else{
@@ -195,7 +195,7 @@ public class BasicRouter extends AbstractRouter{
 			// Is this source from a buffer (likely a clock net)?
 			boolean currNetOutputFromBUF = currSource.getInstance().getType().toString().contains("BUF");
 			
-			isCurrSinkAClkWire = (we.getWireDirection(currSink.wire).equals(WireDirection.CLK) ||
+			isCurrSinkAClkWire = (we.getWireDirection(currSink.wire).equals(WireDirection.get("CLK")) ||
 								  currSinkPin.getName().contains("CLK") ||
 								  currSinkPin.getName().equals("C")) &&
 								 (currNetOutputFromBUF || 

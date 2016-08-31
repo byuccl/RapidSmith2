@@ -67,10 +67,10 @@ public abstract class PinSorter{
 	 */
 	public static PinSorter createPinSorter(Device dev){
 		FamilyType type = dev.getFamilyType();
-		switch(type){
-			case VIRTEX4:
+		switch(type.name()){
+			case "VIRTEX4":
 				return new V4PinSorter(dev);
-			case VIRTEX5:
+			case "VIRTEX5":
 				return new V5PinSorter(dev);
 			default:
 				MessageGenerator.briefError("Sorry, " +	type.name() + 

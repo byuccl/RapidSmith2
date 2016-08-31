@@ -62,7 +62,7 @@ public class CreateDesignExample {
 		
 		// Let's place some of the cells into a slice
 		// Get the first SLICEL in the device
-		Site slice = device.getAllSitesOfType(SiteType.SLICEL)[0];
+		Site slice = device.getAllSitesOfType(SiteType.get("SLICEL"))[0];
 		
 		// Let's place the invcell on the A5LUT
 		design.placeCell(invcell, slice.getBel("A5LUT"));

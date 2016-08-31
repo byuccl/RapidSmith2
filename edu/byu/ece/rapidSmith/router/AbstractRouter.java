@@ -249,7 +249,7 @@ public abstract class AbstractRouter{
 				}
 			}
 		}
-		if(we.getWireType(pip.getStartWire()).equals(WireType.LONG) && we.getWireType(pip.getEndWire()).equals(WireType.LONG)){
+		if(we.getWireType(pip.getStartWire()).equals(WireType.get("LONG")) && we.getWireType(pip.getEndWire()).equals(WireType.get("LONG"))){
 			wires = pip.getTile().getWireConnections(pip.getStartWire());
 			if(wires != null && wires.length > 1){
 				for(WireConnection w : wires){
@@ -272,7 +272,7 @@ public abstract class AbstractRouter{
 				}
 			}
 		}
-		if(we.getWireType(pip.getStartWire()).equals(WireType.LONG) && we.getWireType(pip.getEndWire()).equals(WireType.LONG)){
+		if(we.getWireType(pip.getStartWire()).equals(WireType.get("LONG")) && we.getWireType(pip.getEndWire()).equals(WireType.get("LONG"))){
 			wires = pip.getTile().getWireConnections(pip.getStartWire());
 			if(wires != null && wires.length > 1){
 				for(WireConnection w : wires){

@@ -39,21 +39,24 @@ public class PartNameTools{
 	/** Stores a set of FamilyTypes which require ISE 10.1.03 or older to function. */
 	private static HashSet<FamilyType> legacyTypes;
 	
-	private static FamilyType[] basicTypes = {FamilyType.KINTEX7,
-								  			FamilyType.SPARTAN2, FamilyType.SPARTAN2E, FamilyType.SPARTAN3, 
-											FamilyType.SPARTAN3A, FamilyType.SPARTAN3ADSP, FamilyType.SPARTAN3E,
-											FamilyType.SPARTAN6, FamilyType.VIRTEX, FamilyType.VIRTEX2,
-											FamilyType.VIRTEX2P, FamilyType.VIRTEX4, FamilyType.VIRTEX5,
-											FamilyType.VIRTEX6, FamilyType.VIRTEX7, FamilyType.VIRTEXE};
+	private static FamilyType[] basicTypes = {
+			FamilyType.get("KINTEX7"), FamilyType.get("SPARTAN2"),
+			FamilyType.get("SPARTAN2E"), FamilyType.get("SPARTAN3"),
+			FamilyType.get("SPARTAN3A"), FamilyType.get("SPARTAN3ADSP"),
+			FamilyType.get("SPARTAN3E"), FamilyType.get("SPARTAN6"),
+			FamilyType.get("VIRTEX"), FamilyType.get("VIRTEX2"),
+			FamilyType.get("VIRTEX2P"), FamilyType.get("VIRTEX4"),
+			FamilyType.get("VIRTEX5"), FamilyType.get("VIRTEX6"),
+			FamilyType.get("VIRTEX7"), FamilyType.get("VIRTEXE")};
 	
 	static{
 		legacyTypes = new HashSet<FamilyType>();
-		legacyTypes.add(FamilyType.SPARTAN2);
-		legacyTypes.add(FamilyType.SPARTAN2E);
-		legacyTypes.add(FamilyType.VIRTEX);
-		legacyTypes.add(FamilyType.VIRTEXE);
-		legacyTypes.add(FamilyType.VIRTEX2);
-		legacyTypes.add(FamilyType.VIRTEX2P);
+		legacyTypes.add(FamilyType.get("SPARTAN2"));
+		legacyTypes.add(FamilyType.get("SPARTAN2E"));
+		legacyTypes.add(FamilyType.get("VIRTEX"));
+		legacyTypes.add(FamilyType.get("VIRTEXE"));
+		legacyTypes.add(FamilyType.get("VIRTEX2"));
+		legacyTypes.add(FamilyType.get("VIRTEX2P"));
 	}
 	
 	public static FamilyType[] getBasicFamilyTypes(){
@@ -148,143 +151,143 @@ public class PartNameTools{
 		// Match part name with family
 		if(tokens[0].equals("xcv")){
 			if(tokens.length >= 3 && tokens[2].startsWith("e")){
-				return FamilyType.VIRTEXE;
+				return FamilyType.get("VIRTEXE");
 			}else{
-				return FamilyType.VIRTEX;
+				return FamilyType.get("VIRTEX");
 			}
 		}else if(tokens[0].equals("xc")){
 			if(tokens[1].equals("2")){
 				if(tokens[2].equals("s")){
 					if(tokens.length >= 5 && tokens[4].startsWith("e")){
-						return FamilyType.SPARTAN2E;
+						return FamilyType.get("SPARTAN2E");
 					}else{
-						return FamilyType.SPARTAN2; 
+						return FamilyType.get("SPARTAN2");
 					}
 				}else if(tokens[2].startsWith("vp")){
-					return FamilyType.VIRTEX2P;
+					return FamilyType.get("VIRTEX2P");
 				}else if(tokens[2].startsWith("v")){
-					return FamilyType.VIRTEX2;
+					return FamilyType.get("VIRTEX2");
 				}
 			}else if(tokens[1].equals("3")){
 				if(tokens[2].equals("sd")){
-					return FamilyType.SPARTAN3ADSP;
+					return FamilyType.get("SPARTAN3ADSP");
 				}else if(tokens[2].startsWith("s")){
 					if(tokens.length >= 5 && tokens[4].startsWith("e")){
-						return FamilyType.SPARTAN3E;
+						return FamilyType.get("SPARTAN3E");
 					}else if(tokens.length >= 5 && tokens[4].startsWith("a")){
-						return FamilyType.SPARTAN3A;
+						return FamilyType.get("SPARTAN3A");
 					}else {
-						return FamilyType.SPARTAN3;
+						return FamilyType.get("SPARTAN3");
 					}
 				}
 			}else if(tokens[1].equals("4")){
 				if(tokens[2].startsWith("v")){
-					return FamilyType.VIRTEX4;
+					return FamilyType.get("VIRTEX4");
 				}
 			}else if(tokens[1].equals("5")){
 				if(tokens[2].startsWith("v")){
-					return FamilyType.VIRTEX5;
+					return FamilyType.get("VIRTEX5");
 				}
 			}else if(tokens[1].equals("6")){
 				if(tokens[2].startsWith("v")){
 					if(tokens.length >= 5 && (tokens[4].startsWith("l") || tokens[4].startsWith("tl"))){
-						return FamilyType.VIRTEX6L;
+						return FamilyType.get("VIRTEX6L");
 					}else{
-						return FamilyType.VIRTEX6;	
+						return FamilyType.get("VIRTEX6");
 					}
 				}else if(tokens[2].startsWith("s")){
 					if(tokens.length >= 5 && tokens[4].startsWith("l")){
-						return FamilyType.SPARTAN6L;
+						return FamilyType.get("SPARTAN6L");
 					}else{
-						return FamilyType.SPARTAN6;	
+						return FamilyType.get("SPARTAN6");
 					}
 				}
 			}else if(tokens[1].equals("7")){
 				if(tokens[2].startsWith("v")){
-					return FamilyType.VIRTEX7;
+					return FamilyType.get("VIRTEX7");
 				}else if(tokens[2].startsWith("a")){
-					return FamilyType.ARTIX7;
+					return FamilyType.get("ARTIX7");
 				}else if(tokens[2].startsWith("k")){
-					return FamilyType.KINTEX7;
+					return FamilyType.get("KINTEX7");
 				}else if(tokens[2].startsWith("z")){
-					return FamilyType.ZYNQ;
+					return FamilyType.get("ZYNQ");
 				}
 			}
 		}else if(tokens[0].equals("xa")){
 			if(tokens[1].equals("2") && tokens.length >= 5 && tokens[4].startsWith("e")){
-				return FamilyType.ASPARTAN2E;
+				return FamilyType.get("ASPARTAN2E");
 			}else if(tokens[1].equals("3")){
 				if(tokens[2].equals("sd")){
-					return FamilyType.ASPARTAN3ADSP;
+					return FamilyType.get("ASPARTAN3ADSP");
 				}else if(tokens[2].startsWith("s")){
 					if(tokens.length >= 5 && tokens[4].startsWith("e")){
-						return FamilyType.ASPARTAN3E;
+						return FamilyType.get("ASPARTAN3E");
 					}else if(tokens.length >= 5 && tokens[4].startsWith("a")){
-						return FamilyType.ASPARTAN3A;
+						return FamilyType.get("ASPARTAN3A");
 					}else {
-						return FamilyType.ASPARTAN3;
+						return FamilyType.get("ASPARTAN3");
 					}
 				}
 			}else if(tokens[1].equals("6")){
-				return FamilyType.ASPARTAN6;
+				return FamilyType.get("ASPARTAN6");
 			}
 		}else if(tokens[0].equals("xq")){
 			if(tokens[1].equals("2")){
 				if(tokens[2].equals("v")){
-					return FamilyType.QVIRTEX2;
+					return FamilyType.get("QVIRTEX2");
 				}else if(tokens[2].equals("vp")){
-					return FamilyType.QVIRTEX2P;
+					return FamilyType.get("QVIRTEX2P");
 				}
 				
 			}
 			else if(tokens[1].equals("4")){
 				if(tokens[2].startsWith("v")){
-					return FamilyType.QVIRTEX4;
+					return FamilyType.get("QVIRTEX4");
 				}
 			}
 			else if(tokens[1].equals("5")){
 				if(tokens[2].startsWith("v")){
-					return FamilyType.QVIRTEX5;
+					return FamilyType.get("QVIRTEX5");
 				}
 			}else if(tokens[1].equals("6")){
 				if(tokens[2].startsWith("v")){
-					return FamilyType.QVIRTEX6;
+					return FamilyType.get("QVIRTEX6");
 				}else if(tokens[2].startsWith("s")){
 					if(tokens.length >= 5 && tokens[4].startsWith("l")){
-						return FamilyType.QSPARTAN6L;
+						return FamilyType.get("QSPARTAN6L");
 					}else{
-						return FamilyType.QSPARTAN6;
+						return FamilyType.get("QSPARTAN6");
 					}
 				}
 			}else if(tokens[1].equals("7")){
 				if(tokens[2].startsWith("v")){
-					return FamilyType.QVIRTEX7;
+					return FamilyType.get("QVIRTEX7");
 				}else if(tokens[2].startsWith("a")){
-					return FamilyType.QARTIX7;
+					return FamilyType.get("QARTIX7");
 				}else if(tokens[2].startsWith("k")){
-					return FamilyType.QKINTEX7;
+					return FamilyType.get("QKINTEX7");
 				}
 			}
 		}
 		else if(tokens[0].equals("xqv")){
 			if(tokens.length >= 3 && tokens[2].startsWith("e")){
-				return FamilyType.QVIRTEXE;
+				return FamilyType.get("QVIRTEXE");
 			}else{
-				return FamilyType.QVIRTEX;
+				return FamilyType.get("QVIRTEX");
 			}
 		}else if(tokens[0].equals("xqvr")){
-			return FamilyType.QRVIRTEX;
+			return FamilyType.get("QRVIRTEX");
 		}else if(tokens[0].equals("xqr")){
 			if(tokens[1].equals("2")){
-				return FamilyType.QRVIRTEX2;
+				return FamilyType.get("QRVIRTEX2");
 			}else if(tokens[1].equals("4")){
-				return FamilyType.QRVIRTEX4;
+				return FamilyType.get("QRVIRTEX4");
 			}else if(tokens[1].equals("5")){
-				return FamilyType.QRVIRTEX5;
+				return FamilyType.get("QRVIRTEX5");
 			}else if(tokens[1].equals("6")){
-				return FamilyType.QRVIRTEX6;
+				return FamilyType.get("QRVIRTEX6");
 			}else if(tokens[1].equals("7")){
-				return FamilyType.QRVIRTEX7;
+				return FamilyType.get("QRVIRTEX7");
 			}
 		}
 		return null;
@@ -314,59 +317,59 @@ public class PartNameTools{
 	 * @return The base family type architecture.
 	 */
 	public static FamilyType getBaseTypeFromFamilyType(FamilyType type){
-		switch(type){
-			case AARTIX7: return FamilyType.ARTIX7;
-			case ARTIX7: return FamilyType.ARTIX7;
-			case ARTIX7L: return FamilyType.ARTIX7;
-			case ASPARTAN2E: return FamilyType.SPARTAN2E;
-			case ASPARTAN3: return FamilyType.SPARTAN3;
-			case ASPARTAN3A: return FamilyType.SPARTAN3A;
-			case ASPARTAN3ADSP: return FamilyType.SPARTAN3ADSP;
-			case ASPARTAN3E: return FamilyType.SPARTAN3E;
-			case ASPARTAN6: return FamilyType.SPARTAN6;
-			case AZYNQ: return FamilyType.ZYNQ;
-			case KINTEX7: return FamilyType.KINTEX7;
-			case KINTEX7L: return FamilyType.KINTEX7;
-			case QARTIX7: return FamilyType.ARTIX7;
-			case QKINTEX7: return FamilyType.KINTEX7;
-			case QKINTEX7L: return FamilyType.KINTEX7;
-			case QRVIRTEX: return FamilyType.VIRTEX;
-			case QRVIRTEX2: return FamilyType.VIRTEX2;
-			case QRVIRTEX4: return FamilyType.VIRTEX4;
-			case QRVIRTEX5: return FamilyType.VIRTEX5;
-			case QRVIRTEX6: return FamilyType.VIRTEX6;
-			case QRVIRTEX7: return FamilyType.VIRTEX7;
-			case QSPARTAN6: return FamilyType.SPARTAN6;
-			case QSPARTAN6L: return FamilyType.SPARTAN6;
-			case QVIRTEX: return FamilyType.VIRTEX;
-			case QVIRTEX2: return FamilyType.VIRTEX2;
-			case QVIRTEX2P: return FamilyType.VIRTEX2P;
-			case QVIRTEX4: return FamilyType.VIRTEX4;
-			case QVIRTEX5: return FamilyType.VIRTEX5;
-			case QVIRTEX6: return FamilyType.VIRTEX6;
-			case QVIRTEX6L: return FamilyType.VIRTEX6;
-			case QVIRTEX7: return FamilyType.VIRTEX7;
-			case QVIRTEXE: return FamilyType.VIRTEXE;
-			case QZYNQ: return FamilyType.ZYNQ;
-			case SPARTAN2: return FamilyType.SPARTAN2;
-			case SPARTAN2E: return FamilyType.SPARTAN2E;
-			case SPARTAN3: return FamilyType.SPARTAN3;
-			case SPARTAN3A: return FamilyType.SPARTAN3A;
-			case SPARTAN3ADSP: return FamilyType.SPARTAN3ADSP;
-			case SPARTAN3E: return FamilyType.SPARTAN3E;
-			case SPARTAN6: return FamilyType.SPARTAN6;
-			case SPARTAN6L: return FamilyType.SPARTAN6;
-			case VIRTEX: return FamilyType.VIRTEX;
-			case VIRTEX2: return FamilyType.VIRTEX2;
-			case VIRTEX2P: return FamilyType.VIRTEX2P;
-			case VIRTEX4: return FamilyType.VIRTEX4;
-			case VIRTEX5: return FamilyType.VIRTEX5;
-			case VIRTEX6: return FamilyType.VIRTEX6;
-			case VIRTEX6L: return FamilyType.VIRTEX6;
-			case VIRTEX7: return FamilyType.VIRTEX7;
-			case VIRTEX7L: return FamilyType.VIRTEX7;
-			case VIRTEXE: return FamilyType.VIRTEXE;
-			case ZYNQ: return FamilyType.ZYNQ;
+		switch(type.name()){
+			case "AARTIX7": return FamilyType.get("ARTIX7");
+			case "ARTIX7": return FamilyType.get("ARTIX7");
+			case "ARTIX7L": return FamilyType.get("ARTIX7");
+			case "ASPARTAN2E": return FamilyType.get("SPARTAN2E");
+			case "ASPARTAN3": return FamilyType.get("SPARTAN3");
+			case "ASPARTAN3A": return FamilyType.get("SPARTAN3A");
+			case "ASPARTAN3ADSP": return FamilyType.get("SPARTAN3ADSP");
+			case "ASPARTAN3E": return FamilyType.get("SPARTAN3E");
+			case "ASPARTAN6": return FamilyType.get("SPARTAN6");
+			case "AZYNQ": return FamilyType.get("ZYNQ");
+			case "KINTEX7": return FamilyType.get("KINTEX7");
+			case "KINTEX7L": return FamilyType.get("KINTEX7");
+			case "QARTIX7": return FamilyType.get("ARTIX7");
+			case "QKINTEX7": return FamilyType.get("KINTEX7");
+			case "QKINTEX7L": return FamilyType.get("KINTEX7");
+			case "QRVIRTEX": return FamilyType.get("VIRTEX");
+			case "QRVIRTEX2": return FamilyType.get("VIRTEX2");
+			case "QRVIRTEX4": return FamilyType.get("VIRTEX4");
+			case "QRVIRTEX5": return FamilyType.get("VIRTEX5");
+			case "QRVIRTEX6": return FamilyType.get("VIRTEX6");
+			case "QRVIRTEX7": return FamilyType.get("VIRTEX7");
+			case "QSPARTAN6": return FamilyType.get("SPARTAN6");
+			case "QSPARTAN6L": return FamilyType.get("SPARTAN6");
+			case "QVIRTEX": return FamilyType.get("VIRTEX");
+			case "QVIRTEX2": return FamilyType.get("VIRTEX2");
+			case "QVIRTEX2P": return FamilyType.get("VIRTEX2P");
+			case "QVIRTEX4": return FamilyType.get("VIRTEX4");
+			case "QVIRTEX5": return FamilyType.get("VIRTEX5");
+			case "QVIRTEX6": return FamilyType.get("VIRTEX6");
+			case "QVIRTEX6L": return FamilyType.get("VIRTEX6");
+			case "QVIRTEX7": return FamilyType.get("VIRTEX7");
+			case "QVIRTEXE": return FamilyType.get("VIRTEXE");
+			case "QZYNQ": return FamilyType.get("ZYNQ");
+			case "SPARTAN2": return FamilyType.get("SPARTAN2");
+			case "SPARTAN2E": return FamilyType.get("SPARTAN2E");
+			case "SPARTAN3": return FamilyType.get("SPARTAN3");
+			case "SPARTAN3A": return FamilyType.get("SPARTAN3A");
+			case "SPARTAN3ADSP": return FamilyType.get("SPARTAN3ADSP");
+			case "SPARTAN3E": return FamilyType.get("SPARTAN3E");
+			case "SPARTAN6": return FamilyType.get("SPARTAN6");
+			case "SPARTAN6L": return FamilyType.get("SPARTAN6");
+			case "VIRTEX": return FamilyType.get("VIRTEX");
+			case "VIRTEX2": return FamilyType.get("VIRTEX2");
+			case "VIRTEX2P": return FamilyType.get("VIRTEX2P");
+			case "VIRTEX4": return FamilyType.get("VIRTEX4");
+			case "VIRTEX5": return FamilyType.get("VIRTEX5");
+			case "VIRTEX6": return FamilyType.get("VIRTEX6");
+			case "VIRTEX6L": return FamilyType.get("VIRTEX6");
+			case "VIRTEX7": return FamilyType.get("VIRTEX7");
+			case "VIRTEX7L": return FamilyType.get("VIRTEX7");
+			case "VIRTEXE": return FamilyType.get("VIRTEXE");
+			case "ZYNQ": return FamilyType.get("ZYNQ");
 			default: return null;
 		}
 	}
@@ -397,16 +400,16 @@ public class PartNameTools{
 	
 	public static String getSubFamilyFromPart(String partName){
 		partName = partName.toLowerCase();
-		switch(getFamilyTypeFromPart(partName)){
-			case SPARTAN3A:
+		switch(getFamilyTypeFromPart(partName).name()){
+			case "SPARTAN3A":
 				return partName.contains("an") ? "AN" : "A";
-			case SPARTAN6:
+			case "SPARTAN6":
 				if(partName.contains("t") && !(partName.contains("tq") || partName.contains("tg"))){
 					return "LXT";
 				}else{
 					return "LX";
 				}
-			case VIRTEX4: 
+			case "VIRTEX4":
 				if(partName.contains("lx")){
 					return "LX";
 				}else if(partName.contains("sx")){
@@ -414,7 +417,7 @@ public class PartNameTools{
 				}else if(partName.contains("fx")){
 					return "FX";
 				}
-			case VIRTEX5: 
+			case "VIRTEX5":
 				if(partName.contains("lx")){
 					if(partName.contains("t")){
 						return "LXT";
@@ -428,8 +431,8 @@ public class PartNameTools{
 				}else if(partName.contains("tx")){
 					return "TXT";
 				}
-			case VIRTEX6:
-			case VIRTEX6L: 
+			case "VIRTEX6":
+			case "VIRTEX6L":
 				if(partName.contains("lx")){
 					if(partName.contains("t")) return "LXT";
 					else return "LX";					
@@ -443,7 +446,7 @@ public class PartNameTools{
 					if(partName.contains("t")) return "CXT";
 					else return "CX";	
 				}
-			case VIRTEX7:
+			case "VIRTEX7":
 				if(partName.contains("ht")){
 					return "HT";
 				}else if(partName.contains("xt")){
@@ -462,53 +465,53 @@ public class PartNameTools{
 	 * @return The formal family name or null if none exists.
 	 */
 	public static String getFormalFamilyNameFromType(FamilyType type){
-		switch(type){
-			case AARTIX7: return "Automotive Artix7";
-			case ARTIX7: return "Artix7";
-			case ARTIX7L: return "Artix7 Lower Power";
-			case ASPARTAN2E: return "Automotive Spartan2E";
-			case ASPARTAN3: return "Automotive Spartan3";
-			case ASPARTAN3A: return "Automotive Spartan3A";
-			case ASPARTAN3ADSP: return "Automotive Spartan-3A DSP";
-			case ASPARTAN3E: return "Automotive Spartan3E";
-			case ASPARTAN6: return "Automotive Spartan6";
-			case AZYNQ: return "Automotive Zynq";
-			case KINTEX7: return "Kintex7";
-			case KINTEX7L: return "Kintex7 Lower Power";
-			case QKINTEX7L: return "Defense-Grade Kintex-7Q Lower Power";
-			case QSPARTAN6: return "Defense-Grade Spartan-6Q";
-			case QSPARTAN6L: return "Defense-Grade Spartan-6Q Lower Power";
-			case QVIRTEX4: return "Defense-Grade Virtex-4Q";
-			case QVIRTEX5: return "Defense-Grade Virtex-5Q";
-			case QVIRTEX6: return "Defense-Grade Virtex-6Q";
-			case QVIRTEX6L: return "Defense-Grade Virtex-6Q Lower Power";
-			case QVIRTEX: return "QPro Virtex Hi-Rel";
-			case QRVIRTEX: return "QPro Virtex Rad-Hard";
-			case QVIRTEX2: return "QPro Virtex2 Military";
-			case QRVIRTEX2: return "QPro Virtex2 Rad Tolerant";
-			case QVIRTEX2P: return "QPro Virtex2P Hi-Rel";
-			case QVIRTEXE: return "QPro VirtexE Military";
-			case QRVIRTEX4: return "Space-Grade Virtex-4QV";
-			case QZYNQ: return "Defense-Grade Zynq";
-			case SPARTAN2: return "Spartan2";
-			case SPARTAN2E: return "Spartan2E";
-			case SPARTAN3: return "Spartan3";
-			case SPARTAN3A: return "Spartan3A and Spartan3AN";
-			case SPARTAN3ADSP: return "Spartan-3A DSP";
-			case SPARTAN3E: return "Spartan3E";
-			case SPARTAN6: return "Spartan6";
-			case SPARTAN6L: return "Spartan6 Lower Power";
-			case VIRTEX: return "Virtex";
-			case VIRTEX2: return "Virtex2";
-			case VIRTEX2P: return "Virtex2P";
-			case VIRTEX4: return "Virtex4";
-			case VIRTEX5: return "Virtex5";
-			case VIRTEX6: return "Virtex6";
-			case VIRTEX6L: return "Virtex6 Lower Power";
-			case VIRTEX7: return "Virtex7";
-			case VIRTEX7L: return "Virtex7 Lower Power";
-			case VIRTEXE: return "VirtexE";
-			case ZYNQ: return "Zynq";
+		switch(type.name()){
+			case "AARTIX7": return "Automotive Artix7";
+			case "ARTIX7": return "Artix7";
+			case "ARTIX7L": return "Artix7 Lower Power";
+			case "ASPARTAN2E": return "Automotive Spartan2E";
+			case "ASPARTAN3": return "Automotive Spartan3";
+			case "ASPARTAN3A": return "Automotive Spartan3A";
+			case "ASPARTAN3ADSP": return "Automotive Spartan-3A DSP";
+			case "ASPARTAN3E": return "Automotive Spartan3E";
+			case "ASPARTAN6": return "Automotive Spartan6";
+			case "AZYNQ": return "Automotive Zynq";
+			case "KINTEX7": return "Kintex7";
+			case "KINTEX7L": return "Kintex7 Lower Power";
+			case "QKINTEX7L": return "Defense-Grade Kintex-7Q Lower Power";
+			case "QSPARTAN6": return "Defense-Grade Spartan-6Q";
+			case "QSPARTAN6L": return "Defense-Grade Spartan-6Q Lower Power";
+			case "QVIRTEX4": return "Defense-Grade Virtex-4Q";
+			case "QVIRTEX5": return "Defense-Grade Virtex-5Q";
+			case "QVIRTEX6": return "Defense-Grade Virtex-6Q";
+			case "QVIRTEX6L": return "Defense-Grade Virtex-6Q Lower Power";
+			case "QVIRTEX": return "QPro Virtex Hi-Rel";
+			case "QRVIRTEX": return "QPro Virtex Rad-Hard";
+			case "QVIRTEX2": return "QPro Virtex2 Military";
+			case "QRVIRTEX2": return "QPro Virtex2 Rad Tolerant";
+			case "QVIRTEX2P": return "QPro Virtex2P Hi-Rel";
+			case "QVIRTEXE": return "QPro VirtexE Military";
+			case "QRVIRTEX4": return "Space-Grade Virtex-4QV";
+			case "QZYNQ": return "Defense-Grade Zynq";
+			case "SPARTAN2": return "Spartan2";
+			case "SPARTAN2E": return "Spartan2E";
+			case "SPARTAN3": return "Spartan3";
+			case "SPARTAN3A": return "Spartan3A and Spartan3AN";
+			case "SPARTAN3ADSP": return "Spartan-3A DSP";
+			case "SPARTAN3E": return "Spartan3E";
+			case "SPARTAN6": return "Spartan6";
+			case "SPARTAN6L": return "Spartan6 Lower Power";
+			case "VIRTEX": return "Virtex";
+			case "VIRTEX2": return "Virtex2";
+			case "VIRTEX2P": return "Virtex2P";
+			case "VIRTEX4": return "Virtex4";
+			case "VIRTEX5": return "Virtex5";
+			case "VIRTEX6": return "Virtex6";
+			case "VIRTEX6L": return "Virtex6 Lower Power";
+			case "VIRTEX7": return "Virtex7";
+			case "VIRTEX7L": return "Virtex7 Lower Power";
+			case "VIRTEXE": return "VirtexE";
+			case "ZYNQ": return "Zynq";
 			default: return null;
 		}
 	}

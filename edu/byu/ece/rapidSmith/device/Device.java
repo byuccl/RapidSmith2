@@ -611,8 +611,9 @@ public class Device implements Serializable {
 	 * each type of primitive site.
 	 */
 	private void createPrimitiveSiteIndex() {
-		List<List<Site>> tmp = new ArrayList<>(SiteType.values().length);
-		for (int i = 0; i < SiteType.values().length; i++) {
+		int numSiteTypes = SiteType.values().size();
+		List<List<Site>> tmp = new ArrayList<>(numSiteTypes);
+		for (int i = 0; i < numSiteTypes; i++) {
 			tmp.add(new ArrayList<>());
 		}
 

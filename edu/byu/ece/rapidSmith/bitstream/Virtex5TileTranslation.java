@@ -78,7 +78,7 @@ public class Virtex5TileTranslation {
 //			return (getClkColumnIndex(spec));
 //		}
 		
-		if(tile.getType().equals(TileType.CLK_HROW)){
+		if(tile.getType().equals(TileType.get("CLK_HROW"))){
 			return getClkColumnIndex(spec);
 		}else{
 			if(tile.getTileXCoordinate() >= getClkColumnIndex(spec)){

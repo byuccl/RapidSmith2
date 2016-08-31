@@ -96,10 +96,10 @@ public class StaticSourceHandler{
 		finalStaticNets = new ArrayList<>();
 		tempNode = new Node();
 		reservedGNDVCCResources = new HashMap<>();
-		if(dev.getFamilyType().equals(FamilyType.VIRTEX5)){
+		if(dev.getFamilyType().equals(FamilyType.get("VIRTEX5"))){
 			slicePin = "B";
 		}
-		else if(dev.getFamilyType().equals(FamilyType.VIRTEX4)){
+		else if(dev.getFamilyType().equals(FamilyType.get("VIRTEX4"))){
 			slicePin = "Y";
 		}
 		else{
@@ -181,7 +181,7 @@ public class StaticSourceHandler{
 		}
 		
 		Node curr = new Node(source.getTile(), dev.getPrimitiveExternalPin(source).getWireEnum(), null, 0);
-		while(!we.getWireDirection(curr.getWire()).equals(WireDirection.CLK) && !we.getWireType(curr.getWire()).equals(WireType.INT_SOURCE)){
+		while(!we.getWireDirection(curr.getWire()).equals(WireDirection.get("CLK")) && !we.getWireType(curr.getWire()).equals(WireType.get("INT_SOURCE"))){
 			WireConnection[] wires = curr.getConnections();
 			if(wires == null) return null;
 			WireConnection w = wires[0];
@@ -574,7 +574,7 @@ public class StaticSourceHandler{
 			}
 		}
 		
-		if(familyType.equals(FamilyType.VIRTEX4)){
+		if(familyType.equals(FamilyType.get("VIRTEX4"))){
 			reserveVirtex4SpecificResources(netList);
 		}
 		
@@ -594,11 +594,11 @@ public class StaticSourceHandler{
 		// 1. High priority TIEOFF sinks - Do the best you can to attach these sinks to the TIEOFF
 		// 2. Attempt TIEOFF sinks - Attempt to connect them to a TIEOFF, but not critical
 		// 3. SLICE Source - Instance a nearby slice to supply GND/VCC
-		switch(familyType){
-			case VIRTEX4:
+		switch(familyType.name()){
+			case "VIRTEX4":
 				pinSwitchMatrixMap = sortPinsVirtex4(staticSourcedNets);
 				break;
-			case VIRTEX5:
+			case "VIRTEX5":
 				pinSwitchMatrixMap = sortPinsVirtex5(staticSourcedNets);
 				break;
 			default:
@@ -631,7 +631,7 @@ public class StaticSourceHandler{
 			ArrayList<StaticSink> removeThese = new ArrayList<>();
 			
 			// Virtex 5 has some special pins that we should reserve
-			if(dev.getFamilyType().equals(FamilyType.VIRTEX5)){
+			if(dev.getFamilyType().equals(FamilyType.get("VIRTEX5"))){
 				for(StaticSink ss : ps.useTIEOFF){
 					String ssWireName = we.getWireName(ss.switchMatrixSink.wire);
 					String[] fans = fanBounceMap.get(ssWireName);
@@ -732,7 +732,7 @@ public class StaticSourceHandler{
 		for(PinSorter ps : pinSwitchMatrixMap.values()){
 			ssLoop : for(StaticSink ss : ps.useTIEOFF){
 				Instance inst = updateTIEOFF(ss.switchMatrixSink.tile, ss.pin.getNet(), true);
-				if(dev.getFamilyType().equals(FamilyType.VIRTEX5)){				
+				if(dev.getFamilyType().equals(FamilyType.get("VIRTEX5"))){				
 					String[] fanWireNames;
 					if((fanWireNames = fanBounceMap.get(we.getWireName(ss.switchMatrixSink.wire))) != null){
 						Node nn = new Node(inst.getTile(), we.getWireEnum(fanWireNames[0]), null, 0);
@@ -773,7 +773,7 @@ public class StaticSourceHandler{
 			for(StaticSink ss : ps.attemptTIEOFF){
 				Instance inst = updateTIEOFF(ss.switchMatrixSink.tile, ss.pin.getNet(), false);
 				// Special case with CLK pins BRAMs on Virtex5 devices, when competing for FANs against GND Nets
-				if(dev.getFamilyType().equals(FamilyType.VIRTEX5)){
+				if(dev.getFamilyType().equals(FamilyType.get("VIRTEX5"))){
 					int switchBoxSink = ss.switchMatrixSink.wire;			
 					
 					if(we.getWireName(ss.switchMatrixSink.getWire()).startsWith("BYP_B")){
@@ -791,7 +791,7 @@ public class StaticSourceHandler{
 							ps.useSLICE.add(ss);
 							continue;
 						}
-					}else if(ss.pin.getInstance().getPrimitiveSite().getType().equals(SiteType.DSP48E) && ss.pin.getName().contains("CEP")){
+					}else if(ss.pin.getInstance().getPrimitiveSite().getType().equals(SiteType.get("DSP48E")) && ss.pin.getName().contains("CEP")){
 						Node nn = new Node(inst.getTile(), we.getWireEnum("CTRL1"), null, 0);
 						if(!addReservedGNDVCCNode(nn, ss.pin)){
 							// we need to use a SLICE 
@@ -965,7 +965,7 @@ public class StaticSourceHandler{
 		int minColumn = column-1;
 		int minRow = row;
 		String srcTypeString = sourceType.equals(NetType.VCC) ? "_VCC_SOURCE" : "_GND_SOURCE";
-		boolean isVirtex5 = dev.getFamilyType().equals(FamilyType.VIRTEX5);
+		boolean isVirtex5 = dev.getFamilyType().equals(FamilyType.get("VIRTEX5"));
 		Tile currentTile;
 		while(true){
 			switch(dir){
@@ -1013,7 +1013,7 @@ public class StaticSourceHandler{
 			currentTile = dev.getTile(row, column);
 			if(currentTile != null && currentTile.getPrimitiveSites() != null){
 				for(Site site : currentTile.getPrimitiveSites()){
-					if(site.getType().equals(SiteType.SLICEL) || site.getType().equals(SiteType.SLICEM)){
+					if(site.getType().equals(SiteType.get("SLICEL")) || site.getType().equals(SiteType.get("SLICEM"))){
 						if(!router.design.getUsedPrimitiveSites().contains(site)){
 							Instance returnMe = new Instance();
 							HashMap<String, Attribute> attributeMap = new HashMap<>();
@@ -1022,7 +1022,7 @@ public class StaticSourceHandler{
 							attributeMap.put(srcTypeString, new Attribute(srcTypeString,"",slicePin));
 							
 							returnMe.place(site);
-							returnMe.setType(SiteType.SLICEL);
+							returnMe.setType(SiteType.get("SLICEL"));
 							returnMe.setAttributes(attributeMap);
 							returnMe.setName("XDL_DUMMY_" + returnMe.getTile() + "_" + site.getName());
 							currStaticSourcePin = null;
@@ -1079,7 +1079,7 @@ public class StaticSourceHandler{
 		else{
 			currInst = new Instance();
 			currInst.place(router.dev.getPrimitiveSite("TIEOFF" + tileSuffix));
-			currInst.setType(SiteType.TIEOFF);
+			currInst.setType(SiteType.get("TIEOFF"));
 			currInst.setName(instName);
 			currInst.addAttribute(noUserLogicAttr);
 			if(net.getType().equals(NetType.VCC)){

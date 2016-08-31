@@ -292,16 +292,16 @@ public class ModuleInstance{
 				//}
 				net.addPIP(newPip);
 				// Special cases for Virtex 5
-				if(newPip.getStartWire() == mCout && newPipTile.getType().equals(TileType.CLBLL)){
+				if(newPip.getStartWire() == mCout && newPipTile.getType().equals(TileType.get("CLBLL"))){
 					newPip.setStartWire(llCout);
 				}
-				else if(newPip.getStartWire() == llCout && newPipTile.getType().equals(TileType.CLBLM)){
+				else if(newPip.getStartWire() == llCout && newPipTile.getType().equals(TileType.get("CLBLM"))){
 					newPip.setStartWire(mCout);
 				}
 				else if(newPip.getEndWire() == wl5beg_s0){
 					TileType check = dev.getTile(newPipTile.getRow(), newPipTile.getColumn()-1).getType();
 					TileType check2 = dev.getTile(newPipTile.getRow(), newPipTile.getColumn()-2).getType();
-					if(check.equals(TileType.INT_BUFS_R) || check2.equals(TileType.INT_BUFS_R)){
+					if(check.equals(TileType.get("INT_BUFS_R")) || check2.equals(TileType.get("INT_BUFS_R"))){
 						int currWire = wl5beg_s0;
 						WireConnection[] wcs = newPipTile.getWireConnections(currWire);
 						Tile currTile = newPipTile;

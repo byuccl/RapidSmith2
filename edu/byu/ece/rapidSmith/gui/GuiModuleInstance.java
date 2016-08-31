@@ -110,7 +110,7 @@ public class GuiModuleInstance extends QGraphicsPolygonItem {
 
 		for (Instance inst : instances) {
 			Tile tile = inst.getTile();
-			if(inst.getType().equals(SiteType.SLICEM)){
+			if(inst.getType().equals(SiteType.get("SLICEM"))){
 				tilesWithSLICEM.add(tile);
 			}
 			if (!occupiedTiles.contains(tile)) {
@@ -134,7 +134,7 @@ public class GuiModuleInstance extends QGraphicsPolygonItem {
 		for (Net net : nets) {
 			for (PIP pip : net.getPIPs()) {
 				Tile tile = pip.getTile();
-				if (!occupiedTiles.contains(tile) && !tile.getType().equals(TileType.INT_INTERFACE)) {
+				if (!occupiedTiles.contains(tile) && !tile.getType().equals(TileType.get("INT_INTERFACE"))) {
 					occupiedTiles.add(tile);
 					//int col = tile.getColumn();
 					//int row = tile.getRow();
@@ -346,8 +346,8 @@ public class GuiModuleInstance extends QGraphicsPolygonItem {
 			
 			TileType devType = scene.drawnTiles[y][x].getType();
 			if (myType.equals(devType) 
-					|| myType.equals(TileType.CLBLL) && devType.equals(TileType.CLBLM)
-					|| myType.equals(TileType.CLBLM) && devType.equals(TileType.CLBLL) && !hmTile.containsSLICEM()
+					|| myType.equals(TileType.get("CLBLL")) && devType.equals(TileType.get("CLBLM"))
+					|| myType.equals(TileType.get("CLBLM")) && devType.equals(TileType.get("CLBLL")) && !hmTile.containsSLICEM()
 					|| switchboxTypes.contains(myType) && switchboxTypes.contains(devType)){
 				if(tileColliding){
 					hmTile.setState(GuiShapeState.COLLIDING);

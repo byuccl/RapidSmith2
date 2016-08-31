@@ -20,26 +20,56 @@
  */
 package edu.byu.ece.rapidSmith.device;
 
-/**
- * The direction the different wires may travel.
- */
-public enum WireDirection {
-	CLK,
-	NORTH,
-	SOUTH,
-	EAST,
-	WEST,
-	EASTSOUTH,
-	EASTNORTH,
-	NORTHEAST,
-	NORTHWEST,
-	SOUTHEAST,
-	SOUTHWEST,
-	WESTNORTH,
-	WESTSOUTH,
-	HORIZONTAL,
-	VERTICAL,
-	INTERNAL,
-	EXTERNAL,
-	NONE,
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public final class WireDirection {
+	private final String name;
+	private final int ordinal;
+
+	private WireDirection(String name, int ordinal) {
+		this.name = name;
+		this.ordinal = ordinal;
+	}
+
+	public String name() {
+		return name;
+	}
+
+	public int ordinal() {
+		return ordinal;
+	}
+
+	@Override
+	public String toString() {
+		return "WireDirection." + name;
+	}
+
+	private static final HashMap<String, WireDirection> types = new HashMap<>();
+	private static int count = 0;
+
+	public static synchronized WireDirection get(String name) {
+		// synchronized to allow parallel accesses.
+		// WireDirections should be case independent
+		String upper = name.toUpperCase();
+		WireDirection type = types.get(upper);
+
+		// if it doesn't already exist, create it and store it
+		if (type == null) {
+			type = new WireDirection(upper, count++);
+			types.put(name, type);
+		}
+
+		return type;
+	}
+
+	public static synchronized WireDirection valueOf(String name) {
+		return types.get(name.toUpperCase());
+	}
+
+	public static ArrayList<WireDirection> values() {
+		return new ArrayList<>(types.values());
+	}
 }
+
+

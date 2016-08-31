@@ -18,13 +18,13 @@ public class V6UnpackerUtils implements UnpackerUtils {
 		// TODO return a new design
 		// Design prepped = design.deepCopy();
 		for (Instance inst : design.getInstances()) {
-			switch (inst.getType()) {
-				case SLICEL :
-				case SLICEM :
+			switch (inst.getType().name()) {
+				case "SLICEL" :
+				case "SLICEM" :
 					detailStaticSlice(inst, true);
 					detailStaticSlice(inst, false);
 					break;
-				case TIEOFF :
+				case "TIEOFF" :
 					detailStaticTieoff(inst, true);
 					detailStaticTieoff(inst, false);
 					break;

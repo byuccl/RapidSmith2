@@ -54,9 +54,9 @@ public class V6PackerUtils implements PackerUtils {
 
 	private void handleStatics(Design design) {
 		for (Instance inst : design.getInstances()) {
-			switch (inst.getType()) {
-				case SLICEL :
-				case SLICEM :
+			switch (inst.getType().name()) {
+				case "SLICEL" :
+				case "SLICEM" :
 					for (char ch = 'A'; ch <= 'D'; ch++) {
 						String lutName = ch + "6LUT";
 						String usedMuxName = ch + "USED";
@@ -78,7 +78,7 @@ public class V6PackerUtils implements PackerUtils {
 					if (noUserLogic)
 						inst.addAttribute("_NO_USER_LOGIC", "", "");
 					break;
-				case TIEOFF :
+				case "TIEOFF" :
 					inst.addAttribute("_NO_USER_LOGIC", "", "");
 					if (inst.hasAttribute("HARD0GND")) {
 						inst.removeAttribute("HARD0GND");
@@ -186,7 +186,7 @@ public class V6PackerUtils implements PackerUtils {
 	}
 
 	private boolean sharesCarryChainWithDMUX(Instance inst) {
-		if (inst.getType() == SiteType.SLICEL || inst.getType() == SiteType.SLICEM) {
+		if (inst.getType() == SiteType.get("SLICEL") || inst.getType() == SiteType.get("SLICEM")) {
 			Pin coutPin = inst.getPin("COUT");
 			if (coutPin != null && coutPin.getNet() != null) {
 				Pin dmuxPin = inst.getPin("DMUX");

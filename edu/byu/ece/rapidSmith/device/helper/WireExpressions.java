@@ -32,6 +32,8 @@ import java.util.regex.Pattern;
  * @author Chris Lavin
  *         Created on: May 4, 2010
  */
+
+// TODO move this to family info
 public class WireExpressions {
 	// Regular Expressions
 	private Pattern north;
@@ -110,80 +112,80 @@ public class WireExpressions {
 
 	public WireType getWireType(String s) {
 		if (Pattern.matches(omux.pattern(), s)) {
-			return WireType.OMUX;
+			return WireType.get("OMUX");
 		} else if (Pattern.matches(doubleType.pattern(), s)) {
-			return WireType.DOUBLE;
+			return WireType.get("DOUBLE");
 		} else if (Pattern.matches(hex.pattern(), s)) {
-			return WireType.HEX;
+			return WireType.get("HEX");
 		} else if (Pattern.matches(longType.pattern(), s)) {
-			return WireType.LONG;
+			return WireType.get("LONG");
 		} else if (Pattern.matches(bounce.pattern(), s)) {
-			return WireType.BOUNCE;
+			return WireType.get("BOUNCE");
 		} else if (Pattern.matches(omux_output.pattern(), s)) {
-			return WireType.OMUX_OUTPUT;
+			return WireType.get("OMUX_OUTPUT");
 		} else if (Pattern.matches(to_bufg.pattern(), s)) {
-			return WireType.TO_BUFG;
+			return WireType.get("TO_BUFG");
 		} else if (Pattern.matches(pent.pattern(), s)) {
-			return WireType.PENT;
+			return WireType.get("PENT");
 		} else if (Pattern.matches(double_turn.pattern(), s)) {
-			return WireType.DOUBLE_TURN;
+			return WireType.get("DOUBLE_TURN");
 		} else if (Pattern.matches(pent_turn.pattern(), s)) {
-			return WireType.PENT_TURN;
+			return WireType.get("PENT_TURN");
 		} else if (Pattern.matches(int_sink.pattern(), s)) {
-			return WireType.INT_SINK;
+			return WireType.get("INT_SINK");
 		} else if (Pattern.matches(int_source.pattern(), s)) {
-			return WireType.INT_SOURCE;
+			return WireType.get("INT_SOURCE");
 		} else if (Pattern.matches(int_conn.pattern(), s)) {
-			return WireType.INT_CONN;
+			return WireType.get("INT_CONN");
 		} else if (Pattern.matches(triple.pattern(), s)) {
-			return WireType.TRIPLE;
+			return WireType.get("TRIPLE");
 		} else if (Pattern.matches(hept.pattern(), s)) {
-			return WireType.HEPT;
+			return WireType.get("HEPT");
 		} else if (Pattern.matches(triple_turn.pattern(), s)) {
-			return WireType.TRIPLE_TURN;
+			return WireType.get("TRIPLE_TURN");
 		} else if (Pattern.matches(hept_turn.pattern(), s)) {
-			return WireType.HEPT_TURN;
+			return WireType.get("HEPT_TURN");
 		} else if (Pattern.matches(internal.pattern(), s)) {
-			return WireType.INTRASITE;
+			return WireType.get("INTRASITE");
 		}
-		return WireType.OTHER;
+		return WireType.get("OTHER");
 	}
 
 	public WireDirection getWireDirection(String s) {
 		if (Pattern.matches(clk.pattern(), s)) {
-			return WireDirection.CLK;
+			return WireDirection.get("CLK");
 		} else if (Pattern.matches(north.pattern(), s)) {
-			return WireDirection.NORTH;
+			return WireDirection.get("NORTH");
 		} else if (Pattern.matches(south.pattern(), s)) {
-			return WireDirection.SOUTH;
+			return WireDirection.get("SOUTH");
 		} else if (Pattern.matches(east.pattern(), s)) {
-			return WireDirection.EAST;
+			return WireDirection.get("EAST");
 		} else if (Pattern.matches(west.pattern(), s)) {
-			return WireDirection.WEST;
+			return WireDirection.get("WEST");
 		} else if (Pattern.matches(horizontal.pattern(), s)) {
-			return WireDirection.HORIZONTAL;
+			return WireDirection.get("HORIZONTAL");
 		} else if (Pattern.matches(vertical.pattern(), s)) {
-			return WireDirection.VERTICAL;
+			return WireDirection.get("VERTICAL");
 		} else if (Pattern.matches(eastSouth.pattern(), s)) {
-			return WireDirection.EASTSOUTH;
+			return WireDirection.get("EASTSOUTH");
 		} else if (Pattern.matches(eastNorth.pattern(), s)) {
-			return WireDirection.EASTNORTH;
+			return WireDirection.get("EASTNORTH");
 		} else if (Pattern.matches(northEast.pattern(), s)) {
-			return WireDirection.NORTHEAST;
+			return WireDirection.get("NORTHEAST");
 		} else if (Pattern.matches(northWest.pattern(), s)) {
-			return WireDirection.NORTHWEST;
+			return WireDirection.get("NORTHWEST");
 		} else if (Pattern.matches(southEast.pattern(), s)) {
-			return WireDirection.SOUTHEAST;
+			return WireDirection.get("SOUTHEAST");
 		} else if (Pattern.matches(southWest.pattern(), s)) {
-			return WireDirection.SOUTHWEST;
+			return WireDirection.get("SOUTHWEST");
 		} else if (Pattern.matches(westNorth.pattern(), s)) {
-			return WireDirection.WESTNORTH;
+			return WireDirection.get("WESTNORTH");
 		} else if (Pattern.matches(westSouth.pattern(), s)) {
-			return WireDirection.WESTSOUTH;
+			return WireDirection.get("WESTSOUTH");
 		} else if (Pattern.matches(internal.pattern(), s)) {
-			return WireDirection.INTERNAL;
+			return WireDirection.get("INTERNAL");
 		}
-		return WireDirection.NONE;
+		return WireDirection.get("NONE");
 	}
 
 	public static void main(String[] args) {

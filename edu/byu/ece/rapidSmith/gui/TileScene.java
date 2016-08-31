@@ -402,14 +402,14 @@ public class TileScene extends QGraphicsScene{
 	private void drawCLB(QPainter painter, int rectX, int rectY, int rectSide){
 		painter.drawRect(rectX, rectY + rectSide / 2, rectSide / 2 - 1, rectSide / 2 - 1);
 		painter.drawRect(rectX + rectSide / 2, rectY, rectSide / 2 - 1, rectSide / 2 - 1);					
-		switch(device.getFamilyType()){
-			case SPARTAN3:
-			case SPARTAN3A:
-			case SPARTAN3ADSP:
-			case SPARTAN3E:
-			case VIRTEX2:
-			case VIRTEX2P:
-			case VIRTEX4:
+		switch(device.getFamilyType().name()){
+			case "SPARTAN3":
+			case "SPARTAN3A":
+			case "SPARTAN3ADSP":
+			case "SPARTAN3E":
+			case "VIRTEX2":
+			case "VIRTEX2P":
+			case "VIRTEX4":
 				painter.drawRect(rectX, rectY, rectSide / 2 - 1, rectSide / 2 - 1);
 				painter.drawRect(rectX + rectSide / 2, rectY + rectSide / 2, rectSide / 2 - 1, rectSide / 2 - 1);
 				break;
@@ -417,37 +417,37 @@ public class TileScene extends QGraphicsScene{
 	}
 	
 	private void drawBRAM(QPainter painter, int rectX, int rectY, int rectSide, int offset, QColor color){
-		switch(device.getFamilyType()){
-			case SPARTAN6:
+		switch(device.getFamilyType().name()){
+			case "SPARTAN6":
 				painter.drawRect(rectX, rectY - 3 * tileSize, rectSide - 1, 4 * rectSide + 3 * 2 * offset - 1);
 				painter.setPen(color.darker());
 				painter.drawRect(rectX + 2, rectY - 3 * tileSize + 2, rectSide - 1 - 4, 2 * rectSide + 2 * offset - 1 - 2);
 				painter.drawRect(rectX + 2, rectY - tileSize, rectSide - 1 - 4, 2 * rectSide + 2 * offset - 1 - 2);
 				break;
-			case VIRTEX5:
+			case "VIRTEX5":
 				painter.drawRect(rectX, rectY - 4 * tileSize, rectSide - 1, 5 * rectSide + 3 * 2 * offset - 1);
 				painter.setPen(color.darker());
 				painter.drawRect(rectX+2, rectY-4 * tileSize + 2, rectSide - 5, 5 * rectSide + 3 * 2 * offset - 5);
 				break;
-			case KINTEX7:
-			case VIRTEX6:
-			case VIRTEX7:
+			case "KINTEX7":
+			case "VIRTEX6":
+			case "VIRTEX7":
 				painter.drawRect(rectX, rectY - 4 * tileSize, rectSide - 1, 5 * rectSide + 3 * 2 * offset - 1);
 				painter.setPen(color.darker());
 				painter.drawRect(rectX+2, rectY-4 * tileSize + 2, rectSide - 5, ((int)(2.5 * rectSide)) + 3 * 2 * offset - 5);
 				painter.drawRect(rectX+2, (rectY-2 * tileSize) + 7, rectSide - 5, ((int)(2.5 * rectSide)) + 3 * 2 * offset - 5);
 				break;
-			case VIRTEXE:
-			case SPARTAN2:
-			case SPARTAN2E:
-			case SPARTAN3:
-			case SPARTAN3A:
-			case SPARTAN3ADSP:
-			case SPARTAN3E:
-			case VIRTEX:
-			case VIRTEX2:
-			case VIRTEX2P:
-			case VIRTEX4:
+			case "VIRTEXE":
+			case "SPARTAN2":
+			case "SPARTAN2E":
+			case "SPARTAN3":
+			case "SPARTAN3A":
+			case "SPARTAN3ADSP":
+			case "SPARTAN3E":
+			case "VIRTEX":
+			case "VIRTEX2":
+			case "VIRTEX2P":
+			case "VIRTEX4":
 				painter.drawRect(rectX, rectY - 3 * tileSize, rectSide - 1, 4 * rectSide + 3 * 2 * offset - 1);
 				painter.setPen(color.darker());
 				painter.drawRect(rectX + 2, rectY - 3 * tileSize + 2, rectSide / 2 - 4, 4 * (rectSide + offset) - 3);
@@ -457,32 +457,32 @@ public class TileScene extends QGraphicsScene{
 	}
 	
 	private void drawDSP(QPainter painter, int rectX, int rectY, int rectSide, int offset, QColor color){
-		switch(device.getFamilyType()){
-			case SPARTAN6:
+		switch(device.getFamilyType().name()){
+			case "SPARTAN6":
 				painter.drawRect(rectX, rectY - 3 * tileSize, rectSide - 1, 4 * rectSide + 3 * 2 * offset - 1);
 				painter.setPen(color.darker());
 				painter.drawRect(rectX+2, rectY-3 * tileSize + 2, rectSide - 5, 4 * rectSide + 3 * 2 * offset - 5);
 				break;
-			case VIRTEX5:
-			case KINTEX7:
-			case VIRTEX6:
-			case VIRTEX7:
+			case "VIRTEX5":
+			case "KINTEX7":
+			case "VIRTEX6":
+			case "VIRTEX7":
 				painter.drawRect(rectX, rectY - 4 * tileSize, rectSide - 1, 5 * rectSide + 3 * 2 * offset - 1);
 				painter.setPen(color.darker());
 				painter.drawRect(rectX+2, rectY-4 * tileSize + 2, rectSide - 5, ((int)(2.5 * rectSide)) + 3 * 2 * offset - 5);
 				painter.drawRect(rectX+2, (rectY-2 * tileSize) + 7, rectSide - 5, ((int)(2.5 * rectSide)) + 3 * 2 * offset - 5);
 				break;
-			case VIRTEXE:
-			case SPARTAN2:
-			case SPARTAN2E:
-			case SPARTAN3:
-			case SPARTAN3A:
-			case SPARTAN3ADSP:
-			case SPARTAN3E:
-			case VIRTEX:
-			case VIRTEX2:
-			case VIRTEX2P:
-			case VIRTEX4:
+			case "VIRTEXE":
+			case "SPARTAN2":
+			case "SPARTAN2E":
+			case "SPARTAN3":
+			case "SPARTAN3A":
+			case "SPARTAN3ADSP":
+			case "SPARTAN3E":
+			case "VIRTEX":
+			case "VIRTEX2":
+			case "VIRTEX2P":
+			case "VIRTEX4":
 				painter.drawRect(rectX, rectY - 3 * tileSize, rectSide - 1, 4 * rectSide + 3 * 2 * offset - 1);
 				painter.setPen(color.darker());
 				painter.drawRect(rectX + 2, rectY - 3 * tileSize + 2, rectSide - 1 - 4, 2 * rectSide + 2 * offset - 1 - 2);
@@ -502,35 +502,35 @@ public class TileScene extends QGraphicsScene{
 	}
 	
 	private void populateTileTypesToHide(){
-		switch(device.getFamilyType()){
-		case VIRTEX4:
-			tileColumnTypesToHide.add(TileType.CLB_BUFFER);
-			tileColumnTypesToHide.add(TileType.CLK_HROW);
-			tileColumnTypesToHide.add(TileType.CFG_VBRK_FRAME);
-			tileRowTypesToHide.add(TileType.HCLK); 
-			tileRowTypesToHide.add(TileType.BRKH);
+		switch(device.getFamilyType().name()){
+		case "VIRTEX4":
+			tileColumnTypesToHide.add(TileType.get("CLB_BUFFER"));
+			tileColumnTypesToHide.add(TileType.get("CLK_HROW"));
+			tileColumnTypesToHide.add(TileType.get("CFG_VBRK_FRAME"));
+			tileRowTypesToHide.add(TileType.get("HCLK")); 
+			tileRowTypesToHide.add(TileType.get("BRKH"));
 			break;
-		case VIRTEX5:
-			tileColumnTypesToHide.add(TileType.CFG_VBRK);
-			tileColumnTypesToHide.add(TileType.CLKV);
-			tileColumnTypesToHide.add(TileType.INT_BUFS_L);
-			tileColumnTypesToHide.add(TileType.INT_BUFS_R);
-			tileColumnTypesToHide.add(TileType.INT_BUFS_R_MON);
-			tileColumnTypesToHide.add(TileType.INT_INTERFACE);
-			//tileColumnTypesToHide.add(TileType.IOI);
-			tileRowTypesToHide.add(TileType.HCLK); 
-			tileRowTypesToHide.add(TileType.BRKH);
-		case VIRTEX6:
-			tileRowTypesToHide.add(TileType.HCLK); 
-			tileRowTypesToHide.add(TileType.BRKH);
-			tileColumnTypesToHide.add(TileType.INT_INTERFACE);
-			tileColumnTypesToHide.add(TileType.VBRK);
+		case "VIRTEX5":
+			tileColumnTypesToHide.add(TileType.get("CFG_VBRK"));
+			tileColumnTypesToHide.add(TileType.get("CLKV"));
+			tileColumnTypesToHide.add(TileType.get("INT_BUFS_L"));
+			tileColumnTypesToHide.add(TileType.get("INT_BUFS_R"));
+			tileColumnTypesToHide.add(TileType.get("INT_BUFS_R_MON"));
+			tileColumnTypesToHide.add(TileType.get("INT_INTERFACE"));
+			//tileColumnTypesToHide.add(TileType.get("IOI"));
+			tileRowTypesToHide.add(TileType.get("HCLK")); 
+			tileRowTypesToHide.add(TileType.get("BRKH"));
+		case "VIRTEX6":
+			tileRowTypesToHide.add(TileType.get("HCLK")); 
+			tileRowTypesToHide.add(TileType.get("BRKH"));
+			tileColumnTypesToHide.add(TileType.get("INT_INTERFACE"));
+			tileColumnTypesToHide.add(TileType.get("VBRK"));
 			break;
-		case SPARTAN6:
-			tileColumnTypesToHide.add(TileType.INT_INTERFACE);
-			tileColumnTypesToHide.add(TileType.VBRK);
-			tileRowTypesToHide.add(TileType.HCLK_CLB_XL_CLE); 
-			tileRowTypesToHide.add(TileType.REGH_CLEXL_CLE);
+		case "SPARTAN6":
+			tileColumnTypesToHide.add(TileType.get("INT_INTERFACE"));
+			tileColumnTypesToHide.add(TileType.get("VBRK"));
+			tileRowTypesToHide.add(TileType.get("HCLK_CLB_XL_CLE")); 
+			tileRowTypesToHide.add(TileType.get("REGH_CLEXL_CLE"));
 			break;
 		}		
 	}

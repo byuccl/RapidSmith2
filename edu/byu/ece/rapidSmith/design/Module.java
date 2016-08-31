@@ -445,9 +445,9 @@ public class Module implements Serializable{
 		String newName = oldName.substring(0, oldName.lastIndexOf('X')+1) + newTileX + "Y" + newTileY;
 		Tile correspondingTile = dev.getTile(newName); 
 		if(correspondingTile == null){
-			if(templateTile.getType().equals(TileType.CLBLL)){
+			if(templateTile.getType().equals(TileType.get("CLBLL"))){
 				correspondingTile = dev.getTile("CLBLM_X" + newTileX + "Y" + newTileY);
-			}else if(templateTile.getType().equals(TileType.CLBLM)){
+			}else if(templateTile.getType().equals(TileType.get("CLBLM"))){
 				correspondingTile = dev.getTile("CLBLL_X" + newTileX + "Y" + newTileY);
 			}
 		}

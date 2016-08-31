@@ -42,6 +42,8 @@ import java.util.regex.Pattern;
  * Rewritten on: Jun 16 2010 by Jaren Lamprecht
  */
 
+// TODO This class is really only made for V4 and V5.  We should probably make it abstract
+// and subclass it with the families it supports.
 public class HardMacroGenerator {
 
 	/** This variable keeps track of which instances should be removed from the original design */
@@ -61,16 +63,16 @@ public class HardMacroGenerator {
 	static{
 		// Populate the forbidden types for error checking later
 		forbiddenTypes = new HashSet<>();
-		forbiddenTypes.add(SiteType.TIEOFF);
-		forbiddenTypes.add(SiteType.IOB);
-		forbiddenTypes.add(SiteType.IOBM);
-		forbiddenTypes.add(SiteType.IOBS);
-		forbiddenTypes.add(SiteType.PMV);
-		forbiddenTypes.add(SiteType.DCM_ADV);
-		forbiddenTypes.add(SiteType.ISERDES);
-		forbiddenTypes.add(SiteType.OSERDES);
-		forbiddenTypes.add(SiteType.ILOGIC);
-		forbiddenTypes.add(SiteType.OLOGIC);
+		forbiddenTypes.add(SiteType.get("TIEOFF"));
+		forbiddenTypes.add(SiteType.get("IOB"));
+		forbiddenTypes.add(SiteType.get("IOBM"));
+		forbiddenTypes.add(SiteType.get("IOBS"));
+		forbiddenTypes.add(SiteType.get("PMV"));
+		forbiddenTypes.add(SiteType.get("DCM_ADV"));
+		forbiddenTypes.add(SiteType.get("ISERDES"));
+		forbiddenTypes.add(SiteType.get("OSERDES"));
+		forbiddenTypes.add(SiteType.get("ILOGIC"));
+		forbiddenTypes.add(SiteType.get("OLOGIC"));
 	}
 	/** The output buffer for the VHDL wrapper to be created */
 	private BufferedWriter vhd;
@@ -144,7 +146,7 @@ public class HardMacroGenerator {
 
 		for(Instance inst : design.getInstances()){
 			if(inst.getName().startsWith("IOBSLICE_")){
-				inst.setType(SiteType.IOB);
+				inst.setType(SiteType.get("IOB"));
 			}
 		}
 		
@@ -250,7 +252,7 @@ public class HardMacroGenerator {
 	 */
 	public void handleIOLOGIC(){
 		for(Instance inst : design.getInstances()){
-			if(inst.getType().equals(SiteType.ILOGIC)){
+			if(inst.getType().equals(SiteType.get("ILOGIC"))){
 				boolean foundBadInstance = false;
 				if(inst.getName().contains("XDL_DUMMY_IOI")){
 					for(Attribute attr : inst.getAttributes()){
@@ -288,7 +290,7 @@ public class HardMacroGenerator {
 					}
 				}
 			}
-			else if(inst.getType().equals(SiteType.OLOGIC)){
+			else if(inst.getType().equals(SiteType.get("OLOGIC"))){
 				boolean foundBadInstance = false;
 				if(inst.getName().contains("XDL_DUMMY_IOI")){
 					for(Attribute attr : inst.getAttributes()){
@@ -373,7 +375,7 @@ public class HardMacroGenerator {
 				//check to see if the BUFG has an IOBSource before removing
 				boolean IOBSource = false;
 				for(Net n : pin.getInstance().getNetList()){
-					if(n.getSource().getInstance().getType().equals(SiteType.IOB)){
+					if(n.getSource().getInstance().getType().equals(SiteType.get("IOB"))){
 						IOBSource = true;
 						break;
 					}
@@ -428,8 +430,8 @@ public class HardMacroGenerator {
 	private void handleIOSERDES(){
 		// Remove ISERDES/OSERDES
 		for(Instance inst : design.getInstances()){
-			if(inst.getType().equals(SiteType.ISERDES) ||
-			   inst.getType().equals(SiteType.OSERDES)){
+			if(inst.getType().equals(SiteType.get("ISERDES")) ||
+			   inst.getType().equals(SiteType.get("OSERDES"))){
 				instancesToRemove.add(inst);
 			}
 			boolean foundBadInstance = false;
@@ -464,7 +466,7 @@ public class HardMacroGenerator {
 		int uniqueGL = 100000;
 		for(Net net : design.getNets()){
 			if(net.isStaticNet()){
-				if(net.getSource().getInstance().getType().equals(SiteType.TIEOFF) || net.getSource().getInstance().getName().contains("XDL_DUMMY_CLB")){
+				if(net.getSource().getInstance().getType().equals(SiteType.get("TIEOFF")) || net.getSource().getInstance().getName().contains("XDL_DUMMY_CLB")){
 					instancesToRemove.add(net.getSource().getInstance());
 					netsToRemove.add(net);
 
@@ -528,11 +530,11 @@ public class HardMacroGenerator {
  		for(Instance inst: hardMacro.getInstances()){
 			// Check for illegal instances in hard macro
 			if(forbiddenTypes.contains(inst.getType())){
-				if(inst.getType().equals(SiteType.DCM_ADV) && inst.getName().startsWith("XIL_ML_UNUSED_DCM")){
+				if(inst.getType().equals(SiteType.get("DCM_ADV")) && inst.getName().startsWith("XIL_ML_UNUSED_DCM")){
 					System.out.println("Error: " + inst.getType().toString() + ", " + inst.getName() +
 					" found in hard macro.  This is a bug that needs to be fixed.");
 				}
-				else if(!inst.getType().equals(SiteType.DCM_ADV)){
+				else if(!inst.getType().equals(SiteType.get("DCM_ADV"))){
 					System.out.println("Error: " + inst.getType().toString() + ", " + inst.getName() +
 					" found in hard macro.  This is a bug that needs to be fixed.");
 				}
@@ -594,7 +596,7 @@ public class HardMacroGenerator {
 	 */
 	private Pin isNetOutputofBUFG(Net net) {
 		if(net.getSource() != null){
-			return net.getSource().getInstance().getType().equals(SiteType.BUFG) ? net.getSource() : null;
+			return net.getSource().getInstance().getType().equals(SiteType.get("BUFG")) ? net.getSource() : null;
 		}else{
 			return null;
 		}
@@ -607,8 +609,8 @@ public class HardMacroGenerator {
 	 */
 	private Pin isNetConnectedToDCMOrPMV(Net net) {
 		for(Pin pin : net.getPins()){
-			if((pin.getInstance().getType().equals(SiteType.DCM_ADV) && pin.getInstanceName().startsWith("XIL_ML_UNUSED_DCM"))||
-					pin.getInstance().getType().equals(SiteType.PMV)){
+			if((pin.getInstance().getType().equals(SiteType.get("DCM_ADV")) && pin.getInstanceName().startsWith("XIL_ML_UNUSED_DCM"))||
+					pin.getInstance().getType().equals(SiteType.get("PMV"))){
 				return pin;
 			}
 		}
@@ -623,7 +625,7 @@ public class HardMacroGenerator {
 	private Instance createRegisterSlice(String name){
 		Instance inst = new Instance();
 		inst.setName(name);
-		inst.setType(SiteType.SLICEL);
+		inst.setType(SiteType.get("SLICEL"));
 		if(design.getExactFamilyName().contains("virtex4")){
 			inst.getAttributes().add(new Attribute("DYMUX","","BY"));
 			inst.getAttributes().add(new Attribute("FFY","","#FF"));
@@ -663,9 +665,9 @@ public class HardMacroGenerator {
 	 * @return True if the pin is connected to an IOB, false otherwise.
 	 */
 	private boolean isPinConnectedToIOB(Pin pin){
-		if(pin.getInstance().getType().equals(SiteType.IOB)||
-			pin.getInstance().getType().equals(SiteType.IOBM)||
-			pin.getInstance().getType().equals(SiteType.IOBS)){
+		if(pin.getInstance().getType().equals(SiteType.get("IOB"))||
+			pin.getInstance().getType().equals(SiteType.get("IOBM"))||
+			pin.getInstance().getType().equals(SiteType.get("IOBS"))){
 			return true;
 		}
 		return false;
@@ -726,7 +728,7 @@ public class HardMacroGenerator {
 				if(net.getSource() == null){
 					failAndExit("This net does not have a source: " + net);
 				}
-				if(!net.getSource().getInstance().getType().equals(SiteType.TIEOFF)){
+				if(!net.getSource().getInstance().getType().equals(SiteType.get("TIEOFF"))){
 					failAndExit("1. This case is unexpected. Talk to Chris about getting it implemented.");
 				}
 				
@@ -774,7 +776,7 @@ public class HardMacroGenerator {
 				// Check if this net drives the BUFG, if so, we don't want to create any ports
 				// We'll do that with the output of the BUFG
 				for(Pin p : net.getPins()){
-					if(p.getInstance().getType().equals(SiteType.BUFG)){
+					if(p.getInstance().getType().equals(SiteType.get("BUFG"))){
 						netsToRemove.add(net);
 						return;
 					}
@@ -791,7 +793,7 @@ public class HardMacroGenerator {
 			else{
 				// Check if this is a static net
 				if(net.isStaticNet()){
-					if(!net.getSource().getInstance().getType().equals(SiteType.TIEOFF)){
+					if(!net.getSource().getInstance().getType().equals(SiteType.get("TIEOFF"))){
 						failAndExit("2. This case is unexpected. Talk to Chris about getting it implemented.");
 					}
 					
@@ -884,7 +886,7 @@ public class HardMacroGenerator {
 		boolean containsBUFG = false;
 		Pin bufgPin = null;
 		for(Pin p : net.getPins()){
-			if(p.getInstance().getType().equals(SiteType.BUFG)){
+			if(p.getInstance().getType().equals(SiteType.get("BUFG"))){
 				containsBUFG = true;
 				bufgPin = p;
 			}
@@ -916,8 +918,8 @@ public class HardMacroGenerator {
 		HashSet<Site> sliceLocations = new HashSet<>();
 		// Find all used SLICEs in the current design 
 		for(Instance inst : design.getInstances()){
-			if(inst.getType().equals(SiteType.SLICEL) ||
-					inst.getType().equals(SiteType.SLICEM)){
+			if(inst.getType().equals(SiteType.get("SLICEL")) ||
+					inst.getType().equals(SiteType.get("SLICEM"))){
 				sliceLocations.add(inst.getPrimitiveSite());
 				if(!inst.getName().contains("slice")){
 					xAvg += inst.getInstanceX();
@@ -928,8 +930,8 @@ public class HardMacroGenerator {
 		}
 		// Also includes SLICEs that will be added to the design
 		for(Instance inst : instancesToAdd){
-			if(inst.getType().equals(SiteType.SLICEL) ||
-					inst.getType().equals(SiteType.SLICEM)){
+			if(inst.getType().equals(SiteType.get("SLICEL")) ||
+					inst.getType().equals(SiteType.get("SLICEM"))){
 				sliceLocations.add(inst.getPrimitiveSite());
 				if(!inst.getName().contains("slice")){
 					xAvg += inst.getInstanceX();
@@ -1016,7 +1018,7 @@ public class HardMacroGenerator {
 	private Instance createStaticSliceSource(NetType netType){
 		Instance inst = new Instance();
 		inst.setName("RS_DUMMY_CLB");
-		inst.setType(SiteType.SLICEL);
+		inst.setType(SiteType.get("SLICEL"));
 		if(design.getExactFamilyName().contains("virtex4")){
 			inst.getAttributes().add(new Attribute("G","","#LUT:D=" + (netType.equals(NetType.GND) ? "0" :"1")));
 			inst.getAttributes().add(new Attribute("YUSED","","0"));
@@ -1035,7 +1037,7 @@ public class HardMacroGenerator {
 	private Instance createPassThruSlice(){
 		Instance inst = new Instance();
 		inst.setName("XDL_LUT");
-		inst.setType(SiteType.SLICEL);
+		inst.setType(SiteType.get("SLICEL"));
 		if(design.getExactFamilyName().contains("virtex4")){
 			inst.getAttributes().add(new Attribute("YUSED","","0"));
 			inst.getAttributes().add(new Attribute("G","","#LUT:D=A1"));			

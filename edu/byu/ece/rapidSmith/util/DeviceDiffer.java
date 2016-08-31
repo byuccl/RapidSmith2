@@ -349,8 +349,8 @@ public class DeviceDiffer {
 		// site sources and sinks causing upstream counnections to be maintained
 		WireType goldWireType = weGold.getWireType(wc.getWire());
 		WireType testWireType = weTest.getWireType(weTest.getWireEnum(weGold.getWireName(wc.getWire())));
-		if ((goldWireType == WireType.SITE_SOURCE || goldWireType == WireType.SITE_SINK) &&
-				!(testWireType == WireType.SITE_SOURCE || testWireType == WireType.SITE_SINK))
+		if ((goldWireType == WireType.get("SITE_SOURCE") || goldWireType == WireType.get("SITE_SINK")) &&
+				!(testWireType == WireType.get("SITE_SOURCE") || testWireType == WireType.get("SITE_SINK")))
 			return true;
 
 		return false;
@@ -361,8 +361,8 @@ public class DeviceDiffer {
 		// site sources and sinks and not LONG like they should have been
 		String sinkName = weTest.getWireName(wc.getWire());
 		WireType goldWireType = weGold.getWireType(weGold.getWireEnum(sinkName));
-		if ((goldWireType == WireType.SITE_SOURCE || goldWireType == WireType.SITE_SINK) &&
-				weTest.getWireType(weTest.getWireEnum(sinkName)) == WireType.LONG)
+		if ((goldWireType == WireType.get("SITE_SOURCE") || goldWireType == WireType.get("SITE_SINK")) &&
+				weTest.getWireType(weTest.getWireEnum(sinkName)) == WireType.get("LONG"))
 			return true;
 
 		return false;

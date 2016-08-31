@@ -47,7 +47,7 @@ public class HelloWorld{
 		// Create a new instance
 		Instance myInstance = new Instance();
 		myInstance.setName("Bob");
-		myInstance.setType(SiteType.SLICEL);
+		myInstance.setType(SiteType.get("SLICEL"));
 		// We need to add the instance to the design so it knows about it
 		design.addInstance(myInstance);
 		// Make the F LUT an Inverter Gate
@@ -91,7 +91,7 @@ public class HelloWorld{
 		// Let's create an IOB to drive our Inverter gate in Bob's LUT
 		Instance myIOB = new Instance();
 		myIOB.setName("input");
-		myIOB.setType(SiteType.IOB);
+		myIOB.setType(SiteType.get("IOB"));
 		design.addInstance(myIOB);
 		// These are typical attributes that need to be set to configure the IOB
 		// the way you like it

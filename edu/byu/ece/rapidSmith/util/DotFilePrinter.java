@@ -359,7 +359,7 @@ public class DotFilePrinter {
 		dotBuilder.append("    label=" + site.getName() + ";\n");
 	
 		// format a slice to make it look good
-		if (site.getType() == SiteType.SLICEL || site.getType() == SiteType.SLICEM ) {
+		if (site.getType() == SiteType.get("SLICEL") || site.getType() == SiteType.get("SLICEM") ) {
 			formatSliceCluster(site, design.getCellsAtSite(site));
 		}
 		else {

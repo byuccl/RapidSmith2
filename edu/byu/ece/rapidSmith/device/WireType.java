@@ -20,29 +20,56 @@
  */
 package edu.byu.ece.rapidSmith.device;
 
-/**
- * The types of the different wires.
- */
-public enum WireType {
-	OMUX,
-	OMUX_OUTPUT,
-	DOUBLE,
-	DOUBLE_TURN,
-	TRIPLE,
-	TRIPLE_TURN,
-	PENT,
-	PENT_TURN,
-	HEX,
-	HEPT,
-	HEPT_TURN,
-	LONG,
-	BOUNCE,
-	INT_SINK,
-	INT_SOURCE,
-	INT_CONN,
-	TO_BUFG,
-	SITE_SINK,
-	SITE_SOURCE,
-	INTRASITE,
-	OTHER,
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public final class WireType {
+	private final String name;
+	private final int ordinal;
+
+	private WireType(String name, int ordinal) {
+		this.name = name;
+		this.ordinal = ordinal;
+	}
+
+	public String name() {
+		return name;
+	}
+
+	public int ordinal() {
+		return ordinal;
+	}
+
+	@Override
+	public String toString() {
+		return "WireType." + name;
+	}
+
+	private static final HashMap<String, WireType> types = new HashMap<>();
+	private static int count = 0;
+
+	public static synchronized WireType get(String name) {
+		// synchronized to allow parallel accesses.
+		// WireTypes should be case independent
+		String upper = name.toUpperCase();
+		WireType type = types.get(upper);
+
+		// if it doesn't already exist, create it and store it
+		if (type == null) {
+			type = new WireType(upper, count++);
+			types.put(name, type);
+		}
+
+		return type;
+	}
+
+	public static synchronized WireType valueOf(String name) {
+		return types.get(name.toUpperCase());
+	}
+
+	public static ArrayList<WireType> values() {
+		return new ArrayList<>(types.values());
+	}
 }
+
+

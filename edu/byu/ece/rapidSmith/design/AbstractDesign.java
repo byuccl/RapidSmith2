@@ -125,57 +125,58 @@ public abstract class AbstractDesign implements Serializable {
 		return PartNameTools.getFamilyTypeFromPart(partName);
 	}
 
+	// TODO move this to family info?
 	static {
 		sliceTypes = new HashSet<>();
-		sliceTypes.add(SiteType.SLICE);
-		sliceTypes.add(SiteType.SLICEL);
-		sliceTypes.add(SiteType.SLICEM);
-		sliceTypes.add(SiteType.SLICEX);
+		sliceTypes.add(SiteType.get("SLICE"));
+		sliceTypes.add(SiteType.get("SLICEL"));
+		sliceTypes.add(SiteType.get("SLICEM"));
+		sliceTypes.add(SiteType.get("SLICEX"));
 
 		dspTypes = new HashSet<>();
-		dspTypes.add(SiteType.DSP48);
-		dspTypes.add(SiteType.DSP48A);
-		dspTypes.add(SiteType.DSP48A1);
-		dspTypes.add(SiteType.DSP48E);
-		dspTypes.add(SiteType.DSP48E1);
-		dspTypes.add(SiteType.MULT18X18);
-		dspTypes.add(SiteType.MULT18X18SIO);
+		dspTypes.add(SiteType.get("DSP48"));
+		dspTypes.add(SiteType.get("DSP48A"));
+		dspTypes.add(SiteType.get("DSP48A1"));
+		dspTypes.add(SiteType.get("DSP48E"));
+		dspTypes.add(SiteType.get("DSP48E1"));
+		dspTypes.add(SiteType.get("MULT18X18"));
+		dspTypes.add(SiteType.get("MULT18X18SIO"));
 
 		bramTypes = new HashSet<>();
-		bramTypes.add(SiteType.BLOCKRAM);
-		bramTypes.add(SiteType.FIFO16);
-		bramTypes.add(SiteType.FIFO18E1);
-		bramTypes.add(SiteType.FIFO36_72_EXP);
-		bramTypes.add(SiteType.FIFO36_EXP);
-		bramTypes.add(SiteType.FIFO36E1);
-		bramTypes.add(SiteType.RAMB16);
-		bramTypes.add(SiteType.RAMB16BWE);
-		bramTypes.add(SiteType.RAMB16BWER);
-		bramTypes.add(SiteType.RAMB18E1);
-		bramTypes.add(SiteType.RAMB18X2);
-		bramTypes.add(SiteType.RAMB18X2SDP);
-		bramTypes.add(SiteType.RAMB36_EXP);
-		bramTypes.add(SiteType.RAMB36E1);
-		bramTypes.add(SiteType.RAMB36SDP_EXP);
-		bramTypes.add(SiteType.RAMB8BWER);
-		bramTypes.add(SiteType.RAMBFIFO18);
-		bramTypes.add(SiteType.RAMBFIFO18_36);
-		bramTypes.add(SiteType.RAMBFIFO36);
-		bramTypes.add(SiteType.RAMBFIFO36E1);
+		bramTypes.add(SiteType.get("BLOCKRAM"));
+		bramTypes.add(SiteType.get("FIFO16"));
+		bramTypes.add(SiteType.get("FIFO18E1"));
+		bramTypes.add(SiteType.get("FIFO36_72_EXP"));
+		bramTypes.add(SiteType.get("FIFO36_EXP"));
+		bramTypes.add(SiteType.get("FIFO36E1"));
+		bramTypes.add(SiteType.get("RAMB16"));
+		bramTypes.add(SiteType.get("RAMB16BWE"));
+		bramTypes.add(SiteType.get("RAMB16BWER"));
+		bramTypes.add(SiteType.get("RAMB18E1"));
+		bramTypes.add(SiteType.get("RAMB18X2"));
+		bramTypes.add(SiteType.get("RAMB18X2SDP"));
+		bramTypes.add(SiteType.get("RAMB36_EXP"));
+		bramTypes.add(SiteType.get("RAMB36E1"));
+		bramTypes.add(SiteType.get("RAMB36SDP_EXP"));
+		bramTypes.add(SiteType.get("RAMB8BWER"));
+		bramTypes.add(SiteType.get("RAMBFIFO18"));
+		bramTypes.add(SiteType.get("RAMBFIFO18_36"));
+		bramTypes.add(SiteType.get("RAMBFIFO36"));
+		bramTypes.add(SiteType.get("RAMBFIFO36E1"));
 
 		iobTypes = new HashSet<>();
-		iobTypes.add(SiteType.IOB);
-		iobTypes.add(SiteType.IOB18);
-		iobTypes.add(SiteType.IOB18M);
-		iobTypes.add(SiteType.IOB18S);
-		iobTypes.add(SiteType.IOB33);
-		iobTypes.add(SiteType.IOB33M);
-		iobTypes.add(SiteType.IOB33S);
-		iobTypes.add(SiteType.IOB_USB);
-		iobTypes.add(SiteType.IOBLR);
-		iobTypes.add(SiteType.IOBM);
-		iobTypes.add(SiteType.IOBS);
-		iobTypes.add(SiteType.LOWCAPIOB);
+		iobTypes.add(SiteType.get("IOB"));
+		iobTypes.add(SiteType.get("IOB18"));
+		iobTypes.add(SiteType.get("IOB18M"));
+		iobTypes.add(SiteType.get("IOB18S"));
+		iobTypes.add(SiteType.get("IOB33"));
+		iobTypes.add(SiteType.get("IOB33M"));
+		iobTypes.add(SiteType.get("IOB33S"));
+		iobTypes.add(SiteType.get("IOB_USB"));
+		iobTypes.add(SiteType.get("IOBLR"));
+		iobTypes.add(SiteType.get("IOBM"));
+		iobTypes.add(SiteType.get("IOBS"));
+		iobTypes.add(SiteType.get("LOWCAPIOB"));
 	}
 
 }

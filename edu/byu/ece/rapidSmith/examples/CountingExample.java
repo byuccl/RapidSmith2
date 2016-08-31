@@ -47,18 +47,18 @@ public class CountingExample {
 	static{
 		wireTypesOfInterest = new HashSet<WireType>();
 		// Example: Virtex 4 & 5 wire types
-		wireTypesOfInterest.add(WireType.DOUBLE);
-		wireTypesOfInterest.add(WireType.DOUBLE_TURN);
-		wireTypesOfInterest.add(WireType.TRIPLE);
-		wireTypesOfInterest.add(WireType.TRIPLE_TURN);
-		wireTypesOfInterest.add(WireType.PENT);
-		wireTypesOfInterest.add(WireType.PENT_TURN);
-		wireTypesOfInterest.add(WireType.HEX);
-		wireTypesOfInterest.add(WireType.HEPT);
-		wireTypesOfInterest.add(WireType.HEPT_TURN);
-		// TODO - Add support for long lines which can be driven from multiple 		
+		wireTypesOfInterest.add(WireType.get("DOUBLE"));
+		wireTypesOfInterest.add(WireType.get("DOUBLE_TURN"));
+		wireTypesOfInterest.add(WireType.get("TRIPLE"));
+		wireTypesOfInterest.add(WireType.get("TRIPLE_TURN"));
+		wireTypesOfInterest.add(WireType.get("PENT"));
+		wireTypesOfInterest.add(WireType.get("PENT_TURN"));
+		wireTypesOfInterest.add(WireType.get("HEX"));
+		wireTypesOfInterest.add(WireType.get("HEPT"));
+		wireTypesOfInterest.add(WireType.get("HEPT_TURN"));
+		// TODO - Add support for long lines which can be driven from multiple
 	}
-	
+
 	/**
 	 * Counts all the switch matrices used based on assigned PIPs.
 	 * @param nets The nets to analyze.
@@ -80,12 +80,12 @@ public class CountingExample {
 		}
 		return tiles.size();
 	}
-	
+
 	/**
 	 * Counts the number of wires used based on their resource length.
-	 * Note: This method assumes that the nets are valid and routed 
+	 * Note: This method assumes that the nets are valid and routed
 	 * without sharing resources.
-	 * 
+	 *
 	 * @param nets Nets to analyze
 	 * @return
 	 */
@@ -94,7 +94,7 @@ public class CountingExample {
 		HashSet<TileType> intTypes = null;
 		Device dev = null;
 		// points
-		
+
 		for(Net n : nets){
 			if(intTypes == null) {
 				// TODO Looks like getSwitchMatrixTypes should be static
@@ -105,10 +105,10 @@ public class CountingExample {
 				countWire(p.getStartWire(), wireCounts, dev);
 				countWire(p.getEndWire(), wireCounts, dev);
 			}
-		}		
+		}
 		return wireCounts;
 	}
-	
+
 	/**
 	 * Helper function to countUsedWireLengths() to eliminate code duplication
 	 * in counting wire types
@@ -120,8 +120,8 @@ public class CountingExample {
 		WireEnumerator we = dev.getWireEnumerator();
 		WireType pipWireType = we.getWireType(pipWire);
 		if(wireTypesOfInterest.contains(pipWireType)){
-			// If a wire name has BEG in it, this is the only entry 
-			// point to drive the resource, long lines 
+			// If a wire name has BEG in it, this is the only entry
+			// point to drive the resource, long lines
 			// have multiple points
 			if(we.getWireName(pipWire).contains("BEG")){
 				Integer count = wireCounts.get(pipWireType);
@@ -132,7 +132,7 @@ public class CountingExample {
 				}
 			}
 		}
-		if(pipWireType.equals(WireType.LONG)){
+		if(pipWireType.equals(WireType.get("LONG"))){
 			// TODO
 		}		
 	}

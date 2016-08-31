@@ -20,63 +20,56 @@
  */
 package edu.byu.ece.rapidSmith.util;
 
-/**
- * These names are taken from the Xilinx tool 'partgen.'  They are the
- * architecture names given, however, here they are called the family name. 
- * See the PartNameTools class for supporting methods.
- * @author Chris Lavin
- */
-public enum FamilyType{
-	AARTIX7,
-	ARTIX7,
-	ARTIX7L,
-	ASPARTAN2E,
-	ASPARTAN3,
-	ASPARTAN3A,
-	ASPARTAN3ADSP,
-	ASPARTAN3E,
-	ASPARTAN6,
-	AZYNQ,
-	KINTEX7,
-	KINTEX7L,
-	QARTIX7,
-	QKINTEX7,
-	QKINTEX7L,
-	QRVIRTEX,
-	QRVIRTEX2,
-	QRVIRTEX4,
-	QRVIRTEX5,
-	QRVIRTEX6,
-	QRVIRTEX7,
-	QSPARTAN6,
-	QSPARTAN6L,
-	QVIRTEX,
-	QVIRTEX2,
-	QVIRTEX2P,
-	QVIRTEX4,
-	QVIRTEX5,
-	QVIRTEX6,
-	QVIRTEX6L,
-	QVIRTEX7,
-	QVIRTEXE,
-	QZYNQ,
-	SPARTAN2,
-	SPARTAN2E,
-	SPARTAN3,
-	SPARTAN3A,
-	SPARTAN3ADSP,
-	SPARTAN3E,
-	SPARTAN6,
-	SPARTAN6L,
-	VIRTEX,
-	VIRTEX2,
-	VIRTEX2P,
-	VIRTEX4,
-	VIRTEX5,
-	VIRTEX6,
-	VIRTEX6L,
-	VIRTEX7,
-	VIRTEX7L,
-	VIRTEXE,
-	ZYNQ
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public final class FamilyType {
+	private final String name;
+	private final int ordinal;
+
+	private FamilyType(String name, int ordinal) {
+		this.name = name;
+		this.ordinal = ordinal;
+	}
+
+	public String name() {
+		return name;
+	}
+
+	public int ordinal() {
+		return ordinal;
+	}
+
+	@Override
+	public String toString() {
+		return "FamilyType." + name;
+	}
+
+	private static final HashMap<String, FamilyType> types = new HashMap<>();
+	private static int count = 0;
+
+	public static synchronized FamilyType get(String name) {
+		// synchronized to allow parallel accesses.
+		// FamilyTypes should be case independent
+		String upper = name.toUpperCase();
+		FamilyType type = types.get(upper);
+
+		// if it doesn't already exist, create it and store it
+		if (type == null) {
+			type = new FamilyType(upper, count++);
+			types.put(name, type);
+		}
+
+		return type;
+	}
+
+	public static synchronized FamilyType valueOf(String name) {
+		return types.get(name.toUpperCase());
+	}
+
+	public static ArrayList<FamilyType> values() {
+		return new ArrayList<>(types.values());
+	}
 }
+
+

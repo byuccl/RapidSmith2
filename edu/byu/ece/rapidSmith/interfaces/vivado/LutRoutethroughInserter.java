@@ -73,8 +73,8 @@ public class LutRoutethroughInserter {
 		// add to the qualifitedSiteTypes as needed
 		this.qualifiedSiteTypes = new HashSet<SiteType>( 
 			Arrays.asList(
-				SiteType.SLICEL, 
-				SiteType.SLICEM
+				SiteType.get("SLICEL"),
+				SiteType.get("SLICEM")
 			)
 		);
 	}
@@ -103,7 +103,7 @@ public class LutRoutethroughInserter {
 	}
 	
 	private Collection<RoutethroughConfiguration> getRoutethroughConfigurations(Site site) {
-		return site.getType() == SiteType.SLICEL ? 
+		return site.getType() == SiteType.get("SLICEL") ?
 					getSliceLRoutethroughConfigurations() :
 					getSliceMRoutethroughConfigurations();
 	}
