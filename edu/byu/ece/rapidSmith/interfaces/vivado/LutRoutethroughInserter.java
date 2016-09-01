@@ -30,7 +30,9 @@ import edu.byu.ece.rapidSmith.device.WireEnumerator;
  * routethrough without placing a cell on it, but that is an internal operation <br>
  * this needs to be done to import routes correctly back into Vivado. 
  *  
- * TODO: This is focused on the series 7 slice architecture for now
+ * TODO: Update this to ignore Lut's that are used as a VCC or GND source <br>
+ * TODO: This is focused on the series 7 slice architecture for now <br>
+ * 
  * @author Thomas Townsend
  *
  */
