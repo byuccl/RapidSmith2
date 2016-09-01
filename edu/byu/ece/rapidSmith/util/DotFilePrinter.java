@@ -5,9 +5,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
@@ -24,6 +25,7 @@ import edu.byu.ece.rapidSmith.device.SiteType;
  * You can learn more about the format of DOT files at the following link: <br>
  * <a href="http://www.graphviz.org/Documentation/dotguide.pdf">Dot Guide</a>
  * 
+ * TODO: add max fanout to constructor
  * TODO: add assertions throughout the code
  * 
  * @author Thomas Townsend
@@ -36,6 +38,7 @@ public class DotFilePrinter {
 	private BufferedWriter outputStream; 
 	private final Map<String,String> dotProperties; 
 	private CellDesign design;
+	private static final int MAX_FANOUT = 10;
 	
 	/**
 	 * Creates a new DotFilePrinter for the specified CellDesign
@@ -167,7 +170,12 @@ public class DotFilePrinter {
 		return dotBuilder.toString();
 	}
 	
-	
+	/**
+	 * 
+	 * @param outputFile
+	 * @param site
+	 * @throws IOException
+	 */
 	public void printSiteDotString(String outputFile, Site site) throws IOException {
 		outputStream = new BufferedWriter(new FileWriter(outputFile));
 		outputStream.write(getSiteDotString(site));
@@ -186,81 +194,11 @@ public class DotFilePrinter {
 				
 		// add the dot file header
 		dotBuilder.append("digraph " + design.getName() + "{\n");
+		
 		formatGraphProperties();
-		
-		// create blank nodes
-		for (Cell cell: design.getCellsAtSite(site)) {
-			for (CellNet net : cell.getNetList()) {
-				CellPin source = net.getSourcePin();
-				
-				if (source.getCell().isVccSource() || source.getCell().isGndSource() || net.getSinkPins().size() == 0 || net.getSinkPins().size() > 10) {
-					continue;
-				}
-				
-				if (!isCellPinInSite(source, site) && !nodeIds.containsKey(source.getFullName())) {
-					int id = nodeIds.size();
-					nodeIds.put(source.getFullName(), id);
-					dotBuilder.append("  " + id + " [style=invis];\n");
-				}
-				
-				for (CellPin cellPin : net.getSinkPins()) {
-					if (!isCellPinInSite(cellPin, site) && !nodeIds.containsKey(cellPin.getFullName())) {
-						int id = nodeIds.size();
-						nodeIds.put(cellPin.getFullName(), id);
-						dotBuilder.append("  " + id + " [style=invis];\n");
-					}
-				}
-			}
-		}
-				
+		formatBlankNodes(site);
 		formatSiteCluster(site);
-
-		HashSet<CellNet> processedNets = new HashSet<CellNet>();
-		
-		for (Cell cell: design.getCellsAtSite(site)) {
-			
-			if (cell.isVccSource() || cell.isGndSource()) {
-				continue;
-			}
-			
-			for (CellNet net: cell.getNetList()) {
-				
-				boolean sourceInSite = false;
-				
-				if (processedNets.contains(net) || net.getSinkPins().size() == 0 || net.getSinkPins().size() > 10) {
-					continue;
-				}
-								
-				CellPin source = net.getSourcePin();
-				
-				if (source == null || source.getCell().isVccSource() || source.getCell().isGndSource()) {
-					continue;
-				}
-				
-				if (!isCellPinInSite(source, site)) {
-					dotBuilder.append(String.format("  %d:e->", nodeIds.get(source.getFullName())));
-				}
-				else {
-					sourceInSite = true; 
-					dotBuilder.append(String.format("  %d:%d:e->", nodeIds.get(source.getCell().getName()), 
-															   nodeIds.get(source.getFullName())));
-				}
-				
-				StringJoiner joiner = new StringJoiner(",");
-				for (CellPin sinkPin : net.getSinkPins()) {
-					if (sinkPin.getCell().getAnchorSite().equals(site)) {
-						joiner.add(String.format("%d:%d", nodeIds.get(sinkPin.getCell().getName()), 
-														  nodeIds.get(sinkPin.getFullName())));
-					}
-					else if (sourceInSite) {
-						joiner.add(nodeIds.get(sinkPin.getFullName()).toString() + ":w");
-					}
-				}
-				
-				dotBuilder.append(joiner.toString() + ";\n");
-				processedNets.add(net);
-			}
-		}
+		formatSiteNets(site);
 		
 		dotBuilder.append("}");
 		
@@ -279,7 +217,7 @@ public class DotFilePrinter {
 		
 		for(String key : dotProperties.keySet()) {
 			String value = dotProperties.get(key);
-			dotBuilder.append(String.format("  %s=%s\n", key, value));
+			dotBuilder.append(String.format("  %s=%s;\n", key, value));
 		}
 	}
 	
@@ -379,31 +317,158 @@ public class DotFilePrinter {
 		StringBuilder cellBuilder = new StringBuilder();
 		StringBuilder ffBuilder = new StringBuilder();
 		
-		
 		// TODO: test to see if I need to add a unique number to each of the clusters 
 		lutBuilder.append("    subgraph clusterLUT {\n" );
 		lutBuilder.append("      style=invis\n");
-				
+		
+		cellBuilder.append("    subgraph clusterMid {\n" );
+		cellBuilder.append("      style=invis\n");
+		
 		ffBuilder.append("    subgraph clusterFF {\n" );
 		ffBuilder.append("      style=invis\n");
+				
+		Cell lutCell = null;
+		Cell middleCell = null;
+		Cell ffCell = null;
 		
 		for (Cell cell : cellsAtSite) {
 			if (cell.getLibCell().isLut()) {
 				formatCell(cell, lutBuilder, "      ");
+				lutCell = cell;
 			}
 			else if (cell.getAnchor().getName().contains("FF")) {
 				formatCell(cell, ffBuilder, "      ");
+				ffCell = cell;
 			}
 			else { // basic cell
-				formatCell(cell, cellBuilder, "    ");
+				formatCell(cell, cellBuilder, "      ");
+				middleCell = cell;
 			}
 		}
 		
 		lutBuilder.append("    }\n");
+		cellBuilder.append("    }\n");		
 		ffBuilder.append("    }\n");
 
 		dotBuilder.append(lutBuilder.toString());
 		dotBuilder.append(cellBuilder.toString());
 		dotBuilder.append(ffBuilder.toString());
+		
+		formatSliceLayout(lutCell, middleCell, ffCell);
 	}
-}
+	
+	/*
+	 * Adds invisible edges so that the LUTs are displayed to the left, the FF are displayed
+	 * to the right, and everything else is displayed in the middle for a slice.
+	 */
+	private void formatSliceLayout(Cell lutCell, Cell middleCell, Cell ffCell) {
+		// add invisible edges to create desired layout
+		if (lutCell != null) {		
+			if (middleCell != null) {
+				dotBuilder.append(String.format("    %d->%d [lhead=clusterLUT, ltail=clusterMid, style=invis];\n", 
+												nodeIds.get(lutCell.getName()), nodeIds.get(middleCell.getName())));
+			}
+			else if (ffCell != null) {
+				dotBuilder.append(String.format("    %d->%d [lhead=clusterLUT, ltail=clusterFF style=invis];\n", 
+												nodeIds.get(lutCell.getName()), nodeIds.get(ffCell.getName())));
+			}
+		}
+		
+		if (ffCell != null && middleCell != null) {
+			dotBuilder.append(String.format("    %d->%d [lhead=clusterMid, ltail=clusterFF, style=invis];\n", 
+											nodeIds.get(middleCell.getName()), nodeIds.get(ffCell.getName())));
+		}
+	}
+	
+	/*
+	 * 
+	 */
+	private void formatBlankNodes(Site site) {
+		
+		for (CellNet net : getUniqueNetsAtSite(site)) {		
+			
+			if(!isNetQualifiedForSiteView(net)){
+				continue;
+			}
+
+			CellPin source = net.getSourcePin();
+			if (!isCellPinInSite(source, site)) {
+				createBlankNode(source.getFullName());
+			}
+			
+			for (CellPin cellPin : net.getSinkPins()) {
+				if (!isCellPinInSite(cellPin, site)) {
+					createBlankNode(cellPin.getFullName());
+				}
+			}
+		}
+	}
+	
+	private Set<CellNet> getUniqueNetsAtSite(Site site) {
+		return design.getCellsAtSite(site).stream()
+				.flatMap(x->x.getNetList().stream())
+				.collect(Collectors.toSet());
+	}
+	
+	private boolean isNetQualifiedForSiteView(CellNet net) {
+		
+		CellPin source = net.getSourcePin(); 
+		return source != null &&
+				!source.getCell().isGndSource() &&
+				!source.getCell().isVccSource() &&
+				net.getSinkPins().size() > 0 &&
+				net.getSinkPins().size() < MAX_FANOUT; 
+	}
+	
+	private boolean createBlankNode(String nodeName) {
+		
+		if(nodeIds.containsKey(nodeName)) {
+			return false;
+		}
+	
+		int id = nodeIds.size();
+		nodeIds.put(nodeName, id);
+		dotBuilder.append("  " + id + " [style=invis];\n");
+		
+		return true;
+	}
+	
+	/*
+	 * This function will only print the nets attached to the specified site
+	 */
+	private void formatSiteNets(Site site) {
+		
+		for (CellNet net : getUniqueNetsAtSite(site)) {
+		
+			if (!isNetQualifiedForSiteView(net)) {
+				continue;
+			}
+			
+			// format source
+			boolean sourceInSite = false;
+			CellPin source = net.getSourcePin();
+			if (isCellPinInSite(source, site)) {
+				sourceInSite = true; 
+				dotBuilder.append(String.format("  %d:%d:e->", nodeIds.get(source.getCell().getName()), 
+															   nodeIds.get(source.getFullName())));
+			}
+			else {
+				dotBuilder.append(String.format("  %d:e->", nodeIds.get(source.getFullName())));
+			}
+			
+			// format sinks
+			StringJoiner joiner = new StringJoiner(",");
+			for (CellPin sinkPin : net.getSinkPins()) {
+				if (isCellPinInSite(sinkPin, site)) {
+					joiner.add(String.format("%d:%d", nodeIds.get(sinkPin.getCell().getName()), 
+													  nodeIds.get(sinkPin.getFullName())));
+				}
+				else if (sourceInSite) {
+					joiner.add(nodeIds.get(sinkPin.getFullName()).toString() + ":w");
+				}
+			}
+			
+			dotBuilder.append(joiner.toString() + ";\n");
+		}
+	}
+ }
