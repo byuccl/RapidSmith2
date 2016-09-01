@@ -302,8 +302,8 @@ public final class EdifInterface {
 		// TODO: copy old edif environment properties into new edif environment properties
 		EdifEnvironment edifEnvironment = new EdifEnvironment(createEdifNameable(design.getName()));
 		edifEnvironment.setAuthor("BYU CCL");
-		edifEnvironment.setProgram("RapidSmith2");
-		edifEnvironment.setVersion("1.0.0"); // TODO: replace this with the current RS2 version
+		edifEnvironment.setProgram("RapidSmith");
+		edifEnvironment.setVersion("2.0.0");
 		edifEnvironment.setDateWithCurrentTime();
 		EdifLibraryManager libManager = edifEnvironment.getLibraryManager();
 				
