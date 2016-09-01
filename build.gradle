@@ -1,0 +1,30 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+
+group 'edu.byu.ece'
+version '2.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile fileTree(dir: 'jars', include: ['*.jar'])
+    compile 'com.caucho:hessian:4.0.38'
+    compile 'org.antlr:antlr4-runtime:4.5.3'
+    compile 'org.jdom:jdom2:2.0.6'
+    compile 'net.sourceforge.argparse4j:argparse4j:0.7.0'
+    compile 'net.sf.jopt-simple:jopt-simple:5.0.2'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.hamcrest:java-hamcrest:2.0.0.0'
+}
+
