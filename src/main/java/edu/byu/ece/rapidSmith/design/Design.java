@@ -20,21 +20,11 @@
  */
 package edu.byu.ece.rapidSmith.design;
 
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
-import edu.byu.ece.rapidSmith.design.parser.DesignParser;
-import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.WireEnumerator;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -67,8 +57,6 @@ public class Design extends AbstractDesign {
 	private HashMap<String,Net> nets;
 	/** A flag designating if this is a design or hard macro */
 	private boolean isHardMacro;
-	/**  This is the actual part database device for the design specified by partName */
-	private transient Device dev;
 
 	/** This is the special design name used by Xilinx to denote an XDL design as a hard macro */
 	public static final String hardMacroDesignName = "__XILINX_NMC_MACRO";
@@ -112,24 +100,6 @@ public class Design extends AbstractDesign {
 	}
 
 	/**
-	 * @deprecated replaced by <code>Design(Path)</code>.
-	 */
-	@Deprecated
-	public Design(String xdlFileName){
-		this(Paths.get(xdlFileName));
-	}
-
-	/**
-	 * Constructs a design loaded from the specified XDL file.
-	 *
-	 * @param xdlFilePath path to the XDL file
-	 */
-	public Design(Path xdlFilePath) {
-		this();
-		loadXDLFile(xdlFilePath);
-	}
-
-	/**
 	 * Sets the part name and loads the device.
 	 * The part name should include package and speed grade (ex. xc4vfx12ff668-10).
 	 * @param partName name of the Xilinx FPGA part.
@@ -137,53 +107,8 @@ public class Design extends AbstractDesign {
 	@Override
 	public void setPartName(String partName) {
 		super.setPartName(partName);
-		loadDevice();
 	}
-
-	/**
-	 * Returns the device specific to this part.
-	 * This should be the same device loaded with the XDL design file.
-	 *
-	 * @return the device specific to this design's part
-	 */
-	public Device getDevice() {
-		return dev;
-	}
-
-	/**
-	 * Returns the wire enumerator specific to this part.
-	 * This should be the wire enumerator associated with the same device loaded
-	 * with the XDL design file.
-	 *
-	 * @return the wire enumerator specific to this design's part
-	 */
-	public WireEnumerator getWireEnumerator() {
-		return dev.getWireEnumerator();
-	}
-
-	/**
-	 * Sets the device specific to this part.
-	 * Generally only used by the parser when loading a design, but could be used
-	 * to convert a design to a different part (among a host of other transformations).
-	 *
-	 * @param dev the device to set this design with
-	 */
-	public void setDevice(Device dev) {
-		this.dev = dev;
-	}
-
-	private void loadDevice(){
-		dev = RapidSmithEnv.getDefaultEnv().getDevice(partName);
-	}
-
-	/**
-	 * @deprecated device is loaded by default
-	 */
-	@Deprecated
-	public void loadDeviceAndWireEnumerator() {
-		loadDevice();
-	}
-
+	
 	/**
 	 * Returns the NCD version present in the XDL design.
 	 * The NCD version defaults to 3.2 unless overwritten.
@@ -653,13 +578,6 @@ public class Design extends AbstractDesign {
 	}
 
 	/**
-	 * Clears out all the used sites in the design, use with caution.
-	 */
-	public void clearUsedPrimitiveSites(){
-		usedPrimitiveSites.clear();
-	}
-
-	/**
 	 * Unroutes the current design by removing all PIPs.
 	 */
 	public void unrouteDesign(){
@@ -689,158 +607,5 @@ public class Design extends AbstractDesign {
 			}
 		}
 		modules.clear();
-	}
-
-	/**
-	 * @deprecated replaced with <code>loadXDLFile(Path)</code>
-	 */
-	public void loadXDLFile(String fileName){
-		loadXDLFile(Paths.get(fileName));
-	}
-
-	/**
-	 * Loads this instance of design with the XDL design found in
-	 * the specified file.
-	 * @param filePath the path to the XDL file to load
-	 */
-	public void loadXDLFile(Path filePath) {
-		DesignParser parser = new DesignParser(filePath.toString());
-		parser.setDesign(this);
-		parser.parseXDL();
-	}
-
-	/**
-	 * Saves the XDL design to a minimalist XDL file.  This is the same
-	 * as saveXDLFile(fileName, false);
-	 * @param fileName name of the file to save the design to
-	 */
-	public void saveXDLFile(String fileName){
-		saveXDLFile(Paths.get(fileName), false);
-	}
-
-	/**
-	 * Saves the XDL design to a minimalist XDL file.  This is the same
-	 * as saveXDLFile(fileName, false);
-	 * @param filePath path to the file to save the design to
-	 */
-	public void saveXDLFile(Path filePath) {
-		saveXDLFile(filePath, false);
-	}
-
-	public float getMaxClkPeriodOfModuleInstances(){
-		float maxModulePeriod = 0.0f;
-		int missingClockRate = 0;
-		for(ModuleInstance mi : getModuleInstances()){
-			float currModuleClkPeriod = mi.getModule().getMinClkPeriod();
-			if(currModuleClkPeriod != Float.MAX_VALUE){
-				if(currModuleClkPeriod > maxModulePeriod)
-					maxModulePeriod = currModuleClkPeriod;
-			}
-			else{
-				missingClockRate++;
-			}
-		}
-		return maxModulePeriod;
-	}
-
-	public String getMaxClkPeriodOfModuleInstancesReport(){
-		String nl = System.getProperty("line.separator");
-		float maxModulePeriod = 0.0f;
-		int missingClockRate = 0;
-		for(ModuleInstance mi : getModuleInstances()){
-			float currModuleClkPeriod = mi.getModule().getMinClkPeriod();
-			if(currModuleClkPeriod != Float.MAX_VALUE){
-				if(currModuleClkPeriod > maxModulePeriod)
-					maxModulePeriod = currModuleClkPeriod;
-			}
-			else{
-				missingClockRate++;
-			}
-		}
-		StringBuilder sb = new StringBuilder(nl + "Theoretical Min Clock Period: " +
-				String.format("%6.3f", maxModulePeriod) +
-				" ns (" + 1000.0f*(1/maxModulePeriod) +" MHz)" + nl);
-		if(missingClockRate > 0){
-			sb.append("  (Although, ").append(missingClockRate).append(" module instances did not have min clock period stored)").append(nl);
-		}
-
-		return sb.toString();
-	}
-
-	/**
-	 * @deprecated replaced by <code>saveXDLFile(Path, boolean)</code>
-	 */
-	@Deprecated
-	public void saveXDLFile(String fileName, boolean addComments) {
-		saveXDLFile(Paths.get(fileName), addComments);
-	}
-
-	/**
-	 * Saves the XDL design with PIPs and optional comments.
-	 * @param filePath path to the file to save the design to
-	 * @param addComments adds the same comments found in XDL designs created by the
-	 * Xilinx xdl tool if true, otherwise no comments are added
-	 */
-	public void saveXDLFile(Path filePath, boolean addComments) {
-		saveXDLFile(filePath, addComments, true);
-	}
-
-	/**
-	 * Saves the XDL design with optional comments.
-	 * @param filePath path to the file to save the design to
-	 * @param addComments adds the same comments found in XDL designs created by the
-	 * Xilinx xdl tool if true, otherwise no comments are added
-	 * @param addPips true if PIPs should be written or false to ignore them
-	 */
-	public void saveXDLFile(Path filePath, boolean addComments, boolean addPips) {
-		String nl = System.lineSeparator();
-		BufferedWriter bw = null;
-		try {
-			bw = Files.newBufferedWriter(filePath, Charset.defaultCharset());
-			XDLOutputter outputter = new XDLOutputter();
-			outputter.output(this, bw);
-		} catch (IOException e) {
-			MessageGenerator.briefError("Error writing XDL file: " +
-					filePath.toString() + File.separator + e.getMessage());
-		} finally {
-			try {
-				if (bw != null)
-					bw.close();
-			} catch (IOException ignored) { }
-		}
-	}
-
-	/**
-	 * @deprecated replaced with <code>saveXDLFileWithoutPIPs(Path)</code>
-	 */
-	public void saveXDLFileWithoutPIPs(String fileName){
-		saveXDLFileWithoutPIPs(Paths.get(fileName));
-	}
-
-	/**
-	 * Saves the design to XDL without comments or PIPs.
-	 * @param filePath the path to the file to write
-	 */
-	public void saveXDLFileWithoutPIPs(Path filePath) {
-		saveXDLFile(filePath, false, false);
-	}
-
-	/**
-	 *
-	 * @deprecated replaced with <code>saveComparableXDLFile(Path)</code>
-	 */
-	@Deprecated
-	public void saveComparableXDLFile(String fileName){
-		saveComparableXDLFile(Paths.get(fileName));
-	}
-
-	/**
-	 * Saves an XDL file in a manner that is easily comparable with another.
-	 * Namely, all instances, nets, pins, etc are alphabetically ordered.  This
-	 * method is equivalent to saveXDLFile(filePath, true)
-	 * @param filePath the path to file to write to
-	 */
-	public void saveComparableXDLFile(Path filePath) {
-		saveXDLFile(filePath, true);
 	}
 }

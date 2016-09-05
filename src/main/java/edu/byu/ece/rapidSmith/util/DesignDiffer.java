@@ -21,6 +21,7 @@
 package edu.byu.ece.rapidSmith.util;
 
 import edu.byu.ece.rapidSmith.design.*;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -28,6 +29,7 @@ import joptsimple.OptionSet;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Function;
@@ -740,7 +742,7 @@ public class DesignDiffer {
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		OptionParser parser = new OptionParser();
 		parser.acceptsAll(Arrays.asList("output", "o"), "Output file, stdout if not specified").withRequiredArg();
 		parser.accepts("match_sites", "Match instances based on site, assumes placed circuit");
@@ -769,8 +771,10 @@ public class DesignDiffer {
 			System.exit(-1);
 		}
 
-		Design design1 = new Design(Paths.get((String) options.nonOptionArguments().get(0)));
-		Design design2 = new Design(Paths.get((String) options.nonOptionArguments().get(1)));
+		Path path1 = Paths.get((String) options.nonOptionArguments().get(0));
+		Path path2 = Paths.get((String) options.nonOptionArguments().get(1));
+		Design design1 = new XDLReader().readDesign(path1);
+		Design design2 = new XDLReader().readDesign(path2);
 
 		DesignDiffer designDiffer = new DesignDiffer();
 		if (options.has("match_sites"))

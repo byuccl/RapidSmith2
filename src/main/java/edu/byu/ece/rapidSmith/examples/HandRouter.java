@@ -23,14 +23,21 @@ package edu.byu.ece.rapidSmith.examples;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import edu.byu.ece.rapidSmith.design.*;
 import edu.byu.ece.rapidSmith.device.*;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;
 import edu.byu.ece.rapidSmith.router.Node;
 import edu.byu.ece.rapidSmith.util.FileConverter;
+import edu.byu.ece.rapidSmith.util.FileTools;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
+
+import static edu.byu.ece.rapidSmith.util.FileTools.getFileExtension;
 
 /**
  * This class is an example of how to do some simple routing by hand. It
@@ -53,18 +60,17 @@ public class HandRouter{
 	 * Initialize the HandRouter with the design
 	 * @param inputFileName The input file to load
 	 */
-	public HandRouter(String inputFileName){
-		design = new Design();
+	public HandRouter(String inputFileName) throws IOException {
+		Path inputFile = Paths.get(inputFileName);
 		
 		// Check if we are loading an NCD file, convert accordingly
-		if(inputFileName.toLowerCase().endsWith("ncd")){
-			inputFileName = FileConverter.convertNCD2XDL(inputFileName);
-		}
-		
+		if(Objects.equals(getFileExtension(inputFile), "ncd"))
+			inputFile = FileConverter.convertNCD2XDL(inputFile);
+
 		// Load the design 
-		design.loadXDLFile(Paths.get(inputFileName));
+		design = new XDLReader().readDesign(inputFile);
 		dev = design.getDevice();
-		we = design.getWireEnumerator();
+		we = dev.getWireEnumerator();
 
 		// Delete the temporary XDL file, if needed
 		//FileTools.deleteFile(inputFileName); 
@@ -235,21 +241,22 @@ public class HandRouter{
 	 * Saves the design to a file.
 	 * @param outputFileName
 	 */
-	private void saveDesign(String outputFileName){
-		if(outputFileName.toLowerCase().endsWith("ncd")){
-			String xdlFileName = outputFileName+"temp.xdl";
-			design.saveXDLFile(Paths.get(xdlFileName), true);
-			FileConverter.convertXDL2NCD(xdlFileName, outputFileName);
+	private void saveDesign(String outputFileName) throws IOException {
+		Path outputFile = Paths.get(outputFileName);
+		if(Objects.equals(getFileExtension(outputFile), "ncd")) {
+			Path xdlFile = Paths.get(outputFileName+"temp.xdl");
+			new XDLWriter().writeXDL(design, xdlFile);
+			FileConverter.convertXDL2NCD(xdlFile, outputFile);
 
 			// Delete the temporary XDL file, if needed
 			//FileTools.deleteFile(xdlFileName); 
 		}
 		else{
-			design.saveXDLFile(Paths.get(outputFileName), true);
+			new XDLWriter().writeXDL(design, outputFile);
 		}
 	}
 	
-	public static void main(String[] args){
+	public static void main(String[] args) throws IOException {
 		if(args.length != 2){
 			MessageGenerator.briefMessageAndExit("USAGE: <input.xdl|input.ncd> <output.xdl|output.ncd>");
 		}

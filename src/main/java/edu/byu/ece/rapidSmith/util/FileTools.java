@@ -112,19 +112,37 @@ public class FileTools {
 
 	/**
 	 * Takes a file name and removes everything after the last '.' inclusive
-	 * @param fileName The input file name 
+	 * @param path The input file name
 	 * @return the substring of fileName if it contains a '.', it returns fileName otherwise
 	 */
-	public static String removeFileExtension(String fileName){
-		int endIndex = fileName.lastIndexOf('.');
+	public static Path removeFileExtension(Path path){
+		String asString = path.toString();
+		int endIndex = asString.lastIndexOf('.');
 		if(endIndex != -1){
-			return fileName.substring(0, endIndex);
+			path = Paths.get(asString.substring(0, endIndex));
 		}
-		else{
-			return fileName;
+		return path;
+	}
+
+	public static Path replaceFileExtension(Path path, String newExtension) {
+		String asString = path.toString();
+		int endIndex = asString.lastIndexOf('.');
+		if(endIndex != -1) {
+			asString = asString.substring(0, endIndex);
+		}
+		return Paths.get( + '.' + newExtension);
+	}
+
+	public static String getFileExtension(Path path) {
+		String asString = path.toString();
+		int endIndex = asString.lastIndexOf('.');
+		if(endIndex != -1) {
+			return asString.substring(endIndex + 1);
+		} else {
+			return null;
 		}
 	}
-	
+
 	/**
 	 * Creates a directory in the current path called dirName.
 	 * @param dirName Name of the directory to be created.
