@@ -32,6 +32,7 @@ import edu.byu.ece.rapidSmith.design.Design;
 import edu.byu.ece.rapidSmith.design.Instance;
 import edu.byu.ece.rapidSmith.design.Net;
 import edu.byu.ece.rapidSmith.design.Pin;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 public class TraceReportParser{
@@ -61,9 +62,8 @@ public class TraceReportParser{
 		return pathOffsets;
 	}
 
-	public void parseTWR(String twrFileName, String xdlFileName){
-		design = new Design();
-		design.loadXDLFile(Paths.get(xdlFileName));
+	public void parseTWR(String twrFileName, String xdlFileName) throws IOException {
+		design = new XDLReader().readDesign(Paths.get(xdlFileName));
 		parseTWR(twrFileName, design);
 	}
 	
@@ -273,7 +273,7 @@ public class TraceReportParser{
 	}
 	
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		TraceReportParser test = new TraceReportParser();
 		test.parseTWR(args[0], args[1]);
 		

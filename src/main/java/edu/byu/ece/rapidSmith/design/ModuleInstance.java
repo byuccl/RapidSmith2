@@ -271,7 +271,7 @@ public class ModuleInstance{
 		//=======================================================//
 		/* Place net at new location                             */
 		//=======================================================//
-		WireEnumerator we = design.getWireEnumerator();
+		WireEnumerator we = design.getDevice().getWireEnumerator();
 		int mCout = we.getWireEnum("M_COUT");
 		int llCout = we.getWireEnum("LL_COUT");
 		int wl5beg_s0 = we.getWireEnum("WL5BEG_S0");

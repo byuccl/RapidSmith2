@@ -20,16 +20,19 @@
  */
 package edu.byu.ece.rapidSmith.placer;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Random;
 import edu.byu.ece.rapidSmith.design.*;
 import edu.byu.ece.rapidSmith.device.*;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 public class RandomPlacer{
-  public static void main(String[] args){
+  public static void main(String[] args) throws IOException {
     // Create and load a design
-    Design design = new Design(Paths.get(args[0]));
+    Design design = new XDLReader().readDesign(Paths.get(args[0]));
 
     // Create a random number generator
     Random rng = new Random(0);
@@ -49,7 +52,7 @@ public class RandomPlacer{
     }
     
     // Save the placed design
-    design.saveXDLFile(args[1]);
+    new XDLWriter().writeXDL(design, Paths.get(args[1]));
   }
 }
 

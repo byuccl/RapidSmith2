@@ -20,6 +20,7 @@
  */
 package edu.byu.ece.rapidSmith.router;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,6 +31,8 @@ import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.design.Pin;
 import edu.byu.ece.rapidSmith.device.WireConnection;
 import edu.byu.ece.rapidSmith.device.WireDirection;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 /**
@@ -295,7 +298,7 @@ public class BasicRouter extends AbstractRouter{
 				(System.nanoTime() - start) / 1000000000.0);
 	}
 	
-	public static void main(String[] args){
+	public static void main(String[] args) throws IOException {
 		long[] runtimes = new long[4];
 		String nl = System.getProperty("line.separator");
 		runtimes[0] = runtimes[1] = System.nanoTime();
@@ -306,8 +309,7 @@ public class BasicRouter extends AbstractRouter{
 		
 		// Initialize router and load design and device
 		BasicRouter router = new BasicRouter();
-		router.design = new Design();
-		router.design.loadXDLFile(Paths.get(args[0]));
+		router.design = new XDLReader().readDesign(Paths.get(args[0]));
 		router.dev = router.design.getDevice();
 
 		runtimes[1] = System.nanoTime() - runtimes[1];
@@ -320,7 +322,7 @@ public class BasicRouter extends AbstractRouter{
 		runtimes[3] = System.nanoTime();
 		
 		// Save routed design to XDL file
-		router.design.saveXDLFile(Paths.get(args[1]), true);
+		new XDLWriter().writeXDL(router.design, Paths.get(args[1]));
 		
 		runtimes[3] = System.nanoTime() - runtimes[3];
 		runtimes[0] = System.nanoTime() - runtimes[0];

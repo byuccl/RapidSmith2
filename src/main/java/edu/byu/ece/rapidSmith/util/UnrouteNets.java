@@ -20,6 +20,7 @@
  */
 package edu.byu.ece.rapidSmith.util;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +29,8 @@ import edu.byu.ece.rapidSmith.design.Design;
 import edu.byu.ece.rapidSmith.design.Net;
 import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.design.Pin;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;
 
 
 public class UnrouteNets {
@@ -83,20 +86,15 @@ public class UnrouteNets {
 	}
 	
 	
-	public static void main(String[] args){
+	public static void main(String[] args) throws IOException {
 		if(args.length != 2){
 			System.out.println("USAGE: <input.xdl> <output.xdl>");
 			System.exit(0);
 		}
-		Design design = new Design();
-		
-		design.loadXDLFile(Paths.get(args[0]));
-		
+		Design design = new XDLReader().readDesign(Paths.get(args[0]));
 		design.unrouteDesign();
-		
 		design.setNets(combineStaticNets(design.getNets()));
-		
-		design.saveXDLFile(args[1]);
+		new XDLWriter().writeXDL(design, Paths.get(args[1]));
 	}
 	
 }

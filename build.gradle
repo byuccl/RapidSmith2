@@ -9,8 +9,14 @@ sourceCompatibility = '1.8'
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'ch.raffael.gradlePlugins.antlr4:gradle-antlr4-plugin:1.0'
     }
 }
+
+apply plugin:'ch.raffael.antlr4'
 
 repositories {
     mavenCentral()
@@ -26,5 +32,25 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:java-hamcrest:2.0.0.0'
+}
+
+antlr4 {
+    // The version of the ANTLR tool to use; you can mix these
+    // using the runtimePackage argument
+    version = '4.5.3'
+
+    // what to generate
+    listener = true
+    visitor = false
+
+    // what package to find the runtime classes in;
+    // best used with preshadow
+    runtimePackage = 'org.antlr.v4.runtime'
+
+//    // where to put the generated classes
+//    destination = "$buildDir/antlr4/src"
+//
+//    // where to put intermediate files
+//    generateDir = "$buildDir/antlr4/gen"
 }
 
