@@ -30,6 +30,7 @@ import com.trolltech.qt.gui.QPainterPath;
 import com.trolltech.qt.gui.QPen;
 
 import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.gui.TileScene;
 import edu.byu.ece.rapidSmith.timing.PathDelay;
 
@@ -37,33 +38,35 @@ public class DesignTileScene extends TileScene {
 
 	private QPen wirePen;
 	private ArrayList<PathItem> currLines;
-	
+
 	private float minDelay = Float.MAX_VALUE;
-	
+
 	private float maxDelay = Float.MIN_VALUE;
-	
+
 	public DesignTileScene(){
 		super();
-		currLines = new ArrayList<PathItem>();
+		currLines = new ArrayList<>();
 		wirePen = new QPen(QColor.yellow, 0.75, PenStyle.SolidLine);
 	}
-	
+
 	public DesignTileScene(Device device, boolean hideTiles, boolean drawPrimitives){
 		super(device, hideTiles, drawPrimitives);
-		currLines = new ArrayList<PathItem>();
+		currLines = new ArrayList<>();
 		wirePen = new QPen(QColor.yellow, 0.25, PenStyle.SolidLine);
 	}
-	
-	
-	public void drawPath(ArrayList<Connection> conns, PathDelay pd){
+
+
+	public void drawPath(ArrayList<WireJunction> conns, PathDelay pd){
 		double enumSize = we.getWires().length;
 		QPainterPath path = new QPainterPath();
-		
-		for(Connection conn : conns){
-			double x1 = (double) tileXMap.get(conn.startTile)*tileSize  + (conn.startWire%tileSize);
-			double y1 = (double) tileYMap.get(conn.startTile)*tileSize  + (conn.startWire*tileSize)/enumSize;
-			double x2 = (double) tileXMap.get(conn.endTile)*tileSize  + (conn.endWire%tileSize);
-			double y2 = (double) tileYMap.get(conn.endTile)*tileSize  + (conn.endWire*tileSize)/enumSize;
+
+		for(WireJunction conn : conns){
+			Wire startWire = conn.getStartWire();
+			Wire endWire = conn.getEndWire();
+			double x1 = (double) tileXMap.get(startWire.getTile())*tileSize  + (startWire.getWireEnum()%tileSize);
+			double y1 = (double) tileYMap.get(startWire.getTile())*tileSize  + (startWire.getWireEnum()*tileSize)/enumSize;
+			double x2 = (double) tileXMap.get(endWire.getTile())*tileSize  + (endWire.getWireEnum()%tileSize);
+			double y2 = (double) tileYMap.get(endWire.getTile())*tileSize  + (endWire.getWireEnum()*tileSize)/enumSize;
 
 			path.moveTo(x1, y1);
 			path.lineTo(x2, y2);
@@ -75,16 +78,16 @@ public class DesignTileScene extends TileScene {
 		item.setZValue(20);
 		addItem(item);
 		currLines.add(item);
-		
+
 		item.setToolTip(pd.getSource() + " to \n" + pd.getDestination() + "\n (" + String.format("%.3f", pd.getDelay()) + "ns)");
 		if(pd.getDelay() > maxDelay){
 			maxDelay = pd.getDelay();
 		}
 		else if(pd.getDelay() < minDelay){
 			minDelay = pd.getDelay();
-		}	
+		}
 	}
-	
+
 	public void sortPaths(){
 		PathItem[] paths = new PathItem[currLines.size()];
 		paths = currLines.toArray(paths);
@@ -113,7 +116,7 @@ public class DesignTileScene extends TileScene {
 		addItem(line);
 		currLines.add(line);
 	}*/
-	
+
 	/**
 	 * @return the currLines
 	 */
