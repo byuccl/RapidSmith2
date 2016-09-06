@@ -139,7 +139,7 @@ public class DeviceBrowserScene extends TileScene{
 				for(Connection c : currWire.getWireConnections()){
 					Wire w = c.getSinkWire();
 					queue.add(w);
-					level.put(w, lev);
+					level.put(w, lev+1);
 				}
 			}
 		}
