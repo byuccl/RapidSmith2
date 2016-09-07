@@ -32,6 +32,7 @@ import edu.byu.ece.rapidSmith.design.Instance;
 import edu.byu.ece.rapidSmith.design.Net;
 import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.device.Site;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 import edu.byu.ece.rapidSmith.router.Node;
 
 /**
@@ -137,14 +138,13 @@ public class XDLDesignChecker{
 		}		
 	}
 		
-	public static void main(String[] args){
+	public static void main(String[] args) throws IOException {
 		if(args.length != 1){
 			MessageGenerator.briefMessageAndExit("USAGE: <input.xdl>");
 		}
 
-		Design design = new Design();
-		design.loadXDLFile(Paths.get(args[0]));
-		
+		Design design = new XDLReader().readDesign(Paths.get(args[0]));
+
 		// Check for unique placement of primitives
 		MessageGenerator.printHeader("CHECKING FOR UNIQUE PRIMITIVE PLACEMENTS ... ");
 		HashMap<Site, Instance> usedSites = new HashMap<Site, Instance>();

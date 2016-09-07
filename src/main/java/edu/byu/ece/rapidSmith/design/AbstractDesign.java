@@ -1,6 +1,8 @@
 package edu.byu.ece.rapidSmith.design;
 
+import edu.byu.ece.rapidSmith.RapidSmithEnv;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
+import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.util.FamilyType;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
@@ -26,6 +28,7 @@ public abstract class AbstractDesign implements Serializable {
 	// use partName instead of device here to allow speed grade to be specified
 	/**  This is the Xilinx part, package and speed grade that this design targets */
 	protected String partName;
+	protected Device device;
 
 	public AbstractDesign() {
 		partName = null;
@@ -75,6 +78,11 @@ public abstract class AbstractDesign implements Serializable {
 	 */
 	public void setPartName(String partName) {
 		this.partName = partName;
+		this.device = RapidSmithEnv.getDefaultEnv().getDevice(partName);
+	}
+
+	public Device getDevice() {
+		return device;
 	}
 
 	/**

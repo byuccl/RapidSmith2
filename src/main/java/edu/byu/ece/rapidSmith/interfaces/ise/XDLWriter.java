@@ -1,13 +1,17 @@
-package edu.byu.ece.rapidSmith.design;
+package edu.byu.ece.rapidSmith.interfaces.ise;
 
+import edu.byu.ece.rapidSmith.design.*;
 import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.util.FileTools;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
-public class XDLOutputter {
+public class XDLWriter {
 	private String nl = System.lineSeparator();
 	private boolean addComments = true;
 	private boolean addPips = true;
@@ -15,22 +19,28 @@ public class XDLOutputter {
 	private Design design;
 	private Writer out;
 
-	public XDLOutputter setLineSeparator(String lineSeparator) {
+	public XDLWriter setLineSeparator(String lineSeparator) {
 		nl = lineSeparator;
 		return this;
 	}
 
-	public XDLOutputter addComments(boolean c) {
+	public XDLWriter addComments(boolean c) {
 		this.addComments = c;
 		return this;
 	}
 
-	public XDLOutputter addPips(boolean p) {
+	public XDLWriter addPips(boolean p) {
 		this.addPips = p;
 		return this;
 	}
 
-	public void output(Design design, Writer out) throws IOException {
+	public void writeXDL(Design design, Path file) throws IOException {
+		try (Writer writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
+			writeXDL(design, writer);
+		}
+	}
+
+	public void writeXDL(Design design, Writer out) throws IOException {
 		this.design = design;
 		this.out = out;
 		writeHeader();

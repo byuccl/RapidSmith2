@@ -20,12 +20,15 @@
  */
 package edu.byu.ece.rapidSmith.examples;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
 import edu.byu.ece.rapidSmith.design.*;
 import edu.byu.ece.rapidSmith.device.*;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;
 
 /**
  * A simple class to illustrate how to use some of the basic methods in RapidSmith.
@@ -33,7 +36,7 @@ import edu.byu.ece.rapidSmith.device.*;
  */
 public class HelloWorld{
 
-	public static void main(String[] args){
+	public static void main(String[] args) throws IOException {
 		// Create a new Design from scratch rather than load an existing design
 		Design design = new Design();
 		
@@ -116,12 +119,11 @@ public class HelloWorld{
 		// Now let's write out our new design
 		// We'll print the standard XDL comments out
 		String fileName = design.getName() +".xdl";
-		design.saveXDLFile(Paths.get(fileName), true);
-		
+		new XDLWriter().writeXDL(design, Paths.get(fileName));
+
 		// We can load XDL files the same way.
-		Design inputFromFile = new Design();
-		inputFromFile.loadXDLFile(Paths.get(fileName));
-		
+		Design inputFromFile = new XDLReader().readDesign(Paths.get(fileName));
+
 		// Hello World
 		System.out.println(inputFromFile.getName());
 	}

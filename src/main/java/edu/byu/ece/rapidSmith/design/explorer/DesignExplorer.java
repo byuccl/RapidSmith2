@@ -28,11 +28,13 @@ import edu.byu.ece.rapidSmith.design.Design;
 import edu.byu.ece.rapidSmith.design.explorer.FilterWindow.FilterType;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.gui.FileFilters;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 import edu.byu.ece.rapidSmith.timing.PathDelay;
 import edu.byu.ece.rapidSmith.timing.PathOffset;
 import edu.byu.ece.rapidSmith.timing.TraceReportParser;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
@@ -118,7 +120,7 @@ public class DesignExplorer extends QMainWindow{
 	 * @param fileToOpen The name of the design to open
 	 * @param traceFileToOpen Name of the trace report file (TWR) to load 
 	 */
-	public DesignExplorer(QWidget parent, String fileToOpen, String traceFileToOpen){
+	public DesignExplorer(QWidget parent, String fileToOpen, String traceFileToOpen) {
 		super(parent);
 		
 		setupFileActions();
@@ -148,17 +150,25 @@ public class DesignExplorer extends QMainWindow{
 		tabs.addTab(moduleInstanceWindow, MODULE_INSTANCES);
 		
 		if(fileToOpen != null){
-			internalOpenDesign(fileToOpen);
+			try {
+				internalOpenDesign(fileToOpen);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		if(traceFileToOpen != null){
 			internalLoadDesignTimingInfo(traceFileToOpen);
 		}
 		
-		if(currOpenFileName == null){
-        	openDesign();
-        }
-		// Set the opening default window size to 1024x768 pixels
+		if(currOpenFileName == null) {
+			try {
+				openDesign();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			// Set the opening default window size to 1024x768 pixels
+		}
 		resize(1024, 768);
 	}
 
@@ -182,7 +192,7 @@ public class DesignExplorer extends QMainWindow{
 	/**
 	 * Opens a file chooser dialog to load an XDL file.
 	 */
-	protected void openDesign(){
+	protected void openDesign() throws IOException {
 		String fileName = QFileDialog.getOpenFileName(this, "Choose a file...",
 				".", FileFilters.xdlFilter);
 		if(fileName.endsWith(".xdl")){
@@ -225,7 +235,7 @@ public class DesignExplorer extends QMainWindow{
 	 * Loads the XDL design fileName into the design explorer.
 	 * @param fileName Name of the XDL file to load.
 	 */
-	private void internalOpenDesign(String fileName){
+	private void internalOpenDesign(String fileName) throws IOException {
 		currOpenFileName = fileName;
 		String shortFileName = fileName.substring(fileName.lastIndexOf('/')+1);
 		QProgressDialog progress = new QProgressDialog("Loading "+currOpenFileName+"...", "", 0, 100, this);
@@ -235,9 +245,8 @@ public class DesignExplorer extends QMainWindow{
 		progress.show();
 		progress.setValue(0);	
 		progress.setValue(10);
-		design = new Design();
 		progress.setValue(20);
-		design.loadXDLFile(Paths.get(fileName));
+		design = new XDLReader().readDesign(Paths.get(fileName));
 		progress.setValue(50);
 		device = design.getDevice();
 		progress.setValue(70);
