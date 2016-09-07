@@ -22,40 +22,42 @@ package edu.byu.ece.rapidSmith.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class FileConverter {
 	
 	/**
 	 * Converts the file called ncdFileName to XDL with a file by the same name
 	 * but with an .xdl extension.
-	 * @param ncdFileName The NCD file to convert
+	 * @param ncdFile The NCD file to convert
 	 * @return Name of the output XDL file, or null if conversion failed.
 	 */
-	public static String convertNCD2XDL(String ncdFileName){
-		String xdlFileName = FileTools.removeFileExtension(ncdFileName) + ".xdl";
-		boolean success = convertNCD2XDL(ncdFileName, xdlFileName);
+	public static Path convertNCD2XDL(Path ncdFile){
+		Path xdlFileName = FileTools.replaceFileExtension(ncdFile, "xdl");
+		boolean success = convertNCD2XDL(ncdFile, xdlFileName);
 		return success ? xdlFileName : null;
 	}
 
 	/**
 	 * Converts the file called nmcFileName to XDL with a file by the same name
 	 * but with an .xdl extension.
-	 * @param nmcFileName The NMC file to convert
+	 * @param nmcFile The NMC file to convert
 	 * @return Name of the output XDL file.
 	 */
-	public static String convertNMC2XDL(String nmcFileName){
-		String xdlFileName = FileTools.removeFileExtension(nmcFileName) + ".xdl";
-		boolean success = convertNCD2XDL(nmcFileName, xdlFileName);
-		return success ? xdlFileName : null;
+	public static Path convertNMC2XDL(Path nmcFile){
+		Path xdlFile = FileTools.replaceFileExtension(nmcFile, "xdl");
+		boolean success = convertNCD2XDL(nmcFile, xdlFile);
+		return success ? xdlFile : null;
 	}
 
 	/**
 	 * Converts the file called ngcFileName to EDIF with the name ndfFileName
-	 * @param ngcFileName The input NGC file name
-	 * @param ndfFileName The output NDF file name
+	 * @param ngcFile The input NGC file name
+	 * @param ndfFile The output NDF file name
 	 */
-	public static boolean convertNGC2NDF(String ngcFileName, String ndfFileName){
-		String command = "ngc2edif " + ngcFileName + " " + ndfFileName + " -w";
+	public static boolean convertNGC2NDF(Path ngcFile, Path ndfFile){
+		String command = "ngc2edif " + ngcFile + " " + ndfFile + " -w";
 		// Generate XDL
 		try {
 			Process p = Runtime.getRuntime().exec(command);
@@ -83,22 +85,22 @@ public class FileConverter {
 	/**
 	 * Converts the file called ncdFileName to an NDF with a file by the same name
 	 * but with an .ndf extension. 
-	 * @param ngcFileName The NGC file to convert.
+	 * @param ngcFile The NGC file to convert.
 	 * @return The output file name.
 	 */
-	public static String convertNGC2NDF(String ngcFileName){
-		String ndfFileName = FileTools.removeFileExtension(ngcFileName) + ".ndf";
-		convertNGC2NDF(ngcFileName, ndfFileName);
-		return ndfFileName;
+	public static Path convertNGC2NDF(Path ngcFile){
+		Path ndfFile = FileTools.replaceFileExtension(ngcFile, "ndf");
+		convertNGC2NDF(ngcFile, ndfFile);
+		return ndfFile;
 	}	
 	
 	/**
 	 * Converts the file called ncdFileName to XDL with the name xdlFileName
-	 * @param ncdFileName The input NCD file name
-	 * @param xdlFileName The output XDL file name
+	 * @param ncdFile The input NCD file name
+	 * @param xdlFile The output XDL file name
 	 */
-	public static boolean convertNCD2XDL(String ncdFileName, String xdlFileName){
-		String command = "xdl -ncd2xdl " + ncdFileName + " " + xdlFileName;
+	public static boolean convertNCD2XDL(Path ncdFile, Path xdlFile){
+		String command = "xdl -ncd2xdl " + ncdFile + " " + xdlFile;
 		// Generate XDL
 		try {
 			Process p = Runtime.getRuntime().exec(command);
@@ -126,52 +128,52 @@ public class FileConverter {
 	/**
 	 * Converts the file called xdlFileName to an NCD with a file by the same name
 	 * but with an .ncd extension. 
-	 * @param xdlFileName The XDL file to convert.
+	 * @param xdlFile The XDL file to convert.
 	 * @return Name of the output NCD file or null if conversion failed.
 	 */
-	public static String convertXDL2NCD(String xdlFileName){
-		String ncdFileName = FileTools.removeFileExtension(xdlFileName) + ".ncd";
-		boolean success = convertXDL2NCD(xdlFileName, ncdFileName);
-		return success ? ncdFileName : null;
+	public static Path convertXDL2NCD(Path xdlFile){
+		Path ncdFile = FileTools.replaceFileExtension(xdlFile, "ncd");
+		boolean success = convertXDL2NCD(xdlFile, ncdFile);
+		return success ? ncdFile : null;
 	}
 	
 	/**
 	 * Converts the file called xdlFileName to an NMC with a file by the same name
 	 * but with an .nmc extension. Note that this will always have 1 error with Virtex 4
 	 * parts as they will never contain all DCMs configured.  This error can be ignored.
-	 * @param xdlFileName The XDL file to convert.
+	 * @param xdlFile The XDL file to convert.
 	 * @return Name of the output NMC file.
 	 */
-	public static String convertXDL2NMC(String xdlFileName){
-		String nmcFileName = FileTools.removeFileExtension(xdlFileName) + ".nmc";
-		boolean success = convertXDL2NCD(xdlFileName, nmcFileName);
+	public static Path convertXDL2NMC(Path xdlFile){
+		Path nmcFileName = FileTools.replaceFileExtension(xdlFile, "nmc");
+		boolean success = convertXDL2NCD(xdlFile, nmcFileName);
 		return success ? nmcFileName : null;
 	}
 
 	
 	/**
 	 * Converts xdlFileName to an NCD file called ncdFileName.  It uses the -force option by default.
-	 * @param xdlFileName The input XDL file
-	 * @param ncdFileName The output NCD file
+	 * @param xdlFile The input XDL file
+	 * @param ncdFile The output NCD file
 	 * @return True if operation was successful, false otherwise.
 	 */
-	public static boolean convertXDL2NCD(String xdlFileName, String ncdFileName){
-		return convertXDL2NCD(xdlFileName, ncdFileName, false);
+	public static boolean convertXDL2NCD(Path xdlFile, Path ncdFile){
+		return convertXDL2NCD(xdlFile, ncdFile, false);
 	}
 	
 	/**
 	 * Converts xdlFileName to an NCD file called ncdFileName.  It uses the 
 	 * -force option by default.
-	 * @param xdlFileName The input XDL file
-	 * @param ncdFileName The output NCD file
+	 * @param xdlFile The input XDL file
+	 * @param ncdFile The output NCD file
 	 * @param useLegacyTools Flag indicating if the method should use the 
 	 * legacy xdl tool (10.1 or earlier as specified by environment variable
 	 *  XILINX_LEGACY_PATH. If the environment variable is not set, it defaults
 	 *  to regular tools on PATH.
 	 * @return True if operation was successful, false otherwise.
 	 */
-	public static boolean convertXDL2NCD(String xdlFileName, String ncdFileName, boolean useLegacyTools){
-		String command = "xdl -xdl2ncd -force " + xdlFileName + " " + ncdFileName;
+	public static boolean convertXDL2NCD(Path xdlFile, Path ncdFile, boolean useLegacyTools){
+		String command = "xdl -xdl2ncd -force " + xdlFile + " " + ncdFile;
 		if(useLegacyTools){
 			command = RunXilinxTools.getBinPathToLegacyXilinxTools() + File.separator + command;
 		}

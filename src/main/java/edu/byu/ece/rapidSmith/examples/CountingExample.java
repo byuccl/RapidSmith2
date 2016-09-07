@@ -20,6 +20,7 @@
  */
 package edu.byu.ece.rapidSmith.examples;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.TileType;
 import edu.byu.ece.rapidSmith.device.WireEnumerator;
 import edu.byu.ece.rapidSmith.device.WireType;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 
 /**
  * Generated to help answer a request from Vincent in 
@@ -137,12 +139,12 @@ public class CountingExample {
 		}		
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		if(args.length == 0){
 			System.out.println("Please supply an XDL file name");
 			System.exit(0);
 		}
-		Design d = new Design(Paths.get(args[0]));
+		Design d = new XDLReader().readDesign(Paths.get(args[0]));
 		int switchMatricesUsed = countSwitchMatricesUsed(d.getNets());
 		System.out.println("      Number of nets: " + d.getNets().size());
 		System.out.println("Switch matrices used: " + switchMatricesUsed);

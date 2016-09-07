@@ -395,7 +395,6 @@ public class Instance implements Serializable{
 			design.releasePrimitiveSite(this.site);
 		}
 		setPrimitiveSite(site);
-		setBonded(null);
 		if(design != null) design.setPrimitiveSiteUsed(site, this);
 	}
 

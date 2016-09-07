@@ -21,16 +21,20 @@
 package edu.byu.ece.rapidSmith.util;
 
 import edu.byu.ece.rapidSmith.design.Design;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 
 public class FlattenDesign {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		if(args.length != 2){
 			MessageGenerator.briefMessageAndExit("USAGE: <inputDesign.xdl> <flattenedDesign.xdl>");
 		}
-		Design d = new Design(Paths.get(args[0]));
+		Design d = new XDLReader().readDesign(Paths.get(args[0]));
 		d.flattenDesign();
-		d.saveXDLFile(Paths.get(args[1]), true);
+		XDLWriter writer = new XDLWriter();
+		writer.writeXDL(d, Paths.get(args[1]));
 	}
 }
