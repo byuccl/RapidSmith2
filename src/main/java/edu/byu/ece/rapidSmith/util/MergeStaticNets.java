@@ -20,13 +20,13 @@
  */
 package edu.byu.ece.rapidSmith.util;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-import edu.byu.ece.rapidSmith.design.Design;
-import edu.byu.ece.rapidSmith.design.Net;
-import edu.byu.ece.rapidSmith.design.NetType;
-import edu.byu.ece.rapidSmith.design.Pin;
+import edu.byu.ece.rapidSmith.design.*;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;
 
 /**
  * This class will read in an XDL design and unroute and merge all 
@@ -38,15 +38,13 @@ import edu.byu.ece.rapidSmith.design.Pin;
  */
 public class MergeStaticNets {
 
-	public static void main(String[] args){
+	public static void main(String[] args) throws IOException {
 		if(args.length != 2){
 			MessageGenerator.briefMessageAndExit("USAGE: <input.xdl> <output.xdl>");
 		}
-		
-		Design design = new Design();
-		
-		design.loadXDLFile(Paths.get(args[0]));
-				
+
+		Design design = new XDLReader().readDesign(Paths.get(args[0]));
+
 		Net gnd = new Net("GLOBAL_LOGIC0",NetType.GND);
 		Net vcc = new Net("GLOBAL_LOGIC1",NetType.VCC);
 		
@@ -79,7 +77,9 @@ public class MergeStaticNets {
 		
 		design.addNet(gnd);
 		design.addNet(vcc);
-		
-		design.saveXDLFile(Paths.get(args[1]), true);
+
+		XDLWriter outputter = new XDLWriter();
+		outputter.addComments(true);
+		outputter.writeXDL(design, Paths.get(args[1]));
 	}
 }
