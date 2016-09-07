@@ -23,12 +23,17 @@ package edu.byu.ece.rapidSmith.util;
 import edu.byu.ece.rapidSmith.design.*;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.SiteType;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1461,24 +1466,25 @@ public class HardMacroGenerator {
 		design.setName("GRACEFUL_FAILURE");
 	}
 	
-	public static void main(String[] args){
+	public static void main(String[] args) throws IOException {
 		if(args.length < 2 || args.length > 3){
 			System.out.println("USAGE: <input.xdl|input.ncd> <output file type: xdl|nmc> [optional: original_vhdl_top.vhd]");
 			System.exit(0);
 		}		
-		Design input = new Design();
+		Design input;
 		Design output; 
 		String originalVHDLFileName = args.length==3 ? args[2] : null;
 		// If we are supplied an NCD, convert it to XDL
-		if(args[0].endsWith(".ncd")){
-			FileConverter.convertNCD2XDL(args[0]);
-			if(!(new File(args[0]).exists())){
+		Path inputFile = Paths.get(args[0]);
+		if(Objects.equals(FileTools.getFileExtension(inputFile), "ncd")) {
+			FileConverter.convertNCD2XDL(inputFile);
+			if (!(Files.exists(inputFile))) {
 				HardMacroGenerator.failAndExit("XDL Generation failed, check your NCD file for correctness.");
 			}
-			input.loadXDLFile(Paths.get(args[0].replace(".ncd", ".xdl")));
+			input = new XDLReader().readDesign(FileTools.replaceFileExtension(inputFile, "xdl"));
 		}
 		else{
-			input.loadXDLFile(Paths.get(args[0]));
+			input = new XDLReader().readDesign(inputFile);
 		}
 		
 		HardMacroGenerator hmTool = new HardMacroGenerator(input);
@@ -1490,16 +1496,16 @@ public class HardMacroGenerator {
 		}
 		
 		// Output NMC if desired
-		String xdlFileName = hmTool.hardMacro.getName() + ".xdl";
-		if(args[1].toLowerCase().endsWith("nmc")){
-			output.saveXDLFile(xdlFileName);
-			FileConverter.convertXDL2NMC(xdlFileName);
-			if(!(new File(xdlFileName).exists())){
+		Path xdlFile = Paths.get(hmTool.hardMacro.getName() + ".xdl");
+		XDLWriter writer = new XDLWriter();
+		if (args[1].toLowerCase().endsWith("nmc")) {
+			writer.writeXDL(output, xdlFile);
+			FileConverter.convertXDL2NMC(xdlFile);
+			if (!(Files.exists(xdlFile))) {
 				HardMacroGenerator.failAndExit("NMC Generation failed, re-run by hand to get error message.");
 			}
-		}
-		else{
-			output.saveXDLFile(Paths.get(xdlFileName));
+		} else {
+			writer.writeXDL(output, xdlFile);
 		}
 	}
 }
