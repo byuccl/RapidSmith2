@@ -60,14 +60,14 @@ public class CreateDesignExample {
 		clknet.connectToPin(clkbufcell.getPin("O"));
 		clknet.connectToPin(ffcell.getPin("C"));
 		
-		// Let's place some of the cells into a slice
+		// Place some of the cells into a slice
 		// Get the first SLICEL in the device
 		Site slice = device.getAllSitesOfType(SiteType.SLICEL)[0];
 		
-		// Let's place the invcell on the A5LUT
+		// Place the invcell on the A5LUT
 		design.placeCell(invcell, slice.getBel("A5LUT"));
 
-		// Let's place the ffcell on the AFF
+		// Place the ffcell on the AFF
 		design.placeCell(ffcell, slice.getBel("AFF"));
 
 		// Now, prettyprint what we have created
