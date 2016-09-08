@@ -14,6 +14,8 @@ import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
+import edu.byu.ece.rapidSmith.interfaces.vivado.DesignInfoInterface;
+
 /**
  * This class is used to interface Vivado and RapidSmith. <br>
  * It parses TINCR checkpoints and creates equivalent RapidSmith designs. <br>
@@ -26,10 +28,6 @@ public final class VivadoInterface {
 
 	private static final String CELL_LIBRARY_NAME = "cellLibrary.xml";
 
-	private static String partname;
-	private static CellLibrary libCells;
-	private static Device device;
-		
 	/**
 	 * Parses a TINCR checkpoint, and creates an equivalent RapidSmith 2 design.
 	 * 
@@ -37,7 +35,7 @@ public final class VivadoInterface {
 	 * @throws InvalidEdifNameException 
 	 * @throws EdifNameConflictException 
 	 */
-	public static CellDesign loadTCP (String tcp) throws IOException, ParseException {
+	public static ImportedTCP loadTCP (String tcp) throws IOException, ParseException {
 	
 		if (tcp.endsWith("/") || tcp.endsWith("\\")) {
 			tcp = tcp.substring(0, tcp.length()-1);
@@ -49,8 +47,11 @@ public final class VivadoInterface {
 		}
 			
 		// setup the cell library and the device based on the part in the TCP file
-		partname = parseInfoFile(tcp);
-		initializeDevice(partname);
+		String partName = DesignInfoInterface.parseInfoFile(Paths.get(tcp, "design.info").toString());
+		CellLibrary libCells = new CellLibrary(RapidSmithEnv.getDefaultEnv()
+				.getPartFolderPath(partName)
+				.resolve(CELL_LIBRARY_NAME));
+		Device device = RapidSmithEnv.getDefaultEnv().getDevice(partName);	
 		
 		// create the RS2 netlist 
 		String edifFile = Paths.get(tcp, "netlist.edf").toString();
@@ -62,45 +63,11 @@ public final class VivadoInterface {
 
 		String routingFile = Paths.get(tcp, "routing.txt").toString();
 		XdcRoutingInterface.parseRoutingXDC(routingFile, design, device);
-							
-		return design;
+			
+		
+		return new ImportedTCP(partName, design, device, libCells);
 	}
 		
-	/*
-	 * Load the cell library and device files...
-	 */
-	private static void initializeDevice(String partname) throws IOException {
-		
-		libCells = new CellLibrary(RapidSmithEnv.getDefaultEnv()
-				.getPartFolderPath(partname)
-				.resolve(CELL_LIBRARY_NAME));
-		device = RapidSmithEnv.getDefaultEnv().getDevice(partname);	
-	}
-	
-	/*
-	 * Parses the Vivado part name from the "design.info" file of a TINCR checkpoint 
-	 */
-	private static String parseInfoFile (String tcp) throws IOException {
-		
-		BufferedReader br = null;
-		String part = "";
-		
-		try {
-			br = new BufferedReader(new FileReader(tcp + File.separator + "design.info"));
-			String line = br.readLine();
-			part = line.split("=")[1];
-		}
-		catch (IndexOutOfBoundsException e) {
-			MessageGenerator.briefErrorAndExit("[ERROR]: No part name found in the design.info file.");
-		}
-		finally {
-			if (br != null)
-				br.close();
-		}
-		
-		return part;
-	}
-	
 	/**
 	 * Export the RapidSmith2 design into an existing TINCR checkpoint file. 
 	 *   
@@ -110,7 +77,7 @@ public final class VivadoInterface {
 	 * @throws InvalidEdifNameException 
 	 * @throws EdifNameConflictException 
 	 */
-	public static void writeTCP(String tcpDirectory, CellDesign design) throws IOException, EdifNameConflictException, InvalidEdifNameException {
+	public static void writeTCP(String tcpDirectory, CellDesign design, String partName) throws IOException, EdifNameConflictException, InvalidEdifNameException {
 				
 		new File(tcpDirectory).mkdir();
 		
@@ -122,5 +89,9 @@ public final class VivadoInterface {
 		
 		String edifOut = Paths.get(tcpDirectory, "netlist.edf").toString();
 		EdifInterface.writeEdif(edifOut, design);
+		
+		String partInfoOut = Paths.get(tcpDirectory, "design.info").toString();
+		DesignInfoInterface.writeInfoFile(partInfoOut, partName);
+				
 	}
 } // END CLASS 
