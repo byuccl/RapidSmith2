@@ -33,7 +33,8 @@ import edu.byu.ece.rapidSmith.design.Net;
 import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
-import edu.byu.ece.rapidSmith.router.Node;
+import edu.byu.ece.rapidSmith.device.TileWire;
+import edu.byu.ece.rapidSmith.device.Wire;
 
 /**
  * This class is meant to debug problem with XDL files.  It
@@ -42,18 +43,18 @@ import edu.byu.ece.rapidSmith.router.Node;
  */
 public class XDLDesignChecker{
 
-	
+
 	public static ArrayList<Net> setNets(ArrayList<Net> nets, int size){
-		ArrayList<Net> removed = new ArrayList<Net>();
+		ArrayList<Net> removed = new ArrayList<>();
 		while(size > 0){
 			removed.add(nets.remove(0));
 			size--;
 		}
 		return removed;
 	}
-	
+
 	public static ArrayList<PIP> removeFirstHalf(ArrayList<PIP> pips){
-		ArrayList<PIP> removed = new ArrayList<PIP>();
+		ArrayList<PIP> removed = new ArrayList<>();
 		int size = pips.size();
 		int halfSize = size/2;
 		while(halfSize > 0) {
@@ -62,9 +63,9 @@ public class XDLDesignChecker{
 		}
 		return removed;
 	}
-	
+
 	public static ArrayList<PIP> removeLastHalf(ArrayList<PIP> pips){
-		ArrayList<PIP> removed = new ArrayList<PIP>();
+		ArrayList<PIP> removed = new ArrayList<>();
 		int size = pips.size();
 		int halfSize = size/2;
 		while(halfSize > 0) {
@@ -73,10 +74,10 @@ public class XDLDesignChecker{
 		}
 		return removed;
 	}
-	
+
 	public static String readLineFromStdIn(){
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		
+
 		try{
 			return br.readLine();
 		}
@@ -85,9 +86,9 @@ public class XDLDesignChecker{
 			return null;
 		}
 	}
-	
+
 	public static void runCommandWithoutOutput(String command){
-		
+
 		// Generate NCD
 		try {
 			Process p = Runtime.getRuntime().exec(command);
@@ -99,7 +100,7 @@ public class XDLDesignChecker{
 				if(p.waitFor() != 0){
 					throw new IOException();
 				}
-			} 
+			}
 			catch (InterruptedException e) {
 				e.printStackTrace();
 				System.out.println("Unknown Error While converting XDL to NCD/NMC.");
@@ -109,11 +110,11 @@ public class XDLDesignChecker{
 		} catch (IOException e){
 			System.out.println("COMMAND FAILED:");
 			System.out.println("\""+ command +"\"");
-		}		
-	}	
-	
+		}
+	}
+
 	public static void runCommandAndPrintOutput(String command){
-				
+
 		// Generate NCD
 		try {
 			Process p = Runtime.getRuntime().exec(command);
@@ -125,7 +126,7 @@ public class XDLDesignChecker{
 				if(p.waitFor() != 0){
 					throw new IOException();
 				}
-			} 
+			}
 			catch (InterruptedException e) {
 				e.printStackTrace();
 				System.out.println("Unknown Error While converting XDL to NCD/NMC.");
@@ -135,7 +136,7 @@ public class XDLDesignChecker{
 		} catch (IOException e){
 			System.out.println("COMMAND FAILED:");
 			System.out.println("\""+ command +"\"");
-		}		
+		}
 	}
 		
 	public static void main(String[] args) throws IOException {
@@ -147,7 +148,7 @@ public class XDLDesignChecker{
 
 		// Check for unique placement of primitives
 		MessageGenerator.printHeader("CHECKING FOR UNIQUE PRIMITIVE PLACEMENTS ... ");
-		HashMap<Site, Instance> usedSites = new HashMap<Site, Instance>();
+		HashMap<Site, Instance> usedSites = new HashMap<>();
 		for(Instance inst : design.getInstances()){
 			if(inst.getPrimitiveSite() == null){
 				System.out.println("Warning: " + inst.getName() +" is unplaced.");
@@ -162,11 +163,11 @@ public class XDLDesignChecker{
 				usedSites.put(inst.getPrimitiveSite(), inst);
 			}
 		}
-		
-		
-		
+
+
+
 		// Check for duplicate PIPs
-		HashMap<PIP,Net> pipMap = new HashMap<PIP, Net>();
+		HashMap<PIP,Net> pipMap = new HashMap<>();
 		MessageGenerator.printHeader("CHECKING FOR DUPLICATE PIPS ... ");
 		for(Net net : design.getNets()){
 			for(PIP pip : net.getPIPs()){
@@ -181,13 +182,13 @@ public class XDLDesignChecker{
 				}
 			}
 		}
-		
+
 		// Checking for duplicate PIP sinks
-		HashMap<Node,Net> pipSinks = new HashMap<Node, Net>();
+		HashMap<Wire, Net> pipSinks = new HashMap<>();
 		MessageGenerator.printHeader("CHECKING FOR DUPLICATE PIP SINKS ... ");
 		for(Net net : design.getNets()){
 			for(PIP pip : net.getPIPs()){
-				Node n = new Node(pip.getTile(), pip.getEndWire(), null, 0);
+				Wire n = new TileWire(pip.getTile(), pip.getEndWire());
 				Net tmp = pipSinks.get(n);
 				if(tmp == null){
 					pipSinks.put(n, net);

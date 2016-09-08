@@ -21,7 +21,8 @@
 package edu.byu.ece.rapidSmith.design.explorer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.trolltech.qt.core.QSize;
 import com.trolltech.qt.core.Qt.AspectRatioMode;
@@ -38,11 +39,12 @@ import edu.byu.ece.rapidSmith.design.Design;
 import edu.byu.ece.rapidSmith.design.ModuleInstance;
 import edu.byu.ece.rapidSmith.design.Net;
 import edu.byu.ece.rapidSmith.design.PIP;
+import edu.byu.ece.rapidSmith.design.subsite.Connection;
 import edu.byu.ece.rapidSmith.device.Tile;
-import edu.byu.ece.rapidSmith.device.WireConnection;
+import edu.byu.ece.rapidSmith.device.TileWire;
+import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.gui.GuiModuleInstance;
 import edu.byu.ece.rapidSmith.gui.TileView;
-import edu.byu.ece.rapidSmith.router.Node;
 import edu.byu.ece.rapidSmith.timing.PathDelay;
 import edu.byu.ece.rapidSmith.timing.PathElement;
 import edu.byu.ece.rapidSmith.timing.RoutingPathElement;
@@ -63,13 +65,13 @@ public class TileWindow extends QWidget{
 	private QGridLayout layout;
 	/** The sidebar view (for use with timing analysis) */
 	protected QGraphicsView sidebarView;
-	
+
 	protected TimingSlider slider;
-	
+
 	protected QGraphicsScene sidebarScene;
 	/**
 	 * Constructor
-	 * @param parent 
+	 * @param parent
 	 */
 	public TileWindow(QWidget parent){
 		super(parent);
@@ -79,7 +81,7 @@ public class TileWindow extends QWidget{
 
 		// Side bar setup
 		QGridLayout sidebarLayout = new QGridLayout();
-		sidebarScene = new QGraphicsScene(this);		
+		sidebarScene = new QGraphicsScene(this);
 		QLineEdit textBox = new QLineEdit();
 		sidebarView = new QGraphicsView(sidebarScene);
 		slider = new TimingSlider(scene, textBox);
@@ -91,16 +93,16 @@ public class TileWindow extends QWidget{
 		sidebarView.setLayout(sidebarLayout);
 		slider.sliderMoved.connect(slider, "updatePaths(Integer)");
 		textBox.textChanged.connect(slider, "updateText(String)");
-		
+
 		QSplitter splitter = new QSplitter(Orientation.Horizontal);
 		splitter.setEnabled(true);
 		sidebarView.setMinimumWidth(90);
 		splitter.addWidget(sidebarView);
 		splitter.addWidget(view);
-		layout.addWidget(splitter);		
+		layout.addWidget(splitter);
 		this.setLayout(layout);
 	}
-	
+
 	/**
 	 * Updates the design.
 	 * @param design New design to set.
@@ -116,7 +118,7 @@ public class TileWindow extends QWidget{
 			scene.addItem(new GuiModuleInstance(mi, scene, false));
 		}
 	}
-	
+
 	/**
 	 * Moves the cursor to a new tile in the tile array.
 	 * @param tile The new tile to move the cursor to.
@@ -126,18 +128,18 @@ public class TileWindow extends QWidget{
 		int tileSize = scene.getTileSize();
 		QSize size = this.frameSize();
 		view.fitInView(scene.getDrawnTileX(t)*tileSize - size.width()/2,
-				scene.getDrawnTileY(t)*tileSize - size.height()/2, 
+				scene.getDrawnTileY(t)*tileSize - size.height()/2,
 				size.width(), size.height(), AspectRatioMode.KeepAspectRatio);
 		view.zoomIn(); view.zoomIn();
-		view.zoomIn(); view.zoomIn();		
+		view.zoomIn(); view.zoomIn();
 		scene.updateCurrXY(scene.getDrawnTileX(t), scene.getDrawnTileY(t));
 		scene.updateCursor();
 	}
-	
+
 	public void drawCriticalPaths(ArrayList<PathDelay> pathDelays){
-		DesignTileScene scn = (DesignTileScene) scene;
+		DesignTileScene scn = scene;
 		for(PathDelay pd : pathDelays){
-			ArrayList<Connection> conns = new ArrayList<Connection>();
+			ArrayList<WireJunction> conns = new ArrayList<>();
 			for(PathElement pe : pd.getMaxDataPath()){
 				if(pe.getType().equals("net")){
 					if(pe.getClass().equals(RoutingPathElement.class)){
@@ -156,38 +158,34 @@ public class TileWindow extends QWidget{
 		}
 		scn.sortPaths();
 	}
-	
-	public ArrayList<Connection> getAllConnections(Net net){
-		ArrayList<Connection> conns = new ArrayList<Connection>();
-		HashMap<Node, Node> nodeMap = new HashMap<Node, Node>();
+
+	public ArrayList<WireJunction> getAllConnections(Net net){
+		ArrayList<WireJunction> conns = new ArrayList<>();
+		Set<Wire> wireSet = new HashSet<>();
 		for(PIP p : net.getPIPs()){
-			
+
 			if(scene.tileXMap.get(p.getTile()) != null && scene.tileYMap.get(p.getTile()) != null){
-				conns.add(new Connection(p));
+				conns.add(new WireJunction(p));
 			}
-			
-			Node start = new Node(p.getTile(), p.getStartWire(), null, 0);
-			Node end = new Node(p.getTile(), p.getEndWire(), null, 0);
-			nodeMap.put(start, start);
-			nodeMap.put(end, end);
+
+			Wire start = new TileWire(p.getTile(), p.getStartWire());
+			Wire end = new TileWire(p.getTile(), p.getEndWire());
+			wireSet.add(start);
+			wireSet.add(end);
 		}
-		Node tmp = new Node();
-		Node tmp2 = new Node();
-		Node tmp3 = new Node();
 		for(PIP p : net.getPIPs()){
-			tmp.setTileAndWire(p.getTile(), p.getEndWire());
+			Wire tmp = new TileWire(p.getTile(), p.getEndWire());
 			//System.out.println("  " + tmp.toString(scene.getWireEnumerator()));
-			if(tmp.getConnections() == null) continue;
-			for(WireConnection w : tmp.getConnections()){
-				tmp2.setTileAndWire(w.getTile(tmp.getTile()), w.getWire());
+			for(Connection w : tmp.getWireConnections()){
+				Wire tmp2 = w.getSinkWire();
 				//System.out.println("    " + tmp2.toString(scene.getWireEnumerator()));
-				if(!tmp2.getTile().equals(tmp.getTile()) && tmp2.getConnections() != null){
-					for(WireConnection w2 : tmp2.getConnections()){
-						tmp3.setTileAndWire(w2.getTile(tmp2.getTile()), w2.getWire());
+				if(!tmp2.getTile().equals(tmp.getTile())){
+					for(Connection w2 : tmp2.getWireConnections()){
+						Wire tmp3 = w2.getSinkWire();
 						//System.out.println("      " + tmp3.toString(scene.getWireEnumerator()));
-						if(nodeMap.get(tmp3) != null){
+						if(wireSet.contains(tmp3)){
 							if(scene.tileXMap.get(tmp.getTile()) != null && scene.tileYMap.get(tmp2.getTile()) != null){
-								Connection conn = new Connection(tmp.getTile(), tmp2.getTile(), tmp.getWire(), tmp2.getWire()); 
+								WireJunction conn = new WireJunction(tmp, tmp2);
 								conns.add(conn);
 								//System.out.println("* " + conn.toString(scene.getWireEnumerator()));
 							}
@@ -196,8 +194,7 @@ public class TileWindow extends QWidget{
 				}
 			}
 		}
-		
-		
+
 		return conns;
 	}
 }
