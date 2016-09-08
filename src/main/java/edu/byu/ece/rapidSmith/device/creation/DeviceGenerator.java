@@ -25,7 +25,6 @@ import edu.byu.ece.rapidSmith.design.Attribute;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.device.helper.*;
 import edu.byu.ece.rapidSmith.primitiveDefs.*;
-import edu.byu.ece.rapidSmith.router.Node;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
 import org.jdom2.Document;
@@ -695,20 +694,21 @@ public final class DeviceGenerator {
 	private void populateSinkPins() {
 		buildWireSourcesCountMap();
 
-		Stack<Node> stack = new Stack<>();
+		Stack<Wire> stack = new Stack<>();
 		for (Tile tile : device.getTileMap().values()) {
-			for (Integer wire : wireSourcesCount.get(tile).keySet()) {
+			for (Integer wireEnum : wireSourcesCount.get(tile).keySet()) {
 				// if 0, then any sink of this wire is unconnected to
 				// the device unless it is a source
 				// if 1, then this wire has a source that would itself be the source
 				// of any sinks on the wire.
 				// Tile sources, however, are always evaluated.
-				int numSources = wireSourcesCount.get(tile).get(wire);
-				if (numSources <= 1 && !arrayContains(tile.getSources(), wire))
+				Wire wire = new TileWire(tile, wireEnum);
+				int numSources = wireSourcesCount.get(tile).get(wireEnum);
+				if (numSources <= 1 && !arrayContains(tile.getSources(), wire.getWireEnum()))
 					continue;
 
-				addSinkWiresToTraverse(stack, tile, wire);
-				findAndAddSinkPins(stack, tile, wire);
+				addSinkWiresToTraverse(stack, wire);
+				findAndAddSinkPins(stack, wire);
 			}
 		}
 
@@ -725,34 +725,35 @@ public final class DeviceGenerator {
 		return isSource;
 	}
 
-	private void findAndAddSinkPins(Stack<Node> stack, Tile srcTile, int srcWire) {
+	private void findAndAddSinkPins(Stack<Wire> stack, Wire srcWire) {
 		// this wire might be a multi-sourced sinkPin
-		checkAndAddSinkPin(srcTile, srcWire, srcTile, srcWire);
+		checkAndAddSinkPin(srcWire, srcWire);
 
 		while (!stack.isEmpty()) {
-			Node cur = stack.pop();
-			final Tile curTile = cur.getTile();
-			final int curWire = cur.getWire();
+			Wire curWire = stack.pop();
 
 			// Check if we've found a sink and add its pin
-			checkAndAddSinkPin(srcTile, srcWire, curTile, curWire);
+			checkAndAddSinkPin(srcWire, curWire);
 
-			addSinkWiresToTraverse(stack, curTile, curWire);
+			addSinkWiresToTraverse(stack, curWire);
 		}
 	}
 
-	private void checkAndAddSinkPin(Tile srcTile, int srcWire, Tile curTile, int curWire) {
-		if (curTile.getSinks().containsKey(curWire)) {
+	private void checkAndAddSinkPin(Wire srcWire, Wire curWire) {
+		Tile curTile = curWire.getTile();
+		Tile srcTile = srcWire.getTile();
+		if (curTile.getSinks().containsKey(curWire.getWireEnum())) {
 			int xOffset = (srcTile.getColumn() - curTile.getColumn());
 			int yOffset = (srcTile.getRow() - curTile.getRow());
 
-			SinkPin sinkPin = new SinkPin(srcWire, xOffset, yOffset);
-			curTile.getSinks().put(curWire, sinksPool.add(sinkPin));
+			SinkPin sinkPin = new SinkPin(srcWire.getWireEnum(), xOffset, yOffset);
+			curTile.getSinks().put(curWire.getWireEnum(), sinksPool.add(sinkPin));
 		}
 	}
 
-	private void addSinkWiresToTraverse(Stack<Node> stack, Tile curTile, int curWire) {
-		WireConnection[] wcs = curTile.getWireConnections(curWire);
+	private void addSinkWiresToTraverse(Stack<Wire> stack, Wire curWire) {
+		Tile curTile = curWire.getTile();
+		WireConnection[] wcs = curTile.getWireConnections(curWire.getWireEnum());
 		if (wcs == null) return;
 		for (WireConnection wc : wcs) {
 			final Tile destTile = wc.getTile(curTile);
@@ -763,7 +764,7 @@ public final class DeviceGenerator {
 				continue;
 
 			if (wireSourcesCount.get(destTile).get(destWire) == 1) {
-				stack.push(new Node(destTile, destWire));
+				stack.push(new TileWire(destTile, destWire));
 			}
 		}
 	}
