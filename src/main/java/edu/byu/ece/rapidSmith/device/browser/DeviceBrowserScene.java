@@ -1,22 +1,22 @@
 /*
  * Copyright (c) 2010-2011 Brigham Young University
- * 
+ *
  * This file is part of the BYU RapidSmith Tools.
- * 
- * BYU RapidSmith Tools is free software: you may redistribute it 
- * and/or modify it under the terms of the GNU General Public License 
- * as published by the Free Software Foundation, either version 2 of 
+ *
+ * BYU RapidSmith Tools is free software: you may redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 2 of
  * the License, or (at your option) any later version.
- * 
- * BYU RapidSmith Tools is distributed in the hope that it will be 
+ *
+ * BYU RapidSmith Tools is distributed in the hope that it will be
  * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
- * 
- * A copy of the GNU General Public License is included with the BYU 
- * RapidSmith Tools. It can be found at doc/gpl2.txt. You may also 
+ *
+ * A copy of the GNU General Public License is included with the BYU
+ * RapidSmith Tools. It can be found at doc/gpl2.txt. You may also
  * get a copy of the license at <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 package edu.byu.ece.rapidSmith.device.browser;
 
@@ -36,12 +36,10 @@ import com.trolltech.qt.gui.QGraphicsSceneMouseEvent;
 import com.trolltech.qt.gui.QMenu;
 import com.trolltech.qt.gui.QPen;
 
-import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.Tile;
-import edu.byu.ece.rapidSmith.device.WireConnection;
+import edu.byu.ece.rapidSmith.design.subsite.Connection;
+import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.gui.NumberedHighlightedTile;
 import edu.byu.ece.rapidSmith.gui.TileScene;
-import edu.byu.ece.rapidSmith.router.Node;
 
 /**
  * This class was written specifically for the DeviceBrowser class.  It
@@ -49,7 +47,7 @@ import edu.byu.ece.rapidSmith.router.Node;
  */
 public class DeviceBrowserScene extends TileScene{
 	/**	 */
-	public Signal1<Tile> updateTile = new Signal1<Tile>();
+	public Signal1<Tile> updateTile = new Signal1<>();
 	/**	 */
 	private QPen wirePen;
 	/**	 */
@@ -59,16 +57,16 @@ public class DeviceBrowserScene extends TileScene{
 	/**	 */
 	private Tile reachabilityTile;
 	/**	 */
-	private ArrayList<NumberedHighlightedTile> currentTiles = new ArrayList<NumberedHighlightedTile>();
-	
-	
+	private ArrayList<NumberedHighlightedTile> currentTiles = new ArrayList<>();
+
+
 	public DeviceBrowserScene(Device device, boolean hideTiles, boolean drawPrimitives, DeviceBrowser browser){
 		super(device, hideTiles, drawPrimitives);
-		currLines = new ArrayList<QGraphicsLineItem>();
+		currLines = new ArrayList<>();
 		wirePen = new QPen(QColor.yellow, 0.25, PenStyle.SolidLine);
 		this.browser = browser;
 	}
-	
+
 	public void drawWire(Tile src, Tile dst){
 		QGraphicsLineItem line = new QGraphicsLineItem(
 				src.getColumn()*tileSize  + tileSize/2,
@@ -86,7 +84,7 @@ public class DeviceBrowserScene extends TileScene{
 		}
 		currLines.clear();
 	}
-	
+
 	public void drawWire(Tile src, int wireSrc, Tile dst, int wireDst){
 		double enumSize = we.getWires().length;
 		double x1 = (double) tileXMap.get(src)*tileSize  + (wireSrc%tileSize);
@@ -112,39 +110,42 @@ public class DeviceBrowserScene extends TileScene{
 	}
 
 	private HashMap<Tile, Integer> findReachability(Tile t, Integer hops){
-		HashMap<Tile, Integer> reachabilityMap = new HashMap<Tile, Integer>();
-		
-		Queue<Node> queue = new LinkedList<Node>();
+		HashMap<Wire, Integer> level = new HashMap<>();
+		HashMap<Tile, Integer> reachabilityMap = new HashMap<>();
+
+		Queue<Wire> queue = new LinkedList<>();
 		for(Integer wire : t.getWires()){
 			WireConnection[] connections = t.getWireConnections(wire);
 			if(connections == null) continue;
 			for(WireConnection wc : connections){
-				queue.add(wc.createNode(t));
+				Wire w = new TileWire(wc.getTile(t), wc.getWire());
+				queue.add(w);
+				level.put(w, 0);
 			}
 		}
-		
+
 		while(!queue.isEmpty()){
-			Node currNode = queue.poll();
-			Integer i = reachabilityMap.get(currNode.getTile());
+			Wire currWire = queue.poll();
+			Integer i = reachabilityMap.get(currWire.getTile());
 			if(i == null){
 				i = 1;
-				reachabilityMap.put(currNode.getTile(), i);
+				reachabilityMap.put(currWire.getTile(), i);
 			}
 			else{
-				reachabilityMap.put(currNode.getTile(), i+1);						
+				reachabilityMap.put(currWire.getTile(), i+1);
 			}
-			if(currNode.getLevel() < hops-1){
-				WireConnection[] connections = currNode.getConnections();
-				if(connections != null){
-					for(WireConnection wc : connections){
-						queue.add(wc.createNode(currNode));
-					}
+			Integer lev = level.get(currWire);
+			if(lev < hops-1){
+				for(Connection c : currWire.getWireConnections()){
+					Wire w = c.getSinkWire();
+					queue.add(w);
+					level.put(w, lev+1);
 				}
 			}
 		}
 		return reachabilityMap;
 	}
-	
+
 	private void drawReachability(HashMap<Tile, Integer> map){
 		menuReachabilityClear();
 		for(Tile t : map.keySet()){
@@ -154,7 +155,7 @@ public class DeviceBrowserScene extends TileScene{
 			currentTiles.add(tile);
 		}
 	}
-	
+
 	@SuppressWarnings("unused")
 	private void menuReachability1(){
 		drawReachability(findReachability(reachabilityTile, 1));
@@ -164,7 +165,7 @@ public class DeviceBrowserScene extends TileScene{
 	private void menuReachability2(){
 		drawReachability(findReachability(reachabilityTile, 2));
 	}
-	
+
 	@SuppressWarnings("unused")
 	private void menuReachability3(){
 		drawReachability(findReachability(reachabilityTile, 3));
@@ -179,7 +180,7 @@ public class DeviceBrowserScene extends TileScene{
 	private void menuReachability5(){
 		drawReachability(findReachability(reachabilityTile, 5));
 	}
-	
+
 	private void menuReachabilityClear(){
 		for(NumberedHighlightedTile rect : currentTiles){
 			rect.remove();
@@ -187,14 +188,14 @@ public class DeviceBrowserScene extends TileScene{
 		currentTiles.clear();
 	}
 
-	
+
 	@Override
 	public void mouseDoubleClickEvent(QGraphicsSceneMouseEvent event){
 		Tile t = getTile(event);
 		this.updateTile.emit(t);
 		super.mouseDoubleClickEvent(event);
 	}
-	
+
 	@Override
 	public void mouseReleaseEvent(QGraphicsSceneMouseEvent event){
 		if(event.button().equals(MouseButton.RightButton)){
@@ -223,11 +224,11 @@ public class DeviceBrowserScene extends TileScene{
 				menu.addAction(action4);
 				menu.addAction(action5);
 				menu.addAction(actionClear);
-				menu.exec(event.screenPos());			
+				menu.exec(event.screenPos());
 			}
 		}
-		
-		
+
+
 		super.mouseReleaseEvent(event);
 	}
 }
