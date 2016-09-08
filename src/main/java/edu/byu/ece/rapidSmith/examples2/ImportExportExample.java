@@ -2,6 +2,7 @@ package edu.byu.ece.rapidSmith.examples2;
 
 import java.io.IOException;
 
+import edu.byu.ece.rapidSmith.interfaces.vivado.ImportedTCP;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.edif.core.EdifNameConflictException;
 import edu.byu.ece.edif.core.InvalidEdifNameException;
@@ -12,42 +13,54 @@ import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
+/**
+ * A simple class to illustrate importing and exporting Tincr checkpoints.
+ * @author Brent Nelson
+ */
+
+/**
+ * @author nelson
+ *
+ */
 public class ImportExportExample {
 	
-	    // part name and cell library  
-	public static final String PART_NAME = "xc7a100tcsg324";
-	public static final String CANONICAL_PART_NAME = "xc7a100tcsg324";
-	public static final String CELL_LIBRARY = "cellLibrary.xml";
-	
-	private static CellLibrary libCells;
-	private static Device device;
-	
-	public static void classSetup() throws IOException {
-		libCells = new CellLibrary(RapidSmithEnv.getDefaultEnv()
-				.getPartFolderPath(PART_NAME)
-				.resolve(CELL_LIBRARY));
-		device = RapidSmithEnv.getDefaultEnv().getDevice(CANONICAL_PART_NAME);
-	}
-	
-	
+	/**
+	 * @param args
+	 * @throws IOException
+	 * @throws ParseException
+	 * @throws EdifNameConflictException
+	 * @throws InvalidEdifNameException
+	 */
 	public static void main(String[] args) throws IOException, ParseException, EdifNameConflictException, InvalidEdifNameException {
-		// Load device file
-		System.out.println("Loading Device...");
-		classSetup();
+		if (args.length < 1) {
+			System.err.println("Usage: ImportExportExample tincrCheckpointName");
+			System.exit(1);
+		}
 		
-		// Loading in a TINCR checkpoint
+		String checkpointIn = args[0];
+		String checkpointOut = args[0] + ".modified";
+
+		System.out.println("Starting ImportExportExample...\n");
+
+		// Load in in a TINCR checkpoint
 		System.out.println("Loading Design...");
-		String checkpointIn = "count16.tcp";
-		String checkpointOut = "count16_modified.tcp";
-		CellDesign design = VivadoInterface.loadTCP(checkpointIn);
+		ImportedTCP tcp = VivadoInterface.loadTCP(checkpointIn);
 		
-		// Call to CAD tool - do some manipulations
-		System.out.println("Modifying Design...");
+		// Get the pieces out of the checkpoint for use in manipulating it
+		CellDesign design = tcp.getDesign();
+		Device device= tcp.getDevice();
+		CellLibrary libCells = tcp.getLibCells();
+		String partName = tcp.getPartName();
+		
+		// Do some manipulations
+		System.out.println("Modifying the design...");
 		// Do something here
 		
 		// Write out TINCR Checkpoint
 		System.out.println("Exporting Modified Design...");
-		VivadoInterface.writeTCP(checkpointOut, design);
+		VivadoInterface.writeTCP(checkpointOut, design, partName);
+		
+		System.out.println("\nDone...");
 	}
 	
 }
