@@ -1,6 +1,6 @@
 package edu.byu.ece.rapidSmith.device;
 
-import edu.byu.ece.rapidSmith.design.Attribute;
+import edu.byu.ece.rapidSmith.design.xdl.Attribute;
 import edu.byu.ece.rapidSmith.design.subsite.SitePip;
 
 import java.io.Serializable;

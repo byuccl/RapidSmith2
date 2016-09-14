@@ -22,7 +22,7 @@ package edu.byu.ece.rapidSmith.timing;
 
 import java.util.ArrayList;
 
-import edu.byu.ece.rapidSmith.design.Net;
+import edu.byu.ece.rapidSmith.design.xdl.Net;
 
 public abstract class Path {
 	/** The source of this connection delay */

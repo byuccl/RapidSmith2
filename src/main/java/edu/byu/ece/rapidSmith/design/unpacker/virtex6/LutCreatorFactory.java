@@ -1,9 +1,9 @@
 package edu.byu.ece.rapidSmith.design.unpacker.virtex6;
 
-import edu.byu.ece.rapidSmith.design.Attribute;
-import edu.byu.ece.rapidSmith.design.Instance;
-import edu.byu.ece.rapidSmith.design.Net;
-import edu.byu.ece.rapidSmith.design.Pin;
+import edu.byu.ece.rapidSmith.design.xdl.Attribute;
+import edu.byu.ece.rapidSmith.design.xdl.Instance;
+import edu.byu.ece.rapidSmith.design.xdl.Net;
+import edu.byu.ece.rapidSmith.design.xdl.Pin;
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.design.unpacker.CellCreator;
 import edu.byu.ece.rapidSmith.design.unpacker.CellCreatorFactory;

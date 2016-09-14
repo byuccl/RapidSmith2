@@ -2,6 +2,7 @@ package edu.byu.ece.rapidSmith.interfaces.ise;
 
 import edu.byu.ece.rapidSmith.RapidSmithEnv;
 import edu.byu.ece.rapidSmith.design.*;
+import edu.byu.ece.rapidSmith.design.xdl.*;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
 import org.antlr.v4.runtime.ANTLRFileStream;

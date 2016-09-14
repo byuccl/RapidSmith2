@@ -1,7 +1,6 @@
 package edu.byu.ece.rapidSmith.design.unpacker;
 
-import edu.byu.ece.rapidSmith.design.Instance;
-import edu.byu.ece.rapidSmith.device.BelId;
+import edu.byu.ece.rapidSmith.design.xdl.Instance;
 
 /**
  *

@@ -35,14 +35,13 @@ import com.trolltech.qt.gui.QPolygonF;
 import com.trolltech.qt.gui.QGraphicsItem.GraphicsItemChange;
 import com.trolltech.qt.gui.QGraphicsItem.GraphicsItemFlag;
 
-import edu.byu.ece.rapidSmith.design.Instance;
-import edu.byu.ece.rapidSmith.design.ModuleInstance;
-import edu.byu.ece.rapidSmith.design.Net;
+import edu.byu.ece.rapidSmith.design.xdl.Instance;
+import edu.byu.ece.rapidSmith.design.xdl.ModuleInstance;
+import edu.byu.ece.rapidSmith.design.xdl.Net;
 import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.device.Tile;
 import edu.byu.ece.rapidSmith.device.TileType;
-import edu.byu.ece.rapidSmith.gui.TileScene;
 
 public class GuiModuleInstance extends QGraphicsPolygonItem {
 

@@ -1,11 +1,8 @@
 package edu.byu.ece.rapidSmith.design.unpacker.virtex6;
 
-import edu.byu.ece.rapidSmith.design.Design;
-import edu.byu.ece.rapidSmith.design.Instance;
-import edu.byu.ece.rapidSmith.design.Net;
-import edu.byu.ece.rapidSmith.design.Pin;
+import edu.byu.ece.rapidSmith.design.xdl.Design;
+import edu.byu.ece.rapidSmith.design.xdl.Instance;
 import edu.byu.ece.rapidSmith.design.unpacker.UnpackerUtils;
-import edu.byu.ece.rapidSmith.device.SiteType;
 
 /**
  *

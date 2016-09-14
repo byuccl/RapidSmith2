@@ -21,7 +21,7 @@
 package edu.byu.ece.rapidSmith.timing;
 
 
-import edu.byu.ece.rapidSmith.design.Net;
+import edu.byu.ece.rapidSmith.design.xdl.Net;
 
 public class PathDelay extends Path {
 	/** Delay or offset in nanoseconds (data path - clock path skew + uncertainty) */

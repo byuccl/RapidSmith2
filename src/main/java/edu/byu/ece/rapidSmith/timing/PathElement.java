@@ -20,7 +20,7 @@
  */
 package edu.byu.ece.rapidSmith.timing;
 
-import edu.byu.ece.rapidSmith.design.Pin;
+import edu.byu.ece.rapidSmith.design.xdl.Pin;
 
 public abstract class PathElement {
 	/** Delay of the path element */

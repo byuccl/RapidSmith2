@@ -41,7 +41,7 @@ import com.trolltech.qt.gui.QPen;
 import com.trolltech.qt.gui.QPixmap;
 import com.trolltech.qt.gui.QImage.Format;
 
-import edu.byu.ece.rapidSmith.design.Design;
+import edu.byu.ece.rapidSmith.design.xdl.Design;
 import edu.byu.ece.rapidSmith.device.*;
 
 /**

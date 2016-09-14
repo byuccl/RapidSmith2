@@ -1,24 +1,15 @@
 package edu.byu.ece.rapidSmith.design.unpacker.virtex6;
 
-import edu.byu.ece.rapidSmith.design.Attribute;
-import edu.byu.ece.rapidSmith.design.Instance;
-import edu.byu.ece.rapidSmith.design.Net;
-import edu.byu.ece.rapidSmith.design.Pin;
+import edu.byu.ece.rapidSmith.design.xdl.Instance;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
 import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
 import edu.byu.ece.rapidSmith.design.unpacker.CellCreator;
 import edu.byu.ece.rapidSmith.design.unpacker.CellCreatorFactory;
-import edu.byu.ece.rapidSmith.design.unpacker.DefaultCellCreator;
 import edu.byu.ece.rapidSmith.device.BelId;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
-import edu.byu.ece.rapidSmith.util.luts.InitString;
-import edu.byu.ece.rapidSmith.util.luts.LutConfig;
-import edu.byu.ece.rapidSmith.util.luts.LutContents;
 
 import java.util.*;
-import java.util.regex.Matcher;
 
 /**
  *
