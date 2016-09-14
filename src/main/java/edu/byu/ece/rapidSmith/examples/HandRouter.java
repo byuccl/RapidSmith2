@@ -34,9 +34,7 @@ import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;
-import edu.byu.ece.rapidSmith.router.Node;
 import edu.byu.ece.rapidSmith.util.FileConverter;
-import edu.byu.ece.rapidSmith.util.FileTools;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 import static edu.byu.ece.rapidSmith.util.FileTools.getFileExtension;
@@ -71,7 +69,6 @@ public class HandRouter{
 		// Load the design
 		design = new XDLReader().readDesign(inputFile);
 		dev = design.getDevice();
-		we = dev.getWireEnumerator();
 
 		// Delete the temporary XDL file, if needed
 		//FileTools.deleteFile(inputFileName);
