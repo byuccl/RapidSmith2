@@ -18,11 +18,10 @@
  * get a copy of the license at <http://www.gnu.org/licenses/>.
  * 
  */
-package edu.byu.ece.rapidSmith.design;
+package edu.byu.ece.rapidSmith.design.xdl;
 
-import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.design.AbstractDesign;
 import edu.byu.ece.rapidSmith.device.Site;
-import edu.byu.ece.rapidSmith.device.WireEnumerator;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 import java.util.*;

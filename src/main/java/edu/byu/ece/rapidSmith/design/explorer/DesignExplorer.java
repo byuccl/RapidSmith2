@@ -24,7 +24,7 @@ import com.trolltech.qt.core.Qt.WindowModality;
 import com.trolltech.qt.gui.*;
 import com.trolltech.qt.gui.QKeySequence.StandardKey;
 import edu.byu.ece.rapidSmith.RapidSmithEnv;
-import edu.byu.ece.rapidSmith.design.Design;
+import edu.byu.ece.rapidSmith.design.xdl.Design;
 import edu.byu.ece.rapidSmith.design.explorer.FilterWindow.FilterType;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.gui.FileFilters;

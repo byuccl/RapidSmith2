@@ -2,6 +2,7 @@ package edu.byu.ece.rapidSmith.design.unpacker;
 
 import edu.byu.ece.rapidSmith.design.*;
 import edu.byu.ece.rapidSmith.design.subsite.*;
+import edu.byu.ece.rapidSmith.design.xdl.*;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.util.FamilyType;
 import edu.byu.ece.rapidSmith.util.luts.LutConfig;

@@ -1,6 +1,6 @@
 package edu.byu.ece.rapidSmith.design.unpacker;
 
-import edu.byu.ece.rapidSmith.design.Design;
+import edu.byu.ece.rapidSmith.design.xdl.Design;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 
 /**

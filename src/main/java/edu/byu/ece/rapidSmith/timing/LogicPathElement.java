@@ -23,7 +23,7 @@ package edu.byu.ece.rapidSmith.timing;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import edu.byu.ece.rapidSmith.design.Instance;
+import edu.byu.ece.rapidSmith.design.xdl.Instance;
 
 public class LogicPathElement extends PathElement implements Serializable{
 

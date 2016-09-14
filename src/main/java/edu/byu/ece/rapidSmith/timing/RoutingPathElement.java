@@ -22,7 +22,7 @@ package edu.byu.ece.rapidSmith.timing;
 
 import java.io.Serializable;
 
-import edu.byu.ece.rapidSmith.design.Net;
+import edu.byu.ece.rapidSmith.design.xdl.Net;
 
 public class RoutingPathElement extends PathElement implements Serializable{
 	

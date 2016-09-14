@@ -35,9 +35,9 @@ import com.trolltech.qt.gui.QLineEdit;
 import com.trolltech.qt.gui.QSplitter;
 import com.trolltech.qt.gui.QWidget;
 
-import edu.byu.ece.rapidSmith.design.Design;
-import edu.byu.ece.rapidSmith.design.ModuleInstance;
-import edu.byu.ece.rapidSmith.design.Net;
+import edu.byu.ece.rapidSmith.design.xdl.Design;
+import edu.byu.ece.rapidSmith.design.xdl.ModuleInstance;
+import edu.byu.ece.rapidSmith.design.xdl.Net;
 import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.design.subsite.Connection;
 import edu.byu.ece.rapidSmith.device.Tile;

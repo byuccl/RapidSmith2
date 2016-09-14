@@ -23,7 +23,9 @@ package edu.byu.ece.rapidSmith.placer;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Random;
-import edu.byu.ece.rapidSmith.design.*;
+
+import edu.byu.ece.rapidSmith.design.xdl.Design;
+import edu.byu.ece.rapidSmith.design.xdl.Instance;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;

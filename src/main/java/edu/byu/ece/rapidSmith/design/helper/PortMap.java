@@ -22,7 +22,7 @@ package edu.byu.ece.rapidSmith.design.helper;
 
 import java.util.ArrayList;
 
-import edu.byu.ece.rapidSmith.design.Port;
+import edu.byu.ece.rapidSmith.design.xdl.Port;
 
 public class PortMap {
 	

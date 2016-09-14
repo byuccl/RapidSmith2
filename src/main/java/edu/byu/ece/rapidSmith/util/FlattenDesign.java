@@ -20,7 +20,7 @@
  */
 package edu.byu.ece.rapidSmith.util;
 
-import edu.byu.ece.rapidSmith.design.Design;
+import edu.byu.ece.rapidSmith.design.xdl.Design;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 

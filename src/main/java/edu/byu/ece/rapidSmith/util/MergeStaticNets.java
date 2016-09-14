@@ -25,6 +25,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import edu.byu.ece.rapidSmith.design.*;
+import edu.byu.ece.rapidSmith.design.xdl.Design;
+import edu.byu.ece.rapidSmith.design.xdl.Net;
+import edu.byu.ece.rapidSmith.design.xdl.Pin;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;
 

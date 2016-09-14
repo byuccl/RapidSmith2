@@ -22,10 +22,10 @@ package edu.byu.ece.rapidSmith.examples;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
 
 import edu.byu.ece.rapidSmith.design.*;
+import edu.byu.ece.rapidSmith.design.xdl.*;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;

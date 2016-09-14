@@ -1,7 +1,7 @@
 package edu.byu.ece.rapidSmith.design.unpacker;
 
-import edu.byu.ece.rapidSmith.design.Attribute;
-import edu.byu.ece.rapidSmith.design.Instance;
+import edu.byu.ece.rapidSmith.design.xdl.Attribute;
+import edu.byu.ece.rapidSmith.design.xdl.Instance;
 import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
 import edu.byu.ece.rapidSmith.design.subsite.PropertyType;

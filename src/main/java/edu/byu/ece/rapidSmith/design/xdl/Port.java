@@ -18,7 +18,7 @@
  * get a copy of the license at <http://www.gnu.org/licenses/>.
  * 
  */
-package edu.byu.ece.rapidSmith.design;
+package edu.byu.ece.rapidSmith.design.xdl;
 
 import java.io.Serializable;
 import java.util.Objects;
