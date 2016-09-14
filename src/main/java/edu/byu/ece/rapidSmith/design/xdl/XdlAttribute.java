@@ -38,7 +38,7 @@ import java.io.Serializable;
  * @author Chris Lavin
  * Created on: Jun 22, 2010
  */
-public class Attribute implements Serializable {
+public class XdlAttribute implements Serializable {
 
 	private static final long serialVersionUID = -7266101885597264094L;
 
@@ -59,7 +59,7 @@ public class Attribute implements Serializable {
 	 * @param logicalName Logical or user name of the attribute (:_:)
 	 * @param value Value of the attribute (::_)
 	 */
-	public Attribute(String physicalName, String logicalName, String value){
+	public XdlAttribute(String physicalName, String logicalName, String value){
 		this.physicalName = physicalName;
 		this.logicalName = logicalName;
 		this.value = value;
@@ -69,7 +69,7 @@ public class Attribute implements Serializable {
 	 * Creates a new attribute by copying the class members from attr.
 	 * @param attr The attribute to model the new attribute after.
 	 */
-	public Attribute(Attribute attr){
+	public XdlAttribute(XdlAttribute attr){
 		this.physicalName = attr.physicalName;
 		this.logicalName = attr.logicalName;
 		this.value = attr.value;

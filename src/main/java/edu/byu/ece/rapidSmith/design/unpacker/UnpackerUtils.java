@@ -1,10 +1,10 @@
 package edu.byu.ece.rapidSmith.design.unpacker;
 
-import edu.byu.ece.rapidSmith.design.xdl.Design;
+import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
 
 /**
  *
  */
 public interface UnpackerUtils {
-	Design prepareForUnpacker(Design design);
+	XdlDesign prepareForUnpacker(XdlDesign design);
 }

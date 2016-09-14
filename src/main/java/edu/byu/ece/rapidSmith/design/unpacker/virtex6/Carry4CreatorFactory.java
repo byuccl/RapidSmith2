@@ -1,6 +1,6 @@
 package edu.byu.ece.rapidSmith.design.unpacker.virtex6;
 
-import edu.byu.ece.rapidSmith.design.xdl.Instance;
+import edu.byu.ece.rapidSmith.design.xdl.XdlInstance;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
@@ -25,19 +25,19 @@ public class Carry4CreatorFactory implements CellCreatorFactory {
 	}
 
 	@Override
-	public CellCreator build(Instance instance) {
+	public CellCreator build(XdlInstance instance) {
 		return new Carry4Creator(instance, id);
 	}
 
 	private class Carry4Creator extends CellCreator {
 		private BelId id;
-		private Instance inst;
+		private XdlInstance inst;
 		private List<Property> properties;
 		private char highestUsed;
 
 		private Map<String, String> cellPinMap = new HashMap<>();
 
-		public Carry4Creator(Instance inst, BelId id) {
+		public Carry4Creator(XdlInstance inst, BelId id) {
 			this.id = id;
 			this.inst = inst;
 			buildLutProperties();
@@ -114,7 +114,7 @@ public class Carry4CreatorFactory implements CellCreatorFactory {
 		}
 
 		@Override
-		protected Instance getInstance() {
+		protected XdlInstance getInstance() {
 			return inst;
 		}
 

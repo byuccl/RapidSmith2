@@ -47,13 +47,13 @@ import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.gui.QAbstractItemView.EditTrigger;
 import com.trolltech.qt.gui.QAbstractItemView.ScrollHint;
 
-import edu.byu.ece.rapidSmith.design.xdl.Attribute;
-import edu.byu.ece.rapidSmith.design.xdl.Instance;
-import edu.byu.ece.rapidSmith.design.xdl.Module;
-import edu.byu.ece.rapidSmith.design.xdl.ModuleInstance;
-import edu.byu.ece.rapidSmith.design.xdl.Net;
+import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
+import edu.byu.ece.rapidSmith.design.xdl.XdlInstance;
+import edu.byu.ece.rapidSmith.design.xdl.XdlModule;
+import edu.byu.ece.rapidSmith.design.xdl.XdlModuleInstance;
+import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
 import edu.byu.ece.rapidSmith.design.PIP;
-import edu.byu.ece.rapidSmith.design.xdl.Pin;
+import edu.byu.ece.rapidSmith.design.xdl.XdlPin;
 import edu.byu.ece.rapidSmith.device.Tile;
 import edu.byu.ece.rapidSmith.timing.LogicPathElement;
 import edu.byu.ece.rapidSmith.timing.Path;
@@ -255,7 +255,7 @@ public class FilterWindow extends QWidget{
 				setHeaders(model, new String[]
 				          {"Name", "Type", "Source Instance", "Fanout", "PIP Count", "Module Instance Name", "Module Name"});
 				if(explorer.design == null) break;
-				for(Net net : explorer.design.getNets()){
+				for(XdlNet net : explorer.design.getNets()){
 		        	if(net.getPins().size() == 0) continue; 
 	        		ArrayList<QStandardItem> items = new ArrayList<QStandardItem>();
 	        		items.add(new DesignItem(net.getName(), net));
@@ -273,7 +273,7 @@ public class FilterWindow extends QWidget{
 				setHeaders(model, new String[]
 				          {"Name", "Type", "Primitive Site", "Tile", "Module Instance Name", "Module Name"});
 				if(explorer.design == null) break;
-            	for(Instance instance : explorer.design.getInstances()){
+            	for(XdlInstance instance : explorer.design.getInstances()){
             		ArrayList<QStandardItem> items = new ArrayList<QStandardItem>();
             		items.add(new DesignItem(instance.getName(), instance));
             		items.add(new DesignItem(instance.getType().toString(), instance));
@@ -289,7 +289,7 @@ public class FilterWindow extends QWidget{
 				setHeaders(model, new String[]
 				          {"Name", "Anchor Name", "Anchor Site", "Instance Count", "Net Count", "Port Count"});
 				if(explorer.design == null) break;
-	        	for(Module module : explorer.design.getModules()){
+	        	for(XdlModule module : explorer.design.getModules()){
             		ArrayList<QStandardItem> items = new ArrayList<QStandardItem>();
             		items.add(new DesignItem(module.getName(), module));
             		items.add(new DesignItem(module.getAnchor().getName(), module));
@@ -305,7 +305,7 @@ public class FilterWindow extends QWidget{
 				setHeaders(model, new String[]
 				          {"Name", "Anchor Name", "Anchor Site", "Module Template"});
 				if(explorer.design == null) break;
-	        	for(ModuleInstance moduleInstance : explorer.design.getModuleInstances()){
+	        	for(XdlModuleInstance moduleInstance : explorer.design.getModuleInstances()){
 	        		ArrayList<QStandardItem> items = new ArrayList<QStandardItem>();
             		items.add(new DesignItem(moduleInstance.getName(), moduleInstance));
             		items.add(new DesignItem(moduleInstance.getAnchor().getName(), moduleInstance));
@@ -382,9 +382,9 @@ public class FilterWindow extends QWidget{
 				subModels[0].removeRows(0, subModels[0].rowCount());
 				subModels[1].removeRows(0, subModels[1].rowCount());
 				
-				Net net = explorer.design.getNet(proxyModel.data(index.row(),0).toString());
+				XdlNet net = explorer.design.getNet(proxyModel.data(index.row(),0).toString());
 				// Populate Pins
-				for(Pin pin : net.getPins()){
+				for(XdlPin pin : net.getPins()){
 					ArrayList<QStandardItem> items = new ArrayList<QStandardItem>();
 					items.add(new DesignItem(pin.getPinType().toString().toLowerCase(), pin));
 					items.add(createNewHyperlinkItem(pin.getInstanceName(), pin)); 
@@ -420,8 +420,8 @@ public class FilterWindow extends QWidget{
 			case INSTANCES:
 				// populate attributes
 				subModels[0].removeRows(0, subModels[0].rowCount());
-				Instance instance = explorer.design.getInstance(proxyModel.data(index.row(),0).toString());
-				for(Attribute attribute : instance.getAttributes()){
+				XdlInstance instance = explorer.design.getInstance(proxyModel.data(index.row(),0).toString());
+				for(XdlAttribute attribute : instance.getAttributes()){
 					ArrayList<QStandardItem> items = new ArrayList<QStandardItem>();
 					items.add(new DesignItem(attribute.getPhysicalName(), attribute));
 					items.add(new DesignItem(attribute.getLogicalName(), attribute));

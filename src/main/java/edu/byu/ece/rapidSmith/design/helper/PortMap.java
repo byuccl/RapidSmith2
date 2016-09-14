@@ -22,15 +22,15 @@ package edu.byu.ece.rapidSmith.design.helper;
 
 import java.util.ArrayList;
 
-import edu.byu.ece.rapidSmith.design.xdl.Port;
+import edu.byu.ece.rapidSmith.design.xdl.XdlPort;
 
 public class PortMap {
 	
-	public ArrayList<Port> sinks;
+	public ArrayList<XdlPort> sinks;
 	public ArrayList<ExternalPortSignal> externalSinks;
 	
 	public PortMap(){
-		this.sinks = new ArrayList<Port>();
+		this.sinks = new ArrayList<XdlPort>();
 		this.externalSinks = new ArrayList<ExternalPortSignal>();
 	}
 	

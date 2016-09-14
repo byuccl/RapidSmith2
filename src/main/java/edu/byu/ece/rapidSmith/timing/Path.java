@@ -22,7 +22,7 @@ package edu.byu.ece.rapidSmith.timing;
 
 import java.util.ArrayList;
 
-import edu.byu.ece.rapidSmith.design.xdl.Net;
+import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
 
 public abstract class Path {
 	/** The source of this connection delay */
@@ -34,7 +34,7 @@ public abstract class Path {
 	/** Number of logic levels the data path traverses */
 	private int levelsOfLogic;
 	/** The net driving the clock on the destination register */
-	private Net destinationClock;
+	private XdlNet destinationClock;
 	/** The uncertainty in the clock as determined by Xilinx trce */
 	private float clockUncertainty;
 	/** List of physical / logical resources */
@@ -91,13 +91,13 @@ public abstract class Path {
 	/**
 	 * @return the destinationClock
 	 */
-	public Net getDestinationClock() {
+	public XdlNet getDestinationClock() {
 		return destinationClock;
 	}
 	/**
 	 * @param destinationClock the destinationClock to set
 	 */
-	public void setDestinationClock(Net destinationClock) {
+	public void setDestinationClock(XdlNet destinationClock) {
 		this.destinationClock = destinationClock;
 	}
 	/**

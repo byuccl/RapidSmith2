@@ -1,6 +1,6 @@
 package edu.byu.ece.rapidSmith.util;
 
-import edu.byu.ece.rapidSmith.design.xdl.Attribute;
+import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.primitiveDefs.PrimitiveConnection;
 import edu.byu.ece.rapidSmith.primitiveDefs.PrimitiveDef;
@@ -499,7 +499,7 @@ public class XDLRCOutputter {
 	private void createPIPMuxElements(SiteTemplate template, Map<Integer, Pin> pinWiresMap, PrimitiveDef def) {
 		for (int source : template.getPipAttributes().keySet()) {
 			int sink = template.getPipAttributes().get(source).keySet().iterator().next();
-			Attribute attr = template.getPipAttributes().get(source).values().iterator().next();
+			XdlAttribute attr = template.getPipAttributes().get(source).values().iterator().next();
 
 			String elName = attr.getPhysicalName();
 			PrimitiveElement el = def.getElement(elName);

@@ -18,7 +18,7 @@ import java.util.HashMap;
  *
  */
 public final class XDLReader {
-	public Design readDesign(Path xdlFile) throws IOException {
+	public XdlDesign readDesign(Path xdlFile) throws IOException {
 		XDLLexer lexer = new XDLLexer(new ANTLRFileStream(xdlFile.toString()));
 		XDLParser parser = new XDLParser(new CommonTokenStream(lexer));
 		XDLParser.DesignContext design = parser.design();
@@ -29,16 +29,16 @@ public final class XDLReader {
 	}
 
 	private static class DesignListener extends XDLParserBaseListener {
-		Design design;
+		XdlDesign design;
 		private CfgState cfgState;
 		private Device device;
 
-		private Net currNet = null;
-		private Instance currInstance = null;
+		private XdlNet currNet = null;
+		private XdlInstance currInstance = null;
 
-		private Module currModule = null;
+		private XdlModule currModule = null;
 		private String currModuleAnchorName = null;
-		private HashMap<String, Pin> modulePinMap = null;
+		private HashMap<String, XdlPin> modulePinMap = null;
 		private ArrayList<String> portNames = null;
 		private ArrayList<String> portInstanceNames = null;
 		private ArrayList<String> portPinNames = null;
@@ -52,7 +52,7 @@ public final class XDLReader {
 			if (device == null)
 				throw new ParseException("unsupported device: " + partName);
 
-			design = new Design(name, partName);
+			design = new XdlDesign(name, partName);
 			cfgState = CfgState.DESIGN;
 		}
 
@@ -71,7 +71,7 @@ public final class XDLReader {
 			String name = stripQuotes(ctx.name.getText()).intern();
 			String typeName = stripQuotes(ctx.type.getText());
 			SiteType type = SiteType.valueOf(typeName);
-			currInstance = new Instance(name, type);
+			currInstance = new XdlInstance(name, type);
 			currInstance.setDesign(design);
 			if (currModule == null) {
 				design.addInstance(currInstance);
@@ -127,15 +127,15 @@ public final class XDLReader {
 		public void enterModule_info(XDLParser.Module_infoContext ctx) {
 			String miName = stripQuotes(ctx.mi.getText()).intern();
 			String moduleName = stripQuotes(ctx.module_name.getText());
-			Module module = design.getModule(moduleName);
+			XdlModule module = design.getModule(moduleName);
 			if (module == null)
 				throw new ParseException("unknown module: " + moduleName);
 			currInstance.setModuleTemplate(module);
 
 			String templateName = stripQuotes(ctx.instance.getText());
-			Instance templateInstance = module.getInstance(templateName);
+			XdlInstance templateInstance = module.getInstance(templateName);
 			currInstance.setModuleTemplateInstance(templateInstance);
-			ModuleInstance mi = design.addInstanceToModuleInstances(
+			XdlModuleInstance mi = design.addInstanceToModuleInstances(
 					currInstance, miName);
 
 			if(templateInstance.equals(module.getAnchor())) {
@@ -157,7 +157,7 @@ public final class XDLReader {
 			} else {
 				type = NetType.WIRE;
 			}
-			currNet = new Net(name, type);
+			currNet = new XdlNet(name, type);
 			if (currModule == null)
 				design.addNet(currNet);
 			else
@@ -172,23 +172,23 @@ public final class XDLReader {
 
 		@Override
 		public void enterPin(XDLParser.PinContext ctx) {
-			Pin pin;
+			XdlPin pin;
 			String instName = stripQuotes(ctx.instance.getText());
-			Instance inst;
+			XdlInstance inst;
 			inst = getPinInstance(instName);
 
 			String name = ctx.name.getText().intern();
 			switch (ctx.direction.getType()) {
 				// Note: old code had an inout option, no special handling though
 				case XDLParser.INPIN:
-					pin = new Pin(false, name, inst);
+					pin = new XdlPin(false, name, inst);
 					break;
 				case XDLParser.OUTPIN:
 					if (currNet.getSource() != null) {
 						throw new ParseException("net " + currNet.getName()
 								+ " has two or more output pins");
 					}
-					pin = new Pin(true, name, inst);
+					pin = new XdlPin(true, name, inst);
 					break;
 				default:
 					throw new ParseException("illegal pin direction");
@@ -202,8 +202,8 @@ public final class XDLReader {
 			inst.addToNetList(currNet);
 		}
 
-		private Instance getPinInstance(String instName) {
-			Instance inst;
+		private XdlInstance getPinInstance(String instName) {
+			XdlInstance inst;
 			if (currModule == null) {
 				inst = design.getInstance(instName);
 			} else {
@@ -238,7 +238,7 @@ public final class XDLReader {
 
 		@Override
 		public void enterAttribute(XDLParser.AttributeContext ctx) {
-			Attribute attr = makeAttribute(ctx);
+			XdlAttribute attr = makeAttribute(ctx);
 
 			switch (cfgState) {
 				case DESIGN:
@@ -258,18 +258,18 @@ public final class XDLReader {
 			}
 		}
 
-		private static Attribute makeAttribute(XDLParser.AttributeContext ctx) {
+		private static XdlAttribute makeAttribute(XDLParser.AttributeContext ctx) {
 			String physicalName = ctx.physical.getText().intern();
 			String logicalName = ctx.logical.getText().intern();
 			String value = ctx.attribute_value().getText().intern();
-			return new Attribute(physicalName, logicalName, value);
+			return new XdlAttribute(physicalName, logicalName, value);
 		}
 
-		private void setNetModuleInstance(Attribute attr) {
-			ModuleInstance mi = design.getModuleInstance(attr.getValue());
+		private void setNetModuleInstance(XdlAttribute attr) {
+			XdlModuleInstance mi = design.getModuleInstance(attr.getValue());
 			currNet.setModuleInstance(mi);
 			mi.addNet(currNet);
-			Module module = mi.getModule();
+			XdlModule module = mi.getModule();
 			currNet.setModuleTemplate(module);
 			String moduleNetName = currNet.getName().replaceFirst(
 					mi.getName() + "/", "");
@@ -278,7 +278,7 @@ public final class XDLReader {
 
 		@Override
 		public void enterModule(XDLParser.ModuleContext ctx) {
-			currModule = new Module();
+			currModule = new XdlModule();
 			modulePinMap = new HashMap<>();
 			portNames = new ArrayList<>();
 			portInstanceNames = new ArrayList<>();
@@ -294,7 +294,7 @@ public final class XDLReader {
 			int numPorts = portNames.size();
 			for (int i = 0; i < numPorts; i++) {
 				String key = portInstanceNames.get(i) + portPinNames.get(i);
-				Port port = new Port(portNames.get(i), modulePinMap.get(key));
+				XdlPort port = new XdlPort(portNames.get(i), modulePinMap.get(key));
 				currModule.addPort(port);
 			}
 

@@ -1,6 +1,6 @@
 package edu.byu.ece.rapidSmith.design.unpacker;
 
-import edu.byu.ece.rapidSmith.design.xdl.Instance;
+import edu.byu.ece.rapidSmith.design.xdl.XdlInstance;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
@@ -25,7 +25,7 @@ public abstract class CellCreator {
 		return cell;
 	}
 
-	protected abstract Instance getInstance();
+	protected abstract XdlInstance getInstance();
 	protected abstract BelId getIdentifier();
 	protected abstract LibraryCell getCellType();
 	protected abstract Collection<Property> getProperties();

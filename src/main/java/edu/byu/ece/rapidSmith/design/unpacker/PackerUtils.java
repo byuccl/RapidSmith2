@@ -1,6 +1,6 @@
 package edu.byu.ece.rapidSmith.design.unpacker;
 
-import edu.byu.ece.rapidSmith.design.xdl.Design;
+import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 
 /**
@@ -9,5 +9,5 @@ import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 public interface PackerUtils {
 	void prepare(CellDesign design);
 
-	void finish(Design design);
+	void finish(XdlDesign design);
 }

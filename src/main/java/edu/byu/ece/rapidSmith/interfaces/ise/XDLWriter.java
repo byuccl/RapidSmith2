@@ -17,7 +17,7 @@ public class XDLWriter {
 	private boolean addComments = true;
 	private boolean addPips = true;
 
-	private Design design;
+	private XdlDesign design;
 	private Writer out;
 
 	public XDLWriter setLineSeparator(String lineSeparator) {
@@ -35,13 +35,13 @@ public class XDLWriter {
 		return this;
 	}
 
-	public void writeXDL(Design design, Path file) throws IOException {
+	public void writeXDL(XdlDesign design, Path file) throws IOException {
 		try (Writer writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
 			writeXDL(design, writer);
 		}
 	}
 
-	public void writeXDL(Design design, Writer out) throws IOException {
+	public void writeXDL(XdlDesign design, Writer out) throws IOException {
 		this.design = design;
 		this.out = out;
 		writeHeader();
@@ -105,9 +105,9 @@ public class XDLWriter {
 				out.append("# =======================================================" + nl + nl);
 			}
 
-			List<Module> modules = new ArrayList<>(design.getModules());
+			List<XdlModule> modules = new ArrayList<>(design.getModules());
 			Collections.sort(modules, (o1, o2) -> o1.getName().compareTo(o2.getName()));
-			for (Module module : modules) {
+			for (XdlModule module : modules) {
 				if (addComments) {
 					out.append("# =======================================================" + nl);
 					out.append("# MODULE of \"" + module.getName() + "\"" + nl);
@@ -140,9 +140,9 @@ public class XDLWriter {
 			out.append("#  MODULE INSTANCES" + nl);
 			out.append("#  =======================================================" + nl);
 
-			List<ModuleInstance> moduleInstanceNames = new ArrayList<>(design.getModuleInstances());
+			List<XdlModuleInstance> moduleInstanceNames = new ArrayList<>(design.getModuleInstances());
 			Collections.sort(moduleInstanceNames, (o1, o2) -> o1.getName().compareTo(o2.getName()));
-			for (ModuleInstance mi : moduleInstanceNames) {
+			for (XdlModuleInstance mi : moduleInstanceNames) {
 				out.append("# instance \"" + mi.getName() + "\" \"" + mi.getModule().getName() + "\" , ");
 				if (mi.getAnchor() != null && mi.getAnchor().isPlaced()) {
 					out.append("placed " + mi.getAnchor().getTile().getName() + " " +
@@ -224,9 +224,9 @@ public class XDLWriter {
 			out.append("#  ================================================" + nl);
 		}
 
-		List<Net> nets = new ArrayList<>(design.getNets());
+		List<XdlNet> nets = new ArrayList<>(design.getNets());
 		Collections.sort(nets, (o1, o2) -> o1.getName().compareTo(o2.getName()));
-		for (Net net : nets) {
+		for (XdlNet net : nets) {
 			out.append("  net \"" + net.getName() + "\" ");
 			if (!net.getType().equals(NetType.WIRE))
 				out.append(net.getType().name().toLowerCase());
@@ -251,13 +251,13 @@ public class XDLWriter {
 			int sliceCount = 0;
 			int bramCount = 0;
 			int dspCount = 0;
-			for (Instance instance : design.getInstances()) {
+			for (XdlInstance instance : design.getInstances()) {
 				SiteType type = instance.getType();
-				if (Design.sliceTypes.contains(type)) {
+				if (XdlDesign.sliceTypes.contains(type)) {
 					sliceCount++;
-				} else if (Design.dspTypes.contains(type)) {
+				} else if (XdlDesign.dspTypes.contains(type)) {
 					dspCount++;
-				} else if (Design.bramTypes.contains(type)) {
+				} else if (XdlDesign.bramTypes.contains(type)) {
 					bramCount++;
 				}
 			}
@@ -277,12 +277,12 @@ public class XDLWriter {
 
 	private void writeHMSummary() throws IOException {
 		if (addComments) {
-			Module mod = design.getHardMacro();
+			XdlModule mod = design.getHardMacro();
 			out.append("# =======================================================" + nl);
 			out.append("# MACRO SUMMARY" + nl);
 			out.append("# Number of Module Insts: " + Integer.toString(mod.getInstances().size()) + nl);
 			Map<SiteType, Integer> instTypeCount = new HashMap<>();
-			for (Instance inst : mod.getInstances()) {
+			for (XdlInstance inst : mod.getInstances()) {
 				Integer count = instTypeCount.get(inst.getType());
 				if (count == null) {
 					instTypeCount.put(inst.getType(), 1);
@@ -303,11 +303,11 @@ public class XDLWriter {
 		}
 	}
 
-	private void writeAttributes(Collection<Attribute> attrs, String sep) throws IOException {
-		List<Attribute> sorted = new ArrayList<>(attrs);
+	private void writeAttributes(Collection<XdlAttribute> attrs, String sep) throws IOException {
+		List<XdlAttribute> sorted = new ArrayList<>(attrs);
 		Collections.sort(sorted, new AttributeComparator());
 
-		for (Attribute attr : sorted) {
+		for (XdlAttribute attr : sorted) {
 			String[] logicalNames = attr.getMultiValueLogicalNames();
 			String[] values = attr.getMultiValueValues();
 			for (int i = 0; i < values.length; i++) {
@@ -321,19 +321,19 @@ public class XDLWriter {
 		}
 	}
 
-	private void writePorts(Collection<Port> ports) throws IOException {
-		List<Port> sorted = new ArrayList<>(ports);
+	private void writePorts(Collection<XdlPort> ports) throws IOException {
+		List<XdlPort> sorted = new ArrayList<>(ports);
 		Collections.sort(sorted, (o1, o2) -> o1.getName().compareTo(o2.getName()));
-		for (Port port : sorted) {
+		for (XdlPort port : sorted) {
 			out.append("  port \"" + port.getName() + "\" \"" + port.getInstanceName() + "\" \"" + port.getPinName() + "\";" + nl);
 		}
 
 	}
 
-	private void writeInstances(Collection<Instance> instances, String ind) throws IOException {
-		List<Instance> sorted = new ArrayList<>(instances);
+	private void writeInstances(Collection<XdlInstance> instances, String ind) throws IOException {
+		List<XdlInstance> sorted = new ArrayList<>(instances);
 		Collections.sort(sorted, (o1, o2) -> o1.getName().compareTo(o2.getName()));
-		for (Instance inst : sorted) {
+		for (XdlInstance inst : sorted) {
 			out.append(ind + "inst \"" + inst.getName() + "\" \"" + inst.getType().name() + "\",");
 			if (inst.isPlaced())
 				out.append("placed " + inst.getTile().getName() +	" " + inst.getPrimitiveSiteName());
@@ -353,10 +353,10 @@ public class XDLWriter {
 		}
 	}
 
-	private void writeNets(Collection<Net> nets, String ind) throws IOException {
-		List<Net> sorted = new ArrayList<>(nets);
+	private void writeNets(Collection<XdlNet> nets, String ind) throws IOException {
+		List<XdlNet> sorted = new ArrayList<>(nets);
 		Collections.sort(sorted, (o1, o2) -> o1.getName().compareTo(o2.getName()));
-		for (Net net : sorted) {
+		for (XdlNet net : sorted) {
 			out.append(ind + "net \"" + net.getName() + "\" ,");
 			if (net.getAttributes() != null) {
 				out.append(" cfg \"");
@@ -371,10 +371,10 @@ public class XDLWriter {
 		}
 	}
 
-	private void writePins(Collection<Pin> pins, String ind) throws IOException {
-		List<Pin> sorted = new ArrayList<>(pins);
+	private void writePins(Collection<XdlPin> pins, String ind) throws IOException {
+		List<XdlPin> sorted = new ArrayList<>(pins);
 		Collections.sort(sorted, (o1, o2) -> o1.getName().compareTo(o2.getName()));
-		for (Pin pin : sorted)
+		for (XdlPin pin : sorted)
 			out.append(ind + pin.getPinType().name().toLowerCase() + " \"" +
 					pin.getInstanceName() + "\" " + pin.getName() + " ," + nl);
 	}
@@ -388,9 +388,9 @@ public class XDLWriter {
 	}
 
 	// Comparators for XDL ordering
-	private static class AttributeComparator implements Comparator<Attribute> {
+	private static class AttributeComparator implements Comparator<XdlAttribute> {
 		@Override
-		public int compare(Attribute t1, Attribute t2) {
+		public int compare(XdlAttribute t1, XdlAttribute t2) {
 			int cmp = t1.getPhysicalName().compareTo(t2.getPhysicalName());
 			if (cmp != 0) return cmp;
 			cmp = t1.getLogicalName().compareTo(t2.getLogicalName());

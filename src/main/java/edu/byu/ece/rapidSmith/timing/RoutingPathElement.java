@@ -22,26 +22,26 @@ package edu.byu.ece.rapidSmith.timing;
 
 import java.io.Serializable;
 
-import edu.byu.ece.rapidSmith.design.xdl.Net;
+import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
 
 public class RoutingPathElement extends PathElement implements Serializable{
 	
 	private static final long serialVersionUID = -8322328106512170640L;
 	
 	/** The net or physical resource */
-	private Net net;
+	private XdlNet net;
 
 	/**
 	 * @param net the net to set
 	 */
-	public void setNet(Net net){
+	public void setNet(XdlNet net){
 		this.net = net;
 	}
 
 	/**
 	 * @return the net
 	 */
-	public Net getNet(){
+	public XdlNet getNet(){
 		return net;
 	}
 	

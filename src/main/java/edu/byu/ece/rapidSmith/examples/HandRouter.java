@@ -31,9 +31,9 @@ import java.util.Objects;
 import edu.byu.ece.rapidSmith.design.*;
 import edu.byu.ece.rapidSmith.design.subsite.Connection;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
-import edu.byu.ece.rapidSmith.design.xdl.Design;
-import edu.byu.ece.rapidSmith.design.xdl.Net;
-import edu.byu.ece.rapidSmith.design.xdl.Pin;
+import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
+import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
+import edu.byu.ece.rapidSmith.design.xdl.XdlPin;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;
@@ -54,7 +54,7 @@ public class HandRouter{
 	/** This is the current device of the design that was loaded */
 	private Device dev;
 	/** This is the current design we are loading */
-	private Design design;
+	private XdlDesign design;
 	/** Standard Input */
 	private BufferedReader br;
 
@@ -82,7 +82,7 @@ public class HandRouter{
 	 * @param netName Name of the net to route
 	 */
 	private void HandRoute(String netName){
-		Net net = design.getNet(netName);
+		XdlNet net = design.getNet(netName);
 		int choice;
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
@@ -103,7 +103,7 @@ public class HandRouter{
 		sources.add(new RouteTree(w));
 
 		// In this loop we'll route each sink pin of the net separately
-		for(Pin sinkPin : net.getPins()){
+		for(XdlPin sinkPin : net.getPins()){
 			if(sinkPin.isOutPin()) continue; // Don't try to route the source to the source
 			boolean start = true;
 			boolean finishedRoute = false;
@@ -265,7 +265,7 @@ public class HandRouter{
 						hr.HandRoute(hr.br.readLine().trim());
 						break;
 					case 2:
-						for(Net net : hr.design.getNets()){
+						for(XdlNet net : hr.design.getNets()){
 							System.out.println("Routing net: " + net.getName());
 							hr.HandRoute(net.getName());
 							break;

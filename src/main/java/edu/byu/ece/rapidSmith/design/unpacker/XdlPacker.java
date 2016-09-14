@@ -25,7 +25,7 @@ public class XdlPacker {
 	private Map<String, Map<BelId, Map<String, String>>> valuesMap;
 	private PackerUtils packerUtils;
 
-	private Design packedDesign;
+	private XdlDesign packedDesign;
 
 	private Set<PIP> pipSet;
 	private Set<BelPin> pinSet;
@@ -92,9 +92,9 @@ public class XdlPacker {
 		}
 	}
 
-	public Design pack(CellDesign cellDesign) {
-		packedDesign = new Design(cellDesign.getName(), cellDesign.getPartName());
-		packedDesign.setNCDVersion(Design.DEFAULT_NCD_VERSION);
+	public XdlDesign pack(CellDesign cellDesign) {
+		packedDesign = new XdlDesign(cellDesign.getName(), cellDesign.getPartName());
+		packedDesign.setNCDVersion(XdlDesign.DEFAULT_NCD_VERSION);
 
 		packerUtils.prepare(cellDesign);
 		packDesignAttributes(cellDesign);
@@ -105,7 +105,7 @@ public class XdlPacker {
 		return packedDesign;
 	}
 
-	private boolean attributesConflict(Instance inst, Property property, String attrName) {
+	private boolean attributesConflict(XdlInstance inst, Property property, String attrName) {
 		return inst.hasAttribute(attrName) &&
 				!Objects.equals(inst.getAttributeValue(attrName), property.getValue());
 	}
@@ -130,7 +130,7 @@ public class XdlPacker {
 		// Since instance map to primitive sites, we'll build the instance by
 		// collecting all the BELs at each site
 		for (Site site : cellDesign.getUsedSites()) {
-			Instance inst = new Instance();
+			XdlInstance inst = new XdlInstance();
 			// guaranteed to be unique but it will probably not be identical to
 			// the original XDL
 			inst.setName(site.getName());
@@ -146,7 +146,7 @@ public class XdlPacker {
 		}
 	}
 
-	private void packCell(Instance inst, Cell cell) {
+	private void packCell(XdlInstance inst, Cell cell) {
 		// BELs in the site should all be of the same primitive type
 		assert cell.getAnchor().getId().getPrimitiveType() == inst.getType();
 
@@ -196,7 +196,7 @@ public class XdlPacker {
 		}
 	}
 
-	private void packCellProperties(Instance inst, Cell cell, BelId belId, String cellType) {
+	private void packCellProperties(XdlInstance inst, Cell cell, BelId belId, String cellType) {
 		// Add the cell's properties as an attribute
 		Map<String, String> attrsMap = renameMap.get(cellType).get(belId);
 		for (Property property : cell.getProperties()) {
@@ -239,12 +239,12 @@ public class XdlPacker {
 			// Need to identify the site pins
 			wiresUsedInRoute = new HashSet<>();
 			CellPin sourcePin = cellNet.getSourcePin();
-			Net net;
+			XdlNet net;
 			if (sourcePin == null) {
 				if (cellNet.getType() == NetType.GND) {
-					net = new Net("global_gnd_net", NetType.GND);
+					net = new XdlNet("global_gnd_net", NetType.GND);
 				} else if (cellNet.getType() == NetType.VCC) {
-					net = new Net("global_vcc_net", NetType.VCC);
+					net = new XdlNet("global_vcc_net", NetType.VCC);
 				} else {
 					throw new AssertionError("Unsourced net must be GND or VCC");
 				}
@@ -252,9 +252,9 @@ public class XdlPacker {
 				assert sourcePin.getCell().getLibCell().getName().equals("TIEOFF");
 
 				if (sourcePin.getName().equals("0")) {
-					net = new Net("global_gnd_net", NetType.GND);
+					net = new XdlNet("global_gnd_net", NetType.GND);
 				} else { // HARD1
-					net = new Net("global_vcc_net", NetType.VCC);
+					net = new XdlNet("global_vcc_net", NetType.VCC);
 				}
 			} else {
 				SiteWire sourceWire = sourcePin.getBelPin().getWire();
@@ -279,11 +279,11 @@ public class XdlPacker {
 		}
 	}
 
-	private void findRouteToBelSink(Net net, BelPin belPin) {
-		Instance inst = packedDesign.getInstanceAtPrimitiveSite(belPin.getBel().getSite());
+	private void findRouteToBelSink(XdlNet net, BelPin belPin) {
+		XdlInstance inst = packedDesign.getInstanceAtPrimitiveSite(belPin.getBel().getSite());
 		for (SitePin sinkPin : belPin.getSitePins()) {
 			if (traverseSinkSite(sinkPin.getInternalWire())) {
-				net.addPin(new Pin(false, sinkPin.getName(), inst));
+				net.addPin(new XdlPin(false, sinkPin.getName(), inst));
 			}
 		}
 	}
@@ -291,7 +291,7 @@ public class XdlPacker {
 	// find the site pin sourcing the net
 	private NetBooleanPair traverseSourceSite(CellNet cellNet, Wire sourceWire) {
 		Site site = sourceWire.getSite();
-		Instance inst = packedDesign.getInstanceAtPrimitiveSite(site);
+		XdlInstance inst = packedDesign.getInstanceAtPrimitiveSite(site);
 		int numNets = 0;
 		NetBooleanPair preferredNet = null;
 
@@ -311,12 +311,12 @@ public class XdlPacker {
 
 				// Add the site PIP attribute to the instance
 				SiteTemplate template = packedDesign.getDevice().getSiteTemplate(inst.getType());
-				inst.addAttribute(new Attribute(template.getPipAttribute(sitePip)));
+				inst.addAttribute(new XdlAttribute(template.getPipAttribute(sitePip)));
 			}
 
 			SitePin sitePin = site.getSitePinOfInternalWire(sinkWire.getWireEnum());
 			if (sitePin != null) {
-				Net net = connectToSitePin(cellNet, site, inst, sitePin);
+				XdlNet net = connectToSitePin(cellNet, site, inst, sitePin);
 
 				// If a sink is found in traversing this net, then the net is
 				// worth adding to the design.
@@ -333,7 +333,7 @@ public class XdlPacker {
 				// follow the site to the sinks if the net is routed
 				NetBooleanPair pair = traverseSourceSite(cellNet, sinkWire);
 				if (pair != null) {
-					Net net = pair.net;
+					XdlNet net = pair.net;
 					if (net.getPins().size() > 1)
 						packedDesign.addNet(net);
 					if (preferredNet == null || !preferredNet.drivesGeneralFabric) {
@@ -346,7 +346,7 @@ public class XdlPacker {
 
 		// Add the net
 		if (preferredNet != null) {
-			Net net = preferredNet.net;
+			XdlNet net = preferredNet.net;
 			if (net.getPins().size() > 1 && packedDesign.getNet(net.getName()) == null)
 				packedDesign.addNet(net);
 		}
@@ -356,24 +356,24 @@ public class XdlPacker {
 	}
 
 	private static class NetBooleanPair {
-		Net net;
+		XdlNet net;
 		boolean drivesGeneralFabric;
 
-		public NetBooleanPair(Net net, boolean drivesGeneralFabric) {
+		public NetBooleanPair(XdlNet net, boolean drivesGeneralFabric) {
 			this.net = net;
 			this.drivesGeneralFabric = drivesGeneralFabric;
 		}
 	}
 
-	private Net connectToSitePin(CellNet cellNet, Site site,
-			Instance inst, SitePin sitePin)
+	private XdlNet connectToSitePin(CellNet cellNet, Site site,
+	                                XdlInstance inst, SitePin sitePin)
 	{
-		Net net = new Net();
+		XdlNet net = new XdlNet();
 		net.setName(site.getName() + "_" + sitePin.getName());
 		net.setType(determineNetType(cellNet));
 
 		// Add the source pin to the net
-		Pin pin = new Pin(true, sitePin.getName(), inst);
+		XdlPin pin = new XdlPin(true, sitePin.getName(), inst);
 		net.addPin(pin);
 
 		// Traverse the net to find all of the sinks
@@ -396,7 +396,7 @@ public class XdlPacker {
 	}
 
 	// traverse the general fabric looking for sites
-	private void traverseGeneralFabric(Net net, SitePin sourcePin, Wire sourceWire) {
+	private void traverseGeneralFabric(XdlNet net, SitePin sourcePin, Wire sourceWire) {
 		traverseGeneralFabric(net, sourceWire);
 
 		if (isSliceCarrySource(sourcePin)) {
@@ -410,7 +410,7 @@ public class XdlPacker {
 	}
 
 	// traverse the general fabric looking for sites
-	private void traverseGeneralFabric(Net net, Wire sourceWire) {
+	private void traverseGeneralFabric(XdlNet net, Wire sourceWire) {
 		wiresUsedInRoute.add(sourceWire);
 		for (Connection c : sourceWire.getWireConnections()) {
 			Wire sinkWire = c.getSinkWire();
@@ -432,11 +432,11 @@ public class XdlPacker {
 			SitePin sinkPin = sinkWire.getTile().getSitePinOfWire(sinkWire.getWireEnum());
 			if (sinkPin != null) {
 				// Only continue if the sink pin is on a used site
-				Instance inst = packedDesign.getInstanceAtPrimitiveSite(sinkPin.getSite());
+				XdlInstance inst = packedDesign.getInstanceAtPrimitiveSite(sinkPin.getSite());
 				if (inst != null) {
 					// follow the wire through the site and add it if it connects to a BEL pin
 					if (traverseSinkSite(sinkPin.getInternalWire())) {
-						net.addPin(new Pin(false, sinkPin.getName(), inst));
+						net.addPin(new XdlPin(false, sinkPin.getName(), inst));
 					}
 				}
 			}
@@ -469,7 +469,7 @@ public class XdlPacker {
 
 		Site site = sourceWire.getSite();
 		// find the instance of this site
-		Instance inst = packedDesign.getInstanceAtPrimitiveSite(site);
+		XdlInstance inst = packedDesign.getInstanceAtPrimitiveSite(site);
 		assert inst != null;
 
 		boolean reachesSiteSink = false;
@@ -494,7 +494,7 @@ public class XdlPacker {
 
 				// the pip was found so add it as an attribute to the instance
 				SiteTemplate template = packedDesign.getDevice().getSiteTemplate(inst.getType());
-				inst.addAttribute(new Attribute(template.getPipAttribute(sitePip)));
+				inst.addAttribute(new XdlAttribute(template.getPipAttribute(sitePip)));
 			}
 
 			if (traverseSinkSite(sinkWire))

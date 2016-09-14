@@ -28,8 +28,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import edu.byu.ece.rapidSmith.design.xdl.Design;
-import edu.byu.ece.rapidSmith.design.xdl.Net;
+import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
+import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
 import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.TileType;
@@ -66,10 +66,10 @@ public class CountingExample {
 	 * @param nets The nets to analyze.
 	 * @return The number of unique switch matrices used in the nets provided.
 	 */
-	public static int countSwitchMatricesUsed(Collection<Net> nets){
+	public static int countSwitchMatricesUsed(Collection<XdlNet> nets){
 		HashSet<String> tiles = new HashSet<String>();
 		HashSet<TileType> intTypes = null;
-		for(Net n : nets){
+		for(XdlNet n : nets){
 			if(intTypes == null) {
 				// TODO Looks like getSwitchMatrixTypes should be static
 				intTypes = n.getSourceTile().getDevice().getSwitchMatrixTypes();
@@ -91,13 +91,13 @@ public class CountingExample {
 	 * @param nets Nets to analyze
 	 * @return
 	 */
-	public static Map<WireType,Integer> countUsedWireLengths(Collection<Net> nets){
+	public static Map<WireType,Integer> countUsedWireLengths(Collection<XdlNet> nets){
 		HashMap<WireType, Integer> wireCounts = new HashMap<WireType, Integer>();
 		HashSet<TileType> intTypes = null;
 		Device dev = null;
 		// points
 		
-		for(Net n : nets){
+		for(XdlNet n : nets){
 			if(intTypes == null) {
 				// TODO Looks like getSwitchMatrixTypes should be static
 				intTypes = n.getSourceTile().getDevice().getSwitchMatrixTypes();
@@ -144,7 +144,7 @@ public class CountingExample {
 			System.out.println("Please supply an XDL file name");
 			System.exit(0);
 		}
-		Design d = new XDLReader().readDesign(Paths.get(args[0]));
+		XdlDesign d = new XDLReader().readDesign(Paths.get(args[0]));
 		int switchMatricesUsed = countSwitchMatricesUsed(d.getNets());
 		System.out.println("      Number of nets: " + d.getNets().size());
 		System.out.println("Switch matrices used: " + switchMatricesUsed);
