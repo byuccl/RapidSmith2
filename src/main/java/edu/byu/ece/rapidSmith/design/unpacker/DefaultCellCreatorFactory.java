@@ -1,6 +1,6 @@
 package edu.byu.ece.rapidSmith.design.unpacker;
 
-import edu.byu.ece.rapidSmith.design.xdl.Instance;
+import edu.byu.ece.rapidSmith.design.xdl.XdlInstance;
 import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
 import edu.byu.ece.rapidSmith.device.BelId;
 
@@ -17,7 +17,7 @@ public class DefaultCellCreatorFactory implements CellCreatorFactory {
 	private Map<String, String> attributes = new HashMap<>();
 
 	@Override
-	public CellCreator build(Instance inst) {
+	public CellCreator build(XdlInstance inst) {
 		DefaultCellCreator cellCreator = new DefaultCellCreator();
 		cellCreator.setCellType(cellType);
 		cellCreator.setPinMap(pinMap);

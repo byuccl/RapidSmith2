@@ -35,9 +35,9 @@ import com.trolltech.qt.gui.QLineEdit;
 import com.trolltech.qt.gui.QSplitter;
 import com.trolltech.qt.gui.QWidget;
 
-import edu.byu.ece.rapidSmith.design.xdl.Design;
-import edu.byu.ece.rapidSmith.design.xdl.ModuleInstance;
-import edu.byu.ece.rapidSmith.design.xdl.Net;
+import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
+import edu.byu.ece.rapidSmith.design.xdl.XdlModuleInstance;
+import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
 import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.design.subsite.Connection;
 import edu.byu.ece.rapidSmith.device.Tile;
@@ -60,7 +60,7 @@ public class TileWindow extends QWidget{
 	/** Associated scene with this window */
 	protected DesignTileScene scene;
 	/** The current design */
-	protected Design design;
+	protected XdlDesign design;
 	/** The layout for the window */
 	private QGridLayout layout;
 	/** The sidebar view (for use with timing analysis) */
@@ -107,14 +107,14 @@ public class TileWindow extends QWidget{
 	 * Updates the design.
 	 * @param design New design to set.
 	 */
-	public void setDesign(Design design){
+	public void setDesign(XdlDesign design){
 		this.design = design;
 		scene.setDesign(this.design);
 		scene.initializeScene(true, true);
 		scene.setDevice(design.getDevice());
 
 		// Create hard macro blocks
-		for(ModuleInstance mi : design.getModuleInstances()){
+		for(XdlModuleInstance mi : design.getModuleInstances()){
 			scene.addItem(new GuiModuleInstance(mi, scene, false));
 		}
 	}
@@ -144,7 +144,7 @@ public class TileWindow extends QWidget{
 				if(pe.getType().equals("net")){
 					if(pe.getClass().equals(RoutingPathElement.class)){
 						RoutingPathElement rpe = (RoutingPathElement) pe;
-						Net net = rpe.getNet();
+						XdlNet net = rpe.getNet();
 						conns.addAll(getAllConnections(net));
 						/*for(Connection conn : conns){
 							scn.drawWire(conn);
@@ -159,7 +159,7 @@ public class TileWindow extends QWidget{
 		scn.sortPaths();
 	}
 
-	public ArrayList<WireJunction> getAllConnections(Net net){
+	public ArrayList<WireJunction> getAllConnections(XdlNet net){
 		ArrayList<WireJunction> conns = new ArrayList<>();
 		Set<Wire> wireSet = new HashSet<>();
 		for(PIP p : net.getPIPs()){

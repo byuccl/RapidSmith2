@@ -25,21 +25,21 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import edu.byu.ece.rapidSmith.design.xdl.Design;
-import edu.byu.ece.rapidSmith.design.xdl.Net;
+import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
+import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
 import edu.byu.ece.rapidSmith.design.NetType;
-import edu.byu.ece.rapidSmith.design.xdl.Pin;
+import edu.byu.ece.rapidSmith.design.xdl.XdlPin;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;
 
 
 public class UnrouteNets {
 	
-	public static ArrayList<Net> combineStaticNets(Collection<Net> nets){
-		ArrayList<Net> gndNets = new ArrayList<Net>();
-		ArrayList<Net> vccNets = new ArrayList<Net>();
-		ArrayList<Net> newNets = new ArrayList<Net>();
-		for(Net net : nets){
+	public static ArrayList<XdlNet> combineStaticNets(Collection<XdlNet> nets){
+		ArrayList<XdlNet> gndNets = new ArrayList<XdlNet>();
+		ArrayList<XdlNet> vccNets = new ArrayList<XdlNet>();
+		ArrayList<XdlNet> newNets = new ArrayList<XdlNet>();
+		for(XdlNet net : nets){
 			if(net.getType().equals(NetType.GND)) {
 				gndNets.add(net);
 			}
@@ -57,22 +57,22 @@ public class UnrouteNets {
 		}
 		
 		
-		Net gndNet = new Net();
+		XdlNet gndNet = new XdlNet();
 		gndNet.setName("GLOBAL_LOGIC0");
 		gndNet.setType(NetType.GND);
-		for(Net net : gndNets){
-			for(Pin pin : net.getPins()) {
+		for(XdlNet net : gndNets){
+			for(XdlPin pin : net.getPins()) {
 				if(!pin.isOutPin()) {
 					gndNet.addPin(pin);
 				}
 			}
 		}
 		
-		Net vccNet = new Net();
+		XdlNet vccNet = new XdlNet();
 		vccNet.setName("GLOBAL_LOGIC1");
 		vccNet.setType(NetType.VCC);
-		for(Net net : vccNets){
-			for(Pin pin : net.getPins()) {
+		for(XdlNet net : vccNets){
+			for(XdlPin pin : net.getPins()) {
 				if(!pin.isOutPin()) {
 					vccNet.addPin(pin);
 				}
@@ -91,7 +91,7 @@ public class UnrouteNets {
 			System.out.println("USAGE: <input.xdl> <output.xdl>");
 			System.exit(0);
 		}
-		Design design = new XDLReader().readDesign(Paths.get(args[0]));
+		XdlDesign design = new XDLReader().readDesign(Paths.get(args[0]));
 		design.unrouteDesign();
 		design.setNets(combineStaticNets(design.getNets()));
 		new XDLWriter().writeXDL(design, Paths.get(args[1]));

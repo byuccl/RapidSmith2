@@ -21,7 +21,7 @@
 package edu.byu.ece.rapidSmith.timing;
 
 
-import edu.byu.ece.rapidSmith.design.xdl.Net;
+import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
 
 public class PathDelay extends Path {
 	/** Delay or offset in nanoseconds (data path - clock path skew + uncertainty) */
@@ -29,7 +29,7 @@ public class PathDelay extends Path {
 	/** Skew estimated for the clock path */
 	private float clockPathSkew;
 	/** The net driving the clock on the source register */
-	private Net sourceClock;
+	private XdlNet sourceClock;
 	
 	
 	/**
@@ -60,13 +60,13 @@ public class PathDelay extends Path {
 	/**
 	 * @return the sourceClock
 	 */
-	public Net getSourceClock() {
+	public XdlNet getSourceClock() {
 		return sourceClock;
 	}
 	/**
 	 * @param sourceClock the sourceClock to set
 	 */
-	public void setSourceClock(Net sourceClock) {
+	public void setSourceClock(XdlNet sourceClock) {
 		this.sourceClock = sourceClock;
 	}
 }

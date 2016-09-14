@@ -1,6 +1,6 @@
 package edu.byu.ece.rapidSmith.device;
 
-import edu.byu.ece.rapidSmith.design.xdl.Attribute;
+import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
 import edu.byu.ece.rapidSmith.design.subsite.SitePip;
 
 import java.io.Serializable;
@@ -29,7 +29,7 @@ public final class SiteTemplate implements Serializable {
 	// Map of the site wires to the bel pin templates the wire connect to
 	private transient Map<Integer, BelPinTemplate> belPins;
 	// Map of XDL attributes that should be created for each PIP
-	private Map<Integer, Map<Integer, Attribute>> pipAttributes;
+	private Map<Integer, Map<Integer, XdlAttribute>> pipAttributes;
 
 	public SiteType getType() {
 		return type;
@@ -103,15 +103,15 @@ public final class SiteTemplate implements Serializable {
 		this.internalSiteWireMap = internalSiteWireMap;
 	}
 
-	public Map<Integer, Map<Integer, Attribute>> getPipAttributes() {
+	public Map<Integer, Map<Integer, XdlAttribute>> getPipAttributes() {
 		return pipAttributes;
 	}
 
-	public Attribute getPipAttribute(SitePip pip) {
+	public XdlAttribute getPipAttribute(SitePip pip) {
 		return pipAttributes.get(pip.getStartWire()).get(pip.getEndWire());
 	}
 
-	public void setPipAttributes(Map<Integer, Map<Integer, Attribute>> pipAttributes) {
+	public void setPipAttributes(Map<Integer, Map<Integer, XdlAttribute>> pipAttributes) {
 		this.pipAttributes = pipAttributes;
 	}
 
@@ -177,7 +177,7 @@ public final class SiteTemplate implements Serializable {
 		private WireHashMap routing;
 		private Collection<SitePinTemplate> sources;
 		private Collection<SitePinTemplate> sinks;
-		private Map<Integer, Map<Integer, Attribute>> pipAttributes;
+		private Map<Integer, Map<Integer, XdlAttribute>> pipAttributes;
 
 		public Object readResolve() {
 			SiteTemplate template = new SiteTemplate();

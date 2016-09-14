@@ -1,10 +1,10 @@
 package edu.byu.ece.rapidSmith.design.unpacker;
 
-import edu.byu.ece.rapidSmith.design.xdl.Instance;
+import edu.byu.ece.rapidSmith.design.xdl.XdlInstance;
 
 /**
  *
  */
 public interface CellCreatorFactory {
-	CellCreator build(Instance instance);
+	CellCreator build(XdlInstance instance);
 }

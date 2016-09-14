@@ -1,20 +1,20 @@
 package edu.byu.ece.rapidSmith.design.unpacker.virtex6;
 
-import edu.byu.ece.rapidSmith.design.xdl.Design;
-import edu.byu.ece.rapidSmith.design.xdl.Instance;
+import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
+import edu.byu.ece.rapidSmith.design.xdl.XdlInstance;
 import edu.byu.ece.rapidSmith.design.unpacker.UnpackerUtils;
 
 /**
  *
  */
 public class V6UnpackerUtils implements UnpackerUtils {
-	private Instance staticSourceInst;
+	private XdlInstance staticSourceInst;
 
 	@Override
-	public Design prepareForUnpacker(Design design) {
+	public XdlDesign prepareForUnpacker(XdlDesign design) {
 		// TODO return a new design
 		// Design prepped = design.deepCopy();
-		for (Instance inst : design.getInstances()) {
+		for (XdlInstance inst : design.getInstances()) {
 			switch (inst.getType()) {
 				case SLICEL :
 				case SLICEM :
@@ -31,7 +31,7 @@ public class V6UnpackerUtils implements UnpackerUtils {
 		return design;
 	}
 
-	private void detailStaticSlice(Instance inst, boolean isVcc) {
+	private void detailStaticSlice(XdlInstance inst, boolean isVcc) {
 		String attrName = isVcc ? "_VCC_SOURCE" : "_GND_SOURCE";
 		if (!inst.hasAttribute(attrName))
 			return;
@@ -47,7 +47,7 @@ public class V6UnpackerUtils implements UnpackerUtils {
 		inst.addAttribute(source + "USED", "", "0");
 	}
 
-	private void detailStaticTieoff(Instance inst, boolean isVcc) {
+	private void detailStaticTieoff(XdlInstance inst, boolean isVcc) {
 		String attrName = isVcc ? "_VCC_SOURCE" : "_GND_SOURCE";
 		if (!inst.hasAttribute(attrName))
 			return;

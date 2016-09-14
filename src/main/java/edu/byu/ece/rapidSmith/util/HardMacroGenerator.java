@@ -51,17 +51,17 @@ import java.util.regex.Pattern;
 public class HardMacroGenerator {
 
 	/** This variable keeps track of which instances should be removed from the original design */
-	private ArrayList<Instance> instancesToRemove;
+	private ArrayList<XdlInstance> instancesToRemove;
 	/** This variable keeps track of which nets should be removed from the original design */
-	private ArrayList<Net> netsToRemove;
+	private ArrayList<XdlNet> netsToRemove;
 	/** This variable keeps track of which instances should be added from the original design */
-	private ArrayList<Instance> instancesToAdd;
+	private ArrayList<XdlInstance> instancesToAdd;
 	/** This variable keeps track of which nets should be added from the original design */
-	private ArrayList<Net> netsToAdd;
+	private ArrayList<XdlNet> netsToAdd;
 	/** The XDL design that will be converted to a hard macro */
-	private Design design;
+	private XdlDesign design;
 	/** The hard macro that will be created, eventually will be added to design */
-	private Module hardMacro;
+	private XdlModule hardMacro;
 	/** All of the InstanceTypes that are not allowed in hard macros  */
 	private static HashSet<SiteType> forbiddenTypes;
 	static{
@@ -103,7 +103,7 @@ public class HardMacroGenerator {
 	 * Constructor
 	 * @param design The XDL_Design that should be converted to a hard macro
 	 */
-	public HardMacroGenerator(Design design){
+	public HardMacroGenerator(XdlDesign design){
 		this.design = design;
 		if(!(this.design.getExactFamilyName().contains("virtex4") || this.design.getExactFamilyName().contains("virtex5"))){
 			MessageGenerator.briefErrorAndExit("HMG does not support " + design.getExactFamilyName());
@@ -116,7 +116,7 @@ public class HardMacroGenerator {
 		netsToRemove = new ArrayList<>();
 		instancesToAdd = new ArrayList<>();
 		netsToAdd = new ArrayList<>();
-		hardMacro = new Module();
+		hardMacro = new XdlModule();
 	
 	}
 	
@@ -127,9 +127,9 @@ public class HardMacroGenerator {
 	 * @param vhdName The output file name, used to generate the VHDL wrapper file name.
 	 * @return The newly created hard macro.
 	 */
-	public Design convertToHardMacro(String vhdName){
+	public XdlDesign convertToHardMacro(String vhdName){
 		hardMacro.setName(design.getName() + "_HARD_MACRO");
-		hardMacro.addAttribute(new Attribute("_SYSTEM_MACRO","","FALSE"));
+		hardMacro.addAttribute(new XdlAttribute("_SYSTEM_MACRO","","FALSE"));
 		originalVHDLFileName = vhdName;
 		
 		// Initialize OutputBuffer for VHD file
@@ -148,14 +148,14 @@ public class HardMacroGenerator {
 			failAndExit("Problem creating file: " + fileNameVHD);
 		}
 
-		for(Instance inst : design.getInstances()){
+		for(XdlInstance inst : design.getInstances()){
 			if(inst.getName().startsWith("IOBSLICE_")){
 				inst.setType(SiteType.IOB);
 			}
 		}
 		
 		//check for unplaced instances
-		for(Instance instance: design.getInstances()){
+		for(XdlInstance instance: design.getInstances()){
 			if(!instance.isPlaced()){
 				failAndExit("This design is not fully placed.  Did PAR fail?");
 			}
@@ -166,7 +166,7 @@ public class HardMacroGenerator {
 		
 		// Make the design a hard macro
 		design.setIsHardMacro(true);
-		design.setName(Design.hardMacroDesignName);
+		design.setName(XdlDesign.hardMacroDesignName);
 		
 		//Handle Nets
 		handleNets();
@@ -184,10 +184,10 @@ public class HardMacroGenerator {
 		handleTIEOFFS();
 
 		//add instances and nets
-		for(Instance i: instancesToAdd){
+		for(XdlInstance i: instancesToAdd){
 			design.addInstance(i);
 		}
-		for(Net n: netsToAdd){
+		for(XdlNet n: netsToAdd){
 			design.addNet(n);
 		}
 		
@@ -202,10 +202,10 @@ public class HardMacroGenerator {
 		handleSHAPE();
 		
 		// Move hard macro into design file
-		for(Instance i: design.getInstances()){
+		for(XdlInstance i: design.getInstances()){
 			hardMacro.addInstance(i);
 		}
-		for(Net n: design.getNets()){
+		for(XdlNet n: design.getNets()){
 			hardMacro.addNet(n);
 		}
 
@@ -239,9 +239,9 @@ public class HardMacroGenerator {
 	 * to a design results with the duplicate shape names.
 	 */
 	public void handleSHAPE(){
-		for(Instance i: design.getInstances()){
-			ArrayList<Attribute> attributesToRemove = new ArrayList<>();
-			for(Attribute a: i.getAttributes()){
+		for(XdlInstance i: design.getInstances()){
+			ArrayList<XdlAttribute> attributesToRemove = new ArrayList<>();
+			for(XdlAttribute a: i.getAttributes()){
 				if(a.getValue().contains("XDL_SHAPE")){
 					attributesToRemove.add(a);
 				}
@@ -255,11 +255,11 @@ public class HardMacroGenerator {
 	 * be part of a hard macro. We are assuming that they were not intentional.
 	 */
 	public void handleIOLOGIC(){
-		for(Instance inst : design.getInstances()){
+		for(XdlInstance inst : design.getInstances()){
 			if(inst.getType().equals(SiteType.ILOGIC)){
 				boolean foundBadInstance = false;
 				if(inst.getName().contains("XDL_DUMMY_IOI")){
-					for(Attribute attr : inst.getAttributes()){
+					for(XdlAttribute attr : inst.getAttributes()){
 						if(attr.getPhysicalName().equals("_NO_USER_LOGIC")){
 							foundBadInstance = true;
 							instancesToRemove.add(inst);
@@ -268,14 +268,14 @@ public class HardMacroGenerator {
 					}
 				}
 				if(!foundBadInstance){
-					Instance newSLICE = createRegisterSlice(inst.getName());
+					XdlInstance newSLICE = createRegisterSlice(inst.getName());
 					placeStaticSlice(newSLICE, false);
 					newSLICE.setNetList(inst.getNetList());
 					instancesToRemove.add(inst);
 					instancesToAdd.add(newSLICE);
-					for(Net net : inst.getNetList()){
+					for(XdlNet net : inst.getNetList()){
 						net.getPIPs().clear();
-						for(Pin pin : net.getPins()){
+						for(XdlPin pin : net.getPins()){
 							if(pin.getInstance().equals(inst)){
 								pin.setInstance(newSLICE);
 								String pinName = pin.getName();
@@ -297,7 +297,7 @@ public class HardMacroGenerator {
 			else if(inst.getType().equals(SiteType.OLOGIC)){
 				boolean foundBadInstance = false;
 				if(inst.getName().contains("XDL_DUMMY_IOI")){
-					for(Attribute attr : inst.getAttributes()){
+					for(XdlAttribute attr : inst.getAttributes()){
 						if(attr.getPhysicalName().equals("_NO_USER_LOGIC")){
 							foundBadInstance = true;
 							instancesToRemove.add(inst);
@@ -306,14 +306,14 @@ public class HardMacroGenerator {
 					}
 				}
 				if(!foundBadInstance){
-					Instance newSLICE = createRegisterSlice(inst.getName());
+					XdlInstance newSLICE = createRegisterSlice(inst.getName());
 					placeStaticSlice(newSLICE, false);
 					newSLICE.setNetList(inst.getNetList());
 					instancesToRemove.add(inst);
 					instancesToAdd.add(newSLICE);
-					for(Net net : inst.getNetList()){
+					for(XdlNet net : inst.getNetList()){
 						net.getPIPs().clear();
-						for(Pin pin : net.getPins()){
+						for(XdlPin pin : net.getPins()){
 							if(pin.getInstance().equals(inst)){
 								pin.setInstance(newSLICE);
 								String pinName = pin.getName();
@@ -337,7 +337,7 @@ public class HardMacroGenerator {
 		design.getInstances().removeAll(instancesToRemove);
 		instancesToRemove.clear();
 		
-		for(Instance i: instancesToAdd){
+		for(XdlInstance i: instancesToAdd){
 			design.addInstance(i);
 		}
 		//design.getInstances().addAll(instancesToAdd);
@@ -350,9 +350,9 @@ public class HardMacroGenerator {
 	 */
 	private void handleNets(){
 		// Iterate through all nets to turn design into hard macro
-		Pin pin = null;
-		for(Net net: design.getNets()){
-			ArrayList<Pin> pins = null;
+		XdlPin pin = null;
+		for(XdlNet net: design.getNets()){
+			ArrayList<XdlPin> pins = null;
 			
 			//check for forbidden pips and unroute
 			boolean clearPips = false;
@@ -378,7 +378,7 @@ public class HardMacroGenerator {
 				
 				//check to see if the BUFG has an IOBSource before removing
 				boolean IOBSource = false;
-				for(Net n : pin.getInstance().getNetList()){
+				for(XdlNet n : pin.getInstance().getNetList()){
 					if(n.getSource().getInstance().getType().equals(SiteType.IOB)){
 						IOBSource = true;
 						break;
@@ -393,7 +393,7 @@ public class HardMacroGenerator {
 					net.getPIPs().clear();
 					
 					// Arbitrarily choose an inpin as the new port
-					Pin port = net.getPins().get(0);
+					XdlPin port = net.getPins().get(0);
 					String clkname = pin.getInstance().getName();
 					String[] parts = clkname.split("_");
 					clkname = "";
@@ -409,7 +409,7 @@ public class HardMacroGenerator {
 						clkname = clkname.substring(0, clkname.length()-1);
 					}
 					
-					Port newPort = new Port(clkname +"_inport",port);
+					XdlPort newPort = new XdlPort(clkname +"_inport",port);
 					hardMacro.getPorts().add(newPort);
 					port.setPort(newPort);
 					
@@ -418,7 +418,7 @@ public class HardMacroGenerator {
 			}
 			// Rip out DCMs/PMV
 			else if((pin = isNetConnectedToDCMOrPMV(net)) != null){
-				for(Pin p : net.getPins()){
+				for(XdlPin p : net.getPins()){
 					instancesToRemove.add(p.getInstance());
 				}
 				netsToRemove.add(net);
@@ -433,14 +433,14 @@ public class HardMacroGenerator {
 	 */
 	private void handleIOSERDES(){
 		// Remove ISERDES/OSERDES
-		for(Instance inst : design.getInstances()){
+		for(XdlInstance inst : design.getInstances()){
 			if(inst.getType().equals(SiteType.ISERDES) ||
 			   inst.getType().equals(SiteType.OSERDES)){
 				instancesToRemove.add(inst);
 			}
 			boolean foundBadInstance = false;
 			if(inst.getName().contains("XDL_DUMMY_CLB")){
-				for(Attribute attr : inst.getAttributes()){
+				for(XdlAttribute attr : inst.getAttributes()){
 					if(attr.getPhysicalName().equals("_NO_USER_LOGIC")){
 						foundBadInstance = true;
 						break;
@@ -449,12 +449,12 @@ public class HardMacroGenerator {
 				if(!foundBadInstance){
 					inst.getAttributes().clear();
 					if(design.getExactFamilyName().contains("virtex4")){
-						inst.getAttributes().add(new Attribute("G","","#LUT:D=0"));
-						inst.getAttributes().add(new Attribute("YUSED","","0"));
+						inst.getAttributes().add(new XdlAttribute("G","","#LUT:D=0"));
+						inst.getAttributes().add(new XdlAttribute("YUSED","","0"));
 					}else if(design.getExactFamilyName().contains("virtex5")){
 						//TODO V5
-						inst.getAttributes().add(new Attribute("D6LUT","","#LUT:O6=0"));
-						inst.getAttributes().add(new Attribute("DUSED","","0"));
+						inst.getAttributes().add(new XdlAttribute("D6LUT","","#LUT:O6=0"));
+						inst.getAttributes().add(new XdlAttribute("DUSED","","0"));
 					}
 				}
 			}
@@ -468,7 +468,7 @@ public class HardMacroGenerator {
 	private void handleTIEOFFS(){
 		int diff = 10000;
 		int uniqueGL = 100000;
-		for(Net net : design.getNets()){
+		for(XdlNet net : design.getNets()){
 			if(net.isStaticNet()){
 				if(net.getSource().getInstance().getType().equals(SiteType.TIEOFF) || net.getSource().getInstance().getName().contains("XDL_DUMMY_CLB")){
 					instancesToRemove.add(net.getSource().getInstance());
@@ -476,11 +476,11 @@ public class HardMacroGenerator {
 
 					int num = 0;
 
-					for(Pin p : net.getPins()){
+					for(XdlPin p : net.getPins()){
 						if(!p.isOutPin()){
-							Port newPort = null;
+							XdlPort newPort = null;
 							if(net.getName().startsWith("GLOBAL_LOGIC")){
-								newPort = new Port(net.getName()+"_inport" + num,p);
+								newPort = new XdlPort(net.getName()+"_inport" + num,p);
 								hardMacro.getPorts().add(newPort);
 							}
 							else{
@@ -488,12 +488,12 @@ public class HardMacroGenerator {
 								if(net.getType() == NetType.VCC){
 									type = "1";
 								}
-								newPort = new Port("GLOBAL_LOGIC"+type+"_"+(uniqueGL++)+"_inport" + num,p);
+								newPort = new XdlPort("GLOBAL_LOGIC"+type+"_"+(uniqueGL++)+"_inport" + num,p);
 								hardMacro.getPorts().add(newPort);
 							}
 							
 							// Create a new net for each pin created
-							Net newNet = new Net();
+							XdlNet newNet = new XdlNet();
 							if(net.getName().charAt(12) == '0'){
 								newNet.setName("GLOBAL_LOGIC0_" + diff++);
 							}
@@ -531,7 +531,7 @@ public class HardMacroGenerator {
 		HashSet<String> instanceLocations = new HashSet<>();
 		HashSet<String> netNames = new HashSet<>();
 		HashSet<String> portNames = new HashSet<>();
- 		for(Instance inst: hardMacro.getInstances()){
+ 		for(XdlInstance inst: hardMacro.getInstances()){
 			// Check for illegal instances in hard macro
 			if(forbiddenTypes.contains(inst.getType())){
 				if(inst.getType().equals(SiteType.DCM_ADV) && inst.getName().startsWith("XIL_ML_UNUSED_DCM")){
@@ -544,7 +544,7 @@ public class HardMacroGenerator {
 				}
 			}
 			if(inst.getName().contains("XDL_DUMMY_CLB")){
-				for(Attribute attr : inst.getAttributes()){
+				for(XdlAttribute attr : inst.getAttributes()){
 					if(attr.getPhysicalName().equals("_NO_USER_LOGIC")){
 						System.out.println("ERROR: Instance is statically configured, this will not work" +
 								" as a hard macro: " + inst.getName());
@@ -568,7 +568,7 @@ public class HardMacroGenerator {
 				System.out.println("ERROR: Two instances placed at same location: " + inst.getName() + " " + inst.getPrimitiveSiteName());
 			}
 		}
- 		for(Port port : hardMacro.getPorts()){
+ 		for(XdlPort port : hardMacro.getPorts()){
  			// Check for unique port names
 			if(!portNames.contains(port.getName())){
 				portNames.add(port.getName());
@@ -577,7 +577,7 @@ public class HardMacroGenerator {
 				System.out.println("ERROR: Duplicate port name: " + port.getName());
 			}
  		}
- 		for(Net net : hardMacro.getNets()){
+ 		for(XdlNet net : hardMacro.getNets()){
  			// Check for illegal net types
  			if(net.isStaticNet()){
  				System.out.println("ERROR: Net type is illegal for hard macro: " + net.getName() 
@@ -598,7 +598,7 @@ public class HardMacroGenerator {
 	 * @param net The net to test.
 	 * @return The pin that is the driving the net if driven by a BUFG, null otherwise. 
 	 */
-	private Pin isNetOutputofBUFG(Net net) {
+	private XdlPin isNetOutputofBUFG(XdlNet net) {
 		if(net.getSource() != null){
 			return net.getSource().getInstance().getType().equals(SiteType.BUFG) ? net.getSource() : null;
 		}else{
@@ -611,8 +611,8 @@ public class HardMacroGenerator {
 	 * @param net The net to check.
 	 * @return The pin connected to a DCM or PMV.
 	 */
-	private Pin isNetConnectedToDCMOrPMV(Net net) {
-		for(Pin pin : net.getPins()){
+	private XdlPin isNetConnectedToDCMOrPMV(XdlNet net) {
+		for(XdlPin pin : net.getPins()){
 			if((pin.getInstance().getType().equals(SiteType.DCM_ADV) && pin.getInstanceName().startsWith("XIL_ML_UNUSED_DCM"))||
 					pin.getInstance().getType().equals(SiteType.PMV)){
 				return pin;
@@ -626,24 +626,24 @@ public class HardMacroGenerator {
 	 * @param name
 	 * @return the newly created slice instance
 	 */
-	private Instance createRegisterSlice(String name){
-		Instance inst = new Instance();
+	private XdlInstance createRegisterSlice(String name){
+		XdlInstance inst = new XdlInstance();
 		inst.setName(name);
 		inst.setType(SiteType.SLICEL);
 		if(design.getExactFamilyName().contains("virtex4")){
-			inst.getAttributes().add(new Attribute("DYMUX","","BY"));
-			inst.getAttributes().add(new Attribute("FFY","","#FF"));
-			inst.getAttributes().add(new Attribute("FFY_INIT_ATTR","","INIT0"));
-			inst.getAttributes().add(new Attribute("FFY_SR_ATTR","","SRLOW"));
-			inst.getAttributes().add(new Attribute("SYNC_ATTR","","SYNC"));
+			inst.getAttributes().add(new XdlAttribute("DYMUX","","BY"));
+			inst.getAttributes().add(new XdlAttribute("FFY","","#FF"));
+			inst.getAttributes().add(new XdlAttribute("FFY_INIT_ATTR","","INIT0"));
+			inst.getAttributes().add(new XdlAttribute("FFY_SR_ATTR","","SRLOW"));
+			inst.getAttributes().add(new XdlAttribute("SYNC_ATTR","","SYNC"));
 		}else if(design.getExactFamilyName().contains("virtex5")){
 			//TODO V5
 			//might need?: inst.getAttributes().add(new Attribute("CEUSED","","0"));
-			inst.getAttributes().add(new Attribute("DFFMUX","","DX"));
-			inst.getAttributes().add(new Attribute("DFF","","#FF"));
-			inst.getAttributes().add(new Attribute("DFFINIT","","INIT0"));
-			inst.getAttributes().add(new Attribute("DFFSR","","SRLOW"));
-			inst.getAttributes().add(new Attribute("SYNC_ATTR","","SYNC"));
+			inst.getAttributes().add(new XdlAttribute("DFFMUX","","DX"));
+			inst.getAttributes().add(new XdlAttribute("DFF","","#FF"));
+			inst.getAttributes().add(new XdlAttribute("DFFINIT","","INIT0"));
+			inst.getAttributes().add(new XdlAttribute("DFFSR","","SRLOW"));
+			inst.getAttributes().add(new XdlAttribute("SYNC_ATTR","","SYNC"));
 		}
 		return inst;
 	}
@@ -653,9 +653,9 @@ public class HardMacroGenerator {
 	 * @param net The net to test for IOB connections.
 	 * @return A list of pins connected to IOBs, the list will be empty if the net does not connect to IOBs.
 	 */
-	private ArrayList<Pin> isNetConnectedToIOB(Net net){
-		ArrayList<Pin> list = new ArrayList<>();
-		for(Pin pin : net.getPins()){
+	private ArrayList<XdlPin> isNetConnectedToIOB(XdlNet net){
+		ArrayList<XdlPin> list = new ArrayList<>();
+		for(XdlPin pin : net.getPins()){
 			if(isPinConnectedToIOB(pin)){
 				list.add(pin);
 			}
@@ -668,7 +668,7 @@ public class HardMacroGenerator {
 	 * @param pin The pin to test.
 	 * @return True if the pin is connected to an IOB, false otherwise.
 	 */
-	private boolean isPinConnectedToIOB(Pin pin){
+	private boolean isPinConnectedToIOB(XdlPin pin){
 		if(pin.getInstance().getType().equals(SiteType.IOB)||
 			pin.getInstance().getType().equals(SiteType.IOBM)||
 			pin.getInstance().getType().equals(SiteType.IOBS)){
@@ -683,7 +683,7 @@ public class HardMacroGenerator {
 	 * @param net The current net to convert.
 	 * @param pins The pins that are connected to IOBs.
 	 */
-	private void handleIOBs(Net net, ArrayList<Pin> pins) {
+	private void handleIOBs(XdlNet net, ArrayList<XdlPin> pins) {
 		// Add code to detect feedback on external nets 
 		// where the output is connected to IOBs, Xilinx has a bug in XDL conversion
 		
@@ -694,7 +694,7 @@ public class HardMacroGenerator {
 				// Check for pass through nets, an IOB that drive IOBs
 				boolean inputFound = false;
 				boolean outputFound = false;
-				for(Pin p : pins){
+				for(XdlPin p : pins){
 					if(!p.isOutPin()){
 						inputFound = true;
 					}
@@ -710,7 +710,7 @@ public class HardMacroGenerator {
 				String outputNames = "MULTI_OUTPUT_PORT";
 				
 				
-				for(Pin pin : pins){
+				for(XdlPin pin : pins){
 					// Remove the IOB instance
 					if(isTriState(pin.getInstance())){
 						failGracefully("This design contains tri-state IO, which is not yet supported by the HMG.");
@@ -720,7 +720,7 @@ public class HardMacroGenerator {
 					net.getPins().remove(pin);
 				}	
 				net.getPIPs().clear();
-				Port newPort = new Port(outputNames+"_outport",net.getSource());
+				XdlPort newPort = new XdlPort(outputNames+"_outport",net.getSource());
 				hardMacro.getPorts().add(newPort);
 				net.getSource().setPort(newPort);
 			}
@@ -738,7 +738,7 @@ public class HardMacroGenerator {
 				
 				instancesToRemove.add(net.getSource().getInstance());
 				
-				for(Pin pin : pins){
+				for(XdlPin pin : pins){
 					// Remove the IOB instance
 					if(isTriState(pin.getInstance())){
 						failGracefully("This design contains tri-state IO, which is not yet supported by the HMG.");
@@ -746,20 +746,20 @@ public class HardMacroGenerator {
 					instancesToRemove.add(pin.getInstance());
 					
 					// Create New Net and static SLICE source with Pin connected to static SLICE
-					Net newNet = new Net(pin.getInstance().getName() +"_"+ net.getType(), NetType.WIRE);
-					Instance inst = createStaticSliceSource(net.getType());
+					XdlNet newNet = new XdlNet(pin.getInstance().getName() +"_"+ net.getType(), NetType.WIRE);
+					XdlInstance inst = createStaticSliceSource(net.getType());
 					placeStaticSlice(inst, true);
-					Pin newPin = null;
+					XdlPin newPin = null;
 					if(design.getExactFamilyName().contains("virtex4")){
-						 newPin = new Pin(true,"Y",inst);
+						 newPin = new XdlPin(true,"Y",inst);
 					}else if(design.getExactFamilyName().contains("virtex5")){
 						//TODO V5
-						newPin = new Pin(true,"D",inst);
+						newPin = new XdlPin(true,"D",inst);
 					}
 					newNet.replaceSource(newPin);
 					netsToAdd.add(newNet);
 					instancesToAdd.add(inst);
-					Port newPort = new Port(pin.getInstance().getName()+"_outport",newPin);
+					XdlPort newPort = new XdlPort(pin.getInstance().getName()+"_outport",newPin);
 					hardMacro.getPorts().add(newPort);
 					newPin.setPort(newPort);
 				}
@@ -767,7 +767,7 @@ public class HardMacroGenerator {
 		}
 		else{ // This is just a single IOB
 			// There should only be 1 pin 
-			Pin pin = pins.get(0);
+			XdlPin pin = pins.get(0);
 			// Remove IOB
 			if(isTriState(pin.getInstance())){
 				failGracefully("Sorry, this design contains tri-state IO.  Tri-state IO is not yet supported by the HMG.");
@@ -779,7 +779,7 @@ public class HardMacroGenerator {
 			if(pin.isOutPin()){
 				// Check if this net drives the BUFG, if so, we don't want to create any ports
 				// We'll do that with the output of the BUFG
-				for(Pin p : net.getPins()){
+				for(XdlPin p : net.getPins()){
 					if(p.getInstance().getType().equals(SiteType.BUFG)){
 						netsToRemove.add(net);
 						return;
@@ -788,9 +788,9 @@ public class HardMacroGenerator {
 				// CASE 1:
 				// CASE 2:
 				// Now create a port, we just choose an arbitrary one if there are more than one
-				Pin p = net.getPins().get(0);
+				XdlPin p = net.getPins().get(0);
 				//XDL_Pin p = pins.get(0); -- This is wrong here because we already removed this pin
-				Port newPort = new Port(pin.getInstance().getName()+"_inport",p);
+				XdlPort newPort = new XdlPort(pin.getInstance().getName()+"_inport",p);
 				hardMacro.addPort(newPort);
 				p.setPort(newPort);
 			}
@@ -805,21 +805,21 @@ public class HardMacroGenerator {
 					netsToRemove.add(net);
 					
 					// Create New Net and static SLICE source with Pin connected to static SLICE
-					Net newNet = new Net(pin.getInstance().getName() + "_" + net.getType(),NetType.WIRE);
-					Instance inst = createStaticSliceSource(net.getType());
+					XdlNet newNet = new XdlNet(pin.getInstance().getName() + "_" + net.getType(),NetType.WIRE);
+					XdlInstance inst = createStaticSliceSource(net.getType());
 					placeStaticSlice(inst, true);
-					Pin newPin = null;
+					XdlPin newPin = null;
 					if(design.getExactFamilyName().contains("virtex4")){
-						 newPin = new Pin(true,"Y",inst);
+						 newPin = new XdlPin(true,"Y",inst);
 					}else if(design.getExactFamilyName().contains("virtex5")){
 						//TODO V5
-						newPin = new Pin(true,"D",inst);
+						newPin = new XdlPin(true,"D",inst);
 					}
 					newNet.getPins().add(newPin);
 					newNet.replaceSource(newPin);
 					netsToAdd.add(newNet);
 					instancesToAdd.add(inst);
-					Port newPort = new Port(pin.getInstance().getName()+"_outport",newPin);
+					XdlPort newPort = new XdlPort(pin.getInstance().getName()+"_outport",newPin);
 					hardMacro.getPorts().add(newPort);
 					newPin.setPort(newPort);
 				}
@@ -827,8 +827,8 @@ public class HardMacroGenerator {
 					
 					// CASE 3:
 					// CASE 4:
-					Pin p = net.getSource();
-					Port newPort = new Port(pin.getInstance().getName()+"_outport",p);
+					XdlPin p = net.getSource();
+					XdlPort newPort = new XdlPort(pin.getInstance().getName()+"_outport",p);
 					hardMacro.getPorts().add(newPort);
 					p.setPort(newPort);
 				}
@@ -841,37 +841,37 @@ public class HardMacroGenerator {
 	 * @param net The current net to convert.
 	 * @param pins The pins that are connected to IOBs.
 	 */
-	private void handlePassThruIOBs(Net net, ArrayList<Pin> pins) {
+	private void handlePassThruIOBs(XdlNet net, ArrayList<XdlPin> pins) {
 		System.out.println("WARNING: Design contains wires only connected to IOBs, net: " + net.getName());
 		System.out.println("         This net has been divided by a LUT. Performance of signal will go down.");
 		net.getPIPs().clear();
-		Pin inPin = null;
+		XdlPin inPin = null;
 		
-		for(Pin pin : pins){
+		for(XdlPin pin : pins){
 			// For each output IOB, create a new LUT and net
 			if(!pin.isOutPin()){
-				Net newOutputNet = new Net();
-				Instance newLUT = createPassThruSlice();
+				XdlNet newOutputNet = new XdlNet();
+				XdlInstance newLUT = createPassThruSlice();
 				placeStaticSlice(newLUT, true);
 				instancesToAdd.add(newLUT);
 				newOutputNet.setName(net.getName() + "_OUTPUT");
-				Pin newLUTPin = null;
+				XdlPin newLUTPin = null;
 				if(design.getExactFamilyName().contains("virtex4")){
-					 newLUTPin = new Pin(true,"Y",newLUT);
+					 newLUTPin = new XdlPin(true,"Y",newLUT);
 				}else if(design.getExactFamilyName().contains("virtex5")){
 					//TODO V5
-					newLUTPin = new Pin(true,"D",newLUT);
+					newLUTPin = new XdlPin(true,"D",newLUT);
 				}
 				newOutputNet.getPins().add(newLUTPin);
-				Pin newPin = null;
+				XdlPin newPin = null;
 				if(design.getExactFamilyName().contains("virtex4")){
-					 newPin = new Pin(false,"G1",newLUT);
+					 newPin = new XdlPin(false,"G1",newLUT);
 				}else if(design.getExactFamilyName().contains("virtex5")){
 					//TODO V5
-					newPin = new Pin(false,"D1",newLUT);
+					newPin = new XdlPin(false,"D1",newLUT);
 				}
 				net.getPins().add(newPin);
-				Port newPort = new Port(pin.getInstance().getName()+"_outport",
+				XdlPort newPort = new XdlPort(pin.getInstance().getName()+"_outport",
 						newLUTPin);
 				hardMacro.getPorts().add(newPort);
 				newLUTPin.setPort(newPort);
@@ -888,15 +888,15 @@ public class HardMacroGenerator {
 			failAndExit("ERROR: Check net: " + net.getName());
 		}
 		boolean containsBUFG = false;
-		Pin bufgPin = null;
-		for(Pin p : net.getPins()){
+		XdlPin bufgPin = null;
+		for(XdlPin p : net.getPins()){
 			if(p.getInstance().getType().equals(SiteType.BUFG)){
 				containsBUFG = true;
 				bufgPin = p;
 			}
 		}
 		if(!containsBUFG){
-			Port newPort = new Port(inPin.getInstance().getName()+"_inport",
+			XdlPort newPort = new XdlPort(inPin.getInstance().getName()+"_inport",
 					net.getPins().get(0));
 			hardMacro.getPorts().add(newPort);
 			net.getPins().get(0).setPort(newPort);
@@ -915,13 +915,13 @@ public class HardMacroGenerator {
 	 * static slices.
 	 * @param slice The slice to be placed.
 	 */
-	private void placeStaticSlice(Instance slice, boolean updateName){
+	private void placeStaticSlice(XdlInstance slice, boolean updateName){
 		int xAvg = 0;
 		int yAvg = 0;
 		int avg = 0;
 		HashSet<Site> sliceLocations = new HashSet<>();
 		// Find all used SLICEs in the current design 
-		for(Instance inst : design.getInstances()){
+		for(XdlInstance inst : design.getInstances()){
 			if(inst.getType().equals(SiteType.SLICEL) ||
 					inst.getType().equals(SiteType.SLICEM)){
 				sliceLocations.add(inst.getPrimitiveSite());
@@ -933,7 +933,7 @@ public class HardMacroGenerator {
 			}
 		}
 		// Also includes SLICEs that will be added to the design
-		for(Instance inst : instancesToAdd){
+		for(XdlInstance inst : instancesToAdd){
 			if(inst.getType().equals(SiteType.SLICEL) ||
 					inst.getType().equals(SiteType.SLICEM)){
 				sliceLocations.add(inst.getPrimitiveSite());
@@ -1019,17 +1019,17 @@ public class HardMacroGenerator {
 	 * @param netType Valid types are "gnd" and "vcc"
 	 * @return The newly create instance
 	 */
-	private Instance createStaticSliceSource(NetType netType){
-		Instance inst = new Instance();
+	private XdlInstance createStaticSliceSource(NetType netType){
+		XdlInstance inst = new XdlInstance();
 		inst.setName("RS_DUMMY_CLB");
 		inst.setType(SiteType.SLICEL);
 		if(design.getExactFamilyName().contains("virtex4")){
-			inst.getAttributes().add(new Attribute("G","","#LUT:D=" + (netType.equals(NetType.GND) ? "0" :"1")));
-			inst.getAttributes().add(new Attribute("YUSED","","0"));
+			inst.getAttributes().add(new XdlAttribute("G","","#LUT:D=" + (netType.equals(NetType.GND) ? "0" :"1")));
+			inst.getAttributes().add(new XdlAttribute("YUSED","","0"));
 		}else if(design.getExactFamilyName().contains("virtex5")){
 			//TODO V5
-			inst.getAttributes().add(new Attribute("DUSED","","0"));
-			inst.getAttributes().add(new Attribute("D6LUT","","#LUT:O6=" + (netType.equals(NetType.GND) ? "0" :"1")));
+			inst.getAttributes().add(new XdlAttribute("DUSED","","0"));
+			inst.getAttributes().add(new XdlAttribute("D6LUT","","#LUT:O6=" + (netType.equals(NetType.GND) ? "0" :"1")));
 		}
 		return inst;
 	}
@@ -1038,17 +1038,17 @@ public class HardMacroGenerator {
 	 * Creates a slice for a signal to pass through
 	 * @return the slice
 	 */
-	private Instance createPassThruSlice(){
-		Instance inst = new Instance();
+	private XdlInstance createPassThruSlice(){
+		XdlInstance inst = new XdlInstance();
 		inst.setName("XDL_LUT");
 		inst.setType(SiteType.SLICEL);
 		if(design.getExactFamilyName().contains("virtex4")){
-			inst.getAttributes().add(new Attribute("YUSED","","0"));
-			inst.getAttributes().add(new Attribute("G","","#LUT:D=A1"));			
+			inst.getAttributes().add(new XdlAttribute("YUSED","","0"));
+			inst.getAttributes().add(new XdlAttribute("G","","#LUT:D=A1"));
 		}else if(design.getExactFamilyName().contains("virtex5")){
 			//TODO V5
-			inst.getAttributes().add(new Attribute("DUSED","","0"));
-			inst.getAttributes().add(new Attribute("D6LUT","","#LUT:O6=A1"));
+			inst.getAttributes().add(new XdlAttribute("DUSED","","0"));
+			inst.getAttributes().add(new XdlAttribute("D6LUT","","#LUT:O6=A1"));
 		}
 		return inst;
 	}
@@ -1058,8 +1058,8 @@ public class HardMacroGenerator {
 	 * @param instance
 	 * @return True if tri-state
 	 */
-	public boolean isTriState(Instance instance){
-		for(Attribute cfg:instance.getAttributes()){
+	public boolean isTriState(XdlInstance instance){
+		for(XdlAttribute cfg:instance.getAttributes()){
 			if(cfg.getPhysicalName().compareTo("TUSED") == 0){
 				if(cfg.getValue().compareTo("#OFF") != 0){
 					return true;
@@ -1085,7 +1085,7 @@ public class HardMacroGenerator {
 		
 		HashMap<String,String[]> signalMap = null;
 		
-		for(Port port : hardMacro.getPorts()){
+		for(XdlPort port : hardMacro.getPorts()){
 			String portName = port.getName();
 			String busName;
 			Integer bitNumber = -1;
@@ -1137,7 +1137,7 @@ public class HardMacroGenerator {
 			}
 		}
 		
-		for(Port port : hardMacro.getPorts()){
+		for(XdlPort port : hardMacro.getPorts()){
 			String portName = port.getName();
 			
 			// Replace invalid VHDL identifier characters
@@ -1317,7 +1317,7 @@ public class HardMacroGenerator {
 			vhd.write("component " + hardMacro.getName() + newLine);
 			vhd.write("port(" + newLine);
 			int portCounter = hardMacro.getPorts().size();
-			for(Port port : hardMacro.getPorts()){
+			for(XdlPort port : hardMacro.getPorts()){
 				
 				vhd.write("  " + port.getName() + " :\t" +
 						(port.getName().contains("_inport") ? "in" : "out") +
@@ -1335,7 +1335,7 @@ public class HardMacroGenerator {
 			vhd.write("end component;" + newLine + newLine);
 			
 			multiCount = 0;
-			for(Port port : hardMacro.getPorts()){
+			for(XdlPort port : hardMacro.getPorts()){
 				if(port.getName().startsWith("MULTI_OUTPUT_PORT")){
 					vhd.write("signal multipleOutput_" + multiCount + " : std_logic;" + newLine);
 					multiCount++;
@@ -1364,7 +1364,7 @@ public class HardMacroGenerator {
 			vhd.write("  port map(" + newLine);
 			multiCount = 0;
 			portCounter = hardMacro.getPorts().size();
-			for(Port port : hardMacro.getPorts()){
+			for(XdlPort port : hardMacro.getPorts()){
 				
 				vhd.write("  " + port.getName() + " => ");
 				if(port.getName().startsWith("GLOBAL_LOGIC0")){
@@ -1472,8 +1472,8 @@ public class HardMacroGenerator {
 			System.out.println("USAGE: <input.xdl|input.ncd> <output file type: xdl|nmc> [optional: original_vhdl_top.vhd]");
 			System.exit(0);
 		}		
-		Design input;
-		Design output; 
+		XdlDesign input;
+		XdlDesign output;
 		String originalVHDLFileName = args.length==3 ? args[2] : null;
 		// If we are supplied an NCD, convert it to XDL
 		Path inputFile = Paths.get(args[0]);

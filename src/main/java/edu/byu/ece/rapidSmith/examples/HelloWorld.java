@@ -38,7 +38,7 @@ public class HelloWorld{
 
 	public static void main(String[] args) throws IOException {
 		// Create a new Design from scratch rather than load an existing design
-		Design design = new Design();
+		XdlDesign design = new XdlDesign();
 		
 		// Set its name
 		design.setName("helloWorld");
@@ -48,19 +48,19 @@ public class HelloWorld{
 		design.setPartName("xc4vfx12ff668-10");
 		
 		// Create a new instance
-		Instance myInstance = new Instance();
+		XdlInstance myInstance = new XdlInstance();
 		myInstance.setName("Bob");
 		myInstance.setType(SiteType.SLICEL);
 		// We need to add the instance to the design so it knows about it
 		design.addInstance(myInstance);
 		// Make the F LUT an Inverter Gate
-		myInstance.addAttribute(new Attribute("F","LUT_of_Bob","#LUT:D=~A1"));
+		myInstance.addAttribute(new XdlAttribute("F","LUT_of_Bob","#LUT:D=~A1"));
 		
 		// Add the instance to the design
 		design.addInstance(myInstance);
 		
 		// This is how we can get the reference to the instance from the design, by name
-		Instance bob = design.getInstance("Bob");
+		XdlInstance bob = design.getInstance("Bob");
 		
 		// Let's find a primitive site for our instance Bob
 		Map<String, Site> primitiveSites = design.getDevice().getPrimitiveSites();
@@ -92,29 +92,29 @@ public class HelloWorld{
 		}
 		
 		// Let's create an IOB to drive our Inverter gate in Bob's LUT
-		Instance myIOB = new Instance();
+		XdlInstance myIOB = new XdlInstance();
 		myIOB.setName("input");
 		myIOB.setType(SiteType.IOB);
 		design.addInstance(myIOB);
 		// These are typical attributes that need to be set to configure the IOB
 		// the way you like it
-		myIOB.addAttribute(new Attribute("INBUFUSED","","0"));
-		myIOB.addAttribute(new Attribute("IOATTRBOX","","LVCMOS25"));
+		myIOB.addAttribute(new XdlAttribute("INBUFUSED","","0"));
+		myIOB.addAttribute(new XdlAttribute("IOATTRBOX","","LVCMOS25"));
 		// Another way to find a primitive site is by name, this is the pin name 
 		// that you might find in a UCF file
 		myIOB.place(design.getDevice().getPrimitiveSite("C17"));
 		
 		// Let's also create a new net to connect the two pins
-		Net fred = new Net();
+		XdlNet fred = new XdlNet();
 		// Be sure to add fred to the design
 		design.addNet(fred);
 		fred.setName("fred");
 		// All nets are normally of type WIRE, however, some are also GND and VCC
 		fred.setType(NetType.WIRE);
 		// Add the IOB pin as an output pin or the source of the net
-		fred.addPin(new Pin(true,"I",myIOB));
+		fred.addPin(new XdlPin(true,"I",myIOB));
 		// Add Bob as the input pin or sink, which is the input to the inverter
-		fred.addPin(new Pin(false, "F1", bob));
+		fred.addPin(new XdlPin(false, "F1", bob));
 		
 		// Now let's write out our new design
 		// We'll print the standard XDL comments out
@@ -122,7 +122,7 @@ public class HelloWorld{
 		new XDLWriter().writeXDL(design, Paths.get(fileName));
 
 		// We can load XDL files the same way.
-		Design inputFromFile = new XDLReader().readDesign(Paths.get(fileName));
+		XdlDesign inputFromFile = new XDLReader().readDesign(Paths.get(fileName));
 
 		// Hello World
 		System.out.println(inputFromFile.getName());

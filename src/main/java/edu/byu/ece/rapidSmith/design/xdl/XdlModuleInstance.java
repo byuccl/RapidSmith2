@@ -35,32 +35,32 @@ import edu.byu.ece.rapidSmith.util.MessageGenerator;
  * 
  * @author Chris Lavin Created on: Jun 22, 2010
  */
-public class ModuleInstance{
+public class XdlModuleInstance {
 
 	/** Name of the module instance */
 	private String name;
 	/** The design which contains this module instance */
-	private transient Design design;
+	private transient XdlDesign design;
 	/** The module of which this object is an instance of */
-	private Module module;
+	private XdlModule module;
 	/** The anchor instance of the module instance */
-	private Instance anchor;
+	private XdlInstance anchor;
 	/** A list of all primitive instances which make up this module instance */
-	private ArrayList<Instance> instances;
+	private ArrayList<XdlInstance> instances;
 	/** A list of all nets internal to this module instance */
-	private ArrayList<Net> nets;
+	private ArrayList<XdlNet> nets;
 	
 	/**
 	 * Constructor initializing instance module name
 	 * @param name Name of the module instance
 	 */
-	public ModuleInstance(String name, Design design){
+	public XdlModuleInstance(String name, XdlDesign design){
 		this.name = name;
 		this.setDesign(design);
 		this.module = null;
 		this.setAnchor(null);
-		instances = new ArrayList<Instance>();
-		nets = new ArrayList<Net>();
+		instances = new ArrayList<XdlInstance>();
+		nets = new ArrayList<XdlNet>();
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class ModuleInstance{
 	 * which extend ModuleInstance.
 	 * @param moduleInstance The module instance to mimic.
 	 */
-	public ModuleInstance(ModuleInstance moduleInstance){
+	public XdlModuleInstance(XdlModuleInstance moduleInstance){
 		this.name = moduleInstance.name;
 		this.setDesign(moduleInstance.design);
 		this.module = moduleInstance.module;
@@ -83,7 +83,7 @@ public class ModuleInstance{
 	 * module instance.
 	 * @param inst The instance to add.
 	 */
-	public void addInstance(Instance inst){
+	public void addInstance(XdlInstance inst){
 		instances.add(inst);
 	}
 
@@ -91,7 +91,7 @@ public class ModuleInstance{
 	 * Adds the net to the net list that are members of the module instance.
 	 * @param net The net to add.
 	 */
-	public void addNet(Net net){
+	public void addNet(XdlNet net){
 		nets.add(net);
 	}
 
@@ -112,56 +112,56 @@ public class ModuleInstance{
 	/**
 	 * @param design the design to set
 	 */
-	public void setDesign(Design design){
+	public void setDesign(XdlDesign design){
 		this.design = design;
 	}
 
 	/**
 	 * @return the design
 	 */
-	public Design getDesign(){
+	public XdlDesign getDesign(){
 		return design;
 	}
 
 	/**
 	 * @return the moduleType
 	 */
-	public Module getModule(){
+	public XdlModule getModule(){
 		return module;
 	}
 
 	/**
 	 * @param module the module to set.
 	 */
-	public void setModule(Module module){
+	public void setModule(XdlModule module){
 		this.module = module;
 	}
 
 	/**
 	 * @return the instances
 	 */
-	public ArrayList<Instance> getInstances(){
+	public ArrayList<XdlInstance> getInstances(){
 		return instances;
 	}
 
 	/**
 	 * @param instances the instances to set
 	 */
-	public void setInstances(ArrayList<Instance> instances){
+	public void setInstances(ArrayList<XdlInstance> instances){
 		this.instances = instances;
 	}
 
 	/**
 	 * @return the nets
 	 */
-	public ArrayList<Net> getNets(){
+	public ArrayList<XdlNet> getNets(){
 		return nets;
 	}
 
 	/**
 	 * @param nets the nets to set
 	 */
-	public void setNets(ArrayList<Net> nets){
+	public void setNets(ArrayList<XdlNet> nets){
 		this.nets = nets;
 	}
 
@@ -169,7 +169,7 @@ public class ModuleInstance{
 	 * Sets the anchor instance for this module instance.
 	 * @param anchor The new anchor instance for this module instance.
 	 */
-	public void setAnchor(Instance anchor){
+	public void setAnchor(XdlInstance anchor){
 		this.anchor = anchor;
 	}
 
@@ -177,7 +177,7 @@ public class ModuleInstance{
 	 * Gets and returns the anchor instance for this module instance.
 	 * @return The anchor instance for this module instance.
 	 */
-	public Instance getAnchor(){
+	public XdlInstance getAnchor(){
 		return anchor;
 	}
 	
@@ -194,7 +194,7 @@ public class ModuleInstance{
 	public ArrayList<Site> getAllValidPlacements(){
 		ArrayList<Site> validSites = new ArrayList<Site>();
 		Site originalSite = getAnchor().getPrimitiveSite();
-		Design design = getDesign();
+		XdlDesign design = getDesign();
 		Site[] sites = design.getDevice().getAllCompatibleSites(getAnchor().getType());
 		for(Site newAnchorSite : sites){
 			if(place(newAnchorSite, design.getDevice())){
@@ -235,13 +235,13 @@ public class ModuleInstance{
 		}
 		
 		// save original placement in case new placement is invalid
-		HashMap<Instance, Site> originalSites;
-		originalSites = isPlaced() ? new HashMap<Instance, Site>() : null;
+		HashMap<XdlInstance, Site> originalSites;
+		originalSites = isPlaced() ? new HashMap<XdlInstance, Site>() : null;
 
 		//=======================================================//
 		/* Place instances at new location                       */
 		//=======================================================//
-		for(Instance inst : instances){
+		for(XdlInstance inst : instances){
 			Site templateSite = inst.getModuleTemplateInstance().getPrimitiveSite();
 			Tile newTile = module.getCorrespondingTile(templateSite.getTile(), newAnchorSite.getTile(), dev);
 			Site newSite = Device.getCorrespondingPrimitiveSite(templateSite, newTile);
@@ -257,7 +257,7 @@ public class ModuleInstance{
 					unplace();
 					return false;
 				}
-				for(Instance i : originalSites.keySet()){
+				for(XdlInstance i : originalSites.keySet()){
 					design.getInstance(i.getName()).place(originalSites.get(i));
 				}
 				return false;
@@ -276,9 +276,9 @@ public class ModuleInstance{
 		int mCout = we.getWireEnum("M_COUT");
 		int llCout = we.getWireEnum("LL_COUT");
 		int wl5beg_s0 = we.getWireEnum("WL5BEG_S0");
-		for(Net net : nets){
+		for(XdlNet net : nets){
 			net.getPIPs().clear();
-			Net templateNet = net.getModuleTemplateNet();
+			XdlNet templateNet = net.getModuleTemplateNet();
 			for(PIP pip : templateNet.getPIPs()){
 				Tile templatePipTile = pip.getTile();
 				Tile newPipTile = module.getCorrespondingTile(templatePipTile, newAnchorSite.getTile(), dev);
@@ -327,11 +327,11 @@ public class ModuleInstance{
 	 */
 	public void unplace(){
 		//unplace instances
-		for(Instance inst : instances){
+		for(XdlInstance inst : instances){
 			inst.unPlace();
 		}
 		//unplace nets (remove pips)
-		for(Net net : nets){
+		for(XdlNet net : nets){
 			net.getPIPs().clear();
 		}
 	}
@@ -371,7 +371,7 @@ public class ModuleInstance{
 			return false;
 		if(getClass() != obj.getClass())
 			return false;
-		ModuleInstance other = (ModuleInstance) obj;
+		XdlModuleInstance other = (XdlModuleInstance) obj;
 		if(name == null){
 			if(other.name != null)
 				return false;
