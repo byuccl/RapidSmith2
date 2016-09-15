@@ -22,7 +22,6 @@
 package edu.byu.ece.rapidSmith.device.creation;
 
 import edu.byu.ece.rapidSmith.design.Attribute;
-import edu.byu.ece.rapidSmith.design.subsite.Connection;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.device.helper.*;
 import edu.byu.ece.rapidSmith.primitiveDefs.*;
@@ -161,10 +160,7 @@ public final class DeviceGenerator {
 		tileWiresPool = new HashPool<>();
 
 		makeWireCorrections(wcsToAdd, wcsToRemove);
-
-		// we should add our function here
-		// addLutRouteThroughConnections()
-		
+	
 		device.constructDependentResources();
 
 		// free unneeded pools for garbage collection when done with
@@ -211,11 +207,6 @@ public final class DeviceGenerator {
 		}
 	}
 	
-	private static void addLutRoutethroughConnections(Device device, Document familyInfo) {
-		
-		familyInfo.getRootElement(); 
-	}
-
 	/**
 	 * Creates the templates for the primitive sites with information from the
 	 * primitive defs and device information file.
