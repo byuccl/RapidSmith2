@@ -653,6 +653,17 @@ public final class Site implements Serializable{
 	}
 	
 	/**
+	 * This method checks to see if the specified start and <br>
+	 * end wire form a bel routethrough.
+	 * @param startWire Start wire enum
+	 * @param endWire Sink wire enum
+	 * @return True if the wires form a routethrough
+	 */
+	public boolean isRoutethrough(Integer startWire, Integer endWire) {
+		return this.template.isRoutethrough(startWire, endWire);
+	}
+	
+	/**
 	 * This method gets the type of otherSite and calls the other method
 	 * public boolean isCompatiblePrimitiveType(PrimitiveType otherType);
 	 * See that method for more information.
