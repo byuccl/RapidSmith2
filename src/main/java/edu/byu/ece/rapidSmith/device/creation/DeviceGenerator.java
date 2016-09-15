@@ -27,9 +27,6 @@ import edu.byu.ece.rapidSmith.device.helper.*;
 import edu.byu.ece.rapidSmith.primitiveDefs.*;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
-
-import org.antlr.v4.runtime.FailedPredicateException;
-import org.hamcrest.core.StringStartsWith;
 import org.jdom2.Document;
 import org.jdom2.Element;
 
