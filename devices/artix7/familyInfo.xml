@@ -1570,34 +1570,226 @@
         <bel>
           <name>D6LUT</name>
           <type>D6LUT</type>
+		  <routethroughs>
+			  <routethrough>
+				<input>A1</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A2</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A3</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A4</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A5</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A6</input>
+				<output>O6</output>
+			  </routethrough>
+		  </routethroughs>
         </bel>
         <bel>
           <name>D5LUT</name>
           <type>D5LUT</type>
+		  <routethroughs>
+			  <routethrough>
+				<input>A1</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A2</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A3</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A4</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A5</input>
+				<output>O5</output>
+			  </routethrough>
+		  </routethroughs>
         </bel>
         <bel>
           <name>C6LUT</name>
           <type>C6LUT</type>
+		  <routethroughs>
+			  <routethrough>
+				<input>A1</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A2</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A3</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A4</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A5</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A6</input>
+				<output>O6</output>
+			  </routethrough>
+		  </routethroughs>
         </bel>
         <bel>
           <name>C5LUT</name>
           <type>C5LUT</type>
+		  <routethroughs>
+			  <routethrough>
+				<input>A1</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A2</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A3</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A4</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A5</input>
+				<output>O5</output>
+			  </routethrough>
+		  </routethroughs>
         </bel>
         <bel>
           <name>B6LUT</name>
           <type>B6LUT</type>
+		  <routethroughs>
+			  <routethrough>
+				<input>A1</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A2</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A3</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A4</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A5</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A6</input>
+				<output>O6</output>
+			  </routethrough>
+		  </routethroughs>
         </bel>
         <bel>
           <name>B5LUT</name>
           <type>B5LUT</type>
+		  <routethroughs>
+			  <routethrough>
+				<input>A1</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A2</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A3</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A4</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A5</input>
+				<output>O5</output>
+			  </routethrough>
+		  </routethroughs>
         </bel>
         <bel>
           <name>A6LUT</name>
           <type>A6LUT</type>
+		  <routethroughs>
+			  <routethrough>
+				<input>A1</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A2</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A3</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A4</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A5</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A6</input>
+				<output>O6</output>
+			  </routethrough>
+		  </routethroughs>
         </bel>
         <bel>
           <name>A5LUT</name>
           <type>A5LUT</type>
+		  <routethroughs>
+			  <routethrough>
+				<input>A1</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A2</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A3</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A4</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A5</input>
+				<output>O5</output>
+			  </routethrough>
+		  </routethroughs>
         </bel>
         <bel>
           <name>CARRY4</name>
@@ -1666,22 +1858,16 @@
       </bels>
       <corrections>
         <modify_element>    <name>A5FFMUX</name> <type>mux</type> </modify_element>
-<!--        <modify_element>    <name>A5LUT</name> <type>mux</type> </modify_element> -->
-<!--        <modify_element>    <name>A6LUT</name> <type>mux</type> </modify_element> -->
         <modify_element>    <name>ACY0</name> <type>mux</type> </modify_element>
         <modify_element>    <name>AFFMUX</name> <type>mux</type> </modify_element>
         <modify_element>    <name>AOUTMUX</name> <type>mux</type> </modify_element>
         <modify_element>    <name>AUSED</name> <type>mux</type> </modify_element>
         <modify_element>    <name>B5FFMUX</name> <type>mux</type> </modify_element>
-<!--        <modify_element>    <name>B5LUT</name> <type>mux</type> </modify_element> -->
-<!--        <modify_element>    <name>B6LUT</name> <type>mux</type> </modify_element> -->
         <modify_element>    <name>BCY0</name> <type>mux</type> </modify_element>
         <modify_element>    <name>BFFMUX</name> <type>mux</type> </modify_element>
         <modify_element>    <name>BOUTMUX</name> <type>mux</type> </modify_element>
         <modify_element>    <name>BUSED</name> <type>mux</type> </modify_element>
         <modify_element>    <name>C5FFMUX</name> <type>mux</type> </modify_element>
-<!--        <modify_element>    <name>C5LUT</name> <type>mux</type> </modify_element> -->
-<!--        <modify_element>    <name>C6LUT</name> <type>mux</type> </modify_element> -->
         <modify_element>    <name>CCY0</name> <type>mux</type> </modify_element>
         <modify_element>    <name>CEUSEDMUX</name> <type>mux</type> </modify_element>
         <modify_element>    <name>CFFMUX</name> <type>mux</type> </modify_element>
@@ -1690,8 +1876,6 @@
         <modify_element>    <name>COUTUSED</name> <type>mux</type> </modify_element>
         <modify_element>    <name>CUSED</name> <type>mux</type> </modify_element>
         <modify_element>    <name>D5FFMUX</name> <type>mux</type> </modify_element>
-<!--        <modify_element>    <name>D5LUT</name> <type>mux</type> </modify_element> -->
-<!--        <modify_element>    <name>D6LUT</name> <type>mux</type> </modify_element> -->
         <modify_element>    <name>DCY0</name> <type>mux</type> </modify_element>
         <modify_element>    <name>DFFMUX</name> <type>mux</type> </modify_element>
         <modify_element>    <name>DOUTMUX</name> <type>mux</type> </modify_element>
@@ -1740,34 +1924,226 @@
         <bel>
           <name>D6LUT</name>
           <type>D6LUT</type>
+		  <routethroughs>
+			  <routethrough>
+				<input>A1</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A2</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A3</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A4</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A5</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A6</input>
+				<output>O6</output>
+			  </routethrough>
+		  </routethroughs>
         </bel>
         <bel>
           <name>D5LUT</name>
           <type>D5LUT</type>
+		  <routethroughs>
+			  <routethrough>
+				<input>A1</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A2</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A3</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A4</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A5</input>
+				<output>O5</output>
+			  </routethrough>
+		  </routethroughs>
         </bel>
         <bel>
           <name>C6LUT</name>
           <type>C6LUT</type>
+		  <routethroughs>
+			  <routethrough>
+				<input>A1</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A2</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A3</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A4</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A5</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A6</input>
+				<output>O6</output>
+			  </routethrough>
+		  </routethroughs>
         </bel>
         <bel>
           <name>C5LUT</name>
           <type>C5LUT</type>
+		  <routethroughs>
+			  <routethrough>
+				<input>A1</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A2</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A3</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A4</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A5</input>
+				<output>O5</output>
+			  </routethrough>
+		  </routethroughs>
         </bel>
         <bel>
           <name>B6LUT</name>
           <type>B6LUT</type>
+		  <routethroughs>
+			  <routethrough>
+				<input>A1</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A2</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A3</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A4</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A5</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A6</input>
+				<output>O6</output>
+			  </routethrough>
+		  </routethroughs>
         </bel>
         <bel>
           <name>B5LUT</name>
           <type>B5LUT</type>
+		  <routethroughs>
+			  <routethrough>
+				<input>A1</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A2</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A3</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A4</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A5</input>
+				<output>O5</output>
+			  </routethrough>
+		  </routethroughs>
         </bel>
         <bel>
           <name>A6LUT</name>
           <type>A6LUT</type>
+		  <routethroughs>
+			  <routethrough>
+				<input>A1</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A2</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A3</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A4</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A5</input>
+				<output>O6</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A6</input>
+				<output>O6</output>
+			  </routethrough>
+		  </routethroughs>
         </bel>
         <bel>
           <name>A5LUT</name>
           <type>A5LUT</type>
+		  <routethroughs>
+			  <routethrough>
+				<input>A1</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A2</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A3</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A4</input>
+				<output>O5</output>
+			  </routethrough>
+			  <routethrough>
+				<input>A5</input>
+				<output>O5</output>
+			  </routethrough>
+		  </routethroughs>
         </bel>
         <bel>
           <name>CARRY4</name>
@@ -1836,24 +2212,18 @@
       </bels>
       <corrections>
         <modify_element>    <name>A5FFMUX</name> <type>mux</type> </modify_element>
-<!--        <modify_element>    <name>A5LUT</name> <type>mux</type> </modify_element> -->
-<!--        <modify_element>    <name>A6LUT</name> <type>mux</type> </modify_element> -->
         <modify_element>    <name>ACY0</name> <type>mux</type> </modify_element>
         <modify_element>    <name>ADI1MUX</name> <type>mux</type> </modify_element>
         <modify_element>    <name>AFFMUX</name> <type>mux</type> </modify_element>
         <modify_element>    <name>AOUTMUX</name> <type>mux</type> </modify_element>
         <modify_element>    <name>AUSED</name> <type>mux</type> </modify_element>
         <modify_element>    <name>B5FFMUX</name> <type>mux</type> </modify_element>
-<!--        <modify_element>    <name>B5LUT</name> <type>mux</type> </modify_element> -->
-<!--        <modify_element>    <name>B6LUT</name> <type>mux</type> </modify_element> -->
         <modify_element>    <name>BCY0</name> <type>mux</type> </modify_element>
         <modify_element>    <name>BDI1MUX</name> <type>mux</type> </modify_element>
         <modify_element>    <name>BFFMUX</name> <type>mux</type> </modify_element>
         <modify_element>    <name>BOUTMUX</name> <type>mux</type> </modify_element>
         <modify_element>    <name>BUSED</name> <type>mux</type> </modify_element>
         <modify_element>    <name>C5FFMUX</name> <type>mux</type> </modify_element>
-<!--        <modify_element>    <name>C5LUT</name> <type>mux</type> </modify_element> -->
-<!--        <modify_element>    <name>C6LUT</name> <type>mux</type> </modify_element> -->
         <modify_element>    <name>CCY0</name> <type>mux</type> </modify_element>
         <modify_element>    <name>CDI1MUX</name> <type>mux</type> </modify_element>
         <modify_element>    <name>CEUSEDMUX</name> <type>mux</type> </modify_element>
@@ -1863,8 +2233,6 @@
         <modify_element>    <name>COUTUSED</name> <type>mux</type> </modify_element>
         <modify_element>    <name>CUSED</name> <type>mux</type> </modify_element>
         <modify_element>    <name>D5FFMUX</name> <type>mux</type> </modify_element>
-<!--        <modify_element>    <name>D5LUT</name> <type>mux</type> </modify_element> -->
-<!--        <modify_element>    <name>D6LUT</name> <type>mux</type> </modify_element> -->
         <modify_element>    <name>DCY0</name> <type>mux</type> </modify_element>
         <modify_element>    <name>DFFMUX</name> <type>mux</type> </modify_element>
         <modify_element>    <name>DOUTMUX</name> <type>mux</type> </modify_element>
