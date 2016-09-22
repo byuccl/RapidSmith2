@@ -30,6 +30,9 @@ public final class SiteTemplate implements Serializable {
 	private transient Map<Integer, BelPinTemplate> belPins;
 	// Map of XDL attributes that should be created for each PIP
 	private Map<Integer, Map<Integer, XdlAttribute>> pipAttributes;
+	// Map containing the bel routethrough information of the site
+	private Map<Integer, Set<Integer>> belRoutethroughMap;
+
 
 	public SiteType getType() {
 		return type;
@@ -115,6 +118,20 @@ public final class SiteTemplate implements Serializable {
 		this.pipAttributes = pipAttributes;
 	}
 
+	public void setBelRoutethroughs(Map<Integer, Set<Integer>> belRoutethroughs) {
+		this.belRoutethroughMap = belRoutethroughs;
+	}
+
+	public boolean isRoutethrough(Integer startWire, Integer endWire) {
+
+		if (belRoutethroughMap == null) {
+			return false;
+		}
+
+		Set<Integer> sinks = belRoutethroughMap.get(startWire);
+		return sinks == null ? false : sinks.contains(endWire);
+	}
+
 	@Override
 	public String toString() {
 		return "PrimitiveTemplate{" +
@@ -178,6 +195,7 @@ public final class SiteTemplate implements Serializable {
 		private Collection<SitePinTemplate> sources;
 		private Collection<SitePinTemplate> sinks;
 		private Map<Integer, Map<Integer, XdlAttribute>> pipAttributes;
+		private Map<Integer, Set<Integer>> belRoutethroughMap;
 
 		public Object readResolve() {
 			SiteTemplate template = new SiteTemplate();
@@ -204,6 +222,7 @@ public final class SiteTemplate implements Serializable {
 				}
 			}
 			template.pipAttributes = pipAttributes;
+			template.belRoutethroughMap = belRoutethroughMap;
 
 			return template;
 		}
@@ -218,6 +237,7 @@ public final class SiteTemplate implements Serializable {
 		repl.sources = sources.values();
 		repl.sinks = sinks.values();
 		repl.pipAttributes = pipAttributes;
+		repl.belRoutethroughMap = belRoutethroughMap;
 
 		return repl;
 	}
