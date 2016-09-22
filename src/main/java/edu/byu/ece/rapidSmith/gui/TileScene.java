@@ -41,7 +41,7 @@ import com.trolltech.qt.gui.QPen;
 import com.trolltech.qt.gui.QPixmap;
 import com.trolltech.qt.gui.QImage.Format;
 
-import edu.byu.ece.rapidSmith.design.Design;
+import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
 import edu.byu.ece.rapidSmith.device.*;
 
 /**
@@ -85,7 +85,7 @@ public class TileScene extends QGraphicsScene{
 	/** The signal which is made when a mouse button is pressed */
 	public Signal0 mousePressed = new Signal0();
 	/** The current design associated with this scene */
-	private Design design;
+	private XdlDesign design;
 	/** This is the actual image shown in the scene of the FPGA fabric */
 	public QImage qImage;
 	/** This is the set of column tile types which should not be drawn */
@@ -110,7 +110,7 @@ public class TileScene extends QGraphicsScene{
 	 * @param hideTiles A flag to hide/show certain tiles to make the fabric appear more homogeneous.
 	 * @param drawPrimitives A flag to draw boxes to represent primitives. 
 	 */
-	public TileScene(Design design, boolean hideTiles, boolean drawPrimitives){
+	public TileScene(XdlDesign design, boolean hideTiles, boolean drawPrimitives){
 		setDesign(design);
 		initializeScene(hideTiles, drawPrimitives);
 	}
@@ -363,11 +363,11 @@ public class TileScene extends QGraphicsScene{
 	}
 	
 
-	public Design getDesign(){
+	public XdlDesign getDesign(){
 		return design;
 	}
 
-	public void setDesign(Design design){
+	public void setDesign(XdlDesign design){
 		this.design = design;
 		if(this.design != null){
 			setDevice(design.getDevice());

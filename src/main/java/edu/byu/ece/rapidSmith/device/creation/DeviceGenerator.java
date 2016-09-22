@@ -21,7 +21,7 @@
 
 package edu.byu.ece.rapidSmith.device.creation;
 
-import edu.byu.ece.rapidSmith.design.Attribute;
+import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.device.helper.*;
 import edu.byu.ece.rapidSmith.primitiveDefs.*;
@@ -349,7 +349,7 @@ public final class DeviceGenerator {
 		WireHashMap wireMap = new WireHashMap();
 		// Stores the attributes associated with the subsite PIPs for converting
 		// back to XDL
-		Map<Integer, Map<Integer, Attribute>> muxes = new HashMap<>();
+		Map<Integer, Map<Integer, XdlAttribute>> muxes = new HashMap<>();
 
 		/*
 		    We build the routing structure by find all of the wire sources and
@@ -448,7 +448,7 @@ public final class DeviceGenerator {
 	 * @param muxes   the connection to attribute map for the site template
 	 */
 	private void createAndAddMuxPips(PrimitiveDef def, PrimitiveElement el,
-	                                 WireHashMap wireMap, Map<Integer, Map<Integer, Attribute>> muxes) {
+	                                 WireHashMap wireMap, Map<Integer, Map<Integer, XdlAttribute>> muxes) {
 		String elName = el.getName();
 		String sinkName = getIntrasiteWireName(def.getType(), elName, getOutputPin(el));
 		Integer sinkWire = we.getWireEnum(sinkName);
@@ -460,8 +460,8 @@ public final class DeviceGenerator {
 			int srcWire = we.getWireEnum(srcName);
 			wireMap.put(srcWire, wcs);
 
-			Attribute attr = new Attribute(elName, "", pin.getInternalName());
-			Map<Integer, Attribute> sinkMap = muxes.get(srcWire);
+			XdlAttribute attr = new XdlAttribute(elName, "", pin.getInternalName());
+			Map<Integer, XdlAttribute> sinkMap = muxes.get(srcWire);
 			if (sinkMap == null) {
 				sinkMap = new HashMap<>();
 				muxes.put(srcWire, sinkMap);

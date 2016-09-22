@@ -1,7 +1,7 @@
 package edu.byu.ece.rapidSmith.design.unpacker.virtex6;
 
-import edu.byu.ece.rapidSmith.design.Attribute;
-import edu.byu.ece.rapidSmith.design.Instance;
+import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
+import edu.byu.ece.rapidSmith.design.xdl.XdlInstance;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
@@ -33,18 +33,18 @@ public class RegInitCreatorFactory implements CellCreatorFactory {
 	}
 
 	@Override
-	public CellCreator build(Instance instance) {
+	public CellCreator build(XdlInstance instance) {
 		return new RegInitCreator(id, instance);
 	}
 
 	private class RegInitCreator extends DefaultCellCreator {
 		private LibraryCell cellType;
-		public RegInitCreator(BelId id, Instance inst) {
+		public RegInitCreator(BelId id, XdlInstance inst) {
 			setIdentifier(id);
 			setInstance(inst);
 			setAttributes(attributes);
 
-			Attribute belAttr = inst.getAttribute(getIdentifier().getName());
+			XdlAttribute belAttr = inst.getAttribute(getIdentifier().getName());
 			if (id.getName().contains("5")) {
 				cellType = FF_INIT;
 			} else {
@@ -63,8 +63,8 @@ public class RegInitCreatorFactory implements CellCreatorFactory {
 		@Override
 		protected Collection<Property> getProperties() {
 			List<Property> properties = new ArrayList<>();
-			Instance inst = getInstance();
-			for (Attribute attr : inst.getAttributes()) {
+			XdlInstance inst = getInstance();
+			for (XdlAttribute attr : inst.getAttributes()) {
 				if (attributes.containsKey(attr.getPhysicalName())) {
 					Property property = new Property(
 							attributes.get(attr.getPhysicalName()),

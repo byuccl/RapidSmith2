@@ -35,20 +35,19 @@ import com.trolltech.qt.gui.QPolygonF;
 import com.trolltech.qt.gui.QGraphicsItem.GraphicsItemChange;
 import com.trolltech.qt.gui.QGraphicsItem.GraphicsItemFlag;
 
-import edu.byu.ece.rapidSmith.design.Instance;
-import edu.byu.ece.rapidSmith.design.ModuleInstance;
-import edu.byu.ece.rapidSmith.design.Net;
+import edu.byu.ece.rapidSmith.design.xdl.XdlInstance;
+import edu.byu.ece.rapidSmith.design.xdl.XdlModuleInstance;
+import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
 import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.device.Tile;
 import edu.byu.ece.rapidSmith.device.TileType;
-import edu.byu.ece.rapidSmith.gui.TileScene;
 
 public class GuiModuleInstance extends QGraphicsPolygonItem {
 
 	public Signal1<Boolean> selected = new Signal1<Boolean>();
 	public Signal0 moved = new Signal0();
-	private ModuleInstance moduleInstance;
+	private XdlModuleInstance moduleInstance;
 	private TileScene scene;
 	private ArrayList<HMTile> hmTiles;
 	private HashSet<TileType> switchboxTypes;
@@ -60,7 +59,7 @@ public class GuiModuleInstance extends QGraphicsPolygonItem {
 	private ArrayList<Integer> occupiedTilesY;
 	
 
-	public GuiModuleInstance(ModuleInstance modInst, TileScene scene, boolean movable){
+	public GuiModuleInstance(XdlModuleInstance modInst, TileScene scene, boolean movable){
 		this.moduleInstance = modInst;
 		this.scene = scene;
 		this.hmTiles = new ArrayList<HMTile>();
@@ -91,8 +90,8 @@ public class GuiModuleInstance extends QGraphicsPolygonItem {
 		switchboxTypes = moduleInstance.getDesign().getDevice().getSwitchMatrixTypes();
 		HashSet<Tile> occupiedTiles = new HashSet<Tile>();
 		HashSet<Tile> tilesWithSLICEM = new HashSet<Tile>();
-		Collection<Instance> instances = null;
-		Collection<Net> nets = null;
+		Collection<XdlInstance> instances = null;
+		Collection<XdlNet> nets = null;
 		Tile anchorTile = null;
 		int minRow = Integer.MAX_VALUE;
 		int minCol = Integer.MAX_VALUE;
@@ -108,7 +107,7 @@ public class GuiModuleInstance extends QGraphicsPolygonItem {
 			anchorTile = moduleInstance.getModule().getAnchor().getTile();
 		}
 
-		for (Instance inst : instances) {
+		for (XdlInstance inst : instances) {
 			Tile tile = inst.getTile();
 			if(inst.getType().equals(SiteType.SLICEM)){
 				tilesWithSLICEM.add(tile);
@@ -131,7 +130,7 @@ public class GuiModuleInstance extends QGraphicsPolygonItem {
 				minRow = (minRow <= row) ? minRow : row;
 			}
 		}
-		for (Net net : nets) {
+		for (XdlNet net : nets) {
 			for (PIP pip : net.getPIPs()) {
 				Tile tile = pip.getTile();
 				if (!occupiedTiles.contains(tile) && !tile.getType().equals(TileType.INT_INTERFACE)) {
@@ -466,7 +465,7 @@ public class GuiModuleInstance extends QGraphicsPolygonItem {
 		super.mouseReleaseEvent(event);
 	}
 
-	public ModuleInstance getModuleInstance() {
+	public XdlModuleInstance getModuleInstance() {
 		return moduleInstance;
 	}
 	
@@ -476,7 +475,7 @@ public class GuiModuleInstance extends QGraphicsPolygonItem {
 
 	
 	public void setAnchorOffset() {
-		Instance anchorInst = null;
+		XdlInstance anchorInst = null;
 		if (moduleInstance.getInstances().get(0).isPlaced()) {
 			anchorInst  = moduleInstance.getAnchor();
 		} else {

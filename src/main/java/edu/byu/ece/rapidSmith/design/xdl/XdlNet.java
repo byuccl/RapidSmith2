@@ -18,12 +18,14 @@
  * get a copy of the license at <http://www.gnu.org/licenses/>.
  * 
  */
-package edu.byu.ece.rapidSmith.design;
+package edu.byu.ece.rapidSmith.design.xdl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import edu.byu.ece.rapidSmith.design.NetType;
+import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.device.Tile;
 
 /**
@@ -33,7 +35,7 @@ import edu.byu.ece.rapidSmith.device.Tile;
  * @author Chris Lavin
  * Created on: Jun 25, 2010
  */
-public class Net implements Serializable {
+public class XdlNet implements Serializable {
 	private static final long serialVersionUID = 6252168375875946963L;
 
 	/** Unique name of this net */
@@ -41,27 +43,27 @@ public class Net implements Serializable {
 	/** Type of this net (VCC, GND, WIRE, ...) */
 	private NetType type;
 	/** Attributes of this net, often are not used */
-	private ArrayList<Attribute> attributes;
+	private ArrayList<XdlAttribute> attributes;
 	/** Source and sink pins of this net */
-	private ArrayList<Pin> pins;
+	private ArrayList<XdlPin> pins;
 	/** Routing resources or Programmable-Interconnect-Points */ 
 	private ArrayList<PIP> pips;
 	/** The source pin for this net */
-	private Pin source;
+	private XdlPin source;
 	/** The number of sinks this net contains */
 	private int fanOut;
 	/** The module instance this net is a member of */
-	private ModuleInstance moduleInstance;
+	private XdlModuleInstance moduleInstance;
 	/** The module template (or definition) this net is a member of */
-	private Module moduleTemplate;
+	private XdlModule moduleTemplate;
 	/** The net in the module template corresponding to this net */
-	private Net moduleTemplateNet;
+	private XdlNet moduleTemplateNet;
 	
 	/**
 	 * Constructs a nameless net.
 	 * Initializes the pins and pips with empty structures.
 	 */
-	public Net(){
+	public XdlNet(){
 		this.name = null;
 		this.type = NetType.WIRE;
 		this.pins = new ArrayList<>();
@@ -80,7 +82,7 @@ public class Net implements Serializable {
 	 * @param name name for the net
 	 * @param type type for the net
 	 */
-	public Net(String name, NetType type){
+	public XdlNet(String name, NetType type){
 		this.name = name;
 		this.type = type;
 		this.pins = new ArrayList<>();
@@ -129,7 +131,7 @@ public class Net implements Serializable {
 	 * Returns the pins (source and sinks) of this net.
 	 * @return the pins of this net
 	 */
-	public ArrayList<Pin> getPins(){
+	public ArrayList<XdlPin> getPins(){
 		return pins;
 	}
 
@@ -139,10 +141,10 @@ public class Net implements Serializable {
 	 * this net to the pin's instance.
 	 * @param list list containing the new pins
 	 */
-	public boolean setPins(ArrayList<Pin> list){
-		Pin src = null;
+	public boolean setPins(ArrayList<XdlPin> list){
+		XdlPin src = null;
 		this.fanOut = 0;
-		for(Pin p : list){
+		for(XdlPin p : list){
 			if(p.isOutPin()){
 				if(src != null){
 					return false;
@@ -167,7 +169,7 @@ public class Net implements Serializable {
 	 * @param pin the new pin to add
 	 * @return true if the operation completed successfully
 	 */
-	public boolean addPin(Pin pin){
+	public boolean addPin(XdlPin pin){
 		if(pin.isOutPin()){
 			if(source != null){
 				return false;
@@ -187,9 +189,9 @@ public class Net implements Serializable {
 	 * @param pinsToAdd the list of new pins to add
 	 * @return true if the operation completed successfully
 	 */
-	public boolean addPins(Collection<Pin> pinsToAdd) {
+	public boolean addPins(Collection<XdlPin> pinsToAdd) {
 		boolean success = true;
-		for(Pin pin : pinsToAdd){
+		for(XdlPin pin : pinsToAdd){
 			if(!this.addPin(pin))
 				success = false;
 		}
@@ -203,7 +205,7 @@ public class Net implements Serializable {
 	 * @param pin the pin to remove
 	 * @return true if the operation completed successfully
 	 */
-	public boolean removePin(Pin pin){
+	public boolean removePin(XdlPin pin){
 		if(pin.isOutPin() && pin.equals(source)){
 			this.source = null;
 		}
@@ -272,7 +274,7 @@ public class Net implements Serializable {
 	 * Returns the attributes for this net.
 	 * @return the attributes for this net
 	 */
-	public ArrayList<Attribute> getAttributes(){
+	public ArrayList<XdlAttribute> getAttributes(){
 		return attributes;
 	}
 
@@ -280,7 +282,7 @@ public class Net implements Serializable {
 	 * Sets the list of attributes for this net.
 	 * @param attributes the new list of attributes
 	 */
-	public void setAttributes(ArrayList<Attribute> attributes){
+	public void setAttributes(ArrayList<XdlAttribute> attributes){
 		this.attributes = attributes;
 	}
 
@@ -291,7 +293,7 @@ public class Net implements Serializable {
 	 * @param value the value of the attribute
 	 */
 	public void addAttribute(String physicalName, String logicalName, String value){
-		addAttribute(new Attribute(physicalName, logicalName, value));
+		addAttribute(new XdlAttribute(physicalName, logicalName, value));
 	}
 
 	/**
@@ -300,14 +302,14 @@ public class Net implements Serializable {
 	 * @param value the value of the attribute
 	 */
 	public void addAttribute(String physicalName, String value){
-		addAttribute(new Attribute(physicalName, null, value));
+		addAttribute(new XdlAttribute(physicalName, null, value));
 	}
 
 	/**
 	 * Add the attribute to this net.
 	 * @param attribute the attribute to add
 	 */
-	public void addAttribute(Attribute attribute){
+	public void addAttribute(XdlAttribute attribute){
 		if(attributes == null){
 			attributes = new ArrayList<>();
 		}
@@ -342,7 +344,7 @@ public class Net implements Serializable {
 		// checks to see if a net is a clk net:
 		// Most of the sink pins have "CLK" in the internal pin name
 		int count = 0;
-		for(Pin p : pins){
+		for(XdlPin p : pins){
 			if(p.getName().contains("CLK")){
 				count++;
 			}
@@ -354,7 +356,7 @@ public class Net implements Serializable {
 	 * Returns the source of this net.
 	 * @return the current source of this net, or null if it does not exist
 	 */
-	public Pin getSource(){
+	public XdlPin getSource(){
 		return source;
 	}
 
@@ -365,7 +367,7 @@ public class Net implements Serializable {
 	 * the source if the pin is an outpin.
 	 * @param source the new source pin for this net
 	 */
-	public void setSource(Pin source){
+	public void setSource(XdlPin source){
 		this.source = source;
 	}
 
@@ -374,7 +376,7 @@ public class Net implements Serializable {
 	 * adds it to the pin list in this net.
 	 * @param newSource the new source of this net
 	 */
-	public boolean replaceSource(Pin newSource){
+	public boolean replaceSource(XdlPin newSource){
 		if(!newSource.isOutPin()){
 			return false;
 		}
@@ -422,7 +424,7 @@ public class Net implements Serializable {
 	 * Returns the module template this net is a member of.
 	 * @return the module template this net is a member of
 	 */
-	public Module getModuleTemplate(){
+	public XdlModule getModuleTemplate(){
 		return moduleTemplate;
 	}
 
@@ -430,7 +432,7 @@ public class Net implements Serializable {
 	 * Sets the module class this net implements.
 	 * @param module the module which this net implements
 	 */
-	public void setModuleTemplate(Module module){
+	public void setModuleTemplate(XdlModule module){
 		this.moduleTemplate = module;
 	}
 
@@ -438,7 +440,7 @@ public class Net implements Serializable {
 	 * Returns this nets current module instance it belongs to.
 	 * @return the module instance of this net, or null if none exists
 	 */
-	public ModuleInstance getModuleInstance(){
+	public XdlModuleInstance getModuleInstance(){
 		return moduleInstance;
 	}
 
@@ -446,7 +448,7 @@ public class Net implements Serializable {
 	 * Sets the module instance which this net belongs to.
 	 * @param moduleInstance this nets new moduleInstance
 	 */
-	public void setModuleInstance(ModuleInstance moduleInstance){
+	public void setModuleInstance(XdlModuleInstance moduleInstance){
 		this.moduleInstance = moduleInstance;
 	}
 
@@ -454,7 +456,7 @@ public class Net implements Serializable {
 	 * Returns the net found in the module which this net implements.
 	 * @return the net found in the module which this net implements
 	 */
-	public Net getModuleTemplateNet(){
+	public XdlNet getModuleTemplateNet(){
 		return moduleTemplateNet;
 	}
 
@@ -463,7 +465,7 @@ public class Net implements Serializable {
 	 * @param moduleTemplateNet the template net in the module to which this
 	 * net corresponds.
 	 */
-	public void setModuleTemplateNet(Net moduleTemplateNet){
+	public void setModuleTemplateNet(XdlNet moduleTemplateNet){
 		this.moduleTemplateNet = moduleTemplateNet;
 	}
 

@@ -18,7 +18,7 @@
  * get a copy of the license at <http://www.gnu.org/licenses/>.
  * 
  */
-package edu.byu.ece.rapidSmith.design;
+package edu.byu.ece.rapidSmith.design.xdl;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -30,18 +30,18 @@ import java.util.Objects;
  * @author Chris Lavin
  * Created on: Jun 22, 2010
  */
-public class Port implements Serializable, Cloneable{
+public class XdlPort implements Serializable, Cloneable{
 
 	private static final long serialVersionUID = -8961782654770650827L;
 	/** Name of the Port of the current module, this is the port of an instance in the module. */
 	private String name;
 	/** This is the pin that the port references. */
-	private Pin pin;
+	private XdlPin pin;
 
 	/**
 	 * Default constructor, everything is null.
 	 */
-	public Port(){
+	public XdlPort(){
 		name = null;
 		setPin(null);
 	}
@@ -52,7 +52,7 @@ public class Port implements Serializable, Cloneable{
 	 * @param name Name of the port
 	 * @param pin Pin which the port references
 	 */
-	public Port(String name, Pin pin){
+	public XdlPort(String name, XdlPin pin){
 		this.name = name;
 		this.setPin(pin);
 	}
@@ -95,7 +95,7 @@ public class Port implements Serializable, Cloneable{
 	 * Sets the pin this port exists on.
 	 * @param pin the pin to set
 	 */
-	public void setPin(Pin pin) {
+	public void setPin(XdlPin pin) {
 		this.pin = pin;
 	}
 
@@ -103,7 +103,7 @@ public class Port implements Serializable, Cloneable{
 	 * Returns the pin this port resides on.
 	 * @return the pin this port resides on
 	 */
-	public Pin getPin() {
+	public XdlPin getPin() {
 		return pin;
 	}
 
@@ -111,7 +111,7 @@ public class Port implements Serializable, Cloneable{
 	 * Returns the instance this port resides on.
 	 * @return the instance this port resides on
 	 */
-	public Instance getInstance() {
+	public XdlInstance getInstance() {
 		return pin.getInstance();
 	}
 
@@ -148,7 +148,7 @@ public class Port implements Serializable, Cloneable{
 			return false;
 		if(getClass() != obj.getClass())
 			return false;
-		Port other = (Port) obj;
+		XdlPort other = (XdlPort) obj;
 		return Objects.equals(getInstance(), other.getInstance()) &&
 				Objects.equals(getName(), other.getName()) &&
 				Objects.equals(getPin(), other.getPin());

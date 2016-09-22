@@ -21,6 +21,7 @@
 package edu.byu.ece.rapidSmith.util;
 
 import edu.byu.ece.rapidSmith.design.*;
+import edu.byu.ece.rapidSmith.design.xdl.*;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
@@ -90,7 +91,7 @@ public class DesignDiffer {
 	 * @param design1 First design to compare.
 	 * @param design2 Second design to compare.
 	 */
-	public DifferenceTree diffDesigns(Design design1, Design design2) {
+	public DifferenceTree diffDesigns(XdlDesign design1, XdlDesign design2) {
 		DifferenceTree diffs = new DifferenceTree(design1.getName(), "design");
 
 		// Compare Design elements
@@ -117,25 +118,25 @@ public class DesignDiffer {
 		}
 
 		// compare design attributes
-		Map<String, Set<Attribute>> attrs2 = new HashMap<>();
-		for (Attribute attr : design2.getAttributes()) {
+		Map<String, Set<XdlAttribute>> attrs2 = new HashMap<>();
+		for (XdlAttribute attr : design2.getAttributes()) {
 			String physicalName = attr.getPhysicalName();
 			if (!attrs2.containsKey(physicalName))
 				attrs2.put(physicalName, new HashSet<>());
-			Set<Attribute> attrs = attrs2.get(physicalName);
+			Set<XdlAttribute> attrs = attrs2.get(physicalName);
 			attrs.add(attr);
 		}
-		for (Attribute attr1 : design1.getAttributes()) {
+		for (XdlAttribute attr1 : design1.getAttributes()) {
 			if (attr1.getPhysicalName().startsWith("_")) {
 				// test if it exists and remove it simultaneously
-				Set<Attribute> attrSet2 = attrs2.get(attr1.getPhysicalName());
+				Set<XdlAttribute> attrSet2 = attrs2.get(attr1.getPhysicalName());
 				if (attrSet2 == null) {
 					diffs.add(Difference.subtraction("attribute", attr1.getPhysicalName()));
 					continue;
 				}
 				boolean found = false;
-				for (Iterator<Attribute> iterator = attrSet2.iterator(); iterator.hasNext(); ) {
-					Attribute attr2 = iterator.next();
+				for (Iterator<XdlAttribute> iterator = attrSet2.iterator(); iterator.hasNext(); ) {
+					XdlAttribute attr2 = iterator.next();
 					if (attr2.getValue().equals(attr1.getValue())) {
 						iterator.remove();
 						found = true;
@@ -146,27 +147,27 @@ public class DesignDiffer {
 					diffs.add(Difference.addition("attribute", attr1.getPhysicalName()));
 			} else {
 				// test if it exists and remove it simultaneously
-				Set<Attribute> attrSet2 = attrs2.remove(attr1.getPhysicalName());
+				Set<XdlAttribute> attrSet2 = attrs2.remove(attr1.getPhysicalName());
 				if (attrSet2 == null) {
 					diffs.add(Difference.subtraction("attribute", attr1.getPhysicalName()));
 					continue;
 				}
-				Attribute attr2 = attrSet2.iterator().next();
+				XdlAttribute attr2 = attrSet2.iterator().next();
 				attrSet2.clear();
 				DifferenceTree attrTree = diffAttributes(attr1, attr2);
 				if (!attrTree.isEmpty())
 					diffs.addChild(attrTree);
 			}
 		}
-		for (Set<Attribute> attrSet2 : attrs2.values()) {
-			for (Attribute attr2 : attrSet2) {
+		for (Set<XdlAttribute> attrSet2 : attrs2.values()) {
+			for (XdlAttribute attr2 : attrSet2) {
 				diffs.add(Difference.addition("attribute", attr2.getPhysicalName()));
 			}
 		}
 
 		// Compare instances
-		for (Instance inst1 : design1.getInstances()) {
-			Instance inst2 = null;
+		for (XdlInstance inst1 : design1.getInstances()) {
+			XdlInstance inst2 = null;
 			switch (matchInstanceMethod) {
 				case BY_NAME :
 					inst2 = design2.getInstance(inst1.getName());
@@ -182,7 +183,7 @@ public class DesignDiffer {
 			DifferenceTree instTree = diffInstances(inst1, inst2);
 			diffs.addChild(instTree);
 		}
-		for (Instance inst2 : design2.getInstances()) {
+		for (XdlInstance inst2 : design2.getInstances()) {
 			switch (matchInstanceMethod) {
 				case BY_NAME :
 					if (design1.getInstance(inst2.getName()) == null)
@@ -197,17 +198,17 @@ public class DesignDiffer {
 
 		// compare nets
 
-		Map<PinId, Net> netSourcePinMap = null;
+		Map<PinId, XdlNet> netSourcePinMap = null;
 		if (matchNetMethod == MatchNetMethod.BY_SOURCE_PIN) {
 			netSourcePinMap = new HashMap<>();
-			for (Net net : design2.getNets()) {
+			for (XdlNet net : design2.getNets()) {
 				if (net.getSource() != null)
 					netSourcePinMap.put(new PinId(net.getSource()), net);
 			}
 		}
 
-		for (Net net1 : design1.getNets()) {
-			Net net2 = null;
+		for (XdlNet net1 : design1.getNets()) {
+			XdlNet net2 = null;
 			switch(matchNetMethod) {
 				case BY_NAME :
 					net2 = design2.getNet(net1.getName());
@@ -230,21 +231,21 @@ public class DesignDiffer {
 		}
 		switch (matchNetMethod) {
 			case BY_NAME:
-				for (Net net2 : design2.getNets()) {
+				for (XdlNet net2 : design2.getNets()) {
 					if (design1.getNet(net2.getName()) == null)
 						diffs.add(Difference.addition("net", net2.getName()));
 					break;
 				}
 			case BY_SOURCE_PIN:
 				//noinspection ConstantConditions
-				for (Net net2 : netSourcePinMap.values()) {
+				for (XdlNet net2 : netSourcePinMap.values()) {
 					diffs.add(Difference.addition("net", net2.getName()));
 				}
 		}
 
 		// compare modules
-		for (Module module1 : design1.getModules()) {
-			Module module2 = design2.getModule(module1.getName());
+		for (XdlModule module1 : design1.getModules()) {
+			XdlModule module2 = design2.getModule(module1.getName());
 			if (module2 == null) {
 				diffs.add(Difference.subtraction("module", module1.getName()));
 				continue;
@@ -253,14 +254,14 @@ public class DesignDiffer {
 			if (!modTree.isEmpty())
 				diffs.addChild(modTree);
 		}
-		for (Module module2 : design2.getModules()) {
+		for (XdlModule module2 : design2.getModules()) {
 			if (design1.getModuleInstance(module2.getName()) == null)
 				diffs.add(Difference.addition("module", module2.getName()));
 		}
 
 		// compare module instances
-		for (ModuleInstance mi1 : design1.getModuleInstances()) {
-			ModuleInstance mi2 = design2.getModuleInstance(mi1.getName());
+		for (XdlModuleInstance mi1 : design1.getModuleInstances()) {
+			XdlModuleInstance mi2 = design2.getModuleInstance(mi1.getName());
 			if (mi2 == null) {
 				diffs.add(Difference.subtraction("module_instance", mi1.getName()));
 				continue;
@@ -269,7 +270,7 @@ public class DesignDiffer {
 			if (!miTree.isEmpty())
 				diffs.addChild(miTree);
 		}
-		for (ModuleInstance mi2 : design2.getModuleInstances()) {
+		for (XdlModuleInstance mi2 : design2.getModuleInstances()) {
 			if (design1.getModuleInstance(mi2.getName()) == null)
 				diffs.add(Difference.addition("module_instance", mi2.getName()));
 		}
@@ -277,15 +278,15 @@ public class DesignDiffer {
 		return diffs;
 	}
 
-	private DifferenceTree diffModules(Module mod1, Module mod2) {
+	private DifferenceTree diffModules(XdlModule mod1, XdlModule mod2) {
 		DifferenceTree diffs = new DifferenceTree(mod1.getName(), "module");
 
 		// compare module attributes
-		Map<String, Attribute> attrs2 = mod2.getAttributes().stream()
-				.collect(Collectors.toMap(Attribute::getPhysicalName, Function.identity()));
-		for (Attribute attr1 : mod1.getAttributes()) {
+		Map<String, XdlAttribute> attrs2 = mod2.getAttributes().stream()
+				.collect(Collectors.toMap(XdlAttribute::getPhysicalName, Function.identity()));
+		for (XdlAttribute attr1 : mod1.getAttributes()) {
 			// test if it exists and remove it simultaneously
-			Attribute attr2 = attrs2.remove(attr1.getPhysicalName());
+			XdlAttribute attr2 = attrs2.remove(attr1.getPhysicalName());
 			if (attr2 == null) {
 				diffs.add(Difference.subtraction("attribute", attr1.getPhysicalName()));
 				continue;
@@ -294,7 +295,7 @@ public class DesignDiffer {
 			if (!attrTree.isEmpty())
 				diffs.addChild(attrTree);
 		}
-		for (Attribute attr2 : attrs2.values()) {
+		for (XdlAttribute attr2 : attrs2.values()) {
 			diffs.add(Difference.addition("attribute", attr2.getPhysicalName()));
 		}
 
@@ -311,8 +312,8 @@ public class DesignDiffer {
 		}
 
 		// compare ports
-		for (Port port1 : mod1.getPorts()) {
-			Port port2 = mod2.getPort(port1.getName());
+		for (XdlPort port1 : mod1.getPorts()) {
+			XdlPort port2 = mod2.getPort(port1.getName());
 			if (port2 == null) {
 				diffs.add(Difference.subtraction("port", port1.getName()));
 				continue;
@@ -321,14 +322,14 @@ public class DesignDiffer {
 			if (!portTree.isEmpty())
 				diffs.addChild(portTree);
 		}
-		for (Port port2 : mod2.getPorts()) {
+		for (XdlPort port2 : mod2.getPorts()) {
 			if (mod1.getPort(port2.getName()) == null)
 				diffs.add(Difference.addition("port", port2.getName()));
 		}
 
 		// Compare instances
-		for (Instance inst1 : mod1.getInstances()) {
-			Instance inst2 = mod2.getInstance(inst1.getName());
+		for (XdlInstance inst1 : mod1.getInstances()) {
+			XdlInstance inst2 = mod2.getInstance(inst1.getName());
 			if (inst2 == null) {
 				diffs.add(Difference.subtraction("instance", inst1.getName()));
 				continue;
@@ -336,14 +337,14 @@ public class DesignDiffer {
 			DifferenceTree instTree = diffInstances(inst1, inst2);
 			diffs.addChild(instTree);
 		}
-		for (Instance inst2 : mod2.getInstances()) {
+		for (XdlInstance inst2 : mod2.getInstances()) {
 			if (mod1.getInstance(inst2.getName()) == null)
 				diffs.add(Difference.addition("instance", inst2.getName()));
 		}
 
 		// compare nets
-		for (Net net1 : mod1.getNets()) {
-			Net net2 = mod2.getNet(net1.getName());
+		for (XdlNet net1 : mod1.getNets()) {
+			XdlNet net2 = mod2.getNet(net1.getName());
 			if (net2 == null) {
 				diffs.add(Difference.subtraction("net", net1.getName()));
 				continue;
@@ -352,7 +353,7 @@ public class DesignDiffer {
 			if (!netTree.isEmpty())
 				diffs.addChild(netTree);
 		}
-		for (Net net2 : mod2.getNets()) {
+		for (XdlNet net2 : mod2.getNets()) {
 			if (mod1.getNet(net2.getName()) == null)
 				diffs.add(Difference.addition("net", net2.getName()));
 		}
@@ -360,31 +361,31 @@ public class DesignDiffer {
 		return diffs;
 	}
 
-	private DifferenceTree diffModuleInstances(ModuleInstance mi1, ModuleInstance mi2) {
+	private DifferenceTree diffModuleInstances(XdlModuleInstance mi1, XdlModuleInstance mi2) {
 		DifferenceTree diffs = new DifferenceTree(mi1.getName(), "module instance");
 		if (!mi1.getModule().getName().equals(mi2.getName()))
 			diffs.add(Difference.change("module", mi1.getModule().getName(), mi2.getModule().getName()));
 
-		Map<String, Instance> instances1 = mi1.getInstances().stream()
+		Map<String, XdlInstance> instances1 = mi1.getInstances().stream()
 				.collect(Collectors.toMap(i -> i.getModuleTemplateInstance().getName(), Function.identity()));
-		Map<String, Instance> instances2 = mi2.getInstances().stream()
+		Map<String, XdlInstance> instances2 = mi2.getInstances().stream()
 				.collect(Collectors.toMap(i -> i.getModuleTemplateInstance().getName(), Function.identity()));
 		for (String templateInstName : instances1.keySet()) {
-			Instance miInst1 = instances1.get(templateInstName);
-			Instance miInst2 = instances2.get(templateInstName);
+			XdlInstance miInst1 = instances1.get(templateInstName);
+			XdlInstance miInst2 = instances2.get(templateInstName);
 
 			if (!miInst1.getName().equals(miInst2.getName())) {
 				diffs.add(Difference.change(templateInstName + " instantiation", miInst1.getName(), miInst2.getName()));
 			}
 		}
 
-		Map<String, Net> nets1 = mi1.getNets().stream()
+		Map<String, XdlNet> nets1 = mi1.getNets().stream()
 				.collect(Collectors.toMap(i -> i.getModuleTemplateNet().getName(), Function.identity()));
-		Map<String, Net> nets2 = mi2.getNets().stream()
+		Map<String, XdlNet> nets2 = mi2.getNets().stream()
 				.collect(Collectors.toMap(i -> i.getModuleTemplateNet().getName(), Function.identity()));
 		for (String templateNetName : nets1.keySet()) {
-			Net miNet1 = nets1.get(templateNetName);
-			Net miNet2 = nets2.get(templateNetName);
+			XdlNet miNet1 = nets1.get(templateNetName);
+			XdlNet miNet2 = nets2.get(templateNetName);
 
 			if (!miNet1.getName().equals(miNet2.getName())) {
 				diffs.add(Difference.change(templateNetName + " instantiation", miNet1.getName(), miNet2.getName()));
@@ -394,7 +395,7 @@ public class DesignDiffer {
 		return diffs;
 	}
 
-	private DifferenceTree diffAttributes(Attribute attr1, Attribute attr2) {
+	private DifferenceTree diffAttributes(XdlAttribute attr1, XdlAttribute attr2) {
 		// TODO handle multi value attributes to remove ordering requirement
 		// TODO compare LUTS based on function instead of string representation
 
@@ -407,7 +408,7 @@ public class DesignDiffer {
 		return diffs;
 	}
 
-	public DifferenceTree diffInstances(Instance inst1, Instance inst2) {
+	public DifferenceTree diffInstances(XdlInstance inst1, XdlInstance inst2) {
 		DifferenceTree diffs = new DifferenceTree(inst1.getName(), "instance");
 		// compare names
 		if (!inst1.getName().equals(inst2.getName()))
@@ -434,8 +435,8 @@ public class DesignDiffer {
 		}
 
 		// compare pins
-		for (Pin pin1 : inst1.getPins()) {
-			Pin pin2 = inst2.getPin(pin1.getName());
+		for (XdlPin pin1 : inst1.getPins()) {
+			XdlPin pin2 = inst2.getPin(pin1.getName());
 			if (pin2 == null) {
 				diffs.add(Difference.subtraction("pin", pin1.getName()));
 				continue;
@@ -444,18 +445,18 @@ public class DesignDiffer {
 			if (!pinTree.isEmpty())
 				diffs.addChild(pinTree);
 		}
-		for (Pin pin2 : inst2.getPins()) {
+		for (XdlPin pin2 : inst2.getPins()) {
 			if (inst1.getPin(pin2.getName()) == null)
 				diffs.add(Difference.addition("pin", pin2.getName()));
 		}
 
 		// compare attributes
-		for (Attribute attr1 : inst1.getAttributes()) {
+		for (XdlAttribute attr1 : inst1.getAttributes()) {
 			if (ignoreBelProps && attr1.getPhysicalName().equals("_BEL_PROP"))
 				continue;
 			if (ignoreInstProps && attr1.getPhysicalName().equals("_INST_PROP"))
 				continue;
-			Attribute attr2 = inst2.getAttribute(attr1.getPhysicalName());
+			XdlAttribute attr2 = inst2.getAttribute(attr1.getPhysicalName());
 			if (attr2 == null) {
 				if (!attr1.getValue().equals("#OFF"))
 					diffs.add(Difference.subtraction("attribute", attr1.getPhysicalName()));
@@ -465,7 +466,7 @@ public class DesignDiffer {
 			if (!attrTree.isEmpty())
 				diffs.addChild(attrTree);
 		}
-		for (Attribute attr2 : inst2.getAttributes()) {
+		for (XdlAttribute attr2 : inst2.getAttributes()) {
 			if (ignoreBelProps && attr2.getPhysicalName().equals("_BEL_PROP"))
 				continue;
 			if (ignoreInstProps && attr2.getPhysicalName().equals("_INST_PROP"))
@@ -478,7 +479,7 @@ public class DesignDiffer {
 		return diffs;
 	}
 
-	public DifferenceTree diffNets(Net net1, Net net2) {
+	public DifferenceTree diffNets(XdlNet net1, XdlNet net2) {
 		DifferenceTree diffs = new DifferenceTree(net1.getName(), "net");
 		if (!net1.getName().equals(net2.getName()))
 			diffs.add(Difference.change("name", net1.getName(), net2.getName()));
@@ -498,10 +499,10 @@ public class DesignDiffer {
 
 		// compare attributes
 		if (net2.getAttributes() != null) {
-			Map<String, Attribute> attrs2 = net2.getAttributes().stream()
-					.collect(Collectors.toMap(Attribute::getPhysicalName, Function.identity()));
-			for (Attribute attr1 : net1.getAttributes()) {
-				Attribute attr2 = attrs2.get(attr1.getPhysicalName());
+			Map<String, XdlAttribute> attrs2 = net2.getAttributes().stream()
+					.collect(Collectors.toMap(XdlAttribute::getPhysicalName, Function.identity()));
+			for (XdlAttribute attr1 : net1.getAttributes()) {
+				XdlAttribute attr2 = attrs2.get(attr1.getPhysicalName());
 				if (attr2 == null) {
 					diffs.add(Difference.subtraction("attribute", attr1.getPhysicalName()));
 					continue;
@@ -510,28 +511,28 @@ public class DesignDiffer {
 				if (!attrTree.isEmpty())
 					diffs.addChild(attrTree);
 			}
-			for (Attribute attr2 : attrs2.values()) {
+			for (XdlAttribute attr2 : attrs2.values()) {
 				diffs.add(Difference.addition("attribute", attr2.getPhysicalName()));
 			}
 		} else {
 			if (net1.getAttributes() != null) {
-				for (Attribute attr1 : net1.getAttributes()) {
+				for (XdlAttribute attr1 : net1.getAttributes()) {
 					diffs.add(Difference.addition("attribute", attr1.getPhysicalName()));
 				}
 			}
 		}
 
 		// compare pins
-		Map<PinId, Pin> pins2 = net2.getPins().stream()
+		Map<PinId, XdlPin> pins2 = net2.getPins().stream()
 				.collect(Collectors.toMap(PinId::new, Function.identity()));
-		for (Pin pin1 : net1.getPins()) {
+		for (XdlPin pin1 : net1.getPins()) {
 			// Check for existence and remove it simultaneously
-			Pin pin2 = pins2.remove(new PinId(pin1));
+			XdlPin pin2 = pins2.remove(new PinId(pin1));
 			if (pin2 == null) {
 				diffs.add(Difference.subtraction("pin", new PinId(pin1).toString()));
 			}
 		}
-		for (Pin pin2 : pins2.values()) {
+		for (XdlPin pin2 : pins2.values()) {
 			diffs.add(Difference.addition("pin", new PinId(pin2).toString()));
 		}
 
@@ -551,9 +552,9 @@ public class DesignDiffer {
 	}
 
 	private class PinId {
-		private Pin pin;
+		private XdlPin pin;
 
-		private PinId(Pin pin) {
+		private PinId(XdlPin pin) {
 			this.pin = pin;
 		}
 
@@ -603,14 +604,14 @@ public class DesignDiffer {
 		}
 	}
 
-	private DifferenceTree diffPins(Pin pin1, Pin pin2) {
+	private DifferenceTree diffPins(XdlPin pin1, XdlPin pin2) {
 		DifferenceTree diffs = new DifferenceTree(pin1.getName(), "pin");
 		if (pin1.getPinType() != pin2.getPinType())
 			diffs.add(Difference.change("type", pin1.getPinType().toString(), pin2.getPinType().toString()));
 		return diffs;
 	}
 
-	private DifferenceTree diffPorts(Port port1, Port port2) {
+	private DifferenceTree diffPorts(XdlPort port1, XdlPort port2) {
 		DifferenceTree diffs = new DifferenceTree(port1.getName(), "port");
 		if (!port1.getPinName().equals(port2.getPinName()))
 			diffs.add(Difference.change("pin", port1.getPinName(), port2.getPinName()));
@@ -773,8 +774,8 @@ public class DesignDiffer {
 
 		Path path1 = Paths.get((String) options.nonOptionArguments().get(0));
 		Path path2 = Paths.get((String) options.nonOptionArguments().get(1));
-		Design design1 = new XDLReader().readDesign(path1);
-		Design design2 = new XDLReader().readDesign(path2);
+		XdlDesign design1 = new XDLReader().readDesign(path1);
+		XdlDesign design2 = new XDLReader().readDesign(path2);
 
 		DesignDiffer designDiffer = new DesignDiffer();
 		if (options.has("match_sites"))
