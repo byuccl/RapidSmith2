@@ -25,6 +25,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import edu.byu.ece.rapidSmith.design.*;
+import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
+import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
+import edu.byu.ece.rapidSmith.design.xdl.XdlPin;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;
 
@@ -43,27 +46,27 @@ public class MergeStaticNets {
 			MessageGenerator.briefMessageAndExit("USAGE: <input.xdl> <output.xdl>");
 		}
 
-		Design design = new XDLReader().readDesign(Paths.get(args[0]));
+		XdlDesign design = new XDLReader().readDesign(Paths.get(args[0]));
 
-		Net gnd = new Net("GLOBAL_LOGIC0",NetType.GND);
-		Net vcc = new Net("GLOBAL_LOGIC1",NetType.VCC);
+		XdlNet gnd = new XdlNet("GLOBAL_LOGIC0",NetType.GND);
+		XdlNet vcc = new XdlNet("GLOBAL_LOGIC1",NetType.VCC);
 		
-		ArrayList<Net> netsToRemove = new ArrayList<Net>();
+		ArrayList<XdlNet> netsToRemove = new ArrayList<XdlNet>();
 		
-		for(Net net : design.getNets()){
+		for(XdlNet net : design.getNets()){
 			if(net.isStaticNet()){
 				netsToRemove.add(net);
 				if(net.getSource() != null && net.getSource().getInstance() != null){
 					design.getInstanceMap().remove(net.getSource().getInstance().getName());
 				}
 				if(net.getType().equals(NetType.GND)){
-					for(Pin pin : net.getPins()){
+					for(XdlPin pin : net.getPins()){
 						if(pin.isOutPin()) continue;
 						gnd.addPin(pin);
 					}
 				}
 				else if(net.getType().equals(NetType.VCC)){
-					for(Pin pin : net.getPins()){
+					for(XdlPin pin : net.getPins()){
 						if(pin.isOutPin()) continue;
 						vcc.addPin(pin);
 					}
@@ -71,7 +74,7 @@ public class MergeStaticNets {
 			}
 		}
 		
-		for(Net net : netsToRemove){
+		for(XdlNet net : netsToRemove){
 			design.removeNet(net.getName());
 		}
 		

@@ -1,9 +1,9 @@
 package edu.byu.ece.rapidSmith.design.unpacker.virtex6;
 
-import edu.byu.ece.rapidSmith.design.Attribute;
-import edu.byu.ece.rapidSmith.design.Instance;
-import edu.byu.ece.rapidSmith.design.Net;
-import edu.byu.ece.rapidSmith.design.Pin;
+import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
+import edu.byu.ece.rapidSmith.design.xdl.XdlInstance;
+import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
+import edu.byu.ece.rapidSmith.design.xdl.XdlPin;
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.design.unpacker.CellCreator;
 import edu.byu.ece.rapidSmith.design.unpacker.CellCreatorFactory;
@@ -53,18 +53,18 @@ public class LutCreatorFactory implements CellCreatorFactory {
 	}
 
 	@Override
-	public CellCreator build(Instance instance) {
+	public CellCreator build(XdlInstance instance) {
 		return new LutCreator(instance, id);
 	}
 	private class LutCreator extends CellCreator {
 		private BelId id;
-		private Instance inst;
+		private XdlInstance inst;
 		private LibraryCell cellType;
 		private List<Property> properties;
 
 		private Map<String, String> cellPinMap = new HashMap<>();
 
-		public LutCreator(Instance inst, BelId id) {
+		public LutCreator(XdlInstance inst, BelId id) {
 			this.id = id;
 			this.inst = inst;
 			buildLutProperties();
@@ -74,7 +74,7 @@ public class LutCreatorFactory implements CellCreatorFactory {
 			properties = new ArrayList<>();
 
 			String LE = "" + id.getName().charAt(0);
-			Attribute belAttr = inst.getAttribute(id.getName());
+			XdlAttribute belAttr = inst.getAttribute(id.getName());
 			LutConfig lutCfg = new LutConfig(belAttr.getValue());
 			lutCfg.reduce();
 			int minNumberOfInputs = lutCfg.getMinNumOfInputs();
@@ -265,7 +265,7 @@ public class LutCreatorFactory implements CellCreatorFactory {
 			}
 		}
 
-		private boolean isSharedLut(String LE, Instance inst) {
+		private boolean isSharedLut(String LE, XdlInstance inst) {
 			String lut6 = LE + "6LUT";
 			String lut5 = LE + "5LUT";
 			return inst.hasAttribute(lut5) && !inst.getAttributeValue(lut5).equals("#OFF") &&
@@ -297,12 +297,12 @@ public class LutCreatorFactory implements CellCreatorFactory {
 				lutCfg.remapPins(remap);
 		}
 
-		private void remapStaticsPins(Instance inst, String LE) {
+		private void remapStaticsPins(XdlInstance inst, String LE) {
 			for (int i = 1; i <= 6; i++) {
-				Pin apin = inst.getPin(LE + i);
-				Net anet = apin != null ? apin.getNet() : null;
-				Pin wapin = inst.getPin("A" + i);
-				Net wanet = wapin != null ? wapin.getNet() : null;
+				XdlPin apin = inst.getPin(LE + i);
+				XdlNet anet = apin != null ? apin.getNet() : null;
+				XdlPin wapin = inst.getPin("A" + i);
+				XdlNet wanet = wapin != null ? wapin.getNet() : null;
 
 				assert apin != null;
 				assert wapin != null;
@@ -325,12 +325,12 @@ public class LutCreatorFactory implements CellCreatorFactory {
 			lutCfg.remapPins(remap);
 		}
 
-		private int countStaticPins(Instance inst, String LE) {
+		private int countStaticPins(XdlInstance inst, String LE) {
 			// Determine the number of non-statically sourced nets
 			int nonStaticInputCount = 0;
 			for (int i = 1; i <= 6 ; i++) {
-				Pin pin = inst.getPin(LE + i);
-				Net sourceNet = pin != null ? pin.getNet() : null;
+				XdlPin pin = inst.getPin(LE + i);
+				XdlNet sourceNet = pin != null ? pin.getNet() : null;
 				if (sourceNet == null)
 					continue;
 				if (!sourceNet.isStaticNet())
@@ -342,8 +342,8 @@ public class LutCreatorFactory implements CellCreatorFactory {
 				// but just to be safe, I will
 				int waNonStaticsCount = 0;
 				for (int i = 1; i <= 6; i++) {
-					Pin pin = inst.getPin("A" + i);
-					Net sourceNet = pin != null ? pin.getNet() : null;
+					XdlPin pin = inst.getPin("A" + i);
+					XdlNet sourceNet = pin != null ? pin.getNet() : null;
 					if (sourceNet == null)
 						continue;
 					if (!sourceNet.isStaticNet())
@@ -356,7 +356,7 @@ public class LutCreatorFactory implements CellCreatorFactory {
 		}
 
 		@Override
-		protected Instance getInstance() {
+		protected XdlInstance getInstance() {
 			return inst;
 		}
 

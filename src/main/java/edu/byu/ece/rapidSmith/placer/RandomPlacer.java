@@ -23,7 +23,9 @@ package edu.byu.ece.rapidSmith.placer;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Random;
-import edu.byu.ece.rapidSmith.design.*;
+
+import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
+import edu.byu.ece.rapidSmith.design.xdl.XdlInstance;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;
@@ -32,13 +34,13 @@ import edu.byu.ece.rapidSmith.util.MessageGenerator;
 public class RandomPlacer{
   public static void main(String[] args) throws IOException {
     // Create and load a design
-    Design design = new XDLReader().readDesign(Paths.get(args[0]));
+    XdlDesign design = new XDLReader().readDesign(Paths.get(args[0]));
 
     // Create a random number generator
     Random rng = new Random(0);
 
     // Place all unplaced instances
-    for(Instance i : design.getInstances()){
+    for(XdlInstance i : design.getInstances()){
 	    if(i.isPlaced()) continue;
 	    Site[] sites = design.getDevice().getAllCompatibleSites(i.getType());
 	    int idx = rng.nextInt(sites.length);

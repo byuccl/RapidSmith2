@@ -1,7 +1,7 @@
 package edu.byu.ece.rapidSmith.design.unpacker;
 
-import edu.byu.ece.rapidSmith.design.Attribute;
-import edu.byu.ece.rapidSmith.design.Instance;
+import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
+import edu.byu.ece.rapidSmith.design.xdl.XdlInstance;
 import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
 import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
@@ -15,7 +15,7 @@ import java.util.*;
 public class DefaultCellCreator extends CellCreator {
 	private BelId id;
 	private LibraryCell cellType;
-	private Instance instance;
+	private XdlInstance instance;
 
 	private Map<String, String> pinMap;
 	private Map<String, String> attributes;
@@ -36,7 +36,7 @@ public class DefaultCellCreator extends CellCreator {
 		this.attributes = directAttributes;
 	}
 
-	protected void setInstance(Instance instance) {
+	protected void setInstance(XdlInstance instance) {
 		this.instance = instance;
 	}
 
@@ -51,14 +51,14 @@ public class DefaultCellCreator extends CellCreator {
 	}
 
 	@Override
-	public Instance getInstance() {
+	public XdlInstance getInstance() {
 		return instance;
 	}
 
 	@Override
 	protected Collection<Property> getProperties() {
 		List<Property> properties = new ArrayList<>();
-		for (Attribute attr : instance.getAttributes()) {
+		for (XdlAttribute attr : instance.getAttributes()) {
 			if (attributes.containsKey(attr.getPhysicalName())) {
 				Property property = new Property(
 						attributes.get(attr.getPhysicalName()),

@@ -24,7 +24,7 @@ import com.trolltech.qt.core.Qt.WindowModality;
 import com.trolltech.qt.gui.*;
 import com.trolltech.qt.gui.QKeySequence.StandardKey;
 import edu.byu.ece.rapidSmith.RapidSmithEnv;
-import edu.byu.ece.rapidSmith.design.Design;
+import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
 import edu.byu.ece.rapidSmith.design.explorer.FilterWindow.FilterType;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.gui.FileFilters;
@@ -53,7 +53,7 @@ public class DesignExplorer extends QMainWindow{
 	/** Device of the current design that is open */
 	protected Device device;
 	/** The design that is current and active */
-	protected Design design;
+	protected XdlDesign design;
 	/** Name of the Program */
 	protected static String title = "Design Explorer";
 	/** File Name of the current design that is open */
