@@ -157,7 +157,7 @@ public final class DeviceGenerator {
 		tileWiresPool = new HashPool<>();
 
 		makeWireCorrections(wcsToAdd, wcsToRemove);
-
+	
 		device.constructDependentResources();
 
 		// free unneeded pools for garbage collection when done with
@@ -203,7 +203,7 @@ public final class DeviceGenerator {
 				device.getIOBTypes().add(type);
 		}
 	}
-
+	
 	/**
 	 * Creates the templates for the primitive sites with information from the
 	 * primitive defs and device information file.
@@ -218,7 +218,7 @@ public final class DeviceGenerator {
 			SiteTemplate template = new SiteTemplate();
 			template.setType(def.getType());
 			template.setBelTemplates(createBelTemplates(def, ptEl));
-			createAndSetIntrasiteRouting(def, template);
+			createAndSetIntrasiteRouting(def, template, ptEl);
 			createAndSetSitePins(def, template);
 
 			Element compatTypesEl = ptEl.getChild("compatible_types");
@@ -335,7 +335,7 @@ public final class DeviceGenerator {
 			if (belEl.getChildText("name").equals(belName))
 				return belEl.getChildText("type");
 		}
-		assert false : "No type found for the specified BEL";
+		assert false : "No type found for the specified BEL " + belName + ptElement.getChildText("name");
 		return null;
 	}
 
@@ -345,7 +345,7 @@ public final class DeviceGenerator {
 	 * @param def      the primitive def for the current type
 	 * @param template the template for the current type
 	 */
-	private void createAndSetIntrasiteRouting(PrimitiveDef def, SiteTemplate template) {
+	private void createAndSetIntrasiteRouting(PrimitiveDef def, SiteTemplate template, Element siteElement) {
 		WireHashMap wireMap = new WireHashMap();
 		// Stores the attributes associated with the subsite PIPs for converting
 		// back to XDL
@@ -368,11 +368,75 @@ public final class DeviceGenerator {
 				createAndAddMuxPips(def, el, wireMap, muxes);
 			}
 		}
-
+		
+		Map<Integer, Set<Integer>> belRoutethroughMap = createBelRoutethroughs(template, siteElement, wireMap); 
+		
+		template.setBelRoutethroughs(belRoutethroughMap); 
 		template.setRouting(wireMap);
 		template.setPipAttributes(muxes);
 	}
 
+	/**
+	 * Creates a BEL routethrough map for the site template.  
+	 * @param template Site Template to generate routethroughs for
+	 * @param siteElement XML document element of the site in the familyinfo.xml file
+	 * @param wireMap WireHashMap of the site template
+	 * @return A Map of BEL routethroughs
+	 */
+	private Map <Integer, Set<Integer>> createBelRoutethroughs(SiteTemplate template, Element siteElement, WireHashMap wireMap) {
+		
+		Map <Integer, Set<Integer>> belRoutethroughMap = new HashMap<Integer, Set<Integer>>();
+		
+		for (Element belEl : siteElement.getChild("bels").getChildren("bel")) {
+			String belType = belEl.getChildText("type");
+			
+			Element routethroughs = belEl.getChild("routethroughs");
+			
+			// bel has routethroughs
+			if (routethroughs != null) {
+				System.out.println(template.getType());
+				for(Element routethrough : routethroughs.getChildren("routethrough")) {
+				
+					String inputPin = routethrough.getChildText("input");
+					String outputPin = routethrough.getChildText("output");
+					
+					Integer startEnum = we.getWireEnum(getIntrasiteWireName(template.getType(), belType, inputPin)); 
+					Integer endEnum = we.getWireEnum(getIntrasiteWireName(template.getType(), belType, outputPin));
+										
+					// check that the wire names actually exist
+					assert (startEnum != null && endEnum != null) : "Intrasite wirename not found";
+					
+					// add the routethrough to the routethrough map; 
+					Set<Integer> sinkWires = belRoutethroughMap.get(startEnum);					
+					if (sinkWires == null) {
+						sinkWires = new HashSet<Integer>();
+						belRoutethroughMap.put(startEnum, sinkWires);
+					}
+					sinkWires.add(endEnum);
+				}
+			}
+		}
+		
+		// create a new wire connection for each routethrough and adds them to the wire map
+		for (Integer startWire : belRoutethroughMap.keySet()) {
+			
+			Set<Integer> sinkWires = belRoutethroughMap.get(startWire);				
+			WireConnection[] wireConnections = new WireConnection[sinkWires.size()];
+			
+			int index = 0; 
+			for (Integer sink : sinkWires) {
+				// routethroughs will be considered as pips in rapidSmith
+				wireConnections[index] =  new WireConnection(sink, 0, 0, true);
+				index++;
+			}
+			
+			wireMap.put(startWire, wireConnections);
+		}
+		
+		// return null if the belRoutethroughMap is empty
+		return belRoutethroughMap.isEmpty() ? null : belRoutethroughMap;
+	}
+	
 	/**
 	 * Creates a PIP wire connection from each input of the mux to the output.
 	 * Additionally creates the attribute that would represent this connection

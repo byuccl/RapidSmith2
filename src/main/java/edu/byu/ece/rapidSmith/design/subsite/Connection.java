@@ -237,7 +237,8 @@ public abstract class Connection implements Serializable {
 
 		@Override
 		public boolean isRouteThrough() {
-			return false;
+			// bel routethrough
+			return sourceWire.getSite().isRoutethrough(sourceWire.getWireEnum(), wc.getWire());
 		}
 
 		@Override
