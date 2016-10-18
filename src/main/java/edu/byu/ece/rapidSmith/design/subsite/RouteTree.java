@@ -1,6 +1,8 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.design.PIP;
+import edu.byu.ece.rapidSmith.device.BelPin;
+import edu.byu.ece.rapidSmith.device.SitePin;
 import edu.byu.ece.rapidSmith.device.Wire;
 
 import java.util.*;
@@ -67,6 +69,22 @@ public final class RouteTree implements
 	public Collection<RouteTree> getSinkTrees() {
 		return sinkTrees;
 	}
+	
+	public boolean isLeaf() {
+		return sinkTrees.size() == 0;
+	}
+	
+	public SitePin getConnectingSitePin() {
+		Collection<Connection> pinConnections = wire.getPinConnections();
+		assert(!pinConnections.isEmpty()) : "RouteTree does not connect to SitePin";
+		return pinConnections.iterator().next().getSitePin();
+	}
+	
+	public BelPin getConnectingBelPin() {
+		Collection<Connection> terminalConnections = wire.getTerminals();;
+		assert(!terminalConnections.isEmpty()) : "RouteTree does not connect to BelPin";
+		return terminalConnections.iterator().next().getBelPin();
+	}
 
 	public RouteTree addConnection(Connection c) {
 		RouteTree endTree = new RouteTree(c.getSinkWire(), c);
@@ -122,6 +140,12 @@ public final class RouteTree implements
 		return Integer.compare(cost, o.cost);
 	}
 
+	public boolean prune(RouteTree terminal) {
+		Set<RouteTree> toPrune = new HashSet<RouteTree>();
+		toPrune.add(terminal);
+		return prune(toPrune);
+	}
+	
 	public boolean prune(Set<RouteTree> terminals) {
 		return pruneChildren(terminals);
 	}

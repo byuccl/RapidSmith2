@@ -5,7 +5,7 @@ import java.util.MissingResourceException;
 
 import edu.byu.ece.edif.util.parse.ParseException;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.interfaces.vivado.ImportedTCP;
+import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.util.DotFilePrinter;
 
@@ -39,7 +39,7 @@ public class DotFilePrinterDemo {
 		System.out.println("Loading Device and Design...");		
 		// replace with your file location
 		String checkpoint = args[0];
-		ImportedTCP tcp = VivadoInterface.loadTCP(checkpoint);
+		TincrCheckpoint tcp = VivadoInterface.loadTCP(checkpoint);
 		CellDesign design = tcp.getDesign();
 	
 		System.out.println("Printing DOT file...");

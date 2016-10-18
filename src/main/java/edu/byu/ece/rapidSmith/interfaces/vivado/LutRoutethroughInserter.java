@@ -1,10 +1,12 @@
 package edu.byu.ece.rapidSmith.interfaces.vivado;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
@@ -12,341 +14,171 @@ import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
-import edu.byu.ece.rapidSmith.design.subsite.Connection;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
 import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.Site;
-import edu.byu.ece.rapidSmith.device.SitePin;
-import edu.byu.ece.rapidSmith.device.SiteType;
-import edu.byu.ece.rapidSmith.device.WireEnumerator;
 
 /**
- * This class is used to insert LUT buffers for LUT BELs that are acting <br>
- * as routethroughs. Vivado, during routing, can configure a LUT to be a <br> 
- * routethrough without placing a cell on it, but that is an internal operation <br>
- * this needs to be done to import routes correctly back into Vivado. 
+ * This class is used to insert LUT buffers on BELs that are acting as routethroughs. <br>
+ * It is not possible to manually set a BEL in Vivado as a routethrough, so a LUT1 cell
+ * needs to be inserted on the bel to achieve the same functionality. 
  *  
- * TODO: Update this to ignore Lut's that are used as a VCC or GND source <br>
- * TODO: This is focused on the series 7 slice architecture for now <br>
+ * TODO: add option to create a deep copy of the 
  * 
  * @author Thomas Townsend
  *
  */
 public class LutRoutethroughInserter {
 	
-	private static HashSet<BelPin> usedRouteThroughBelPins = new HashSet<BelPin>();
-	private static int nextUniqueID = 0; 
+	private final CellDesign design;
+	private final CellLibrary libCells; 
+	private final Map<BelPin, CellPin> belPinToCellPinMap;
+	private static final String ROUTETHROUGH_INIT_STRING = "2'h2";
+	private static final String ROUTETHROUGH_NAME = "rapidSmithRoutethrough";
+	private int routethroughID;
+	private Collection<CellNet> netsToAdd = new ArrayList<CellNet>();
+	private List<Cell> cellsToAdd = new ArrayList<Cell>();
 	
-	private CellDesign design;
-	private WireEnumerator wireEnumerator;
-	private CellLibrary libCells;
-	
-	private Collection<RoutethroughConfiguration> configsSliceL;
-	private Collection<RoutethroughConfiguration> configsSliceM;
-	
-	private HashSet<SiteType> qualifiedSiteTypes;
-	
-	private static boolean isBelPinUsed(BelPin bp) {
-		return usedRouteThroughBelPins.contains(bp);
-	}
-	
-	private static void addUsedBelPin(BelPin bp) {
-		usedRouteThroughBelPins.add(bp);
-		nextUniqueID++;
-	}
-	
-	/**
-	 * 
-	 * @param design
-	 * @param device
-	 * @param libCells
-	 */
-	public LutRoutethroughInserter(CellDesign design, Device device, CellLibrary libCells) {
-		this.design = design;
-		this.wireEnumerator = device.getWireEnumerator();
+	public LutRoutethroughInserter(CellDesign design, CellLibrary libCells, Map<BelPin, CellPin> pinMap) {
+		this.design = design; 
 		this.libCells = libCells;
-		this.configsSliceL = null;
-		this.configsSliceM = null;
+		this.routethroughID = 0;
+		this.netsToAdd = new ArrayList<CellNet>();
+		this.belPinToCellPinMap = pinMap;
+	}
+	
+	public LutRoutethroughInserter(CellDesign design, CellLibrary libCells) {
+		this.design = design; 
+		this.libCells = libCells;
+		this.routethroughID = 0;
+		this.netsToAdd = new ArrayList<CellNet>();
+		this.belPinToCellPinMap = createBelPinToCellPinMap();
+	}
 		
-		// add to the qualifitedSiteTypes as needed
-		this.qualifiedSiteTypes = new HashSet<SiteType>( 
-			Arrays.asList(
-				SiteType.SLICEL, 
-				SiteType.SLICEM
-			)
-		);
+	/**
+	 * Creates and returns a map from BelPin to CellPin in the current design.
+	 */
+	private Map<BelPin, CellPin> createBelPinToCellPinMap() {
+		
+		return design.getUsedSites().stream()
+				.flatMap(site -> design.getCellsAtSite(site).stream())
+				.flatMap(cell -> cell.getPins().stream())
+				.collect(Collectors.toMap(CellPin::getBelPin, Function.identity()));
 	}
 	
 	/**
-	 * 
+	 * Runs the routethrough inserter. Looks for all LUT BELs in the design that are being
+	 * used as a routethrough, and inserts a LUT1 cell instead.
+	 *  
+	 * @param design CellDesign to insert routethroughs
+	 * @param libCells CellLibrary of the current part 
 	 */
-	public void insertLutRoutethroughs() {
-				
-		for (Site site : design.getUsedSites()) {
+	public CellDesign execute() {
+		
+		for (CellNet net: design.getNets()) {
 			
-			if (!isSiteQualified(site) ) {
+			if (net.isIntrasite()) {
+				continue;
+			}
+		
+			for (RouteTree routeTree : net.getSinkSitePinRouteTrees()) {
+				
+				List<CellPin> sinks = new ArrayList<CellPin>(4);
+				BelPin rtSource = tryFindRoutethroughSourcePin(routeTree, sinks);
+						
+				if (rtSource != null) { // we found a routethrough
+					insertRouteThroughBel(net, rtSource, sinks);
+				}
+			}
+		}
+		
+		// add the newly created nets to the design
+		addRoutethroughNetsToDesign();
+		
+	
+		System.out.println(this.netsToAdd.size());
+		
+		for (CellNet net : netsToAdd) {
+			System.out.println(net.getName());
+			net.getPins().forEach(pin -> System.out.println("  " +  pin.getName() + ":" + pin.getBelPin().getName()));
+		}
+		
+		return this.design;
+	}
+	
+	/**
+	 * Looks for Lut routethroughs in the specified RouteTree.
+	 *  
+	 * @param route RouteTree to search for LUT routethroughs
+	 * @param sinks List to add sink CellPins to
+	 * @return The source BelPin of the routethrough. If no routethrough is found, null is returned
+	 */
+	private BelPin tryFindRoutethroughSourcePin(RouteTree route, List<CellPin> sinks ) {
+		
+		Iterator<RouteTree> rtIterator = route.getFirstSource().iterator();
+		BelPin rtSource = null;
+		
+		while (rtIterator.hasNext()) {
+			RouteTree current = rtIterator.next();
+			
+			if(!current.isSourced()) {
 				continue;
 			}
 			
-			for (RoutethroughConfiguration config : getRoutethroughConfigurations(site)) {
-				
-				config.tryInsertLutRoutethroughBuffer(design, site, wireEnumerator, libCells);
+			if (current.getConnection().isRouteThrough()) {
+				rtSource = current.getSourceTree().getConnectingBelPin();
+			}
+			else if (current.isLeaf()) {
+				BelPin bp = current.getConnectingBelPin();
+				sinks.add(belPinToCellPinMap.get(bp));
 			}
 		}
-	}
 		
-	public boolean isSiteQualified(Site site) {
-		
-		return qualifiedSiteTypes.contains(site.getType());
-	}
-	
-	private Collection<RoutethroughConfiguration> getRoutethroughConfigurations(Site site) {
-		return site.getType() == SiteType.SLICEL ? 
-					getSliceLRoutethroughConfigurations() :
-					getSliceMRoutethroughConfigurations();
+		// null indicates we didn't find a routethrough
+		return rtSource;
 	}
 	
-	// TODO: add SLICEM connections as well
-	private Collection<RoutethroughConfiguration> getSliceLRoutethroughConfigurations() {
+	/**
+	 * Rips up the LUT routethrough, and replaces it with a LUT1 pass-through cell 
+	 * that is placed on the routethrough BEL.
+	 * 
+	 * @param net Net containing the routethrough
+	 * @param rtSource BelPin source of the routethrough
+	 * @param sinks List of cell pin sinks in the original net
+	 */
+	private void insertRouteThroughBel(CellNet net, BelPin rtSource, List<CellPin> sinks) {
+		// TODO: replace this code with a function
+		//create a new lut1 cell with the appropriate init string
+		Cell buffer = new Cell(ROUTETHROUGH_NAME + routethroughID, libCells.get("LUT1") );
+		buffer.updateProperty(new Property("INIT", PropertyType.EDIF, ROUTETHROUGH_INIT_STRING));
+		design.addCell(buffer);
 		
-		// lazy initialization
-		if (configsSliceL != null) {
-			return configsSliceL;
-		}
+		// break the netlist 
+		net.disconnectFromPins(sinks);
+		net.connectToPin(buffer.getPin("I0"));
 		
-		// create a new configuration for SLICEL
-		configsSliceL = new ArrayList<RoutethroughConfiguration>();
+		// add new net .. TODO: randomize the naming scheme more
+		CellNet routethroughNet = new CellNet(ROUTETHROUGH_NAME + "Net" + routethroughID++, NetType.WIRE);
+		routethroughNet.connectToPin(buffer.getPin("O"));
+		routethroughNet.connectToPins(sinks);
+		routethroughNet.setIsIntrasite(true); // mark the second portion of the net as intrasite
+		netsToAdd.add(routethroughNet);
 		
-		// Flip Flop routethrough configs
-		configsSliceL.add(new RoutethroughConfiguration("AFF", "D", "intrasite:SLICEL/AFFMUX.O6", "A6LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("AFF", "D", "intrasite:SLICEL/AFFMUX.O5", "A5LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("A5FF", "D", "intrasite:SLICEL/A5FFMUX.IN_A", "A5LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("BFF", "D", "intrasite:SLICEL/BFFMUX.O6", "B6LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("BFF", "D", "intrasite:SLICEL/BFFMUX.O5", "B5LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("B5FF", "D", "intrasite:SLICEL/B5FFMUX.IN_A", "B5LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("CFF", "D", "intrasite:SLICEL/CFFMUX.O6", "C6LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("CFF", "D", "intrasite:SLICEL/CFFMUX.O5", "C5LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("C5FF", "D", "intrasite:SLICEL/C5FFMUX.IN_A", "C5LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("DFF", "D", "intrasite:SLICEL/DFFMUX.O6", "D6LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("DFF", "D", "intrasite:SLICEL/DFFMUX.O5", "D5LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("D5FF", "D", "intrasite:SLICEL/D5FFMUX.IN_A", "D5LUT"));
+		// place lut cell and map pins correctly
+		Bel rtBel = rtSource.getBel();
+		design.placeCell(buffer, rtBel);
+		buffer.getPin("I0").setBelPin(rtSource);
+		buffer.getPin("O").setBelPin(buffer.getPin("O").getPossibleBelPins().get(0));
 		
-		// Carry routethrough configs
-		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "S[0]", null, "A6LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "S[1]", null, "B6LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "S[2]", null, "C6LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "S[3]", null, "D6LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "DI[0]", "intrasite:SLICEL/ACY0.O5", "A5LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "DI[1]", "intrasite:SLICEL/BCY0.O5", "B5LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "DI[2]", "intrasite:SLICEL/CCY0.O5", "C5LUT"));
-		configsSliceL.add(new RoutethroughConfiguration("CARRY4", "DI[3]", "intrasite:SLICEL/DCY0.O5", "D5LUT"));
-		
-		return configsSliceL;
+		cellsToAdd.add(buffer);
 	}
 	
-	private Collection<RoutethroughConfiguration> getSliceMRoutethroughConfigurations() {
-		
-		// lazy initialization
-		if (configsSliceL != null) {
-			return configsSliceM;
-		}
-		
-		// create a new configuration for SLICEL
-		configsSliceM = new ArrayList<RoutethroughConfiguration>();
-		
-		// Flip Flop routethrough configs
-		configsSliceM.add(new RoutethroughConfiguration("AFF", "D", "intrasite:SLICEM/AFFMUX.O6", "A6LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("AFF", "D", "intrasite:SLICEM/AFFMUX.O5", "A5LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("A5FF", "D", "intrasite:SLICEM/A5FFMUX.IN_A", "A5LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("BFF", "D", "intrasite:SLICEM/BFFMUX.O6", "B6LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("BFF", "D", "intrasite:SLICEM/BFFMUX.O5", "B5LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("B5FF", "D", "intrasite:SLICEM/B5FFMUX.IN_A", "B5LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("CFF", "D", "intrasite:SLICEM/CFFMUX.O6", "C6LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("CFF", "D", "intrasite:SLICEM/CFFMUX.O5", "C5LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("C5FF", "D", "intrasite:SLICEM/C5FFMUX.IN_A", "C5LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("DFF", "D", "intrasite:SLICEM/DFFMUX.O6", "D6LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("DFF", "D", "intrasite:SLICEM/DFFMUX.O5", "D5LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("D5FF", "D", "intrasite:SLICEM/D5FFMUX.IN_A", "D5LUT"));
-		
-		// Carry routethrough configs
-		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "S[0]", null, "A6LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "S[1]", null, "B6LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "S[2]", null, "C6LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "S[3]", null, "D6LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "DI[0]", "intrasite:SLICEM/ACY0.O5", "A5LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "DI[1]", "intrasite:SLICEM/BCY0.O5", "B5LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "DI[2]", "intrasite:SLICEM/CCY0.O5", "C5LUT"));
-		configsSliceM.add(new RoutethroughConfiguration("CARRY4", "DI[3]", "intrasite:SLICEM/DCY0.O5", "D5LUT"));
-		
-		return configsSliceM;
-	}
-		
-	// TODO: put this in its own class file so that I can have a static WireEnumerator that I can set once
-	private class RoutethroughConfiguration {
-		
-		private static final String ROUTETHROUGH_INIT_STRING = "2'h2";
-		
-		// Strings that define the routethrough configuration
-		private final String sinkBelName;
-		private final String sinkCellPinName;
-		private final String connectingSitePipName;
-		private final String candidateLutName;
-		private final int lutInputCount;
-		
-		// actual physical elements for a specific configuration... used to create buffer
-		private Bel lutBel;
-		private BelPin lutBelPin;
-		private CellPin sinkPin;
-		private CellNet net;
-		
-		public RoutethroughConfiguration(String sinkBelName, String sinkCellPinName, String connectingSitePipName, String candidateLutName) {
-			this.sinkBelName = sinkBelName;
-			this.sinkCellPinName = sinkCellPinName;
-			this.connectingSitePipName = connectingSitePipName;
-			this.candidateLutName = candidateLutName;
-			this.lutInputCount = candidateLutName.contains("5") ? 5 : 6 ;
-		}
-		
-		/*
-		 * Tests to check if a routethrough buffer needs to be added to the design for Vivado import. <br>
-		 * If it does, then a routethrough buffer is inserted.
-		 */
-		public boolean tryInsertLutRoutethroughBuffer(CellDesign design, Site site, WireEnumerator we, CellLibrary library) {
-			
-			if (!testRoutethroughConfiguration(design, site, we)) {
-				return false;
-			}
-			
-			insertRoutethroughBuffer(design, library);
-			return true;
-		}
-		
-		/*
-		 * Returns true if a routethrough LUT needs to be added to the design.
-		 */
-		private boolean testRoutethroughConfiguration(CellDesign design, Site site, WireEnumerator we) {
-			
-			return isConnectingSitePipUsed(design, site, we) &&
-					!isCandidateLutUsed(design, site) &&
-					isSinkPinConnectedToNet(design, site) &&
-					isNetConnectedToCandidateLut(site);
-		}
-		
-		private boolean isConnectingSitePipUsed(CellDesign design, Site site, WireEnumerator we) {
-			
-			HashSet<Integer> usedSitePips = design.getUsedSitePipsAtSite(site);
-			return connectingSitePipName == null || usedSitePips.contains(we.getWireEnum(connectingSitePipName)); 
-		}
-		
-		private boolean isCandidateLutUsed(CellDesign design, Site site) {
-			
-			// check if the lut bel is used
-			lutBel = site.getBel(candidateLutName);
-			return design.getCellAtBel(lutBel) != null; 
-		}
-		
-		private boolean isSinkPinConnectedToNet(CellDesign design, Site site) {
-			
-			// check if there is cell placed at the bel
-			Bel sinkBel = site.getBel(sinkBelName);
-			Cell sinkCell = design.getCellAtBel(sinkBel);
-			
-			if (sinkCell == null) {
-				return false;
-			}
-			
-			// check if there is a net connected to the sink pin
-			sinkPin = sinkCell.getPin(sinkCellPinName);
-			net = sinkPin.getNet(); 
-		
-			return sinkPin.isConnectedToNet(); 
-		}
-		
-		private boolean isNetConnectedToCandidateLut(Site site) {
-								
-			// assuming the first RouteTree object in the net is the actual route
-			RouteTree route = net.getRouteTrees().iterator().next(); 
-			
-			Iterator<RouteTree> rtIterator = route.getFirstSource().iterator(); 
-			
-			// search through the entire route tree
-			while ( rtIterator.hasNext() ) {
-				
-				RouteTree currentRouteTree = rtIterator.next(); 
-				
-				Collection<Connection> pinConnections = currentRouteTree.getWire().getPinConnections();
-				
-				if (pinConnections.size() == 0) {
-					continue;
-				}
-				
-				SitePin sitePin = pinConnections.iterator().next().getSitePin(); 
-				
-				if (isSitePinConnectedToCandidateLut(sitePin, site)) {
-					return true;
-				}
-			}
-			
-			// partially routed net...do not create a routethrough
-			return false;
-		}
-		
-		private boolean isSitePinConnectedToCandidateLut(SitePin sitePin, Site site) {
-			
-			if (sitePin.getSite().equals(site)) { // && sitePin.getDirection() == PinDirection.IN) {
-				String pinName = sitePin.getName();
-				
-				int input = Character.getNumericValue(pinName.charAt(pinName.length() - 1));
-				char pinStart = pinName.charAt(0);
-				char lutStart = this.candidateLutName.charAt(0);
-				this.lutBelPin = this.lutBel.getBelPin("A" + input);
-				
-				return pinStart == lutStart &&
-						input > 0 && input <= lutInputCount &&
-						!isBelPinUsed(lutBelPin);
-			}
-			
-			return false;
-		}
-				
-		/*
-		 * Inserts a RT buffer to the design
-		 * TODO: create a better way to create unique names for the inserted cell and net
-		 */
-		private void insertRoutethroughBuffer(CellDesign design, CellLibrary libCells) {
-			addUsedBelPin(lutBelPin);
-			
-			//create a new lut1 cell with the appropriate init string
-			Cell buffer = new Cell("lutRtBuffer" + LutRoutethroughInserter.nextUniqueID, libCells.get("LUT1") );
-			buffer.updateProperty(new Property("INIT", PropertyType.EDIF, ROUTETHROUGH_INIT_STRING));
-			design.addCell(buffer);
-			
-			// break the netlist 
-			net.disconnectFromPin(sinkPin);
-			net.connectToPin(buffer.getPin("I0"));
-			
-			// add new net
-			CellNet tmpNet = new CellNet("lutRtBufferNet" + LutRoutethroughInserter.nextUniqueID, NetType.WIRE);
-			tmpNet.connectToPin(buffer.getPin("O"));
-			tmpNet.connectToPin(sinkPin);
-			design.addNet(tmpNet);
-			
-			// place lut cell and map pins correctly
-			design.placeCell(buffer, lutBel);
-			buffer.getPin("I0").setBelPin(lutBelPin);
-			buffer.getPin("O").setBelPin("O" + this.lutInputCount);
-		}
-		
-		private void addUsedBelPin(BelPin bp) {
-			LutRoutethroughInserter.addUsedBelPin(bp);
-		}
-		
-		private boolean isBelPinUsed(BelPin bp) {
-			return LutRoutethroughInserter.isBelPinUsed(bp);
-		}
+	/**
+	 * Adds all newly created nets to the CellDesign
+	 */
+	private void addRoutethroughNetsToDesign() {
+		netsToAdd.forEach(net -> design.addNet(net));
 	}
 }
