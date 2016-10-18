@@ -2,30 +2,16 @@ package edu.byu.ece.rapidSmith.interfaces.vivado;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-
-import edu.byu.ece.rapidSmith.design.subsite.Cell;
-import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.design.subsite.CellPin;
-import edu.byu.ece.rapidSmith.device.Bel;
-import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.Site;
-import edu.byu.ece.rapidSmith.device.SiteType;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
 
 /**
  * This class is used for parsing and writing design.info files in a TINCR checkpoint. <br>
- * design.info files are used to specify the physical location of cells in a Vivado netlist.
+ * Currently, the design.info file only contains the part-name of the TCP device. <br>
+ * We may add to what is in this file in the future
  * 
  * @author Thomas Townsend
  *
@@ -40,9 +26,6 @@ public class DesignInfoInterface {
 	 * @param device Device which the design is implemented on
 	 * @throws IOException
 	 */
-	/*
-	 * Parses the Vivado part name from the "design.info" file of a TINCR checkpoint 
-	 */
 	public static String parseInfoFile (String tcp) throws IOException {
 		
 		BufferedReader br = null;
@@ -54,7 +37,7 @@ public class DesignInfoInterface {
 			part = line.split("=")[1];
 		}
 		catch (IndexOutOfBoundsException e) {
-			MessageGenerator.briefErrorAndExit("[ERROR]: No part name found in the design.info file.");
+			throw new ParseException("No part name found in the design.info file.");
 		}
 		finally {
 			if (br != null)
@@ -78,5 +61,4 @@ public class DesignInfoInterface {
 		fileout.write("part=" + partName + "\n");
 		fileout.close();
 	}
-	
 }

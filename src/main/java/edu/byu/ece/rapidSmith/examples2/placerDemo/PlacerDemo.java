@@ -20,7 +20,7 @@ import edu.byu.ece.edif.core.InvalidEdifNameException;
 import edu.byu.ece.edif.util.parse.ParseException;
 import edu.byu.ece.rapidSmith.RapidSmithEnv;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.interfaces.vivado.ImportedTCP;
+import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.examples2.placerDemo.SimulatedAnnealingPlacer;
@@ -81,9 +81,8 @@ public class PlacerDemo {
 		classSetup();
 		
 		System.out.println("Loading Design...");			
-		ImportedTCP tcp = VivadoInterface.loadTCP(tcpDirectory);
+		TincrCheckpoint tcp = VivadoInterface.loadTCP(tcpDirectory);
 		CellDesign design = tcp.getDesign();
-		String partName = tcp.getPartName();
 		
 		// create a stream to vivado if in interactive mode
 		BufferedWriter out = (interactiveMode) ? createVivadoOutputStream(tcpDirectory, vivadoInstanceDirectory) : null;
@@ -98,7 +97,7 @@ public class PlacerDemo {
 		
 		// Export the design to a TCP file
 		System.out.println("Exporting Placed Design...");
-		VivadoInterface.writeTCP(tcpDirectory, design, partName);
+		VivadoInterface.writeTCP(tcpDirectory, design, tcp.getDevice(), tcp.getLibCells());
 		System.out.println("Successfully added placement constraints to TINCR checkpoint: " + tcpDirectory);
 		
 		if (interactiveMode) {

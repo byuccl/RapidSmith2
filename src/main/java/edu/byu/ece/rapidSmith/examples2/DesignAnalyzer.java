@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import edu.byu.ece.rapidSmith.interfaces.vivado.ImportedTCP;
+import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.edif.util.parse.ParseException;
 import edu.byu.ece.rapidSmith.RapidSmithEnv;
@@ -52,7 +52,7 @@ public class DesignAnalyzer {
 		
 		// Loading in a TINCR checkpoint
 		System.out.println("Loading Design...");
-		ImportedTCP tcp = VivadoInterface.loadTCP(checkpointbase+".tcp");
+		TincrCheckpoint tcp = VivadoInterface.loadTCP(checkpointbase+".tcp");
 		CellDesign design = tcp.getDesign();
 		
 //        DesignAnalyzer da = new DesignAnalyzer();
@@ -108,8 +108,8 @@ public class DesignAnalyzer {
 					System.out.println("  Pin:  " + cp.getCell().getName() + "." + cp.getName());
 			}
 			// Print out the net's route trees if it has any
-			if (n.getRouteTrees() != null) {
-				Collection<RouteTree> rts = n.getRouteTrees();
+			if (n.getIntersiteRouteTreeList() != null) {
+				Collection<RouteTree> rts = n.getIntersiteRouteTreeList();
 				if (rts.isEmpty())
 					System.out.println("  Route Trees: none");
 				else

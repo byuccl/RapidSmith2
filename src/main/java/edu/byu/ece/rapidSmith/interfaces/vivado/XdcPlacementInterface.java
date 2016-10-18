@@ -5,10 +5,11 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
@@ -18,10 +19,11 @@ import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.SiteType;
+
 import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
 
 /**
- * This class is used for parsing and writing placement XDC files in a TINCR checkpoint. <br>
+ * This class is used for parsing and writing placement XDC files in a TINCR checkpoint.
  * Placement.xdc files are used to specify the physical location of cells in a Vivado netlist.
  * 
  * @author Thomas Townsend
@@ -29,6 +31,18 @@ import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
  */
 public class XdcPlacementInterface {
 
+	private CellDesign design;
+	private Device device;
+	private int currentLineNumber;
+	private String currentFile;
+	private Map<BelPin, CellPin> belPinToCellPinMap; 
+	
+	public XdcPlacementInterface(CellDesign design, Device device) {
+		this.design = design;
+		this.device = device;
+		belPinToCellPinMap = new HashMap<BelPin, CellPin>();
+	}
+	
 	/**
 	 * Applies the placement constraints from the TINCR checkpoint files
 	 * to the RapidSmith2 Cell Design.
@@ -38,90 +52,199 @@ public class XdcPlacementInterface {
 	 * @param device Device which the design is implemented on
 	 * @throws IOException
 	 */
-	public static void parsePlacementXDC(String xdcFile, CellDesign design, Device device) throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader(xdcFile));
+	public void parsePlacementXDC(String xdcFile) throws IOException {
+		
+		currentFile = xdcFile;
+		LineNumberReader br = new LineNumberReader(new BufferedReader(new FileReader(xdcFile)));
 		String line = null;
 		
-		//parse the placement file
 		while ((line = br.readLine()) != null) {
+			currentLineNumber = br.getLineNumber();
+			
 			String[] toks = line.split("\\s+");
-			if (toks[0].equals("LOC")) {
-				String cname = toks[1]; 
-				String sname = toks[2];
-				Cell c = design.getCell(cname);
-				
-				Objects.requireNonNull(c, "Null cell found in design! This should never happen.");
-								
-				Site ps = device.getPrimitiveSite(sname);
-				
-				if (ps == null) {
-					br.close();
-					throw new ParseException(String.format("Site: %s not found in the current device!", sname));
-				}
-				
-				String stype = toks[3]; 
-				ps.setType(SiteType.valueOf(stype));
-
-				String bname = toks[4];
-				Bel b = ps.getBel(bname);
-				
-				if (b == null) {
-					br.close();
-					throw new ParseException(String.format("Bel: %s not found in site: %s.", bname, sname));
-				}
-				
-				design.placeCell(c, b);
-
-				// Now, map all the cell pins to bel pins
-				// TODO: Add a special case for mapping BRAM cell pins that can map to multiple bel pins
-				//		it seems that this has something to do with 
-				for (CellPin cp : c.getPins()) {
-					List<BelPin> bpl = cp.getPossibleBelPins();
-					
-					//special case for the CIN pin ... TODO: update cell library instead of doing this
-					if (b.getName().equals("CARRY4") && cp.getName().equals("CI") ) {
-						cp.setBelPin("CIN");
-					}
-					//TODO: may have to update this with startwith FIFO as well as RAMB
-					else if (bpl.size() == 1 || b.getName().startsWith("RAMB")) {
-						cp.setBelPin(bpl.get(0));
-					}
-					else if (bpl.size() == 0) {
-						br.close();
-						throw new ParseException(String.format("Uknown cellpin to belpin mapping for cellpin: %s. Update CellLibrary.xml.", cp.getName()));
-					}
-				}				
-			}
-			//LOCK_PINS MAP1 MAP2 ... CELL
-			else if (toks[0].equals("LOCK_PINS")) {
-				String cellName = toks[toks.length-1];
-				Cell cell = design.getCell(cellName); 
-				
-				if (cell == null) {
-					br.close();
-					throw new ParseException(String.format("Cell %s does not exist in the design!", cellName));
-				}
-				
-				//extract the actual cell to bel pin mappings for LUTs
-				for(int i = 1; i < toks.length-1; i++){
-					String[] pins = toks[i].split(":");
-					cell.getPin(pins[0]).setBelPin(pins[1]);
-				}
-			}
-			// pins (ports)
-			else if (toks[0].equals("PACKAGE_PIN")) {
-				String siteName = toks[1];
-				String cellName = toks[2];
-				
-				Bel bel = device.getPrimitiveSite(siteName).getBel("PAD");
-				Cell cell = design.getCell(cellName); 
-				design.placeCell(cell, bel);
-				cell.getPin("PAD").setBelPin(bel.getBelPin("PAD"));
+			
+			switch (toks[0]) {
+				case "LOC" : applyCellPlacement(toks);
+					break;
+				case "PINMAP" : applyCellPinMappings(toks);
+					break;
+				case "PACKAGE_PIN" : applyPortPlacement(toks) ;
+					break;
+				default :
+					throw new ParseException(String.format("Unrecognized Token: %s \nOn %d of %s", toks[0], currentLineNumber, currentFile));
 			}
 		}
+	
 		br.close();
 	}
 	
+	private void applyCellPlacement(String[] toks) {
+		
+		Cell cell = tryGetCell(toks[1]);
+		Site site = tryGetSite(toks[2]);
+		
+		// TODO: add a check to see that the sitetype is a valid option for the site
+		String siteType = toks[3]; 
+		site.setType(SiteType.valueOf(siteType));
+		
+		Bel bel = tryGetBel(site, toks[4]);
+		
+		design.placeCell(cell, bel);
+	}
+	
+	private void applyCellPinMappings(String[] toks) {
+		
+		Cell cell = tryGetCell(toks[1]);
+		Bel bel = cell.getAnchor();
+		
+		assert(bel != null);
+		
+		for (int i = 2; i < toks.length; i++) {
+			String[] pinmap = toks[i].split(":");
+
+			// TODO: Right now I am assuming that a cell pin maps to only one bel pin, but this is incorrect.
+			//		 Need to update this function to once multi-bel pin mappings are implemented
+			if (pinmap.length > 1) {
+				CellPin cellPin = tryGetCellPin(cell, pinmap[0]);
+				BelPin belPin = tryGetBelPin(bel, pinmap[1]);
+				cellPin.setBelPin(belPin);
+				
+				belPinToCellPinMap.put(belPin, cellPin);
+				
+				// Need this to import routing correctly
+				for (int j = 2; j < pinmap.length; j++) {
+					belPin = tryGetBelPin(bel, pinmap[j]);
+					belPinToCellPinMap.put(belPin, cellPin);
+				}
+			}
+		}
+	}
+	
+	private void applyPortPlacement(String[] toks) {
+		
+		Site site = tryGetSite(toks[1]);
+		Cell cell = tryGetCell(toks[2]);
+				
+		// TODO: update this so PAD is not hardcoded in this location. Not sure if there is a way to do this...
+		Bel bel = tryGetBel(site, "PAD"); 
+		design.placeCell(cell, bel);
+		
+		BelPin belPin = tryGetBelPin(bel, "PAD");
+		CellPin cellPin = tryGetCellPin(cell, "PAD");
+		
+		cellPin.setBelPin(belPin);
+		belPinToCellPinMap.put(belPin, cellPin);
+	}
+
+	/**
+	 * Returns the map of BelPin->CellPin mapping after the placement xdc
+	 * has been applied to the design. Should be called after parsePlacementXDC
+	 * is called.
+	 * 
+	 * @return Map from BelPin to the CellPin that is placed on it
+	 */
+	public Map<BelPin, CellPin> getPinMap() {
+		return belPinToCellPinMap;
+	}
+	
+	/**
+	 * Tries to retrieve the Cell object with the given name
+	 * from the currently loaded design. If the cell does not exist,
+	 * a ParseException is thrown
+	 * 
+	 * @param cellName Name of the cell to retrieve
+	 */
+	private Cell tryGetCell(String cellName) {
+		
+		Cell cell = design.getCell(cellName);
+		
+		if (cell == null) {
+			throw new ParseException("Cell \"" + cellName + "\" not found in the current device. \n" 
+									+ "On line " + this.currentLineNumber + " of " + currentFile);
+		}
+		
+		return cell;
+	}
+	
+	/**
+	 * Tries to retrieve a CellPin object on the specified Cell parameter.
+	 * If the pin does not exist, a ParseException is thrown.
+	 * 
+	 * @param Cell Cell which the pin is attached
+	 * @param pinName Name of the pin
+	 * @return CellPin
+	 */
+	private CellPin tryGetCellPin(Cell cell, String pinName) {
+		
+		CellPin pin = cell.getPin(pinName);
+		
+		if (pin == null) {
+			throw new ParseException(String.format("CellPin: \"%s/%s\" does not exist in the current device"
+												 + "On line %d of %s", cell.getName(), pinName, currentLineNumber, currentFile));
+		}
+		
+		return pin;
+	}
+	
+	/**
+	 * Tries to retrieve the Site object with the given site name
+	 * from the currently loaded device. If the site does not exist
+	 * a ParseException is thrown
+	 * 
+	 * @param siteName Name of the site to retrieve
+	 */
+	private Site tryGetSite(String siteName) {
+		
+		Site site = device.getPrimitiveSite(siteName);
+		
+		if (site == null) {
+			throw new ParseException("Site \"" + siteName + "\" not found in the current device. \n" 
+									+ "On line " + this.currentLineNumber + " of " + currentFile);
+		}
+		
+		return site;
+	}
+		
+	/**
+	 * Tries to retrieve a BEL object from the currently loaded device. 
+	 * If the BEL does not exist, a ParseException is thrown. 
+	 * 
+	 * @param site Site where the BEL resides
+	 * @param belName Name of the BEL within the site
+	 * @return Bel
+	 */
+	private Bel tryGetBel(Site site, String belName) {
+		
+		Bel bel = site.getBel(belName);
+		
+		if (bel == null) {
+			throw new ParseException(String.format("Bel: \"%s/%s\" does not exist in the current device"
+												 + "On line %d of %s", site.getName(), belName, currentLineNumber, currentFile));
+		}
+		
+		return bel;
+	}
+	
+	/**
+	 * Tries to retrieve a BelPin object from the currently loaded device
+	 * If the pin does not exist, a ParseException is thrown.
+	 * 
+	 * @param bel Bel which the pin is attached
+	 * @param pinName Name of the bel pin
+	 * @return BelPin
+	 */
+	private BelPin tryGetBelPin(Bel bel, String pinName) {
+		
+		BelPin pin = bel.getBelPin(pinName);
+		
+		if (pin == null) {
+			throw new ParseException(String.format("BelPin: \"%s/%s\" does not exist in the current device.\n"
+												 + "On line %d of %s", bel.getName(), pinName, currentLineNumber, currentFile));
+		}
+		
+		return pin;
+	}
+		
 	/**
 	 * Creates a placement.xdc file from the cells of the given design <br>
 	 * This file can be imported into Vivado to constrain the cells to a physical location
@@ -130,7 +253,7 @@ public class XdcPlacementInterface {
 	 * @param design Design with cells to export
 	 * @throws IOException
 	 */
-	public static void writePlacementXDC(String xdcOut, CellDesign design) throws IOException {
+	public void writePlacementXDC(String xdcOut) throws IOException {
 		
 		BufferedWriter fileout = new BufferedWriter (new FileWriter(xdcOut));
 		
@@ -151,7 +274,7 @@ public class XdcPlacementInterface {
 			fileout.write(String.format("set_property LOC %s [get_cells {%s}]\n", ps.getName(), cellname));
 								
 			//TODO: Update this function when more cells with LOCK_PINS are discovered
-			if(cell.getLibCell().isLut()) { //.getName().startsWith("LUT")) {
+			if(cell.getLibCell().isLut()) { 
 				fileout.write("set_property LOCK_PINS { ");
 				for(CellPin cp: cell.getInputPins()) 
 					fileout.write(String.format("%s:%s ", cp.getName(), cp.getBelPin().getName()));
@@ -169,7 +292,7 @@ public class XdcPlacementInterface {
 	 * 
 	 * TODO: Add <is_lut>, <is_carry>, and <is_ff> tags to cell library
 	 */
-	private static Collection<Cell> sortCellsForXdcExport(CellDesign design) {
+	private Collection<Cell> sortCellsForXdcExport(CellDesign design) {
 		
 		// cell bins
 		ArrayList<Cell> sorted = new ArrayList<Cell>(design.getCells().size());

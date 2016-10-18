@@ -61,7 +61,7 @@ public final class EdifInterface {
 	/* ********************
 	 * 	 Import Section
 	 *********************/
-
+		
 	/**
 	 * Parses the Edif netlist into a RapidSmith2 CellDesign data structure
 	 * 
@@ -72,6 +72,9 @@ public final class EdifInterface {
 	 * @throws ParseException
 	 */
 	public static CellDesign parseEdif(String edifFile, CellLibrary libCells) throws FileNotFoundException, ParseException {
+		
+		List<CellNet> vccNets = new ArrayList<CellNet>();
+		List<CellNet> gndNets = new ArrayList<CellNet>();
 		
 		// parse edif into the BYU edif tools data structures
 		EdifEnvironment top = EdifParser.translate(edifFile);
@@ -85,8 +88,10 @@ public final class EdifInterface {
 		// add all the cells and nets to the design
 		processTopLevelEdifPorts(design, topLevelCell.getInterface(), libCells);
 		processEdifCells(design, topLevelCell.getCellInstanceList(), libCells);
-		processEdifNets(design, topLevelCell.getNetList());
-		
+		processEdifNets(design, topLevelCell.getNetList(), vccNets, gndNets);
+				
+		collapseStaticNets(design, libCells, vccNets, gndNets);
+				
 		return design;
 	}
 	
@@ -151,7 +156,7 @@ public final class EdifInterface {
 	/*
 	 * Converts EDIF nets to equivalent RapidSmith nets and adds them to the design
 	 */
-	private static void processEdifNets(CellDesign design, Collection<EdifNet> edifNets) {
+	private static void processEdifNets(CellDesign design, Collection<EdifNet> edifNets, List<CellNet> vccNets, List<CellNet> gndNets) {
 		 
 		if (edifNets == null || edifNets.size() == 0) {
 			MessageGenerator.briefError("[Warning] No nets found in the edif netlist");
@@ -174,8 +179,19 @@ public final class EdifInterface {
 			
 			processNetConnections(sources, design, cn);
 			processNetConnections(net.getSinkPortRefs(false, true), design, cn);
-							
-			design.addNet(cn);
+			
+			// Add the net to the design if is is NOT a static net.
+			// Otherwise, store it for later use (will collapse later)
+			if (cn.isVCCNet()) {
+				vccNets.add(cn);
+			}
+			else if (cn.isGNDNet()) {
+				gndNets.add(cn);
+			}
+			else {
+				design.addNet(cn);
+			}
+			
 			cn.updateProperties(createCellProperties(net.getPropertyList()));
 		}
 	}
@@ -201,7 +217,7 @@ public final class EdifInterface {
 				Cell portCell = design.getCell(portname);
 				
 				if (portCell == null) {
-					throw new Exceptions.ParseException("Cell " + portname + " does not exist in the design!");
+					throw new Exceptions.ParseException("Port Cell " + portname + " does not exist in the design!");
 				}
 				
 				net.connectToPin(portCell.getPin("PAD"));
@@ -282,6 +298,55 @@ public final class EdifInterface {
 	 */
 	private static int reverseBusIndex(int width, int busMember) {
 		return width - 1 - busMember;
+	}
+	
+	private static void collapseStaticNets(CellDesign design, CellLibrary libCells, List<CellNet> vccNets, List<CellNet> gndNets) {
+		
+		// Create new global VCC/GND cells and nets
+		Cell globalVCC = new Cell("RapidSmithGlobalVCC", libCells.getVccSource());
+		Cell globalGND = new Cell("RapidSmithGlobalGND", libCells.getGndSource());		
+		CellNet globalVCCNet = new CellNet("RapidSmithGlobalVCCNet", NetType.VCC);
+		CellNet globalGNDNet = new CellNet("RapidSmithGlobalGNDNet", NetType.GND);
+		
+		// Connect the global sources to the global nets
+		globalVCCNet.connectToPin(globalVCC.getOutputPins().iterator().next());
+		globalGNDNet.connectToPin(globalGND.getOutputPins().iterator().next());
+		
+		// Add all the VCC/GND sink pins to the global nets
+		List<CellNet> netsToRemove = new ArrayList<CellNet>();
+		
+		for(CellNet net : vccNets) {
+			transferSinkPins(net, globalVCCNet);
+			netsToRemove.add(net);
+		}
+		
+		for(CellNet net : gndNets) {
+			transferSinkPins(net, globalGNDNet);
+			netsToRemove.add(net);
+		}
+			
+		// Remove the old VCC/GND cells from the list
+		List<Cell> cellsToRemove = new ArrayList<Cell>();
+		for (Cell cell : design.getCells()) {
+			if (cell.isVccSource() || cell.isGndSource()) {
+				cellsToRemove.add(cell);
+			}
+		}
+		cellsToRemove.forEach(cell -> design.removeCell(cell));
+		
+		// Add the new master cells/nets to the design
+		// TODO: add these as special nets in the design
+		design.addCell(globalVCC);
+		design.addNet(globalVCCNet);
+		design.addCell(globalGND);
+		design.addNet(globalGNDNet);
+	}
+	
+	private static void transferSinkPins(CellNet oldNet, CellNet newNet) {
+		Collection<CellPin> sinkPins = oldNet.getSinkPins();
+		oldNet.disconnectFromAllPins();
+		oldNet.unroute();
+		newNet.connectToPins(sinkPins);
 	}
 	
 	/* *********************

@@ -2,7 +2,9 @@ package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.design.PIP;
+import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.PinDirection;
+import edu.byu.ece.rapidSmith.device.SitePin;
 
 import java.io.Serializable;
 import java.util.*;
@@ -26,11 +28,19 @@ public class CellNet implements Serializable {
 	private NetType type;
 	private CellDesign design;
 	/** Source and sink pins of the net */
-	private List<CellPin> pins;
+	private Set<CellPin> pins;
 	private CellPin sourcePin;
-	/** Routing resources or Programmable-Interconnect-Points */
-	private List<RouteTree> routeTrees;
 	private Map<Object, Property> propertyMap;
+
+	private Set<CellPin> routedSinks; 
+	private boolean isIntrasite;
+	private RouteStatus routeStatus;
+	
+	// Physical route information
+	private RouteTree source;
+	private List<RouteTree> intersiteRoutes;
+	private Map<BelPin, RouteTree> belPinToSinkRTMap;
+	private Map<SitePin, RouteTree> sitePinToRTMap;
 
 	/**
 	 * Creates a new net with the given name.
@@ -42,11 +52,12 @@ public class CellNet implements Serializable {
 
 		this.name = name;
 		this.type = type;
+		this.isIntrasite = false;
 		init();
 	}
 
 	private void init() {
-		this.pins = new ArrayList<>(3);
+		this.pins = new HashSet<>();
 	}
 
 	/**
@@ -190,6 +201,11 @@ public class CellNet implements Serializable {
 		return pins;
 	}
 
+	/**
+	 * Returns the sink pins of the net. This structure should not be modified by the user.
+	 * 
+	 * @return CellPin sinks of the net
+	 */
 	public Collection<CellPin> getSinkPins() {
 		return getPins().stream()
 				.filter(p -> p != sourcePin)
@@ -274,6 +290,29 @@ public class CellNet implements Serializable {
 	}
 
 	/**
+	 * Removes a collection of pins from the net. 
+	 * 
+	 * @param pins Collection of pins to remove
+	 */
+	public void disconnectFromPins(Collection<CellPin> pins) {
+		pins.forEach(pin -> disconnectFromPin(pin));
+	}
+	
+	/**
+	 * Disconnects the net from all of its current pins
+	 */
+	public void disconnectFromAllPins() { 
+		
+		pins.forEach(pin -> pin.clearNet());
+		
+		if (sourcePin != null) {
+			sourcePin = null;
+		}
+		
+		pins.clear();
+	}
+	
+	/**
 	 * Removes a pin from this net.
 	 *
 	 * @param pin the pin to remove
@@ -349,52 +388,10 @@ public class CellNet implements Serializable {
 		return type.equals(NetType.GND);
 	}
 
-	/**
-	 * Returns the PIPs (routing resources) used by this net.
-	 *
-	 * @return the PIPs used by this net
-	 */
-	public Collection<RouteTree> getRouteTrees() {
-		if (routeTrees == null)
-			return Collections.emptyList();
-		return routeTrees;
-	}
-
-	public void addRouteTree(RouteTree rt) {
-		Objects.requireNonNull(rt);
-
-		if (routeTrees == null)
-			routeTrees = new ArrayList<>();
-		routeTrees.add(rt);
-	}
-
-	/**
-	 * Sets the route trees of the net to the specified list of RouteTrees
-	 *
-	 * @param rts List of RouteTree objects to add to the net
-	 */
-	public void setRouteTrees(List<RouteTree> rts) {
-		// TODO remove this.  I don't want nets potentially sharing route trees.
-		routeTrees = rts;
-	}
-
-	/**
-	 * This removes all PIPs from this net, causing it to be in an unrouted state.
-	 * PIPs from placed relatively-routed molecules are preserved.
-	 */
-	public void unroute() {
-		routeTrees = null;
-	}
-
-	public boolean isRouted() {
-		// TODO The routeTrees.size() > 0 was added but shouldn't be needed.
-		return routeTrees != null && routeTrees.size() > 0;
-	}
-
 	public CellNet deepCopy() {
 		CellNet copy = new CellNet(getName(), getType());
-		if (routeTrees != null)
-			routeTrees.forEach(rt -> copy.addRouteTree(rt.deepCopy()));
+		if (intersiteRoutes != null)
+			intersiteRoutes.forEach(rt -> copy.addIntersiteRouteTree(rt.deepCopy()));
 		return copy;
 	}
 
@@ -410,17 +407,342 @@ public class CellNet implements Serializable {
 		return "CellNet{" + getName() + "}";
 	}
 
+	/**
+	 * Returns true if the net is either a VCC or GND net. 
+	 * 
+	 * @return 
+	 */
 	public boolean isStaticNet() {
 		return type == NetType.VCC || type == NetType.GND;
 	}
-
+	
+	/* **********************************
+	 * 	    Physical Route Functions
+	 * **********************************/
+	
+	/**
+	 * Returns a collection of pips that are used in this nets physical route
+	 * @return
+	 */
 	public Collection<PIP> getPips() {
-		if (routeTrees == null)
+		if (intersiteRoutes == null)
 			return Collections.emptySet();
 		Set<PIP> pipSet = new HashSet<>();
-		for (RouteTree tree : routeTrees) {
+		for (RouteTree tree : intersiteRoutes) {
 			pipSet.addAll(tree.getAllPips());
 		}
 		return pipSet;
+	}
+
+	/**
+	 * Marks the net as intrasite (completely contained within a site) or not (streches across site boundaries). 
+	 * 
+	 * @param isInstrasite Boolean 
+	 */
+	public void setIsIntrasite(boolean isInstrasite) {
+		this.isIntrasite = isInstrasite;
+	}
+	
+	/**
+	 * Returns True if the net is an intrasite net. False otherwise
+	 * @return
+	 */
+	public boolean isIntrasite() {
+		return isIntrasite;
+	}
+	
+	/**
+	 * Returns all of the unrouted sinks of the net
+	 * @return
+	 */
+	public Set<CellPin> getUnroutedSinks() {
+		
+		if (routedSinks == null || routedSinks.isEmpty()) {
+			return (Set<CellPin>) getSinkPins(); 
+		}
+		
+		return pins.stream()
+					.filter(pin -> !routedSinks.contains(pin) && pin.isInpin())
+					.collect(Collectors.toSet());
+	}
+	
+	/**
+	 * Returns all of the routed sinks of the net
+	 * @return
+	 */
+	public Set<CellPin> getRoutedSinks() {
+		
+		if (routedSinks == null) {
+			return Collections.emptySet();
+		}
+		
+		return routedSinks; 
+	}
+	
+	/**
+	 * Mark a collection of pins in the net that have been routed. It is up to the user
+	 * to keep the routed sinks up-to-date.
+	 * 
+	 * @param cellPin Collection of cell pins to be marked as routed
+	 */
+	public void addRoutedSinks(Collection<CellPin> cellPin) {
+		cellPin.forEach(this::addRoutedSink);
+	}
+	
+	/**
+	 * Marks the specified pin as being routed. It is up to the user to keep the
+	 * routed sinks up-to-date. 
+	 * 
+	 * @param cellPin CellPin object to mark as routed
+	 */
+	public void addRoutedSink(CellPin cellPin) {
+		
+		if (!pins.contains(cellPin)) {
+			throw new IllegalArgumentException("CellPin" + cellPin.getName() + " not attached to net. "
+					+ "Cannot be added to the routed sinks of the net!");
+		}
+		
+		if (cellPin.isOutpin()) {
+			throw new IllegalArgumentException(String.format("CellPin %s is an output pin. Cannout be added as a routed sink!", cellPin.getName()));
+		}
+		
+		if(routedSinks == null) {
+			routedSinks = new HashSet<CellPin>();
+		}
+		routedSinks.add(cellPin);
+	}
+	
+	/**
+	 * This removes all PIPs from this net, causing it to be in an unrouted state.
+	 * PIPs from placed relatively-routed molecules are preserved.
+	 */
+	public void unroute() {
+		intersiteRoutes = null;
+		routedSinks = null;
+	}
+	
+	/**
+	 * Sets the route tree starting at the source BelPin, and ending on the site pin where it leaves the site.
+	 * For intrasite nets, it will end on another BelPin within the site.
+	 * @param source
+	 */
+	public void setSourceRouteTree(RouteTree source) {
+		
+		this.source = source;
+	}
+	
+	/**
+	 * Returns the starting intrasite route of the net
+	 * @return
+	 */
+	public RouteTree getSourceRouteTree() {
+		return source;
+	}
+	
+	/**
+	 * Adds an intersite RouteTree object to the net. An intersite route
+	 * starts at a site pin, and ends at one or more site pins. In general,
+	 * a net will have exactly one intersite route tree, but GND and VCC
+	 * nets will have more than one (since they are sourced by multiple tieoff locations)
+	 *  
+	 * @param intersite The RouteTree to add
+	 */
+	public void addIntersiteRouteTree(RouteTree intersite) {	
+		Objects.requireNonNull(intersite);
+
+		if (intersiteRoutes == null) {
+			intersiteRoutes = new ArrayList<RouteTree>();
+		}
+		this.intersiteRoutes.add(intersite);
+	}
+	
+	/**
+	 * Sets the list of intersite route trees to the specified list.
+	 * @param routes
+	 */
+	public void setIntersiteRouteTrees(List<RouteTree> routes) {
+		this.intersiteRoutes = routes;
+	}
+	
+	/**
+	 * Returns the first intersite route associated with the net. 
+	 * Use this function for general nets which should only have one
+	 * Route Tree.  
+	 * 
+	 * @return
+	 */
+	public RouteTree getIntersiteRouteTree() {
+		
+		if (intersiteRoutes == null) {
+			return null;
+		}
+		
+		return intersiteRoutes.get(0);
+	}
+	
+	/**
+	 * Returns all intersite RouteTree objects associated with this net.
+	 * 
+	 * @return A List of RouteTree objects
+	 */
+	public List<RouteTree> getIntersiteRouteTreeList() {
+	
+		if (intersiteRoutes == null) {
+			return Collections.emptyList();
+		}
+		return intersiteRoutes;
+	}
+	
+	/**
+	 * Adds a RouteTree object that connects to the specified BelPin. 
+	 * 
+	 * @param bp Connecting BelPin
+	 * @param route RouteTree leading to that BelPin
+	 */
+	public void addSinkRouteTree(BelPin bp, RouteTree route) {
+		
+		if (belPinToSinkRTMap == null) {
+			belPinToSinkRTMap = new HashMap<BelPin, RouteTree>();
+		}
+		belPinToSinkRTMap.put(bp, route);
+	}
+	
+	/**
+	 * Adds a RouteTree object that starts at the specified SitePin
+	 * 
+	 * @param sp Source SitePin
+	 * @param route RouteTree sourced by the SitePin
+	 */
+	public void addSinkRouteTree(SitePin sp, RouteTree route) {
+		
+		if (sitePinToRTMap == null) {
+			sitePinToRTMap = new HashMap<SitePin, RouteTree>();
+		}
+		sitePinToRTMap.put(sp, route);
+	}
+
+	/**
+	 * Returns the RouteTree object connected to the given SitePin object. 
+	 * This RouteTree contains wires INSIDE the Site, and will connect to
+	 * several BelPin sinks within the Site of the SitePin.
+	 * 
+	 * @param belPin Input (sink) SitePin
+	 * @return
+	 */
+	public RouteTree getSinkRouteTree(SitePin sitePin) {
+				
+		return sitePinToRTMap == null ? null : sitePinToRTMap.get(sitePin);
+	}
+
+	/**
+	 * Returns a set of SitePins that the net is currently connected to.
+	 * @return
+	 */
+	public Set<SitePin> getSitePins() {
+		return sitePinToRTMap == null ? null : sitePinToRTMap.keySet();
+	}
+	
+	/**
+	 * Returns the SitePin to RouteTree Map of the cell net. Should not 
+	 * be modified by the user. 
+	 * @return
+	 */
+	public Map<SitePin, RouteTree> getSitePinRouteTrees() {
+		return sitePinToRTMap;
+	}
+	
+	/**
+	 * Returns a list of RouteTree connected to sink SitePin objects
+	 * @return
+	 */
+	public List<RouteTree> getSinkSitePinRouteTrees() {
+		
+		if (sitePinToRTMap == null) {
+			return null;
+		}
+		
+		return sitePinToRTMap.keySet().stream()
+									.filter(SitePin::isInput)
+									.map(sp -> sitePinToRTMap.get(sp))
+									.collect(Collectors.toList());
+	}
+	
+	/**
+	 * Returns a list of RouteTrees that are connected to the specified Cell Pin 
+	 * 
+	 * TODO: Change this, because a cell pin can map to multiple bel pins.
+	 * TODO: Is this even useful? The user can do this themselves as well...
+	 * 
+	 * @param cellPin sink CellPin
+	 * @return A List of RouteTree
+	 */
+	public RouteTree getSinkRouteTree(CellPin cellPin) {
+		
+		BelPin belPin = cellPin.getBelPin();
+		return belPinToSinkRTMap.get(belPin);
+	}
+	
+	/**
+	 * Returns the RouteTree object connected to the specified BelPin
+	 * 
+	 * @param belPin Input BelPin
+	 * @return
+	 */
+	public RouteTree getSinkRouteTree(BelPin belPin) {
+		return belPinToSinkRTMap == null ? null : belPinToSinkRTMap.get(belPin);
+	}
+	
+	/**
+	 * Returns a set of BelPins that the net is currently connected to.
+	 * 
+	 * TODO: Could this be done by simply taking all the sink cell pins and getting the
+	 * 		 corresponding BelPin? 
+	 * @return
+	 */
+	public Set<BelPin> getBelPins() {
+		return belPinToSinkRTMap == null ? null : belPinToSinkRTMap.keySet();
+	}
+	
+	/**
+	 * Returns the BelPin to RouteTree map of the net
+	 * @return
+	 */
+	public Map<BelPin, RouteTree> getBelPinRouteTrees() {
+		return belPinToSinkRTMap;
+	}
+		
+	/**
+	 * Computes the current routing status based on the routed sink pins of the net. 
+	 * Possible statuses include: <br>
+	 * 1.) UNROUTED <br>
+	 * 2.) PARTIALLY_ROUTED <br>
+	 * 3.) FULLY_ROUTED <br> 
+	 * 
+	 * @return The current RouteStatus of the net
+	 */
+	public RouteStatus getRouteStatus() {
+		
+		if (routedSinks == null || routedSinks.isEmpty()) {
+			return RouteStatus.UNROUTED;
+		}
+		else if (routedSinks.size() == pins.size() - 1 ) {
+			return RouteStatus.FULLY_ROUTED;
+		}
+		else {
+			return RouteStatus.PARTIALLY_ROUTED;
+		}
+	}
+	
+	/**
+	 * Enumerated Type describing the routing status of a net in the design 
+	 * 
+	 * TODO: Add INTRASITE as a possible RouteStatus?
+	 * 
+	 * @author Thomas Townsend
+	 */
+	public enum RouteStatus {
+		UNROUTED,
+		PARTIALLY_ROUTED,
+		FULLY_ROUTED
 	}
 }
