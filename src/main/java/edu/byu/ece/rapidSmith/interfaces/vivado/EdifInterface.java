@@ -344,7 +344,7 @@ public final class EdifInterface {
 	
 	private static void transferSinkPins(CellNet oldNet, CellNet newNet) {
 		Collection<CellPin> sinkPins = oldNet.getSinkPins();
-		oldNet.disconnectFromAllPins();
+		oldNet.detachNet();
 		oldNet.unroute();
 		newNet.connectToPins(sinkPins);
 	}
