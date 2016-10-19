@@ -70,20 +70,31 @@ public final class RouteTree implements
 		return sinkTrees;
 	}
 	
+	/**
+	 * Returns true if the RouteTree object is a leaf (i.e. it has no children). 
+	 * For a fully routed net, a leaf tree should connect to either a SitePin
+	 * or BelPin.
+	 */
 	public boolean isLeaf() {
 		return sinkTrees.size() == 0;
 	}
 	
+	/**
+	 * Returns the SitePin connected to the wire of the RouteTree. If no SitePin
+	 * object is connected, null is returned.
+	 */
 	public SitePin getConnectingSitePin() {
 		Collection<Connection> pinConnections = wire.getPinConnections();
-		assert(!pinConnections.isEmpty()) : "RouteTree does not connect to SitePin";
-		return pinConnections.iterator().next().getSitePin();
+		return (pinConnections.isEmpty()) ? null : pinConnections.iterator().next().getSitePin(); 
 	}
 	
+	/**
+	 * Returns the BelPin connected to the wire of the RouteTree. If no BelPin
+	 * object is connected, null is returned.
+	 */
 	public BelPin getConnectingBelPin() {
-		Collection<Connection> terminalConnections = wire.getTerminals();;
-		assert(!terminalConnections.isEmpty()) : "RouteTree does not connect to BelPin";
-		return terminalConnections.iterator().next().getBelPin();
+		Collection<Connection> terminalConnections = wire.getTerminals();
+		return terminalConnections.isEmpty() ? null : terminalConnections.iterator().next().getBelPin();
 	}
 
 	public RouteTree addConnection(Connection c) {

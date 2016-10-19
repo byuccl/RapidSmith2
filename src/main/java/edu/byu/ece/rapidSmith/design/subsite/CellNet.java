@@ -301,7 +301,7 @@ public class CellNet implements Serializable {
 	/**
 	 * Disconnects the net from all of its current pins
 	 */
-	public void disconnectFromAllPins() { 
+	public void detachNet() { 
 		
 		pins.forEach(pin -> pin.clearNet());
 		
@@ -731,18 +731,5 @@ public class CellNet implements Serializable {
 		else {
 			return RouteStatus.PARTIALLY_ROUTED;
 		}
-	}
-	
-	/**
-	 * Enumerated Type describing the routing status of a net in the design 
-	 * 
-	 * TODO: Add INTRASITE as a possible RouteStatus?
-	 * 
-	 * @author Thomas Townsend
-	 */
-	public enum RouteStatus {
-		UNROUTED,
-		PARTIALLY_ROUTED,
-		FULLY_ROUTED
 	}
 }
