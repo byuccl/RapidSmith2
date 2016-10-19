@@ -1,19 +1,15 @@
 package edu.byu.ece.rapidSmith.interfaces.vivado;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 import edu.byu.ece.edif.core.EdifNameConflictException;
 import edu.byu.ece.edif.core.InvalidEdifNameException;
-import edu.byu.ece.edif.util.parse.ParseException;
+import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
 import edu.byu.ece.rapidSmith.RapidSmithEnv;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
-
 import edu.byu.ece.rapidSmith.interfaces.vivado.DesignInfoInterface;
 
 /**
@@ -35,7 +31,7 @@ public final class VivadoInterface {
 	 * @throws InvalidEdifNameException 
 	 * @throws EdifNameConflictException 
 	 */
-	public static ImportedTCP loadTCP (String tcp) throws IOException, ParseException {
+	public static TincrCheckpoint loadTCP (String tcp) throws IOException {
 	
 		if (tcp.endsWith("/") || tcp.endsWith("\\")) {
 			tcp = tcp.substring(0, tcp.length()-1);
@@ -55,17 +51,23 @@ public final class VivadoInterface {
 		
 		// create the RS2 netlist 
 		String edifFile = Paths.get(tcp, "netlist.edf").toString();
-		CellDesign design = EdifInterface.parseEdif(edifFile, libCells);
+		CellDesign design;
+		try {
+			design = EdifInterface.parseEdif(edifFile, libCells);
+		} catch (edu.byu.ece.edif.util.parse.ParseException e) {
+			throw new ParseException(e);
+		}
 		
 		// re-create the placement and routing information
-		String placementFile = Paths.get(tcp, "placement.txt").toString();
-		XdcPlacementInterface.parsePlacementXDC(placementFile, design, device);
-
-		String routingFile = Paths.get(tcp, "routing.txt").toString();
-		XdcRoutingInterface.parseRoutingXDC(routingFile, design, device);
-			
+		String placementFile = Paths.get(tcp, "placement.rsc").toString();
+		XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device);
+		placementInterface.parsePlacementXDC(placementFile);
+ 
+		String routingFile = Paths.get(tcp, "routing.rsc").toString();
+		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap());
+		routingInterface.parseRoutingXDC(routingFile);
 		
-		return new ImportedTCP(partName, design, device, libCells);
+		return new TincrCheckpoint(partName, design, device, libCells);
 	}
 		
 	/**
@@ -77,21 +79,36 @@ public final class VivadoInterface {
 	 * @throws InvalidEdifNameException 
 	 * @throws EdifNameConflictException 
 	 */
-	public static void writeTCP(String tcpDirectory, CellDesign design, String partName) throws IOException, EdifNameConflictException, InvalidEdifNameException {
+	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells) throws IOException {
 				
 		new File(tcpDirectory).mkdir();
 		
+		// insert routethrough buffers
+		LutRoutethroughInserter inserter = new LutRoutethroughInserter(design, libCells);
+		inserter.execute();
+		
 		String placementOut = Paths.get(tcpDirectory, "placement.xdc").toString();	
-		XdcPlacementInterface.writePlacementXDC(placementOut, design);
+		XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device);
+		placementInterface.writePlacementXDC(placementOut);
 		
 		String routingOut = Paths.get(tcpDirectory, "routing.xdc").toString();
-		XdcRoutingInterface.writeRoutingXDC(routingOut, design);
+		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, null);
+		routingInterface.writeRoutingXDC(routingOut, design);
 		
 		String edifOut = Paths.get(tcpDirectory, "netlist.edf").toString();
-		EdifInterface.writeEdif(edifOut, design);
+		
+		try {
+			EdifInterface.writeEdif(edifOut, design);
+		} 
+		catch (EdifNameConflictException e) {
+			throw new AssertionError(e); 
+		}
+		catch (InvalidEdifNameException e) {
+			throw new AssertionError(e);
+		}
 		
 		String partInfoOut = Paths.get(tcpDirectory, "design.info").toString();
-		DesignInfoInterface.writeInfoFile(partInfoOut, partName);
+		DesignInfoInterface.writeInfoFile(partInfoOut, device.getPartName());
 				
-	}
+	}	
 } // END CLASS 

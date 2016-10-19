@@ -237,9 +237,9 @@ public class DotFilePrinter {
 			formatCellPins(c.getInputPins(), builder, "{ ", "} |");
 		}
 		
-		// add cell info
+		// add cell info .. TODO: update this to print all properties of a cell
 		String lutString = (c.getLibCell().isLut() ? "\\n" + c.getProperty("INIT").getValue() : "");
-		builder.append(String.format(" { <%d>%s%s\\n%s\\n(%s) } ", cellId, c.getName(), lutString, c.getAnchor().getName(), c.getLibCell().getName()));
+		builder.append(String.format(" { <%d>%s%s\\n%s\\n(%s) } ", cellId, getAbbreviatedCellName(c), lutString, c.getAnchor().getName(), c.getLibCell().getName()));
 		
 		// add output pin info
 		if (c.getOutputPins().size() > 0) {
@@ -247,6 +247,15 @@ public class DotFilePrinter {
 		}
 		
 		builder.append("}\"];\n");
+	}
+	
+	/*
+	 * Shortens a cell name if necessary to improve readability of the graph
+	 */
+	private String getAbbreviatedCellName(Cell cell) {
+		
+		String cellName = cell.getName();
+		return cellName.length() > 20 ? cellName.substring(0, 19) + "..." : cellName;
 	}
 	
 	/*
@@ -316,8 +325,7 @@ public class DotFilePrinter {
 		StringBuilder lutBuilder = new StringBuilder();
 		StringBuilder cellBuilder = new StringBuilder();
 		StringBuilder ffBuilder = new StringBuilder();
-		
-		// TODO: test to see if I need to add a unique number to each of the clusters 
+		 
 		lutBuilder.append("    subgraph clusterLUT {\n" );
 		lutBuilder.append("      style=invis\n");
 		
@@ -359,7 +367,8 @@ public class DotFilePrinter {
 	
 	/*
 	 * Adds invisible edges so that the LUTs are displayed to the left, the FF are displayed
-	 * to the right, and everything else is displayed in the middle for a slice.
+	 * to the right, and everything else is displayed in the middle for a slice.\
+	 * TODO: may have to add an invisible node between the two
 	 */
 	private void formatSliceLayout(Cell lutCell, Cell middleCell, Cell ffCell) {
 		// add invisible edges to create desired layout
@@ -373,8 +382,7 @@ public class DotFilePrinter {
 												nodeIds.get(lutCell.getName()), nodeIds.get(ffCell.getName())));
 			}
 		}
-		
-		if (ffCell != null && middleCell != null) {
+		else if (ffCell != null && middleCell != null) {
 			dotBuilder.append(String.format("    %d->%d [lhead=clusterMid, ltail=clusterFF, style=invis];\n", 
 											nodeIds.get(middleCell.getName()), nodeIds.get(ffCell.getName())));
 		}

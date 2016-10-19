@@ -31,6 +31,10 @@ public class CellDesign extends AbstractDesign {
 	
 	private HashMap<Site, HashSet<Integer>> usedSitePipsMap;
 
+	private CellNet vccNet;
+	
+	private CellNet gndNet;
+	
 	/**
 	 * Constructor which initializes all member data structures. Sets name and
 	 * partName to null.
@@ -321,8 +325,23 @@ public class CellDesign extends AbstractDesign {
 		if (hasNet(net.getName()))
 			throw new DesignAssemblyException("Net with name already exists in design.");
 
-		net.setDesign(this);
+		if (net.isVCCNet()) {
+			if (vccNet != null) {
+				throw new DesignAssemblyException("VCC net already exists in design.");
+			}
+			vccNet = net;
+		}
+		else if (net.isGNDNet()) {
+			if (gndNet != null) {
+				throw new DesignAssemblyException("GND net already exists in design.");
+			}
+			gndNet = net;
+		} 
+		
+		// TODO: should VCC and GND nets be added to the net data structure
 		netMap.put(net.getName(), net);
+		net.setDesign(this);
+		
 		return net;
 	}
 
@@ -342,8 +361,17 @@ public class CellDesign extends AbstractDesign {
 	}
 
 	private void removeNet_impl(CellNet net) {
-		netMap.remove(net.getName());
 		net.setDesign(null);
+		
+		if (net.isVCCNet()) {
+			vccNet = null;
+		} 
+		else if (net.isGNDNet()) {
+			gndNet = null;
+		}
+		else {
+			netMap.remove(net.getName());
+		}
 	}
 
 	/**
@@ -364,6 +392,24 @@ public class CellDesign extends AbstractDesign {
 		List<CellPin> pins = new ArrayList<>(net.getPins());
 		pins.forEach(net::disconnectFromPin);
 		net.unroute();
+	}
+
+	/**
+	 * Returns the power(VCC) net of the design
+	 * 
+	 * @return
+	 */
+	public CellNet getVccNet() {
+		return vccNet;
+	}
+	
+	/**
+	 * Returns the ground(GND) net of the design
+	 * 
+	 * @return
+	 */
+	public CellNet getGndNet() {
+		return gndNet;
 	}
 
 	/**
