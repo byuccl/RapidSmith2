@@ -338,7 +338,7 @@ public class CellDesign extends AbstractDesign {
 			gndNet = net;
 		} 
 		
-		// TODO: should VCC and GND nets be added to the net data stucture
+		// TODO: should VCC and GND nets be added to the net data structure
 		netMap.put(net.getName(), net);
 		net.setDesign(this);
 		
