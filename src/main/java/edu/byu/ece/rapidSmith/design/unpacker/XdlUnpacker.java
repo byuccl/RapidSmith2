@@ -369,7 +369,7 @@ public class XdlUnpacker {
 		// follow the pips from the source wire and connect pins and ports
 		RouteTree rt = findSinks(sourceWire, inst);
 		if (preserveRouting && rt != null) // TODO allow for intrasite option routing
-			cellNet.addRouteTree(rt);
+			cellNet.addIntersiteRouteTree(rt);
 	}
 
 	private RouteTree findSinks(SiteWire sourceWire, XdlInstance inst) {
@@ -473,7 +473,7 @@ public class XdlUnpacker {
 			cellNet.disconnectFromPin(pin);
 			globalNet.connectToPin(pin);
 		}
-		cellNet.getRouteTrees().forEach(globalNet::addRouteTree);
+		cellNet.getIntersiteRouteTreeList().forEach(globalNet::addIntersiteRouteTree);
 		cellNet.unroute();
 		if (!cellNet.isStaticNet())
 			cellDesign.removeNet(cellNet);

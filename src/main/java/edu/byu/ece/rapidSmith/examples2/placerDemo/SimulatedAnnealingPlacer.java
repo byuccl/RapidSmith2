@@ -642,7 +642,8 @@ public class SimulatedAnnealingPlacer {
 		
 		try {
 			System.out.println("Updating vivado with current placement...");
-			XdcPlacementInterface.writePlacementXDC(placementXdc, design);
+			XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, null);
+			placementInterface.writePlacementXDC(placementXdc);
 			writeVivadoCommand("place_design -quiet -unplace\n");
 			writeVivadoCommand("read_xdc -quiet " + placementXdc + "\n");
 			writeVivadoCommand("start_gui\n");

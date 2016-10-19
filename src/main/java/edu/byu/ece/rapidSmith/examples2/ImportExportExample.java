@@ -2,7 +2,7 @@ package edu.byu.ece.rapidSmith.examples2;
 
 import java.io.IOException;
 
-import edu.byu.ece.rapidSmith.interfaces.vivado.ImportedTCP;
+import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.edif.core.EdifNameConflictException;
 import edu.byu.ece.edif.core.InvalidEdifNameException;
@@ -44,7 +44,7 @@ public class ImportExportExample {
 
 		// Load in in a TINCR checkpoint
 		System.out.println("Loading Design...");
-		ImportedTCP tcp = VivadoInterface.loadTCP(checkpointIn);
+		TincrCheckpoint tcp = VivadoInterface.loadTCP(checkpointIn);
 		
 		// Get the pieces out of the checkpoint for use in manipulating it
 		CellDesign design = tcp.getDesign();
@@ -58,9 +58,8 @@ public class ImportExportExample {
 		
 		// Write out TINCR Checkpoint
 		System.out.println("Exporting Modified Design...");
-		VivadoInterface.writeTCP(checkpointOut, design, partName);
+		VivadoInterface.writeTCP(checkpointOut, design, device, libCells);
 		
 		System.out.println("\nDone...");
 	}
-	
 }
