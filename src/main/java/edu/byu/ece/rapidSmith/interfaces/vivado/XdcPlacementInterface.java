@@ -94,26 +94,19 @@ public class XdcPlacementInterface {
 	
 	private void applyCellPinMappings(String[] toks) {
 		
-		Cell cell = tryGetCell(toks[1]);
+		Cell cell = tryGetPlacedCell(toks[1]);
 		Bel bel = cell.getAnchor();
-		
-		assert(bel != null);
 		
 		for (int i = 2; i < toks.length; i++) {
 			String[] pinmap = toks[i].split(":");
 
-			// TODO: Right now I am assuming that a cell pin maps to only one bel pin, but this is incorrect.
-			//		 Need to update this function to once multi-bel pin mappings are implemented
+			// If pinmap.length = 1, this mean the cell pin has no belPinMapping.
 			if (pinmap.length > 1) {
 				CellPin cellPin = tryGetCellPin(cell, pinmap[0]);
-				BelPin belPin = tryGetBelPin(bel, pinmap[1]);
-				cellPin.setBelPin(belPin);
 				
-				belPinToCellPinMap.put(belPin, cellPin);
-				
-				// Need this to import routing correctly
-				for (int j = 2; j < pinmap.length; j++) {
-					belPin = tryGetBelPin(bel, pinmap[j]);
+				for (int j = 1; j < pinmap.length; j++) {
+					BelPin belPin = tryGetBelPin(bel, pinmap[j]);
+					cellPin.mapToBelPin(belPin);
 					belPinToCellPinMap.put(belPin, cellPin);
 				}
 			}
@@ -132,7 +125,7 @@ public class XdcPlacementInterface {
 		BelPin belPin = tryGetBelPin(bel, "PAD");
 		CellPin cellPin = tryGetCellPin(cell, "PAD");
 		
-		cellPin.setBelPin(belPin);
+		cellPin.mapToBelPin(belPin);
 		belPinToCellPinMap.put(belPin, cellPin);
 	}
 
@@ -160,6 +153,17 @@ public class XdcPlacementInterface {
 		
 		if (cell == null) {
 			throw new ParseException("Cell \"" + cellName + "\" not found in the current device. \n" 
+									+ "On line " + this.currentLineNumber + " of " + currentFile);
+		}
+		
+		return cell;
+	}
+	
+	private Cell tryGetPlacedCell(String cellName) {
+		Cell cell = tryGetCell(cellName);
+		
+		if (!cell.isPlaced()) {
+			throw new ParseException("Cell \"" + cellName + "\" not placed. Cannot apply a pin mapping.\n"
 									+ "On line " + this.currentLineNumber + " of " + currentFile);
 		}
 		
@@ -277,7 +281,7 @@ public class XdcPlacementInterface {
 			if(cell.getLibCell().isLut()) { 
 				fileout.write("set_property LOCK_PINS { ");
 				for(CellPin cp: cell.getInputPins()) 
-					fileout.write(String.format("%s:%s ", cp.getName(), cp.getBelPin().getName()));
+					fileout.write(String.format("%s:%s ", cp.getName(), cp.getMappedBelPin().getName()));
 				
 				fileout.write("} [get_cells {" + cellname + "}]\n");
 			}

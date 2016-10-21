@@ -359,7 +359,7 @@ public class XdlUnpacker {
 			String cellPinName = cellCreators.get(cell).getCellPin(belPin.getName());
 			CellPin cellPin = cellPinName != null ? cell.getPin(cellPinName) : null;
 			if (cellPin != null)
-				cellPin.setBelPin(belPin);
+				cellPin.mapToBelPin(belPin);
 		}
 	}
 

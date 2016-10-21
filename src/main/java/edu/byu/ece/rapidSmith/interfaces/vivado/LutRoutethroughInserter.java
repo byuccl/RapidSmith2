@@ -2,11 +2,10 @@ package edu.byu.ece.rapidSmith.interfaces.vivado;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
@@ -62,10 +61,22 @@ public class LutRoutethroughInserter {
 	 */
 	private Map<BelPin, CellPin> createBelPinToCellPinMap() {
 		
-		return design.getUsedSites().stream()
-				.flatMap(site -> design.getCellsAtSite(site).stream())
-				.flatMap(cell -> cell.getPins().stream())
-				.collect(Collectors.toMap(CellPin::getBelPin, Function.identity()));
+		// Get all cell pins in the netlist
+		Iterator<CellPin> cellPinIt =  design.getUsedSites().stream()
+										.flatMap(site -> design.getCellsAtSite(site).stream())
+										.flatMap(cell -> cell.getPins().stream()).iterator();
+		
+		// create the map from BelPin to CellPin
+		HashMap<BelPin, CellPin> tmpMap = new HashMap<BelPin, CellPin>();
+		while(cellPinIt.hasNext()) {
+			CellPin cellPin = cellPinIt.next();
+			
+			for (BelPin belPin : cellPin.getMappedBelPins()) {
+				tmpMap.put(belPin, cellPin);
+			}	
+		}
+		
+		return tmpMap;
 	}
 	
 	/**
@@ -78,11 +89,7 @@ public class LutRoutethroughInserter {
 	public CellDesign execute() {
 		
 		for (CellNet net: design.getNets()) {
-			
-			if (net.isIntrasite()) {
-				continue;
-			}
-		
+								
 			for (RouteTree routeTree : net.getSinkSitePinRouteTrees()) {
 				
 				List<CellPin> sinks = new ArrayList<CellPin>(4);
@@ -96,16 +103,8 @@ public class LutRoutethroughInserter {
 		
 		// add the newly created nets to the design
 		addRoutethroughNetsToDesign();
-		
-	
-		System.out.println(this.netsToAdd.size());
-		
-		for (CellNet net : netsToAdd) {
-			System.out.println(net.getName());
-			net.getPins().forEach(pin -> System.out.println("  " +  pin.getName() + ":" + pin.getBelPin().getName()));
-		}
-		
-		return this.design;
+
+		return design;
 	}
 	
 	/**
@@ -169,8 +168,8 @@ public class LutRoutethroughInserter {
 		// place lut cell and map pins correctly
 		Bel rtBel = rtSource.getBel();
 		design.placeCell(buffer, rtBel);
-		buffer.getPin("I0").setBelPin(rtSource);
-		buffer.getPin("O").setBelPin(buffer.getPin("O").getPossibleBelPins().get(0));
+		buffer.getPin("I0").mapToBelPin(rtSource);
+		buffer.getPin("O").mapToBelPin(buffer.getPin("O").getPossibleBelPins().get(0));
 		
 		cellsToAdd.add(buffer);
 	}
