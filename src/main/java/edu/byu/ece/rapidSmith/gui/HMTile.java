@@ -23,18 +23,14 @@
  */
 package edu.byu.ece.rapidSmith.gui;
 
-import java.io.File;
-
 import com.trolltech.qt.gui.QBitmap;
 import com.trolltech.qt.gui.QBrush;
 import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
 import com.trolltech.qt.gui.QGraphicsRectItem;
 import com.trolltech.qt.gui.QPen;
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.Tile;
-import edu.byu.ece.rapidSmith.gui.TileScene;
-import edu.byu.ece.rapidSmith.util.FileTools;
 
 /**
  * @author marc
@@ -48,7 +44,7 @@ public class HMTile extends QGraphicsRectItem {
 	static QColor GREEN = new QColor(0, 255, 0, 190);
 	static QColor ORANGE = new QColor(255, 153, 51, 190);
 	static QColor RED = new QColor(255, 0, 0, 190);
-	static QBitmap anchorPixmap = new QBitmap(RapidSmithEnv.getDefaultEnv().getSourcePath()
+	static QBitmap anchorPixmap = new QBitmap(RSEnvironment.getDefault().getSourcePath()
 			.resolve("images").resolve("anchor.bmp").toString());
 	static QBrush ANCHOR_GREEN = new QBrush(GREEN, anchorPixmap);
 	static QBrush ANCHOR_ORANGE = new QBrush(ORANGE, anchorPixmap);

@@ -20,7 +20,7 @@
  */
 package edu.byu.ece.rapidSmith.device;
 
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.design.xdl.XdlPin;
 import edu.byu.ece.rapidSmith.device.helper.HashPool;
@@ -92,14 +92,14 @@ public class Device implements Serializable {
 	public Device() { }
 
 	/**
-	 * Shortcut for {@code RapidSmithEnv.getDefaultEnv().getDevice(partName)};
+	 * Shortcut for {@code RapidSmithEnv.getDefault().getDevice(partName)};
 	 *
 	 * @param partName the part name of the device to get.
 	 * @return the previously loaded device if the part has already been loaded in
 	 *   the default environment, else the newly loaded device.
 	 */
 	public static Device getInstance(String partName) {
-		return RapidSmithEnv.getDefaultEnv().getDevice(partName);
+		return RSEnvironment.getDefault().getDevice(partName);
 	}
 
 	//========================================================================//

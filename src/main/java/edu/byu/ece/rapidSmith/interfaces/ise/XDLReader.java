@@ -1,6 +1,6 @@
 package edu.byu.ece.rapidSmith.interfaces.ise;
 
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.*;
 import edu.byu.ece.rapidSmith.design.xdl.*;
 import edu.byu.ece.rapidSmith.device.*;
@@ -48,7 +48,7 @@ public final class XDLReader {
 			String name = stripQuotes(ctx.name.getText());
 
 			String partName = ctx.part.getText();
-			device = RapidSmithEnv.getDefaultEnv().getDevice(partName);
+			device = RSEnvironment.getDefault().getDevice(partName);
 			if (device == null)
 				throw new ParseException("unsupported device: " + partName);
 

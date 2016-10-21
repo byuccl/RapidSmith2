@@ -20,7 +20,7 @@
  */
 package edu.byu.ece.rapidSmith.util;
 
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.device.TileType;
 import edu.byu.ece.rapidSmith.device.creation.*;
@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -255,7 +254,7 @@ public class TileAndPrimitiveEnumerator{
 	}
 
 	public static Path getPathToFiles(){
-		Path path = RapidSmithEnv.getDefaultEnv().getSourcePath();
+		Path path = RSEnvironment.getDefault().getSourcePath();
 		return path.resolve("edu")
 				.resolve("byu")
 				.resolve("ece")

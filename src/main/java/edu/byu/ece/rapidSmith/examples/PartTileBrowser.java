@@ -20,7 +20,6 @@
  */
 package edu.byu.ece.rapidSmith.examples;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.trolltech.qt.core.QModelIndex;
@@ -37,10 +36,9 @@ import com.trolltech.qt.gui.QTreeWidget;
 import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.gui.QDockWidget.DockWidgetFeature;
 
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.gui.WidgetMaker;
-import edu.byu.ece.rapidSmith.util.FileTools;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 /**
@@ -88,12 +86,12 @@ public class PartTileBrowser extends QMainWindow{
 		setWindowTitle("Part Tile Browser");
 
 		createTreeView();
-		List<String> parts = RapidSmithEnv.getDefaultEnv().getAvailableParts();
+		List<String> parts = RSEnvironment.getDefault().getAvailableParts();
 		if(parts.size() < 1){
 			MessageGenerator.briefErrorAndExit("Error: No available parts. Please generate part database files.");
 		}
 		currPartName = parts.get(0);
-		device = RapidSmithEnv.getDefaultEnv().getDevice(currPartName);
+		device = RSEnvironment.getDefault().getDevice(currPartName);
 		
 		scene = new PartTileBrowserScene(device);
 
@@ -135,7 +133,7 @@ public class PartTileBrowser extends QMainWindow{
 			progress.show();
 			progress.setValue(10);
 			
-			device = RapidSmithEnv.getDefaultEnv().getDevice(currPartName);
+			device = RSEnvironment.getDefault().getDevice(currPartName);
 			progress.setValue(100);
 			scene.setDevice(device);
 			statusLabel.setText("Loaded: "+currPartName.toUpperCase());

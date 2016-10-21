@@ -20,7 +20,7 @@
  */
 package edu.byu.ece.rapidSmith.bitstream;
 
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.bitstreamTools.configuration.FPGA;
 import edu.byu.ece.rapidSmith.bitstreamTools.configuration.Frame;
 import edu.byu.ece.rapidSmith.bitstreamTools.configuration.FrameAddressRegister;
@@ -31,7 +31,6 @@ import edu.byu.ece.rapidSmith.bitstreamTools.configurationSpecification.XilinxCo
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Tile;
 import edu.byu.ece.rapidSmith.device.TileType;
-import edu.byu.ece.rapidSmith.util.FileTools;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 /**
@@ -118,7 +117,7 @@ public class Virtex5TileTranslation {
 		String partName = "xc5vlx30t";
 		String packageName = "ff665";
 		// Load up all the RapidSmith data structures
-		Device dev = RapidSmithEnv.getDefaultEnv().getDevice(partName + packageName);
+		Device dev = RSEnvironment.getDefault().getDevice(partName + packageName);
 		
 		XilinxConfigurationSpecification spec = DeviceLookup.lookupPartV4V5V6(partName);
 

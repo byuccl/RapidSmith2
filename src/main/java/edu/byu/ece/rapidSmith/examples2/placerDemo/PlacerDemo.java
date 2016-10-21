@@ -18,12 +18,11 @@ import joptsimple.OptionSet;
 import edu.byu.ece.edif.core.EdifNameConflictException;
 import edu.byu.ece.edif.core.InvalidEdifNameException;
 import edu.byu.ece.edif.util.parse.ParseException;
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.examples2.placerDemo.SimulatedAnnealingPlacer;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 /**
@@ -50,7 +49,7 @@ public class PlacerDemo {
 	private static Device device;
 	
 	public static void classSetup() throws IOException {
-		device = RapidSmithEnv.getDefaultEnv().getDevice(CANONICAL_PART_NAME);
+		device = RSEnvironment.getDefault().getDevice(CANONICAL_PART_NAME);
 	}
 	
 	//List of Benchmarks

@@ -7,17 +7,15 @@ import java.util.List;
 import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.edif.util.parse.ParseException;
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
-import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 public class DesignAnalyzer {
 	
@@ -30,10 +28,10 @@ public class DesignAnalyzer {
 	private static Device device;
 	
 	public static void classSetup() throws IOException {
-		libCells = new CellLibrary(RapidSmithEnv.getDefaultEnv()
+		libCells = new CellLibrary(RSEnvironment.getDefault()
 				.getPartFolderPath(PART_NAME)
 				.resolve(CELL_LIBRARY));
-		device = RapidSmithEnv.getDefaultEnv().getDevice(CANONICAL_PART_NAME);
+		device = RSEnvironment.getDefault().getDevice(CANONICAL_PART_NAME);
 	}
 	
 	

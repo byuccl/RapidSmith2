@@ -23,7 +23,7 @@ package edu.byu.ece.rapidSmith.design.explorer;
 import com.trolltech.qt.core.Qt.WindowModality;
 import com.trolltech.qt.gui.*;
 import com.trolltech.qt.gui.QKeySequence.StandardKey;
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
 import edu.byu.ece.rapidSmith.design.explorer.FilterWindow.FilterType;
 import edu.byu.ece.rapidSmith.device.Device;
@@ -48,7 +48,7 @@ public class DesignExplorer extends QMainWindow{
 	/** Status Bar Label */
 	protected QLabel statusLabel;
 	/** Path to images in RapidSmith */
-	protected static String rsrcPath = RapidSmithEnv.getDefaultEnv()
+	protected static String rsrcPath = RSEnvironment.getDefault()
 			.getSourcePath().resolve("images").toString();
 	/** Device of the current design that is open */
 	protected Device device;

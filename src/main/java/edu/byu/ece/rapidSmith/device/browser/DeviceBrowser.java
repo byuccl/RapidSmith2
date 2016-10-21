@@ -37,11 +37,10 @@ import com.trolltech.qt.gui.QTreeWidgetItem;
 import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.gui.QDockWidget.DockWidgetFeature;
 
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.gui.TileView;
 import edu.byu.ece.rapidSmith.gui.WidgetMaker;
-import edu.byu.ece.rapidSmith.util.FileTools;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 /**
@@ -105,7 +104,7 @@ public class DeviceBrowser extends QMainWindow{
 		initializeSideBar();
 		
 		// Gets the available parts in RapidSmith and populates the selection tree
-		List<String> parts = RapidSmithEnv.getDefaultEnv().getAvailableParts();
+		List<String> parts = RSEnvironment.getDefault().getAvailableParts();
 		if(parts.size() < 1){
 			MessageGenerator.briefErrorAndExit("Error: No available parts. " +
 					"Please generate part database files.");
@@ -117,7 +116,7 @@ public class DeviceBrowser extends QMainWindow{
 			currPart = parts.get(0);
 		}
 		
-		device = RapidSmithEnv.getDefaultEnv().getDevice(currPart);
+		device = RSEnvironment.getDefault().getDevice(currPart);
 		we = device.getWireEnumerator();
 
 		// Setup the scene and view for the GUI
@@ -254,7 +253,7 @@ public class DeviceBrowser extends QMainWindow{
 			if(currPart.equals(data))
 				return;
 			currPart = (String) data;			
-			device = RapidSmithEnv.getDefaultEnv().getDevice(currPart);
+			device = RSEnvironment.getDefault().getDevice(currPart);
 			we = device.getWireEnumerator();
 			scene.setDevice(device);
 			scene.initializeScene(hideTiles, drawPrimitives);
