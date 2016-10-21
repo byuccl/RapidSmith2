@@ -169,12 +169,14 @@ public class XdcRoutingInterface {
 			Site site = tryGetSite(sitePinToks[0]);
 			SitePin pin = tryGetSitePin(site, sitePinToks[1]);
 			
-			if (pin.isInput()) {
+			if (pin.isInput()) { // of a site
 				createIntrasiteRoute(pin, net, design.getUsedSitePipsAtSite(site));
 			}
 			else { // pin is an output of the site
-				BelPin source = tryGetNetSource(net).getBelPin();
-				createIntrasiteRoute(source, false, false, design.getUsedSitePipsAtSite(site));
+
+				CellPin sourceCellPin = tryGetNetSource(net);
+				BelPin sourceBelPin = tryGetMappedBelPin(sourceCellPin);
+				createIntrasiteRoute(sourceBelPin, false, false, design.getUsedSitePipsAtSite(site));
 			}
 		}
 	}
@@ -186,14 +188,11 @@ public class XdcRoutingInterface {
 	private void processIntrasitePins(String[] toks) {
 		
 		CellNet net = tryGetCellNet(toks[1]);		
-		BelPin belPin = tryGetNetSource(net).getBelPin();
-		
-		if (belPin == null) {
-			throw new AssertionError(net + " ");
-		}
-		
-		Site site = belPin.getBel().getSite();
-		createIntrasiteRoute(belPin, true, false, design.getUsedSitePipsAtSite(site));
+		CellPin sourceCellPin = tryGetNetSource(net);
+		BelPin sourceBelPin = tryGetMappedBelPin(sourceCellPin);
+				
+		Site site = sourceBelPin.getBel().getSite();
+		createIntrasiteRoute(sourceBelPin, true, false, design.getUsedSitePipsAtSite(site));
 		net.setIsIntrasite(true);
 	}
 	
@@ -1016,6 +1015,26 @@ public class XdcRoutingInterface {
 		
 		return pin;
 	}
+	
+	/**
+	 * Tries to get the BelPin that the specified CellPin is mapped to.
+	 * If this function is called, it is expected that the CellPin maps
+	 * to exactly one BelPin (it is a source pin). 
+	 * @param cellPin CellPin to get the BelPin mapping of
+	 * @return BelPin
+	 */
+	private BelPin tryGetMappedBelPin(CellPin cellPin) {
+		
+		int mapCount = cellPin.getMappedBelPinCount(); 
+		
+		if (mapCount != 1) {
+			throw new ParseException(String.format("Cell pin source \"%s\" should map to exactly one BelPin, but maps to %d\n"
+												+ "On %d of %s", cellPin.getName(), mapCount, currentLineNumber, currentFile));
+		}
+		
+		return cellPin.getMappedBelPin();
+	}
+	
 	
 	/**
 	 * Tries to retrieve the integer enumeration of a wire name in the currently loaded device <br>

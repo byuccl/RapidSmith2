@@ -7,8 +7,11 @@ import edu.byu.ece.rapidSmith.device.PinDirection;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *  A pin on a Cell.  CellPins connect cells to nets and map to BelPins.
@@ -21,8 +24,9 @@ public class CellPin implements Serializable {
 	private Cell cell;
 	/** The net this pin is a member of */
 	private CellNet net;
-	/** The BelPin this pin is placed on */
-	private BelPin belPin;
+	
+	/** Set of BelPin objects that this pin maps to*/
+	private Set<BelPin> belPinMappingSet;
 
 	CellPin(Cell cell, LibraryPin libraryPin) {
 		assert cell != null;
@@ -113,34 +117,119 @@ public class CellPin implements Serializable {
 	void clearNet() {
 		this.net = null;
 	}
-
+	
 	/**
-	 * @return the BelPin this pin is placed on
+	 * Maps the CellPin to the specified BelPin
+	 * 
+	 * @param pin BelPin to map this CellPin to 
+	 * @return <code>true</code> if the CellPin is not already mapped to the BelPin 
 	 */
-	public BelPin getBelPin() {
-		return belPin;
+	public boolean mapToBelPin(BelPin pin) {
+		
+		if (belPinMappingSet == null) {
+			belPinMappingSet = new HashSet<BelPin>();
+		}
+		
+		return belPinMappingSet.add(pin);
 	}
-
+	
 	/**
-	 * Sets the BelPin this pin is placed on to the pin specified
-	 * by the given name.
-	 * @param pinName name of the BelPin this pin is placed
+	 * Maps the CellPin to all BelPins in the specified collection
+	 *  
+	 * @param pins Collection of BelPins to map BelPins to. 
+	 * @return <code>true</code> if all BelPins in "pins" have not already been mapped to the CellPin
 	 */
-	public void setBelPin(String pinName) {
-		setBelPin(getCell().getAnchor().getBelPin(pinName));
+	public boolean mapToBelPins(Collection<BelPin> pins) {
+		
+		boolean allPinsMapped = true;
+		
+		for (BelPin pin : pins) {
+			allPinsMapped &= mapToBelPin(pin);
+		}
+		return allPinsMapped;
 	}
-
-	public void setBelPin(BelPin belPin) {
-		assert belPin != null;
-
-		this.belPin = belPin;
+	
+	/**
+	 * Tests if the mapping from this pin to the specified BelPin exists
+	 * 
+	 * @param pin BelPin to test mapping
+	 * @return <code>true</code> if the mapping {@code this} -> {@code pin} exists
+	 */
+	public boolean isMappedTo(BelPin pin) {
+		
+		if (belPinMappingSet == null) {
+			return false;
+		}
+		
+		return belPinMappingSet.contains(pin);
 	}
-
-	public void clearBelPin() {
-		if (getPossibleBelPins().size() > 1)
-			this.belPin = null;
+	
+	/**
+	 * Tests to see if the pin has been mapped to a BelPin
+	 * 
+	 * @return <code>true</code> if this pin is mapped to at least one BelPin.
+	 */
+	public boolean isMapped() {
+		return belPinMappingSet != null && !belPinMappingSet.isEmpty();
 	}
-
+	
+	/**
+	 * Returns a set of BelPins that this CellPin is currently mapped to.
+	 * If the CellPin is not mapped to any BelPins, and empty set is returned. 
+	 */
+	public Set<BelPin> getMappedBelPins() {
+		return (belPinMappingSet == null) ? Collections.emptySet() : belPinMappingSet; 
+	}
+	
+	/**
+	 * Get the BelPin that this CellPin currently maps to. Use this function
+	 * if you know that the CellPin is currently mapped to only one BelPin, otherwise
+	 * use {@link #getMappedBelPins()} instead.
+	 * 
+	 * @return The BelPin that this CellPin is mapped to. If the CellPin
+	 * is not mapped, <code>null</code> is returned. 
+	 */
+	public BelPin getMappedBelPin() {
+		if (belPinMappingSet == null || belPinMappingSet.isEmpty()) {
+			return null;
+		}
+		else {
+			return belPinMappingSet.iterator().next();
+		}
+	}
+	
+	/**
+	 * Get the number of BelPins that this pin is mapped to. In most cases,
+	 * CellPins are mapped to only one BelPin, but it is possible that they can
+	 * be mapped to 0 or more than 1 BelPins. 
+	 * 
+	 *  @return The number of mapped BelPins
+	 */
+	public int getMappedBelPinCount() {
+		return belPinMappingSet == null ? 0 : belPinMappingSet.size();
+	}
+	
+	/**
+	 * Removes all CellPin -> BelPin mappings for this pin (i.e. this
+	 * pin will no longer map to any BelPins). 
+	 */
+	public void clearPinMappings() {
+		if (getPossibleBelPins().size() > 1) {
+			this.belPinMappingSet = null;
+		}
+	}
+	
+	/**
+	 * Removes the pin mapping to the specified BelPin
+	 * 
+	 * @param belPin BelPin to un-map
+	 */
+	public void clearPinMapping(BelPin belPin) {
+		if (belPinMappingSet != null && belPinMappingSet.contains(belPin)) {
+			belPinMappingSet.remove(belPin);
+		}
+	}
+	
 	/**
 	 * Returns the BelPins that this pin can potentially be placed.
 	 * @return list of possible BelPins
@@ -151,8 +240,9 @@ public class CellPin implements Serializable {
 
 	public List<BelPin> getPossibleBelPins(Bel bel) {
 		List<String> belPinNames = getPossibleBelPinNames(bel.getId());
-		if (belPinNames == null)
-			return null;
+		if (belPinNames == null) {
+			return Collections.emptyList();
+		}
 		List<BelPin> belPins = new ArrayList<>(belPinNames.size());
 		for (String pinName : belPinNames) {
 			belPins.add(bel.getBelPin(pinName));
