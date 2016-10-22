@@ -34,7 +34,6 @@ public class CellNet implements Serializable {
 
 	private Set<CellPin> routedSinks; 
 	private boolean isIntrasite;
-	private RouteStatus routeStatus;
 	
 	// Physical route information
 	private RouteTree source;
