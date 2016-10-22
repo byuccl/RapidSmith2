@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import edu.byu.ece.rapidSmith.design.NetType;
+import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
@@ -622,6 +623,7 @@ public class XdcRoutingInterface {
 				// TODO: see if there are any other examples of this besides A6 lut pin with VCC net
 				assert(currentNet.isStaticNet()) : "Only static nets should not have site pin information" ;
 				createStaticNetImplicitSinks(sitePin, currentNet);
+				// TODO: add pseudo pins here
 			}
 		}
 		
@@ -639,6 +641,8 @@ public class XdcRoutingInterface {
 			throw new AssertionError("Static net does not finish...");
 		}
 		staticRoute.applyRouting();
+		// we can set sinks as routed here because we only call this function if we reach a site pin
+		staticRoute.setSinksAsRouted();
 	}
 	
 	/*
@@ -725,9 +729,9 @@ public class XdcRoutingInterface {
 	}
 	
 	/**
-	 * Creates a route starting at the specified site pin object. <br>
-	 * The search is guided by the specified used site pips of the site. <br>
-	 * If no valid route is found, an exception is thrown becaues this function <br>.
+	 * Creates a route starting at the specified site pin object.
+	 * The search is guided by the specified used site pips of the site.
+	 * If no valid route is found, an exception is thrown because this function.
 	 * expects a route to be found 
 	 * 
 	 * @param pin Site Pin to start the route
@@ -740,7 +744,7 @@ public class XdcRoutingInterface {
 		buildIntrasiteRoute(route, usedSiteWires);
 		
 		if (!route.isValid()) {			
-			throw new AssertionError("Valid intrasite route not found from site pin : " + pin);
+			throw new AssertionError("Valid intrasite route not found from site pin : " + pin + " Net: " + net.getName());
 		}
 		
 		route.applyRouting();
@@ -748,9 +752,9 @@ public class XdcRoutingInterface {
 	}
 	
 	/**
-	 * Creates a route starting at the specified bel pin object. <br>
-	 * The search is guided by the specified used site pips of the site. <br>
-	 * If no valid route is found, an exception is thrown because this function <br>
+	 * Creates a route starting at the specified bel pin object.
+	 * The search is guided by the specified used site pips of the site.
+	 * If no valid route is found, an exception is thrown because this function 
 	 * expects a route to be found 
 	 * 
 	 * @param pin Bel Pin to start the route
@@ -1241,7 +1245,11 @@ public class XdcRoutingInterface {
 			net.addSinkRouteTree(source, route);
 			
 			for (BelPin pin : this.belPinSinks) {
-				net.addSinkRouteTree(pin, route);	
+				net.addSinkRouteTree(pin, route);
+				 
+				if (allowUnusedBelPins) {
+					createAndAttachPseudoPin(pin);
+				}
 			}
 		}
 
@@ -1269,6 +1277,19 @@ public class XdcRoutingInterface {
 			// (2) The BelPin is being used (i.e. a cell pin has been mapped to it)
 			return !terminals.isEmpty() &&
 					(allowUnusedBelPins || isBelPinUsed(terminals.iterator().next().getBelPin()));
+		}
+		
+		// TODO: document this
+		private void createAndAttachPseudoPin(BelPin belPin) {
+			Cell cell = design.getCellAtBel(belPin.getBel());
+			assert (cell != null) : "Expected a cell to be mapped to a bel." ;
+			assert (net.isStaticNet()) : "Net should be a static net!";
+			String pinName = (net.isVCCNet() ? "VCC_pseudo" : "GND_pseudo") + cell.getPseudoPinCount();
+			CellPin pseudo = cell.attachPseudoPin(pinName, belPin.getDirection());
+			assert (pseudo != null) : "Pseudo pin should never be null!";
+			net.connectToPin(pseudo);
+			pseudo.mapToBelPin(belPin);
+			belPinToCellPinMap.put(belPin, pseudo);
 		}
 	}
 	
