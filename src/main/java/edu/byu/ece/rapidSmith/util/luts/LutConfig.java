@@ -1,8 +1,8 @@
 package edu.byu.ece.rapidSmith.util.luts;
 
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.util.*;
 
@@ -23,6 +23,7 @@ public final class LutConfig {
 	}
 
 	private void parseLutAttribute(String attr) {
+		// prep the parser
 		ANTLRInputStream input = new ANTLRInputStream(attr);
 		LutEquationLexer lexer = new LutEquationLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -30,9 +31,14 @@ public final class LutConfig {
 		// Replace the default error listener with my fail hard listener
 		parser.removeErrorListeners();
 		parser.addErrorListener(new LutParseErrorListener());
+
+		// do the actual parsing
 		ParseTree tree = parser.config_string();
-		ParserVisitor visitor = new ParserVisitor();
-		visitor.visit(tree);
+
+		// traverse the tree
+		LutParserListener listener = new LutParserListener();
+		ParseTreeWalker walker = new ParseTreeWalker();
+		walker.walk(listener, tree);
 	}
 
 	/**
@@ -179,11 +185,11 @@ public final class LutConfig {
 	}
 
 	public void remapPins(int[] remap) {
-		Stack<EquationTree> stack = new Stack<>();
-		EquationTree eqn = contents.getCopyOfEquation();
+		Stack<LutEquation> stack = new Stack<>();
+		LutEquation eqn = contents.getEquation();
 		stack.push(eqn);
 		while (!stack.isEmpty()) {
-			EquationTree tree = stack.pop();
+			LutEquation tree = stack.pop();
 			if (tree.getClass() == LutInput.class) {
 				LutInput lutInput = (LutInput) tree;
 				int orig = lutInput.getIndex();
@@ -210,38 +216,33 @@ public final class LutConfig {
 	}
 
 	/* Parse a lut configuration attribute value to a LUTConfiguration */
-	private class ParserVisitor extends LutEquationBaseVisitor<Object> {
+	private class LutParserListener extends LutEquationBaseListener {
 
 		@Override
-		public Object visitOp_mode(@NotNull LutEquationParser.Op_modeContext ctx) {
-			operatingMode = ctx.getText();
-			return Void.TYPE;
+		public void enterOp_mode(LutEquationParser.Op_modeContext ctx) {
+			setOperatingMode(ctx.getText());
 		}
 
 		@Override
-		public Object visitOutput_pin(@NotNull LutEquationParser.Output_pinContext ctx) {
-			output = ctx.getText();
-			return Void.TYPE;
+		public void enterOutput_pin(LutEquationParser.Output_pinContext ctx) {
+			setOutputPinName(ctx.getText());
 		}
 
 		@Override
-		public Object visitStatic_value(@NotNull LutEquationParser.Static_valueContext ctx) {
+		public void enterStatic_value(LutEquationParser.Static_valueContext ctx) {
 			isVcc = ctx.getText().equals("1");
 			isGnd = ctx.getText().equals("0");
-			return Void.TYPE;
 		}
 
 		@Override
-		public Object visitInit_string(@NotNull LutEquationParser.Init_stringContext ctx) {
-			contents = new LutContents(InitString.parse(ctx.getText()));
-			return Void.TYPE;
+		public void enterInit_string(LutEquationParser.Init_stringContext ctx) {
+			setContents(new LutContents(InitString.parse(ctx.getText())));
 		}
 
 		@Override
-		public Object visitEquation_value(@NotNull LutEquationParser.Equation_valueContext ctx) {
-			EquationTree eqn = new EqnParserVisitor().visitEquation(ctx.equation());
-			contents = new LutContents(eqn);
-			return Void.TYPE;
+		public void enterEquation_value(LutEquationParser.Equation_valueContext ctx) {
+			LutEquation eqn = new EqnParserVisitor().visitEquation(ctx.equation());
+			setContents(new LutContents(eqn));
 		}
 	}
 

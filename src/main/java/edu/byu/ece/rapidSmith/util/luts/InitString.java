@@ -94,14 +94,14 @@ public final class InitString {
 	/**
 	 * Converts the equation tree to a init string.
 	 *
-	 * @param equationTree the tree to convert
+	 * @param lutEquation the tree to convert
 	 * @return the equation represented in init string format
 	 */
-	public static InitString convertToInitString(EquationTree equationTree) {
-		return new InitString(buildInitString_recursive(equationTree));
+	public static InitString convertToInitString(LutEquation lutEquation) {
+		return new InitString(buildInitString_recursive(lutEquation));
 	}
 
-	private static long buildInitString_recursive(EquationTree tree) {
+	private static long buildInitString_recursive(LutEquation tree) {
 		if (tree instanceof LutInput) {
 			LutInput lutInput = (LutInput) tree;
 			long inputValue = LutContents.inputValues.get(lutInput.getIndex()-1);

@@ -15,10 +15,10 @@ public final class LutContents {
 			0xFFFFFFFF00000000L
 	);
 
-	private EquationTree eqn;
+	private LutEquation eqn;
 	private InitString initString;
 
-	public LutContents(EquationTree eqn) {
+	public LutContents(LutEquation eqn) {
 		this.eqn = eqn;
 	}
 
@@ -27,7 +27,7 @@ public final class LutContents {
 	}
 
 	public static LutContents parseEquation(String eqn) {
-		return new LutContents(EquationTree.parse(eqn));
+		return new LutContents(LutEquation.parse(eqn));
 	}
 
 	public static LutContents parseInitString(String initString) {
@@ -41,7 +41,7 @@ public final class LutContents {
 
 	private void computeEquation() {
 		if (eqn == null) {
-			eqn = EquationTree.convertToEquationTree(initString);
+			eqn = LutEquation.convertToLutEquation(initString);
 		}
 	}
 
@@ -50,7 +50,7 @@ public final class LutContents {
 		return getUsedInputs(new HashSet<>(), eqn);
 	}
 
-	private Set<Integer> getUsedInputs(Set<Integer> usedInputs, EquationTree node) {
+	private Set<Integer> getUsedInputs(Set<Integer> usedInputs, LutEquation node) {
 		// Is null, means either static source or constant output
 		if (node == null)
 			return usedInputs;
@@ -79,16 +79,16 @@ public final class LutContents {
 	public int getMinNumOfInputs() {
 		// We'll convert to initString, minimize it, and convert it back to a
 		// minimized equation
-		EquationTree tree = getReducedForm().eqn;
+		LutEquation tree = getReducedForm().eqn;
 		return getUsedInputs(new HashSet<>(), tree).size();
 	}
 
 	public LutContents getReducedForm() {
 		computeInitString();
-		return new LutContents(EquationTree.convertToEquationTree(initString));
+		return new LutContents(LutEquation.convertToLutEquation(initString));
 	}
 
-	public EquationTree getCopyOfEquation() {
+	public LutEquation getEquation() {
 		computeEquation();
 		return eqn.deepCopy();
 	}
