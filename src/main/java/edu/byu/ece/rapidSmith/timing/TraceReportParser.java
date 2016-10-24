@@ -28,10 +28,10 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-import edu.byu.ece.rapidSmith.design.Design;
-import edu.byu.ece.rapidSmith.design.Instance;
-import edu.byu.ece.rapidSmith.design.Net;
-import edu.byu.ece.rapidSmith.design.Pin;
+import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
+import edu.byu.ece.rapidSmith.design.xdl.XdlInstance;
+import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
+import edu.byu.ece.rapidSmith.design.xdl.XdlPin;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
@@ -41,7 +41,7 @@ public class TraceReportParser{
 	public static final String OFFSET = "Offset:";
 	
 	private BufferedReader br;
-	private Design design = null;
+	private XdlDesign design = null;
 	
 	private String line;
 
@@ -67,7 +67,7 @@ public class TraceReportParser{
 		parseTWR(twrFileName, design);
 	}
 	
-	public void parseTWR(String twrFileName, Design design){
+	public void parseTWR(String twrFileName, XdlDesign design){
 		this.design = design;
 		parseTWR(twrFileName);
 	}
@@ -215,13 +215,13 @@ public class TraceReportParser{
 					
 					currElement.setDelay(Float.parseFloat(parts[4+offset]));
 					if(design != null){
-						Net net = design.getNet(parts[5+offset]);
+						XdlNet net = design.getNet(parts[5+offset]);
 						if(net == null){
 							MessageGenerator.briefErrorAndExit("This net \"" + parts[4+offset] +
 							"\" is null.");
 						}
 						((RoutingPathElement)currElement).setNet(net);
-						for(Pin p : net.getPins()){
+						for(XdlPin p : net.getPins()){
 							if(p.getName().equals(pinName) && p.getInstance().getPrimitiveSiteName().equals(primitiveSiteName)){
 								currElement.setPin(p);
 								break;
@@ -243,13 +243,13 @@ public class TraceReportParser{
 					currElement.setType(parts[2]);
 					//System.out.println("line="+line+", parts=" + parts.length);
 					if(design != null){
-						Instance instance = design.getInstance(parts[4]);
+						XdlInstance instance = design.getInstance(parts[4]);
 						((LogicPathElement)currElement).setInstance(instance);
 						if(instance == null){
 							MessageGenerator.briefErrorAndExit("This instance \"" + parts[4] +
 							"\" is null.");
 						}
-						Pin p = instance.getPin(pinName);
+						XdlPin p = instance.getPin(pinName);
 						if(p == null){
 							//System.out.println("Problem Getting Pin: " + parts[1]);
 							//System.out.println("Line: " + line);

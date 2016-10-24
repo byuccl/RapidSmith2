@@ -1,6 +1,6 @@
 package edu.byu.ece.rapidSmith.device;
 
-import edu.byu.ece.rapidSmith.design.Attribute;
+import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
 import edu.byu.ece.rapidSmith.design.subsite.SitePip;
 
 import java.io.Serializable;
@@ -29,10 +29,11 @@ public final class SiteTemplate implements Serializable {
 	// Map of the site wires to the bel pin templates the wire connect to
 	private transient Map<Integer, BelPinTemplate> belPins;
 	// Map of XDL attributes that should be created for each PIP
-	private Map<Integer, Map<Integer, Attribute>> pipAttributes;
+	private Map<Integer, Map<Integer, XdlAttribute>> pipAttributes;
 	// Map containing the bel routethrough information of the site
 	private Map<Integer, Set<Integer>> belRoutethroughMap;
-	
+
+
 	public SiteType getType() {
 		return type;
 	}
@@ -105,28 +106,28 @@ public final class SiteTemplate implements Serializable {
 		this.internalSiteWireMap = internalSiteWireMap;
 	}
 
-	public Map<Integer, Map<Integer, Attribute>> getPipAttributes() {
+	public Map<Integer, Map<Integer, XdlAttribute>> getPipAttributes() {
 		return pipAttributes;
 	}
 
-	public Attribute getPipAttribute(SitePip pip) {
+	public XdlAttribute getPipAttribute(SitePip pip) {
 		return pipAttributes.get(pip.getStartWire()).get(pip.getEndWire());
 	}
 
-	public void setPipAttributes(Map<Integer, Map<Integer, Attribute>> pipAttributes) {
+	public void setPipAttributes(Map<Integer, Map<Integer, XdlAttribute>> pipAttributes) {
 		this.pipAttributes = pipAttributes;
 	}
-	
+
 	public void setBelRoutethroughs(Map<Integer, Set<Integer>> belRoutethroughs) {
 		this.belRoutethroughMap = belRoutethroughs;
 	}
-	
+
 	public boolean isRoutethrough(Integer startWire, Integer endWire) {
-				
+
 		if (belRoutethroughMap == null) {
-			return false; 
+			return false;
 		}
-		
+
 		Set<Integer> sinks = belRoutethroughMap.get(startWire);
 		return sinks == null ? false : sinks.contains(endWire);
 	}
@@ -193,7 +194,7 @@ public final class SiteTemplate implements Serializable {
 		private WireHashMap routing;
 		private Collection<SitePinTemplate> sources;
 		private Collection<SitePinTemplate> sinks;
-		private Map<Integer, Map<Integer, Attribute>> pipAttributes;
+		private Map<Integer, Map<Integer, XdlAttribute>> pipAttributes;
 		private Map<Integer, Set<Integer>> belRoutethroughMap;
 
 		public Object readResolve() {
@@ -237,7 +238,7 @@ public final class SiteTemplate implements Serializable {
 		repl.sinks = sinks.values();
 		repl.pipAttributes = pipAttributes;
 		repl.belRoutethroughMap = belRoutethroughMap;
-		
+
 		return repl;
 	}
 

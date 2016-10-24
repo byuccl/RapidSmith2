@@ -22,7 +22,7 @@ package edu.byu.ece.rapidSmith.device;
 
 import edu.byu.ece.rapidSmith.RapidSmithEnv;
 import edu.byu.ece.rapidSmith.design.PIP;
-import edu.byu.ece.rapidSmith.design.Pin;
+import edu.byu.ece.rapidSmith.design.xdl.XdlPin;
 import edu.byu.ece.rapidSmith.device.helper.HashPool;
 import edu.byu.ece.rapidSmith.primitiveDefs.PrimitiveDefList;
 import edu.byu.ece.rapidSmith.util.FamilyType;
@@ -352,7 +352,7 @@ public class Device implements Serializable {
 	 * @param pin the pin to get the external name from.
 	 * @return the wire enumeration of the internal pin on the instance primitive of pin.
 	 */
-	public TileWire getPrimitiveExternalPin(Pin pin) {
+	public TileWire getPrimitiveExternalPin(XdlPin pin) {
 		return pin.getInstance().getPrimitiveSite().getSitePin(pin.getName()).getExternalWire();
 	}
 

@@ -18,11 +18,12 @@
  * get a copy of the license at <http://www.gnu.org/licenses/>.
  * 
  */
-package edu.byu.ece.rapidSmith.design;
+package edu.byu.ece.rapidSmith.design.xdl;
 
 import java.io.Serializable;
 import java.util.Objects;
 
+import edu.byu.ece.rapidSmith.design.PinType;
 import edu.byu.ece.rapidSmith.device.Tile;
 
 /**
@@ -31,7 +32,7 @@ import edu.byu.ece.rapidSmith.device.Tile;
  * @author Chris Lavin
  * Created on: Jun 22, 2010
  */
-public class Pin implements Serializable, Cloneable {
+public class XdlPin implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = -6675131973998249758L;
 
@@ -40,16 +41,16 @@ public class Pin implements Serializable, Cloneable {
 	/** The internal pin name on the instance this pin refers to */
 	private String name;
 	/** The instance where the pin is located */
-	private Instance instance;
+	private XdlInstance instance;
 	/** The Port that references this pin, if there is one */
-	private Port port;
+	private XdlPort port;
 	/** The net this pin is a member of */
-	private Net net;
+	private XdlNet net;
 	
 	/**
 	 * Constructor setting things to null and false.
 	 */
-	public Pin(){
+	public XdlPin(){
 		this.pinType = null;
 		this.name = null;
 		this.setInstance(null);
@@ -63,7 +64,7 @@ public class Pin implements Serializable, Cloneable {
 	 * @param pinName the name of the pin on the instance (internal name)
 	 * @param instance the instance where the pin resides
 	 */
-	public Pin(boolean isOutputPin, String pinName, Instance instance){
+	public XdlPin(boolean isOutputPin, String pinName, XdlInstance instance){
 		this.pinType = isOutputPin ? PinType.OUTPIN : PinType.INPIN;
 		this.name = pinName;
 		this.setInstance(instance);
@@ -76,7 +77,7 @@ public class Pin implements Serializable, Cloneable {
 	 * @param pinName the name of the pin on the instance (internal name)
 	 * @param instance the instance where the pin resides
 	 */
-	public Pin(PinType pinType, String pinName, Instance instance){
+	public XdlPin(PinType pinType, String pinName, XdlInstance instance){
 		this.pinType = pinType;
 		this.name = pinName;
 		this.setInstance(instance);
@@ -102,7 +103,7 @@ public class Pin implements Serializable, Cloneable {
 	 * Returns the instance where this pin resides.
 	 * @return the instance where the pin resides
 	 */
-	public Instance getInstance() {
+	public XdlInstance getInstance() {
 		return this.instance;
 	}
 	
@@ -152,7 +153,7 @@ public class Pin implements Serializable, Cloneable {
 	 * Sets the instance to which this pin belongs.
 	 * @param instance the instance to which this pin belongs
 	 */
-	public void setInstance(Instance instance){
+	public void setInstance(XdlInstance instance){
 		if(this.instance != null){
 			this.instance.removePin(this);
 			if(net != null && net.getPIPs().size() > 0){
@@ -181,7 +182,7 @@ public class Pin implements Serializable, Cloneable {
 	 * Sets the port that references this pin.
 	 * @param port the port that references this pin
 	 */
-	public void setPort(Port port){
+	public void setPort(XdlPort port){
 		this.port = port;
 	}
 	
@@ -189,7 +190,7 @@ public class Pin implements Serializable, Cloneable {
 	 * Gets the port that references this pin.  Null if there is none
 	 * @return the port that references this pin
 	 */
-	public Port getPort(){
+	public XdlPort getPort(){
 		return this.port;
 	}
 	
@@ -197,7 +198,7 @@ public class Pin implements Serializable, Cloneable {
 	 * Sets the net attached to this pin.
 	 * @param net the net to set
 	 */
-	public void setNet(Net net) {
+	public void setNet(XdlNet net) {
 		this.net = net;
 	}
 
@@ -205,7 +206,7 @@ public class Pin implements Serializable, Cloneable {
 	 * Returns the net attached to this pin.
 	 * @return the net
 	 */
-	public Net getNet() {
+	public XdlNet getNet() {
 		return net;
 	}
 	
@@ -248,7 +249,7 @@ public class Pin implements Serializable, Cloneable {
 			return false;
 		if(getClass() != obj.getClass())
 			return false;
-		Pin other = (Pin) obj;
+		XdlPin other = (XdlPin) obj;
 		return Objects.equals(getInstance(), other.getInstance()) &&
 				Objects.equals(getPinType(), other.getPinType()) &&
 				Objects.equals(getName(), other.getName());
