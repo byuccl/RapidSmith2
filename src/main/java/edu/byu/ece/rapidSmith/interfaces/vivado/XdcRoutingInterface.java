@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import edu.byu.ece.rapidSmith.design.NetType;
+import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
@@ -62,7 +63,7 @@ public class XdcRoutingInterface {
 	private Set<Bel> staticSourceBels;
 	private int currentLineNumber;
 	private String currentFile;
-	
+		
 	public XdcRoutingInterface(CellDesign design, Device device, Map<BelPin, CellPin> pinMap) {
 		
 		this.device = device;
@@ -159,6 +160,7 @@ public class XdcRoutingInterface {
 	private void processIntersitePins(String[] toks) {
 		
 		CellNet net = tryGetCellNet(toks[1]);
+		
 		// System.out.println(net.getName());
 		for (int index = 2 ; index < toks.length; index++) {
 			
@@ -169,12 +171,14 @@ public class XdcRoutingInterface {
 			Site site = tryGetSite(sitePinToks[0]);
 			SitePin pin = tryGetSitePin(site, sitePinToks[1]);
 			
-			if (pin.isInput()) {
+			if (pin.isInput()) { // of a site				
 				createIntrasiteRoute(pin, net, design.getUsedSitePipsAtSite(site));
 			}
 			else { // pin is an output of the site
-				BelPin source = tryGetNetSource(net).getBelPin();
-				createIntrasiteRoute(source, false, false, design.getUsedSitePipsAtSite(site));
+
+				CellPin sourceCellPin = tryGetNetSource(net);
+				BelPin sourceBelPin = tryGetMappedBelPin(sourceCellPin);
+				createIntrasiteRoute(sourceBelPin, false, false, design.getUsedSitePipsAtSite(site));
 			}
 		}
 	}
@@ -186,14 +190,11 @@ public class XdcRoutingInterface {
 	private void processIntrasitePins(String[] toks) {
 		
 		CellNet net = tryGetCellNet(toks[1]);		
-		BelPin belPin = tryGetNetSource(net).getBelPin();
-		
-		if (belPin == null) {
-			throw new AssertionError(net + " ");
-		}
-		
-		Site site = belPin.getBel().getSite();
-		createIntrasiteRoute(belPin, true, false, design.getUsedSitePipsAtSite(site));
+		CellPin sourceCellPin = tryGetNetSource(net);
+		BelPin sourceBelPin = tryGetMappedBelPin(sourceCellPin);
+				
+		Site site = sourceBelPin.getBel().getSite();
+		createIntrasiteRoute(sourceBelPin, true, false, design.getUsedSitePipsAtSite(site));
 		net.setIsIntrasite(true);
 	}
 	
@@ -262,16 +263,17 @@ public class XdcRoutingInterface {
 		for (int i = 1; i < toks.length; i++) {
 			String[] routethroughToks = toks[i].split("/");
 			
-			assert(routethroughToks.length == 3);
+			// TODO: change this to a check and add an assertion?
+			assert(routethroughToks.length == 4);
 			
+			// TODO: Check that the input pin is an input pin and the output pin is an output pin?
 			Site site = tryGetSite(routethroughToks[0]);
 			Bel bel = tryGetBel(site, routethroughToks[1]);
-			BelPin belPin = tryGetBelPin(bel, routethroughToks[2]);
-			
-			Wire outputWire = bel.getSources().iterator().next().getWire();
-			
+			BelPin inputPin = tryGetBelPin(bel, routethroughToks[2]);
+			BelPin outputPin = tryGetBelPin(bel, routethroughToks[3]);
+		
 			routethroughBels.add(bel);
-			usedRoutethroughMap.put(belPin, outputWire);
+			usedRoutethroughMap.put(inputPin, outputPin.getWire());
 		}
 	}
 	
@@ -623,6 +625,7 @@ public class XdcRoutingInterface {
 				// TODO: see if there are any other examples of this besides A6 lut pin with VCC net
 				assert(currentNet.isStaticNet()) : "Only static nets should not have site pin information" ;
 				createStaticNetImplicitSinks(sitePin, currentNet);
+				// TODO: add pseudo pins here
 			}
 		}
 		
@@ -640,6 +643,8 @@ public class XdcRoutingInterface {
 			throw new AssertionError("Static net does not finish...");
 		}
 		staticRoute.applyRouting();
+		// we can set sinks as routed here because we only call this function if we reach a site pin
+		staticRoute.setSinksAsRouted();
 	}
 	
 	/*
@@ -726,9 +731,9 @@ public class XdcRoutingInterface {
 	}
 	
 	/**
-	 * Creates a route starting at the specified site pin object. <br>
-	 * The search is guided by the specified used site pips of the site. <br>
-	 * If no valid route is found, an exception is thrown becaues this function <br>.
+	 * Creates a route starting at the specified site pin object.
+	 * The search is guided by the specified used site pips of the site.
+	 * If no valid route is found, an exception is thrown because this function.
 	 * expects a route to be found 
 	 * 
 	 * @param pin Site Pin to start the route
@@ -741,7 +746,7 @@ public class XdcRoutingInterface {
 		buildIntrasiteRoute(route, usedSiteWires);
 		
 		if (!route.isValid()) {			
-			throw new AssertionError("Valid intrasite route not found from site pin : " + pin);
+			throw new AssertionError("Valid intrasite route not found from site pin : " + pin + " Net: " + net.getName());
 		}
 		
 		route.applyRouting();
@@ -749,9 +754,9 @@ public class XdcRoutingInterface {
 	}
 	
 	/**
-	 * Creates a route starting at the specified bel pin object. <br>
-	 * The search is guided by the specified used site pips of the site. <br>
-	 * If no valid route is found, an exception is thrown because this function <br>
+	 * Creates a route starting at the specified bel pin object.
+	 * The search is guided by the specified used site pips of the site.
+	 * If no valid route is found, an exception is thrown because this function 
 	 * expects a route to be found 
 	 * 
 	 * @param pin Bel Pin to start the route
@@ -803,12 +808,11 @@ public class XdcRoutingInterface {
 		Wire startWire = startRoute.getWire();
 		routeQueue.add(startRoute);
 		visitedWires.add(startWire);
-				
+		
 		while (!routeQueue.isEmpty()) {
-
 			RouteTree currentRoute = routeQueue.poll();
 			Wire currentWire = currentRoute.getWire();
-			
+						
 			// reached a used bel pin that is not the source
 			if (intrasiteRoute.isValidBelPinSink(currentWire) && !currentWire.equals(startWire)) {
 				
@@ -853,6 +857,7 @@ public class XdcRoutingInterface {
 	 * 
 	 */
 	private boolean isQualifiedConnection(Connection conn, Wire sourceWire, Set<Integer> usedSiteWires) {
+				
 		return !conn.isPip() || // the connection is a regular wire connection
 				isUsedRoutethrough(conn, sourceWire) || // or, the connection is a used lut routethrough 
 				usedSiteWires.contains(sourceWire.getWireEnum()); // or the connection is a used site pip
@@ -1018,6 +1023,26 @@ public class XdcRoutingInterface {
 	}
 	
 	/**
+	 * Tries to get the BelPin that the specified CellPin is mapped to.
+	 * If this function is called, it is expected that the CellPin maps
+	 * to exactly one BelPin (it is a source pin). 
+	 * @param cellPin CellPin to get the BelPin mapping of
+	 * @return BelPin
+	 */
+	private BelPin tryGetMappedBelPin(CellPin cellPin) {
+		
+		int mapCount = cellPin.getMappedBelPinCount(); 
+		
+		if (mapCount != 1) {
+			throw new ParseException(String.format("Cell pin source \"%s\" should map to exactly one BelPin, but maps to %d\n"
+												+ "On %d of %s", cellPin.getName(), mapCount, currentLineNumber, currentFile));
+		}
+		
+		return cellPin.getMappedBelPin();
+	}
+	
+	
+	/**
 	 * Tries to retrieve the integer enumeration of a wire name in the currently loaded device <br>
 	 * If the wire does not exist, a ParseException is thrown <br>
 	 * @param wireName
@@ -1049,7 +1074,7 @@ public class XdcRoutingInterface {
 		
 		//write the routing information to the TCL script
 		for(CellNet net : design.getNets()) {
-
+			// System.out.println(net.getName());
 			// only print nets that have routing information. Grab the first RouteTree of the net and use this as the final route
 			if ( net.getIntersiteRouteTree() != null ) {
 				fileout.write(String.format("set_property ROUTE %s [get_nets {%s}]\n", getVivadoRouteString(net), net.getName()));
@@ -1222,7 +1247,11 @@ public class XdcRoutingInterface {
 			net.addSinkRouteTree(source, route);
 			
 			for (BelPin pin : this.belPinSinks) {
-				net.addSinkRouteTree(pin, route);	
+				net.addSinkRouteTree(pin, route);
+				 
+				if (allowUnusedBelPins) {
+					createAndAttachPseudoPin(pin);
+				}
 			}
 		}
 
@@ -1250,6 +1279,19 @@ public class XdcRoutingInterface {
 			// (2) The BelPin is being used (i.e. a cell pin has been mapped to it)
 			return !terminals.isEmpty() &&
 					(allowUnusedBelPins || isBelPinUsed(terminals.iterator().next().getBelPin()));
+		}
+		
+		// TODO: document this
+		private void createAndAttachPseudoPin(BelPin belPin) {
+			Cell cell = design.getCellAtBel(belPin.getBel());
+			assert (cell != null) : "Expected a cell to be mapped to a bel." ;
+			assert (net.isStaticNet()) : "Net should be a static net!";
+			String pinName = (net.isVCCNet() ? "VCC_pseudo" : "GND_pseudo") + cell.getPseudoPinCount();
+			CellPin pseudo = cell.attachPseudoPin(pinName, belPin.getDirection());
+			assert (pseudo != null) : "Pseudo pin should never be null!";
+			net.connectToPin(pseudo);
+			pseudo.mapToBelPin(belPin);
+			belPinToCellPinMap.put(belPin, pseudo);
 		}
 	}
 	

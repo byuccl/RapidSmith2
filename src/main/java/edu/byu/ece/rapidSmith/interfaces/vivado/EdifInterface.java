@@ -510,6 +510,10 @@ public final class EdifInterface {
 		// create the port references for the edif net
 		for (CellPin cellPin : cellNet.getPins()) {
 			
+			if (cellPin.isPseudoPin()) {
+				continue;
+			}
+			
 			Cell parentCell = cellPin.getCell();
 			
 			EdifPortRef portRef = parentCell.isPort() ?

@@ -1,6 +1,7 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.design.AbstractDesign;
+import edu.byu.ece.rapidSmith.design.Pin;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.Site;
 
@@ -558,7 +559,7 @@ public class CellDesign extends AbstractDesign {
 		getNets().forEach(CellNet::unroute);
 
 		for (Cell cell : getCells()) {
-			cell.getPins().forEach(CellPin::clearBelPin);
+			cell.getPins().forEach(CellPin::clearPinMappings);
 		}
 	}
 
@@ -590,8 +591,10 @@ public class CellDesign extends AbstractDesign {
 			if (cell.isPlaced()) {
 				designCopy.placeCell(cellCopy, cell.getAnchor());
 				for (CellPin cellPin : cell.getPins()) {
-					if (cellPin.getBelPin() != null)
-						cellCopy.getPin(cellPin.getName()).setBelPin(cellPin.getBelPin());
+					if (cellPin.getMappedBelPinCount() > 0) {
+						CellPin copyPin = cellCopy.getPin(cellPin.getName());
+						cellPin.getMappedBelPins().forEach(pin -> copyPin.mapToBelPin(pin));
+					}
 				}
 			}
 		}
