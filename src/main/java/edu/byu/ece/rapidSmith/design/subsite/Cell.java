@@ -196,13 +196,18 @@ public class Cell {
 	 * 
 	 * @param pinName Name of the pin to attach
 	 * @param dir Direction of the pseudo pin
+	 * 
+	 * @throws AssertionError If a pin with {@code pinName} already exists on this cell
+	 * 							an assertion error is thrown.
+	 * 
 	 * @return The newly created pseudo CellPin. If a pin by {@code pinName}
 	 * 			already exists, then null is returned.  
 	 */
 	public CellPin attachPseudoPin(String pinName, PinDirection dir) {
 		
 		if ( pinMap.containsKey(pinName) ) {
-			return null;
+			throw new AssertionError("Pin \"" + pinName + "\" already attached to cell  \"" 
+									+ getName() + "\". Cannot attach it again");
 		}
 		
 		if ( pseudoPins == null ) {
@@ -222,18 +227,22 @@ public class Cell {
 	 * before this function is called.
 	 * 
 	 * @param pin Pseudo pin to attach to the cell
+	 * 
+	 * @throws AssertionError If {@code pin} already exists on this cell an assertion error is thrown.
+	 * @throws IllegalArgumentException If {@code pin} is not a pseudo pin, an exception is thrown.
+	 * 
 	 * @return <code>true</code> if the pin was successfully attached
-	 * 			to the cell. <code>false</code> if either {@code pin} is
-	 * 			not a pseudo pin, or another with same name as {@code pin} 
-	 * 			already exists on the cell. 
+	 * 			to the cell. <code>false</code> otherwise 
 	 */
 	public boolean attachPseudoPin(CellPin pin) {
 		if (!pin.isPseudoPin()) {
-			return false; 
+			throw new IllegalArgumentException("Expected argument \"pin\" to be a pseudo cell pin.\n"
+												+ "Cell: " + getName() + " Pin: " + pin.getName()); 
 		}
 		
 		if (pinMap.containsKey(pin.getName())) {
-			return false;
+			throw new AssertionError("Pin \"" + pin.getName() + "\" already attached to cell  \"" 
+									+ getName() + "\". Cannot attach it again");
 		}
 		
 		pin.setCell(this);
@@ -251,36 +260,35 @@ public class Cell {
 	 * 			{@code pin} is not a pseudo pin, or is not attached to the cell 
 	 */
 	public boolean removePseudoPin(CellPin pin) {
-		if (pseudoPins.contains(pin)) {
-			pinMap.remove(pin.getName());
-			pseudoPins.remove(pin);
-			return true;
+		
+		if (pseudoPins == null || !pseudoPins.contains(pin)) {
+			return false; 
 		}
-		return false;
+		
+		pinMap.remove(pin.getName());
+		pseudoPins.remove(pin);
+		return true;
 	}
 	
 	/**
-	 * Removes a pseudo pin from the cell.
+	 * Removes a pseudo pin from the cell. If you want to remove the pin from the design
+	 * completely, you will need to disconnect it from all nets as well.
 	 * 
 	 * @param pinName Name of the pin to remove
-	 * @return <code>true</code> if the pin with the name
-	 * 			{@code pinName} is attached to the cell and 
-	 * 			was successfully removed. <code>false</code> is 
-	 * 			returned if the pin was not attached to the cell
-	 * 			or is not a pseudo pin.
-	 */
-	// TODO: should I return the removed pin here? 
-	public boolean removePseudoPin(String pinName) {
+	 * @return The CellPin object removed from the cell. If no matching cell pin is found
+	 * 			or the cell pin is not a pseudo pin, null is returned.
+	 */ 
+	public CellPin removePseudoPin(String pinName) {
 		
 		CellPin pin = pinMap.get(pinName);
 		
 		if (pin == null || !pin.isPseudoPin()) {
-			return false;
+			return null;
 		}
 		
 		pinMap.remove(pinName);
 		pseudoPins.remove(pin);
-		return true;
+		return pin;
 	}
 	
 	/**
@@ -294,7 +302,8 @@ public class Cell {
 			return Collections.emptySet();
 		}
 		
-		return pseudoPins;
+		// TODO: think about creating this unmodifiable during class creation instead of on demand
+		return Collections.unmodifiableSet(pseudoPins);
 	}
 	
 	/**

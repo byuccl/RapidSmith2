@@ -223,7 +223,7 @@ public class CellPin implements Serializable {
 	 * If the CellPin is not mapped to any BelPins, and empty set is returned. 
 	 */
 	public Set<BelPin> getMappedBelPins() {
-		return (belPinMappingSet == null) ? Collections.emptySet() : belPinMappingSet; 
+		return (belPinMappingSet == null) ? Collections.emptySet() : Collections.unmodifiableSet(belPinMappingSet); 
 	}
 	
 	/**
@@ -294,11 +294,18 @@ public class CellPin implements Serializable {
 	}
 
 	/**
-	 * Returns the names of the BelPins that this pin can potentially be placed.
-	 * @return list of names of possible BelPins
+	 * Returns the names of the BelPins that this pin can potentially be placed. This function
+	 * should NOT be called if the CellPin is a pseudo CellPin. 
+	 * 
+	 * @return list of names of possible BelPins. Null is returned if the CellPin is a pseudo pin
 	 */
 	public List<String> getPossibleBelPinNames() {
-		if (!cell.isPlaced() || this.isPseudo) {
+		
+		if (this.isPseudo) {
+			return null;
+		}
+		
+		if (!cell.isPlaced()) {
 			return Collections.emptyList();
 		}
 		BelId belId = cell.getAnchor().getId();
@@ -313,7 +320,7 @@ public class CellPin implements Serializable {
 
 		// pseudo pins do not have a backing library pin, so return an empty list
 		if (isPseudo) {
-			return Collections.emptyList();
+			return null;
 		}
 		
 		List<String> namesTmp = libraryPin.getPossibleBelPins().getOrDefault(belId, Collections.emptyList());
