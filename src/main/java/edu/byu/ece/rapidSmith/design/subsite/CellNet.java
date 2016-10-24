@@ -667,15 +667,15 @@ public class CellNet implements Serializable {
 	}
 	
 	/**
-	 * Returns a RouteTree of this net that is connected to the specified CellPin. If the CellPin
+	 * Returns a RouteTree object that is connected to the specified CellPin. If the CellPin
 	 * is connected to multiple RouteTree objects (because it is mapped to multiple BelPins)
-	 * than only one of the RouteTrees will be returned. Only use this function if you
-	 * know that the CellPin maps to a single BelPin.
+	 * then only one of the RouteTrees will be returned. To return all of the route trees, call
+	 * {@link #getSinkRouteTrees}. Only use this function if you know that the CellPin maps to a single BelPin.
 	 * 
 	 * @param cellPin sink CellPin
 	 * @return A RouteTree that is connected to the specified CellPin. If no
 	 * 		   connecting RouteTree exists, null is returned. If more than one
-	 * 		   RouteTree is connected to the CellPin, than one of the RouteTrees
+	 * 		   RouteTree is connected to the CellPin, then one of the RouteTrees
 	 * 		   will be returned (no guarantee which that will be)
 	 */
 	public RouteTree getSinkRouteTree(CellPin cellPin) {
@@ -686,13 +686,13 @@ public class CellNet implements Serializable {
 	
 	/**
 	 * Returns all RouteTrees of this net that are connected to the specified CellPin.
-	 * If the CellPin only maps to one BelPin, use {@link #getSinkRouteTree(CellPin, edu.byu.ece.rapidSmith.design.subsite.CellNet) }
+	 * If the CellPin only maps to one BelPin, use {@link #getSinkRouteTree(CellPin, CellNet) }
 	 * instead.
 	 * 
 	 * @param cellPin sink CellPin
 	 * @return A Set of RouteTree objects that cellPin is connected to.
 	 */
-	public Set<RouteTree> getSinkRouteTrees(CellPin cellPin) {
+	public Set <RouteTree> getSinkRouteTrees(CellPin cellPin) {
 		
 		Set<RouteTree> connectedRouteTrees = new HashSet<RouteTree>();
 		
