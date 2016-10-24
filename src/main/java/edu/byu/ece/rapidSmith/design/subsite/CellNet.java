@@ -572,7 +572,7 @@ public class CellNet implements Serializable {
 	 */
 	public RouteTree getIntersiteRouteTree() {
 		
-		if (intersiteRoutes == null) {
+		if (intersiteRoutes == null || intersiteRoutes.isEmpty()) {
 			return null;
 		}
 		

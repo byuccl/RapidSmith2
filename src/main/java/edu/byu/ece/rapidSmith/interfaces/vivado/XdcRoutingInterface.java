@@ -63,7 +63,7 @@ public class XdcRoutingInterface {
 	private Set<Bel> staticSourceBels;
 	private int currentLineNumber;
 	private String currentFile;
-	
+		
 	public XdcRoutingInterface(CellDesign design, Device device, Map<BelPin, CellPin> pinMap) {
 		
 		this.device = device;
@@ -160,6 +160,7 @@ public class XdcRoutingInterface {
 	private void processIntersitePins(String[] toks) {
 		
 		CellNet net = tryGetCellNet(toks[1]);
+		
 		// System.out.println(net.getName());
 		for (int index = 2 ; index < toks.length; index++) {
 			
@@ -170,7 +171,7 @@ public class XdcRoutingInterface {
 			Site site = tryGetSite(sitePinToks[0]);
 			SitePin pin = tryGetSitePin(site, sitePinToks[1]);
 			
-			if (pin.isInput()) { // of a site
+			if (pin.isInput()) { // of a site				
 				createIntrasiteRoute(pin, net, design.getUsedSitePipsAtSite(site));
 			}
 			else { // pin is an output of the site
@@ -262,16 +263,17 @@ public class XdcRoutingInterface {
 		for (int i = 1; i < toks.length; i++) {
 			String[] routethroughToks = toks[i].split("/");
 			
-			assert(routethroughToks.length == 3);
+			// TODO: change this to a check and add an assertion?
+			assert(routethroughToks.length == 4);
 			
+			// TODO: Check that the input pin is an input pin and the output pin is an output pin?
 			Site site = tryGetSite(routethroughToks[0]);
 			Bel bel = tryGetBel(site, routethroughToks[1]);
-			BelPin belPin = tryGetBelPin(bel, routethroughToks[2]);
-			
-			Wire outputWire = bel.getSources().iterator().next().getWire();
-			
+			BelPin inputPin = tryGetBelPin(bel, routethroughToks[2]);
+			BelPin outputPin = tryGetBelPin(bel, routethroughToks[3]);
+		
 			routethroughBels.add(bel);
-			usedRoutethroughMap.put(belPin, outputWire);
+			usedRoutethroughMap.put(inputPin, outputPin.getWire());
 		}
 	}
 	
@@ -806,12 +808,11 @@ public class XdcRoutingInterface {
 		Wire startWire = startRoute.getWire();
 		routeQueue.add(startRoute);
 		visitedWires.add(startWire);
-				
+		
 		while (!routeQueue.isEmpty()) {
-
 			RouteTree currentRoute = routeQueue.poll();
 			Wire currentWire = currentRoute.getWire();
-			
+						
 			// reached a used bel pin that is not the source
 			if (intrasiteRoute.isValidBelPinSink(currentWire) && !currentWire.equals(startWire)) {
 				
@@ -856,6 +857,7 @@ public class XdcRoutingInterface {
 	 * 
 	 */
 	private boolean isQualifiedConnection(Connection conn, Wire sourceWire, Set<Integer> usedSiteWires) {
+				
 		return !conn.isPip() || // the connection is a regular wire connection
 				isUsedRoutethrough(conn, sourceWire) || // or, the connection is a used lut routethrough 
 				usedSiteWires.contains(sourceWire.getWireEnum()); // or the connection is a used site pip
@@ -1072,7 +1074,7 @@ public class XdcRoutingInterface {
 		
 		//write the routing information to the TCL script
 		for(CellNet net : design.getNets()) {
-
+			// System.out.println(net.getName());
 			// only print nets that have routing information. Grab the first RouteTree of the net and use this as the final route
 			if ( net.getIntersiteRouteTree() != null ) {
 				fileout.write(String.format("set_property ROUTE %s [get_nets {%s}]\n", getVivadoRouteString(net), net.getName()));
