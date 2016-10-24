@@ -8,7 +8,6 @@ import edu.byu.ece.rapidSmith.device.Site;
 
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -197,7 +196,7 @@ public class Cell {
 	 * @param pinName Name of the pin to attach
 	 * @param dir Direction of the pseudo pin
 	 * 
-	 * @throws AssertionError If a pin with {@code pinName} already exists on this cell
+	 * @throws IllegalArgumentException If a pin with {@code pinName} already exists on this cell
 	 * 							an assertion error is thrown.
 	 * 
 	 * @return The newly created pseudo CellPin. If a pin by {@code pinName}
@@ -206,7 +205,7 @@ public class Cell {
 	public CellPin attachPseudoPin(String pinName, PinDirection dir) {
 		
 		if ( pinMap.containsKey(pinName) ) {
-			throw new AssertionError("Pin \"" + pinName + "\" already attached to cell  \"" 
+			throw new IllegalArgumentException("Pin \"" + pinName + "\" already attached to cell  \"" 
 									+ getName() + "\". Cannot attach it again");
 		}
 		
@@ -228,8 +227,8 @@ public class Cell {
 	 * 
 	 * @param pin Pseudo pin to attach to the cell
 	 * 
-	 * @throws AssertionError If {@code pin} already exists on this cell an assertion error is thrown.
-	 * @throws IllegalArgumentException If {@code pin} is not a pseudo pin, an exception is thrown.
+	 * @throws IllegalArgumentException If {@code pin} already exists on this cell or 
+	 * 			is not a pseudo pin, an exception is thrown.
 	 * 
 	 * @return <code>true</code> if the pin was successfully attached
 	 * 			to the cell. <code>false</code> otherwise 
@@ -241,7 +240,7 @@ public class Cell {
 		}
 		
 		if (pinMap.containsKey(pin.getName())) {
-			throw new AssertionError("Pin \"" + pin.getName() + "\" already attached to cell  \"" 
+			throw new IllegalArgumentException("Pin \"" + pin.getName() + "\" already attached to cell  \"" 
 									+ getName() + "\". Cannot attach it again");
 		}
 		
