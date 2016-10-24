@@ -3,6 +3,7 @@ package edu.byu.ece.rapidSmith.design.subsite;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelId;
 import edu.byu.ece.rapidSmith.device.BondedType;
+import edu.byu.ece.rapidSmith.device.PinDirection;
 import edu.byu.ece.rapidSmith.device.Site;
 
 import java.util.*;
@@ -30,6 +31,8 @@ public class Cell {
 	private Map<Object, Property> properties;
 	/** Mapping of pin names to CellPin objects of this cell */
 	private Map<String, CellPin> pinMap;
+	/**	Set of pseudo pins attached to the cell */
+	private Set<CellPin> pseudoPins;
 
 	/**
 	 * Creates a new cell with specified name and type.
@@ -185,6 +188,131 @@ public class Cell {
 
 	void unplace() {
 		this.anchor = null;
+	}
+	
+	/**
+	 * Creates a new pseudo pin, and attaches it to the cell. 
+	 * 
+	 * @param pinName Name of the pin to attach
+	 * @param dir Direction of the pseudo pin
+	 * 
+	 * @throws IllegalArgumentException If a pin with {@code pinName} already exists on this cell
+	 * 							an assertion error is thrown.
+	 * 
+	 * @return The newly created pseudo CellPin. If a pin by {@code pinName}
+	 * 			already exists, then null is returned.  
+	 */
+	public CellPin attachPseudoPin(String pinName, PinDirection dir) {
+		
+		if ( pinMap.containsKey(pinName) ) {
+			throw new IllegalArgumentException("Pin \"" + pinName + "\" already attached to cell  \"" 
+									+ getName() + "\". Cannot attach it again");
+		}
+		
+		if ( pseudoPins == null ) {
+			pseudoPins = new HashSet<CellPin>(5);
+		}
+		
+		CellPin pseudo = CellPin.createPseudoPin(this, pinName, dir);
+		this.pinMap.put(pinName, pseudo);
+		this.pseudoPins.add(pseudo);
+		return pseudo;
+	}
+	
+	/**
+	 * Attaches an existing pseudo pin to this cell. The pin will be
+	 * updated to point to this cell as its new parent. Any BEL pin mappings
+	 * that were previously on the pin are now invalid and should be invalidated
+	 * before this function is called.
+	 * 
+	 * @param pin Pseudo pin to attach to the cell
+	 * 
+	 * @throws IllegalArgumentException If {@code pin} already exists on this cell or 
+	 * 			is not a pseudo pin, an exception is thrown.
+	 * 
+	 * @return <code>true</code> if the pin was successfully attached
+	 * 			to the cell. <code>false</code> otherwise 
+	 */
+	public boolean attachPseudoPin(CellPin pin) {
+		if (!pin.isPseudoPin()) {
+			throw new IllegalArgumentException("Expected argument \"pin\" to be a pseudo cell pin.\n"
+												+ "Cell: " + getName() + " Pin: " + pin.getName()); 
+		}
+		
+		if (pinMap.containsKey(pin.getName())) {
+			throw new IllegalArgumentException("Pin \"" + pin.getName() + "\" already attached to cell  \"" 
+									+ getName() + "\". Cannot attach it again");
+		}
+		
+		pin.setCell(this);
+		this.pinMap.put(pin.getName(), pin);
+		this.pseudoPins.add(pin);
+		return true;
+	}
+	
+	/**
+	 * Removes a pseudo pin from the cell
+	 * 
+	 * @param pin CellPin to remove
+	 * @return <code>true</code> if the pin was attached to the cell 
+	 * 			and was successfully removed. <code>false</code> is returned if either
+	 * 			{@code pin} is not a pseudo pin, or is not attached to the cell 
+	 */
+	public boolean removePseudoPin(CellPin pin) {
+		
+		if (pseudoPins == null || !pseudoPins.contains(pin)) {
+			return false; 
+		}
+		
+		pinMap.remove(pin.getName());
+		pseudoPins.remove(pin);
+		return true;
+	}
+	
+	/**
+	 * Removes a pseudo pin from the cell. If you want to remove the pin from the design
+	 * completely, you will need to disconnect it from all nets as well.
+	 * 
+	 * @param pinName Name of the pin to remove
+	 * @return The CellPin object removed from the cell. If no matching cell pin is found
+	 * 			or the cell pin is not a pseudo pin, null is returned.
+	 */ 
+	public CellPin removePseudoPin(String pinName) {
+		
+		CellPin pin = pinMap.get(pinName);
+		
+		if (pin == null || !pin.isPseudoPin()) {
+			return null;
+		}
+		
+		pinMap.remove(pinName);
+		pseudoPins.remove(pin);
+		return pin;
+	}
+	
+	/**
+	 * Gets all pseudo pins currently attached to this cell
+	 * 
+	 * @return A Set of attached pseudo pins
+	 */
+	public Set<CellPin> getPseudoPins() {
+		
+		if (pseudoPins == null) {
+			return Collections.emptySet();
+		}
+		
+		// TODO: think about creating this unmodifiable during class creation instead of on demand
+		return Collections.unmodifiableSet(pseudoPins);
+	}
+	
+	/**
+	 * Gets the number of pseudo (fake) pins
+	 * currently attached to this cell.
+	 * 
+	 * @return The number of pseudo pins attached to this cell.
+	 */
+	public int getPseudoPinCount() {
+		return pseudoPins == null ? 0 : pseudoPins.size();
 	}
 
 	/**

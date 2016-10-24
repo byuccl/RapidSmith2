@@ -186,7 +186,7 @@ public class XdlPacker {
 			int pinIndex = cellPin.getName().charAt(1) - '1';
 			if (pinIndex < 0 || pinIndex > 5)
 				continue;
-			remap[(pinIndex)] = cellPin.getBelPin().getName().charAt(1) - '0';
+			remap[(pinIndex)] = cellPin.getMappedBelPin().getName().charAt(1) - '0';
 		}
 		String cellName = cell.getLibCell().getName();
 		LutConfig config = (LutConfig) cell.getPropertyValue(cellName);
@@ -231,8 +231,8 @@ public class XdlPacker {
 			for (CellPin pin : cellNet.getPins()) {
 				if (!pin.isInpin())
 					continue;
-				assert pin.getBelPin() != null;
-				pinSet.add(pin.getBelPin());
+				assert pin.getMappedBelPin() != null;
+				pinSet.add(pin.getMappedBelPin());
 			}
 
 			// starting from the source, traverse out and find all of the sinks.
@@ -248,7 +248,7 @@ public class XdlPacker {
 				} else {
 					throw new AssertionError("Unsourced net must be GND or VCC");
 				}
-			} else if (sourcePin.getBelPin() == null) {
+			} else if (sourcePin.getMappedBelPin() == null) {
 				assert sourcePin.getCell().getLibCell().getName().equals("TIEOFF");
 
 				if (sourcePin.getName().equals("0")) {
@@ -257,7 +257,7 @@ public class XdlPacker {
 					net = new XdlNet("global_vcc_net", NetType.VCC);
 				}
 			} else {
-				SiteWire sourceWire = sourcePin.getBelPin().getWire();
+				SiteWire sourceWire = sourcePin.getMappedBelPin().getWire();
 				NetBooleanPair netBooleanPair = traverseSourceSite(cellNet, sourceWire);
 				if (netBooleanPair != null)
 					net = netBooleanPair.net;

@@ -1,8 +1,11 @@
 package edu.byu.ece.rapidSmith.util;
 
+import java.util.Collection;
 import java.util.Iterator;
 
+import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
+import edu.byu.ece.rapidSmith.design.subsite.CellPin;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 import edu.byu.ece.rapidSmith.device.Wire;
 
@@ -66,5 +69,40 @@ public final class RapidSmithDebug {
 		cmd += "}]";
 		
 		return cmd;
+	}
+	
+	/**
+	 * Prints the full CellPin name and BelPin mappings for each pseudo cell found attached to Cells in the
+	 * collection {@code cells}. Each pseudo pin is printed in the following format:   
+	 * <br>
+	 * "Pseudo Pin: cellName.pseudoPinName -> BelPin1 BelPin2 ... BelPinN" <br>
+	 * <br>
+	 * The total number of pseudo cell pins in the collection is also printed. 
+	 * To print all pseudo pins in a design, pass in the collections returned from 
+	 * {@link CellDesign#getCells}.
+	 *  
+	 * @param cells Collections of Cell objects
+	 */
+	public static void printPseudoPins(Collection<Cell> cells) {
+		int pseudoPinCount = 0;
+		for (Cell cell : cells) {
+			pseudoPinCount += cell.getPseudoPinCount();
+			for (CellPin pin : cell.getPseudoPins()) {
+				System.out.print("Pseudo Pin: " + pin.getFullName() + " -> ");
+				pin.getMappedBelPins().forEach(belPin -> System.out.print(belPin));
+				System.out.println();
+			}
+		}
+		
+		System.out.println("Pseudo Pin Count: " + pseudoPinCount);
+	}
+	
+	public static void printNetInfo(CellNet net) {
+	
+		System.out.println("Net:" + net.getName() );
+		System.out.println("Type: " + net.getType());
+		System.out.println("Pin Count: " + net.getPins().size());
+		System.out.println("Number of routed sinks: " + net.getRoutedSinks().size());
+		System.out.println("Route Status: " + net.getRouteStatus() + (net.isIntrasite() ? ", INTRASITE" : "" ));
 	}
 }
