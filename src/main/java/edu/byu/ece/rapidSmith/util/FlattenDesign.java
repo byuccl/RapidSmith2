@@ -20,7 +20,7 @@
  */
 package edu.byu.ece.rapidSmith.util;
 
-import edu.byu.ece.rapidSmith.design.Design;
+import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 
@@ -32,7 +32,7 @@ public class FlattenDesign {
 		if(args.length != 2){
 			MessageGenerator.briefMessageAndExit("USAGE: <inputDesign.xdl> <flattenedDesign.xdl>");
 		}
-		Design d = new XDLReader().readDesign(Paths.get(args[0]));
+		XdlDesign d = new XDLReader().readDesign(Paths.get(args[0]));
 		d.flattenDesign();
 		XDLWriter writer = new XDLWriter();
 		writer.writeXDL(d, Paths.get(args[1]));

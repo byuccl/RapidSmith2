@@ -18,7 +18,7 @@
  * get a copy of the license at <http://www.gnu.org/licenses/>.
  * 
  */
-package edu.byu.ece.rapidSmith.design;
+package edu.byu.ece.rapidSmith.design.xdl;
 
 import java.io.Serializable;
 import java.util.*;
@@ -34,7 +34,7 @@ import edu.byu.ece.rapidSmith.device.Tile;
  * @author Chris Lavin
  * Created on: Jun 22, 2010
  */
-public class Instance implements Serializable{
+public class XdlInstance implements Serializable{
 
 	private static final long serialVersionUID = -7993281723620318536L;
 
@@ -46,27 +46,27 @@ public class Instance implements Serializable{
 	private Boolean bonded;
 	/** The XDL Design this instance belongs to,
 	 * it is null if this instance is part of a module definition */
-	private transient Design design;
+	private transient XdlDesign design;
 	/** All of the attributes in this instance */
-	private Map<String, Attribute> attributes;
+	private Map<String, XdlAttribute> attributes;
 	/** This is a site of where the primitive will reside */
 	private Site site;
 	/** A list of nets to which this instance is connected */
-	private HashSet<Net> netList;
+	private HashSet<XdlNet> netList;
 	/** A list of all pins on this instance which are connected in nets */
-	private Map<String, Pin> pinMap;
+	private Map<String, XdlPin> pinMap;
 	/** Name of the module instance which this instance belongs to */
-	private ModuleInstance moduleInstance;
+	private XdlModuleInstance moduleInstance;
 	/** The module template (or definition) this instance is a member of */
-	private Module moduleTemplate;
+	private XdlModule moduleTemplate;
 	/** The instance in the module template corresponding to this instance */
-	private Instance moduleTemplateInstance;
+	private XdlInstance moduleTemplateInstance;
 	
 	/**
 	 * Creates a new nameless, typeless Instance.
 	 * The attributes, nets and pins are initialized with empty structures.
 	 */
-	public Instance(){
+	public XdlInstance(){
 		name = null;
 		design = null;
 		attributes = new HashMap<>();
@@ -88,7 +88,7 @@ public class Instance implements Serializable{
 	 * @param name name of the new Instance
 	 * @param type the type of the new instance
 	 */
-	public Instance(String name, SiteType type){
+	public XdlInstance(String name, SiteType type){
 		this.name = name;
 		this.type = type;
 		
@@ -159,7 +159,7 @@ public class Instance implements Serializable{
 	 * @return the design this instance is a part of or null if this instance is
 	 *  not part of a design
 	 */
-	public Design getDesign(){
+	public XdlDesign getDesign(){
 		return design;
 	}
 
@@ -168,7 +168,7 @@ public class Instance implements Serializable{
 	 * The design should be null if it is a module definition.
 	 * @param design the design for this instance
 	 */
-	public void setDesign(Design design){
+	public void setDesign(XdlDesign design){
 		this.design = design;
 	}
 
@@ -177,7 +177,7 @@ public class Instance implements Serializable{
 	 * The collection supports removal but not insertion.
 	 * @return the Collection containing the attributes of this instance
 	 */
-	public Collection<Attribute> getAttributes(){
+	public Collection<XdlAttribute> getAttributes(){
 		return attributes.values();
 	}
 
@@ -187,7 +187,7 @@ public class Instance implements Serializable{
 	 * @return the attribute with the physical name specified, or null if
 	 *   no such attribute exists.
 	 */
-	public Attribute getAttribute(String physicalName){
+	public XdlAttribute getAttribute(String physicalName){
 		return attributes.get(physicalName);
 	}
 
@@ -197,7 +197,7 @@ public class Instance implements Serializable{
 	 * @return the value of the attribute or null if the attribute does not exist
 	 */
 	public String getAttributeValue(String physicalName){
-		Attribute attr = getAttribute(physicalName);
+		XdlAttribute attr = getAttribute(physicalName);
 		return attr==null ? null : attr.getValue();
 	}
 
@@ -209,21 +209,21 @@ public class Instance implements Serializable{
 	 */
 	public void addAttribute(String physicalName, String logicalName, String value){
 		if(physicalName.getBytes()[0] == '_'){
-			Attribute attr = attributes.get(physicalName);
+			XdlAttribute attr = attributes.get(physicalName);
 			if(attr != null){
-				attr.setLogicalName(attr.getLogicalName() + Attribute.multiValueSeparator + logicalName);
-				attr.setValue(attr.getValue() + Attribute.multiValueSeparator + value);
+				attr.setLogicalName(attr.getLogicalName() + XdlAttribute.multiValueSeparator + logicalName);
+				attr.setValue(attr.getValue() + XdlAttribute.multiValueSeparator + value);
 				return;
 			}
 		}
-		attributes.put(physicalName, new Attribute(physicalName, logicalName, value));
+		attributes.put(physicalName, new XdlAttribute(physicalName, logicalName, value));
 	}
 	
 	/**
 	 * Adds the attribute to this instance.
 	 * @param attribute the attribute to add
 	 */
-	public void addAttribute(Attribute attribute){
+	public void addAttribute(XdlAttribute attribute){
 		addAttribute(attribute.getPhysicalName(), attribute.getLogicalName(), attribute.getValue());
 	}
 
@@ -231,7 +231,7 @@ public class Instance implements Serializable{
 	 * Sets the map of attributes for this instance.
 	 * @param attributes the map of attributes to associate with this instance
 	 */
-	public void setAttributes(HashMap<String, Attribute> attributes){
+	public void setAttributes(HashMap<String, XdlAttribute> attributes){
 		this.attributes = attributes;
 	}
 
@@ -253,7 +253,7 @@ public class Instance implements Serializable{
 	 * @param physicalName name of the attribute to remove
 	 * @return the removed attribute, null if the attribute does not exist
 	 */
-	public Attribute removeAttribute(String physicalName){
+	public XdlAttribute removeAttribute(String physicalName){
 		return attributes.remove(physicalName);
 	}
 	
@@ -265,7 +265,7 @@ public class Instance implements Serializable{
 	 * @return true if the value of the attribute matches
 	 */
 	public boolean testAttributeValue(String physicalName, String value){
-		Attribute attr = getAttribute(physicalName); 
+		XdlAttribute attr = getAttribute(physicalName);
 		return attr != null && attr.getValue().equals(value);
 	}
 
@@ -273,7 +273,7 @@ public class Instance implements Serializable{
 	 * Returns the nets that connect to this instance and its pins.
 	 * @return the set of nets connecting to this instance
 	 */
-	public HashSet<Net> getNetList() {
+	public HashSet<XdlNet> getNetList() {
 		return netList;
 	}
 
@@ -281,7 +281,7 @@ public class Instance implements Serializable{
 	 * Adds the net to the netlist for this instance
 	 * @param net the net to be added
 	 */
-	public void addToNetList(Net net){
+	public void addToNetList(XdlNet net){
 		this.netList.add(net);
 	}
 
@@ -290,7 +290,7 @@ public class Instance implements Serializable{
 	 * This method does not add this instance to the netlist.
 	 * @param netList the netlist for this instance
 	 */
-	public void setNetList(HashSet<Net> netList) {
+	public void setNetList(HashSet<XdlNet> netList) {
 		this.netList = netList;
 	}
 
@@ -300,7 +300,7 @@ public class Instance implements Serializable{
 	 * @return the pin on this instance with the specified name or null if no pin
 	 *   exists with the name
 	 */
-	public Pin getPin(String pinName){
+	public XdlPin getPin(String pinName){
 		return pinMap.get(pinName);
 	}
 
@@ -309,7 +309,7 @@ public class Instance implements Serializable{
 	 * The collection supports removal but not insertion.
 	 * @return the set of pins on this instance
 	 */
-	public Collection<Pin> getPins(){
+	public Collection<XdlPin> getPins(){
 		return pinMap.values();
 	}
 
@@ -318,7 +318,7 @@ public class Instance implements Serializable{
 	 * The pin map consist of pin names to pins.
 	 * @return returns the pin map for this instance
 	 */
-	public Map<String, Pin> getPinMap(){
+	public Map<String, XdlPin> getPinMap(){
 		return pinMap;
 	}
 
@@ -335,7 +335,7 @@ public class Instance implements Serializable{
 	 * Adds a pin to the pin list of this instance.
 	 * @param pin the pin to add
 	 */
-	public void addPin(Pin pin){
+	public void addPin(XdlPin pin){
 		if(pin.getName() != null) this.pinMap.put(pin.getName(), pin);
 	}
 
@@ -343,7 +343,7 @@ public class Instance implements Serializable{
 	 * Removes the pin from this instance.
 	 * @param pin the pin to remove
 	 */
-	public Pin removePin(Pin pin){
+	public XdlPin removePin(XdlPin pin){
 		return this.pinMap.remove(pin.getName());
 	}
 
@@ -450,7 +450,7 @@ public class Instance implements Serializable{
 	 * @return the module instance this instance is a member of or null if it not
 	 *   a member of any module instance
 	 */
-	public ModuleInstance getModuleInstance(){
+	public XdlModuleInstance getModuleInstance(){
 		return moduleInstance;
 	}
 
@@ -490,7 +490,7 @@ public class Instance implements Serializable{
 	 * module to which this instance belongs).  
 	 * @param instanceModule the module instance for this instance
 	 */
-	public void setModuleInstance(ModuleInstance instanceModule){
+	public void setModuleInstance(XdlModuleInstance instanceModule){
 		this.moduleInstance = instanceModule;
 	}
 	
@@ -500,7 +500,7 @@ public class Instance implements Serializable{
 	 * @param inst the instance to check
 	 * @return true if both instances are members of the same module instance
 	 */
-	public boolean isMemberOfSameModuleInstance(Instance inst){
+	public boolean isMemberOfSameModuleInstance(XdlInstance inst){
 		if(this.moduleInstance==null || inst.moduleInstance == null)
 			return false;
 		return this.moduleInstance.equals(inst.moduleInstance);
@@ -510,7 +510,7 @@ public class Instance implements Serializable{
 	 * Returns the module template this instance is a member of.
 	 * @return the module template this instance is a member of
 	 */
-	public Module getModuleTemplate(){
+	public XdlModule getModuleTemplate(){
 		return moduleTemplate;
 	}
 
@@ -518,7 +518,7 @@ public class Instance implements Serializable{
 	 * Sets the module this instance implements.
 	 * @param instanceModuleTemplate the module which this instance implements
 	 */
-	public void setModuleTemplate(Module instanceModuleTemplate){
+	public void setModuleTemplate(XdlModule instanceModuleTemplate){
 		this.moduleTemplate = instanceModuleTemplate;
 	}
 
@@ -526,7 +526,7 @@ public class Instance implements Serializable{
 	 * Returns the instance in the module which this instance implements.
 	 * @return the instance in the module which this instance implements
 	 */
-	public Instance getModuleTemplateInstance(){
+	public XdlInstance getModuleTemplateInstance(){
 		return moduleTemplateInstance;
 	}
 
@@ -535,7 +535,7 @@ public class Instance implements Serializable{
 	 * @param moduleTemplateInstance the instance in the module to which this
 	 * instance corresponds
 	 */
-	public void setModuleTemplateInstance(Instance moduleTemplateInstance){
+	public void setModuleTemplateInstance(XdlInstance moduleTemplateInstance){
 		this.moduleTemplateInstance = moduleTemplateInstance;
 	}
 
@@ -566,7 +566,7 @@ public class Instance implements Serializable{
 					.append(getModuleTemplateInstance().getName()).append("\" ,");
 		}
 		sb.append(nl).append("  cfg \"");
-		for(Attribute attr : attributes.values()){
+		for(XdlAttribute attr : attributes.values()){
 			sb.append(" ").append(attr.toString());
 		}
 		sb.append(" \"").append(nl).append("  ;").append(nl);
@@ -579,7 +579,7 @@ public class Instance implements Serializable{
 	 * @return true if this instance is a slice
 	 */
 	public boolean isSLICE(){
-		return Design.sliceTypes.contains(getType());
+		return XdlDesign.sliceTypes.contains(getType());
 	}
 	
 	/**
@@ -587,7 +587,7 @@ public class Instance implements Serializable{
 	 * @return true if this instance is a DSP
 	 */
 	public boolean isDSP(){
-		return Design.dspTypes.contains(getType());
+		return XdlDesign.dspTypes.contains(getType());
 	}
 	
 	/**
@@ -595,7 +595,7 @@ public class Instance implements Serializable{
 	 * @return true if this instance is a BRAM
 	 */
 	public boolean isBRAM(){
-		return Design.bramTypes.contains(getType());
+		return XdlDesign.bramTypes.contains(getType());
 	}
 	
 	/**
@@ -603,6 +603,6 @@ public class Instance implements Serializable{
 	 * @return true if this instance is a IOB
 	 */
 	public boolean isIOB(){
-		return Design.iobTypes.contains(getType());
+		return XdlDesign.iobTypes.contains(getType());
 	}
 }

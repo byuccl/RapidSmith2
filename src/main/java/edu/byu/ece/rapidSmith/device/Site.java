@@ -20,7 +20,7 @@
  */
 package edu.byu.ece.rapidSmith.device;
 
-import edu.byu.ece.rapidSmith.design.Attribute;
+import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
 import edu.byu.ece.rapidSmith.design.subsite.SitePip;
 
 import java.io.Serializable;
@@ -368,27 +368,27 @@ public final class Site implements Serializable{
 		return template.getReverseWireConnections(wire);
 	}
 
-	public Attribute getPipAttribute(int sourceWire, int sinkWire) {
+	public XdlAttribute getPipAttribute(int sourceWire, int sinkWire) {
 		return getPipAttribute(getTemplate(), sourceWire, sinkWire);
 	}
 
-	public Attribute getPipAttribute(SiteType type, int sourceWire, int sinkWire) {
+	public XdlAttribute getPipAttribute(SiteType type, int sourceWire, int sinkWire) {
 		return getPipAttribute(getTemplate(type), sourceWire, sinkWire);
 	}
 
-	public Attribute getPipAttribute(SiteTemplate template, int sourceWire, int sinkWire) {
+	public XdlAttribute getPipAttribute(SiteTemplate template, int sourceWire, int sinkWire) {
 		return template.getPipAttributes().get(sourceWire).get(sinkWire);
 	}
 
-	public Attribute getPipAttribute(SitePip sitePip) {
+	public XdlAttribute getPipAttribute(SitePip sitePip) {
 		return getPipAttribute(getTemplate(), sitePip);
 	}
 
-	public Attribute getPipAttribute(SiteType type, SitePip sitePip) {
+	public XdlAttribute getPipAttribute(SiteType type, SitePip sitePip) {
 		return getPipAttribute(getTemplate(type), sitePip);
 	}
 
-	public Attribute getPipAttribute(SiteTemplate template, SitePip sitePip) {
+	public XdlAttribute getPipAttribute(SiteTemplate template, SitePip sitePip) {
 		return template.getPipAttribute(sitePip);
 	}
 

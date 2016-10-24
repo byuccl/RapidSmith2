@@ -6,6 +6,7 @@ import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
 import edu.byu.ece.rapidSmith.design.unpacker.PackerUtils;
+import edu.byu.ece.rapidSmith.design.xdl.*;
 import edu.byu.ece.rapidSmith.device.*;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class V6PackerUtils implements PackerUtils {
 	}
 
 	@Override
-	public void finish(Design design) {
+	public void finish(XdlDesign design) {
 		Device device = design.getDevice();
 
 		handleRouteThroughs(design, device);
@@ -38,11 +39,11 @@ public class V6PackerUtils implements PackerUtils {
 		mergeDMuxNetsIntoCoutNets(design);
 	}
 
-	private void createIONets(Design design) {
-		for (Instance inst : design.getInstances()) {
+	private void createIONets(XdlDesign design) {
+		for (XdlInstance inst : design.getInstances()) {
 			if (design.getDevice().getIOBTypes().contains(inst.getType())) {
 				String padName = inst.getAttribute("PAD").getLogicalName();
-				Net net = new Net(inst.getName(), NetType.WIRE);
+				XdlNet net = new XdlNet(inst.getName(), NetType.WIRE);
 				// TODO should this be the instance name or the pad name?
 				// logical_name definitely uses the inst name
 				// value doesn't seem to matter, maybe its pcf related?
@@ -52,8 +53,8 @@ public class V6PackerUtils implements PackerUtils {
 		}
 	}
 
-	private void handleStatics(Design design) {
-		for (Instance inst : design.getInstances()) {
+	private void handleStatics(XdlDesign design) {
+		for (XdlInstance inst : design.getInstances()) {
 			switch (inst.getType()) {
 				case SLICEL :
 				case SLICEM :
@@ -69,7 +70,7 @@ public class V6PackerUtils implements PackerUtils {
 						}
 					}
 					boolean noUserLogic = true;
-					for (Attribute attr : inst.getAttributes()) {
+					for (XdlAttribute attr : inst.getAttributes()) {
 						if (!attr.getPhysicalName().matches("_(VCC|GND)_SOURCE")) {
 							noUserLogic = false;
 							break;
@@ -94,7 +95,7 @@ public class V6PackerUtils implements PackerUtils {
 		}
 	}
 
-	private boolean lutIsStaticSource(Instance inst, char le) {
+	private boolean lutIsStaticSource(XdlInstance inst, char le) {
 		String lut5Name = le + "5LUT";
 		String lut6Name = le + "6LUT";
 		String staticEqnPattern = "#LUT:O6=[01]";
@@ -106,7 +107,7 @@ public class V6PackerUtils implements PackerUtils {
 		return lut5Unused && lut6IsStatic;
 	}
 
-	private boolean appropriateStaticRouting(Instance inst, char le) {
+	private boolean appropriateStaticRouting(XdlInstance inst, char le) {
 		String oUsedMuxName = le + "USED";
 		String f7MuxName = "F7" + (le == 'A' || le == 'B' ? "A" : "B") + "MUX";
 		String outMuxName = le + "OUTMUX";
@@ -120,15 +121,15 @@ public class V6PackerUtils implements PackerUtils {
 		return oUsedMuxUsed && !f7MuxUsed && !outMuxUsed && !ffMuxUsed;
 	}
 
-	private void handleRouteThroughs(Design design, Device device) {
-		for (Net net : design.getNets()) {
+	private void handleRouteThroughs(XdlDesign design, Device device) {
+		for (XdlNet net : design.getNets()) {
 			for (PIP pip : net.getPIPs()) {
 				RouteThrough rt = getRouteThrough(device, pip);
 				if (rt != null) {
 					Site site = rt.site;
-					Instance inst = design.getInstanceAtPrimitiveSite(site);
+					XdlInstance inst = design.getInstanceAtPrimitiveSite(site);
 					if (inst == null) {
-						inst = new Instance("XDL_DUMMY_" + site.getTile().getName() +
+						inst = new XdlInstance("XDL_DUMMY_" + site.getTile().getName() +
 								"_" + site.getName(), rt.rt.getType());
 						design.addInstance(inst);
 						inst.place(site);
@@ -158,22 +159,22 @@ public class V6PackerUtils implements PackerUtils {
 		return null;
 	}
 
-	private void mergeDMuxNetsIntoCoutNets(Design design) {
-		for (Instance inst : design.getInstances()) {
+	private void mergeDMuxNetsIntoCoutNets(XdlDesign design) {
+		for (XdlInstance inst : design.getInstances()) {
 			if (sharesCarryChainWithDMUX(inst)) {
-				Pin coutPin = inst.getPin("COUT");
-				Pin dmuxPin = inst.getPin("DMUX");
-				Attribute dmuxout = inst.getAttribute("DOUTMUX");
+				XdlPin coutPin = inst.getPin("COUT");
+				XdlPin dmuxPin = inst.getPin("DMUX");
+				XdlAttribute dmuxout = inst.getAttribute("DOUTMUX");
 				// Get the sink pins on the DMUX net
-				List<Pin> toMove = new ArrayList<>();
-				for (Pin pin : dmuxPin.getNet().getPins()) {
+				List<XdlPin> toMove = new ArrayList<>();
+				for (XdlPin pin : dmuxPin.getNet().getPins()) {
 					if (pin != dmuxPin) {
 						toMove.add(pin);
 					}
 				}
 
 				// move all of the DMUX pins into the COUT net
-				for (Pin pin : toMove) {
+				for (XdlPin pin : toMove) {
 					dmuxPin.getNet().removePin(pin);
 					coutPin.getNet().addPin(pin);
 				}
@@ -185,13 +186,13 @@ public class V6PackerUtils implements PackerUtils {
 		}
 	}
 
-	private boolean sharesCarryChainWithDMUX(Instance inst) {
+	private boolean sharesCarryChainWithDMUX(XdlInstance inst) {
 		if (inst.getType() == SiteType.SLICEL || inst.getType() == SiteType.SLICEM) {
-			Pin coutPin = inst.getPin("COUT");
+			XdlPin coutPin = inst.getPin("COUT");
 			if (coutPin != null && coutPin.getNet() != null) {
-				Pin dmuxPin = inst.getPin("DMUX");
+				XdlPin dmuxPin = inst.getPin("DMUX");
 				if (dmuxPin != null && dmuxPin.getNet() != null) {
-					Attribute doutmux = inst.getAttribute("DOUTMUX");
+					XdlAttribute doutmux = inst.getAttribute("DOUTMUX");
 					return doutmux != null && doutmux.getValue().equals("CY");
 				}
 			}

@@ -18,11 +18,10 @@
  * get a copy of the license at <http://www.gnu.org/licenses/>.
  * 
  */
-package edu.byu.ece.rapidSmith.design;
+package edu.byu.ece.rapidSmith.design.xdl;
 
-import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.design.AbstractDesign;
 import edu.byu.ece.rapidSmith.device.Site;
-import edu.byu.ece.rapidSmith.device.WireEnumerator;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 import java.util.*;
@@ -36,7 +35,7 @@ import java.util.*;
  * @author Chris Lavin
  * Created on: Jun 22, 2010
  */
-public class Design extends AbstractDesign {
+public class XdlDesign extends AbstractDesign {
 
 	public static final String DEFAULT_NCD_VERSION = "v3.2"; // current and final supported version of XDL
 
@@ -44,17 +43,17 @@ public class Design extends AbstractDesign {
 	/**  XDL is typically generated from NCD, this is the version of that NCD file (v3.2 is typical) */
 	private String NCDVersion;
 	/**  All of the attributes in the design */
-	private ArrayList<Attribute> attributes;
+	private ArrayList<XdlAttribute> attributes;
 	/** This is the list of modules or macros in the design */
-	private HashMap<String,Module> modules;
+	private HashMap<String,XdlModule> modules;
 	/** Keeps track of module instances and groups them according to module instance name */
-	private HashMap<String,ModuleInstance> moduleInstances;
+	private HashMap<String,XdlModuleInstance> moduleInstances;
 	/** This is a list of all the instances of primitives and macros in the design */
-	private HashMap<String,Instance> instances;
+	private HashMap<String,XdlInstance> instances;
 	/** A map used to keep track of all used primitive sites used by the design */
-	private HashMap<Site,Instance> usedPrimitiveSites;
+	private HashMap<Site,XdlInstance> usedPrimitiveSites;
 	/** This is a list of all the nets in the design */
-	private HashMap<String,Net> nets;
+	private HashMap<String,XdlNet> nets;
 	/** A flag designating if this is a design or hard macro */
 	private boolean isHardMacro;
 
@@ -67,7 +66,7 @@ public class Design extends AbstractDesign {
 	 * the default "3.2".  The design is set as not a hard macro.  All other
 	 * structures are initialized as empty.
 	 */
-	public Design(){
+	public XdlDesign(){
 		super();
 		init();
 	}
@@ -82,7 +81,7 @@ public class Design extends AbstractDesign {
 	 * @param designName the name for created design
 	 * @param partName the target part for the design
 	 */
-	public Design(String designName, String partName){
+	public XdlDesign(String designName, String partName){
 		super(designName, partName);
 		init();
 	}
@@ -95,7 +94,7 @@ public class Design extends AbstractDesign {
 		attributes = new ArrayList<>();
 		isHardMacro = false;
 		moduleInstances = new HashMap<>();
-		NCDVersion = Design.DEFAULT_NCD_VERSION;
+		NCDVersion = XdlDesign.DEFAULT_NCD_VERSION;
 
 	}
 
@@ -131,7 +130,7 @@ public class Design extends AbstractDesign {
 	 * Returns the Collection containing the attributes of this design.
 	 * @return the attributes of this design.
 	 */
-	public ArrayList<Attribute> getAttributes() {
+	public ArrayList<XdlAttribute> getAttributes() {
 		return attributes;
 	}
 
@@ -141,7 +140,7 @@ public class Design extends AbstractDesign {
 	 * @param attributes A collection containing the new attributes to associate
 	 *   with this design.
 	 */
-	public void setAttributes(ArrayList<Attribute> attributes) {
+	public void setAttributes(ArrayList<XdlAttribute> attributes) {
 		this.attributes = attributes;
 	}
 
@@ -153,7 +152,7 @@ public class Design extends AbstractDesign {
 	 * @param value value of the attribute
 	 */
 	public void addAttribute(String physicalName, String logicalName, String value) {
-		attributes.add(new Attribute(physicalName, logicalName, value));
+		attributes.add(new XdlAttribute(physicalName, logicalName, value));
 	}
 
 	/**
@@ -172,7 +171,7 @@ public class Design extends AbstractDesign {
 	 *
 	 * @param attribute the attribute to add
 	 */
-	public void addAttribute(Attribute attribute) {
+	public void addAttribute(XdlAttribute attribute) {
 		attributes.add(attribute);
 	}
 
@@ -184,7 +183,7 @@ public class Design extends AbstractDesign {
 	 *   physical name
 	 */
 	public boolean hasAttribute(String physicalName) {
-		for (Attribute attr : attributes) {
+		for (XdlAttribute attr : attributes) {
 			if (attr.getPhysicalName().equals(physicalName)) {
 				return true;
 			}
@@ -214,7 +213,7 @@ public class Design extends AbstractDesign {
 	 * is a hard macro (a hard macro design will have only one module).
 	 * @return the module of the hard macro, null if this is not a hard macro design
 	 */
-	public Module getHardMacro(){
+	public XdlModule getHardMacro(){
 		if(isHardMacro){
 			return modules.values().iterator().next();
 		}
@@ -226,7 +225,7 @@ public class Design extends AbstractDesign {
 	 * @param name the name of the instance to get
 	 * @return the instance with the specified name, or null if it does not exist
 	 */
-	public Instance getInstance(String name){
+	public XdlInstance getInstance(String name){
 		return instances.get(name);
 	}
 
@@ -234,7 +233,7 @@ public class Design extends AbstractDesign {
 	 * Returns the Collection of instances in the design.
 	 * @return the instances of the design
 	 */
-	public Collection<Instance> getInstances(){
+	public Collection<XdlInstance> getInstances(){
 		return instances.values();
 	}
 
@@ -242,7 +241,7 @@ public class Design extends AbstractDesign {
 	 * Returns the map of instance names to instances in this design.
 	 * @return the map of instances in this design
 	 */
-	public HashMap<String,Instance> getInstanceMap(){
+	public HashMap<String,XdlInstance> getInstanceMap(){
 		return instances;
 	}
 
@@ -250,7 +249,7 @@ public class Design extends AbstractDesign {
 	 * Adds an instance to this design.
 	 * @param inst the instance to add
 	 */
-	public void addInstance(Instance inst){
+	public void addInstance(XdlInstance inst){
 		if(inst.isPlaced()){
 			setPrimitiveSiteUsed(inst.getPrimitiveSite(), inst);
 		}
@@ -278,11 +277,11 @@ public class Design extends AbstractDesign {
 	 * @param instance the instance in the design to remove
 	 * @return true if the operation was successful
 	 */
-	public boolean removeInstance(Instance instance){
+	public boolean removeInstance(XdlInstance instance){
 		if(instance.getModuleInstance() != null){
 			return false;
 		}
-		for(Pin p : instance.getPins()){
+		for(XdlPin p : instance.getPins()){
 			// TODO - We can sort through PIPs to only remove those that need
 			// to be removed, we just need a method to do that
 			if(p.getNet() != null){
@@ -306,7 +305,7 @@ public class Design extends AbstractDesign {
 	 * @param name the name of the net to get
 	 * @return the net with the specified name, or null if it does not exist
 	 */
-	public Net getNet(String name){
+	public XdlNet getNet(String name){
 		return nets.get(name);
 	}
 
@@ -314,7 +313,7 @@ public class Design extends AbstractDesign {
 	 * Returns the Collections of nets in this design.
 	 * @return the nets in this design
 	 */
-	public Collection<Net> getNets(){
+	public Collection<XdlNet> getNets(){
 		return nets.values();
 	}
 
@@ -322,7 +321,7 @@ public class Design extends AbstractDesign {
 	 * Returns the map of nets in this design.
 	 * @return the nets of this design
 	 */
-	public HashMap<String,Net> getNetMap(){
+	public HashMap<String,XdlNet> getNetMap(){
 		return nets;
 	}
 
@@ -330,7 +329,7 @@ public class Design extends AbstractDesign {
 	 * Adds a net to this design.
 	 * @param net the net to add
 	 */
-	public void addNet(Net net){
+	public void addNet(XdlNet net){
 		nets.put(net.getName(), net);
 	}
 
@@ -338,9 +337,9 @@ public class Design extends AbstractDesign {
 	 * Sets the nets of this design.
 	 * @param netList the new list of nets for this design
 	 */
-	public void setNets(Collection<Net> netList){
+	public void setNets(Collection<XdlNet> netList){
 		nets.clear();
-		for(Net net : netList) {
+		for(XdlNet net : netList) {
 			addNet(net);
 		}
 	}
@@ -350,7 +349,7 @@ public class Design extends AbstractDesign {
 	 * @param name the name of the net to remove
 	 */
 	public void removeNet(String name){
-		Net n = getNet(name);
+		XdlNet n = getNet(name);
 		if(n != null)
 			removeNet(n);
 	}
@@ -359,8 +358,8 @@ public class Design extends AbstractDesign {
 	 * Removes the net from this design
 	 * @param net the net to remove from the design
 	 */
-	public void removeNet(Net net){
-		for(Pin p : net.getPins()){
+	public void removeNet(XdlNet net){
+		for(XdlPin p : net.getPins()){
 			p.getInstance().getNetList().remove(net);
 			if(net.equals(p.getNet())){
 				p.setNet(null);
@@ -374,7 +373,7 @@ public class Design extends AbstractDesign {
 	 * @param name the name of the module to get
 	 * @return the module with the specified name, if it exists, null otherwise
 	 */
-	public Module getModule(String name){
+	public XdlModule getModule(String name){
 		return modules.get(name);
 	}
 
@@ -382,7 +381,7 @@ public class Design extends AbstractDesign {
 	 * Returns the Collection of modules in this design.
 	 * @return the modules of this design
 	 */
-	public Collection<Module> getModules(){
+	public Collection<XdlModule> getModules(){
 		return modules.values();
 	}
 
@@ -390,7 +389,7 @@ public class Design extends AbstractDesign {
 	 * Adds a module to this design.
 	 * @param module the module to add
 	 */
-	public void addModule(Module module){
+	public void addModule(XdlModule module){
 		modules.put(module.getName(), module);
 	}
 
@@ -399,7 +398,7 @@ public class Design extends AbstractDesign {
 	 * @param name the name of the moduleInstance to get
 	 * @return the moduleInstance name, or null if it does not exist
 	 */
-	public ModuleInstance getModuleInstance(String name){
+	public XdlModuleInstance getModuleInstance(String name){
 		return moduleInstances.get(name);
 	}
 
@@ -407,7 +406,7 @@ public class Design extends AbstractDesign {
 	 * Returns the Collection of all of the module instances in this design.
 	 * @return the module instances in this design
 	 */
-	public Collection<ModuleInstance> getModuleInstances(){
+	public Collection<XdlModuleInstance> getModuleInstances(){
 		return moduleInstances.values();
 	}
 
@@ -416,7 +415,7 @@ public class Design extends AbstractDesign {
 	 * module instance name.
 	 * @return the Map containing all current module instances.
 	 */
-	public HashMap<String, ModuleInstance> getModuleInstanceMap(){
+	public HashMap<String, XdlModuleInstance> getModuleInstanceMap(){
 		return moduleInstances;
 	}
 
@@ -428,21 +427,21 @@ public class Design extends AbstractDesign {
 	 * @param module the module for the new ModuleInstance
 	 * @return the new ModuleInstance
 	 */
-	public ModuleInstance createModuleInstance(String name, Module module){
+	public XdlModuleInstance createModuleInstance(String name, XdlModule module){
 		if(modules.get(module.getName()) == null)
 			modules.put(module.getName(), module);
 
-		ModuleInstance modInst = new ModuleInstance(name, this);
+		XdlModuleInstance modInst = new XdlModuleInstance(name, this);
 		moduleInstances.put(modInst.getName(), modInst);
 		modInst.setModule(module);
 		String prefix = modInst.getName()+"/";
-		HashMap<Instance,Instance> inst2instMap = new HashMap<>();
-		for(Instance templateInst : module.getInstances()){
-			Instance inst = new Instance();
+		HashMap<XdlInstance,XdlInstance> inst2instMap = new HashMap<>();
+		for(XdlInstance templateInst : module.getInstances()){
+			XdlInstance inst = new XdlInstance();
 			inst.setName(prefix+templateInst.getName());
 			inst.setModuleTemplate(module);
 			inst.setModuleTemplateInstance(templateInst);
-			for(Attribute attr : templateInst.getAttributes()){
+			for(XdlAttribute attr : templateInst.getAttributes()){
 				inst.addAttribute(attr);
 			}
 			inst.setBonded(templateInst.getBonded());
@@ -457,24 +456,24 @@ public class Design extends AbstractDesign {
 			inst2instMap.put(templateInst,inst);
 		}
 
-		HashMap<Pin,Port> pinToPortMap = new HashMap<>();
-		for(Port port : module.getPorts()){
+		HashMap<XdlPin,XdlPort> pinToPortMap = new HashMap<>();
+		for(XdlPort port : module.getPorts()){
 			pinToPortMap.put(port.getPin(),port);
 		}
 
-		for(Net templateNet : module.getNets()){
-			Net net = new Net(prefix+templateNet.getName(), templateNet.getType());
+		for(XdlNet templateNet : module.getNets()){
+			XdlNet net = new XdlNet(prefix+templateNet.getName(), templateNet.getType());
 
-			HashSet<Instance> instanceList = new HashSet<>();
-			Port port = null;
-			for(Pin templatePin : templateNet.getPins()){
-				Port temp = pinToPortMap.get(templatePin);
+			HashSet<XdlInstance> instanceList = new HashSet<>();
+			XdlPort port = null;
+			for(XdlPin templatePin : templateNet.getPins()){
+				XdlPort temp = pinToPortMap.get(templatePin);
 				port = (temp != null)? temp : port;
-				Instance inst = inst2instMap.get(templatePin.getInstance());
+				XdlInstance inst = inst2instMap.get(templatePin.getInstance());
 				if(inst == null)
 					System.out.println("DEBUG: could not find Instance "+prefix+templatePin.getInstanceName());
 				instanceList.add(inst);
-				Pin pin = new Pin(templatePin.isOutPin(), templatePin.getName(), inst);
+				XdlPin pin = new XdlPin(templatePin.isOutPin(), templatePin.getName(), inst);
 				net.addPin(pin);
 			}
 
@@ -489,15 +488,15 @@ public class Design extends AbstractDesign {
 			}
 			this.addNet(net);
 			if(templateNet.hasAttributes()){
-				for(Attribute a: templateNet.getAttributes()){
+				for(XdlAttribute a: templateNet.getAttributes()){
 					if(a.getPhysicalName().contains("BELSIG")){
-						net.addAttribute(new Attribute(a.getPhysicalName(), a.getLogicalName().replace(a.getValue(), modInst.getName() + "/" + a.getValue()), modInst.getName() + "/" + a.getValue()));
+						net.addAttribute(new XdlAttribute(a.getPhysicalName(), a.getLogicalName().replace(a.getValue(), modInst.getName() + "/" + a.getValue()), modInst.getName() + "/" + a.getValue()));
 					}else{
 						net.addAttribute(a);
 					}
 				}
 			}
-			for(Instance inst : instanceList){
+			for(XdlInstance inst : instanceList){
 				inst.addToNetList(net);
 			}
 		}
@@ -516,11 +515,11 @@ public class Design extends AbstractDesign {
 	 * @param moduleInstanceName the name of the module instance to add the instance to
 	 * @return the module instance that the instance was added to
 	 */
-	public ModuleInstance addInstanceToModuleInstances(Instance inst, String moduleInstanceName){
-		ModuleInstance mi = moduleInstances.get(moduleInstanceName);
+	public XdlModuleInstance addInstanceToModuleInstances(XdlInstance inst, String moduleInstanceName){
+		XdlModuleInstance mi = moduleInstances.get(moduleInstanceName);
 
 		if(mi == null){
-			mi = new ModuleInstance(moduleInstanceName, this);
+			mi = new XdlModuleInstance(moduleInstanceName, this);
 			moduleInstances.put(moduleInstanceName, mi);
 			mi.setModule(inst.getModuleTemplate());
 		}
@@ -543,7 +542,7 @@ public class Design extends AbstractDesign {
 	 * @param site the site of the desired instance
 	 * @return the instance at the specified site, or null if the site is unoccupied
 	 */
-	public Instance getInstanceAtPrimitiveSite(Site site){
+	public XdlInstance getInstanceAtPrimitiveSite(Site site){
 		return usedPrimitiveSites.get(site);
 	}
 
@@ -563,7 +562,7 @@ public class Design extends AbstractDesign {
 	 * is null
 	 * @return the instance previously at the specified site
 	 */
-	Instance setPrimitiveSiteUsed(Site site, Instance inst){
+	XdlInstance setPrimitiveSiteUsed(Site site, XdlInstance inst){
 		if(site == null) return null;
 		return usedPrimitiveSites.put(site, inst);
 	}
@@ -573,7 +572,7 @@ public class Design extends AbstractDesign {
 	 * @param site the site to free
 	 * @return the instance previously at the specified site
 	 */
-	Instance releasePrimitiveSite(Site site){
+	XdlInstance releasePrimitiveSite(Site site){
 		return usedPrimitiveSites.remove(site);
 	}
 
@@ -582,7 +581,7 @@ public class Design extends AbstractDesign {
 	 */
 	public void unrouteDesign(){
 		// Just remove all the PIPs
-		for(Net net : nets.values()){
+		for(XdlNet net : nets.values()){
 			net.getPIPs().clear();
 		}
 	}
@@ -598,11 +597,11 @@ public class Design extends AbstractDesign {
 			MessageGenerator.briefError("ERROR: Cannot flatten a hard macro design");
 			return;
 		}
-		for(ModuleInstance mi : moduleInstances.values()){
-			for(Instance instance : mi.getInstances()){
+		for(XdlModuleInstance mi : moduleInstances.values()){
+			for(XdlInstance instance : mi.getInstances()){
 				instance.detachFromModule();
 			}
-			for(Net net : mi.getNets()){
+			for(XdlNet net : mi.getNets()){
 				net.detachFromModule();
 			}
 		}

@@ -2,6 +2,7 @@ package edu.byu.ece.rapidSmith.design.unpacker;
 
 import edu.byu.ece.rapidSmith.design.*;
 import edu.byu.ece.rapidSmith.design.subsite.*;
+import edu.byu.ece.rapidSmith.design.xdl.*;
 import edu.byu.ece.rapidSmith.device.*;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
@@ -28,7 +29,7 @@ public class XdlUnpacker {
 	private Map<SiteType, Site> siteTemplates;
 	private Map<Cell, CellCreator> cellCreators;
 
-	private Map<Net, CellNet> netMap;
+	private Map<XdlNet, CellNet> netMap;
 	private Map<Bel, Cell> instanceBelToCellMap;
 
 	private CellNet cellNet;
@@ -65,7 +66,7 @@ public class XdlUnpacker {
 		}
 	}
 
-	public CellDesign unpack(Design design) {
+	public CellDesign unpack(XdlDesign design) {
 		return unpack(design, true);
 	}
 
@@ -78,7 +79,7 @@ public class XdlUnpacker {
 		}
 	}
 
-	public CellDesign unpack(Design design, boolean preserveRouting) {
+	public CellDesign unpack(XdlDesign design, boolean preserveRouting) {
 		device = design.getDevice();
 		cellCreators = new HashMap<>();
 
@@ -109,17 +110,17 @@ public class XdlUnpacker {
 		return ret;
 	}
 
-	private void setPrimitiveTypes(Design design) {
+	private void setPrimitiveTypes(XdlDesign design) {
 		// Sets the type of the primitive site this pin exists on
-		for (Instance inst : design.getInstances()) {
+		for (XdlInstance inst : design.getInstances()) {
 			if (inst.isPlaced())
 				inst.getPrimitiveSite().setType(inst.getType());
 		}
 	}
 
-	private void createAndAddGlobalNets(Design design) {
+	private void createAndAddGlobalNets(XdlDesign design) {
 		netMap = new HashMap<>();
-		for (Net net : design.getNets()) {
+		for (XdlNet net : design.getNets()) {
 			// Don't deal with pin-less nets, most likely they are the IO pseudo nets
 			if (net.getPins().isEmpty())
 				continue;
@@ -152,7 +153,7 @@ public class XdlUnpacker {
 	}
 
 	// Build one or more route trees based on the PIPs in the net
-	private List<RouteTree> buildRouteTreeFromPips(Pin sourcePin, Collection<PIP> pips) {
+	private List<RouteTree> buildRouteTreeFromPips(XdlPin sourcePin, Collection<PIP> pips) {
 		Set<PIP> pipSet = new HashSet<>(pips);
 		Map<Wire, RouteTree> routeTreeMap = new HashMap<>();
 		Set<Wire> visited = new HashSet<>();
@@ -214,9 +215,9 @@ public class XdlUnpacker {
 		return rt;
 	}
 
-	private void createAndAddInstances(Design design) {
+	private void createAndAddInstances(XdlDesign design) {
 		// Now to handle the instances
-		for (Instance inst : design.getInstances()) {
+		for (XdlInstance inst : design.getInstances()) {
 			// Map from the bel names to the cell at that location
 			instanceBelToCellMap = new HashMap<>();
 			// Use the cell creators to create a cell for each used BEL in the instance
@@ -229,7 +230,7 @@ public class XdlUnpacker {
 		}
 	}
 
-	private void createAndAddCells(Instance inst) {
+	private void createAndAddCells(XdlInstance inst) {
 		// We'll work off of the BEL templates in the site to distinguish which
 		// attributes are actually BELs
 		Site siteTemplate = siteTemplates.get(inst.getType());
@@ -239,7 +240,7 @@ public class XdlUnpacker {
 		for (Bel belTemplate : siteTemplate.getBels()) {
 			// This BEL is used if the attribute exists and is not configured
 			// to #OFF
-			Attribute attr = inst.getAttribute(belTemplate.getId().getName());
+			XdlAttribute attr = inst.getAttribute(belTemplate.getId().getName());
 			if (attr != null && !attr.getValue().equals("#OFF")) {
 				// Make a cell creator object for this cell, create the cell,
 				// and add it to the molecule
@@ -258,9 +259,9 @@ public class XdlUnpacker {
 		}
 	}
 
-	private void createAndConnectNetsFromInputPorts(Instance inst) {
+	private void createAndConnectNetsFromInputPorts(XdlInstance inst) {
 		// create nets all of the input ports/pins
-		for (Pin pin : inst.getPins()) {
+		for (XdlPin pin : inst.getPins()) {
 			if (pin.isOutPin() || pin.getNet() == null)
 				continue;
 
@@ -273,7 +274,7 @@ public class XdlUnpacker {
 		}
 	}
 
-	private void createAndConnectNetsFromCells(Instance inst) {
+	private void createAndConnectNetsFromCells(XdlInstance inst) {
 		for (Bel bel : instanceBelToCellMap.keySet()) {
 			// get the bel template to determine the names of the pins to add to the cell
 			Cell cell = instanceBelToCellMap.get(bel);
@@ -294,7 +295,7 @@ public class XdlUnpacker {
 	}
 
 	private void createAndConnectNetsFromPins(
-			Instance inst, Bel belTemplate, Cell cell)	{
+			XdlInstance inst, Bel belTemplate, Cell cell)	{
 		for (BelPin belPin : belTemplate.getSources()) {
 			// determine the cell pin to create for this bel pin
 			String cellPinName = cellCreators.get(cell).getCellPin(belPin.getName());
@@ -364,14 +365,14 @@ public class XdlUnpacker {
 	}
 
 	private void buildIntrasiteRoutingNetwork(
-			Instance inst, SiteWire sourceWire) {
+			XdlInstance inst, SiteWire sourceWire) {
 		// follow the pips from the source wire and connect pins and ports
 		RouteTree rt = findSinks(sourceWire, inst);
 		if (preserveRouting && rt != null) // TODO allow for intrasite option routing
 			cellNet.addIntersiteRouteTree(rt);
 	}
 
-	private RouteTree findSinks(SiteWire sourceWire, Instance inst) {
+	private RouteTree findSinks(SiteWire sourceWire, XdlInstance inst) {
 		Site siteTemplate = sourceWire.getSite();
 		RouteTree rt = null;
 
@@ -447,17 +448,17 @@ public class XdlUnpacker {
 	}
 
 	private RouteTree connectToSitePin(
-			SiteWire sourceWire, Instance inst,
+			SiteWire sourceWire, XdlInstance inst,
 			RouteTree rt, Connection c) {
 		// This is a site pin wire, add its related port to the port list
 		SitePin sitePin = c.getSitePin();
 		String sitePinName = sitePin.getName();
-		Pin origDesignPin = inst.getPin(sitePinName);
+		XdlPin origDesignPin = inst.getPin(sitePinName);
 
 		// if null, then this pin is unused in the design and no port exists
 		if (origDesignPin != null && origDesignPin.getNet() != null) {
 			// Route will reach pin, but not poke out into tile fabric
-			Net outerNet = origDesignPin.getNet();
+			XdlNet outerNet = origDesignPin.getNet();
 			mergeCellNetWithExistingNet(netMap.get(outerNet));
 			rt = initRouteTree(rt, sourceWire);
 		}
@@ -479,10 +480,10 @@ public class XdlUnpacker {
 		cellNet = globalNet;
 	}
 
-	private boolean pipUsedInInstances(SiteWire sourceWire, Wire sinkWire, Instance inst) {
-		Attribute pipAttr = sourceWire.getSite().getPipAttribute(
+	private boolean pipUsedInInstances(SiteWire sourceWire, Wire sinkWire, XdlInstance inst) {
+		XdlAttribute pipAttr = sourceWire.getSite().getPipAttribute(
 				sourceWire.getWireEnum(), sinkWire.getWireEnum());
-		Attribute attr = inst.getAttribute(pipAttr.getPhysicalName());
+		XdlAttribute attr = inst.getAttribute(pipAttr.getPhysicalName());
 		return attr != null && attr.getValue().equals(pipAttr.getValue());
 	}
 

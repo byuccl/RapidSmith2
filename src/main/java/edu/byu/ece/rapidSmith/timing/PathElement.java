@@ -20,7 +20,7 @@
  */
 package edu.byu.ece.rapidSmith.timing;
 
-import edu.byu.ece.rapidSmith.design.Pin;
+import edu.byu.ece.rapidSmith.design.xdl.XdlPin;
 
 public abstract class PathElement {
 	/** Delay of the path element */
@@ -28,7 +28,7 @@ public abstract class PathElement {
 	/** Type of the delay element */
 	private String type;
 	/** Primitive Site and Pin where the path elements resides */
-	private Pin pin;
+	private XdlPin pin;
 	
 	/**
 	 * @return the delay
@@ -57,13 +57,13 @@ public abstract class PathElement {
 	/**
 	 * @return the pin
 	 */
-	public Pin getPin() {
+	public XdlPin getPin() {
 		return pin;
 	}
 	/**
 	 * @param pin the pin to set
 	 */
-	public void setPin(Pin pin) {
+	public void setPin(XdlPin pin) {
 		this.pin = pin;
 	}
 	

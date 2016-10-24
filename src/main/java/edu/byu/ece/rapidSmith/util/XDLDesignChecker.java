@@ -27,9 +27,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import edu.byu.ece.rapidSmith.design.Design;
-import edu.byu.ece.rapidSmith.design.Instance;
-import edu.byu.ece.rapidSmith.design.Net;
+import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
+import edu.byu.ece.rapidSmith.design.xdl.XdlInstance;
+import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
 import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
@@ -44,8 +44,8 @@ import edu.byu.ece.rapidSmith.device.Wire;
 public class XDLDesignChecker{
 
 
-	public static ArrayList<Net> setNets(ArrayList<Net> nets, int size){
-		ArrayList<Net> removed = new ArrayList<>();
+	public static ArrayList<XdlNet> setNets(ArrayList<XdlNet> nets, int size){
+		ArrayList<XdlNet> removed = new ArrayList<>();
 		while(size > 0){
 			removed.add(nets.remove(0));
 			size--;
@@ -144,12 +144,12 @@ public class XDLDesignChecker{
 			MessageGenerator.briefMessageAndExit("USAGE: <input.xdl>");
 		}
 
-		Design design = new XDLReader().readDesign(Paths.get(args[0]));
+		XdlDesign design = new XDLReader().readDesign(Paths.get(args[0]));
 
 		// Check for unique placement of primitives
 		MessageGenerator.printHeader("CHECKING FOR UNIQUE PRIMITIVE PLACEMENTS ... ");
-		HashMap<Site, Instance> usedSites = new HashMap<>();
-		for(Instance inst : design.getInstances()){
+		HashMap<Site, XdlInstance> usedSites = new HashMap<>();
+		for(XdlInstance inst : design.getInstances()){
 			if(inst.getPrimitiveSite() == null){
 				System.out.println("Warning: " + inst.getName() +" is unplaced.");
 			}
@@ -167,11 +167,11 @@ public class XDLDesignChecker{
 
 
 		// Check for duplicate PIPs
-		HashMap<PIP,Net> pipMap = new HashMap<>();
+		HashMap<PIP,XdlNet> pipMap = new HashMap<>();
 		MessageGenerator.printHeader("CHECKING FOR DUPLICATE PIPS ... ");
-		for(Net net : design.getNets()){
+		for(XdlNet net : design.getNets()){
 			for(PIP pip : net.getPIPs()){
-				Net tmp = pipMap.get(pip);
+				XdlNet tmp = pipMap.get(pip);
 				if(tmp == null){
 					pipMap.put(pip, net);
 				}
@@ -184,12 +184,12 @@ public class XDLDesignChecker{
 		}
 
 		// Checking for duplicate PIP sinks
-		HashMap<Wire, Net> pipSinks = new HashMap<>();
+		HashMap<Wire, XdlNet> pipSinks = new HashMap<>();
 		MessageGenerator.printHeader("CHECKING FOR DUPLICATE PIP SINKS ... ");
-		for(Net net : design.getNets()){
+		for(XdlNet net : design.getNets()){
 			for(PIP pip : net.getPIPs()){
 				Wire n = new TileWire(pip.getTile(), pip.getEndWire());
-				Net tmp = pipSinks.get(n);
+				XdlNet tmp = pipSinks.get(n);
 				if(tmp == null){
 					pipSinks.put(n, net);
 				}

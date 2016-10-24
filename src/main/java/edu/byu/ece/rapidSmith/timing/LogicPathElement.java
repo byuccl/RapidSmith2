@@ -23,14 +23,14 @@ package edu.byu.ece.rapidSmith.timing;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import edu.byu.ece.rapidSmith.design.Instance;
+import edu.byu.ece.rapidSmith.design.xdl.XdlInstance;
 
 public class LogicPathElement extends PathElement implements Serializable{
 
 	private static final long serialVersionUID = -1302954929866402566L;
 
 	/** The instance or physical resource */
-	private Instance instance;
+	private XdlInstance instance;
 	/** The logical resources (FFs,...) part of this path element */
 	private ArrayList<String> logicalResources = new ArrayList<String>();
 	
@@ -38,13 +38,13 @@ public class LogicPathElement extends PathElement implements Serializable{
 	/**
 	 * @return the instance
 	 */
-	public Instance getInstance() {
+	public XdlInstance getInstance() {
 		return instance;
 	}
 	/**
 	 * @param instance the instance to set
 	 */
-	public void setInstance(Instance instance) {
+	public void setInstance(XdlInstance instance) {
 		this.instance = instance;
 	}
 	/**

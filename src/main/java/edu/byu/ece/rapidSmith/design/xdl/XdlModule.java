@@ -18,13 +18,14 @@
  * get a copy of the license at <http://www.gnu.org/licenses/>.
  * 
  */
-package edu.byu.ece.rapidSmith.design;
+package edu.byu.ece.rapidSmith.design.xdl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
+import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.Tile;
@@ -36,7 +37,7 @@ import edu.byu.ece.rapidSmith.device.TileType;
  * @author Chris Lavin
  * Created on: Jun 22, 2010
  */
-public class Module implements Serializable{
+public class XdlModule implements Serializable{
 
 	private static final long serialVersionUID = 7127893920489370872L;
 	/** This is the key into externalPortMap for retrieving the constraints used to build the hard macro */
@@ -44,15 +45,15 @@ public class Module implements Serializable{
 	/** Unique name of this module */
 	private String name;
 	/** All of the attributes in this module */
-	private ArrayList<Attribute> attributes;
+	private ArrayList<XdlAttribute> attributes;
 	/** This is the anchor of the module */
-	private Instance anchor;
+	private XdlInstance anchor;
 	/** Ports on the module */
-	private HashMap<String, Port> portMap;
+	private HashMap<String, XdlPort> portMap;
 	/** Instances which are part of the module */
-	private HashMap<String,Instance> instanceMap;
+	private HashMap<String,XdlInstance> instanceMap;
 	/** Nets of the module */
-	private HashMap<String,Net> netMap;
+	private HashMap<String,XdlNet> netMap;
 	/** Keeps track of the minimum clock period of this module */
 	private float minClkPeriod = Float.MAX_VALUE;
 	/** Provides a catch-all map to store information about hard macro */
@@ -63,13 +64,13 @@ public class Module implements Serializable{
 	/**
 	 * Empty constructor, strings are null, everything else is initialized
 	 */
-	public Module(){
+	public XdlModule(){
 		name = null;
 		anchor = null;
-		attributes = new ArrayList<Attribute>();
-		portMap = new HashMap<String, Port>();
-		instanceMap = new HashMap<String,Instance>();
-		netMap = new HashMap<String,Net>();
+		attributes = new ArrayList<XdlAttribute>();
+		portMap = new HashMap<String, XdlPort>();
+		instanceMap = new HashMap<String,XdlInstance>();
+		netMap = new HashMap<String,XdlNet>();
 		validPlacements = new ArrayList<Site>();
 	}
 	
@@ -78,10 +79,10 @@ public class Module implements Serializable{
 	 * settings and adds this module to the module list.  
 	 * @return A complete hard macro design with this module as the hard macro.
 	 */
-	public Design createDesignFromModule(String partName){
-		Design design = new Design();
+	public XdlDesign createDesignFromModule(String partName){
+		XdlDesign design = new XdlDesign();
 		design.setPartName(partName);
-		design.setName(Design.hardMacroDesignName);
+		design.setName(XdlDesign.hardMacroDesignName);
 		design.setIsHardMacro(true);
 		design.addModule(this);
 		return design;
@@ -108,7 +109,7 @@ public class Module implements Serializable{
 	 * Gets and returns the current attributes of this module
 	 * @return The current attributes of this module
 	 */
-	public ArrayList<Attribute> getAttributes(){
+	public ArrayList<XdlAttribute> getAttributes(){
 		return attributes;
 	}
 	
@@ -118,14 +119,14 @@ public class Module implements Serializable{
 	 * @param value Value to set the new attribute to.
 	 */
 	public void addAttribute(String physicalName, String logicalName, String value){
-		attributes.add(new Attribute(physicalName, logicalName, value));
+		attributes.add(new XdlAttribute(physicalName, logicalName, value));
 	}
 	
 	/**
 	 * Add the attribute to this module.
 	 * @param attribute The attribute to add.
 	 */
-	public void addAttribute(Attribute attribute){
+	public void addAttribute(XdlAttribute attribute){
 		attributes.add(attribute);
 	}
 	
@@ -137,7 +138,7 @@ public class Module implements Serializable{
 	 * 		   physical name physicalName, false otherwise.
 	 */
 	public boolean hasAttribute(String physicalName){
-		for(Attribute attr : attributes){
+		for(XdlAttribute attr : attributes){
 			if(attr.getPhysicalName().equals(physicalName)){
 				return true;
 			}
@@ -150,7 +151,7 @@ public class Module implements Serializable{
 	 * @param attributes The new list of attributes to associate with this
 	 * module.
 	 */
-	public void setAttributes(ArrayList<Attribute> attributes){
+	public void setAttributes(ArrayList<XdlAttribute> attributes){
 		this.attributes = attributes;
 	}
 
@@ -159,7 +160,7 @@ public class Module implements Serializable{
 	 * This gets and returns the instance anchor of the module.
 	 * @return Instance which is the anchor for this module.
 	 */
-	public Instance getAnchor(){
+	public XdlInstance getAnchor(){
 		return anchor;
 	}
 	
@@ -168,7 +169,7 @@ public class Module implements Serializable{
 	 * @param name Name of the instance in the module to get.
 	 * @return The instance name or null if it does not exist.
 	 */
-	public Instance getInstance(String name){
+	public XdlInstance getInstance(String name){
 		return instanceMap.get(name);
 	}
 	
@@ -176,7 +177,7 @@ public class Module implements Serializable{
 	 * Gets and returns all of the instances part of this module.
 	 * @return The instances that are part of this module.
 	 */
-	public Collection<Instance> getInstances(){
+	public Collection<XdlInstance> getInstances(){
 		return instanceMap.values();
 	}
 	
@@ -185,7 +186,7 @@ public class Module implements Serializable{
 	 * @param name Name of the net in the module to get.
 	 * @return The net name or null if it does not exist.
 	 */
-	public Net getNet(String name){
+	public XdlNet getNet(String name){
 		return netMap.get(name);
 	}
 	
@@ -193,7 +194,7 @@ public class Module implements Serializable{
 	 * Gets and returns all the nets that are part of the module.
 	 * @return The nets that are part of this module.
 	 */
-	public Collection<Net> getNets(){
+	public Collection<XdlNet> getNets(){
 		return netMap.values();
 	}
 	
@@ -202,7 +203,7 @@ public class Module implements Serializable{
 	 * @param name The name of the net to remove.
 	 */
 	public void removeNet(String name){
-		Net n = getNet(name);
+		XdlNet n = getNet(name);
 		if(n != null) removeNet(n);
 	}
 	
@@ -210,8 +211,8 @@ public class Module implements Serializable{
 	 * Removes a net from the design
 	 * @param net The net to remove from the design.
 	 */
-	public void removeNet(Net net){
-		for(Pin p : net.getPins()){
+	public void removeNet(XdlNet net){
+		for(XdlPin p : net.getPins()){
 			p.getInstance().getNetList().remove(net);
 			if(p.getNet().equals(net)){
 				p.setNet(null);
@@ -241,11 +242,11 @@ public class Module implements Serializable{
 	 * @param instance The instance in the design to remove.
 	 * @return True if the operation was successful, false otherwise.
 	 */
-	public boolean removeInstance(Instance instance){
+	public boolean removeInstance(XdlInstance instance){
 		if(instance.getModuleInstance() != null){
 			return false;
 		}
-		for(Pin p : instance.getPins()){
+		for(XdlPin p : instance.getPins()){
 			p.getNet().unroute(); 
 			if(p.getNet().getPins().size() == 1){
 				netMap.remove(p.getNet().getName());
@@ -267,7 +268,7 @@ public class Module implements Serializable{
 	 * Sets the anchor instance for this module.
 	 * @param anchor New anchor instance for this module.
 	 */
-	public void setAnchor(Instance anchor){
+	public void setAnchor(XdlInstance anchor){
 		this.anchor = anchor;
 	}
 	
@@ -275,7 +276,7 @@ public class Module implements Serializable{
 	 * Gets and returns the port list for this module.
 	 * @return The port list for this module.
 	 */
-	public Collection<Port> getPorts(){
+	public Collection<XdlPort> getPorts(){
 		return portMap.values();
 	}
 
@@ -283,9 +284,9 @@ public class Module implements Serializable{
 	 * Sets the port list for this module.
 	 * @param portList The new port list to be set for this module.
 	 */
-	public void setPorts(ArrayList<Port> portList){
+	public void setPorts(ArrayList<XdlPort> portList){
 		portMap.clear();
-		for(Port p: portList){
+		for(XdlPort p: portList){
 			addPort(p);
 		}
 	}
@@ -294,7 +295,7 @@ public class Module implements Serializable{
 	 * Adds a port to this module.
 	 * @param port The new port to add.
 	 */
-	public void addPort(Port port){
+	public void addPort(XdlPort port){
 		this.portMap.put(port.getName(), port);
 	}
 	
@@ -303,7 +304,7 @@ public class Module implements Serializable{
 	 * @param name the port's name
 	 * @return the port
 	 */
-	public Port getPort(String name){
+	public XdlPort getPort(String name){
 		return this.portMap.get(name);
 	}
 	
@@ -311,7 +312,7 @@ public class Module implements Serializable{
 	 * Adds a net to this module.
 	 * @param net The net to add to the module.
 	 */
-	public void addNet(Net net){
+	public void addNet(XdlNet net){
 		this.netMap.put(net.getName(), net);
 	}
 	
@@ -319,7 +320,7 @@ public class Module implements Serializable{
 	 * Adds an instance to this module.
 	 * @param inst The instance to add to the module.
 	 */
-	public void addInstance(Instance inst){
+	public void addInstance(XdlInstance inst){
 		this.instanceMap.put(inst.getName(), inst);
 	}
 	
@@ -355,7 +356,7 @@ public class Module implements Serializable{
 	 * Sets the design in all the module's instances to null
 	 */
 	public void disconnectDesign(){
-		for(Instance i: this.getInstances()){
+		for(XdlInstance i: this.getInstances()){
 			i.setDesign(null);
 		}
 	}
@@ -403,7 +404,7 @@ public class Module implements Serializable{
 		//=======================================================//
 		/* Check instances at proposed location                  */
 		//=======================================================//
-		for(Instance inst : getInstances()){
+		for(XdlInstance inst : getInstances()){
 			Site templateSite = inst.getPrimitiveSite();
 			Tile newTile = getCorrespondingTile(templateSite.getTile(), proposedAnchorSite.getTile(), dev);
 			if(newTile == null){
@@ -417,7 +418,7 @@ public class Module implements Serializable{
 		//=======================================================//
 		/* Check nets at proposed location                       */
 		//=======================================================//
-		for(Net net : getNets()){
+		for(XdlNet net : getNets()){
 			for(PIP pip : net.getPIPs()){
 				if(getCorrespondingTile(pip.getTile(), proposedAnchorSite.getTile(), dev) == null){
 					return false;
@@ -476,7 +477,7 @@ public class Module implements Serializable{
 			return false;
 		if(getClass() != obj.getClass())
 			return false;
-		Module other = (Module) obj;
+		XdlModule other = (XdlModule) obj;
 		if(name == null){
 			if(other.name != null)
 				return false;
