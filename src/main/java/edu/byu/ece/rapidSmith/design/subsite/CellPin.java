@@ -260,7 +260,7 @@ public abstract class CellPin implements Serializable {
 	public abstract String getName();
 	
 	/**
-	 * @return Returns the full name of the CellPin in the form "cellName/pinName"
+	 * @return the full name of the CellPin in the form "cellName/pinName"
 	 */
 	public abstract String getFullName();
 
@@ -317,7 +317,7 @@ public abstract class CellPin implements Serializable {
 	public abstract List<String> getPossibleBelPinNames(BelId belId);  
 	
 	/**
-	 * @return Returns the backing {@link LibraryPin} of this CellPin. If the caller is a 
+	 * @return the backing {@link LibraryPin} of this CellPin. If the caller is a 
 	 * 			pseudo cell pin, <code>null</code> is returned because it has no
 	 * 			backing {@link LibraryPin}.
 	 */
