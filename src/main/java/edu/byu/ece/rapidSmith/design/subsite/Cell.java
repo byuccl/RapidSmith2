@@ -54,7 +54,7 @@ public class Cell {
 		
 		this.pinMap = new HashMap<>();
 		for (LibraryPin pin : libCell.getLibraryPins()) {
-			this.pinMap.put(pin.getName(), new CellPin(this, pin));
+			this.pinMap.put(pin.getName(), new BackedCellPin(this, pin));
 		}
 
 		// TODO subcells for hierarchical macros
@@ -213,10 +213,12 @@ public class Cell {
 			pseudoPins = new HashSet<CellPin>(5);
 		}
 		
-		CellPin pseudo = CellPin.createPseudoPin(this, pinName, dir);
-		this.pinMap.put(pinName, pseudo);
-		this.pseudoPins.add(pseudo);
-		return pseudo;
+		CellPin pseudoPin = new PseudoCellPin(pinName, dir);
+		pseudoPin.setCell(this);
+		
+		this.pinMap.put(pinName, pseudoPin);
+		this.pseudoPins.add(pseudoPin);
+		return pseudoPin;
 	}
 	
 	/**
