@@ -89,18 +89,17 @@ public class RSEnvironment {
 	}
 
 	/**
+	 * @return the root of this environment
+	 */
+	public Path getEnvironmentPath() {
+		return rsPath;
+	}
+
+	/**
 	 * @return the path to the devices in this environment
 	 */
 	public Path getDevicePath() {
 		return rsPath.resolve("devices");
-	}
-
-	// TODO remove this method  -- anything that needs to be accessed should be placed elsewhere
-	/**
-	 * @return the path to the source files in this environment
-	 */
-	public Path getSourcePath() {
-		return rsPath;
 	}
 
 	/**

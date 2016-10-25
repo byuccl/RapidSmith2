@@ -20,7 +20,6 @@
  */
 package edu.byu.ece.rapidSmith.util;
 
-import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.device.TileType;
 import edu.byu.ece.rapidSmith.device.creation.*;
@@ -30,6 +29,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -116,9 +116,9 @@ public class TileAndPrimitiveEnumerator{
 		}
 	}
 
-	public void writeEnumFiles() {
-		writeTileTypeEnumFile();
-		writePrimitiveTypeEnumFile();
+	public void writeEnumFiles(Path pathToSource) {
+		writeTileTypeEnumFile(pathToSource);
+		writePrimitiveTypeEnumFile(pathToSource);
 	}
 
 	private class TileAndPrimitiveFinderListener extends XDLRCParserListener {
@@ -177,8 +177,8 @@ public class TileAndPrimitiveEnumerator{
 		bw.write(nl);
 	}
 
-	private void writeTileTypeEnumFile() {
-		Path path = getPathToFiles();
+	private void writeTileTypeEnumFile(Path pathToSource) {
+		Path path = getPathToEnumFiles(pathToSource);
 		try {
 			BufferedWriter bw = Files.newBufferedWriter(
 					path.resolve(tileTypeName + ".java"), Charset.defaultCharset());
@@ -215,8 +215,8 @@ public class TileAndPrimitiveEnumerator{
 		}
 	}
 
-	private void writePrimitiveTypeEnumFile() {
-		Path path = getPathToFiles();
+	private void writePrimitiveTypeEnumFile(Path pathToSource) {
+		Path path = getPathToEnumFiles(pathToSource);
 		try {
 			BufferedWriter bw = Files.newBufferedWriter(
 					path.resolve( primitiveTypeName + ".java"), Charset.defaultCharset());
@@ -253,9 +253,8 @@ public class TileAndPrimitiveEnumerator{
 		}
 	}
 
-	public static Path getPathToFiles(){
-		Path path = RSEnvironment.defaultEnv().getSourcePath();
-		return path.resolve("edu")
+	public static Path getPathToEnumFiles(Path pathToSource){
+		return pathToSource.resolve("edu")
 				.resolve("byu")
 				.resolve("ece")
 				.resolve("rapidSmith")
@@ -274,10 +273,12 @@ public class TileAndPrimitiveEnumerator{
 		System.out.println("Enumerating Tiles and Primitives...");
 		
 		// Create the .java files for the Design package
-		for (String fileArg : args) {
+		Path pathToSource = Paths.get(args[0]);
+		for (int i = 1; i < args.length; i++) {
+			String fileArg = args[i];
 			me.addSupportForFamily(FamilyType.valueOf(fileArg));
 		}
-		me.writeEnumFiles();
+		me.writeEnumFiles(pathToSource);
 
 		System.out.println("DONE!");
 	}
