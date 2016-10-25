@@ -34,7 +34,6 @@ public class CellNet implements Serializable {
 
 	private Set<CellPin> routedSinks; 
 	private boolean isIntrasite;
-	private RouteStatus routeStatus;
 	
 	// Physical route information
 	private RouteTree source;
@@ -573,7 +572,7 @@ public class CellNet implements Serializable {
 	 */
 	public RouteTree getIntersiteRouteTree() {
 		
-		if (intersiteRoutes == null) {
+		if (intersiteRoutes == null || intersiteRoutes.isEmpty()) {
 			return null;
 		}
 		
@@ -658,7 +657,7 @@ public class CellNet implements Serializable {
 	public List<RouteTree> getSinkSitePinRouteTrees() {
 		
 		if (sitePinToRTMap == null) {
-			return null;
+			return Collections.emptyList();
 		}
 		
 		return sitePinToRTMap.keySet().stream()
@@ -668,18 +667,42 @@ public class CellNet implements Serializable {
 	}
 	
 	/**
-	 * Returns a list of RouteTrees that are connected to the specified Cell Pin 
-	 * 
-	 * TODO: Change this, because a cell pin can map to multiple bel pins.
-	 * TODO: Is this even useful? The user can do this themselves as well...
+	 * Returns a RouteTree object that is connected to the specified CellPin. If the CellPin
+	 * is connected to multiple RouteTree objects (because it is mapped to multiple BelPins)
+	 * then only one of the RouteTrees will be returned. To return all of the route trees, call
+	 * {@link #getSinkRouteTrees}. Only use this function if you know that the CellPin maps to a single BelPin.
 	 * 
 	 * @param cellPin sink CellPin
-	 * @return A List of RouteTree
+	 * @return A RouteTree that is connected to the specified CellPin. If no
+	 * 		   connecting RouteTree exists, null is returned. If more than one
+	 * 		   RouteTree is connected to the CellPin, then one of the RouteTrees
+	 * 		   will be returned (no guarantee which that will be)
 	 */
 	public RouteTree getSinkRouteTree(CellPin cellPin) {
 		
-		BelPin belPin = cellPin.getBelPin();
+		BelPin belPin = cellPin.getMappedBelPin();
 		return belPinToSinkRTMap.get(belPin);
+	}
+	
+	/**
+	 * Returns all RouteTrees of this net that are connected to the specified CellPin.
+	 * If the CellPin only maps to one BelPin, use {@link #getSinkRouteTree(CellPin, CellNet) }
+	 * instead.
+	 * 
+	 * @param cellPin sink CellPin
+	 * @return A Set of RouteTree objects that cellPin is connected to.
+	 */
+	public Set <RouteTree> getSinkRouteTrees(CellPin cellPin) {
+		
+		Set<RouteTree> connectedRouteTrees = new HashSet<RouteTree>();
+		
+		for (BelPin belPin : cellPin.getMappedBelPins()) {
+			if (belPinToSinkRTMap.containsKey(belPin)) {
+				connectedRouteTrees.add(belPinToSinkRTMap.get(belPin));
+			}
+		}
+		
+		return connectedRouteTrees;
 	}
 	
 	/**

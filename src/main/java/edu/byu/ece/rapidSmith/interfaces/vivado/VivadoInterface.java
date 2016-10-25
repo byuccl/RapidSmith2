@@ -48,7 +48,9 @@ public final class VivadoInterface {
 				.resolve(CELL_LIBRARY_NAME));
 		Device device = RSEnvironment.getDefault().getDevice(partName);
 		
-		// create the RS2 netlist 
+		// TODO: throw an exception here if the we can't find the device
+
+		// create the RS2 netlist
 		String edifFile = Paths.get(tcp, "netlist.edf").toString();
 		CellDesign design;
 		try {
