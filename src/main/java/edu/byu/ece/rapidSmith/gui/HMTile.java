@@ -46,17 +46,10 @@ public class HMTile extends QGraphicsRectItem {
 	static final QColor GREEN = new QColor(0, 255, 0, 190);
 	static final QColor ORANGE = new QColor(255, 153, 51, 190);
 	static final QColor RED = new QColor(255, 0, 0, 190);
-	static final QBitmap anchorPixmap;
-	static final QBrush ANCHOR_GREEN;
-	static final QBrush ANCHOR_ORANGE;
-	static final QBrush ANCHOR_RED;
-
-	static {
-		anchorPixmap = new QBitmap("classpath:images/anchor.bmp");
-		ANCHOR_GREEN = new QBrush(GREEN, anchorPixmap);
-		ANCHOR_ORANGE = new QBrush(ORANGE, anchorPixmap);
-		ANCHOR_RED = new QBrush(RED, anchorPixmap);
-	}
+	static final QBitmap anchorPixmap = new QBitmap("classpath:images/anchor.bmp");
+	static final QBrush ANCHOR_GREEN = new QBrush(GREEN, anchorPixmap);
+	static final QBrush ANCHOR_ORANGE = new QBrush(ORANGE, anchorPixmap);
+	static final QBrush ANCHOR_RED = new QBrush(RED, anchorPixmap);
 
 	public HMTile(Tile newTile, TileScene scene, QGraphicsItemInterface parent, boolean hasSLICEM, boolean isAnchor)
 	{
