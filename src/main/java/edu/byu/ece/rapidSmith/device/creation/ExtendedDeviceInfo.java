@@ -2,7 +2,7 @@ package edu.byu.ece.rapidSmith.device.creation;
 
 import com.caucho.hessian.io.Hessian2Input;
 import com.caucho.hessian.io.Hessian2Output;
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.Connection;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.device.helper.HashPool;
@@ -355,7 +355,7 @@ public class ExtendedDeviceInfo implements Serializable {
 	}
 
 	private static Path getExtendedInfoPath(Device device) {
-		RapidSmithEnv env = RapidSmithEnv.getDefaultEnv();
+		RSEnvironment env = RSEnvironment.defaultEnv();
 		Path partFolderPath = env.getPartFolderPath(device.getFamilyType());
 		partFolderPath = partFolderPath.resolve(device.getPartName() + "_info.dat");
 		return partFolderPath;
