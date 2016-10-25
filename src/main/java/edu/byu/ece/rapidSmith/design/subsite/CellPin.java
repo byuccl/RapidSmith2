@@ -1,130 +1,44 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
-import edu.byu.ece.rapidSmith.device.Bel;
-import edu.byu.ece.rapidSmith.device.BelId;
-import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.PinDirection;
-
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import edu.byu.ece.rapidSmith.device.Bel;
+import edu.byu.ece.rapidSmith.device.BelId;
+import edu.byu.ece.rapidSmith.device.BelPin;
+import edu.byu.ece.rapidSmith.device.PinDirection;
+
 /**
- *  A pin on a Cell.  CellPins connect cells to nets and map to BelPins.
+ *  A pin on a Cell. CellPins connect cells to nets and map to BelPins.
  *  CellPins are obtained through calls to {@link Cell#getPin(String)}.
+ *  
+ *  @author Travis Haroldsen
+ *  @author Thomas Townsend 
+ *
  */
-public class CellPin implements Serializable {
-	/** LibraryPin forming the basis of this pin */
-	private LibraryPin libraryPin;
+public abstract class CellPin implements Serializable {
+ 
+	/** TODO: ask Travis what these are for*/
+	private static final long serialVersionUID = 2612839140455524421L;
 	/** The cell this pin resides on */
 	private Cell cell;
 	/** The net this pin is a member of */
 	private CellNet net;
 	/** Set of BelPin objects that this pin maps to*/
 	private Set<BelPin> belPinMappingSet;
-	/** Flag that marks this cellPin as a PseudoPin */
-	private boolean isPseudo;
-	/** Name of the pin if it is pseudo pin*/
-	private String pseudoPinName;
-	/** Direction of pin if it is a pseudo pin*/
-	private PinDirection pseudoPinDirection;
-	 
-	
-	CellPin(Cell cell, LibraryPin libraryPin) {
-		assert cell != null;
-		assert libraryPin != null;
-
-		this.cell = cell;
-		this.libraryPin = libraryPin;
-		this.isPseudo = false;
-	}
-	
-	/**
-	 * Private constructor used to create pseudo cell pins
-	 */
-	private CellPin(Cell cell, String pinName, PinDirection dir) {
-		this.cell = cell;
-		this.isPseudo = true;
-		this.pseudoPinName = pinName;
-		this.pseudoPinDirection = dir;
-	}
-	
-	/**
-	 * Creates a new pseudo CellPin object. Pseudo cell pins
-	 * are not backed by a LibraryCellPin, but they are still
-	 * associated with a cell.
-	 *  
-	 * @param parent The parent cell of this pin.
-	 * @return A CellPin object
-	 */
-	public static CellPin createPseudoPin(Cell parent, String pinName, PinDirection dir) {
-		return new CellPin(parent, pinName, dir); 
-	}
 
 	/**
-	 * @return the name of this pin
-	 */
-	public String getName() {
-		
-		return isPseudo ? pseudoPinName : libraryPin.getName();
-	}
-
-	public String getFullName() {
-		return getCell().getName() + "." + getName();
-	}
-
-	/**
-	 * @return the direction of this pin from the cell's perspective
-	 */
-	public PinDirection getDirection() {
-		return isPseudo ? pseudoPinDirection : libraryPin.getDirection();
-	}
-
-	/**
-	 * @return <code>true</code> if the pin is an input (either INPUT or INOUT)
-	 * to the cell
-	 */
-	public boolean isInpin() {
-		
-		PinDirection pinDirection = (isPseudo) ? pseudoPinDirection : libraryPin.getDirection();
-		
-		switch (pinDirection) {
-			case IN:
-			case INOUT:
-				return true;
-			default:
-				return false;
-		}
-	}
-
-	/**
-	 * @return <code>true</code> if the pin is an output (either OUTPUT or INOUT)
-	 * to the cell
-	 */
-	public boolean isOutpin() {
-		
-		PinDirection pinDirection = (isPseudo) ? pseudoPinDirection : libraryPin.getDirection();
-		
-		switch (pinDirection) {
-			case OUT:
-			case INOUT:
-				return true;
-			default:
-				return false;
-		}
-	}
-
-	/**
-	 * Checks if the CellPin is a pseudo pin
+	 * Protected Constructor to create a new CellPin
 	 * 
-	 * @return <code>true</code> if the pin is a pseudo pin. <code>false</code> otherwise
+	 * @param cell Parent cell of the CellPin. Can be <code>null</code>
+	 * 				if the cell is an unattached pseudo pin 
 	 */
-	public boolean isPseudoPin(){
-		return isPseudo;
+	protected CellPin(Cell cell) {
+		this.cell = cell;
 	}
 	
 	/**
@@ -136,14 +50,27 @@ public class CellPin implements Serializable {
 		return cell;
 	}
 
+	/**
+	 * Sets the {@link Cell} that this pin is attached to. This is package 
+	 * private, and should not be called by regular users.
+	 * 
+	 * @param inst {@link Cell} to mark as the parent of this pin
+	 */
 	void setCell(Cell inst) {
 		this.cell = inst;
 	}
 
+	/**
+	 * Unattaches this pin from the {@link Cell} is was attached to. This
+	 * is package private, and should not be called by regular users
+	 */
 	void clearCell() {
 		this.cell = null;
 	}
 
+	/**
+	 * @return <code>true</code> is this CellPin is attached to a net
+	 */
 	public boolean isConnectedToNet() {
 		return net != null;
 	}
@@ -155,12 +82,51 @@ public class CellPin implements Serializable {
 		return net;
 	}
 
+	/**
+	 * Sets the {@link CellNet} object that this CellPin is
+	 * connected to. This call is package private and should
+	 * not be used by regular users.
+	 * 
+	 * @param net {@link CellNet} to connect the CellPin to.
+	 */
 	void setNet(CellNet net) {
 		this.net = net;
 	}
 
+	/**
+	 * Disconnects this pin from the net is was connected to. This
+	 * is package private and should not be called by regular users.
+	 */
 	void clearNet() {
 		this.net = null;
+	}
+	
+	/**
+	 * @return <code>true</code> if the pin is an input (either INPUT or INOUT)
+	 * to the cell. <code>false</code> otherwise.
+	 */
+	public boolean isInpin() {
+		switch (getDirection()) {
+		case IN:
+		case INOUT:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	/**
+	 * @return <code>true</code> if the pin is an output (either OUTPUT or INOUT)
+	 * to the cell. <code>false</code> otherwise.
+	 */
+	public boolean isOutpin(){
+		switch (getDirection()) {
+		case OUT:
+		case INOUT:
+			return true;
+		default:
+			return false;
+		}
 	}
 	
 	/**
@@ -276,63 +242,84 @@ public class CellPin implements Serializable {
 	}
 	
 	/**
-	 * Returns the BelPins that this pin can potentially be placed.
-	 * @return list of possible BelPins
+	 * Prints the CellPin object in the form: 
+	 * "CellPin{ parentCellName.CellPinName }"
 	 */
-	public List<BelPin> getPossibleBelPins() {
-		return getPossibleBelPins(cell.getAnchor());
-	}
-
-	public List<BelPin> getPossibleBelPins(Bel bel) {
-		List<String> belPinNames = getPossibleBelPinNames(bel.getId());
-		List<BelPin> belPins = new ArrayList<>(belPinNames.size());
-		
-		for (String pinName : belPinNames) {
-			belPins.add(bel.getBelPin(pinName));
-		}
-		return belPins;
-	}
-
-	/**
-	 * Returns the names of the BelPins that this pin can potentially be placed. This function
-	 * should NOT be called if the CellPin is a pseudo CellPin. 
-	 * 
-	 * @return list of names of possible BelPins. Null is returned if the CellPin is a pseudo pin
-	 */
-	public List<String> getPossibleBelPinNames() {
-		
-		if (this.isPseudo) {
-			return null;
-		}
-		
-		if (!cell.isPlaced()) {
-			return Collections.emptyList();
-		}
-		BelId belId = cell.getAnchor().getId();
-		return libraryPin.getPossibleBelPins().get(belId);
-	}
-
-	/**
-	 * Returns the names of the BelPins that this pin can potentially be placed.
-	 * @return list of names of possible BelPins
-	 */
-	public List<String> getPossibleBelPinNames(BelId belId) {
-
-		// pseudo pins do not have a backing library pin, so return an empty list
-		if (isPseudo) {
-			return null;
-		}
-		
-		List<String> namesTmp = libraryPin.getPossibleBelPins().getOrDefault(belId, Collections.emptyList());
-		return (namesTmp == null) ? Collections.emptyList() : namesTmp;
-	}
-
 	@Override
 	public String toString() {
 		return "CellPin{" + getFullName() + "}";
 	}
+	
+	/* **************************************************************
+	 *  List of Abstract Functions to be implemented by sub-classes 
+	 * **************************************************************/
+	
+	/**
+	 * @return the name of this pin
+	 */
+	public abstract String getName();
+	
+	/**
+	 * @return Returns the full name of the CellPin in the form "cellName/pinName"
+	 */
+	public abstract String getFullName();
 
-	public LibraryPin getLibraryPin() {
-		return libraryPin;
-	}
+	/**
+	 * @return the direction of this pin from the cell's perspective
+	 */
+	public abstract PinDirection getDirection();  
+	
+	/** 
+	 * @return <code>true</code> if the pin is a pseudo pin. <code>false</code> otherwise.
+	 */
+	public abstract boolean isPseudoPin(); 
+	
+	/**
+	 * Returns the BelPins that this pin can potentially be mapped onto. The BEL that this pin's parent
+	 * cell is placed on is used to determine the potential mappings. This function should 
+	 * NOT be called on pseudo CellPin objects because pseudo pins are not backed
+	 * by an associated {@link LibraryPin}.
+	 * 
+	 * @return list of possible BelPins (which might be empty). If the caller is a pseudo pin, 
+	 * 			<code>null</code> is returned.
+	 */
+	public abstract List<BelPin> getPossibleBelPins(); 
+
+	/**
+	 * Returns the BelPins that this pin can potentially be mapped to on the specified {@code bel}. 
+	 * This function should NOT be called on pseudo CellPin objects because pseudo pins are not backed
+	 * by an associated {@link LibraryPin}.
+	 * 
+	 * @param bel The BEL to get the possible pin maps for this pin
+	 * @return list of possible BelPins (which could be empty). If the caller is a pseudo pin, 
+	 * 			<code>null</code> is returned
+	 */
+	public abstract List<BelPin> getPossibleBelPins(Bel bel); 
+	
+	/**
+	 * Returns the names of the BelPins that this pin can potentially be mapped onto. This function
+	 * should NOT be called if the CellPin is a pseudo CellPin because pseudo pins are not backed
+	 * by an associated {@link LibraryPin}. 
+	 * 
+	 * @return list of names of possible BelPins (which could be empty). If the caller is a pseudo pin, 
+	 * 			<code>null</code> is returned
+	 */
+	public abstract List<String> getPossibleBelPinNames();  
+	
+	/**
+	 * Returns the names of the BelPins that this pin can potentially be mapped onto.
+	 * This function should NOT be called if the CellPin is a pseudo CellPin because 
+	 * pseudo pins are not backed by an associated {@link LibraryPin}.
+	 * 
+	 * @return list of names of possible BelPins (which could be empty). If the caller is a pseudo pin, 
+	 * 			<code>null</code> is returned
+	 */
+	public abstract List<String> getPossibleBelPinNames(BelId belId);  
+	
+	/**
+	 * @return Returns the backing {@link LibraryPin} of this CellPin. If the caller is a 
+	 * 			pseudo cell pin, <code>null</code> is returned because it has no
+	 * 			backing {@link LibraryPin}.
+	 */
+	public abstract LibraryPin getLibraryPin();  
 }
