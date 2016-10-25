@@ -19,7 +19,7 @@ import edu.byu.ece.rapidSmith.device.PinDirection;
  */
 public class BackedCellPin extends CellPin {
 
-	/** TODO: Not sure what to put here...*/
+	/** Unique serial number for class */
 	private static final long serialVersionUID = 3866278951715319836L;
 	/** LibraryPin forming the basis of this pin */
 	private LibraryPin libraryPin;

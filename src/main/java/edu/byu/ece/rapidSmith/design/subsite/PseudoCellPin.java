@@ -21,8 +21,9 @@ import edu.byu.ece.rapidSmith.device.PinDirection;
  */
 public class PseudoCellPin extends CellPin {
 
-	/** TODO: change the serial version UID? */
-	private static final long serialVersionUID = 1L;
+	
+	/** Unqiue Serial Version for this class */
+	private static final long serialVersionUID = -4765068478025538798L;
 	/** Name of the pseudo pin */
 	private String name;
 	/** Direction of the pseudo pin relative to the cell*/
