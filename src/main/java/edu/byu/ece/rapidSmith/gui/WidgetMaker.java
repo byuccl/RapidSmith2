@@ -26,9 +26,8 @@ import com.trolltech.qt.core.Qt.ItemDataRole;
 import com.trolltech.qt.gui.QTreeWidget;
 import com.trolltech.qt.gui.QTreeWidgetItem;
 
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.util.FamilyType;
-import edu.byu.ece.rapidSmith.util.FileTools;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
 
 public class WidgetMaker {
@@ -42,7 +41,7 @@ public class WidgetMaker {
 		HashMap<FamilyType, QTreeWidgetItem> familyItems = new HashMap<FamilyType, QTreeWidgetItem>();
 		HashMap<String, QTreeWidgetItem> subFamilyItems = new HashMap<String, QTreeWidgetItem>();
 		
-		for(String partName : RapidSmithEnv.getDefaultEnv().getAvailableParts()){
+		for(String partName : RSEnvironment.defaultEnv().getAvailableParts()){
 			FamilyType type = PartNameTools.getFamilyTypeFromPart(partName);
 			QTreeWidgetItem familyItem = familyItems.get(type);
 			if(familyItem == null){
