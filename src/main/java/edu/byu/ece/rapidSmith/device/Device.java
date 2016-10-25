@@ -92,7 +92,7 @@ public class Device implements Serializable {
 	public Device() { }
 
 	/**
-	 * Shortcut for {@code RapidSmithEnv.getDefault().getDevice(partName)};
+	 * Shortcut for {@code RSEnvironment.getDefault().getDevice(partName)};
 	 *
 	 * @param partName the part name of the device to get.
 	 * @return the previously loaded device if the part has already been loaded in
