@@ -6,11 +6,10 @@ import java.nio.file.Paths;
 import edu.byu.ece.edif.core.EdifNameConflictException;
 import edu.byu.ece.edif.core.InvalidEdifNameException;
 import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.interfaces.vivado.DesignInfoInterface;
 
 /**
  * This class is used to interface Vivado and RapidSmith. <br>
@@ -44,14 +43,14 @@ public final class VivadoInterface {
 			
 		// setup the cell library and the device based on the part in the TCP file
 		String partName = DesignInfoInterface.parseInfoFile(Paths.get(tcp, "design.info").toString());
-		CellLibrary libCells = new CellLibrary(RapidSmithEnv.getDefaultEnv()
+		CellLibrary libCells = new CellLibrary(RSEnvironment.defaultEnv()
 				.getPartFolderPath(partName)
 				.resolve(CELL_LIBRARY_NAME));
-		Device device = RapidSmithEnv.getDefaultEnv().getDevice(partName);
+		Device device = RSEnvironment.defaultEnv().getDevice(partName);
 		
 		// TODO: throw an exception here if the we can't find the device
-		
-		// create the RS2 netlist 
+
+		// create the RS2 netlist
 		String edifFile = Paths.get(tcp, "netlist.edf").toString();
 		CellDesign design;
 		try {

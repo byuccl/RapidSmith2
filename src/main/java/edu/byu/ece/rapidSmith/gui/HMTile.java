@@ -23,18 +23,16 @@
  */
 package edu.byu.ece.rapidSmith.gui;
 
-import java.io.File;
-
 import com.trolltech.qt.gui.QBitmap;
 import com.trolltech.qt.gui.QBrush;
 import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
 import com.trolltech.qt.gui.QGraphicsRectItem;
 import com.trolltech.qt.gui.QPen;
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.Tile;
-import edu.byu.ece.rapidSmith.gui.TileScene;
-import edu.byu.ece.rapidSmith.util.FileTools;
+
+import java.awt.*;
 
 /**
  * @author marc
@@ -45,17 +43,14 @@ public class HMTile extends QGraphicsRectItem {
 	private Tile tile;
 	private boolean containsSLICEM;
 	private boolean isAnchor;
-	static QColor GREEN = new QColor(0, 255, 0, 190);
-	static QColor ORANGE = new QColor(255, 153, 51, 190);
-	static QColor RED = new QColor(255, 0, 0, 190);
-	static QBitmap anchorPixmap = new QBitmap(RapidSmithEnv.getDefaultEnv().getSourcePath()
-			.resolve("images").resolve("anchor.bmp").toString());
-	static QBrush ANCHOR_GREEN = new QBrush(GREEN, anchorPixmap);
-	static QBrush ANCHOR_ORANGE = new QBrush(ORANGE, anchorPixmap);
-	static QBrush ANCHOR_RED = new QBrush(RED, anchorPixmap);
-	
-	
-		
+	static final QColor GREEN = new QColor(0, 255, 0, 190);
+	static final QColor ORANGE = new QColor(255, 153, 51, 190);
+	static final QColor RED = new QColor(255, 0, 0, 190);
+	static final QBitmap anchorPixmap = new QBitmap("classpath:images/anchor.bmp");
+	static final QBrush ANCHOR_GREEN = new QBrush(GREEN, anchorPixmap);
+	static final QBrush ANCHOR_ORANGE = new QBrush(ORANGE, anchorPixmap);
+	static final QBrush ANCHOR_RED = new QBrush(RED, anchorPixmap);
+
 	public HMTile(Tile newTile, TileScene scene, QGraphicsItemInterface parent, boolean hasSLICEM, boolean isAnchor)
 	{
 		super(0,0,scene.tileSize - 2, scene.tileSize - 2, parent);
@@ -64,21 +59,21 @@ public class HMTile extends QGraphicsRectItem {
 		this.isAnchor = isAnchor;
 		
 	}
-	
+
 	public HMTile(Tile newTile, TileScene scene, QGraphicsItemInterface parent)
 	{
 		this(newTile,scene,parent,false,false);
 	}
-	
+
 	public Tile getTile()
 	{
 		return tile;
 	}
-	
+
 	public boolean containsSLICEM(){
 		return containsSLICEM;
 	}
-	
+
 	public void setState(GuiShapeState newState){
 		
 		switch (newState) {

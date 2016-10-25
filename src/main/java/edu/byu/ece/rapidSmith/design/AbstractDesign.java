@@ -1,7 +1,6 @@
 package edu.byu.ece.rapidSmith.design;
 
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
-import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.util.FamilyType;
@@ -78,7 +77,7 @@ public abstract class AbstractDesign implements Serializable {
 	 */
 	public void setPartName(String partName) {
 		this.partName = partName;
-		this.device = RapidSmithEnv.getDefaultEnv().getDevice(partName);
+		this.device = RSEnvironment.defaultEnv().getDevice(partName);
 	}
 
 	public Device getDevice() {

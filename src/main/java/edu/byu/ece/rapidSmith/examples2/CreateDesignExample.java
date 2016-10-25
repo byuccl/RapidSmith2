@@ -1,14 +1,11 @@
 package edu.byu.ece.rapidSmith.examples2;
 
 import java.io.*;
-import java.util.Collection;
-import java.util.List;
 
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.*;
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.*;
-import edu.byu.ece.rapidSmith.examples2.DesignAnalyzer;
 
 public class CreateDesignExample {
 
@@ -27,13 +24,13 @@ public class CreateDesignExample {
 
 		// Load the cell library from the directory indicated by the part name 
 		// (directory should be $RAPIDSMITH_PATH/devices/artix7)
-		CellLibrary libCells = new CellLibrary(RapidSmithEnv.getDefaultEnv()
+		CellLibrary libCells = new CellLibrary(RSEnvironment.defaultEnv()
 				.getPartFolderPath("xc7a100tcsg324")
 				.resolve("cellLibrary.xml"));
 		System.out.println("Cell library loaded: cellLibrary.xml");
 
 		// Load the device file from the directory indicated by the part name
-		Device device = RapidSmithEnv.getDefaultEnv().getDevice("xc7a100tcsg324");
+		Device device = RSEnvironment.defaultEnv().getDevice("xc7a100tcsg324");
 		System.out.println("Device loaded: xc7a100tcsg324");
 		
 		// Create a new empty CellDesign for the designated FPGA part
