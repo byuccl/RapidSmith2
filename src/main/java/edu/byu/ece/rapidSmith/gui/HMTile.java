@@ -44,7 +44,7 @@ public class HMTile extends QGraphicsRectItem {
 	static QColor GREEN = new QColor(0, 255, 0, 190);
 	static QColor ORANGE = new QColor(255, 153, 51, 190);
 	static QColor RED = new QColor(255, 0, 0, 190);
-	static QBitmap anchorPixmap = new QBitmap(RSEnvironment.getDefault().getSourcePath()
+	static QBitmap anchorPixmap = new QBitmap(RSEnvironment.defaultEnv().getSourcePath()
 			.resolve("images").resolve("anchor.bmp").toString());
 	static QBrush ANCHOR_GREEN = new QBrush(GREEN, anchorPixmap);
 	static QBrush ANCHOR_ORANGE = new QBrush(ORANGE, anchorPixmap);

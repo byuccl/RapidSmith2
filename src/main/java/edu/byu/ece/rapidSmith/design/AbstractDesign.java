@@ -77,7 +77,7 @@ public abstract class AbstractDesign implements Serializable {
 	 */
 	public void setPartName(String partName) {
 		this.partName = partName;
-		this.device = RSEnvironment.getDefault().getDevice(partName);
+		this.device = RSEnvironment.defaultEnv().getDevice(partName);
 	}
 
 	public Device getDevice() {

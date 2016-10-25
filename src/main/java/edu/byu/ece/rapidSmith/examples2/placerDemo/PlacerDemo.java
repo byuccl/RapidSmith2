@@ -49,7 +49,7 @@ public class PlacerDemo {
 	private static Device device;
 	
 	public static void classSetup() throws IOException {
-		device = RSEnvironment.getDefault().getDevice(CANONICAL_PART_NAME);
+		device = RSEnvironment.defaultEnv().getDevice(CANONICAL_PART_NAME);
 	}
 	
 	//List of Benchmarks

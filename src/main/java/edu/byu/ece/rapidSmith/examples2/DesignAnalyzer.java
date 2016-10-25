@@ -28,10 +28,10 @@ public class DesignAnalyzer {
 	private static Device device;
 	
 	public static void classSetup() throws IOException {
-		libCells = new CellLibrary(RSEnvironment.getDefault()
+		libCells = new CellLibrary(RSEnvironment.defaultEnv()
 				.getPartFolderPath(PART_NAME)
 				.resolve(CELL_LIBRARY));
-		device = RSEnvironment.getDefault().getDevice(CANONICAL_PART_NAME);
+		device = RSEnvironment.defaultEnv().getDevice(CANONICAL_PART_NAME);
 	}
 	
 	

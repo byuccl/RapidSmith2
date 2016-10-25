@@ -20,7 +20,7 @@ import java.util.*;
  * Class for accessing the RapidSmith environment.  The environment exists in a
  * directory in the users file system (usually specified by the "RAPIDSMITH_PATH"
  * environment variable).  A default environment is accessible with the
- * {@link #getDefault()} method.
+ * {@link #defaultEnv()} method.
  */
 public class RSEnvironment {
 	/** Environment Variable Name which points to the rapidSmith project on disk */
@@ -43,7 +43,7 @@ public class RSEnvironment {
 	 * @throws EnvironmentException if the environment is not set and the default
 	 *   environment cannot be obtained
 	 */
-	public static RSEnvironment getDefault() {
+	public static RSEnvironment defaultEnv() {
 		if (defaultEnv == null)
 			defaultEnv = new RSEnvironment();
 		return defaultEnv;

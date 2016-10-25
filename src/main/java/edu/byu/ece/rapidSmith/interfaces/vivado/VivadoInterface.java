@@ -43,10 +43,10 @@ public final class VivadoInterface {
 			
 		// setup the cell library and the device based on the part in the TCP file
 		String partName = DesignInfoInterface.parseInfoFile(Paths.get(tcp, "design.info").toString());
-		CellLibrary libCells = new CellLibrary(RSEnvironment.getDefault()
+		CellLibrary libCells = new CellLibrary(RSEnvironment.defaultEnv()
 				.getPartFolderPath(partName)
 				.resolve(CELL_LIBRARY_NAME));
-		Device device = RSEnvironment.getDefault().getDevice(partName);
+		Device device = RSEnvironment.defaultEnv().getDevice(partName);
 		
 		// TODO: throw an exception here if the we can't find the device
 

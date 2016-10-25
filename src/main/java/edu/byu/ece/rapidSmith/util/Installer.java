@@ -73,7 +73,7 @@ public class Installer {
 		if (options.has("env"))
 			env = new RSEnvironment(Paths.get((String) options.valueOf("env")));
 		else
-			env = RSEnvironment.getDefault();
+			env = RSEnvironment.defaultEnv();
 		boolean forceRebuild = options.has("force");
 		boolean generateFromISE = options.has("ise");
 

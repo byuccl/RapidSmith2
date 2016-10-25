@@ -155,7 +155,7 @@ public class BrowseDevice{
 		if(args.length != 1){
 			MessageGenerator.briefMessageAndExit("USAGE: <device part name, ex: xc4vfx12ff668 >");
 		}
-		Device dev = RSEnvironment.getDefault().getDevice(args[0]);
+		Device dev = RSEnvironment.defaultEnv().getDevice(args[0]);
 
 		run(dev);
 	}

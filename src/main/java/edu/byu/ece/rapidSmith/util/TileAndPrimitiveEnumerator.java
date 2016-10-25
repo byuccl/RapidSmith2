@@ -254,7 +254,7 @@ public class TileAndPrimitiveEnumerator{
 	}
 
 	public static Path getPathToFiles(){
-		Path path = RSEnvironment.getDefault().getSourcePath();
+		Path path = RSEnvironment.defaultEnv().getSourcePath();
 		return path.resolve("edu")
 				.resolve("byu")
 				.resolve("ece")

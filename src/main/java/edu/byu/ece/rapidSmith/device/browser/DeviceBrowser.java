@@ -104,7 +104,7 @@ public class DeviceBrowser extends QMainWindow{
 		initializeSideBar();
 		
 		// Gets the available parts in RapidSmith and populates the selection tree
-		List<String> parts = RSEnvironment.getDefault().getAvailableParts();
+		List<String> parts = RSEnvironment.defaultEnv().getAvailableParts();
 		if(parts.size() < 1){
 			MessageGenerator.briefErrorAndExit("Error: No available parts. " +
 					"Please generate part database files.");
@@ -116,7 +116,7 @@ public class DeviceBrowser extends QMainWindow{
 			currPart = parts.get(0);
 		}
 		
-		device = RSEnvironment.getDefault().getDevice(currPart);
+		device = RSEnvironment.defaultEnv().getDevice(currPart);
 		we = device.getWireEnumerator();
 
 		// Setup the scene and view for the GUI
@@ -253,7 +253,7 @@ public class DeviceBrowser extends QMainWindow{
 			if(currPart.equals(data))
 				return;
 			currPart = (String) data;			
-			device = RSEnvironment.getDefault().getDevice(currPart);
+			device = RSEnvironment.defaultEnv().getDevice(currPart);
 			we = device.getWireEnumerator();
 			scene.setDevice(device);
 			scene.initializeScene(hideTiles, drawPrimitives);

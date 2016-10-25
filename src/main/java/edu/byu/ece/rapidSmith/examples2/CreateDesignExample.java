@@ -24,13 +24,13 @@ public class CreateDesignExample {
 
 		// Load the cell library from the directory indicated by the part name 
 		// (directory should be $RAPIDSMITH_PATH/devices/artix7)
-		CellLibrary libCells = new CellLibrary(RSEnvironment.getDefault()
+		CellLibrary libCells = new CellLibrary(RSEnvironment.defaultEnv()
 				.getPartFolderPath("xc7a100tcsg324")
 				.resolve("cellLibrary.xml"));
 		System.out.println("Cell library loaded: cellLibrary.xml");
 
 		// Load the device file from the directory indicated by the part name
-		Device device = RSEnvironment.getDefault().getDevice("xc7a100tcsg324");
+		Device device = RSEnvironment.defaultEnv().getDevice("xc7a100tcsg324");
 		System.out.println("Device loaded: xc7a100tcsg324");
 		
 		// Create a new empty CellDesign for the designated FPGA part

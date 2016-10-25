@@ -92,14 +92,14 @@ public class Device implements Serializable {
 	public Device() { }
 
 	/**
-	 * Shortcut for {@code RSEnvironment.getDefault().getDevice(partName)};
+	 * Shortcut for {@code RSEnvironment.defaultEnv().getDevice(partName)};
 	 *
 	 * @param partName the part name of the device to get.
 	 * @return the previously loaded device if the part has already been loaded in
 	 *   the default environment, else the newly loaded device.
 	 */
 	public static Device getInstance(String partName) {
-		return RSEnvironment.getDefault().getDevice(partName);
+		return RSEnvironment.defaultEnv().getDevice(partName);
 	}
 
 	//========================================================================//

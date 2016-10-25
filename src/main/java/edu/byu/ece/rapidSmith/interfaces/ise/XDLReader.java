@@ -48,7 +48,7 @@ public final class XDLReader {
 			String name = stripQuotes(ctx.name.getText());
 
 			String partName = ctx.part.getText();
-			device = RSEnvironment.getDefault().getDevice(partName);
+			device = RSEnvironment.defaultEnv().getDevice(partName);
 			if (device == null)
 				throw new ParseException("unsupported device: " + partName);
 

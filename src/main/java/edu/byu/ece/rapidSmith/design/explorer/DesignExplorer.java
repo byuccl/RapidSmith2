@@ -48,7 +48,7 @@ public class DesignExplorer extends QMainWindow{
 	/** Status Bar Label */
 	protected QLabel statusLabel;
 	/** Path to images in RapidSmith */
-	protected static String rsrcPath = RSEnvironment.getDefault()
+	protected static String rsrcPath = RSEnvironment.defaultEnv()
 			.getSourcePath().resolve("images").toString();
 	/** Device of the current design that is open */
 	protected Device device;

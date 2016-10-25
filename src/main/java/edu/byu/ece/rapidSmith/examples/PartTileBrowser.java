@@ -86,12 +86,12 @@ public class PartTileBrowser extends QMainWindow{
 		setWindowTitle("Part Tile Browser");
 
 		createTreeView();
-		List<String> parts = RSEnvironment.getDefault().getAvailableParts();
+		List<String> parts = RSEnvironment.defaultEnv().getAvailableParts();
 		if(parts.size() < 1){
 			MessageGenerator.briefErrorAndExit("Error: No available parts. Please generate part database files.");
 		}
 		currPartName = parts.get(0);
-		device = RSEnvironment.getDefault().getDevice(currPartName);
+		device = RSEnvironment.defaultEnv().getDevice(currPartName);
 		
 		scene = new PartTileBrowserScene(device);
 
@@ -133,7 +133,7 @@ public class PartTileBrowser extends QMainWindow{
 			progress.show();
 			progress.setValue(10);
 			
-			device = RSEnvironment.getDefault().getDevice(currPartName);
+			device = RSEnvironment.defaultEnv().getDevice(currPartName);
 			progress.setValue(100);
 			scene.setDevice(device);
 			statusLabel.setText("Loaded: "+currPartName.toUpperCase());

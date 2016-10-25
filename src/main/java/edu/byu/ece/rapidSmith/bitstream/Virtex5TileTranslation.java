@@ -117,7 +117,7 @@ public class Virtex5TileTranslation {
 		String partName = "xc5vlx30t";
 		String packageName = "ff665";
 		// Load up all the RapidSmith data structures
-		Device dev = RSEnvironment.getDefault().getDevice(partName + packageName);
+		Device dev = RSEnvironment.defaultEnv().getDevice(partName + packageName);
 		
 		XilinxConfigurationSpecification spec = DeviceLookup.lookupPartV4V5V6(partName);
 

@@ -41,7 +41,7 @@ public class WidgetMaker {
 		HashMap<FamilyType, QTreeWidgetItem> familyItems = new HashMap<FamilyType, QTreeWidgetItem>();
 		HashMap<String, QTreeWidgetItem> subFamilyItems = new HashMap<String, QTreeWidgetItem>();
 		
-		for(String partName : RSEnvironment.getDefault().getAvailableParts()){
+		for(String partName : RSEnvironment.defaultEnv().getAvailableParts()){
 			FamilyType type = PartNameTools.getFamilyTypeFromPart(partName);
 			QTreeWidgetItem familyItem = familyItems.get(type);
 			if(familyItem == null){
