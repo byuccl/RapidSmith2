@@ -1,7 +1,6 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.design.AbstractDesign;
-import edu.byu.ece.rapidSmith.design.Pin;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.Site;
 
