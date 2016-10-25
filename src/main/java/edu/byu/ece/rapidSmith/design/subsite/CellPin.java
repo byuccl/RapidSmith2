@@ -22,7 +22,7 @@ import edu.byu.ece.rapidSmith.device.PinDirection;
  */
 public abstract class CellPin implements Serializable {
  
-	/** TODO: ask Travis what these are for*/
+	/** Unique Serial number for this class */
 	private static final long serialVersionUID = 2612839140455524421L;
 	/** The cell this pin resides on */
 	private Cell cell;
