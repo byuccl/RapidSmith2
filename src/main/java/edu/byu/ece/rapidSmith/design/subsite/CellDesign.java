@@ -28,11 +28,11 @@ public class CellDesign extends AbstractDesign {
 	private Map<String, CellNet> netMap;
 	/** Map of properties of this design. */
 	private Map<Object, Property> propertyMap;
-	
+	/** Map from a site to the used SitePip wires in the site*/
 	private HashMap<Site, HashSet<Integer>> usedSitePipsMap;
-
+	/** The VCC RapidSmith net */
 	private CellNet vccNet;
-	
+	/** The GND RapidSmith net */
 	private CellNet gndNet;
 	
 	/**
