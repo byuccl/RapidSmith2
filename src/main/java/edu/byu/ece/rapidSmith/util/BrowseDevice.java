@@ -23,7 +23,7 @@ package edu.byu.ece.rapidSmith.util;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.*;
 
 /**
@@ -155,7 +155,7 @@ public class BrowseDevice{
 		if(args.length != 1){
 			MessageGenerator.briefMessageAndExit("USAGE: <device part name, ex: xc4vfx12ff668 >");
 		}
-		Device dev = RapidSmithEnv.getDefaultEnv().getDevice(args[0]);
+		Device dev = RSEnvironment.defaultEnv().getDevice(args[0]);
 
 		run(dev);
 	}

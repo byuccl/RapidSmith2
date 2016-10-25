@@ -7,11 +7,9 @@ import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.edif.core.EdifNameConflictException;
 import edu.byu.ece.edif.core.InvalidEdifNameException;
 import edu.byu.ece.edif.util.parse.ParseException;
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 /**
  * A simple class to illustrate importing and exporting Tincr checkpoints.

@@ -20,7 +20,7 @@
  */
 package edu.byu.ece.rapidSmith.util;
 
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.creation.DeviceFilesCreator;
 import edu.byu.ece.rapidSmith.device.creation.ISE_XDLRCRetriever;
@@ -52,7 +52,7 @@ public class Installer {
 		MessageGenerator.printHeader("RapidSmith Release " + Device.rapidSmithVersion + " - Installer");
 
 		OptionParser parser = new OptionParser();
-		parser.acceptsAll(Arrays.asList("out", "o"), "Output directory for generated device files").withRequiredArg();
+		parser.accepts("env", "Output directory for generated device files").withRequiredArg();
 		parser.acceptsAll(Arrays.asList("force", "f"), "Overwrite existing device files");
 		parser.acceptsAll(Arrays.asList("ise"), "Generate XDLRC using ISE. Otherwise, it will use an existing XDLRC");
 		parser.accepts("ignore_disclaimer", "Ignores the disclaimer");
@@ -69,9 +69,11 @@ public class Installer {
 			System.exit(-1);
 		}
 
-		RapidSmithEnv env = new RapidSmithEnv();
-		if (options.has("out"))
-			env.setDevicePath(Paths.get((String) options.valueOf("out")));
+		RSEnvironment env;
+		if (options.has("env"))
+			env = new RSEnvironment(Paths.get((String) options.valueOf("env")));
+		else
+			env = RSEnvironment.defaultEnv();
 		boolean forceRebuild = options.has("force");
 		boolean generateFromISE = options.has("ise");
 

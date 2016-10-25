@@ -20,7 +20,7 @@
  */
 package edu.byu.ece.rapidSmith.device.creation;
 
-import edu.byu.ece.rapidSmith.RapidSmithEnv;
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.util.FamilyType;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
@@ -44,9 +44,9 @@ import java.nio.file.Path;
  */
 public class DeviceFilesCreator {
 	private XDLRCRetriever xdlrcRetriever;
-	private RapidSmithEnv env;
+	private RSEnvironment env;
 
-	public DeviceFilesCreator(XDLRCRetriever xdlrcRetriever, RapidSmithEnv env) {
+	public DeviceFilesCreator(XDLRCRetriever xdlrcRetriever, RSEnvironment env) {
 		this.xdlrcRetriever = xdlrcRetriever;
 		this.env = env;
 	}
@@ -77,7 +77,7 @@ public class DeviceFilesCreator {
 		// Write the Device to File
 		System.out.println("Writing device to compact file");
 		try {
-			env.writeCompressedDeviceFile(device);
+			env.writeDeviceFile(device);
 		} catch (IOException e) {
 			System.err.println("Failed writing device to disk.");
 			e.printStackTrace();
