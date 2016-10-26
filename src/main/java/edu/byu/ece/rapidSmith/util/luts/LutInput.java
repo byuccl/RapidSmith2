@@ -1,6 +1,8 @@
 package edu.byu.ece.rapidSmith.util.luts;
 
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
 * A LUT input, possibly inverted, in a {@link LutEquation}.  The index is the equivalent
@@ -74,6 +76,18 @@ public final class LutInput extends LutEquation {
 	@Override
 	public LutEquation deepCopy() {
 		return new LutInput(index, inverted);
+	}
+
+	@Override
+	public void remapPins(Map<Integer, Integer> mapping) {
+		Integer newIndex = mapping.get(index);
+		if (newIndex != null)
+			index = newIndex;
+	}
+
+	@Override
+	protected void getUsedInputs(Set<Integer> usedInputs) {
+		usedInputs.add(getIndex());
 	}
 
 	@Override
