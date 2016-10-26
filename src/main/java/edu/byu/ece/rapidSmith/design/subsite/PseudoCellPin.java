@@ -28,6 +28,8 @@ public class PseudoCellPin extends CellPin {
 	private String name;
 	/** Direction of the pseudo pin relative to the cell*/
 	private PinDirection direction;
+	/** {@link CellPinType} of the pin*/
+	private CellPinType pinType;
 		
 	/**
 	 * PseudoCellPin Constructor. Creates a floating pseudo cell pin that does not
@@ -44,6 +46,7 @@ public class PseudoCellPin extends CellPin {
 		super(null);
 		this.name = pinName;
 		this.direction = pinDir;
+		this.pinType = CellPinType.PSEUDO;
 	}
 
 	@Override
@@ -90,6 +93,11 @@ public class PseudoCellPin extends CellPin {
 	@Override
 	public LibraryPin getLibraryPin() {
 		return null;
+	}
+
+	@Override
+	public CellPinType getType() {
+		return pinType;
 	}
 
 }
