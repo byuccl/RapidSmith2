@@ -8,6 +8,18 @@ import java.util.*;
  * A tree-structured representation of an XDL LUT equation.
  */
 public abstract class LutEquation {
+	private static final List<Long> inputValues = Arrays.asList(
+			0xAAAAAAAAAAAAAAAAL,
+			0xCCCCCCCCCCCCCCCCL,
+			0xF0F0F0F0F0F0F0F0L,
+			0xFF00FF00FF00FF00L,
+			0xFFFF0000FFFF0000L,
+			0xFFFFFFFF00000000L
+	);
+
+	// Prevent users from creating their own subclasses.
+	LutEquation() { }
+
 	/**
 	 * Returns a deep copy of the equation.  Any changes made to the returned equation
 	 * will not be reflected in this equation and vice versa.  Some immutable objects
@@ -35,8 +47,22 @@ public abstract class LutEquation {
 	 */
 	public abstract boolean equals(Object other);
 
-	// Prevent users from creating their own subclasses.
-	LutEquation() { }
+	/**
+	 * Remaps the pins with the index in the keys of mapping to their values.
+	 * @param mapping map of the index of the pins to the indexes to change them to
+	 */
+	public abstract void remapPins(Map<Integer, Integer> mapping);
+
+	/**
+	 * @return the inputs used in this equation
+	 */
+	public final Set<Integer> getUsedInputs() {
+		HashSet<Integer> usedInputs = new HashSet<>();
+		getUsedInputs(usedInputs);
+		return usedInputs;
+	}
+
+	protected abstract void getUsedInputs(Set<Integer> usedInputs);
 
 	/**
 	 * Parses an XDL LUT equation into a LutEquation tree.
@@ -77,10 +103,10 @@ public abstract class LutEquation {
 		for (int i = 0; i < 64; i++) {
 			long mask = 1L << i;
 			// check if this product yields a 1
-			if ((initString.getValue() & mask) != 0) {
+			if ((initString.getCfgValue() & mask) != 0) {
 				MatchProduct product = new MatchProduct();
 				for (int j = 0; j < 6; j++) {
-					if ((mask & LutContents.inputValues.get(j)) != 0)
+					if ((mask & inputValues.get(j)) != 0)
 						product.value[j] = MatchValue.ONE;
 					else
 						product.value[j] = MatchValue.ZERO;

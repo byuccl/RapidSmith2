@@ -1,6 +1,8 @@
 package edu.byu.ece.rapidSmith.util.luts;
 
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
 * A binary operation in a LutEquation.
@@ -17,9 +19,9 @@ public final class BinaryOperation extends LutEquation {
 	 * @param right right sub-equation of the equation
 	 */
 	public BinaryOperation(OpType op, LutEquation left, LutEquation right) {
-		this.op = op;
-		this.left = left;
-		this.right = right;
+		setOp(op);
+		setLeft(left);
+		setRight(right);
 	}
 
 	/**
@@ -35,6 +37,7 @@ public final class BinaryOperation extends LutEquation {
 	 * @param op the new operator for this equation
 	 */
 	public void setOp(OpType op) {
+		Objects.requireNonNull(op);
 		this.op = op;
 	}
 
@@ -51,6 +54,7 @@ public final class BinaryOperation extends LutEquation {
 	 * @param left the new left sub-equation of this operation
 	 */
 	public void setLeft(LutEquation left) {
+		Objects.requireNonNull(left);
 		this.left = left;
 	}
 
@@ -67,12 +71,25 @@ public final class BinaryOperation extends LutEquation {
 	 * @param right the new right sub-equation of this operation
 	 */
 	public void setRight(LutEquation right) {
+		Objects.requireNonNull(right);
 		this.right = right;
 	}
 
 	@Override
 	public LutEquation deepCopy() {
 		return new BinaryOperation(op, left.deepCopy(), right.deepCopy());
+	}
+
+	@Override
+	protected void getUsedInputs(Set<Integer> usedInputs) {
+		getLeft().getUsedInputs(usedInputs);
+		getRight().getUsedInputs(usedInputs);
+	}
+
+	@Override
+	public void remapPins(Map<Integer, Integer> mapping) {
+		getLeft().remapPins(mapping);
+		getRight().remapPins(mapping);
 	}
 
 	@Override
