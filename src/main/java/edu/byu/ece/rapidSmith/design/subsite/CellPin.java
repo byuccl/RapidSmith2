@@ -322,4 +322,9 @@ public abstract class CellPin implements Serializable {
 	 * 			backing {@link LibraryPin}.
 	 */
 	public abstract LibraryPin getLibraryPin();  
+	
+	/**
+	 * @return The {@link CellPinType} of this pin. 
+	 */
+	public abstract CellPinType getType();
 }
