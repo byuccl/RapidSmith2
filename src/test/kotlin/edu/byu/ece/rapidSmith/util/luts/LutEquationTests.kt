@@ -3,6 +3,7 @@ package edu.byu.ece.rapidSmith.util.luts
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DynamicTest.dynamicTest
+import java.lang.AssertionError
 import java.util.*
 
 class LutEquationTests {
@@ -50,7 +51,7 @@ class LutEquationTests {
 	@Test
 	@DisplayName("test init string 0x0000_0000_0000_0000")
 	fun testConvertZeroInitString() {
-		val eq = LutEquation.convertToLutEquation(InitString(0))
+		val eq = LutEquation.convertToLutEquation(InitString(0, 6))
 		assertEquals(Constant.ZERO, eq)
 	}
 
@@ -58,14 +59,14 @@ class LutEquationTests {
 	@DisplayName("test init string 0xFFFF_FFFF_FFFF_FFFF")
 	fun testConvertOneInitString() {
 		// -1 = 0xFFFF
-		val eq = LutEquation.convertToLutEquation(InitString(-1))
+		val eq = LutEquation.convertToLutEquation(InitString(-1, 6))
 		assertEquals(Constant.ONE, eq)
 	}
 
 	@Test
 	@DisplayName("test init string 0x0000_0000_FFFF_FFFF")
 	fun testConvertInvertedA6InitString() {
-		val eq = LutEquation.convertToLutEquation(InitString(0xFFFFFFFFL))
+		val eq = LutEquation.convertToLutEquation(InitString(0xFFFFFFFFL, 6))
 		assertEquals(LutInput(6, true), eq)
 	}
 }
@@ -107,7 +108,7 @@ private fun isUnique(original: LutEquation, copy: LutEquation) {
 			isUnique(original.left, copy.left)
 			isUnique(original.right, copy.right)
 		}
-		else -> { throw AssertionError("unrecognized LutEquation subclass")}
+		else -> throw AssertionError("unrecognized LutEquation subclass")
 	}
 }
 
