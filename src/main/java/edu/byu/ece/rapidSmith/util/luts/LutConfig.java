@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import java.util.*;
 
 /**
- *
+ * Class representing the configuration of a mux.
  */
 public final class LutConfig {
 	private String operatingMode;
@@ -16,13 +16,24 @@ public final class LutConfig {
 	private boolean isGnd;
 	private LutContents contents;
 
-	public LutConfig() {}
+	/**
+	 * Creates a blank LutConfig.
+	 */
+	private LutConfig() {}
 
-	public LutConfig(String cfgString) {
-		parseLutAttribute(cfgString);
+	public LutConfig(String operatingMode, String output, boolean isVcc, boolean isGnd, LutContents contents) {
+		this.operatingMode = operatingMode;
+		this.output = output;
+		this.isVcc = isVcc;
+		this.isGnd = isGnd;
+		this.contents = contents;
 	}
 
-	private void parseLutAttribute(String attr) {
+	public LutConfig(String xdlCfgString, int numInputs) {
+		parseLutAttribute(xdlCfgString, numInputs);
+	}
+
+	private void parseLutAttribute(String attr, int numInputs) {
 		// prep the parser
 		ANTLRInputStream input = new ANTLRInputStream(attr);
 		LutEquationLexer lexer = new LutEquationLexer(input);
@@ -37,7 +48,7 @@ public final class LutConfig {
 
 		// traverse the tree
 		LutParserListener listener = new LutParserListener();
-		ParseTreeWalker walker = new ParseTreeWalker();
+		ParseTreeWalker walker = new ParseTreeWalker(numInputs);
 		walker.walk(listener, tree);
 	}
 
@@ -174,7 +185,7 @@ public final class LutConfig {
 	}
 
 	public LutConfig deepCopy() {
-		LutConfig copy = new LutConfig();
+		LutConfig copy = new LutConfigBuilder().createLutConfig();
 		copy.operatingMode = operatingMode;
 		copy.output = output;
 		copy.isVcc = isVcc;
@@ -182,37 +193,6 @@ public final class LutConfig {
 		if (contents != null)
 			copy.contents = contents.deepCopy();
 		return copy;
-	}
-
-	public void remapPins(int[] remap) {
-		Stack<LutEquation> stack = new Stack<>();
-		LutEquation eqn = contents.getEquation();
-		stack.push(eqn);
-		while (!stack.isEmpty()) {
-			LutEquation tree = stack.pop();
-			if (tree.getClass() == LutInput.class) {
-				LutInput lutInput = (LutInput) tree;
-				int orig = lutInput.getIndex();
-				// subtract 1 from orig to align with zero base array
-				lutInput.setIndex(remap[orig-1]);
-			} else if (tree.getClass() == BinaryOperation.class){
-				BinaryOperation op = (BinaryOperation) tree;
-				stack.push(op.getLeft());
-				stack.push(op.getRight());
-			} else if (tree.getClass() == Constant.class) {
-				// do nothing
-			} else {
-				assert false : "Unknown tree node type";
-			}
-		}
-
-		setContents(new LutContents(eqn));
-	}
-
-	public void reduce() {
-		if (isStaticSource()) // contents are null when configured as static
-			return;
-		setContents(getContents().getReducedForm());
 	}
 
 	/* Parse a lut configuration attribute value to a LUTConfiguration */
@@ -250,5 +230,42 @@ public final class LutConfig {
 	public String toString() {
 		return "#" + operatingMode + ":" + getOutputPinName() + "=" +
 				(isVccSource() ? "1" : (isGndSource() ? "0" : contents.toString()));
+	}
+
+	public class Builder {
+		private String operatingMode;
+		private String output;
+		private boolean isVcc;
+		private boolean isGnd;
+		private LutContents contents;
+
+		public Builder setOperatingMode(String operatingMode) {
+			this.operatingMode = operatingMode;
+			return this;
+		}
+
+		public Builder setOutput(String output) {
+			this.output = output;
+			return this;
+		}
+
+		public Builder setIsVcc(boolean isVcc) {
+			this.isVcc = isVcc;
+			return this;
+		}
+
+		public Builder setIsGnd(boolean isGnd) {
+			this.isGnd = isGnd;
+			return this;
+		}
+
+		public Builder setContents(LutContents contents) {
+			this.contents = contents;
+			return this;
+		}
+
+		public LutConfig createLutConfig() {
+			return new LutConfig(operatingMode, output, isVcc, isGnd, contents);
+		}
 	}
 }
