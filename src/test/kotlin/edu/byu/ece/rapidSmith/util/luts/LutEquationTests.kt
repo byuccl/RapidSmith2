@@ -5,8 +5,11 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DynamicTest.dynamicTest
 import java.lang.AssertionError
 import java.util.*
+import java.util.HashMap
 
 class LutEquationTests {
+	val randomEquations = Array(200, { buildRandomEquation(Random(0xDADBEBAD), 1) } )
+
 	@Test
 	@DisplayName("test constant 0")
 	fun zero() {
@@ -41,10 +44,31 @@ class LutEquationTests {
 	@TestFactory
 	@DisplayName("test random LutEquations")
 	fun testRandom(): List<DynamicTest> {
-		val random = Random(0xDADBEBAD)
-		return Array(200, {
-					makeLutEquationBaseTest(buildRandomEquation(random, 1))
-		}).toList()
+		return Array(200, {	makeLutEquationBaseTest(randomEquations[it]) }).toList()
+	}
+
+	@Test
+	@DisplayName("test remap with empty map")
+	fun testRemapWithEmptyMap() {
+
+	}
+
+	@Test
+	@DisplayName("test direct remapping")
+	fun testDirectRemapping() {
+
+	}
+
+	@TestFactory
+	@DisplayName("test fully specified remap")
+	fun testFullySpecifiedRemap() {
+
+	}
+
+	@Test
+	@DisplayName("test remap with partial map")
+	fun testRemapWithPartialMap() {
+
 	}
 
 	// TODO move to coherence test class
