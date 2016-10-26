@@ -57,14 +57,6 @@ public final class InitString {
 		this.numInputs = other.numInputs;
 	}
 
-	private long getMask(int numInputs) {
-		long mask = 2;
-		for (int i = 1; i < numInputs; i++)
-			mask *= mask;
-		mask -= 1;
-		return mask;
-	}
-
 	/**
 	 * @return the configuration contained in this init string
 	 */
@@ -96,10 +88,7 @@ public final class InitString {
 
 		if (numInputs > this.numInputs) {
 			for (int i = this.numInputs; i <= numInputs; i++) {
-				int shift = 1;
-				for (int j = 0; j < i; j++) {
-					shift *= 2;
-				}
+				int shift = twoToThe(i);
 				cfgValue |= cfgValue << shift;
 			}
 		} else if (numInputs < this.numInputs) {
@@ -113,7 +102,8 @@ public final class InitString {
 	 */
 	@Override
 	public String toString() {
-		return "0x" + Long.toHexString(cfgValue);
+		int numDigits = twoToThe(this.numInputs) / 4;
+		return String.format("0x%0" + numDigits + "X", cfgValue);
 	}
 
 	@Override
@@ -214,5 +204,21 @@ public final class InitString {
 		} else {
 			throw new AssertionError("Unrecognized node");
 		}
+	}
+
+	private int twoToThe(int power) {
+		switch (power) {
+			case 1: return 2;
+			case 2: return 4;
+			case 3: return 8;
+			case 4: return 16;
+			case 5: return 32;
+			case 6: return 64;
+			default: throw new AssertionError("unsupported power");
+		}
+	}
+
+	private long getMask(int numInputs) {
+		return (1 << twoToThe(numInputs)) - 1;
 	}
 }
