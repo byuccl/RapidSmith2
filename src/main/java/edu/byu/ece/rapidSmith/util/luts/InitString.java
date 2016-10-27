@@ -206,7 +206,7 @@ public final class InitString {
 		}
 	}
 
-	private int twoToThe(int power) {
+	private static int twoToThe(int power) {
 		switch (power) {
 			case 1: return 2;
 			case 2: return 4;
@@ -218,7 +218,15 @@ public final class InitString {
 		}
 	}
 
-	private long getMask(int numInputs) {
-		return (1 << twoToThe(numInputs)) - 1;
+	private static long getMask(int numInputs) {
+		switch (numInputs) {
+			case 1: return 0x3L;
+			case 2: return 0xFL;
+			case 3: return 0xFFL;
+			case 4: return 0xFFFFL;
+			case 5: return 0xFFFFFFFFL;
+			case 6: return 0xFFFFFFFFFFFFFFFFL;
+			default: throw new AssertionError("unsupported power");
+		}
 	}
 }
