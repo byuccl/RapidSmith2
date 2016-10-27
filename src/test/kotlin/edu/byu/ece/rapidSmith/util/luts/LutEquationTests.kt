@@ -127,6 +127,8 @@ class LutEquationTests {
 		val eq = LutEquation.convertToLutEquation(InitString(0xFFFFFFFFL, 6))
 		assertEquals(LutInput(6, true), eq)
 	}
+
+	// get used inputs
 }
 
 private fun makeLutEquationBaseTest(equation: LutEquation): DynamicTest {

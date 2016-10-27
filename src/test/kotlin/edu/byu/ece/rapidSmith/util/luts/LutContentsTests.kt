@@ -89,27 +89,27 @@ class LutContentsTests {
 
 
 
-abstract class ParseEquationTest {
-	abstract val testCase: ParseEquationTestCase
-
-	@Test
-	fun equationIsIdentical() {
-		val actual = LutContents.parseEquation(testCase.string)
-		assertEquals(testCase.equation, actual.equation)
-	}
-
-	@Test
-	fun equationStringIsIdentical() {
-		val actual = LutContents.parseEquation(testCase.string)
-		assertEquals(testCase.string, actual.equation.toString())
-	}
-
-	@Test
-	fun deepCopyYieldsIdenticalEquation() {
-		val contents = LutContents.parseEquation(testCase.string)
-
-	}
-}
+//abstract class ParseEquationTest {
+//	abstract val testCase: ParseEquationTestCase
+//
+//	@Test
+//	fun equationIsIdentical() {
+//		val actual = LutContents.parseEquation(testCase.string)
+//		assertEquals(testCase.equation, actual.equation)
+//	}
+//
+//	@Test
+//	fun equationStringIsIdentical() {
+//		val actual = LutContents.parseEquation(testCase.string)
+//		assertEquals(testCase.string, actual.equation.toString())
+//	}
+//
+//	@Test
+//	fun deepCopyYieldsIdenticalEquation() {
+//		val contents = LutContents.parseEquation(testCase.string)
+//
+//	}
+//}
 
 data class ParseEquationTestCase(
 	val equation: LutEquation,
