@@ -8,10 +8,12 @@ import java.lang.IndexOutOfBoundsException
 import java.util.*
 
 class LutEquationTests {
-	val randomEquations: Array<LutEquation>
+	val randomEquations: List<LutEquation>
 
 	init {
-		randomEquations = Array(200, { buildRandomEquation(Random(0xDADBEBAD), 1) } )
+		randomEquations = Array(200, {
+			buildRandomEquation(Random(0xDADBEBAD), 1)
+		} ).toList()
 	}
 
 	@Test
@@ -53,9 +55,9 @@ class LutEquationTests {
 
 	@TestFactory
 	@DisplayName("test remap with empty map")
-	fun testRemapWithEmptyMap() {
+	fun testRemapWithEmptyMap(): List<DynamicTest> {
 		val mapping = emptyMap<Int, Int>()
-		randomEquations.map { dynamicTest(it.toString(), {
+		return randomEquations.map { dynamicTest(it.toString(), {
 			val copy = it.deepCopy()
 			copy.remapPins(mapping)
 			compareWithRemapped(it, copy, mapping)
@@ -64,9 +66,9 @@ class LutEquationTests {
 
 	@TestFactory
 	@DisplayName("test direct remapping")
-	fun testDirectRemapping() {
+	fun testDirectRemapping(): List<DynamicTest> {
 		val mapping = (1..6).associate { Pair(it, it) }
-		randomEquations.map { dynamicTest(it.toString(), {
+		return randomEquations.map { dynamicTest(it.toString(), {
 			val copy = it.deepCopy()
 			copy.remapPins(mapping)
 			compareWithRemapped(it, copy, mapping)
@@ -75,9 +77,9 @@ class LutEquationTests {
 
 	@TestFactory
 	@DisplayName("test fully specified remap")
-	fun testFullySpecifiedRemap() {
+	fun testFullySpecifiedRemap(): List<DynamicTest> {
 		val random = Random(0x444444L)
-		randomEquations.map { dynamicTest(it.toString(), {
+		return randomEquations.map { dynamicTest(it.toString(), {
 			val remainingInputs = arrayListOf(1, 2, 3, 4, 5, 6)
 			Collections.shuffle(remainingInputs, random)
 
@@ -90,9 +92,9 @@ class LutEquationTests {
 
 	@TestFactory
 	@DisplayName("test remap with partial map")
-	fun testRemapWithPartialMap() {
+	fun testRemapWithPartialMap(): List<DynamicTest> {
 		val random = Random(0x55555L)
-		randomEquations.map { dynamicTest(it.toString(), {
+		return randomEquations.map { dynamicTest(it.toString(), {
 			val remainingInputs = arrayListOf(1, 2, 3, 4, 5, 6)
 			Collections.shuffle(remainingInputs, random)
 
