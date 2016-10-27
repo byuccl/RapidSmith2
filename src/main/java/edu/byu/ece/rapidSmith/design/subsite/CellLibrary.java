@@ -86,6 +86,9 @@ public class CellLibrary implements Iterable<LibraryCell> {
 				case "inout": pin.setDirection(PinDirection.INOUT); break;
 				default: assert false : "unrecognized pin direction";
 			}
+			String pinType = pinEl.getChildText("type");
+			pin.setPinType(pinType == null ? CellPinType.DATA : CellPinType.valueOf(pinType));
+			
 			pins.add(pin);
 		}
 		libCell.setLibraryPins(pins);
@@ -140,9 +143,20 @@ public class CellLibrary implements Iterable<LibraryCell> {
 				pin.getPossibleBelPins().put(belId, possPins);
 			}
 		} else {
+			Set<LibraryPin> unmappedPins = new HashSet<LibraryPin>();
+			
+			// Create the bel pin mappings for each cell pin
 			for (Element belPinEl : belPinsEl.getChildren("pin")) {
+				
 				String pinName = belPinEl.getChildText("name");
 				LibraryPin pin = libCell.getLibraryPin(pinName);
+				
+				// skip pins that have no default mapping
+				if (belPinEl.getChild("no_map") != null) {
+					unmappedPins.add(pin);
+					continue;
+				}
+				
 				ArrayList<String> possibles = new ArrayList<>();
 				for (Element possibleEl : belPinEl.getChildren("possible")) {
 					possibles.add(possibleEl.getText());
@@ -150,9 +164,13 @@ public class CellLibrary implements Iterable<LibraryCell> {
 				possibles.trimToSize();
 				pin.getPossibleBelPins().put(belId, possibles);
 			}
+			
+			// Look for cell pins without a bel pin mapping. For these
+			// pins, assume a bel pin name that is identical to the cell pin name
 			for (LibraryPin pin : libCell.getLibraryPins()) {
-				if (pin.getPossibleBelPins(belId) != null)
+				if (pin.getPossibleBelPins(belId) != null || unmappedPins.contains(pin)) {
 					continue;
+				}
 				ArrayList<String> possPins = new ArrayList<>(1);
 				possPins.add(pin.getName());
 				pin.getPossibleBelPins().put(belId, possPins);

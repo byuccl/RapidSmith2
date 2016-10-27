@@ -93,4 +93,9 @@ public class BackedCellPin extends CellPin {
 	public LibraryPin getLibraryPin() {
 		return libraryPin;
 	}
+
+	@Override
+	public CellPinType getType() {
+		return libraryPin.getPinType();
+	}
 }

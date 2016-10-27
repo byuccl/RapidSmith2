@@ -23,22 +23,34 @@ import java.util.stream.Collectors;
  *  Cell nets may be members of a molecule.
  */
 public class CellNet implements Serializable {
+	
+	/** Unique Serialization ID for this class*/
+	private static final long serialVersionUID = 6082237548065721803L;
 	/** Unique name of the net */
 	private String name;
+	/**Type of net*/
 	private NetType type;
+	/** Design the net is attached to*/
 	private CellDesign design;
-	/** Source and sink pins of the net */
+	/** Sink pins of the net */
 	private Set<CellPin> pins;
+	/** Source pin of the net*/
 	private CellPin sourcePin;
+	/** Property map for the Net*/
 	private Map<Object, Property> propertyMap;
-
+	/** Set of CellPins that have been marked as routed in the design*/
 	private Set<CellPin> routedSinks; 
+	/** Set to true if this net is contained within a single site's boundaries*/
 	private boolean isIntrasite;
 	
 	// Physical route information
+	/** Route Tree connecting to the source pin of the net*/
 	private RouteTree source;
+	/** List of intersite RouteTree objects for the net*/
 	private List<RouteTree> intersiteRoutes;
+	/** Maps a connecting BelPin of the net, to the RouteTree connected to the BelPin*/
 	private Map<BelPin, RouteTree> belPinToSinkRTMap;
+	/** Maps a connecting SitePin of the net, to the RouteTree connected to the SitePin*/
 	private Map<SitePin, RouteTree> sitePinToRTMap;
 
 	/**
@@ -352,16 +364,33 @@ public class CellNet implements Serializable {
 
 	/**
 	 * Checks if a net is a clk net and should use the clock routing resources.
-	 * More specifically, checks if at least half of the pins of this net contain
-	 * the substring "CLK" in their names.
+	 * More specifically, checks if the pins connected to this net are of {@link CellPinType#CLOCK}.
 	 *
 	 * @return true if this net is a clock net
 	 */
 	public boolean isClkNet() {
-		// TODO It'd be nice to identify all of the clock pins on the cells
-		// This is kind of difficult to quantify, but we'll assume that if any
-		// of the pins on this net are name CLK or CK, then the net is a clock
-		// net
+		
+		for (CellPin p : this.pins) {
+			if (p.getType() == CellPinType.CLOCK) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Checks if a net is a clk net and should use the clock routing resources.
+	 * More specifically, checks if at least half of the pins of this net contain
+	 * the substring "CLK", "CK", or "C" in their names. This function should only be used if
+	 * the design was imported by the XDL unpacker and will soon be removed. For Vivado 
+	 * imported designs, use {@link CellNet#isClkNet} instead.
+	 * 
+	 * @deprecated
+	 * @return <code>true</code> if the net is a clock net. <code>false</code> otherwise.
+	 */
+	public boolean isClkNetXDL() {
+		
 		Collection<CellPin> cellPins = getPins();
 		for (CellPin p : cellPins) {
 			if (p.getName().contains("CK") || p.getName().contains("CLK") || p.getName().equals("C") ) {
