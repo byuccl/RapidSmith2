@@ -13,6 +13,9 @@ import java.util.Objects;
  *  Pin on a LibraryCell.
  */
 public final class LibraryPin implements Serializable {
+	
+	/** Unique serialization version UID for this class*/
+	private static final long serialVersionUID = 428090750543375520L;
 	/** Name of the pin */
 	private String name;
 	/** The LibraryCell this pin is for */
@@ -22,6 +25,9 @@ public final class LibraryPin implements Serializable {
 	/** Names of the BelPins that this pin can map to for each BelIdentifier */
 	private Map<BelId, List<String>> possibleBelPins;
 
+	/** Type of the LibraryPin. See {@link CellPinType} for the possible types.*/ 
+	private CellPinType pinType;
+	
 	public LibraryPin() {
 		possibleBelPins = new HashMap<>();
 	}
@@ -80,6 +86,23 @@ public final class LibraryPin implements Serializable {
 		this.direction = direction;
 	}
 
+	/**
+	 * Sets the type  of LibraryPin. See {@link CellPinType} for the possible
+	 * pin types. 
+	 * 
+	 * @param type CellPinType
+	 */
+	public void setPinType(CellPinType type) {
+		pinType = type;
+	}
+	
+	/**
+	 * @return The {@link CellPinType} of this LibraryPin
+	 */
+	public CellPinType getPinType() {
+		return pinType;
+	}
+	
 	/**
 	 * Returns a <code>Map</code> of <code>BelIdentifiers</code> the <code>LibraryCell</code>
 	 * can be placed on to a <code>List</code> of names of <code>BelPins</code> on such BELs
