@@ -6,7 +6,7 @@ equation_only : equation EOF ;
 
 op_mode : 'LUT' | 'RAM' | 'ROM' ;
 output_pin : INPUT | OUTPUT_PIN | CONST_VALUE ;
-lut_value : init_string | static_value | equation_value ;
+lut_value : init_string | equation_value ;
 static_value : '0' | '1' ;
 init_string : CONST_VALUE ;
 equation_value : equation ;
