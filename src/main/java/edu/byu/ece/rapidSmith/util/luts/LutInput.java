@@ -18,8 +18,7 @@ public final class LutInput extends LutEquation {
 	 * @param index index of the corresponding input pin
 	 */
 	public LutInput(int index) {
-		this.index = index;
-		this.inverted = false;
+		this(index, false);
 	}
 
 	/**
@@ -29,8 +28,8 @@ public final class LutInput extends LutEquation {
 	 * @param inverted true if the pin should be inverted
 	 */
 	public LutInput(int index, boolean inverted) {
-		this.index = index;
-		this.inverted = inverted;
+		setIndex(index);
+		setInverted(inverted);
 	}
 
 	/**
@@ -49,6 +48,7 @@ public final class LutInput extends LutEquation {
 	public void setIndex(int index) {
 		if (index < 1)
 			throw new IllegalArgumentException("LUT indices start at 1");
+
 		this.index = index;
 	}
 
