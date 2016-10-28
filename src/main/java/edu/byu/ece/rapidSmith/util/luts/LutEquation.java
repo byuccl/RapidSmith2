@@ -100,12 +100,14 @@ public abstract class LutEquation {
 	private static Set<MatchProduct> formProducts(InitString initString) {
 		// organize into set of unsimplified sum of products
 		Set<MatchProduct> products = new HashSet<>();
-		for (int i = 0; i < 64; i++) {
+		int numInputs = initString.getNumInputs();
+		int twoToTheInputs = twoToThe(numInputs);
+		for (int i = 0; i < twoToTheInputs; i++) {
 			long mask = 1L << i;
 			// check if this product yields a 1
 			if ((initString.getCfgValue() & mask) != 0) {
-				MatchProduct product = new MatchProduct();
-				for (int j = 0; j < 6; j++) {
+				MatchProduct product = new MatchProduct(numInputs);
+				for (int j = 0; j < numInputs; j++) {
 					if ((mask & inputValues.get(j)) != 0)
 						product.value[j] = MatchValue.ONE;
 					else
@@ -169,7 +171,7 @@ public abstract class LutEquation {
 
 	private static LutEquation makeProductTree(MatchProduct mp) {
 		LutEquation productTree = null;
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < mp.getNumInputs(); i++) {
 			LutEquation inputTree = null;
 			switch (mp.value[i]) {
 				case DONT_CARE:
@@ -195,13 +197,21 @@ public abstract class LutEquation {
 
 	// A product form of the equation
 	private static class MatchProduct {
-		MatchValue[] value = new MatchValue[6];
+		MatchValue[] value;
+
+		MatchProduct(int numInputs) {
+			value  = new MatchValue[numInputs];
+		}
+
+		int getNumInputs() {
+			return value.length;
+		}
 
 		// checks if this product is one bit different from the other.  This
 		// signifies a don't care
-		public boolean offByOne(MatchProduct other) {
+		boolean offByOne(MatchProduct other) {
 			int offCount = 0;
-			for (int i = 0; i < 6; i++) {
+			for (int i = 0; i < value.length; i++) {
 				if (value[i] != other.value[i]) {
 					offCount++;
 					if (offCount > 1)
@@ -212,10 +222,12 @@ public abstract class LutEquation {
 		}
 
 		// merges two products which are off by one
-		public static MatchProduct merge(MatchProduct mp1, MatchProduct mp2) {
+		static MatchProduct merge(MatchProduct mp1, MatchProduct mp2) {
+			assert mp1.getNumInputs() == mp2.getNumInputs();
 			assert mp1.offByOne(mp2);
-			MatchProduct ret = new MatchProduct();
-			for (int i = 0; i < 6; i++) {
+			int numInputs = mp1.getNumInputs();
+			MatchProduct ret = new MatchProduct(numInputs);
+			for (int i = 0; i < numInputs; i++) {
 				if (mp1.value[i] == mp2.value[i]) {
 					ret.value[i] = mp1.value[i];
 				} else {
@@ -246,7 +258,7 @@ public abstract class LutEquation {
 		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
-			for (int i = 5; i >= 0; i--) {
+			for (int i = getNumInputs()-1; i >= 0; i--) {
 				switch (value[i]) {
 					case ONE:
 						sb.append("1");
@@ -260,6 +272,18 @@ public abstract class LutEquation {
 				}
 			}
 			return sb.toString();
+		}
+	}
+
+	private static int twoToThe(int power) {
+		switch (power) {
+			case 1: return 2;
+			case 2: return 4;
+			case 3: return 8;
+			case 4: return 16;
+			case 5: return 32;
+			case 6: return 64;
+			default: throw new AssertionError("unsupported power");
 		}
 	}
 }

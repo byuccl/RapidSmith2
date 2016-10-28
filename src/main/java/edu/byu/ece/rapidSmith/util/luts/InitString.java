@@ -15,6 +15,8 @@ import java.util.List;
  * to equations in which multiple equations may be functionally identical.
  */
 public final class InitString {
+	public static final int MAX_SUPPORTED_INPUTS = 6;
+
 	private static final List<Long> inputValues = Arrays.asList(
 			0xAAAAAAAAAAAAAAAAL,
 			0xCCCCCCCCCCCCCCCCL,
@@ -38,7 +40,7 @@ public final class InitString {
 	 * @throws IllegalArgumentException if {@code numInputs} > 6 or < 1
 	 */
 	public InitString(long configuration, int numInputs) {
-		if (numInputs > 6)
+		if (numInputs > MAX_SUPPORTED_INPUTS)
 			throw new IllegalArgumentException("cannot support more than 6 inputs");
 		if (numInputs < 1)
 			throw new IllegalArgumentException("init string must have at least 1 input");
@@ -81,7 +83,7 @@ public final class InitString {
 	 * @throws IllegalArgumentException if {@code numInputs} > 6 or < 1
 	 */
 	public void resize(int numInputs) {
-		if (numInputs > 6)
+		if (numInputs > MAX_SUPPORTED_INPUTS)
 			throw new IllegalArgumentException("cannot support more than 6 inputs");
 		if (numInputs < 1)
 			throw new IllegalArgumentException("init string must have at least 1 input");
@@ -102,7 +104,10 @@ public final class InitString {
 	 */
 	@Override
 	public String toString() {
-		int numDigits = twoToThe(this.numInputs) / 4;
+		// get the number of digits need to display the value
+		// add three to enforce rounding up
+		int numDigits = (twoToThe(this.numInputs) + 3) / 4;
+		assert numDigits > 0;
 		return String.format("0x%0" + numDigits + "X", cfgValue);
 	}
 
