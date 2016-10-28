@@ -2,9 +2,16 @@
 /.project
 /.classpath
 **/*.class
+**/.DS_Store
 /.gitignore.orig
 /.gradle/
 /.idea/
 /*.iml
 /build/
 /.settings/
+/testdesigns/.Xil
+/testdesigns/*.tcp
+/testdesigns/*.jou
+/testdesigns/*.log
+/testdesigns/*.dmp
+
