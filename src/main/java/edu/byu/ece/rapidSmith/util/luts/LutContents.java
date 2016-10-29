@@ -40,8 +40,10 @@ public final class LutContents {
 
 	private LutContents(LutContents other) {
 		this.numInputs = other.numInputs;
-		this.equation = other.equation.deepCopy();
-		this.initString = new InitString(other.initString);
+		if (other.equation != null)
+			this.equation = other.equation.deepCopy();
+		if (other.initString != null)
+			this.initString = new InitString(other.initString);
 	}
 
 	/**
