@@ -60,41 +60,44 @@ class LutEquationTests {
 
 	@TestFactory
 	@DisplayName("test LutEquation.toString")
-	fun test_toString() {
-		testCases.map { dynamicTest(it.string) {
+	fun test_toString(): List<DynamicTest> {
+		return testCases.map { dynamicTest(it.string) {
 			assertEquals(it.toString, it.equation.toString())
 		} }
 	}
 
 	@TestFactory
 	@DisplayName("test LutEquation.parse")
-	fun test_parse() {
-		testCases.map { dynamicTest(it.string) {
+	fun test_parse(): List<DynamicTest> {
+		return testCases.map { dynamicTest(it.string) {
 			assertEquals(it.equation, LutEquation.parse(it.string))
 		} }
 	}
 
 	@TestFactory
 	@DisplayName("test LutEquation.deepCopy equality")
-	fun test_deepCopy_equality() {
-		testCases.map { dynamicTest(it.string) {
+	fun test_deepCopy_equality(): List<DynamicTest> {
+		return testCases.map { dynamicTest(it.string) {
 			testEquality(it.equation, it.equation.deepCopy())
 		} }
 	}
 
 	@TestFactory
 	@DisplayName("test LutEquation.deepCopy uniqueness")
-	fun test_deepCopy_uniqueness() {
-		testCases.map { dynamicTest(it.string) {
+	fun test_deepCopy_uniqueness(): List<DynamicTest> {
+		return testCases.map { dynamicTest(it.string) {
 			testUniqueness(it.equation, LutEquation.parse(it.string))
 		} }
 	}
 
 	@TestFactory
 	@DisplayName("test LutEquation.equals")
-	fun test_equals() {
-		testCases.flatMap { first -> testCases.map { second -> Pair(first, second) } }
-			.map {
+	fun test_equals(): List<DynamicTest> {
+		val random = Random(0x8888L)
+		val firstSet = (1..250).map { testCases[random.nextInt(testCases.size)] }
+		val tests = firstSet.zip((1..250).map { testCases[random.nextInt(testCases.size)] })
+
+		return tests.map {
 				val(first, second) = it
 				val equal = first.toString == second.toString
 				val testName = "$first${if (equal) "==" else "!="}$second"
@@ -198,8 +201,8 @@ class LutEquationTests {
 
 	@TestFactory
 	@DisplayName("test LutEquation.getUsedInputs")
-	fun test_getUsedInputs() {
-		testCases.map { dynamicTest(it.string) {
+	fun test_getUsedInputs(): List<DynamicTest> {
+		return testCases.map { dynamicTest(it.string) {
 			val expected = computeUsedInputs(it.equation)
 			assertEquals(expected, it.equation.usedInputs)
 		} }
