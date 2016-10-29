@@ -89,7 +89,7 @@ public final class InitString {
 			throw new IllegalArgumentException("init string must have at least 1 input");
 
 		if (numInputs > this.numInputs) {
-			for (int i = this.numInputs; i <= numInputs; i++) {
+			for (int i = this.numInputs; i < numInputs; i++) {
 				int shift = twoToThe(i);
 				cfgValue |= cfgValue << shift;
 			}
@@ -119,7 +119,8 @@ public final class InitString {
 		if (o.getClass() != InitString.class)
 			return false;
 		InitString that = (InitString) o;
-		return cfgValue == that.cfgValue;
+		return numInputs == that.numInputs &&
+				cfgValue == that.cfgValue;
 	}
 
 	@Override
@@ -137,6 +138,7 @@ public final class InitString {
 	 * @param configuration string representation of the init string
 	 * @param numInputs number of inputs for this init string
 	 * @return a new InitString containing the provided configuration
+	 * @throws LutParseException if string could not be parsed
 	 */
 	public static InitString parse(String configuration, int numInputs) {
 		long value = 0;
@@ -152,7 +154,7 @@ public final class InitString {
 					value <<= 4;
 					value += ch - 'a' + 10;
 				} else {
-					throw new LutParseException("Unrecognized character in init string");
+					throw new LutParseException("unrecognized character in init string");
 				}
 			}
 		} else if (configuration.startsWith("0b")) {
@@ -161,9 +163,11 @@ public final class InitString {
 					value <<= 1;
 					value += ch - '0';
 				} else {
-					throw new LutParseException("Unrecognized character in init string");
+					throw new LutParseException("unrecognized character in init string");
 				}
 			}
+		} else {
+			throw new LutParseException("unsupported init string format");
 		}
 
 		return new InitString(value, numInputs);
