@@ -80,9 +80,10 @@ public final class InitString {
 	 * > 1 and <=6.
 	 *
 	 * @param numInputs the new number of inputs
+	 * @return itself
 	 * @throws IllegalArgumentException if {@code numInputs} > 6 or < 1
 	 */
-	public void resize(int numInputs) {
+	public InitString resize(int numInputs) {
 		if (numInputs > MAX_SUPPORTED_INPUTS)
 			throw new IllegalArgumentException("cannot support more than 6 inputs");
 		if (numInputs < 1)
@@ -97,6 +98,7 @@ public final class InitString {
 			cfgValue &= getMask(numInputs);
 		}
 		this.numInputs = numInputs;
+		return this;
 	}
 
 	/**

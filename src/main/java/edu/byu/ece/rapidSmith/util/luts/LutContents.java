@@ -18,8 +18,12 @@ public final class LutContents {
 	 *
 	 * @param equation equation for the LUT
 	 * @param numInputs the number of inputs for this LUT
+	 * @throws NullPointerException if {@code equation} is null
 	 */
 	public LutContents(LutEquation equation, int numInputs) {
+		Objects.requireNonNull(equation);
+		checkNumInputs(numInputs);
+
 		this.numInputs = numInputs;
 		updateConfiguration(equation);
 	}
@@ -32,17 +36,30 @@ public final class LutContents {
 	 *
 	 * @param initString the init string for the LUT
 	 * @param numInputs the number of inputs for this LUT
+	 * @throws NullPointerException if {@code initString} is null
 	 */
 	public LutContents(InitString initString, int numInputs) {
+		Objects.requireNonNull(initString);
+		checkNumInputs(numInputs);
+
 		this.numInputs = numInputs;
 		updateConfiguration(initString);
 	}
 
-	private LutContents(LutContents other) {
+	/**
+	 * Constructs a deep copy of other (including the equation/InitString).  If supplied,
+	 * the equation form will be preserved as is.
+	 *
+	 * @param other the LutContents to copy
+	 * @throws NullPointerException if {@code other} is null
+	 */
+	public LutContents(LutContents other) {
+		Objects.requireNonNull(other);
+
 		this.numInputs = other.numInputs;
 		if (other.equation != null)
 			this.equation = other.equation.deepCopy();
-		if (other.initString != null)
+		else
 			this.initString = new InitString(other.initString);
 	}
 
@@ -75,6 +92,8 @@ public final class LutContents {
 	 * @param equation new equation for the LUT
 	 */
 	public void updateConfiguration(LutEquation equation) {
+		Objects.requireNonNull(equation);
+
 		this.initString = null;
 		this.equation = equation.deepCopy();
 	}
@@ -86,6 +105,8 @@ public final class LutContents {
 	 * @param initString new init string for the LUT
 	 */
 	public void updateConfiguration(InitString initString) {
+		Objects.requireNonNull(initString);
+
 		this.equation = null;
 		initString.resize(numInputs);
 		this.initString = new InitString(initString);
@@ -112,6 +133,7 @@ public final class LutContents {
 	public void updateNumInputs(int numInputs) {
 		if (numInputs == this.numInputs)
 			return;  // nothing needs to be changed
+		checkNumInputs(numInputs);
 
 		computeInitString();
 		this.numInputs = numInputs;
@@ -170,15 +192,7 @@ public final class LutContents {
 
 		// remap pins
 		reducedForm.remapPins(mapping);
-		this.numInputs = requiredInputs.size();
 		updateConfiguration(reducedForm);
-	}
-
-	/**
-	 * @return a deep copy of this LutContent.
-	 */
-	public LutContents deepCopy() {
-		return new LutContents(this);
 	}
 
 	/**
@@ -195,10 +209,8 @@ public final class LutContents {
 		if (this.getClass() != o.getClass())
 			return false;
 		LutContents other = ((LutContents) o);
-		if (initString == null)
-			computeInitString();
-		if (other.initString == null)
-			other.computeInitString();
+		computeInitString();
+		other.computeInitString();
 		return initString.equals(other.initString);
 	}
 
@@ -225,4 +237,10 @@ public final class LutContents {
 			equation = LutEquation.convertToLutEquation(initString);
 		}
 	}
+
+	private void checkNumInputs(int numInputs) {
+		if (numInputs > InitString.MAX_SUPPORTED_INPUTS)
+			throw new IllegalArgumentException("numInputs too large");
+		if (numInputs < 1)
+			throw new IllegalArgumentException("numInputs too small");	}
 }
