@@ -5,5 +5,14 @@ package edu.byu.ece.rapidSmith.util.luts
  */
 
 class LutConfigTests {
-//	fun
+	// constructor nullness requirments
+	// copy constructor yields deep copy
+	// copy constructor yields equivalent
+	// parse tests
+	// setoperatingmode nullness check
+	// setcontents nullness check
+	// isStaticSourceCheck
+	// isVCC and isGnd checks
+	// configure as VCC and GND source
+	// toXDLAttribute tests
 }
