@@ -185,6 +185,21 @@ public final class LutConfig {
 		this.contents.updateConfiguration(Constant.ZERO);
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		LutConfig lutConfig = (LutConfig) o;
+		return operatingMode == lutConfig.operatingMode &&
+				Objects.equals(outputPin, lutConfig.outputPin) &&
+				Objects.equals(contents, lutConfig.contents);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(operatingMode, outputPin, contents);
+	}
+
 	/* Parse a lut configuration attribute value to a LUTConfiguration */
 	private static class LutParserListener extends LutEquationBaseListener {
 		private final int numInputs;
