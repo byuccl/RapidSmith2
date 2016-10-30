@@ -423,7 +423,13 @@ class LutContentsTests {
 		val eq1 = BinaryOperation(OpType.AND, LutInput(6), LutInput(6, true))
 		val eq2 = Constant.ZERO
 
-		assertEquals(LutContents(eq1, 6), LutContents(eq2, 6))
+		val c1 = LutContents(eq1, 6)
+		val c2 = LutContents(eq2, 6)
+		assertAll(
+			Executable { assertEquals(c1, c2) },
+			Executable { assertEquals(c2, c1) },
+			Executable { assertEquals(c1.hashCode(), c2.hashCode()) }
+		)
 	}
 }
 
