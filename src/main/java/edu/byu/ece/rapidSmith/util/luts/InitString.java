@@ -1,22 +1,114 @@
 package edu.byu.ece.rapidSmith.util.luts;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
+ * String of 0s and 1s representing a lut configuration.  Each bit represents the result
+ * of the LUT for a different set of input values.  The corresponding input for the bit in
+ * the string is obtained from computing the unsigned value of the inputs bits arranged
+ * from highest bit to lowest.  For example, if A6 and A4 are 1 and the other bits are 0,
+ * then the index into the string would be 0b101000 = 0d40.
  *
+ * InitStrings provide for simple means of comparing functionally equivalent LUT
+ * configurations as each possible InitString represents a unique LUT function as opposed
+ * to equations in which multiple equations may be functionally identical.
  */
 public final class InitString {
-	private long value;
+	public static final int MAX_SUPPORTED_INPUTS = 6;
 
-	public InitString(long value) {
-		this.value = value;
+	private static final List<Long> inputValues = Arrays.asList(
+			0xAAAAAAAAAAAAAAAAL,
+			0xCCCCCCCCCCCCCCCCL,
+			0xF0F0F0F0F0F0F0F0L,
+			0xFF00FF00FF00FF00L,
+			0xFFFF0000FFFF0000L,
+			0xFFFFFFFF00000000L
+	);
+
+	private long cfgValue;
+	private int numInputs;
+
+	/**
+	 * Creates a new InitString from the long value.  The InitString is configured to use
+	 * {@code numInputs} number of inputs.  The configuration value is truncated to contain
+	 * only as many bits as required for the specified number of inputs.  Any higher order
+	 * bits are discarded.  {@code numInputs} must be > 1 and <=6.
+	 *
+	 * @param configuration the configuration provided as a long
+	 * @param numInputs number of inputs in this init string
+	 * @throws IllegalArgumentException if {@code numInputs} > 6 or < 1
+	 */
+	public InitString(long configuration, int numInputs) {
+		if (numInputs > MAX_SUPPORTED_INPUTS)
+			throw new IllegalArgumentException("cannot support more than 6 inputs");
+		if (numInputs < 1)
+			throw new IllegalArgumentException("init string must have at least 1 input");
+
+		long mask = getMask(numInputs);
+		this.cfgValue = mask & configuration;
+		this.numInputs = numInputs;
 	}
 
-	public long getValue() {
-		return value;
+	/**
+	 * Constructs a copy of other.
+	 * @param other InitString object to copy
+	 */
+	public InitString(InitString other) {
+		this.cfgValue = other.cfgValue;
+		this.numInputs = other.numInputs;
 	}
 
+	/**
+	 * @return the configuration contained in this init string
+	 */
+	public long getCfgValue() {
+		return cfgValue;
+	}
+
+	/**
+	 * @return the number of inputs used by this init string
+	 */
+	public int getNumInputs() {
+		return numInputs;
+	}
+
+	/**
+	 * Resizes the init string to use the new specified number of inputs.  Downsizing will
+	 * truncate the value to the number of required bits while upsizing will replicate the
+	 * bits treating the new higher order inputs as don't cares.  {@code numInputs} must be
+	 * > 1 and <=6.
+	 *
+	 * @param numInputs the new number of inputs
+	 * @throws IllegalArgumentException if {@code numInputs} > 6 or < 1
+	 */
+	public void resize(int numInputs) {
+		if (numInputs > MAX_SUPPORTED_INPUTS)
+			throw new IllegalArgumentException("cannot support more than 6 inputs");
+		if (numInputs < 1)
+			throw new IllegalArgumentException("init string must have at least 1 input");
+
+		if (numInputs > this.numInputs) {
+			for (int i = this.numInputs; i < numInputs; i++) {
+				int shift = twoToThe(i);
+				cfgValue |= cfgValue << shift;
+			}
+		} else if (numInputs < this.numInputs) {
+			cfgValue &= getMask(numInputs);
+		}
+		this.numInputs = numInputs;
+	}
+
+	/**
+	 * Returns the init string in hex form prepended with 0x.
+	 */
 	@Override
 	public String toString() {
-		return Long.toHexString(value);
+		// get the number of digits need to display the value
+		// add three to enforce rounding up
+		int numDigits = (twoToThe(this.numInputs) + 3) / 4;
+		assert numDigits > 0;
+		return String.format("0x%0" + numDigits + "X", cfgValue);
 	}
 
 	@Override
@@ -27,21 +119,31 @@ public final class InitString {
 		if (o.getClass() != InitString.class)
 			return false;
 		InitString that = (InitString) o;
-		return value == that.value;
+		return numInputs == that.numInputs &&
+				cfgValue == that.cfgValue;
 	}
 
 	@Override
 	public int hashCode() {
-		return (int) (value ^ (value >>> 32));
+		return (int) (cfgValue ^ (cfgValue >>> 32));
 	}
 
 	/* Parse String methods */
-	public static InitString parse(String initString) {
+
+	/**
+	 * Parses the string and returns a new InitString of the configuration.  This method
+	 * supports init strings in the form "0x&lt;cfg&gt;" for value in hexadecimal format
+	 * and "0b&lt;cfg&gt;" for values in binary format.
+	 *
+	 * @param configuration string representation of the init string
+	 * @param numInputs number of inputs for this init string
+	 * @return a new InitString containing the provided configuration
+	 * @throws LutParseException if string could not be parsed
+	 */
+	public static InitString parse(String configuration, int numInputs) {
 		long value = 0;
-		int length = 0;
-		if (initString.startsWith("0x")) {
-			for (char ch : initString.substring(2).toCharArray()) {
-				length += 4;
+		if (configuration.startsWith("0x")) {
+			for (char ch : configuration.substring(2).toCharArray()) {
 				if (ch >= '0' && ch <= '9') {
 					value <<= 4;
 					value += ch - '0';
@@ -52,59 +154,40 @@ public final class InitString {
 					value <<= 4;
 					value += ch - 'a' + 10;
 				} else {
-					throw new LutParseException("Unrecognized character in init string");
+					throw new LutParseException("unrecognized character in init string");
 				}
 			}
-		} else if (initString.startsWith("0b")) {
-			for (char ch : initString.substring(2).toCharArray()) {
-				length += 1;
+		} else if (configuration.startsWith("0b")) {
+			for (char ch : configuration.substring(2).toCharArray()) {
 				if (ch >= '0' && ch <= '1') {
 					value <<= 1;
 					value += ch - '0';
 				} else {
-					throw new LutParseException("Unrecognized character in init string");
+					throw new LutParseException("unrecognized character in init string");
 				}
 			}
+		} else {
+			throw new LutParseException("unsupported init string format");
 		}
 
-		return convertTo6InputInitString(value, length);
+		return new InitString(value, numInputs);
 	}
-
-	// resize to standardize on 6 input luts
-	private static InitString convertTo6InputInitString(long value, int length) {
-		length = roundUpToNearestPowerOfTwo(length);
-		while (length < 64) {
-			value |= value << length;
-			length *= 2;
-		}
-		return new InitString(value);
-	}
-
-	// finds the power of two greater than or equal to val
-	private static int roundUpToNearestPowerOfTwo(int val) {
-		int powerOf2 = 1;
-		while (powerOf2 < val)
-			powerOf2 *= 2;
-		return powerOf2;
-	}
-
-
 
 	/* convert to tree form to init string form */
 	/**
 	 * Converts the equation tree to a init string.
 	 *
-	 * @param equationTree the tree to convert
+	 * @param lutEquation the tree to convert
 	 * @return the equation represented in init string format
 	 */
-	public static InitString convertToInitString(EquationTree equationTree) {
-		return new InitString(buildInitString_recursive(equationTree));
+	public static InitString convertToInitString(LutEquation lutEquation, int numInputs) {
+		return new InitString(buildInitString_recursive(lutEquation), numInputs);
 	}
 
-	private static long buildInitString_recursive(EquationTree tree) {
+	private static long buildInitString_recursive(LutEquation tree) {
 		if (tree instanceof LutInput) {
 			LutInput lutInput = (LutInput) tree;
-			long inputValue = LutContents.inputValues.get(lutInput.getIndex()-1);
+			long inputValue = inputValues.get(lutInput.getIndex()-1);
 			if (lutInput.isInverted())
 				inputValue = ~inputValue;
 			return inputValue;
@@ -129,6 +212,30 @@ public final class InitString {
 			throw new AssertionError("Unknown constant value");
 		} else {
 			throw new AssertionError("Unrecognized node");
+		}
+	}
+
+	private static int twoToThe(int power) {
+		switch (power) {
+			case 1: return 2;
+			case 2: return 4;
+			case 3: return 8;
+			case 4: return 16;
+			case 5: return 32;
+			case 6: return 64;
+			default: throw new AssertionError("unsupported power");
+		}
+	}
+
+	private static long getMask(int numInputs) {
+		switch (numInputs) {
+			case 1: return 0x3L;
+			case 2: return 0xFL;
+			case 3: return 0xFFL;
+			case 4: return 0xFFFFL;
+			case 5: return 0xFFFFFFFFL;
+			case 6: return 0xFFFFFFFFFFFFFFFFL;
+			default: throw new AssertionError("unsupported power");
 		}
 	}
 }

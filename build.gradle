@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'kotlin'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'java-library-distribution'
@@ -8,19 +9,29 @@ version '2.1-SNAPSHOT'
 sourceCompatibility = '1.8'
 
 buildscript {
+    ext.kotlin_version = '1.1-M02'
     repositories {
         mavenCentral()
         jcenter()
+        maven {
+            url 'https://dl.bintray.com/kotlin/kotlin-eap-1.1'
+        }
     }
     dependencies {
         classpath 'ch.raffael.gradlePlugins.antlr4:gradle-antlr4-plugin:1.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0-M2'
     }
 }
 
 apply plugin:'ch.raffael.antlr4'
+apply plugin: 'org.junit.platform.gradle.plugin'
 
 repositories {
     mavenCentral()
+    maven {
+        url 'https://dl.bintray.com/kotlin/kotlin-eap-1.1'
+    }
 }
 
 dependencies {
@@ -31,8 +42,10 @@ dependencies {
     compile 'net.sourceforge.argparse4j:argparse4j:0.7.0'
     compile 'net.sf.jopt-simple:jopt-simple:5.0.2'
 
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.hamcrest:java-hamcrest:2.0.0.0'
+    testCompile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.0-M2'
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.0-M2'
+    testRuntime("org.junit.vintage:junit-vintage-engine:4.12.0-M2")
 }
 
 antlr4 {
@@ -53,5 +66,21 @@ antlr4 {
 //
 //    // where to put intermediate files
 //    generateDir = "$buildDir/antlr4/gen"
+}
+
+junitPlatform {
+    platformVersion '1.0.0-M2'
+//    engines {
+//        // include 'junit-jupiter', 'junit-vintage'
+//        // exclude 'custom-engine'
+//    }
+//    tags {
+//        // include 'fast'
+//        exclude 'slow'
+//    }
+//    includeClassNamePattern '.*Test'
+    // enableStandardTestTask true
+    // reportsDir file('build/test-results/junit-platform') // this is the default
+//    logManager 'org.apache.logging.log4j.jul.LogManager'
 }
 
