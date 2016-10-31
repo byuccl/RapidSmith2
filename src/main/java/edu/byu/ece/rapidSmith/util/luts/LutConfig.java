@@ -1,28 +1,54 @@
 package edu.byu.ece.rapidSmith.util.luts;
 
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.util.*;
 
 /**
- *
+ * Class representing the configuration of a mux.
  */
 public final class LutConfig {
-	private String operatingMode;
-	private String output;
-	private boolean isVcc;
-	private boolean isGnd;
+	private OperatingMode operatingMode;
+	private String outputPin;
 	private LutContents contents;
 
-	public LutConfig() {}
+	/**
+	 * Constructs a new LutConfig.
+	 *
+	 * @param operatingMode the operating mode (LUT, RAM, ROM)
+	 * @param outputPin the pin the lut leaves on (O5, O6)
+	 * @param contents the configuration contents of the LUT
+	 */
+	public LutConfig(OperatingMode operatingMode, String outputPin, LutContents contents) {
+		Objects.requireNonNull(operatingMode);
+		Objects.requireNonNull(contents);
 
-	public LutConfig(String cfgString) {
-		parseLutAttribute(cfgString);
+		this.operatingMode = operatingMode;
+		this.outputPin = outputPin;
+		this.contents = contents;
 	}
 
-	private void parseLutAttribute(String attr) {
+	/**
+	 * Constructs a new LutConfig.
+	 *
+	 * @param operatingMode the operating mode (LUT, RAM, ROM)
+	 * @param contents the configuration contents of the LUT
+	 */
+	public LutConfig(OperatingMode operatingMode, LutContents contents) {
+		this(operatingMode, null, contents);
+	}
+
+	/**
+	 * Parses an XDL LUT attribute string into a LutConfig.
+	 *
+	 * @param attr the attribute to parse
+	 * @param numInputs the number of inputs to the LUT
+	 * @return the parsed LutConfig
+	 */
+	public static LutConfig parseXdlLutAttribute(String attr, int numInputs) {
+		// prep the parser
 		ANTLRInputStream input = new ANTLRInputStream(attr);
 		LutEquationLexer lexer = new LutEquationLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -30,9 +56,15 @@ public final class LutConfig {
 		// Replace the default error listener with my fail hard listener
 		parser.removeErrorListeners();
 		parser.addErrorListener(new LutParseErrorListener());
+
+		// do the actual parsing
 		ParseTree tree = parser.config_string();
-		ParserVisitor visitor = new ParserVisitor();
-		visitor.visit(tree);
+
+		// traverse the tree
+		LutParserListener listener = new LutParserListener(numInputs);
+		ParseTreeWalker walker = new ParseTreeWalker();
+		walker.walk(listener, tree);
+		return listener.makeLutConfig();
 	}
 
 	/**
@@ -40,7 +72,7 @@ public final class LutConfig {
 	 *
 	 * @return the operating mode of this LUT
 	 */
-	public String getOperatingMode() {
+	public OperatingMode getOperatingMode() {
 		return operatingMode;
 	}
 
@@ -49,26 +81,26 @@ public final class LutConfig {
 	 *
 	 * @param operatingMode the new operating mode
 	 */
-	public void setOperatingMode(String operatingMode) {
+	public void setOperatingMode(OperatingMode operatingMode) {
 		this.operatingMode = operatingMode;
 	}
 
 	/**
-	 * Name of the output pin for this LUT, eg O5, O6.
+	 * Name of the output pin for this LUT, eg O5, O6.  Unused when targeting Vivado.
 	 *
 	 * @return the output pin for this LUT
 	 */
 	public String getOutputPinName() {
-		return output;
+		return outputPin;
 	}
 
 	/**
-	 * Sets the output pin for this LUT, eg O5, O6.
+	 * Sets the output pin for this LUT, eg O5, O6.  Unused when targeting Vivado.
 	 *
 	 * @param output the new output pin
 	 */
 	public void setOutputPinName(String output) {
-		this.output = output;
+		this.outputPin = output;
 	}
 
 	/**
@@ -90,7 +122,8 @@ public final class LutConfig {
 	 * @return true if this LUT is configured as a VCC source
 	 */
 	public boolean isVccSource() {
-		return isVcc;
+		return operatingMode == OperatingMode.LUT &&
+				contents.getEquation() == Constant.ONE;
 	}
 
 	/**
@@ -101,7 +134,8 @@ public final class LutConfig {
 	 * @return true if this LUT is configured as a ground source
 	 */
 	public boolean isGndSource() {
-		return isGnd;
+		return operatingMode == OperatingMode.LUT &&
+				contents.getEquation() == Constant.ZERO;
 	}
 
 	/**
@@ -115,139 +149,98 @@ public final class LutConfig {
 		return contents;
 	}
 
-	public void configureAsVccSource() {
-		reset();
-		this.isVcc = true;
-	}
-
-	public void configureAsGndSource() {
-		reset();
-		this.isGnd = true;
-	}
-
+	/**
+	 * Sets the contents of this LUT.
+	 *
+	 * @param contents new contents for this LUT
+	 */
 	public void setContents(LutContents contents) {
-		reset();
 		this.contents = contents;
 	}
 
-	private void reset() {
-		isVcc = false;
-		isGnd = false;
-		contents = null;
+	/**
+	 * Configures the LUT as a VCC source.
+	 */
+	public void configureAsVccSource() {
+		this.operatingMode = OperatingMode.LUT;
+		this.contents.updateConfiguration(Constant.ONE);
 	}
 
 	/**
-	 * Computes and returns the number of inputs required by this LUT's
-	 * configuration.  For example, ((A6 * ~A6) + A5) returns 2.
-	 *
-	 * @return the number of inputs required by this LUT's configuration
+	 * Configures the LUT as a GND source.
 	 */
-	public int getNumUsedInputs() {
-		if (isStaticSource()) // contents are null when configured as static
-			return 0;
-		return contents.getUsedInputs().size();
-	}
-
-	public Set<Integer> getUsedInputs() {
-		if (isStaticSource())
-			return Collections.emptySet();
-		return contents.getUsedInputs();
+	public void configureAsGndSource() {
+		this.operatingMode = OperatingMode.LUT;
+		this.contents.updateConfiguration(Constant.ZERO);
 	}
 
 	/**
-	 * Computes and returns the minimum number of inputs required by this LUT's
-	 * configuration once the equation is optimized.  For example, ((A6 * ~A6) + A5)
-	 * returns 1.
-	 *
-	 * @return the number of inputs required by this LUT's configuration
+	 * @return a deep copy of this configuration
 	 */
-	public int getMinNumOfInputs() {
-		if (isStaticSource()) // contents are null when configured as static
-			return 0;
-		return contents.getMinNumOfInputs();
-	}
-
 	public LutConfig deepCopy() {
-		LutConfig copy = new LutConfig();
-		copy.operatingMode = operatingMode;
-		copy.output = output;
-		copy.isVcc = isVcc;
-		copy.isGnd = isGnd;
-		if (contents != null)
-			copy.contents = contents.deepCopy();
-		return copy;
-	}
-
-	public void remapPins(int[] remap) {
-		Stack<EquationTree> stack = new Stack<>();
-		EquationTree eqn = contents.getCopyOfEquation();
-		stack.push(eqn);
-		while (!stack.isEmpty()) {
-			EquationTree tree = stack.pop();
-			if (tree.getClass() == LutInput.class) {
-				LutInput lutInput = (LutInput) tree;
-				int orig = lutInput.getIndex();
-				// subtract 1 from orig to align with zero base array
-				lutInput.setIndex(remap[orig-1]);
-			} else if (tree.getClass() == BinaryOperation.class){
-				BinaryOperation op = (BinaryOperation) tree;
-				stack.push(op.getLeft());
-				stack.push(op.getRight());
-			} else if (tree.getClass() == Constant.class) {
-				// do nothing
-			} else {
-				assert false : "Unknown tree node type";
-			}
-		}
-
-		setContents(new LutContents(eqn));
-	}
-
-	public void reduce() {
-		if (isStaticSource()) // contents are null when configured as static
-			return;
-		setContents(getContents().getReducedForm());
+		return new LutConfig(operatingMode, outputPin, contents.deepCopy());
 	}
 
 	/* Parse a lut configuration attribute value to a LUTConfiguration */
-	private class ParserVisitor extends LutEquationBaseVisitor<Object> {
+	private static class LutParserListener extends LutEquationBaseListener {
+		private final int numInputs;
+		private OperatingMode mode;
+		private String outputPin;
+		private LutContents contents;
 
-		@Override
-		public Object visitOp_mode(@NotNull LutEquationParser.Op_modeContext ctx) {
-			operatingMode = ctx.getText();
-			return Void.TYPE;
+		public LutParserListener(int numInputs) {
+			this.numInputs = numInputs;
 		}
 
 		@Override
-		public Object visitOutput_pin(@NotNull LutEquationParser.Output_pinContext ctx) {
-			output = ctx.getText();
-			return Void.TYPE;
+		public void enterOp_mode(LutEquationParser.Op_modeContext ctx) {
+			mode = OperatingMode.valueOf(ctx.getText());
 		}
 
 		@Override
-		public Object visitStatic_value(@NotNull LutEquationParser.Static_valueContext ctx) {
-			isVcc = ctx.getText().equals("1");
-			isGnd = ctx.getText().equals("0");
-			return Void.TYPE;
+		public void enterOutput_pin(LutEquationParser.Output_pinContext ctx) {
+			outputPin = ctx.getText();
 		}
 
 		@Override
-		public Object visitInit_string(@NotNull LutEquationParser.Init_stringContext ctx) {
-			contents = new LutContents(InitString.parse(ctx.getText()));
-			return Void.TYPE;
+		public void enterInit_string(LutEquationParser.Init_stringContext ctx) {
+			InitString initString = InitString.parse(ctx.getText(), numInputs);
+			contents = new LutContents(initString, numInputs);
 		}
 
 		@Override
-		public Object visitEquation_value(@NotNull LutEquationParser.Equation_valueContext ctx) {
-			EquationTree eqn = new EqnParserVisitor().visitEquation(ctx.equation());
-			contents = new LutContents(eqn);
-			return Void.TYPE;
+		public void enterEquation_value(LutEquationParser.Equation_valueContext ctx) {
+			LutEquation eqn = new EqnParserVisitor().visitEquation(ctx.equation());
+			contents = new LutContents(eqn, numInputs);
+		}
+
+		LutConfig makeLutConfig() {
+			return new LutConfig(mode, outputPin, contents);
 		}
 	}
 
 	@Override
 	public String toString() {
-		return "#" + operatingMode + ":" + getOutputPinName() + "=" +
-				(isVccSource() ? "1" : (isGndSource() ? "0" : contents.toString()));
+		return "#" + operatingMode + ":" + getOutputPinName() + "=" + contents.toString();
+	}
+
+	public String toXDLAttributeValue() {
+		StringBuilder sb = new StringBuilder();
+		sb.append('#');
+		sb.append(operatingMode.name());
+		sb.append(':');
+		sb.append(getOutputPinName());
+		sb.append('=');
+
+		if (isVccSource()) {
+			sb.append('1');
+		} else if (isGndSource()) {
+			sb.append('0');
+		} else if (operatingMode == OperatingMode.LUT) {
+			sb.append(contents.getEquation().toString());
+		} else {
+			sb.append(contents.getInitString().toString());
+		}
+		return sb.toString();
 	}
 }

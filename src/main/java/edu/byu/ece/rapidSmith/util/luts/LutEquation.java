@@ -5,13 +5,74 @@ import org.antlr.v4.runtime.*;
 import java.util.*;
 
 /**
- *
+ * A tree-structured representation of an XDL LUT equation.
  */
-public abstract class EquationTree {
-	protected abstract EquationTree deepCopy();
+public abstract class LutEquation {
+	private static final List<Long> inputValues = Arrays.asList(
+			0xAAAAAAAAAAAAAAAAL,
+			0xCCCCCCCCCCCCCCCCL,
+			0xF0F0F0F0F0F0F0F0L,
+			0xFF00FF00FF00FF00L,
+			0xFFFF0000FFFF0000L,
+			0xFFFFFFFF00000000L
+	);
 
-	public static EquationTree parse(String eqn) {
-		ANTLRInputStream input = new ANTLRInputStream(eqn);
+	// Prevent users from creating their own subclasses.
+	LutEquation() { }
+
+	/**
+	 * Returns a deep copy of the equation.  Any changes made to the returned equation
+	 * will not be reflected in this equation and vice versa.  Some immutable objects
+	 * may not be updated.
+	 *
+	 * @return a deep copy of this equation
+	 */
+	public abstract LutEquation deepCopy();
+
+	/**
+	 * Returns the string representation of this equation.  The string should be such that
+	 * calling {@link #parse(String)} on the returned string should yield an identical
+	 * equation.
+	 *
+	 * @return the string representation of this equation
+	 */
+	public abstract String toString();
+
+	/**
+	 * Tests for equality of the equations.  Equations are equal if the trees are
+	 * identical.  Equal LutEquations will be functionally equivalent but functionally
+	 * equivalent LutEquations may not be equal.
+	 *
+	 * @return true if this LutEquation is equal to {@code other}
+	 */
+	public abstract boolean equals(Object other);
+
+	/**
+	 * Remaps the pins with the index in the keys of mapping to their values.
+	 * @param mapping map of the index of the pins to the indexes to change them to
+	 */
+	public abstract void remapPins(Map<Integer, Integer> mapping);
+
+	/**
+	 * @return the inputs used in this equation
+	 */
+	public final Set<Integer> getUsedInputs() {
+		HashSet<Integer> usedInputs = new HashSet<>();
+		getUsedInputs(usedInputs);
+		return usedInputs;
+	}
+
+	protected abstract void getUsedInputs(Set<Integer> usedInputs);
+
+	/**
+	 * Parses an XDL LUT equation into a LutEquation tree.
+	 *
+	 * @param string string representation of an equation to parse
+	 * @return the equivalent LutEquation object
+	 * @throws LutParseException if equation is improperly formatted
+	 */
+	public static LutEquation parse(String string) {
+		ANTLRInputStream input = new ANTLRInputStream(string);
 		LutEquationLexer lexer = new LutEquationLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		LutEquationParser parser = new LutEquationParser(tokens);
@@ -25,13 +86,12 @@ public abstract class EquationTree {
 	/* Convert the init string form to tree form */
 
 	/**
-	 * Converts the init string to a minimized equation tree in sum of products
-	 * form.  If the contents are constant value, returns null.
+	 * Converts the init string to a minimized sum of products LutEquation..
 	 *
 	 * @param initString the init string to convert
-	 * @return the minimized equation tree representing the init string
+	 * @return the minimized equivalent LutEquation
 	 */
-	public static EquationTree convertToEquationTree(InitString initString) {
+	public static LutEquation convertToLutEquation(InitString initString) {
 		Set<MatchProduct> products = formProducts(initString);
 		products = reduceProducts(products);
 		return convertToTree(products);
@@ -40,13 +100,15 @@ public abstract class EquationTree {
 	private static Set<MatchProduct> formProducts(InitString initString) {
 		// organize into set of unsimplified sum of products
 		Set<MatchProduct> products = new HashSet<>();
-		for (int i = 0; i < 64; i++) {
+		int numInputs = initString.getNumInputs();
+		int twoToTheInputs = twoToThe(numInputs);
+		for (int i = 0; i < twoToTheInputs; i++) {
 			long mask = 1L << i;
 			// check if this product yields a 1
-			if ((initString.getValue() & mask) != 0) {
-				MatchProduct product = new MatchProduct();
-				for (int j = 0; j < 6; j++) {
-					if ((mask & LutContents.inputValues.get(j)) != 0)
+			if ((initString.getCfgValue() & mask) != 0) {
+				MatchProduct product = new MatchProduct(numInputs);
+				for (int j = 0; j < numInputs; j++) {
+					if ((mask & inputValues.get(j)) != 0)
 						product.value[j] = MatchValue.ONE;
 					else
 						product.value[j] = MatchValue.ZERO;
@@ -88,29 +150,29 @@ public abstract class EquationTree {
 	}
 
 	// Convert the set of products into an equation in SOP form
-	private static EquationTree convertToTree(Set<MatchProduct> products) {
-		EquationTree equationTree = null;
+	private static LutEquation convertToTree(Set<MatchProduct> products) {
+		LutEquation lutEquation = null;
 		for (MatchProduct mp : products) {
-			EquationTree productTree = makeProductTree(mp);
-			if (equationTree == null) // only for first product
-				equationTree = productTree;
+			LutEquation productTree = makeProductTree(mp);
+			if (lutEquation == null) // only for first product
+				lutEquation = productTree;
 			else // make an or chain
-				equationTree = new BinaryOperation(OpType.OR, equationTree, productTree);
+				lutEquation = new BinaryOperation(OpType.OR, lutEquation, productTree);
 		}
 		// handle potential constant outputs
-		if (equationTree == null) {
+		if (lutEquation == null) {
 			if (products.size() == 0)
-				equationTree = Constant.ZERO;
+				lutEquation = Constant.ZERO;
 			else if (products.size() == 1)
-				equationTree = Constant.ONE;
+				lutEquation = Constant.ONE;
 		}
-		return equationTree;
+		return lutEquation;
 	}
 
-	private static EquationTree makeProductTree(MatchProduct mp) {
-		EquationTree productTree = null;
-		for (int i = 0; i < 6; i++) {
-			EquationTree inputTree = null;
+	private static LutEquation makeProductTree(MatchProduct mp) {
+		LutEquation productTree = null;
+		for (int i = 0; i < mp.getNumInputs(); i++) {
+			LutEquation inputTree = null;
 			switch (mp.value[i]) {
 				case DONT_CARE:
 					continue; // don't cares signal unused inputs
@@ -120,6 +182,7 @@ public abstract class EquationTree {
 				case ZERO:
 					inputTree = new LutInput(i+1, true); // an inverted input
 			}
+
 			if (productTree == null) // only true for the first input
 				productTree = inputTree;
 			else // create a chain of ands
@@ -134,13 +197,21 @@ public abstract class EquationTree {
 
 	// A product form of the equation
 	private static class MatchProduct {
-		MatchValue[] value = new MatchValue[6];
+		MatchValue[] value;
+
+		MatchProduct(int numInputs) {
+			value  = new MatchValue[numInputs];
+		}
+
+		int getNumInputs() {
+			return value.length;
+		}
 
 		// checks if this product is one bit different from the other.  This
 		// signifies a don't care
-		public boolean offByOne(MatchProduct other) {
+		boolean offByOne(MatchProduct other) {
 			int offCount = 0;
-			for (int i = 0; i < 6; i++) {
+			for (int i = 0; i < value.length; i++) {
 				if (value[i] != other.value[i]) {
 					offCount++;
 					if (offCount > 1)
@@ -151,10 +222,12 @@ public abstract class EquationTree {
 		}
 
 		// merges two products which are off by one
-		public static MatchProduct merge(MatchProduct mp1, MatchProduct mp2) {
+		static MatchProduct merge(MatchProduct mp1, MatchProduct mp2) {
+			assert mp1.getNumInputs() == mp2.getNumInputs();
 			assert mp1.offByOne(mp2);
-			MatchProduct ret = new MatchProduct();
-			for (int i = 0; i < 6; i++) {
+			int numInputs = mp1.getNumInputs();
+			MatchProduct ret = new MatchProduct(numInputs);
+			for (int i = 0; i < numInputs; i++) {
 				if (mp1.value[i] == mp2.value[i]) {
 					ret.value[i] = mp1.value[i];
 				} else {
@@ -185,7 +258,7 @@ public abstract class EquationTree {
 		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
-			for (int i = 5; i >= 0; i--) {
+			for (int i = getNumInputs()-1; i >= 0; i--) {
 				switch (value[i]) {
 					case ONE:
 						sb.append("1");
@@ -199,6 +272,18 @@ public abstract class EquationTree {
 				}
 			}
 			return sb.toString();
+		}
+	}
+
+	private static int twoToThe(int power) {
+		switch (power) {
+			case 1: return 2;
+			case 2: return 4;
+			case 3: return 8;
+			case 4: return 16;
+			case 5: return 32;
+			case 6: return 64;
+			default: throw new AssertionError("unsupported power");
 		}
 	}
 }
