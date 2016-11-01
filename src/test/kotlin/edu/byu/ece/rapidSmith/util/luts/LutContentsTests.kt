@@ -404,7 +404,7 @@ class LutContentsTests {
 		contents.reduceToMinSize()
 		assertAll(
 			Executable { assertEquals(InitString(0, 6), contents.initString) },
-			Executable { assertEquals(Constant.ZERO, contents.equation) }
+			Executable { assertEquals(Constant.ONE, contents.equation) }
 		)
 	}
 
