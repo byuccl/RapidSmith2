@@ -403,7 +403,7 @@ class LutContentsTests {
 		val contents = LutContents(eq, 6)
 		contents.reduceToMinSize()
 		assertAll(
-			Executable { assertEquals(InitString(0, 6), contents.initString) },
+			Executable { assertEquals(InitString(-1, 6), contents.initString) },
 			Executable { assertEquals(Constant.ONE, contents.equation) }
 		)
 	}
