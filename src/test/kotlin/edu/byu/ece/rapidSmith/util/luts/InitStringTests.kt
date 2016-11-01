@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DynamicTest.*
 
 private val IAE = IllegalArgumentException::class.java
 
+
 class InitStringTests {
 	@Test
 	@DisplayName("construct with 6 inputs")
