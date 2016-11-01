@@ -41,6 +41,15 @@ public final class LutConfig {
 	}
 
 	/**
+	 * Constructs a deep copy of LutConfig {@code other}.
+	 *
+	 * @param other the LutConfig to copy
+	 */
+	public LutConfig(LutConfig other) {
+		this(other.operatingMode, other.outputPin, new LutContents(other.contents));
+	}
+
+	/**
 	 * Parses an XDL LUT attribute string into a LutConfig.
 	 *
 	 * @param attr the attribute to parse
@@ -82,6 +91,7 @@ public final class LutConfig {
 	 * @param operatingMode the new operating mode
 	 */
 	public void setOperatingMode(OperatingMode operatingMode) {
+		Objects.requireNonNull(operatingMode);
 		this.operatingMode = operatingMode;
 	}
 
@@ -155,6 +165,7 @@ public final class LutConfig {
 	 * @param contents new contents for this LUT
 	 */
 	public void setContents(LutContents contents) {
+		Objects.requireNonNull(contents);
 		this.contents = contents;
 	}
 
@@ -174,11 +185,19 @@ public final class LutConfig {
 		this.contents.updateConfiguration(Constant.ZERO);
 	}
 
-	/**
-	 * @return a deep copy of this configuration
-	 */
-	public LutConfig deepCopy() {
-		return new LutConfig(operatingMode, outputPin, contents.deepCopy());
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		LutConfig lutConfig = (LutConfig) o;
+		return operatingMode == lutConfig.operatingMode &&
+				Objects.equals(outputPin, lutConfig.outputPin) &&
+				Objects.equals(contents, lutConfig.contents);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(operatingMode, outputPin, contents);
 	}
 
 	/* Parse a lut configuration attribute value to a LUTConfiguration */
