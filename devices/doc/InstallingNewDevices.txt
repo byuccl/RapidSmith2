@@ -51,7 +51,7 @@ Github (https://github.com/byuccl/tincr.git).  Once it is installed
 and working, you generate an XDLRC file using the following command
 inside the Vivado interactive Tcl shell:
 
-tincr::write_xdlrc -part xc7a100tcsg324 -max_processes 4 -primitive_defs xc7a100tcsg324_full.xdlrc
+tincr::write_xdlrc -part xc7a100tcsg324 -max_processes 1 -primitive_defs xc7a100tcsg324_full.xdlrc
 
 The -max_processes tells the tool how many threads to use to generate
 the file in parallel.  There have been issues with it hanging when

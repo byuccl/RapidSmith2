@@ -58,8 +58,8 @@ Tcl command line.  It will bring up the Vivado gui each time
 it needs.  Important: just be patient - it may take over a
 minute for the Vivado gui to initially load.
 
-Batch mode usage: java edu.byu.ece.rapidSmith.examples2.placerTest.PlacerTest tincrCheckPointName
-Interactive mode usage: java edu.byu.ece.rapidSmith.examples2.placerTest.PlacerTest -I tincrCheckPointName
+Batch mode usage: java edu.byu.ece.rapidSmith.examples2.placerDemo.PlacerDemo tincrCheckPointName
+Interactive mode usage: java edu.byu.ece.rapidSmith.examples2.placerDemo.PlacerDemo -I tincrCheckPointName
 
 
 
