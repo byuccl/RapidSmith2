@@ -43,7 +43,7 @@ public class Installer {
 	public static String nl = System.getProperty("line.separator");
 	public static String disclaimer = 
 		"This material is based upon work supported by the National" + nl + 
-		"Science Foundation under Grant No. 0801876. Any opinions," + nl + 
+		"Science Foundation under Grant No. 0801876 and 1265957. Any opinions," + nl + 
 		"findings, and conclusions or recommendations expressed in this" + nl + 
 		"material are those of the author(s) and do not necessarily" + nl + 
 		"reflect the views of the National Science Foundation.";
