@@ -24,6 +24,11 @@ buildscript {
     }
 }
 
+ext.junit4Version        = '4.12'
+ext.junitVintageVersion  = '4.12.0-M2'
+ext.junitPlatformVersion = '1.0.0-M2'
+ext.junitJupiterVersion  = '5.0.0-M2'
+
 apply plugin:'ch.raffael.antlr4'
 apply plugin: 'org.junit.platform.gradle.plugin'
 
@@ -43,9 +48,13 @@ dependencies {
     compile 'net.sf.jopt-simple:jopt-simple:5.0.2'
 
     testCompile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.0-M2'
-    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.0-M2'
-    testRuntime("org.junit.vintage:junit-vintage-engine:4.12.0-M2")
+    testCompile "org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion"
+    testCompile "org.junit.platform:junit-platform-runner:$junitPlatformVersion"
+
+    testRuntime "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"
+    testRuntime "org.junit.vintage:junit-vintage-engine:$junitVintageVersion"
+
+    testCompile("junit:junit:${junit4Version}")
 }
 
 antlr4 {
