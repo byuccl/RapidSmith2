@@ -41,11 +41,14 @@ proc comp {top} {
     route_design
 
     #	remove files
-    file delete {*}[glob *.log]
-    file delete {*}[glob *.dmp]
+#    file delete {*}[glob *.log]
+#    file delete {*}[glob *.dmp]
 
+    puts "Writing checkpoint"
     write_checkpoint -force $top.dcp
+    puts "Writing rscp"
     tincr::write_rscp $top
+    puts "All done..."
     #	close_design
 
     }
