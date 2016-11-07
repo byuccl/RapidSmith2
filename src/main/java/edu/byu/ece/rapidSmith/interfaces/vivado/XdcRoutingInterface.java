@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import edu.byu.ece.rapidSmith.design.NetType;
+import edu.byu.ece.rapidSmith.design.subsite.BelRoutethrough;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
@@ -57,20 +58,19 @@ public class XdcRoutingInterface {
 	private HashMap<SitePin, IntrasiteRoute> sitePinToRouteMap;
 	private Map<BelPin, CellPin> belPinToCellPinMap;
 	private CellNet currentNet;
-	private Map<BelPin, Wire> usedRoutethroughMap;
 	private Map<SiteType, Set<String>> staticSourceMap;
-	private Set<Bel> routethroughBels;
 	private Set<Bel> staticSourceBels;
 	private int currentLineNumber;
 	private String currentFile;
-		
+	
+	private Map<Bel, BelRoutethrough> belRoutethroughMap;
+	
 	public XdcRoutingInterface(CellDesign design, Device device, Map<BelPin, CellPin> pinMap) {
 		
 		this.device = device;
 		this.wireEnumerator = device.getWireEnumerator();
 		this.design = design;
 		this.sitePinToRouteMap = new HashMap<SitePin, IntrasiteRoute>();
-		this.usedRoutethroughMap = new HashMap<BelPin, Wire>();
 		this.staticSourceMap = new HashMap<SiteType, Set<String>>();
 		this.belPinToCellPinMap = pinMap;
 		this.currentLineNumber = 0;
@@ -81,11 +81,11 @@ public class XdcRoutingInterface {
 	 * Returns a set of BELs that are being used as a routethrough
 	 * @return
 	 */
-	public Set<Bel> getRoutethroughsBels() {
+	public Map<Bel, BelRoutethrough> getRoutethroughsBels() {
 		
-		return (routethroughBels == null) ? 
-				Collections.emptySet() :
-				routethroughBels;
+		return (this.belRoutethroughMap == null) ? 
+				Collections.emptyMap() :
+					belRoutethroughMap;
 	}
 	
 	/**
@@ -218,34 +218,6 @@ public class XdcRoutingInterface {
 			createRouteTreeForNet(start, 4, toks, isBufgClkNet(net));
 			net.addIntersiteRouteTree(start);
 		}
-		
-		/*
-	// 	CellNet net = tryGetCellNet(toks[1]);
-		this.currentNet = net;
-		
-		if (net.isVCCNet()) {
-			if (vccRouteTrees != null) {
-				net.setIntersiteRouteTrees(vccRouteTrees);
-			}
-			else {
-				vccRouteTrees = createRouteTreeListForPowerNet(net, toks);
-			}
-		}
-		else if (net.isGNDNet()) {
-			if (gndRouteTrees != null) {
-				net.setIntersiteRouteTrees(gndRouteTrees);
-			}
-			else {
-				gndRouteTrees = createRouteTreeListForPowerNet(net, toks);
-			}
-		}
-		else { // otherwise, its a general wire
-			
-			RouteTree start = initializeRouteTree(net, toks[3]);
-			createRouteTreeForNet(start, 4, toks, isBufgClkNet(net));
-			net.addIntersiteRouteTree(start);
-		}
-		*/
 	}
 	
 	/**
@@ -256,15 +228,13 @@ public class XdcRoutingInterface {
 	 */
 	private void processLutRoutethroughs(String[] toks) {
 
-		if (toks.length > 1) {
-			this.routethroughBels = new HashSet<Bel>();
-		}
+		//if (toks.length > 1) {
+			this.belRoutethroughMap = new HashMap<Bel, BelRoutethrough>();
+		//}
 		
 		for (int i = 1; i < toks.length; i++) {
-			String[] routethroughToks = toks[i].split("/");
-			
-			// TODO: change this to a check and add an assertion?
-			assert(routethroughToks.length == 4);
+			String[] routethroughToks = toks[i].split("/");			
+			checkTokenLength(routethroughToks.length, 4);
 			
 			// TODO: Check that the input pin is an input pin and the output pin is an output pin?
 			Site site = tryGetSite(routethroughToks[0]);
@@ -272,8 +242,7 @@ public class XdcRoutingInterface {
 			BelPin inputPin = tryGetBelPin(bel, routethroughToks[2]);
 			BelPin outputPin = tryGetBelPin(bel, routethroughToks[3]);
 		
-			routethroughBels.add(bel);
-			usedRoutethroughMap.put(inputPin, outputPin.getWire());
+			belRoutethroughMap.put(bel, new BelRoutethrough(bel, inputPin, outputPin));
 		}
 	}
 	
@@ -290,8 +259,7 @@ public class XdcRoutingInterface {
 		
 		for (int i = 1; i < toks.length; i++) {
 			String[] staticToks = toks[i].split("/");
-			
-			assert(staticToks.length == 3);
+			checkTokenLength(staticToks.length, 3);
 			
 			Site site = tryGetSite(staticToks[0]);
 			Bel bel = tryGetBel(site, staticToks[1]);
@@ -312,7 +280,7 @@ public class XdcRoutingInterface {
 		String namePrefix = "intrasite:" + site.getType() + "/";
 		
 		//list of site pip wires that are used...
-		for(int i = 2; i <toks.length; i++) {
+		for(int i = 2; i < toks.length; i++) {
 			String pipWireName = (namePrefix + toks[i].replace(":", "."));
 			Integer wireEnum = tryGetWireEnum(pipWireName); 
 			
@@ -599,7 +567,7 @@ public class XdcRoutingInterface {
 				pinConnections = rt.getWire().getPinConnections();
 				if (!pinConnections.isEmpty()) {
 					// TODO: remove this once we have tested it
-					System.out.println("HEY! : " + currentNet.getName());
+					// System.out.println("HEY! : " + currentNet.getName());
 					break;
 				}
 				
@@ -722,6 +690,8 @@ public class XdcRoutingInterface {
 									.filter(bel -> bel.getName().contains("VCC") || bel.getName().contains("GND"))
 									.map(bel -> bel.getName())
 									.collect(Collectors.toSet());
+			
+			staticSourceMap.put(site.getType(), staticSourcesInSite);
 		}
 		
 		return staticSourcesInSite.stream()
@@ -799,6 +769,14 @@ public class XdcRoutingInterface {
 		return false;
 	}
 	
+	private void checkTokenLength(int tokenLength, int expectedLength) {
+		
+		if (tokenLength != expectedLength) {
+			throw new ParseException(String.format("Incorrect number of tokens on line %d of %s.\n"
+												+ "Expected: %d Actual: %d", currentLineNumber, currentFile, tokenLength, expectedLength));
+		}
+	}
+	
 	public void buildIntrasiteRoute(IntrasiteRoute intrasiteRoute, Set<Integer> usedSiteWires) {
 		
 		Set<Wire> visitedWires = new HashSet<Wire>(); // used to prevent cycles
@@ -812,10 +790,9 @@ public class XdcRoutingInterface {
 		while (!routeQueue.isEmpty()) {
 			RouteTree currentRoute = routeQueue.poll();
 			Wire currentWire = currentRoute.getWire();
-						
+
 			// reached a used bel pin that is not the source
 			if (intrasiteRoute.isValidBelPinSink(currentWire) && !currentWire.equals(startWire)) {
-				
 				BelPin bp = currentWire.getTerminals().iterator().next().getBelPin();
 				intrasiteRoute.addBelPinSink(bp, currentRoute);
 			}
@@ -825,8 +802,9 @@ public class XdcRoutingInterface {
 				intrasiteRoute.addSitePinSink(sinkPin, currentRoute);
 			}
 			else {
-				for (Connection conn : currentWire.getWireConnections()) {
 				
+				for (Connection conn : currentWire.getWireConnections()) {
+										
 					// skip wires we already visited
 					if (visitedWires.contains(conn.getSinkWire())) {
 						continue;
@@ -883,8 +861,12 @@ public class XdcRoutingInterface {
 		assert (!sourceWire.getTerminals().isEmpty()) : "Wire: " + sourceWire + " should connect to BelPin!";
 		BelPin source = sourceWire.getTerminals().iterator().next().getBelPin();
 		
-		Wire sinkWire = usedRoutethroughMap.get(source);
-		return sinkWire != null && sinkWire.equals(conn.getSinkWire());
+		BelRoutethrough routethrough = this.belRoutethroughMap.get(source.getBel());
+		
+		return routethrough != null && routethrough.getOutputWire().equals(conn.getSinkWire());
+		
+		// Wire sinkWire = usedRoutethroughMap.get(source);
+		// return sinkWire != null && sinkWire.equals(conn.getSinkWire());
 	}
 	
 	/*

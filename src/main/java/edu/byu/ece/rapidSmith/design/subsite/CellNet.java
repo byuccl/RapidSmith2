@@ -273,7 +273,20 @@ public class CellNet implements Serializable {
 
 		pinsToAdd.forEach(this::connectToPin);
 	}
-
+	
+	public int getPseudoPinCount() {
+		
+		int pseudoPinCount = 0;
+		
+		for (CellPin pin : pins) {
+			if (pin.isPseudoPin()) {
+				pseudoPinCount++;
+			}
+		}
+		
+		return pseudoPinCount;
+	}
+	
 	/**
 	 * Adds a pin to this net.  It is an error to add multiple output pins
 	 * (excluding inout pins).
@@ -307,6 +320,16 @@ public class CellNet implements Serializable {
 	 */
 	public void disconnectFromPins(Collection<CellPin> pins) {
 		pins.forEach(pin -> disconnectFromPin(pin));
+	}
+
+	/**
+	 * Tests if the specified pin is attached to the net
+	 * 
+	 * @param pin CellPin to test
+	 * @return <code>true</code> if the pin is attached to the net, <code>false</code> otherwise
+	 */
+	public boolean isConnectedToPin(CellPin pin) {
+		return pins.contains(pin);
 	}
 	
 	/**
@@ -622,6 +645,14 @@ public class CellNet implements Serializable {
 	}
 	
 	/**
+	 * @return <code>true</code> if this net has one intersite {@link RouteTree}
+	 * 		object connected to it. <code>false</code> otherwise.
+	 */
+	public boolean hasIntersiteRouting() {
+		return intersiteRoutes != null && intersiteRoutes.size() > 0;
+	}
+	
+	/**
 	 * Adds a RouteTree object that connects to the specified BelPin. 
 	 * 
 	 * @param bp Connecting BelPin
@@ -752,7 +783,20 @@ public class CellNet implements Serializable {
 	 * @return
 	 */
 	public Set<BelPin> getBelPins() {
-		return belPinToSinkRTMap == null ? null : belPinToSinkRTMap.keySet();
+		
+		Set<BelPin> connectedBelPins = new HashSet<BelPin>();
+		
+		
+		if (belPinToSinkRTMap != null) {
+			connectedBelPins.addAll(belPinToSinkRTMap.keySet());
+		}
+		
+		BelPin belPinSource = sourcePin.getMappedBelPin();
+		if (belPinSource != null) {
+			connectedBelPins.add(belPinSource);
+		}
+		
+		return connectedBelPins;
 	}
 	
 	/**

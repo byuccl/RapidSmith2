@@ -10,6 +10,7 @@ import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.util.EnvironmentException;
 
 /**
  * This class is used to interface Vivado and RapidSmith. <br>
@@ -23,6 +24,10 @@ public final class VivadoInterface {
 
 	private static final String CELL_LIBRARY_NAME = "cellLibrary.xml";
 
+	public static TincrCheckpoint loadTCP(String tcp) throws IOException {
+		return loadTCP(tcp, false);
+	}
+	
 	/**
 	 * Parses a TINCR checkpoint, and creates an equivalent RapidSmith 2 design.
 	 * 
@@ -30,7 +35,7 @@ public final class VivadoInterface {
 	 * @throws InvalidEdifNameException 
 	 * @throws EdifNameConflictException 
 	 */
-	public static TincrCheckpoint loadTCP (String tcp) throws IOException {
+	public static TincrCheckpoint loadTCP (String tcp, boolean storeAdditionalInfo) throws IOException {
 	
 		if (tcp.endsWith("/") || tcp.endsWith("\\")) {
 			tcp = tcp.substring(0, tcp.length()-1);
@@ -50,6 +55,10 @@ public final class VivadoInterface {
 		
 		// TODO: throw an exception here if the we can't find the device
 
+		if (device == null) {
+			throw new EnvironmentException("Device files for part: " + partName + " cannot be found.");
+		}
+		
 		// create the RS2 netlist
 		String edifFile = Paths.get(tcp, "netlist.edf").toString();
 		CellDesign design;
@@ -68,7 +77,15 @@ public final class VivadoInterface {
 		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap());
 		routingInterface.parseRoutingXDC(routingFile);
 		
-		return new TincrCheckpoint(partName, design, device, libCells);
+		TincrCheckpoint tincrCheckpoint = new TincrCheckpoint(partName, design, device, libCells); 
+		
+		if (storeAdditionalInfo) {
+			tincrCheckpoint.setRoutethroughBels(routingInterface.getRoutethroughsBels());
+			tincrCheckpoint.setStaticSourceBels(routingInterface.getStaticSourceBels());
+			tincrCheckpoint.setBelPinToCellPinMap(placementInterface.getPinMap());
+		}
+		
+		return tincrCheckpoint;
 	}
 		
 	/**
