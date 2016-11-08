@@ -766,10 +766,11 @@ public class CellNet implements Serializable {
 	}
 	
 	/**
-	 * Returns the RouteTree object connected to the specified BelPin
+	 * Gets the RouteTree object connected to the specified BelPin of the net
 	 * 
 	 * @param belPin Input BelPin
-	 * @return
+	 * @return A {@link RouteTree} that connects to {@code belPin}. If the belPin
+	 * 		does not attach the net net, <code>null</code> is returned.
 	 */
 	public RouteTree getSinkRouteTree(BelPin belPin) {
 		return belPinToSinkRTMap == null ? null : belPinToSinkRTMap.get(belPin);
@@ -780,12 +781,10 @@ public class CellNet implements Serializable {
 	 * 
 	 * TODO: Could this be done by simply taking all the sink cell pins and getting the
 	 * 		 corresponding BelPin? 
-	 * @return
 	 */
 	public Set<BelPin> getBelPins() {
 		
 		Set<BelPin> connectedBelPins = new HashSet<BelPin>();
-		
 		
 		if (belPinToSinkRTMap != null) {
 			connectedBelPins.addAll(belPinToSinkRTMap.keySet());
@@ -801,7 +800,6 @@ public class CellNet implements Serializable {
 	
 	/**
 	 * Returns the BelPin to RouteTree map of the net
-	 * @return
 	 */
 	public Map<BelPin, RouteTree> getBelPinRouteTrees() {
 		return belPinToSinkRTMap;

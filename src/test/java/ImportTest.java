@@ -57,8 +57,11 @@ public abstract class ImportTest {
 	/** Set to true if you want to run the tests in debug mode, which prints additional information */
 	private static final boolean DEBUG_MODE = true;
 	/** Path to the import test directory */
-	private static final Path testDirectory = RSEnvironment.defaultEnv().getEnvironmentPath().resolve("ImportTests");
-	
+	private static final Path testDirectory = RSEnvironment.defaultEnv().getEnvironmentPath()
+																		.resolve("src")
+																		.resolve("test")
+																		.resolve("resources")
+																		.resolve("ImportTests");
 	// TODO: play around with the command count further...
 	/** Number of commands to run before restarting Vivado*/
 	private static final int MAX_COMMAND_COUNT = 4100;

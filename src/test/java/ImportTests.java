@@ -1,4 +1,5 @@
 import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Tag;
 import org.junit.platform.runner.JUnitPlatform;
 
 /**
@@ -9,6 +10,7 @@ import org.junit.platform.runner.JUnitPlatform;
 public class ImportTests {
 	
 	@RunWith(JUnitPlatform.class)
+	@Tag("slow")
 	public static class SuperCounterTest extends ImportTest {
 		@Override
 		public String getCheckpointName() {
@@ -16,8 +18,8 @@ public class ImportTests {
 		}
 	}
 	
-	
 	@RunWith(JUnitPlatform.class)
+	@Tag("slow")
 	public static class count16Test extends ImportTest {
 		@Override
 		public String getCheckpointName() {
