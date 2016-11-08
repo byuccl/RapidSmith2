@@ -228,9 +228,7 @@ public class XdcRoutingInterface {
 	 */
 	private void processLutRoutethroughs(String[] toks) {
 
-		//if (toks.length > 1) {
-			this.belRoutethroughMap = new HashMap<Bel, BelRoutethrough>();
-		//}
+		this.belRoutethroughMap = new HashMap<Bel, BelRoutethrough>();
 		
 		for (int i = 1; i < toks.length; i++) {
 			String[] routethroughToks = toks[i].split("/");			
@@ -566,8 +564,6 @@ public class XdcRoutingInterface {
 				// we reached a pin connection
 				pinConnections = rt.getWire().getPinConnections();
 				if (!pinConnections.isEmpty()) {
-					// TODO: remove this once we have tested it
-					// System.out.println("HEY! : " + currentNet.getName());
 					break;
 				}
 				

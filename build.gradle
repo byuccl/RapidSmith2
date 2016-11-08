@@ -83,10 +83,10 @@ junitPlatform {
 //        // include 'junit-jupiter', 'junit-vintage'
 //        // exclude 'custom-engine'
 //    }
-//    tags {
+    tags {
 //        // include 'fast'
-//        exclude 'slow'
-//    }
+        exclude 'slow'
+    }
 //    includeClassNamePattern '.*Test'
     // enableStandardTestTask true
     // reportsDir file('build/test-results/junit-platform') // this is the default

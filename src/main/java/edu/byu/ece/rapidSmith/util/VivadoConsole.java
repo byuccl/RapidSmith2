@@ -18,18 +18,21 @@ import edu.byu.ece.rapidSmith.util.EnvironmentException;
  * Spawns a new child instance of Vivado in TCL mode and provides methods
  * to send TCL commands to the newly created process. The results of each command are
  * returned in a buffer as strings. In order for this class to operate correctly, the Vivado
- * executable must be on the user's PATH and TINCR must be installed. <br>
- * TODO: add link to TINCR install instructions 
+ * executable must be on the user's PATH and TINCR must be installed. By default, 
+ * commands will thrown a {@link TimeoutException} if they take longer than 1 minute to return
+ * a result. You can change this with {@link VivadoConsole#setTimeout(long)}<br>
+ *  
  * <br>
- * NOTE: Nested commands are note supported due to how the TCL interpreter works. <br>
- * For example: {@code get_bels -of [get_cells seq_cnt_en_TMR_VOTER_1]}
- * will return an error or timeout. Instead, create your own function in TCL to do this: <br> 
+ * NOTE: Nested commands are currently not supported due to how the TCL interpreter works. <br>
+ * For example: {@code "get_bels -of [get_cells seq_cnt_en_TMR_VOTER_1]"}
+ * will return an error or timeout. Instead, create your own function in TCL to do this:  
+ * <pre>
  * <code>
- * proc get_bel_of_cell {cell} {
- * 	return [get_bels -of [get_cells $cell]]
- * }
- * </code> <br>
- * <br>
+ * proc get_bel_of_cell {cell} { 
+ *     return [get_bels -of [get_cells $cell]] 
+ * } 
+ * </code>
+ * </pre> 
  * TINCR offers several instructions to minimize the number of nested instructions
  * you may need to send
  *
@@ -45,7 +48,7 @@ public class VivadoConsole {
 	private BufferedWriter out;
 	/** Buffer that vivado output will be stored into*/
 	private Queue<String> returnBuffer;
-	/** How to wait for a Vivado result before exiting*/
+	/** How long to wait for a Vivado result before throwing a timeout exception */
 	private static long timeout = 60000;
 	/** Variable marked by the read thread to mark the output from vivado as valid*/
 	private boolean resultValid;
@@ -230,9 +233,11 @@ public class VivadoConsole {
 	/**
 	 * Set the amount of time that a the console will wait for output
 	 * before timing out. If a command runs out of time, an exception
-	 * is thrown. The default timeout is 30 seconds (30,000 milliseconds) 
+	 * is thrown. The default timeout is 60 seconds (60,000 milliseconds).
+	 * If you want the console to wait an unlimited amount of time for a response, set
+	 * the timeout to 0. 
 	 * 
-	 * @param timoutMilliseconds The timeout period in milliseconds
+	 * @param timoutMilliseconds The timeout period in milliseconds. 0 is you don't the console to timeout.
 	 */
 	public static void setTimeout(long timoutMilliseconds) {
 		timeout = timoutMilliseconds;
