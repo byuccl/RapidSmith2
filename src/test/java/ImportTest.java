@@ -102,6 +102,8 @@ public abstract class ImportTest {
 	 */
 	@AfterAll
 	public static void cleanupClass() {
+		
+		resetTclDisplayLimit();		
 		console.close(true);
 		tcp = null;
 		console = null;
@@ -149,7 +151,8 @@ public abstract class ImportTest {
 			
 			debugPrint("Loading DCP...");
 			console = loadDCP(checkpointName + ".dcp");
-			initialized = true;
+			initialized = true;			
+			setTclDisplayLimit();
 		}
 	}
 	
@@ -181,7 +184,6 @@ public abstract class ImportTest {
 		console.runCommand("open_checkpoint " +  testDirectory.resolve("DCP")
 															.resolve(dcpCheckpointFile)
 															.toString().replaceAll("\\\\", "/"));
-		
 		return console;
 	}
 	
@@ -195,6 +197,23 @@ public abstract class ImportTest {
 		debugPrint("Starting new Vivado instance...");
 		console.close(false); 
 		console = loadDCP(testName + ".dcp");
+		setTclDisplayLimit();
+	}
+	
+	/**
+	 * 
+	 */
+	private static void setTclDisplayLimit() {
+		String command = "tincr::set_tcl_display_limit 100000";
+		console.runCommand(command);
+	}
+	
+	/**
+	 * 
+	 */
+	private static void resetTclDisplayLimit() {
+		String command = "tincr::reset_tcl_display_limit";
+		console.runCommand(command);
 	}
 	
 	/**
@@ -207,8 +226,7 @@ public abstract class ImportTest {
 		
 		CellNet vccNet = tcp.getDesign().getVccNet();
 		
-		//String command = "tincr::get_static_net_routing_info 1 ";
-		String command = "tincr::get_vcc_routing_info ";
+		String command = "tincr::report_vcc_routing_info ";
 		List<String> result = sendVivadoCommand(command);
 		
 		assert (result.size() == 4);
@@ -218,7 +236,7 @@ public abstract class ImportTest {
 		
 		CellNet gndNet = tcp.getDesign().getGndNet();
 		
-		command = "tincr::get_gnd_routing_info ";
+		command = "tincr::report_gnd_routing_info ";
 		result = sendVivadoCommand(command);
 	
 		assert (result.size() == 4);
@@ -249,7 +267,7 @@ public abstract class ImportTest {
 				continue;
 			}
 			
-			String command = "tincr::get_physical_net_info " + net.getName();
+			String command = "tincr::report_physical_net_info " + net.getName();
 			List<String> result = sendVivadoCommand(command);
 			
 			assert (result.size() == 3);
@@ -452,7 +470,7 @@ public abstract class ImportTest {
 				continue;
 			}
 						
-			String command = "tincr::get_cell_placement_info " + cell.getName();
+			String command = "tincr::report_cell_placement_info " + cell.getName();
 			List<String> result = sendVivadoCommand(command);
 			
 			assert(result.size() == cell.getPins().size() - cell.getPseudoPinCount() + 1);
@@ -611,7 +629,7 @@ public abstract class ImportTest {
 				propertyList += propertyName + " ";
 			}
 			
-			String command = String.format("tincr::get_property_values %s {%s}", cell.getName(), propertyList);
+			String command = String.format("tincr::report_property_values %s {%s}", cell.getName(), propertyList);
 			List<String> result = sendVivadoCommand(command);
 			
 			assert(result.size() == cell.getProperties().size());
@@ -653,7 +671,7 @@ public abstract class ImportTest {
 		Device device = tcp.getDevice();
 
 		// Test to make sure the number of used sites is identical
-		String command = "tincr::get_used_site_count";
+		String command = "tincr::report_used_site_count";
 		List<String> results = sendVivadoCommand(command);
 		
 		assert (results.size() == 1);
@@ -677,7 +695,7 @@ public abstract class ImportTest {
 				expectedUsedSiteResult = "0";
 			}
 			
-			command = "tincr::get_used_site_pips " + site.getName();
+			command = "tincr::report_used_site_pips " + site.getName();
 			results = sendVivadoCommand(command);
 			
 			assert (results.size() == 2);
