@@ -29,7 +29,7 @@ public class CellDesign extends AbstractDesign {
 	/** Map of properties of this design. */
 	private Map<Object, Property> propertyMap;
 	/** Map from a site to the used SitePip wires in the site*/
-	private HashMap<Site, HashSet<Integer>> usedSitePipsMap;
+	private HashMap<Site, Set<Integer>> usedSitePipsMap;
 	/** The VCC RapidSmith net */
 	private CellNet vccNet;
 	/** The GND RapidSmith net */
@@ -566,8 +566,8 @@ public class CellDesign extends AbstractDesign {
 		this.usedSitePipsMap.put(ps, usedWires);
 	}
 
-	public  HashSet<Integer> getUsedSitePipsAtSite(Site ps) {
-		return this.usedSitePipsMap.get(ps);
+	public  Set<Integer> getUsedSitePipsAtSite(Site ps) {
+		return this.usedSitePipsMap.getOrDefault(ps, Collections.emptySet());
 	}
 
 	/**
