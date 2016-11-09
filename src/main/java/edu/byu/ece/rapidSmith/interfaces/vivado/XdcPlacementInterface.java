@@ -74,7 +74,7 @@ public class XdcPlacementInterface {
 					throw new ParseException(String.format("Unrecognized Token: %s \nOn %d of %s", toks[0], currentLineNumber, currentFile));
 			}
 		}
-	
+
 		br.close();
 	}
 	

@@ -355,6 +355,10 @@ public class Cell {
 			return Collections.emptyList();
 		return properties.values();
 	}
+	
+	public Set<Object> getPropertyNames() {
+		return properties.keySet();
+	}
 
 	/**
 	 * Updates or adds the properties in the provided collection to the properties
