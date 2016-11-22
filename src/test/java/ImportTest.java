@@ -635,7 +635,7 @@ public abstract class ImportTest {
 			assert(result.size() == cell.getProperties().size());
 			
 			for (String tclProperty : result) {
-				String[] tclPropertyToks = tclProperty.split("\\s+");
+				String[] tclPropertyToks = tclProperty.split("!");
 				String rsPropertyValue = cell.getProperty(tclPropertyToks[0]).getValue().toString();
 				String tclPropertyValue = tclPropertyToks[1];
 				
