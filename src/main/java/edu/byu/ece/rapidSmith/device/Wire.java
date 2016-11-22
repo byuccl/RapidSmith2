@@ -14,9 +14,8 @@ import edu.byu.ece.rapidSmith.design.subsite.Connection;
  */
 public interface Wire extends Serializable {
 	int getWireEnum();
-	default String getWireName() {
-		return getTile().getDevice().getWireEnumerator().getWireName(getWireEnum());
-	}
+	String getWireName();
+	String getFullWireName();
 	Tile getTile();
 	Site getSite();
 

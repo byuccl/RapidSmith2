@@ -26,4 +26,13 @@ public class ImportTests {
 			return "count16";
 		}
 	}
+	
+	@RunWith(JUnitPlatform.class)
+	@Tag("slow")
+	public static class cordicTest extends ImportTest {
+		@Override
+		public String getCheckpointName() {
+			return "cordic";
+		}
+	}
 }

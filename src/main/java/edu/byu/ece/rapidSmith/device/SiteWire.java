@@ -1,7 +1,6 @@
 package edu.byu.ece.rapidSmith.device;
 
 import edu.byu.ece.rapidSmith.design.subsite.Connection;
-import edu.byu.ece.rapidSmith.device.*;
 
 import java.io.Serializable;
 import java.util.*;
@@ -12,6 +11,8 @@ import java.util.stream.Stream;
  *
  */
 public class SiteWire implements Wire, Serializable {
+	
+	private static final long serialVersionUID = -3466670995491249683L;
 	private Site site;
 	private int wire;
 
@@ -33,6 +34,16 @@ public class SiteWire implements Wire, Serializable {
 	@Override
 	public int getWireEnum() {
 		return wire;
+	}
+	
+	@Override
+	public String getWireName() {
+		return getTile().getDevice().getWireEnumerator().getWireName(wire);
+	}
+
+	@Override
+	public String getFullWireName() {
+		return getSite().getName() + "/" + getTile().getName() + "/" + getWireName();
 	}
 
 	@Override

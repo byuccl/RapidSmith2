@@ -1,5 +1,6 @@
 package edu.byu.ece.rapidSmith.util;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -48,19 +49,44 @@ public final class RapidSmithDebug {
 	}
 	
 	/**
-	 * Debug method that creates a TCL command that can be run in Vivado <br>
-	 * to highlight all of the wires in a RouteTree. Used to visually <br>
-	 * verify the RouteTree data structure for a specific net.
+	 * Creates a TCL command that can be run in Vivado to highlight all wires 
+	 * in the specified {@link CellNet} object. This command can be used to 
+	 * visualize a net in the Vivado GUI.
 	 * 
-	 * @param net
+	 * @param net CellNet
+	 * @return A formatted TCL command that can be run directly in Vivado.
 	 */
 	public static String createHighlighWiresTclCommand(CellNet net) {
 
+		return createHighlightWiresTclCommand(net.getIntersiteRouteTreeList());
+	}
+	
+	/**
+	 * Creates a TCL command that can be run in Vivado to highlight all wires 
+	 * in the specified {@link RouteTree} object. This command can be used to 
+	 * visualize a RouteString structure in the Vivado GUI.
+	 *  
+	 * @param routeTree RouteTree source (i.e. the top of the tree)
+	 * @return A formatted TCL command that can be run directly in Vivado.
+	 */
+	public static String createHighlightWiresTclCommand(RouteTree routeTree) {
+		return createHighlightWiresTclCommand(Arrays.asList(routeTree));
+	}
+	
+	/**
+	 * Creates a TCL command that can be run in Vivado to highlight all wires 
+	 * in the specified collection of {@link RouteTree} objects. This command can be used to 
+	 * visualize a collection RouteString structure in the Vivado GUI.
+	 *  
+	 * @param routeTrees A collection of RouteTree objects
+	 * @return A formatted TCL command that can be run directly in Vivado.
+	 */
+	public static String createHighlightWiresTclCommand(Collection<RouteTree> routeTrees) {
 		String cmd = "select [get_wires {";
 		
-		for(RouteTree rt : net.getIntersiteRouteTreeList()) {
+		for(RouteTree rt : routeTrees) {
 			Iterator<RouteTree> it = rt.getFirstSource().iterator();
-			// System.out.println(rt.getFirstSource().getWire());
+			
 			while (it.hasNext()) {
 				Wire w = it.next().getWire();
 				cmd += w.getTile().getName() + "/" + w.getWireName() + " "; 
