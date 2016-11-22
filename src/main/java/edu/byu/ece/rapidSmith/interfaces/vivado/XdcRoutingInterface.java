@@ -447,7 +447,7 @@ public class XdcRoutingInterface {
 	 * 
 	 * @param site {@link Site} object
 	 * @param toks An array of used site PIPS in the form: <br>
-	 * {@code SITE_PIPS siteName pip0/input0 pip1/input1 ... pipN/inputN}
+	 * {@code SITE_PIPS siteName pip0:input0 pip1:input1 ... pipN:inputN}
 	 */
 	private void readUsedSitePips(Site site, String[] toks) {
 		
