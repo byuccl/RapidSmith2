@@ -1151,7 +1151,7 @@ public class XdcRoutingInterface {
 			// Leads to a routethrough bel. Currently we cannot attach a pseudo pin to a bel, so we return.
 			// TODO: create routethroughs as we import so we will never run into this case?
 			if (cell == null) {
-				System.out.println("RouteThrough Test: " + belPin.getBel().getFullName() + "/" + belPin.getName());
+				// System.out.println("RouteThrough Test: " + belPin.getBel().getFullName() + "/" + belPin.getName());
 				return;
 			}
 			
