@@ -10,12 +10,10 @@ proc dcp2tcp {top} {
     tincr::write_rscp $top
 }
 
-# The three routines below compile the specified directory of HDL
-# files and create a Tincr checkpoint from that.  They do not remove
-# the files or close the design in case you want to do further work
-# with them.
-
-proc comp {top} {
+# Compile the specified directory of HDL files and create a Tincr
+# checkpoint from that.  They do not remove the files or close the
+# design in case you want to do further work with them.
+proc compile_hdl_to_checkpoint_files {top} {
     link_design -part xc7a100t-csg324-3
     
     if {[glob -nocomplain $top/*.sv] != ""} {
@@ -56,6 +54,8 @@ proc comp {top} {
 # Print the size statistics of an open Vivado design to the specified file.
 # Specifically, the number of Cells, number of nets, number of sites, and 
 # the cell type distribution is printed.
+# This may be useful to understand the size of designs being used for
+# benchmark purposes.
 # NOTE: the filename does not need to have an extension. 
 #	 	".txt" will automatically be appended to the filename 
 proc print_cell_statistics { {filename "cell_stats.txt"} } {
