@@ -26,6 +26,7 @@ import edu.byu.ece.rapidSmith.device.TileDirection;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -460,11 +461,23 @@ public class Tile implements Serializable {
 	}
 
 	/**
-	 * Gets and returns the sources of all the primitive sites in this tile.
+	 * Gets and returns the sources of all the primitive sites in this tile.  This list
+	 * is lazily created.
 	 *
 	 * @return The source wires found in this tile.
 	 */
-	public int[] getSources() {
+	public List<Wire> getSources() {
+		return Arrays.stream(sources)
+				.mapToObj(w -> new TileWire(this, w))
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Used for device creation.
+	 *
+	 * @return The source wires found in this tile.
+	 */
+	public int[] getSourcesArray() {
 		return sources;
 	}
 

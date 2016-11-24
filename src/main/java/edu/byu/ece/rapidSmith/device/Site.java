@@ -344,52 +344,28 @@ public final class Site implements Serializable{
 	 * @param wire the source wire
 	 * @return the wire connections sourced by the specified wire
 	 */
-	public WireConnection[] getWireConnections(int wire) {
+	WireConnection[] getWireConnections(int wire) {
 		return getWireConnections(getTemplate(), wire);
 	}
 
-	public WireConnection[] getWireConnections(SiteType type, int wire) {
+	WireConnection[] getWireConnections(SiteType type, int wire) {
 		return getWireConnections(getTemplate(type), wire);
 	}
 
-	public WireConnection[] getWireConnections(SiteTemplate template, int wire) {
+	WireConnection[] getWireConnections(SiteTemplate template, int wire) {
 		return template.getWireConnections(wire);
 	}
 
-	public WireConnection[] getReverseConnections(int wire) {
+	WireConnection[] getReverseConnections(int wire) {
 		return getReverseConnections(getTemplate(), wire);
 	}
 
-	public WireConnection[] getReverseConnections(SiteType type, int wire) {
+	WireConnection[] getReverseConnections(SiteType type, int wire) {
 		return getReverseConnections(getTemplate(type), wire);
 	}
 
-	public WireConnection[] getReverseConnections(SiteTemplate template, int wire) {
+	WireConnection[] getReverseConnections(SiteTemplate template, int wire) {
 		return template.getReverseWireConnections(wire);
-	}
-
-	public XdlAttribute getPipAttribute(int sourceWire, int sinkWire) {
-		return getPipAttribute(getTemplate(), sourceWire, sinkWire);
-	}
-
-	public XdlAttribute getPipAttribute(SiteType type, int sourceWire, int sinkWire) {
-		return getPipAttribute(getTemplate(type), sourceWire, sinkWire);
-	}
-
-	public XdlAttribute getPipAttribute(SiteTemplate template, int sourceWire, int sinkWire) {
-		return template.getPipAttributes().get(sourceWire).get(sinkWire);
-	}
-
-	public XdlAttribute getPipAttribute(SitePip sitePip) {
-		return getPipAttribute(getTemplate(), sitePip);
-	}
-
-	public XdlAttribute getPipAttribute(SiteType type, SitePip sitePip) {
-		return getPipAttribute(getTemplate(type), sitePip);
-	}
-
-	public XdlAttribute getPipAttribute(SiteTemplate template, SitePip sitePip) {
-		return template.getPipAttribute(sitePip);
 	}
 
 	/**
@@ -560,19 +536,14 @@ public final class Site implements Serializable{
 	 * @return the pin on thes site which connects to the specified internal wire
 	 *   or null if the wire connects to no pins on this site
 	 */
-	public SitePin getSitePinOfInternalWire(int wire) {
-		return getSitePinOfInternalWire(getTemplate(), wire);
-	}
-
-	public SitePin getSitePinOfInternalWire(SiteType type, int wire) {
-		return getSitePinOfInternalWire(getTemplate(type), wire);
-	}
-
-	public SitePin getSitePinOfInternalWire(SiteTemplate template, int wire) {
-		SitePinTemplate pinTemplate = template.getInternalSiteWireMap().get(wire);
+	SitePin getSitePinOfInternalWire(int wire) {
+		SiteTemplate template = getTemplate();
+		Map<Integer, SitePinTemplate> internalSiteWireMap = template.getInternalSiteWireMap();
+		SitePinTemplate pinTemplate = internalSiteWireMap.get(wire);
 		if (pinTemplate == null)
 			return null;
-		return new SitePin(this, pinTemplate, getExternalWire(template.getType(), pinTemplate.getName()));
+		int externalWire = getExternalWire(template.getType(), pinTemplate.getName());
+		return new SitePin(this, pinTemplate, externalWire);
 	}
 
 	// Returns the wire which connects externally to the pin.  Needed to get from
@@ -586,19 +557,14 @@ public final class Site implements Serializable{
 	 * @param wire the site wire
 	 * @return the pin of the BEL in this site which connects to the specified wire
 	 */
-	public BelPin getBelPinOfWire(int wire) {
-		return getBelPinOfWire(getTemplate(), wire);
-	}
-
-	public BelPin getBelPinOfWire(SiteType type, int wire) {
-		return getBelPinOfWire(getTemplate(type), wire);
-	}
-
-	public BelPin getBelPinOfWire(SiteTemplate template, int wire) {
+	BelPin getBelPinOfWire(int wire) {
+		SiteTemplate template = getTemplate();
 		BelPinTemplate pinTemplate = template.getBelPins().get(wire);
 		if (pinTemplate == null)
 			return null;
-		Bel bel = getBel(template, pinTemplate.getId().getName());
+		String belName = pinTemplate.getId().getName();
+		Bel bel = getBel(template, belName);
+		assert bel != null : "illegal device representation";
 		return bel.getBelPin(pinTemplate.getName());
 	}
 
@@ -621,7 +587,7 @@ public final class Site implements Serializable{
 		return externalWires;
 	}
 
-	public Map<SiteType, Map<Integer, SitePinTemplate>> getExternalWireToPinNameMap() {
+	Map<SiteType, Map<Integer, SitePinTemplate>> getExternalWireToPinNameMap() {
 		return externalWireToPinNameMap;
 	}
 
@@ -659,7 +625,7 @@ public final class Site implements Serializable{
 	 * @param endWire Sink wire enum
 	 * @return True if the wires form a routethrough
 	 */
-	public boolean isRoutethrough(Integer startWire, Integer endWire) {
+	boolean isRoutethrough(Integer startWire, Integer endWire) {
 		return this.template.isRoutethrough(startWire, endWire);
 	}
 	
