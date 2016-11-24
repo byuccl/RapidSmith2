@@ -768,7 +768,7 @@ public final class DeviceGenerator {
 				// Tile sources, however, are always evaluated.
 				Wire wire = new TileWire(tile, wireEnum);
 				int numSources = wireSourcesCount.get(tile).get(wireEnum);
-				if (numSources <= 1 && !arrayContains(tile.getSources(), wire.getWireEnum()))
+				if (numSources <= 1 && !arrayContains(tile.getSourcesArray(), wire.getWireEnum()))
 					continue;
 
 				addSinkWiresToTraverse(stack, wire);
