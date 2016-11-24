@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import edu.byu.ece.rapidSmith.design.subsite.Connection;
-
 /**
  * Wires represent a piece of metal on a device.  Wires are composed of two
  * components, a location such as a tile or primitive site where the tile resides

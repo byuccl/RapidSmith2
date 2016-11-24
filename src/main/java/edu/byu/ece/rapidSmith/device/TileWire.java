@@ -5,8 +5,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import edu.byu.ece.rapidSmith.design.subsite.Connection;
-
 /**
  * A wire inside a tile but outside a site.  This is part of the general
  * routing circuitry.  TileWires are composed of the tile the wire exists in

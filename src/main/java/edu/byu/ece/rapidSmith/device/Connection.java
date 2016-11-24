@@ -1,13 +1,8 @@
-package edu.byu.ece.rapidSmith.design.subsite;
+package edu.byu.ece.rapidSmith.device;
 
 import edu.byu.ece.rapidSmith.design.PIP;
-import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.SitePin;
-import edu.byu.ece.rapidSmith.device.SiteWire;
-import edu.byu.ece.rapidSmith.device.TileWire;
-import edu.byu.ece.rapidSmith.device.Wire;
-import edu.byu.ece.rapidSmith.device.WireConnection;
+import edu.byu.ece.rapidSmith.design.subsite.DesignAssemblyException;
+import edu.byu.ece.rapidSmith.design.subsite.SitePip;
 
 import java.io.Serializable;
 import java.util.Collection;

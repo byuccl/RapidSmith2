@@ -1,6 +1,6 @@
 package edu.byu.ece.rapidSmith.util;
 
-import edu.byu.ece.rapidSmith.design.subsite.Connection;
+import edu.byu.ece.rapidSmith.device.Connection;
 import edu.byu.ece.rapidSmith.device.Wire;
 
 import java.util.*;

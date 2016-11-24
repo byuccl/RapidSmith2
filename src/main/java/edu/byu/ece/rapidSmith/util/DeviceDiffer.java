@@ -200,13 +200,13 @@ public class DeviceDiffer {
 	private void diffTilesSources(Tile gold, Tile test) {
 		Set<String> sources = new HashSet<>();
 		if (test.getSources() != null) {
-			for (Integer source : test.getSources()) {
-				sources.add(weTest.getWireName(source));
+			for (Wire source : test.getSources()) {
+				sources.add(source.getWireName());
 			}
 		}
 		if (gold.getSources() != null) {
-			for (Integer source : gold.getSources()) {
-				String sourceName = weGold.getWireName(source);
+			for (Wire source : gold.getSources()) {
+				String sourceName = source.getWireName();
 				if (!sources.remove(sourceName)) {
 					differences.add("source", sourceName, "none");
 				}
