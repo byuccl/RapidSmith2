@@ -188,16 +188,20 @@ public final class Bel implements Serializable {
 	 * This method bypasses the creation of a BelPin object so it should be faster.
 	 *
 	 * @param pinName the name of the pin
-	 * @return the wire the pin of the specified name connects to or -1 if no pin
+	 * @return the wire the pin of the specified name connects to or null if no pin
 	 *   of the name exists on the BEL
 	 */
-	public int getWireOfPin(String pinName) {
+	public SiteWire getWireOfPin(String pinName) {
 		// Check both the sources and sinks structures to find the pin.
-		if (template.getSources().containsKey(pinName))
-			return template.getSources().get(pinName).getWire();
-		if (template.getSinks().containsKey(pinName))
-			return template.getSinks().get(pinName).getWire();
-		return -1;
+		if (template.getSources().containsKey(pinName)) {
+			int wireEnum = template.getSources().get(pinName).getWire();
+			return new SiteWire(this.getSite(), wireEnum);
+		}
+		if (template.getSinks().containsKey(pinName)) {
+			int wireEnum = template.getSinks().get(pinName).getWire();
+			return new SiteWire(this.getSite(), wireEnum);
+		}
+		return null;
 	}
 
 	@Override
