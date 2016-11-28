@@ -4,22 +4,19 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
 import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.edif.util.parse.ParseException;
-import edu.byu.ece.rapidSmith.RSEnvironment;
-import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.device.BelId;
 import edu.byu.ece.rapidSmith.device.SitePin;
 
 public class DesignAnalyzer {
@@ -29,17 +26,6 @@ public class DesignAnalyzer {
 	public static final String CANONICAL_PART_NAME = "xc7a100tcsg324";
 	public static final String CELL_LIBRARY = "cellLibrary.xml";
 	
-	private static CellLibrary libCells;
-	private static Device device;
-	
-	public static void classSetup() throws IOException {
-		libCells = new CellLibrary(RSEnvironment.defaultEnv()
-				.getPartFolderPath(PART_NAME)
-				.resolve(CELL_LIBRARY));
-		device = RSEnvironment.defaultEnv().getDevice(CANONICAL_PART_NAME);
-	}
-	
-	
 	public static void main(String[] args) throws IOException, ParseException {
 		
 		if (args.length < 1) {
@@ -47,30 +33,49 @@ public class DesignAnalyzer {
 			System.exit(1);
 		}
 		
-		String checkpointbase = args[0];
-
-		// Load device file
-		System.out.println("Loading Device...");
-		classSetup();
-		
-		// Loading in a TINCR checkpoint
+		// Load a TINCR checkpoint
 		System.out.println("Loading Design...");
-		TincrCheckpoint tcp = VivadoInterface.loadTCP(checkpointbase+".tcp");
+		TincrCheckpoint tcp = VivadoInterface.loadTCP(args[0] + ".tcp");
 		CellDesign design = tcp.getDesign();
 		
-//        DesignAnalyzer da = new DesignAnalyzer();
-        
+		// Print out a representation of the design 
 		prettyPrintDesign(design);
-		summarizeDesign(design);        
+		
+		System.out.println();
+		
+		// Print out some summary statistics onthe design
+		summarizeDesign(design);      
+		
+		printCellBelMappings(design);
 
 		System.out.println("Done...");
 	}
 
-
+	// Print out the first few cells and the list of Bels they can be placed onto
+	public static void printCellBelMappings(CellDesign design) {
+		System.out.println("\nSome Cell/Bel Mappings:");
+		int i=0;
+		Set<String> cells = new HashSet<String>();
+		for (Cell c : design.getCells()) {
+			if (cells.contains(c.getLibCell().getName()))
+				continue;
+			cells.add(c.getLibCell().getName());
+			if (++i > 20)
+				break;
+			System.out.println("  Cell #" + i + " = " + c.toString());
+			if (c.getPossibleAnchors().size() == 0)
+				System.out.println("    This cell cannot be placed.");
+			for (BelId b : c.getPossibleAnchors()) {
+				System.out.println("    Can be placed onto sites of type " + b.getPrimitiveType() + " on Bels of type " + b.getName());
+			}
+		}
+	}
+	
+	
 	public static void prettyPrintDesign(CellDesign design) {
 		// Print the cells
 		for (Cell c : design.getCells()) {
-			System.out.println("Cell: " + c.getName() + " " + 
+			System.out.println("\nCell: " + c.getName() + " " + 
 					c.getLibCell().getName());
 			if (c.isPlaced())
 				// Print out its placement
@@ -83,210 +88,127 @@ public class DesignAnalyzer {
 						(cp.getNet()!=null?cp.getNet().getName():"<unconnected>"));
 			}
 			// Print the properties for a given cell if there are any
+			// For now, properties are strings. 
 			for (Property p : c.getProperties()) {
-				String s = null;
-//				System.out.print("  Property: " + p.getStringKey() + " = ");
-
-//				if (p.getValue() instanceof Integer)
-//					s = p.getValue().toString() + " <int>";
-//				else if (p.getValue() instanceof Boolean)
-//					s = p.getValue().toString() + " <bool>";
-//				else if (p.getValue() instanceof String)
-//					s = p.getValue().toString() + " <string>";
-//				else MessageGenerator.briefErrorAndExit("[ERROR] Unknown type for property: " + p.toString());
-	
-				s = "  Property: " + p.toString();
+				String s = "  Property: " + p.toString();
 				System.out.println(s);
 			}
 		}
-
+		
 		// Print the nets
-		System.out.println();
 		for (CellNet n : design.getNets()) {
-//			if (!n.getName().equals("D2_1946") && !n.getName().equals("nextstate_TMR_1"))
-//				continue;
-			System.out.println("Net: " + n.getName());
-			HashSet<CellPin> pins = (HashSet<CellPin>) n.getPins();
+			System.out.println("\nNet: " + n.getName());
+
 			// Print the net's pins
-			for (CellPin cp : pins) {
-				if (cp == n.getSourcePin())
-					System.out.println("  Pin*: " + cp.getCell().getName() + "." + cp.getName());
-				else
-					System.out.println("  Pin:  " + cp.getCell().getName() + "." + cp.getName());
+			// Source pin first
+			System.out.println("  Source Pin: " + n.getSourcePin().getCell().getName() + "." + n.getSourcePin().getName());
+
+			// Then the sink pins
+			for (CellPin cp : n.getSinkPins()) {
+				System.out.println("  Pin:  " + cp.getCell().getName() + "." + cp.getName());
 			}
 			
-			// Print the net's route tree(s) if they exist
+            // Print the net's route tree(s) if they exist
+			// In the net definitions which get printed, the syntax is the following:
+			//   1. Branching of nets is shown by enclosing side-branches within { and } characters."
+			//   2. For a given wire segment name, a / character will separate the tile name from the wire name."
+			//   3. Sometimes a wire will have 2 names (or more properly, each end will have a different name with a 
+			//      non-programmable connection between them).  In these cases, the 2nd wire name is appended 
+			//      to the first wire name inside ( )'s.   Otherwise, there are PIPs between successive wires.
+			// There are actually 3 parts to a net's physical routing.  
+			//  a) The first is from a BEL pin to the site pins its leaves the source site on.
+			//  b) The second is the inter-site route for the net = that is the routing that is all done in switchboxes.
+			//  c) Eventually the wire then re-enters sites where the sink BEL pins are.
+			// The code below traverses all 3 sections and prints out what it finds along the way as a way of 
+			// demonstrating how to trace out a net's physical route.
 			
-			// First, do the beginning (source pin intra-site routing)
-			// Iterate through the source RouteTree however you want
-			String s = "{ " + createRoutingString(n.getSourceRouteTree(), true) + " }"; 
-			System.out.println("Source intrasite routing: " + s);
-
-			s = "{ " + createRoutingString(n.getIntersiteRouteTree(), true) + " }";
-			System.out.println("Intersite Routing: " + s);
+			// VCC and GND nets are different from regular nets in that regular nets have a single which is the root of the
+			// route tree while VCC and GND nets are a forest of route trees.  For this demo only do signal nets.
+			if (n.isVCCNet() || n.isGNDNet()) {
+				System.out.println("Vcc or GND net, not printing out its route trees.");  
+				System.out.println("Since VCC and GND drivers (tieoffs) are not placed anywhere, these have no source route trees, they just have intersite sink route trees.");
+				System.out.println("Vcc and GND nets have multiple intersite route trees, each with a single source.");
+			}
+			else {
+				// Regular nets should have only a single route tree
+				assert(n.getIntersiteRouteTreeList().size() <= 1);
+				String s = createRoutingString(n, n.getSourceRouteTree(), true, true);
+				if (s == "")
+					System.out.println("<<<Unrouted>>>");
+				else
+					System.out.println("Physical routing: { " + createRoutingString(n, n.getSourceRouteTree(), true, true) + " }"); 
+			}
 		}
 	}		
 		
-	private static String getSourceIntraSiteRoutingString(RouteTree rt) {
-		String s = "";
-		if (rt == null) return s;
-
-		// If rt is a leaf cell then one and exactly one of these is true:
-		//   (a) We have hit a site pin or
-		//   (b) We have hit a bel pin
-		if(rt.isLeaf())	 {
-			assert (rt.getConnectingBelPin()!=null || rt.getConnectingSitePin()!=null);
-			assert (!(rt.getConnectingBelPin()!=null && rt.getConnectingSitePin()!=null));
-			SitePin conn = rt.getConnectingSitePin();
-			if (conn != null)
-				return s + " SlicePin{" + conn + "}";
-			else {
-				BelPin bp = rt.getConnectingBelPin();
-				if (bp != null)
-					return s + " " + bp;
-			}
-		}
-		// If rt is not a leaf cell then there must be at least one sink tree
-		else {
-			
-			s += " {" + rt.getWire() + "}";
-		}
-		return s;
-	}
-
-
-	public static String getVivadoIntersiteRoutingString(CellNet n) {
-			
-		Collection<RouteTree> rts = n.getIntersiteRouteTreeList();
-			
-		// A WIRE type (normal signal) should have only one route tree if it is routed.
-		if (n.getType().equals(NetType.WIRE)) {
-			assert (rts.size() <= 1);
-			if (rts.size() == 1) {
-				RouteTree rt = n.getIntersiteRouteTreeList().iterator().next();
-				return "{ " + createVivadoRoutingString(rt.getFirstSource(), true) + " }"; 
-			}
-		}
-		// Otherwise, must be a VCC/GND net, which may have multiple route trees, each with their own VCC or GND source.
-		else if (rts.size() > 0) {
-			String routeString = "{ ";
-			for (RouteTree rt : rts) {
-				routeString += "( " + createVivadoRoutingString(rt.getFirstSource(), true) + " ) ";
-			}
-			routeString += "}";
-			return routeString;
-		}
-		return "";
-	}
-
-	// Given a pointer to the head of a RouteTree, format up a string to represent it.
-	// These are essentially the same as the directed routing strings Vivado uses to represent physical routes.
-	// Comparing what this produces to the routing.txt files in a Tincr checkpoint, one will see the same structure.  
-	// However, there are three differences:
-	//   1. Vivado directed routing strings only list the head end of a wire (each end of a wire in Vivado typically has 
-	//     a different name with a non-programmable connection between them).  Here we list both wire end names (the 2nd one is in parentheses).
-	//   2. We list wire segment in the form: tileName/wireName.  This is legal for Vivado but it's representation doesn't usually include the tileName.
-	//   3. When a wire branches, the various branches may appear in a different order between the two representations.  This doesn't change the structure.
-	public static String createVivadoRoutingString(RouteTree rt, boolean head) {
-		String s="";
-		Collection<RouteTree> sinkTrees = rt.getSinkTrees();
-		
-		// Always print first wire at the head of a net's RouteTree
-		if (head)
-			s = rt.getWire().getTile().getName() + "/" + rt.getWire().getWireName();
-
-		// The connection between this RouteTree and its upstream predecessor may be a PIP (programmable connection)
-		//    or it may be a non-programmable connection.  
-		// If it is a programmable connection - include it.
-		else if (rt.getConnection().isPip() || rt.getConnection().isRouteThrough())
-			s = " " + rt.getWire().getTile().getName() + "/" + rt.getWire().getWireName();
-
-		// It is a non-programmable connection (a re-naming of the other end of the wire).
-		// Append it to 
-		else  
-			s += "(" + rt.getWire().getWireName() + ")";
-
-		// Iterate across the sink trees and print them
-		for (Iterator<RouteTree> it = sinkTrees.iterator(); it.hasNext(); ) {
-			RouteTree sink = it.next();
-
-			// If there is only one sink tree then this is just the next wire segment in the route (not a branch).  
-			// Don't enclose this in {}'s, just list it. 
-			// Or, if this is the last leg of a multi-way branch, don't enclose this in {}'s (to match Vivado's style).
-			if (sinkTrees.size() == 1 || !it.hasNext()) {
-				s += createVivadoRoutingString(sink, false);
-			}
-			// Otherwise, this is a branch of the wire, so enclose it in { }'s to mark that the wire is branching.
-			else {
-				s += " {" + createVivadoRoutingString(sink, false) + " }";
-			}
-		}
-		return s;
-	}
 
 	// Given a pointer to the head of a RouteTree, format up a string to represent it.
 	// This works for either intra-site routes as well as inter-site routes
-	public static String createRoutingString(RouteTree rt, boolean head) {
-		if (rt == null)  return "";
+	public static String createRoutingString(CellNet n, RouteTree rt, boolean head, boolean inside) {
 		String s="";
+
+		if (rt == null)  return s;
 
 		Collection<RouteTree> sinkTrees = rt.getSinkTrees();
 		
-		// Always print first wire at the head of a net's RouteTree
+		// Always print first wire at the head of a net's RouteTree. The format is "tileName/wireName".
 		if (head)
 			s = rt.getWire().getTile().getName() + "/" + rt.getWire().getWireName();
 
-		// The connection between this RouteTree and its upstream predecessor may be a PIP (programmable connection)
-		//    or it may be a non-programmable connection.  
+		// The connection between this RouteTree and its upstream predecessor may be a programmable 
+		//   connection (PIP or route-through) or it may be a non-programmable connection.  
 		// Look upstream and, if it is a programmable connection, include it.
 		else if (rt.getConnection().isPip() || rt.getConnection().isRouteThrough())
 			s = " " + rt.getWire().getTile().getName() + "/" + rt.getWire().getWireName();
-		// It is not a programmable connection but a wire end renaming - append it in parens.
+		// It is a non-programmable connection - append it in parens.
 		else  
 			s += "(" + rt.getWire().getWireName() + ")";
 
-		// Now, let's look downstream and see what to do
+		// Now, let's look downstream and see where to go and what to print
 
-		// If it is a leaf cell then let's print the site or bel pin attached
+		// If it is a leaf cell then let's print the site or bel pin attached.  In the case of a site pin, continue following it.
 		if(rt.isLeaf())	 {
-			assert (rt.getConnectingBelPin()!=null || rt.getConnectingSitePin()!=null);
-			assert (!(rt.getConnectingBelPin()!=null && rt.getConnectingSitePin()!=null));
-			SitePin conn = rt.getConnectingSitePin();
-			if (conn != null)
-				return s + " SlicePin{" + conn + "}";
+			SitePin sp = rt.getConnectingSitePin();
+			if (sp != null) {
+				if (inside) 
+					// Follow the route out of the site into the general routing fabric 
+					s += " SitePin{" + sp + "} <<entering general routing fabric>> " + createRoutingString(n, n.getIntersiteRouteTree(), true, !inside);
+				else
+					// Follow the route from the general routing fabric and into a site
+					s += " SitePin{" + sp + "} <<leaving general routing fabric, entering site>> " + createRoutingString(n, n.getSinkRouteTree(sp), true, inside);
+			}
+			// If not a site pin, see if it is a BEL pin (it should be)
 			else {
 				BelPin bp = rt.getConnectingBelPin();
-				if (bp != null)
-					return s + " " + bp;
+				assert (bp != null);
+				return s + " " + bp;
 			}
 		}
 
-		// Otherwise, iterate across the sink trees and print them
+		// Otherwise, if it is not a leaf route tree, then iterate across the sink trees and print them
 		for (Iterator<RouteTree> it = sinkTrees.iterator(); it.hasNext(); ) {
 			RouteTree sink = it.next();
 
 			// If there is only one sink tree then this is just the next wire segment in the route (not a branch).  
-			// Don't enclose this in {}'s, just list it. 
-			// Or, if this is the last leg of a multi-way branch, don't enclose this in {}'s (to match Vivado's style).
-			if (sinkTrees.size() == 1 || !it.hasNext()) {
-				s += createVivadoRoutingString(sink, false);
-			}
+			// Don't enclose this in {}'s, just list it as the next wire segment. 
+			if (sinkTrees.size() == 1) 
+				s += createRoutingString(n, sink, false, inside);
 			// Otherwise, this is a branch of the wire, so enclose it in { }'s to mark that the wire is branching.
 			else {
-				s += " {" + createVivadoRoutingString(sink, false) + " }";
+				s += " {" + createRoutingString(n, sink, false, inside) + " }";
 			}
 		}
 		return s;
 	}
 
 	public static void summarizeDesign(CellDesign design) {
-		int numcells = design.getCells().size();
-		int numnets= design.getNets().size();
 
+		System.out.println("Design Summary:");
 		int numplaced = 0;
 		for (Cell c : design.getCells())
 			if (c.getAnchor() != null)
 				numplaced++;
+		
 		System.out.println("The design has: " + design.getCells().size() + " cells, " + numplaced + " of them are placed.");
 		
 		int numrouted= 0;
@@ -298,4 +220,10 @@ public class DesignAnalyzer {
 	}
 	
 }
+
+// Other ideas:
+// - Get all connected nets from a cell
+// - How to handle pseudo cell pins?
+//   + They don't have a backing library cell pin
+// - Example of attaching a pseudo pin
 
