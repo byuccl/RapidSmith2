@@ -1,11 +1,17 @@
 package edu.byu.ece.rapidSmith.examples2;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.*;
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.*;
+import edu.byu.ece.rapidSmith.examples2.DesignAnalyzer;
 
 public class CreateDesignExample {
 
@@ -31,7 +37,7 @@ public class CreateDesignExample {
 
 		// Load the device file from the directory indicated by the part name
 		Device device = RSEnvironment.defaultEnv().getDevice("xc7a100tcsg324");
-		System.out.println("Device loaded: xc7a100tcsg324");
+		System.out.println("Device loaded: " + device.getPartName());
 		
 		// Create a new empty CellDesign for the designated FPGA part
 		CellDesign design = new CellDesign("HelloWorld", "xc7a100tcsg324");
@@ -78,17 +84,48 @@ public class CreateDesignExample {
 		clkportnet.connectToPin(clkport.getPin("PAD"));
 		clkportnet.connectToPin(clkbufcell.getPin("I"));
 		
-		// Place some of the cells into a slice
-		// Get the first SLICEL in the device
-		Site slice = device.getAllSitesOfType(SiteType.SLICEL)[0];
-		
-		// Place the invcell on the A5LUT
-		design.placeCell(invcell, slice.getBel("A5LUT"));
+		System.out.println();
 
-		// Place the ffcell on the AFF
-		design.placeCell(ffcell, slice.getBel("AFF"));
+		////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Place some of the cells into a slice
+		// There are 2 ways to do this.  
+		// The first (and simpler) way is when you know exactly where you want to place it.
+		// Get the first SLICEL in the device's SLICEL sites
+		Site slice = device.getAllSitesOfType(SiteType.SLICEL)[0];
+		// Place the cell onto the A6LUT of that site
+		design.placeCell(invcell, slice.getBel("A6LUT"));
+		// Now, let's un-place the cell since we are next going to re-place it using the 2nd method
+		design.unplaceCell(invcell);
+		
+		// The more complex way is a multi-step process:
+		// 1. Find a suitable site of the right type (you find the right type by querying the Cell)
+		// 2. Find a BEL within that site to place the cell onto (you find the right BEL types for this by querying the Cell)
+		//    Get a set of BelId objects which describe the site type/belname pairs where this cell could be placed.
+		//    This will consist of pairs like: SLICEL/A6LUT or SLICEM/D6LUT
+		List<BelId> anchors = invcell.getPossibleAnchors();
+		//    Pull the actual site types out of these BelId objects and collect them into a sorted list without duplicates 
+		//    (the resulting list should contain just SLICEL and SLICEM)
+		List<SiteType> anchorsitetypes = anchors.stream().map(b -> b.getPrimitiveType()).distinct().sorted().collect(Collectors.toList());
+		// Grab the first primitive site type in the list (should be SLICEL since the list is sorted)
+		SiteType sitetype = anchorsitetypes.get(0);
+		// Get the first SLICEL in the device's SLICEL sites
+		slice = device.getAllSitesOfType(sitetype)[0];
+		// Place the invcell on a suitable LUT (the first one found that is suitable)
+		// Get a list of the ones which have the primitive site type matching above (which will be SLICEL or SLICEM)
+		anchors = invcell.getPossibleAnchors().stream().filter(t -> t.getPrimitiveType() == sitetype).collect(Collectors.toList());
+		// Place the cell on the bel of the first one
+		design.placeCell(invcell, slice.getBel(anchors.get(0).getName()));
+
+		// Now, place the ffcell on the the first suitable flip flop found in the site used above (the more complex way)  
+		// NOTE: in general it would be good to ensure the LUT and FF in are in corresponding BELS (an ALUT with an AFF, a BLUT with a BFF and so on) 
+		//       to ensure good packing and routability.
+		// But, in this case it doesn't really matter, the design will be routable.
+		anchors = ffcell.getPossibleAnchors().stream().filter(t -> t.getPrimitiveType() == sitetype).collect(Collectors.toList());
+		design.placeCell(ffcell, slice.getBel(anchors.get(0).getName()));
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		// Now, prettyprint what we have created
+		System.out.println("\nContents of design:");
 		DesignAnalyzer.prettyPrintDesign(design);
 		
 		System.out.println("\nDone...");
