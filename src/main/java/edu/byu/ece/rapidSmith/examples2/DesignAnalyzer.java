@@ -2,21 +2,21 @@ package edu.byu.ece.rapidSmith.examples2;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.edif.util.parse.ParseException;
-import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.device.BelId;
 import edu.byu.ece.rapidSmith.device.SitePin;
 
 public class DesignAnalyzer {
@@ -25,21 +25,6 @@ public class DesignAnalyzer {
 	public static final String PART_NAME = "xc7a100tcsg324";
 	public static final String CANONICAL_PART_NAME = "xc7a100tcsg324";
 	public static final String CELL_LIBRARY = "cellLibrary.xml";
-	
-	private static CellLibrary libCells;
-	private static Device device;
-	
-	// This loads a cell library and a device definition
-	// It is not needed to be called if an existing design is being opened since 
-	// the process of opening the design will automatically perform these steps.  
-	// It is included here for reference. 
-	public static void setup() throws IOException {
-		libCells = new CellLibrary(RSEnvironment.defaultEnv()
-				.getPartFolderPath(PART_NAME)
-				.resolve(CELL_LIBRARY));
-		device = RSEnvironment.defaultEnv().getDevice(CANONICAL_PART_NAME);
-	}
-	
 	
 	public static void main(String[] args) throws IOException, ParseException {
 		
@@ -59,11 +44,34 @@ public class DesignAnalyzer {
 		System.out.println();
 		
 		// Print out some summary statistics onthe design
-		summarizeDesign(design);        
+		summarizeDesign(design);      
+		
+		printCellBelMappings(design);
 
 		System.out.println("Done...");
 	}
 
+	// Print out the first few cells and the list of Bels they can be placed onto
+	public static void printCellBelMappings(CellDesign design) {
+		System.out.println("\nSome Cell/Bel Mappings:");
+		int i=0;
+		Set<String> cells = new HashSet<String>();
+		for (Cell c : design.getCells()) {
+			if (cells.contains(c.getLibCell().getName()))
+				continue;
+			cells.add(c.getLibCell().getName());
+			if (++i > 20)
+				break;
+			System.out.println("  Cell #" + i + " = " + c.toString());
+			if (c.getPossibleAnchors().size() == 0)
+				System.out.println("    This cell cannot be placed.");
+			for (BelId b : c.getPossibleAnchors()) {
+				System.out.println("    Can be placed onto sites of type " + b.getPrimitiveType() + " on Bels of type " + b.getName());
+			}
+		}
+	}
+	
+	
 	public static void prettyPrintDesign(CellDesign design) {
 		// Print the cells
 		for (Cell c : design.getCells()) {
@@ -118,13 +126,17 @@ public class DesignAnalyzer {
 			// route tree while VCC and GND nets are a forest of route trees.  For this demo only do signal nets.
 			if (n.isVCCNet() || n.isGNDNet()) {
 				System.out.println("Vcc or GND net, not printing out its route trees.");  
-				System.out.println("Since VCC and GND drivers (tieoffs) are not placed anywhere, these have no source route trees, they just have intrasite sink route trees.");
+				System.out.println("Since VCC and GND drivers (tieoffs) are not placed anywhere, these have no source route trees, they just have intersite sink route trees.");
 				System.out.println("Vcc and GND nets have multiple intersite route trees, each with a single source.");
 			}
 			else {
 				// Regular nets should have only a single route tree
 				assert(n.getIntersiteRouteTreeList().size() <= 1);
-				System.out.println("Physical routing: " + createRoutingString(n, n.getSourceRouteTree(), true, true) + " }"); 
+				String s = createRoutingString(n, n.getSourceRouteTree(), true, true);
+				if (s == "")
+					System.out.println("<<<Unrouted>>>");
+				else
+					System.out.println("Physical routing: { " + createRoutingString(n, n.getSourceRouteTree(), true, true) + " }"); 
 			}
 		}
 	}		
