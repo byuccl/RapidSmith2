@@ -113,11 +113,6 @@ public final class EdifInterface {
 			else {
 				libraryPortType = "OPORT";
 			}
-		
-			// TODO: See if inout ports are supported in RS2, and if not what needs to be updated to support them 
-			// if (port.isInOut()) {
-			// 	throw new UnsupportedOperationException("Inout port functionality not yet implemented! Cannot load EDIF");
-			// }
 
 			String portSuffix = port.getOldName();
 			if (port.isBus()) {

@@ -107,54 +107,57 @@ public class XdcRoutingInterface {
 	public void parseRoutingXDC(String xdcFile) throws IOException {
 
 		currentFile = xdcFile;
-		LineNumberReader br = new LineNumberReader(new BufferedReader(new FileReader(xdcFile)));
-		String line = null;
 
-		while ((line = br.readLine()) != null) {
-			this.currentLineNumber = br.getLineNumber();
-			String[] toks = line.split("\\s+");
-
-			// TODO: I know the order these things appear in the file, so I probably don't need a big switch statement
-			// SITE_PIPS -> STATIC_SOURCES -> LUT_RTS -> INTRASITE/INTERSITE/ROUTE
-			// Update this if there is a performance issue, but it should be fine
-			switch (toks[0]) {
-			
-				case "SITE_PIPS" : processSitePips(toks);
-					break;
-				case "INTERSITE" : processIntersitePins(toks);
-					break;
-				case "INTRASITE" : processIntrasiteRoute(toks);
-					break;
-				case "ROUTE" : processIntersiteRoute(toks); 
-					break;
-				case "LUT_RTS" : processLutRoutethroughs(toks); 
-					break;
-				case "STATIC_SOURCES" : processStaticSources(toks);
-					break;
-				case "VCC": 
-					String[] vcc_wires = br.readLine().split("\\s+");
-					assert (vcc_wires[0].equals("START_WIRES"));
-					processStaticNet(toks, vcc_wires);
-					break; 
-				case "GND": 
-					String[] gnd_wires = br.readLine().split("\\s+");
-					assert (gnd_wires[0].equals("START_WIRES"));
-					processStaticNet(toks, gnd_wires);
-					break;
-				default : 
-					throw new ParseException("Unrecognized Token: " + toks[0]);
+		// try-with-resources to guarantee no resource leakage
+		try (LineNumberReader br = new LineNumberReader(new BufferedReader(new FileReader(xdcFile)))) {
+		
+			String line = null;
+			while ((line = br.readLine()) != null) {
+				this.currentLineNumber = br.getLineNumber();
+				String[] toks = line.split("\\s+");
+	
+				// TODO: I know the order these things appear in the file, so I probably don't need a big switch statement
+				// SITE_PIPS -> STATIC_SOURCES -> LUT_RTS -> INTRASITE/INTERSITE/ROUTE
+				// Update this if there is a performance issue, but it should be fine
+				switch (toks[0]) {
+				
+					case "SITE_PIPS" : processSitePips(toks);
+						break;
+					case "INTERSITE" : processIntersitePins(toks);
+						break;
+					case "INTRASITE" : processIntrasiteRoute(toks);
+						break;
+					case "ROUTE" : processIntersiteRoute(toks); 
+						break;
+					case "LUT_RTS" : processLutRoutethroughs(toks); 
+						break;
+					case "STATIC_SOURCES" : processStaticSources(toks);
+						break;
+					case "VCC": 
+						String[] vcc_wires = br.readLine().split("\\s+");
+						assert (vcc_wires[0].equals("START_WIRES"));
+						processStaticNet(toks, vcc_wires);
+						break; 
+					case "GND": 
+						String[] gnd_wires = br.readLine().split("\\s+");
+						assert (gnd_wires[0].equals("START_WIRES"));
+						processStaticNet(toks, gnd_wires);
+						break;
+					default : 
+						throw new ParseException("Unrecognized Token: " + toks[0]);
+				}
 			}
+			
+			// compute the routing status for the GND and VCC nets at the end
+			if (design.getVccNet() != null) {
+				design.getVccNet().computeRouteStatus();
+			}
+			if (design.getGndNet() != null) {
+				design.getGndNet().computeRouteStatus();
+			}
+			
+			br.close();
 		}
-		
-		// compute the routing status for the GND and VCC nets at the end
-		if (design.getVccNet() != null) {
-			design.getVccNet().computeRouteStatus();
-		}
-		if (design.getGndNet() != null) {
-			design.getGndNet().computeRouteStatus();
-		}
-		
-		br.close();
 	}
 	
 	/**
@@ -1273,386 +1276,3 @@ public class XdcRoutingInterface {
 		}
 	}
 }
-
-/* **********************
- * 	 Old Import Code 
-* ************************/
-
-/*
-private void processIntersiteRoute(String[] toks) {
-	
-	CellNet net = tryGetCellNet(toks[1]);
-	this.currentNet = net;
-	
-	if (net.isVCCNet()) {
-		net.setIntersiteRouteTrees(createRouteTreeListForPowerNet(net, toks));
-	}
-	else if (net.isGNDNet()) {
-		net.setIntersiteRouteTrees(createRouteTreeListForPowerNet(net, toks));
-	}
-	else { // otherwise it's a general net 		
-		RouteTree start = initializeRouteTree(net, toks[3]);
-		createRouteTreeForNet(start, 4, toks, isBufgClkNet(net));
-		net.addIntersiteRouteTree(start);
-	}
-}
-*/
-
-/*
- //
- // Creates the initial RouteTree from a ROUTE string
- //
-private RouteTree initializeRouteTree(CellNet net, String firstWireName) {
-		
-	// create the start of the intersite route tree
-	CellPin source = tryGetNetSource(net);
-	Tile sourceTile = source.getCell().getAnchorSite().getTile(); 
-	Wire firstWire = new TileWire(sourceTile, wireEnumerator.getWireEnum(firstWireName));
-	return new RouteTree(firstWire);
-}
-*/
-
-/*
-private List<RouteTree> createRouteTreeListForPowerNet(CellNet net, String[] toks) {
-	
-	tryGetNetSource(net); // checking to see that the net has a source
-	List<RouteTree> routeTrees = new ArrayList<RouteTree>();
-	
-	int index = 4; 	
-	while(index < toks.length) {
-		
-		RouteTree start = initializeGlobalLogicRouteTree(toks[index++]);
-		index = createRouteTreeForNet(start, index, toks, false);
-		routeTrees.add(start);
-		net.addIntersiteRouteTree(start);
-		index += 3; // get to the start of the next route string
-	}
-	
-	return routeTrees;
-}
-*/
-
-/*
- //
- // Creates the initial RouteTree for a GND or VCC ROUTE string
- //
-private RouteTree initializeGlobalLogicRouteTree(String firstWireName) {
-	
-	String[] toks = firstWireName.split("/");
-	assert(toks.length == 2); 
-	
-	Tile tile = device.getTile(toks[0]);
-	Wire firstWire = new TileWire(tile, wireEnumerator.getWireEnum(toks[1]));
-	
-	return new RouteTree(firstWire);
-}
-
-private int createRouteTreeForNet(RouteTree current, int index, String[] toks, boolean isClkNet) {
-	
-	wiresInNet.clear();
-	terminals.clear();
-	int i = createIntersiteRouteTree(current, index, toks, isClkNet);
-	current.getFirstSource().prune(terminals);
-	return i;
-}
-*/
-
-/*
- //
- // Converts a Vivado ROUTE string to a RS2 RouteTree data structure
- //
-private int createIntersiteRouteTree(RouteTree current, int index, String[] toks, boolean isClkNet) {
-			
-	while ( index < toks.length ) {
-		
-		// new branch
-		if (toks[index].equals("{") ) {
-			index = createIntersiteRouteTree(current, ++index, toks, isClkNet);
-		}
-		//end of a branch
-		else if (toks[index].equals("}") ) {
-			completeFinalBranchNode(current);
-			return index + 1; 
-		}
-		else {
-			
-			current = (isClkNet) ? 
-						findNextClockNode(current, toks[index]) : 
-						findNextNode(current, toks[index]);
-			index++;
-		}
-	}
-	
-	return index;
-}
-*/
-
-/*
-private RouteTree findNextClockNode(RouteTree rt, String nodeName) {
-	
-	// Special case for horizontal and vertical clk wires
-	// In the Route string, they have names like "<2>HCLK..."
-	if ( isDedicatedClockWire(nodeName) ) { 
-		
-		int endIndex = nodeName.indexOf(">");
-		int offset = 1;
-		String clkWireName = nodeName;
-		
-		if (endIndex > 0) {
-			offset = Integer.parseInt(nodeName.substring(1, endIndex));
-			clkWireName = nodeName.substring(endIndex+1);
-		}
-		
-		TileDirection dir = getClockWireDirection(rt.getWire().getWireName(), clkWireName);	
-		return getNextClockWire(rt, rt.getWire().getTile(), clkWireName, offset, dir);
-	}
-				
-	return findNextNode(rt, nodeName); 
-}
-
-private boolean isDedicatedClockWire(String nodeName) {
-	
-	return nodeName.startsWith("<") || nodeName.startsWith("HCLK") || nodeName.startsWith("GCLK");
-}
-
-// This seems a little hackish, and is not guaranteed to work for ultrascale...
-// TODO: think of a better way to do this			
-private TileDirection getClockWireDirection(String prevNodeName, String clockWireName) {
-	if (clockWireName.charAt(0) == 'H') {
-		String[]toks = prevNodeName.split("_");
-		return toks[toks.length-1].contains("L") ? TileDirection.LEFT : TileDirection.RIGHT;					
-	}
-	else {
-		return prevNodeName.contains("BOT") ? TileDirection.BELOW : TileDirection.ABOVE;
-	}
-}
-		
-private RouteTree getNextClockWire(RouteTree tree, Tile tile, String wirename, int offset, TileDirection searchDir)
-{
-	Tile currentTile = tile;
-	int wire = wireEnumerator.getWireEnum(wirename);	
-	
-	assert(currentTile.getWires().contains(wire) == false);
-	
-	// find the correct tile the clock wire branches from based on the offset
-	while (offset > 0) {
-		
-		currentTile = getAdjacentTile(currentTile, searchDir);
-		
-		if (currentTile.getWires().contains(wire)) {
-			offset--;
-		}
-	}
-	
-	// TODO: ask Travis if there is a more efficient way of doing this...
-	// find the wire connection that connects us to the correct tile
-	boolean foundTile = false;
-	for (Connection c : tree.getWire().getWireConnections()) {
-		Tile sinkTile = c.getSinkWire().getTile();
-		// TODO: test to make sure this works!
-		if (sinkTile == currentTile) {
-			tree = addRouteTreeConnection(tree, c);
-			foundTile = true;
-			break;
-		}
-	}
-	assert (foundTile == true);
-	
-	// find the correct wire connection
-	boolean foundWire = false;
-	for (Connection c : tree.getWire().getWireConnections()) {
-		String sinkWireName = c.getSinkWire().getWireName();
-		
-		if (sinkWireName.equals(wirename)) {
-			tree = addRouteTreeConnection(tree, c);
-			foundWire = true;
-			break;
-		}
-	}
-	assert (foundWire == true);
-	
-	return tree;
-}
-*/
-
-/*
-private RouteTree findNextNode(RouteTree rt, String nodeName) {
-	
-	return findNextNode(rt, nodeName, new HashSet<Wire>());
-}
-*/
-
-/*
- //
- // Searches for the next node of the Vivado ROUTE string in RS2. Performs a bounded DFS 
- // looking for the node of interest.  
- // 
- // TODO: update to use integer wire enums instead of string node names...I only have to parse the
- // 		 nodename once when I first read in the nodename, but I don't need to do a string comparison 
- // 		 after that because I can use the enum values instead. May have to create a new data structure
- // 		 that builds on a RouteTree object to speed things up 
- //
-private RouteTree findNextNode(RouteTree rt, String nodeName, HashSet<Wire> wireSet) {
-
-	Queue<RouteTree> routeQueue = new LinkedList<RouteTree>();
-	
-	routeQueue.add(rt);
-	wireSet.add(rt.getWire());
-	
-	// for bidirectional wires, prevent us from searching where we just came from.
-	if (rt.getSourceTree() != null) {
-		wireSet.add(rt.getSourceTree().getWire());
-	}
-	
-	int debugCount = 0;
-	
-	while (!routeQueue.isEmpty()) {
-		
-		// just in case we get lost in our search...
-		if (debugCount++ > 10000) { 
-			break;
-		}
-		
-		RouteTree nextRoute = routeQueue.poll();
-					
-		for (Connection c : nextRoute.getWire().getWireConnections()) {
-		
-			Wire sinkWire = c.getSinkWire();
-			
-			// skip long line sink connections in the same tile and wires we have already looked at
-			if (isSinkLongLineBounce(nextRoute, sinkWire) || wireSet.contains(sinkWire)) {
-				continue;
-			}
-			
-			// found the wire we were looking for
-			if (c.isPip() && sinkWire.getWireName().equals(nodeName)) { 
-				return nextRoute.addConnection(c); 
-			}
-			
-			wireSet.add(sinkWire);
-			routeQueue.add(addRouteTreeConnection(nextRoute, c));
-		}
-	}
-	
-	// for debugging
-	System.out.println(nodeName + " " + rt.getWire().getTile() + "/" + rt.getWire().getWireName());
-	throw new AssertionError("Unable to find the next node after looking at 10,000 wires!");
-}
-
-private boolean isSinkLongLineBounce(RouteTree source, Wire sinkWire) {
-	
-	if (source.getSourceTree() == null) {
-		return false;
-	}
-	
-	Tile currentWireTile = source.getWire().getTile();
-	Tile prevWireTile = source.getSourceTree().getWire().getTile();
-	Tile sinkWireTile = sinkWire.getTile();
-		
-	return isLongLineWire(source.getWire()) &&
-		   currentWireTile.equals(prevWireTile) &&
-		   currentWireTile.equals(sinkWireTile);
-}
-	
-private boolean isLongLineWire(Wire w) {
-	
-	String wireName = w.getWireName();
-	return wireName.startsWith("LV") || wireName.startsWith("LH"); 
-}*/
-
-/*
- //
- // On the final node of a Vivado ROUTE string branch we may have to march along the wires until we hit
- // a site pin. This is the case for I/O nets in particular. 
- // 
- // TODO: Test this feature with other designs...
- //
-private RouteTree completeFinalBranchNode(RouteTree rt) {
-	
-	Collection<Connection> pinConnections = rt.getWire().getPinConnections(); 
-	
-	// march along our current connection until:
-	// (1) We hit a pin connection (site pin routed) or
-	// (2) We hit a multiple wire connection junction (site pin not routed)
-	if (pinConnections.isEmpty()) {
-		Collection<Connection> wireConnections = rt.getWire().getWireConnections();
-		
-		// TODO: remove this, only true for a fully routed design
-		assert(wireConnections.size() == 1) : rt.getWire().getTile() + " " + rt.getWire().getWireName();
-		
-		while (wireConnections.size() == 1) {
-			rt = rt.addConnection(wireConnections.iterator().next());
-			
-			// we reached a pin connection
-			pinConnections = rt.getWire().getPinConnections();
-			if (!pinConnections.isEmpty()) {
-				break;
-			}
-			
-			wireConnections = rt.getWire().getWireConnections();
-			
-			// TODO: remove this, only true for a fully routed design
-			assert(wireConnections.size() == 1) : rt.getWire().getTile() + " " + rt.getWire().getWireName();
-		}
-	}
-			
-	if (!pinConnections.isEmpty()) {
-	
-		// update the net with the routed cell pins
-		SitePin sitePin = pinConnections.iterator().next().getSitePin();
-		IntrasiteRoute internalRoute = sitePinToRouteMap.get(sitePin);
-		
-		if (internalRoute != null) { 
-			internalRoute.setSinksAsRouted();
-		}
-		else { 
-			// implicit intrasite net. An Example is a GND/VCC net going to the A6 pin of a LUT.
-			// I does not actually show the bel pin as used, but it is being used.
-			// TODO: see if there are any other examples of this besides A6 lut pin with VCC net
-			assert(currentNet.isStaticNet()) : "Only static nets should not have site pin information: " + currentNet.getName() + " " + sitePin ;
-			createStaticNetImplicitSinks(sitePin, currentNet);
-		}
-	}
-	
-	// Add the sink RouteTree to the list of terminals for pruning
-	terminals.add(rt);
-	return rt; 
-}*/
-
-/*
- //
- // For routing import, we need to handle nets that use the dedicated clock logic differently
- // Returns true if the source pin of the net is connected to a BUFG cell
- ///
-private boolean isBufgClkNet(CellNet net) {
-	
-	// TODO: may have to add other cells that can be placed on BUFGCTRL sites
-	//		 as well for this to work correctly
-	CellPin source = tryGetNetSource(net);
-	return source.getCell().getLibCell().getName().equals("BUFG");
-}
-
- //
- // 
- // @param parent
- // @param c
- // @return
- //
-private RouteTree addRouteTreeConnection(RouteTree parent, Connection c) {
-	
-	Wire sinkWire = c.getSinkWire();
-	RouteTree childTree = wiresInNet.get(sinkWire);
-	
-	// a route tree for this wire has not yet been created..
-	if (childTree == null) { 
-		childTree = parent.addConnection(c);
-		wiresInNet.put(sinkWire, childTree);
-	}
-	
-	return childTree;
-}*/
-
-// Variables:
-// private HashMap<Wire, RouteTree> wiresInNet = new HashMap<Wire, RouteTree>();
-// private HashSet<RouteTree> terminals = new HashSet<RouteTree>();
-// private CellNet currentNet;
