@@ -4,7 +4,6 @@ import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.util.FamilyType;
-import edu.byu.ece.rapidSmith.util.PartNameTools;
 
 import java.io.Serializable;
 import java.util.*;
@@ -85,53 +84,17 @@ public abstract class AbstractDesign implements Serializable {
 	}
 
 	/**
-	 * Returns the all lower case exact Xilinx family name this design
-	 * targets (ex: qvirtex4 instead of virtex4).
-	 * DO NOT use exact family methods if it is to be used for accessing device
-	 * or wire enumeration files as RapidSmith does not generate files for devices
-	 * that have XDLRC compatible files.
-	 *
-	 * @return the exact Xilinx family name this design targets
-	 */
-	public String getExactFamilyName() {
-		return PartNameTools.getExactFamilyNameFromPart(partName);
-	}
-
-	/**
-	 * Returns the all lower case base family name this design targets.
-	 * This ensures compatibility with all RapidSmith files. For differentiating
-	 * family names (qvirtex4 rather than virtex4) use getExactFamilyName().
-	 *
-	 * @return the base family name of the part this design targets
-	 */
-	public String getFamilyName() {
-		return PartNameTools.getFamilyNameFromPart(partName);
-	}
-
-	/**
-	 * Returns the all lower case exact Xilinx family type this design targets
-	 * (ex: qvirtex4 instead of virtex4).
-	 * DO NOT use exact family methods if it is to be used for accessing device or
-	 * wire enumeration files as RapidSmith does not generate files for devices that
-	 * have XDLRC compatible files.
-	 *
-	 * @return the exact Xilinx family type this design targets
-	 */
-	public FamilyType getExactFamilyType() {
-		return PartNameTools.getExactFamilyTypeFromPart(partName);
-	}
-
-	/**
 	 * Returns the base family type this design targets.
 	 * This ensures compatibility with all RapidSmith files. For differentiating
 	 * family types (qvirtex4 rather than virtex4) use getExactFamilyType().
 	 *
 	 * @return the base family type of the part this design targets
 	 */
-	public FamilyType getFamilyType() {
-		return PartNameTools.getFamilyTypeFromPart(partName);
+	public FamilyType getFamily() {
+		return getDevice().getFamily();
 	}
 
+	// TODO remove these, they should exist in the device now
 	static {
 		sliceTypes = new HashSet<>();
 		sliceTypes.add(SiteType.SLICE);

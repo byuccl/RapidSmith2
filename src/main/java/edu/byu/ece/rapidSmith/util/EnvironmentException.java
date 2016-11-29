@@ -7,4 +7,7 @@ public class EnvironmentException extends RuntimeException {
 		super(message);
 	}
 
+	public EnvironmentException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

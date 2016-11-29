@@ -26,7 +26,6 @@ import edu.byu.ece.rapidSmith.design.xdl.XdlPin;
 import edu.byu.ece.rapidSmith.device.helper.HashPool;
 import edu.byu.ece.rapidSmith.primitiveDefs.PrimitiveDefList;
 import edu.byu.ece.rapidSmith.util.FamilyType;
-import edu.byu.ece.rapidSmith.util.PartNameTools;
 
 import java.io.Serializable;
 import java.util.*;
@@ -53,6 +52,8 @@ public class Device implements Serializable {
 	//========================================================================//
 	/** The Xilinx part name of the device (ie. xc4vfx12ff668, omits the speed grade) */
 	private String partName;
+	/** The Xilinx family of this part */
+	private FamilyType family;
 	/** Number of rows of tiles in the device */
 	private int rows;
 	/** Number of columns of tiles in the device */
@@ -116,24 +117,14 @@ public class Device implements Serializable {
 	}
 
 	/**
-	 * Returns the all lower case exact Xilinx family type for this
-	 * device (ex: qvirtex4 instead of virtex4).
-	 *
-	 * @return the exact Xilinx family type for this device
-	 */
-	public FamilyType getExactFamilyType() {
-		return PartNameTools.getExactFamilyTypeFromPart(partName);
-	}
-
-	/**
 	 * Returns the base family type for this device.
 	 * This ensures compatibility with all RapidSmith files. For differentiating
 	 * family types (qvirtex4 rather than virtex4) use getExactFamilyType().
 	 *
 	 * @return the base family type of the part for this device
 	 */
-	public FamilyType getFamilyType() {
-		return PartNameTools.getFamilyTypeFromPart(partName);
+	public FamilyType getFamily() {
+		return family;
 	}
 
 	/**
@@ -145,6 +136,15 @@ public class Device implements Serializable {
 	 */
 	public void setPartName(String partName) {
 		this.partName = partName;
+	}
+
+	/**
+	 * Sets the family of this device.
+	 *
+	 * @param family the name of the part
+	 */
+	public void setFamily(FamilyType family) {
+		this.family = family;
 	}
 
 	/**
@@ -731,6 +731,7 @@ public class Device implements Serializable {
 	protected static class DeviceReplace implements Serializable {
 		private String version;
 		private String partName;
+		private String family;
 		private Tile[][] tiles;
 		private Map<Integer, Map<Integer, PIPRouteThrough>> routeThroughMap;
 		private Collection<SiteTemplate> siteTemplates;
@@ -745,6 +746,7 @@ public class Device implements Serializable {
 
 		public void readResolve(Device device) {
 			device.partName = partName;
+			device.family = family != null ? FamilyType.valueOf(family) : null;
 			device.tiles = tiles;
 			device.rows = tiles.length;
 			device.columns = tiles[0].length;
@@ -792,6 +794,7 @@ public class Device implements Serializable {
 	public void writeReplace(DeviceReplace repl) {
 		repl.version = LATEST_DEVICE_FILE_VERSION;
 		repl.partName = partName;
+		repl.family = family.name();
 		repl.tiles = tiles;
 		repl.routeThroughMap = routeThroughMap;
 		repl.siteTemplates = siteTemplates.values();

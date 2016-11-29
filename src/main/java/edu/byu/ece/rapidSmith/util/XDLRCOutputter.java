@@ -154,7 +154,7 @@ public class XDLRCOutputter {
 		out.append("# =======================================================" + nl);
 		out.append("(xdl_resource_report v0.2 ");
 		out.append(device.getPartName() + " ");
-		out.append(device.getFamilyType().name().toLowerCase() + nl);
+		out.append(device.getFamily().name().toLowerCase() + nl);
 		out.append("# **************************************************************************" + nl);
 		out.append("# *                                                                        *" + nl);
 		out.append("# * Tile Resources                                                         *" + nl);

@@ -21,14 +21,18 @@
 
 package edu.byu.ece.rapidSmith.device.creation;
 
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.device.helper.*;
 import edu.byu.ece.rapidSmith.primitiveDefs.*;
+import edu.byu.ece.rapidSmith.util.EnvironmentException;
+import edu.byu.ece.rapidSmith.util.FamilyType;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -94,13 +98,12 @@ public final class DeviceGenerator {
 	 * path.
 	 *
 	 * @param xdlrcPath path to the XDLRC file for the device
-	 * @param familyInfo XML containing extended family info
+	 * @param env the RapidSmith environment for this part
 	 * @return the generated Device representation
 	 */
-	public Device generate(Path xdlrcPath, Document familyInfo) {
+	public Device generate(Path xdlrcPath, RSEnvironment env) {
 		MessageGenerator.briefMessage("Generating device for file " + xdlrcPath.getFileName());
 
-		this.familyInfo = familyInfo;
 		this.device = new Device();
 		this.we = new WireEnumerator();
 		this.device.setWireEnumerator(we);
@@ -121,6 +124,7 @@ public final class DeviceGenerator {
 		// wires need to know the source and sink tiles.
 		XDLRCParser parser = new XDLRCParser();
 		MessageGenerator.briefMessage("Starting first pass");
+		parser.registerListener(new FamilyTypeListener(env));
 		parser.registerListener(new WireEnumeratorListener());
 		parser.registerListener(new TileAndSiteGeneratorListener());
 		parser.registerListener(new PrimitiveDefsListener());
@@ -880,6 +884,25 @@ public final class DeviceGenerator {
 	private static String getIntrasiteWireName(
 			SiteType type, String element, String pinName) {
 		return "intrasite:" + type.name() + "/" + element + "." + pinName;
+	}
+
+	private final class FamilyTypeListener extends XDLRCParserListener {
+		private RSEnvironment env;
+
+		public FamilyTypeListener(RSEnvironment env) {
+			this.env = env;
+		}
+
+		@Override
+		protected void enterXdlResourceReport(List<String> tokens) {
+			FamilyType family = FamilyType.valueOf(tokens.get(3).toUpperCase());
+			try {
+				familyInfo = env.loadFamilyInfo(family);
+			} catch (IOException|JDOMException e) {
+				throw new EnvironmentException("Failed to load family information file", e);
+			}
+			device.setFamily(family);
+		}
 	}
 
 	private final class WireEnumeratorListener extends XDLRCParserListener {

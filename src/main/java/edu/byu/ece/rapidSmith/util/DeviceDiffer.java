@@ -1,12 +1,12 @@
 package edu.byu.ece.rapidSmith.util;
 
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.*;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -537,31 +537,15 @@ public class DeviceDiffer {
 	}
 
 	public static void main(String[] args) {
-		Path rsGoldDir = Paths.get(args[0]);
-		Path rsTestDir = Paths.get(args[1]);
+		RSEnvironment rsGoldEnv = new RSEnvironment(Paths.get(args[0]));
+		RSEnvironment rsTestEnv = new RSEnvironment(Paths.get(args[1]));
 		String partName = args[2];
 		boolean verbose = false;
 		if (args.length > 3)
 			verbose = Boolean.getBoolean(args[3]);
 
-		String familyName = PartNameTools.getFamilyNameFromPart(partName);
-		partName = PartNameTools.removeSpeedGrade(partName);
-
-		Path goldDeviceFile = rsGoldDir.resolve(familyName)
-				.resolve(partName +	"_db.dat");
-		Path goldWeFile = rsGoldDir.resolve(familyName)
-				.resolve("wireEnumerator.dat");
-
-		Path testDeviceFile = rsTestDir.resolve(familyName)
-				.resolve(partName +	"_db.dat");
-		Path testWeFile = rsTestDir.resolve(familyName)
-				.resolve("wireEnumerator.dat");
-
-		Device goldDevice = new Device();
-//		goldDevice.readDeviceFromCompactFile(goldDeviceFile.toString());
-
-		Device testDevice = new Device();
-//		testDevice.readDeviceFromCompactFile(testDeviceFile.toString());
+		Device goldDevice = rsGoldEnv.getDevice(partName);
+		Device testDevice = rsTestEnv.getDevice(partName);
 
 		DeviceDiffer differ = new DeviceDiffer(verbose);
 		differ.setGold(goldDevice);

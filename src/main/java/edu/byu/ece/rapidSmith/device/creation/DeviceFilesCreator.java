@@ -22,10 +22,7 @@ package edu.byu.ece.rapidSmith.device.creation;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.util.FamilyType;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
-import edu.byu.ece.rapidSmith.util.PartNameTools;
-import org.jdom2.Document;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -58,21 +55,13 @@ public class DeviceFilesCreator {
 	 * @param part the part to create the device for
 	 */
 	public void createDevice(String part) {
-		FamilyType family = PartNameTools.getFamilyTypeFromPart(part);
-		Document familyInfo = env.loadFamilyInfo(family);
-		if (familyInfo == null) {
-			System.err.println("Failed to load family information file " +
-					"for family " + family);
-			return;
-		}
-
 		// Create XDLRC File if it already hasn't been created
 		System.out.println("Retrieving XDLRC file");
 		Path xdlrcFilePath = xdlrcRetriever.getXDLRCFileForPart(part);
 
 		// Initialize Parser
 		DeviceGenerator generator = new DeviceGenerator();
-		Device device = generator.generate(xdlrcFilePath, familyInfo);
+		Device device = generator.generate(xdlrcFilePath, env);
 
 		// Write the Device to File
 		System.out.println("Writing device to compact file");

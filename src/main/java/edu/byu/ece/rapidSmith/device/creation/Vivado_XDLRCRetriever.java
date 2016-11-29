@@ -26,7 +26,7 @@ public class Vivado_XDLRCRetriever implements XDLRCRetriever {
 
 	@Override
 	public Path getXDLRCFileForPart(String part) {
-		Path xdlrcFile = RSEnvironment.defaultEnv().getPartFolderPath(part).resolve(part + "_full.xdlrc");
+		Path xdlrcFile = RSEnvironment.defaultEnv().getDevicePath().resolve(part + "_full.xdlrc");
 		
 		//if the file doesn't exist, then throw an error and 
 		if (!Files.isRegularFile(xdlrcFile)) {

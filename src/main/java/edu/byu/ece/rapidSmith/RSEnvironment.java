@@ -1,10 +1,10 @@
 package edu.byu.ece.rapidSmith;
 
 import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.util.EnvironmentException;
 import edu.byu.ece.rapidSmith.util.FamilyType;
 import edu.byu.ece.rapidSmith.util.FileTools;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
-import edu.byu.ece.rapidSmith.util.EnvironmentException;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
@@ -34,6 +34,7 @@ public class RSEnvironment {
 
 	private final Path rsPath;
 	private final Map<String, SoftReference<Device>> loadedDevices = new HashMap<>();
+	private final Map<String, FamilyType> supportedParts = new HashMap<>();
 
 	/**
 	 * Returns the default RapidSmith environment.  Unless overwritten with
@@ -77,6 +78,7 @@ public class RSEnvironment {
 			throw new EnvironmentException(RSPATH_ENV_VARIABLE +
 					" environment variable is not set.");
 		}
+		loadSupportedParts();
 	}
 
 	/**
@@ -86,6 +88,16 @@ public class RSEnvironment {
 	public RSEnvironment(Path rapidsmithPath) {
 		Objects.requireNonNull(rapidsmithPath, "rapidsmithPath");
 		rsPath = rapidsmithPath;
+		loadSupportedParts();
+	}
+
+	private void loadSupportedParts() {
+		for (FamilyType family : getAvailableFamilies()) {
+			Path partFolderPath = getPartFolderPath(family);
+			for (String part : getAvailableParts(family)) {
+				supportedParts.put(part, family);
+			}
+		}
 	}
 
 	/**
@@ -147,14 +159,10 @@ public class RSEnvironment {
 	 * @param family family to get the family info file for
 	 * @return the family info xml document
 	 */
-	public Document loadFamilyInfo(FamilyType family) {
+	public Document loadFamilyInfo(FamilyType family) throws JDOMException, IOException {
 		Path path = getPartFolderPath(family).resolve(FAMILY_INFO_FILENAME);
 		SAXBuilder builder = new SAXBuilder();
-		try {
-			return builder.build(path.toFile());
-		} catch (JDOMException | IOException e) {
-			return null;
-		}
+		return builder.build(path.toFile());
 	}
 
 	/**
@@ -163,8 +171,8 @@ public class RSEnvironment {
 	 * @param partName name of the part to get its corresponding folder path.
 	 * @return the path of the folder where the parts files resides
 	 */
-	public Path getPartFolderPath(String partName){
-		return getPartFolderPath(PartNameTools.getFamilyTypeFromPart(partName));
+	public Path getPartFolderPath(String partName) {
+		return getPartFolderPath(getFamilyTypeFromPart(partName));
 	}
 
 	/**
@@ -172,18 +180,16 @@ public class RSEnvironment {
 	 * @param familyType the family type corresponding folder path
 	 * @return the path of the folder where the parts of familyType reside
 	 */
-	public Path getPartFolderPath(FamilyType familyType){
-		familyType = PartNameTools.getBaseTypeFromFamilyType(familyType);
+	public Path getPartFolderPath(FamilyType familyType) {
 		return getDevicePath().resolve(familyType.name().toLowerCase());
 	}
-
 
 	/**
 	 * Returns a list of all parts for which a device file exists for in this environment.
 	 *
 	 * @return a list of available devices in this environment
 	 */
-	public List<String> getAvailableParts(){
+	public List<String> getAvailableParts() {
 		ArrayList<String> allParts = new ArrayList<>();
 		for (FamilyType family : getAvailableFamilies()) {
 			allParts.addAll(getAvailableParts(family));
@@ -197,16 +203,16 @@ public class RSEnvironment {
 	 *
 	 * @return a list of available devices in this environment
 	 */
-	public List<String> getAvailableParts(FamilyType type){
+	public List<String> getAvailableParts(FamilyType type) {
 		ArrayList<String> allParts = new ArrayList<>();
 		String pattern = "_db.dat";
-		Path devFamilyPath = getDevicePath().resolve(type.toString().toLowerCase());
+		Path devFamilyPath = getPartFolderPath(type);
 		if (!Files.isDirectory(devFamilyPath))
 			return allParts;
 		try {
 			for(Path partPath : Files.newDirectoryStream(devFamilyPath)) {
 				String fileName = partPath.getFileName().toString();
-				if(fileName.endsWith(pattern)){
+				if(fileName.endsWith(pattern)) {
 					allParts.add(fileName.replace(pattern, ""));
 				}
 			}
@@ -227,18 +233,19 @@ public class RSEnvironment {
 			return allFamilies;
 		try {
 			for(Path subPath : Files.newDirectoryStream(devicePath)) {
-				if (!Files.isDirectory(subPath))
-					continue;
-				try {
-					String familyName = subPath.getFileName().toString();
-					FamilyType type = FamilyType.valueOf(familyName.toUpperCase());
-					allFamilies.add(type);
-				} catch (IllegalArgumentException ignored) {
+				if (Files.isDirectory(subPath)) {
+					try {
+						String familyName = subPath.getFileName().toString();
+						FamilyType type = FamilyType.valueOf(familyName.toUpperCase());
+						Path familyInfoFilePath = getPartFolderPath(type).resolve(FAMILY_INFO_FILENAME);
+						if (Files.exists(familyInfoFilePath))
+							allFamilies.add(type);
+					} catch (IllegalArgumentException ignored) {
+					}
 				}
 			}
 		} catch (IOException ignored) {
 		}
-
 		return allFamilies;
 	}
 
@@ -250,7 +257,11 @@ public class RSEnvironment {
 	 * @return the full path to the device file for the specified part
 	 */
 	public Path getDeviceFilePath(String partName) {
-		return getPartFolderPath(partName).resolve(
+		return getDeviceFilePath(getFamilyTypeFromPart(partName), partName);
+	}
+
+	private Path getDeviceFilePath(FamilyType family, String partName) {
+		return getPartFolderPath(family).resolve(
 				PartNameTools.removeSpeedGrade(partName) + DEVICE_FILE_SUFFIX);
 	}
 
@@ -262,7 +273,11 @@ public class RSEnvironment {
 	 * @throws IOException if an exception occurs writing the device file
 	 */
 	public void writeDeviceFile(Device device) throws IOException {
-		Path path = getDeviceFilePath(device.getPartName());
+		Path path = getDeviceFilePath(device.getFamily(), device.getPartName());
 		FileTools.writeCompressedDeviceFile(device, path);
+	}
+
+	public FamilyType getFamilyTypeFromPart(String partName) {
+		return supportedParts.get(partName);
 	}
 }

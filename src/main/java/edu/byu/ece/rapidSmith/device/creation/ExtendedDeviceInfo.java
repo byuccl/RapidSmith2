@@ -356,7 +356,7 @@ public class ExtendedDeviceInfo implements Serializable {
 
 	private static Path getExtendedInfoPath(Device device) {
 		RSEnvironment env = RSEnvironment.defaultEnv();
-		Path partFolderPath = env.getPartFolderPath(device.getFamilyType());
+		Path partFolderPath = env.getPartFolderPath(device.getFamily());
 		partFolderPath = partFolderPath.resolve(device.getPartName() + "_info.dat");
 		return partFolderPath;
 	}

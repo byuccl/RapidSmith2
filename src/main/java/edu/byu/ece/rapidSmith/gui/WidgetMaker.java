@@ -28,7 +28,6 @@ import com.trolltech.qt.gui.QTreeWidgetItem;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.util.FamilyType;
-import edu.byu.ece.rapidSmith.util.PartNameTools;
 
 public class WidgetMaker {
 	
@@ -40,28 +39,17 @@ public class WidgetMaker {
 		
 		HashMap<FamilyType, QTreeWidgetItem> familyItems = new HashMap<FamilyType, QTreeWidgetItem>();
 		HashMap<String, QTreeWidgetItem> subFamilyItems = new HashMap<String, QTreeWidgetItem>();
-		
-		for(String partName : RSEnvironment.defaultEnv().getAvailableParts()){
-			FamilyType type = PartNameTools.getFamilyTypeFromPart(partName);
+
+		RSEnvironment env = RSEnvironment.defaultEnv();
+		for(String partName : env.getAvailableParts()){
+			FamilyType type = env.getFamilyTypeFromPart(partName);
 			QTreeWidgetItem familyItem = familyItems.get(type);
 			if(familyItem == null){
 				familyItem = new QTreeWidgetItem(treeWidget);
-				familyItem.setText(0, PartNameTools.getFormalFamilyNameFromType(type));
+				familyItem.setText(0, type.name());
 				familyItems.put(type, familyItem);
 			}
-			String subFamilyName = PartNameTools.getSubFamilyFromPart(partName);
-			QTreeWidgetItem partItem = null;
-			QTreeWidgetItem parent = familyItem;
-			if(subFamilyName != null){
-				QTreeWidgetItem subFamilyItem = subFamilyItems.get(type.toString() + subFamilyName);
-				if(subFamilyItem == null){
-					subFamilyItem = new QTreeWidgetItem(parent);
-					subFamilyItem.setText(0, subFamilyName);
-					subFamilyItems.put(type.toString() + subFamilyName, subFamilyItem);
-				}
-				parent = subFamilyItem;
-			}
-			partItem = new QTreeWidgetItem(parent);
+			QTreeWidgetItem partItem = new QTreeWidgetItem(familyItem);
 			partItem.setText(0, partName);
 	        partItem.setData(0, ItemDataRole.AccessibleDescriptionRole, partName);
 		}

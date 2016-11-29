@@ -402,7 +402,7 @@ public class TileScene extends QGraphicsScene{
 	private void drawCLB(QPainter painter, int rectX, int rectY, int rectSide){
 		painter.drawRect(rectX, rectY + rectSide / 2, rectSide / 2 - 1, rectSide / 2 - 1);
 		painter.drawRect(rectX + rectSide / 2, rectY, rectSide / 2 - 1, rectSide / 2 - 1);					
-		switch(device.getFamilyType()){
+		switch(device.getFamily()){
 			case SPARTAN3:
 			case SPARTAN3A:
 			case SPARTAN3ADSP:
@@ -417,7 +417,7 @@ public class TileScene extends QGraphicsScene{
 	}
 	
 	private void drawBRAM(QPainter painter, int rectX, int rectY, int rectSide, int offset, QColor color){
-		switch(device.getFamilyType()){
+		switch(device.getFamily()){
 			case SPARTAN6:
 				painter.drawRect(rectX, rectY - 3 * tileSize, rectSide - 1, 4 * rectSide + 3 * 2 * offset - 1);
 				painter.setPen(color.darker());
@@ -457,7 +457,7 @@ public class TileScene extends QGraphicsScene{
 	}
 	
 	private void drawDSP(QPainter painter, int rectX, int rectY, int rectSide, int offset, QColor color){
-		switch(device.getFamilyType()){
+		switch(device.getFamily()){
 			case SPARTAN6:
 				painter.drawRect(rectX, rectY - 3 * tileSize, rectSide - 1, 4 * rectSide + 3 * 2 * offset - 1);
 				painter.setPen(color.darker());
@@ -502,7 +502,7 @@ public class TileScene extends QGraphicsScene{
 	}
 	
 	private void populateTileTypesToHide(){
-		switch(device.getFamilyType()){
+		switch(device.getFamily()){
 		case VIRTEX4:
 			tileColumnTypesToHide.add(TileType.CLB_BUFFER);
 			tileColumnTypesToHide.add(TileType.CLK_HROW);
