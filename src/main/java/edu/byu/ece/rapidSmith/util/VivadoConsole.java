@@ -112,10 +112,18 @@ public class VivadoConsole {
 		final ProcessBuilder processBuilder = new ProcessBuilder();
 		processBuilder.redirectErrorStream(true);
 		processBuilder.directory(new File(runDirectory));
-		processBuilder.command("vivado.bat", "-mode", "tcl"); 
+		
+		String osType = System.getProperty("os.name").toLowerCase();
+		String vivadoCommand = "vivado";
+		if (osType.contains("win")) {
+			vivadoCommand += ".bat";
+		}
+		processBuilder.command(vivadoCommand, "-mode", "tcl");
+		
 		try {
 			vivadoProcess = processBuilder.start();
 		} catch (IOException e) {
+			e.printStackTrace();
 			throw new EnvironmentException("Cannot find vivado executable on PATH.");
 		}
 	}

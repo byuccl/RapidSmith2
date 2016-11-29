@@ -13,6 +13,8 @@ import edu.byu.ece.rapidSmith.design.subsite.Connection;
  * and the enumeration identifying the individual wire.
  */
 public class TileWire implements Wire, Serializable {
+
+	private static final long serialVersionUID = 5844788118958981887L;
 	private Tile tile;
 	private int wire;
 	
@@ -28,6 +30,16 @@ public class TileWire implements Wire, Serializable {
 		return tile;
 	}
 
+	@Override
+	public String getWireName() {
+		return tile.getDevice().getWireEnumerator().getWireName(wire);
+	}
+
+	@Override
+	public String getFullWireName() {
+		return getTile().getName() + "/" + getWireName();
+	}
+	
 	/**
 	 * Always returns null.
 	 */
@@ -156,5 +168,4 @@ public class TileWire implements Wire, Serializable {
 	public String toString() {
 		return tile.getName() + " " + tile.getDevice().getWireEnumerator().getWireName(wire);
 	}
-
 }
