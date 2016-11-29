@@ -102,11 +102,16 @@ public final class EdifInterface {
 		
 		for ( EdifPort port : topInterface.getPortList() ) {
 			
-			String libraryPortType = port.isInput() ? "IPORT" : "OPORT";
-		
-			// TODO: See if inout ports are supported in RS2, and if not what needs to be updated to support them 
+			String libraryPortType = null;
+			
 			if (port.isInOut()) {
-				throw new UnsupportedOperationException("Inout port functionality not yet implemented! Cannot load EDIF");
+				libraryPortType = "IOPORT";
+			}
+			else if (port.isInput()) {
+				libraryPortType = "IPORT";
+			}
+			else {
+				libraryPortType = "OPORT";
 			}
 
 			String portSuffix = port.getOldName();
@@ -174,6 +179,7 @@ public final class EdifInterface {
 			
 			if (sources.size() == 0) {
 				MessageGenerator.briefError("[Warning] No source for net " + net.getOldName());
+				design.addNet(cn);
 				continue;
 			}
 			
