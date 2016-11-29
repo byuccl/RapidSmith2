@@ -155,8 +155,6 @@ public class XdcRoutingInterface {
 			if (design.getGndNet() != null) {
 				design.getGndNet().computeRouteStatus();
 			}
-			
-			br.close();
 		}
 	}
 	
