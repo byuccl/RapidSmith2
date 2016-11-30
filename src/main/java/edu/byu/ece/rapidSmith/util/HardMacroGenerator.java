@@ -357,8 +357,8 @@ public class HardMacroGenerator {
 			//check for forbidden pips and unroute
 			boolean clearPips = false;
 			for(PIP p : net.getPIPs()){
-				if(forbiddenPips.contains(p.getStartWireName())
-						||forbiddenPips.contains(p.getEndWireName())){
+				if(forbiddenPips.contains(p.getStartWire().getWireName())
+						||forbiddenPips.contains(p.getEndWire().getWireName())){
 					clearPips = true;
 					break;
 				}

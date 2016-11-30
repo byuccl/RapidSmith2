@@ -31,10 +31,7 @@ import java.util.Map.Entry;
 import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
 import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
 import edu.byu.ece.rapidSmith.design.PIP;
-import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.TileType;
-import edu.byu.ece.rapidSmith.device.WireEnumerator;
-import edu.byu.ece.rapidSmith.device.WireType;
+import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 
 /**
@@ -118,19 +115,19 @@ public class CountingExample {
 	 * @param wireCounts The map that is storing the total counts
 	 * @param dev The relevant Device
 	 */
-	private static void countWire(int pipWire, HashMap<WireType,Integer> wireCounts, Device dev){
+	private static void countWire(Wire pipWire, HashMap<WireType,Integer> wireCounts, Device dev){
 		WireEnumerator we = dev.getWireEnumerator();
-		WireType pipWireType = we.getWireType(pipWire);
+		WireType pipWireType = we.getWireType(pipWire.getWireEnum());
 		if(wireTypesOfInterest.contains(pipWireType)){
 			// If a wire name has BEG in it, this is the only entry 
 			// point to drive the resource, long lines 
 			// have multiple points
-			if(we.getWireName(pipWire).contains("BEG")){
+			if(pipWire.getWireName().contains("BEG")){
 				Integer count = wireCounts.get(pipWireType);
 				if(count == null){
-					wireCounts.put(pipWireType, new Integer(1));
+					wireCounts.put(pipWireType, 1);
 				}else{
-					wireCounts.put(pipWireType, new Integer(count.intValue()+1));
+					wireCounts.put(pipWireType, count+1);
 				}
 			}
 		}

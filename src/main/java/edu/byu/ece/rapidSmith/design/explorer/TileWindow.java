@@ -168,13 +168,13 @@ public class TileWindow extends QWidget{
 				conns.add(new WireJunction(p));
 			}
 
-			Wire start = new TileWire(p.getTile(), p.getStartWire());
-			Wire end = new TileWire(p.getTile(), p.getEndWire());
+			Wire start = p.getStartWire();
+			Wire end = p.getEndWire();
 			wireSet.add(start);
 			wireSet.add(end);
 		}
 		for(PIP p : net.getPIPs()){
-			Wire tmp = new TileWire(p.getTile(), p.getEndWire());
+			Wire tmp = p.getEndWire();
 			//System.out.println("  " + tmp.toString(scene.getWireEnumerator()));
 			for(Connection w : tmp.getWireConnections()){
 				Wire tmp2 = w.getSinkWire();

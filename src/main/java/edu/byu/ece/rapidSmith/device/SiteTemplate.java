@@ -1,7 +1,7 @@
 package edu.byu.ece.rapidSmith.device;
 
+import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
-import edu.byu.ece.rapidSmith.design.subsite.SitePip;
 
 import java.io.Serializable;
 import java.util.*;
@@ -110,8 +110,9 @@ public final class SiteTemplate implements Serializable {
 		return pipAttributes;
 	}
 
-	public XdlAttribute getPipAttribute(SitePip pip) {
-		return pipAttributes.get(pip.getStartWire()).get(pip.getEndWire());
+	public XdlAttribute getPipAttribute(PIP pip) {
+		return pipAttributes.get(pip.getStartWire().getWireEnum())
+				.get(pip.getEndWire().getWireEnum());
 	}
 
 	public void setPipAttributes(Map<Integer, Map<Integer, XdlAttribute>> pipAttributes) {

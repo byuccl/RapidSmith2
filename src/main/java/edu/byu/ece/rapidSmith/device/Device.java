@@ -244,23 +244,28 @@ public class Device implements Serializable {
 	}
 
 	/**
-	 * Checks if this wire is RouteThrough.
+	 * Checks if this PIP is RouteThrough.
 	 *
-	 * @param w the wire connection to test
-	 * @return true if the wire is a routeThrough
+	 * @param pip the pip to test
+	 * @return true if the PIP is a routeThrough
 	 */
-	public boolean isRouteThrough(WireConnection w) {
-		return routeThroughMap.containsKey(w.getWire());
-	}
-
 	public boolean isRouteThrough(PIP pip) {
 		return isRouteThrough(pip.getStartWire(), pip.getEndWire());
 	}
 
-	public boolean isRouteThrough(Integer startWire, Integer endWire) {
-		if (!routeThroughMap.containsKey(endWire))
-			return false;
-		return routeThroughMap.get(endWire).containsKey(startWire);
+	/**
+	 * Checks if the two wires are connected through a RouteThrough.
+	 *
+	 * @param startWire the startWire to test
+	 * @param endWire the endWire to test
+	 * @return true if the PIP is a routeThrough
+	 */
+	public boolean isRouteThrough(Wire startWire, Wire endWire) {
+		return getRouteThrough(startWire, endWire) != null;
+	}
+
+	boolean isRouteThrough(Integer startWire, Integer endWire) {
+		return getRouteThrough(startWire, endWire) != null;
 	}
 
 	/**
@@ -282,13 +287,24 @@ public class Device implements Serializable {
 	 * @return the PIPRouteThrough object or null if the pip is not a
 	 *   route through
 	 */
-	public PIPRouteThrough getRouteThrough(Integer startWire, Integer endWire) {
+	public PIPRouteThrough getRouteThrough(Wire startWire, Wire endWire) {
+		return getRouteThrough(startWire, endWire);
+	}
+
+	/**
+	 * Returns the PIPRouteThrough object for a specified WireConnection.
+	 *
+	 * @param startWire the source wire of the corresponding PIPRouteThrough
+	 * @param endWire the sink wire of the corresponding PIPRouteThrough
+	 * @return the PIPRouteThrough object or null if the pip is not a
+	 *   route through
+	 */
+	PIPRouteThrough getRouteThrough(Integer startWire, Integer endWire) {
 		Map<Integer, PIPRouteThrough> sourceMap = routeThroughMap.get(endWire);
 		if (sourceMap == null)
 			return null;
 		return sourceMap.get(startWire);
 	}
-
 
 	/**
 	 * Sets the WireConnection to PIPRouteThrough object map.

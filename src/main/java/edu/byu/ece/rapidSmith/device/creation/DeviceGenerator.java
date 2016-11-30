@@ -89,6 +89,8 @@ public final class DeviceGenerator {
 	private HashPool<Map<SiteType, Map<String, Integer>>> externalWiresMapPool;
 	private HashPool<AlternativeTypes> alternativeTypesPool;
 
+	private HashSet<IntPair> routethroughs;
+
 	/**
 	 * Generates and returns the Device created from the XDLRC at the specified
 	 * path.
@@ -115,6 +117,8 @@ public final class DeviceGenerator {
 		this.externalWiresPool = new HashPool<>();
 		this.externalWiresMapPool = new HashPool<>();
 		this.alternativeTypesPool = new HashPool<>();
+
+		this.routethroughs = new HashSet<>();
 
 		// Requires a two part iteration, the first to obtain the tiles and sites,
 		// and the second to gather the wires.  Two parses are required since the
@@ -824,7 +828,7 @@ public final class DeviceGenerator {
 			final int destWire = wc.getWire();
 
 			// Don't search through route throughs
-			if (device.isRouteThrough(wc))
+			if (routethroughs.contains(new IntPair(curWire.getWireEnum(), wc.getWire())))
 				continue;
 
 			if (wireSourcesCount.get(destTile).get(destWire) == 1) {
@@ -852,7 +856,7 @@ public final class DeviceGenerator {
 					Integer sinkWire = wc.getWire();
 
 					// Don't include routethroughs in count
-					if (device.isRouteThrough(wc))
+					if (routethroughs.contains(new IntPair(wire, sinkWire)))
 						continue;
 					int count = 0;
 					if (wireSourcesCount.get(sinkTile).containsKey(sinkWire))
@@ -1117,6 +1121,7 @@ public final class DeviceGenerator {
 				PIPRouteThrough currRouteThrough = new PIPRouteThrough(type, inPin, outPin);
 				currRouteThrough = routeThroughPool.add(currRouteThrough);
 				device.addRouteThrough(startWire, endWireEnum, currRouteThrough);
+				routethroughs.add(new IntPair(startWire, endWireEnum));
 			}
 			currTile.addConnection(startWire, wc);
 		}
@@ -1333,6 +1338,30 @@ public final class DeviceGenerator {
 			c.setElement1(tokens.get(4));
 			c.setPin1(tokens.get(5).substring(0, tokens.get(5).length() - 1));
 			currElement.addConnection(c);
+		}
+	}
+
+	private static class IntPair {
+		private final int first;
+		private final int second;
+
+		public IntPair(int first, int second) {
+			this.first = first;
+			this.second = second;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			IntPair intPair = (IntPair) o;
+			return first == intPair.first &&
+					second == intPair.second;
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(first, second);
 		}
 	}
 }

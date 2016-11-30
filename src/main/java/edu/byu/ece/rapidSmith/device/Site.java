@@ -20,9 +20,6 @@
  */
 package edu.byu.ece.rapidSmith.device;
 
-import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
-import edu.byu.ece.rapidSmith.design.subsite.SitePip;
-
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;

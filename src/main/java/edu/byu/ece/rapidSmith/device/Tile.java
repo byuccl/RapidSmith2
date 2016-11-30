@@ -334,7 +334,7 @@ public class Tile implements Serializable {
 	 * @return True if the connection exists in this tile, false otherwise.
 	 */
 	public boolean hasPIP(PIP pip) {
-		return hasConnection(pip.getStartWire(), pip.getEndWire());
+		return hasConnection(pip.getStartWire().getWireEnum(), pip.getEndWire().getWireEnum());
 	}
 
 	private boolean hasConnection(int startWire, int endWire) {
@@ -361,9 +361,11 @@ public class Tile implements Serializable {
 	public ArrayList<PIP> getPIPs() {
 		ArrayList<PIP> pips = new ArrayList<>();
 		for (Integer startWire : wireConnections.keySet()) {
+			TileWire start = new TileWire(this, startWire);
 			for (WireConnection endWire : wireConnections.get(startWire)) {
 				if (endWire.isPIP()) {
-					pips.add(new PIP(this, startWire, endWire.getWire()));
+					TileWire end = new TileWire(this, endWire.getWire());
+					pips.add(new PIP(start, end));
 				}
 			}
 		}
