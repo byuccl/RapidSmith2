@@ -66,11 +66,6 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
-		public WireConnection getBackingConnection() {
-			return wc;
-		}
-
-		@Override
 		public boolean isWireConnection() {
 			return true;
 		}
@@ -141,11 +136,6 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
-		public WireConnection getBackingConnection() {
-			return wc;
-		}
-
-		@Override
 		public boolean isWireConnection() {
 			return true;
 		}
@@ -213,11 +203,6 @@ public abstract class Connection implements Serializable {
 		@Override
 		public Wire getSinkWire() {
 			return new SiteWire(sourceWire.getSite(), wc.getWire());
-		}
-
-		@Override
-		public WireConnection getBackingConnection() {
-			return wc;
 		}
 
 		@Override
@@ -292,11 +277,6 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
-		public WireConnection getBackingConnection() {
-			return null;
-		}
-
-		@Override
 		public boolean isWireConnection() {
 			return false;
 		}
@@ -360,11 +340,6 @@ public abstract class Connection implements Serializable {
 		@Override
 		public Wire getSinkWire() {
 			return pin.getExternalWire();
-		}
-
-		@Override
-		public WireConnection getBackingConnection() {
-			return null;
 		}
 
 		@Override
@@ -434,11 +409,6 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
-		public WireConnection getBackingConnection() {
-			return null;
-		}
-
-		@Override
 		public boolean isWireConnection() {
 			return false;
 		}
@@ -493,8 +463,6 @@ public abstract class Connection implements Serializable {
 	}
 
 	public abstract Wire getSinkWire();
-
-	public abstract WireConnection getBackingConnection();
 
 	public abstract boolean isPip();
 
