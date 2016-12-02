@@ -188,7 +188,7 @@ public class DeviceBrowser extends QMainWindow{
 	 * This method will draw all of the wire connections based on the wire given.
 	 * @param index The index of the wire in the wire list.
 	 */
-	public void wireDoubleClicked(QModelIndex index){
+	protected void wireDoubleClicked(QModelIndex index){
 		scene.clearCurrentLines();
 		if(currTile == null) return;
 		if(index.column() != 0) return;
@@ -214,7 +214,7 @@ public class DeviceBrowser extends QMainWindow{
 	 * This will update the primitive list window based on the current
 	 * selected tile.
 	 */
-	protected void updatePrimitiveList(){
+	private void updatePrimitiveList(){
 		primitiveList.clear();
 		if(currTile == null || currTile.getPrimitiveSites() == null) return;
 		for(Site ps : currTile.getPrimitiveSites()){
@@ -229,7 +229,7 @@ public class DeviceBrowser extends QMainWindow{
 	 * This will update the wire list window based on the current
 	 * selected tile.
 	 */
-	protected void updateWireList(){
+	private void updateWireList(){
 		wireList.clear();
 		if(currTile == null || currTile.getWireHashMap() == null) return;
 		for(Integer wire : currTile.getWireHashMap().keySet()) {
