@@ -37,14 +37,14 @@ public class LutRoutethroughInserter {
 	private static final String ROUTETHROUGH_INIT_STRING = "2'h2";
 	private static final String ROUTETHROUGH_NAME = "rapidSmithRoutethrough";
 	private int routethroughID;
-	private Collection<CellNet> netsToAdd = new ArrayList<CellNet>();
-	private List<Cell> cellsToAdd = new ArrayList<Cell>();
+	private Collection<CellNet> netsToAdd = new ArrayList<>();
+	private List<Cell> cellsToAdd = new ArrayList<>();
 	
 	public LutRoutethroughInserter(CellDesign design, CellLibrary libCells, Map<BelPin, CellPin> pinMap) {
 		this.design = design; 
 		this.libCells = libCells;
 		this.routethroughID = 0;
-		this.netsToAdd = new ArrayList<CellNet>();
+		this.netsToAdd = new ArrayList<>();
 		this.belPinToCellPinMap = pinMap;
 	}
 	
@@ -52,7 +52,7 @@ public class LutRoutethroughInserter {
 		this.design = design; 
 		this.libCells = libCells;
 		this.routethroughID = 0;
-		this.netsToAdd = new ArrayList<CellNet>();
+		this.netsToAdd = new ArrayList<>();
 		this.belPinToCellPinMap = createBelPinToCellPinMap();
 	}
 		
@@ -67,7 +67,7 @@ public class LutRoutethroughInserter {
 										.flatMap(cell -> cell.getPins().stream()).iterator();
 		
 		// create the map from BelPin to CellPin
-		HashMap<BelPin, CellPin> tmpMap = new HashMap<BelPin, CellPin>();
+		HashMap<BelPin, CellPin> tmpMap = new HashMap<>();
 		while(cellPinIt.hasNext()) {
 			CellPin cellPin = cellPinIt.next();
 			
@@ -92,7 +92,7 @@ public class LutRoutethroughInserter {
 								
 			for (RouteTree routeTree : net.getSinkSitePinRouteTrees()) {
 				
-				List<CellPin> sinks = new ArrayList<CellPin>(4);
+				List<CellPin> sinks = new ArrayList<>(4);
 				BelPin rtSource = tryFindRoutethroughSourcePin(routeTree, sinks);
 						
 				if (rtSource != null) { // we found a routethrough
@@ -178,6 +178,6 @@ public class LutRoutethroughInserter {
 	 * Adds all newly created nets to the CellDesign
 	 */
 	private void addRoutethroughNetsToDesign() {
-		netsToAdd.forEach(net -> design.addNet(net));
+		netsToAdd.forEach(design::addNet);
 	}
 }

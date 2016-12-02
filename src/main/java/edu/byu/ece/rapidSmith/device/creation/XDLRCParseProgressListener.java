@@ -42,10 +42,10 @@ public class XDLRCParseProgressListener extends XDLRCParserListener {
 		this.tilesParsed = 0;
 	}
 
-	@Override
 	/**
 	 * Just print a line.
 	 */
+	@Override
 	protected void exitXdlResourceReport(List<String> tokens) {
 		System.out.println();
 	}

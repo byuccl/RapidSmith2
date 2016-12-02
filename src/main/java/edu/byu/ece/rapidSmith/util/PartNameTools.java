@@ -47,7 +47,7 @@ public class PartNameTools{
 											FamilyType.VIRTEX6, FamilyType.VIRTEX7, FamilyType.VIRTEXE};
 	
 	static{
-		legacyTypes = new HashSet<FamilyType>();
+		legacyTypes = new HashSet<>();
 		legacyTypes.add(FamilyType.SPARTAN2);
 		legacyTypes.add(FamilyType.SPARTAN2E);
 		legacyTypes.add(FamilyType.VIRTEX);
@@ -110,7 +110,7 @@ public class PartNameTools{
 		}
 
 	    int last_match = 0;
-	    LinkedList<String> splitted = new LinkedList<String>();
+	    LinkedList<String> splitted = new LinkedList<>();
 		Matcher m = partNamePattern.matcher(partName);
         while(m.find()){
         	if(!partName.substring(last_match,m.start()).trim().isEmpty()){
@@ -146,146 +146,162 @@ public class PartNameTools{
 		String[] tokens = splitPartName(partName);
 
 		// Match part name with family
-		if(tokens[0].equals("xcv")){
-			if(tokens.length >= 3 && tokens[2].startsWith("e")){
-				return FamilyType.VIRTEXE;
-			}else{
-				return FamilyType.VIRTEX;
-			}
-		}else if(tokens[0].equals("xc")){
-			if(tokens[1].equals("2")){
-				if(tokens[2].equals("s")){
-					if(tokens.length >= 5 && tokens[4].startsWith("e")){
-						return FamilyType.SPARTAN2E;
-					}else{
-						return FamilyType.SPARTAN2; 
+		switch (tokens[0]) {
+			case "xcv":
+				if (tokens.length >= 3 && tokens[2].startsWith("e")) {
+					return FamilyType.VIRTEXE;
+				} else {
+					return FamilyType.VIRTEX;
+				}
+			case "xc":
+				switch (tokens[1]) {
+					case "2":
+						if (tokens[2].equals("s")) {
+							if (tokens.length >= 5 && tokens[4].startsWith("e")) {
+								return FamilyType.SPARTAN2E;
+							} else {
+								return FamilyType.SPARTAN2;
+							}
+						} else if (tokens[2].startsWith("vp")) {
+							return FamilyType.VIRTEX2P;
+						} else if (tokens[2].startsWith("v")) {
+							return FamilyType.VIRTEX2;
+						}
+						break;
+					case "3":
+						if (tokens[2].equals("sd")) {
+							return FamilyType.SPARTAN3ADSP;
+						} else if (tokens[2].startsWith("s")) {
+							if (tokens.length >= 5 && tokens[4].startsWith("e")) {
+								return FamilyType.SPARTAN3E;
+							} else if (tokens.length >= 5 && tokens[4].startsWith("a")) {
+								return FamilyType.SPARTAN3A;
+							} else {
+								return FamilyType.SPARTAN3;
+							}
+						}
+						break;
+					case "4":
+						if (tokens[2].startsWith("v")) {
+							return FamilyType.VIRTEX4;
+						}
+						break;
+					case "5":
+						if (tokens[2].startsWith("v")) {
+							return FamilyType.VIRTEX5;
+						}
+						break;
+					case "6":
+						if (tokens[2].startsWith("v")) {
+							if (tokens.length >= 5 && (tokens[4].startsWith("l") || tokens[4].startsWith("tl"))) {
+								return FamilyType.VIRTEX6L;
+							} else {
+								return FamilyType.VIRTEX6;
+							}
+						} else if (tokens[2].startsWith("s")) {
+							if (tokens.length >= 5 && tokens[4].startsWith("l")) {
+								return FamilyType.SPARTAN6L;
+							} else {
+								return FamilyType.SPARTAN6;
+							}
+						}
+						break;
+					case "7":
+						if (tokens[2].startsWith("v")) {
+							return FamilyType.VIRTEX7;
+						} else if (tokens[2].startsWith("a")) {
+							return FamilyType.ARTIX7;
+						} else if (tokens[2].startsWith("k")) {
+							return FamilyType.KINTEX7;
+						} else if (tokens[2].startsWith("z")) {
+							return FamilyType.ZYNQ;
+						}
+						break;
+				}
+				break;
+			case "xa":
+				if (tokens[1].equals("2") && tokens.length >= 5 && tokens[4].startsWith("e")) {
+					return FamilyType.ASPARTAN2E;
+				} else if (tokens[1].equals("3")) {
+					if (tokens[2].equals("sd")) {
+						return FamilyType.ASPARTAN3ADSP;
+					} else if (tokens[2].startsWith("s")) {
+						if (tokens.length >= 5 && tokens[4].startsWith("e")) {
+							return FamilyType.ASPARTAN3E;
+						} else if (tokens.length >= 5 && tokens[4].startsWith("a")) {
+							return FamilyType.ASPARTAN3A;
+						} else {
+							return FamilyType.ASPARTAN3;
+						}
 					}
-				}else if(tokens[2].startsWith("vp")){
-					return FamilyType.VIRTEX2P;
-				}else if(tokens[2].startsWith("v")){
-					return FamilyType.VIRTEX2;
+				} else if (tokens[1].equals("6")) {
+					return FamilyType.ASPARTAN6;
 				}
-			}else if(tokens[1].equals("3")){
-				if(tokens[2].equals("sd")){
-					return FamilyType.SPARTAN3ADSP;
-				}else if(tokens[2].startsWith("s")){
-					if(tokens.length >= 5 && tokens[4].startsWith("e")){
-						return FamilyType.SPARTAN3E;
-					}else if(tokens.length >= 5 && tokens[4].startsWith("a")){
-						return FamilyType.SPARTAN3A;
-					}else {
-						return FamilyType.SPARTAN3;
-					}
+				break;
+			case "xq":
+				switch (tokens[1]) {
+					case "2":
+						if (tokens[2].equals("v")) {
+							return FamilyType.QVIRTEX2;
+						} else if (tokens[2].equals("vp")) {
+							return FamilyType.QVIRTEX2P;
+						}
+
+						break;
+					case "4":
+						if (tokens[2].startsWith("v")) {
+							return FamilyType.QVIRTEX4;
+						}
+						break;
+					case "5":
+						if (tokens[2].startsWith("v")) {
+							return FamilyType.QVIRTEX5;
+						}
+						break;
+					case "6":
+						if (tokens[2].startsWith("v")) {
+							return FamilyType.QVIRTEX6;
+						} else if (tokens[2].startsWith("s")) {
+							if (tokens.length >= 5 && tokens[4].startsWith("l")) {
+								return FamilyType.QSPARTAN6L;
+							} else {
+								return FamilyType.QSPARTAN6;
+							}
+						}
+						break;
+					case "7":
+						if (tokens[2].startsWith("v")) {
+							return FamilyType.QVIRTEX7;
+						} else if (tokens[2].startsWith("a")) {
+							return FamilyType.QARTIX7;
+						} else if (tokens[2].startsWith("k")) {
+							return FamilyType.QKINTEX7;
+						}
+						break;
 				}
-			}else if(tokens[1].equals("4")){
-				if(tokens[2].startsWith("v")){
-					return FamilyType.VIRTEX4;
+				break;
+			case "xqv":
+				if (tokens.length >= 3 && tokens[2].startsWith("e")) {
+					return FamilyType.QVIRTEXE;
+				} else {
+					return FamilyType.QVIRTEX;
 				}
-			}else if(tokens[1].equals("5")){
-				if(tokens[2].startsWith("v")){
-					return FamilyType.VIRTEX5;
+			case "xqvr":
+				return FamilyType.QRVIRTEX;
+			case "xqr":
+				switch (tokens[1]) {
+					case "2":
+						return FamilyType.QRVIRTEX2;
+					case "4":
+						return FamilyType.QRVIRTEX4;
+					case "5":
+						return FamilyType.QRVIRTEX5;
+					case "6":
+						return FamilyType.QRVIRTEX6;
+					case "7":
+						return FamilyType.QRVIRTEX7;
 				}
-			}else if(tokens[1].equals("6")){
-				if(tokens[2].startsWith("v")){
-					if(tokens.length >= 5 && (tokens[4].startsWith("l") || tokens[4].startsWith("tl"))){
-						return FamilyType.VIRTEX6L;
-					}else{
-						return FamilyType.VIRTEX6;	
-					}
-				}else if(tokens[2].startsWith("s")){
-					if(tokens.length >= 5 && tokens[4].startsWith("l")){
-						return FamilyType.SPARTAN6L;
-					}else{
-						return FamilyType.SPARTAN6;	
-					}
-				}
-			}else if(tokens[1].equals("7")){
-				if(tokens[2].startsWith("v")){
-					return FamilyType.VIRTEX7;
-				}else if(tokens[2].startsWith("a")){
-					return FamilyType.ARTIX7;
-				}else if(tokens[2].startsWith("k")){
-					return FamilyType.KINTEX7;
-				}else if(tokens[2].startsWith("z")){
-					return FamilyType.ZYNQ;
-				}
-			}
-		}else if(tokens[0].equals("xa")){
-			if(tokens[1].equals("2") && tokens.length >= 5 && tokens[4].startsWith("e")){
-				return FamilyType.ASPARTAN2E;
-			}else if(tokens[1].equals("3")){
-				if(tokens[2].equals("sd")){
-					return FamilyType.ASPARTAN3ADSP;
-				}else if(tokens[2].startsWith("s")){
-					if(tokens.length >= 5 && tokens[4].startsWith("e")){
-						return FamilyType.ASPARTAN3E;
-					}else if(tokens.length >= 5 && tokens[4].startsWith("a")){
-						return FamilyType.ASPARTAN3A;
-					}else {
-						return FamilyType.ASPARTAN3;
-					}
-				}
-			}else if(tokens[1].equals("6")){
-				return FamilyType.ASPARTAN6;
-			}
-		}else if(tokens[0].equals("xq")){
-			if(tokens[1].equals("2")){
-				if(tokens[2].equals("v")){
-					return FamilyType.QVIRTEX2;
-				}else if(tokens[2].equals("vp")){
-					return FamilyType.QVIRTEX2P;
-				}
-				
-			}
-			else if(tokens[1].equals("4")){
-				if(tokens[2].startsWith("v")){
-					return FamilyType.QVIRTEX4;
-				}
-			}
-			else if(tokens[1].equals("5")){
-				if(tokens[2].startsWith("v")){
-					return FamilyType.QVIRTEX5;
-				}
-			}else if(tokens[1].equals("6")){
-				if(tokens[2].startsWith("v")){
-					return FamilyType.QVIRTEX6;
-				}else if(tokens[2].startsWith("s")){
-					if(tokens.length >= 5 && tokens[4].startsWith("l")){
-						return FamilyType.QSPARTAN6L;
-					}else{
-						return FamilyType.QSPARTAN6;
-					}
-				}
-			}else if(tokens[1].equals("7")){
-				if(tokens[2].startsWith("v")){
-					return FamilyType.QVIRTEX7;
-				}else if(tokens[2].startsWith("a")){
-					return FamilyType.QARTIX7;
-				}else if(tokens[2].startsWith("k")){
-					return FamilyType.QKINTEX7;
-				}
-			}
-		}
-		else if(tokens[0].equals("xqv")){
-			if(tokens.length >= 3 && tokens[2].startsWith("e")){
-				return FamilyType.QVIRTEXE;
-			}else{
-				return FamilyType.QVIRTEX;
-			}
-		}else if(tokens[0].equals("xqvr")){
-			return FamilyType.QRVIRTEX;
-		}else if(tokens[0].equals("xqr")){
-			if(tokens[1].equals("2")){
-				return FamilyType.QRVIRTEX2;
-			}else if(tokens[1].equals("4")){
-				return FamilyType.QRVIRTEX4;
-			}else if(tokens[1].equals("5")){
-				return FamilyType.QRVIRTEX5;
-			}else if(tokens[1].equals("6")){
-				return FamilyType.QRVIRTEX6;
-			}else if(tokens[1].equals("7")){
-				return FamilyType.QRVIRTEX7;
-			}
+				break;
 		}
 		return null;
 	}

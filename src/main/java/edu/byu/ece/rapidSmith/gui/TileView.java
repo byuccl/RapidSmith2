@@ -97,10 +97,10 @@ public class TileView extends QGraphicsView{
 			if (lastPan != null && !lastPan.isNull()) {
 				hasPanned = true;
 				// Get how much we panned
-				QPointF s1 = mapToScene(new QPoint((int) lastPan.x(),
-						(int) lastPan.y()));
-				QPointF s2 = mapToScene(new QPoint((int) event.pos().x(),
-						(int) event.pos().y()));
+				QPointF s1 = mapToScene(new QPoint(lastPan.x(),
+						lastPan.y()));
+				QPointF s2 = mapToScene(new QPoint(event.pos().x(),
+						event.pos().y()));
 				QPointF delta = new QPointF(s1.x() - s2.x(), s1.y() - s2.y());
 				lastPan = event.pos();
 				// Scroll the scrollbars ie. do the pan

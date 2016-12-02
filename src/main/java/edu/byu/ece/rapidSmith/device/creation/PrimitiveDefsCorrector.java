@@ -6,7 +6,6 @@ import edu.byu.ece.rapidSmith.primitiveDefs.*;
 import org.jdom2.Document;
 import org.jdom2.Element;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;

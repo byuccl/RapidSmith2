@@ -68,7 +68,6 @@ public class UCFParser {
 			int ch = -1;
 			int idx = 0;
 			char[] buffer = new char[8192];
-			boolean lineStart = true;
 			boolean inComment = false;
 			boolean usePreviousLine = false;
 			String tempString = "";
@@ -81,7 +80,7 @@ public class UCFParser {
 					inComment = true;
 				}
 				else if((ch == ';' && !inComment && idx > 0) || usePreviousLine){
-					String c = "";
+					String c;
 					if(usePreviousLine) {
 						c = tempString;
 						usePreviousLine = false;
@@ -111,13 +110,9 @@ public class UCFParser {
 									buffer[idx++] = (char) ch;
 									ch = reader.read();
 									if(ch == '\n'){
-										lineStart = true;
 										inComment = false;
 										line++;
 										break;
-									}
-									else{
-										lineStart = false;					
 									}
 								}
 								
@@ -153,20 +148,12 @@ public class UCFParser {
 				}
 				
 				if(ch == '\n'){
-					lineStart = true;
 					inComment = false;
 					line++;
 				}
-				else{
-					lineStart = false;					
-				}
 
 			}
-		} 
-		catch(FileNotFoundException e){
-			e.printStackTrace();
-		} 
-		catch(IOException e){
+		} catch(IOException e){
 			e.printStackTrace();
 		}
 			

@@ -38,8 +38,8 @@ public class Constraint{
 	/** Keeps the original string of the constraint */
 	private String constraint;
 	
-	/** Area group ranges are only set for instances with area groups */
-	/**NOTE!  WE ASSUME THAT THE AREA_GROUP IS DECLARED: 	e.g. "INST "inst_name" AREA_GROUP = "area_group_name";"
+	/* Area group ranges are only set for instances with area groups */
+	/* NOTE!  WE ASSUME THAT THE AREA_GROUP IS DECLARED: 	e.g. "INST "inst_name" AREA_GROUP = "area_group_name";"
 	 * BEFORE AREA_GROUP CONSTRAINTS ARE DECLARED: 			e.g. "AREA_GROUP "area_group_name" RANGE=SLICE_X0Y0:SLICE_X43Y59;"
 	 */
 	private ArrayList<AreaGroupRange> areaGroupRanges;
@@ -67,7 +67,7 @@ public class Constraint{
 	 */
 	private boolean parseConstraint(){
 		ArrayList<String> tokens = getConstraintTokens();
-		values = new ArrayList<String>();
+		values = new ArrayList<>();
 		// Populate StatementType
 		try{
 			statementType = StatementType.valueOf(tokens.get(0).toUpperCase());			
@@ -173,7 +173,7 @@ public class Constraint{
 	 * @return A list of tokens that were found in the constraint string.
 	 */
 	private ArrayList<String> getConstraintTokens(){
-		ArrayList<String> matchList = new ArrayList<String>();	
+		ArrayList<String> matchList = new ArrayList<>();
 		int i = 0;
 		char[] buffer = constraint.toCharArray();
 		char[] token = new char[constraint.length()];
@@ -284,7 +284,7 @@ public class Constraint{
 	
 	public void addAreaGroupRange(AreaGroupRange agr) {
 		if(areaGroupRanges == null)
-			areaGroupRanges = new ArrayList<AreaGroupRange>();
+			areaGroupRanges = new ArrayList<>();
 		areaGroupRanges.add(agr);
 	}
 	

@@ -1,10 +1,5 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
-import edu.byu.ece.rapidSmith.device.Bel;
-import edu.byu.ece.rapidSmith.device.BelId;
-
-import java.util.List;
-
 /**
  *
  */

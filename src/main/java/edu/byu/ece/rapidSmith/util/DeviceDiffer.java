@@ -349,11 +349,9 @@ public class DeviceDiffer {
 		// site sources and sinks causing upstream counnections to be maintained
 		WireType goldWireType = weGold.getWireType(wc.getWire());
 		WireType testWireType = weTest.getWireType(weTest.getWireEnum(weGold.getWireName(wc.getWire())));
-		if ((goldWireType == WireType.SITE_SOURCE || goldWireType == WireType.SITE_SINK) &&
-				!(testWireType == WireType.SITE_SOURCE || testWireType == WireType.SITE_SINK))
-			return true;
+		return (goldWireType == WireType.SITE_SOURCE || goldWireType == WireType.SITE_SINK) &&
+				!(testWireType == WireType.SITE_SOURCE || testWireType == WireType.SITE_SINK);
 
-		return false;
 	}
 
 	private boolean filterWireConnectionFixes2(WireConnection wc) {
@@ -361,11 +359,9 @@ public class DeviceDiffer {
 		// site sources and sinks and not LONG like they should have been
 		String sinkName = weTest.getWireName(wc.getWire());
 		WireType goldWireType = weGold.getWireType(weGold.getWireEnum(sinkName));
-		if ((goldWireType == WireType.SITE_SOURCE || goldWireType == WireType.SITE_SINK) &&
-				weTest.getWireType(weTest.getWireEnum(sinkName)) == WireType.LONG)
-			return true;
+		return (goldWireType == WireType.SITE_SOURCE || goldWireType == WireType.SITE_SINK) &&
+				weTest.getWireType(weTest.getWireEnum(sinkName)) == WireType.LONG;
 
-		return false;
 	}
 
 	private void diffWireConnections(WireConnection[] gold, WireConnection[] test) {
@@ -546,16 +542,6 @@ public class DeviceDiffer {
 
 		String familyName = PartNameTools.getFamilyNameFromPart(partName);
 		partName = PartNameTools.removeSpeedGrade(partName);
-
-		Path goldDeviceFile = rsGoldDir.resolve(familyName)
-				.resolve(partName +	"_db.dat");
-		Path goldWeFile = rsGoldDir.resolve(familyName)
-				.resolve("wireEnumerator.dat");
-
-		Path testDeviceFile = rsTestDir.resolve(familyName)
-				.resolve(partName +	"_db.dat");
-		Path testWeFile = rsTestDir.resolve(familyName)
-				.resolve("wireEnumerator.dat");
 
 		Device goldDevice = new Device();
 //		goldDevice.readDeviceFromCompactFile(goldDeviceFile.toString());

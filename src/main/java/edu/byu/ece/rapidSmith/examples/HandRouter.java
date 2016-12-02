@@ -86,8 +86,8 @@ public class HandRouter{
 		int choice;
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-		ArrayList<PIP> path =  new ArrayList<PIP>();
-		ArrayList<PIP> pipList = new ArrayList<PIP>();
+		ArrayList<PIP> path = new ArrayList<>();
+		ArrayList<PIP> pipList = new ArrayList<>();
 
 		RouteTree currTree = null;
 		Connection currConn;
@@ -96,7 +96,7 @@ public class HandRouter{
 
 		// This keeps track of all the possible starting points (or sources) that
 		// we can use to route this net.
-		ArrayList<RouteTree> sources = new ArrayList<RouteTree>();
+		ArrayList<RouteTree> sources = new ArrayList<>();
 
 		// Add the original source from the net
 		Wire w = dev.getPrimitiveExternalPin(net.getSource());
@@ -173,7 +173,7 @@ public class HandRouter{
 				if(!finishedRoute){
 					// We didn't find the sink yet, let's print out the set of
 					// choices we can follow given our current wire
-					choices = new ArrayList<RouteTree>();
+					choices = new ArrayList<>();
 					for (int i = 0; i < wiresList.size(); i++) {
 						currConn = wiresList.get(i);
 						RouteTree rt = currTree.addConnection(currConn);

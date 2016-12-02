@@ -10,7 +10,7 @@ import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.util.EnvironmentException;
+import edu.byu.ece.rapidSmith.util.Exceptions;
 
 /**
  * This class is used to interface Vivado and RapidSmith. <br>
@@ -56,7 +56,7 @@ public final class VivadoInterface {
 		// TODO: throw an exception here if the we can't find the device
 
 		if (device == null) {
-			throw new EnvironmentException("Device files for part: " + partName + " cannot be found.");
+			throw new Exceptions.EnvironmentException("Device files for part: " + partName + " cannot be found.");
 		}
 		
 		// create the RS2 netlist

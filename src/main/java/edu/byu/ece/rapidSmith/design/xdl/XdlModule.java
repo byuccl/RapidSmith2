@@ -67,11 +67,11 @@ public class XdlModule implements Serializable{
 	public XdlModule(){
 		name = null;
 		anchor = null;
-		attributes = new ArrayList<XdlAttribute>();
-		portMap = new HashMap<String, XdlPort>();
-		instanceMap = new HashMap<String,XdlInstance>();
-		netMap = new HashMap<String,XdlNet>();
-		validPlacements = new ArrayList<Site>();
+		attributes = new ArrayList<>();
+		portMap = new HashMap<>();
+		instanceMap = new HashMap<>();
+		netMap = new HashMap<>();
+		validPlacements = new ArrayList<>();
 	}
 	
 	/**
@@ -368,7 +368,7 @@ public class XdlModule implements Serializable{
 	 */
 	public ArrayList<Site> calculateAllValidPlacements(Device dev){
 		if(getAnchor() == null) return null;
-		ArrayList<Site> validSites = new ArrayList<Site>();
+		ArrayList<Site> validSites = new ArrayList<>();
 		Site[] sites = dev.getAllCompatibleSites(getAnchor().getType());
 		for(Site newAnchorSite : sites){
 			if(isValidPlacement(newAnchorSite, dev)){

@@ -191,9 +191,9 @@ public class ExtendedDeviceInfo implements Serializable {
 
 	private static class WireDistancePair {
 		public Wire wire;
-		public int distance;
+		int distance;
 
-		public WireDistancePair(Wire wire, int distance) {
+		WireDistancePair(Wire wire, int distance) {
 			this.wire = wire;
 			this.distance = distance;
 		}
@@ -363,7 +363,7 @@ public class ExtendedDeviceInfo implements Serializable {
 
 	public static ExtendedDeviceInfo loadCompressedFile(Path path) throws IOException {
 		Hessian2Input hos = null;
-		ExtendedDeviceInfo info = null;
+		ExtendedDeviceInfo info;
 		try {
 			hos = FileTools.getCompactReader(path);
 			info = (ExtendedDeviceInfo) hos.readObject();

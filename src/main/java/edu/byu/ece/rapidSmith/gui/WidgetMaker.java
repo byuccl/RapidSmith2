@@ -38,8 +38,8 @@ public class WidgetMaker {
 		treeWidget.setColumnCount(1);
 		treeWidget.setHeaderLabel(header);
 		
-		HashMap<FamilyType, QTreeWidgetItem> familyItems = new HashMap<FamilyType, QTreeWidgetItem>();
-		HashMap<String, QTreeWidgetItem> subFamilyItems = new HashMap<String, QTreeWidgetItem>();
+		HashMap<FamilyType, QTreeWidgetItem> familyItems = new HashMap<>();
+		HashMap<String, QTreeWidgetItem> subFamilyItems = new HashMap<>();
 		
 		for(String partName : RSEnvironment.defaultEnv().getAvailableParts()){
 			FamilyType type = PartNameTools.getFamilyTypeFromPart(partName);

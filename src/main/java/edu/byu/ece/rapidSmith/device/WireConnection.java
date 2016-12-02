@@ -138,15 +138,10 @@ public class WireConnection implements Serializable, Comparable<WireConnection>{
 		if (getClass() != obj.getClass())
 			return false;
 		WireConnection other = (WireConnection) obj;
-		if (columnOffset != other.columnOffset)
-			return false;
-		if (isPIP != other.isPIP)
-			return false;
-		if (rowOffset != other.rowOffset)
-			return false;
-		if (wire != other.wire)
-			return false;
-		return true;
+		return columnOffset == other.columnOffset &&
+				isPIP == other.isPIP &&
+				rowOffset == other.rowOffset &&
+				wire == other.wire;
 	}
 
 	@Override

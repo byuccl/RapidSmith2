@@ -45,7 +45,7 @@ import edu.byu.ece.rapidSmith.device.TileType;
 
 public class GuiModuleInstance extends QGraphicsPolygonItem {
 
-	public Signal1<Boolean> selected = new Signal1<Boolean>();
+	public Signal1<Boolean> selected = new Signal1<>();
 	public Signal0 moved = new Signal0();
 	private XdlModuleInstance moduleInstance;
 	private TileScene scene;
@@ -62,12 +62,12 @@ public class GuiModuleInstance extends QGraphicsPolygonItem {
 	public GuiModuleInstance(XdlModuleInstance modInst, TileScene scene, boolean movable){
 		this.moduleInstance = modInst;
 		this.scene = scene;
-		this.hmTiles = new ArrayList<HMTile>();
+		this.hmTiles = new ArrayList<>();
 		this.gutsHidden = true;
 		this.isValidlyPlaced = true;
 		
-		this.occupiedTilesX = new ArrayList<Integer>();
-		this.occupiedTilesY = new ArrayList<Integer>();
+		this.occupiedTilesX = new ArrayList<>();
+		this.occupiedTilesY = new ArrayList<>();
 		init();
 
 		this.setFlag(GraphicsItemFlag.ItemIsMovable, movable);
@@ -88,11 +88,11 @@ public class GuiModuleInstance extends QGraphicsPolygonItem {
 
 	private void init() {
 		switchboxTypes = moduleInstance.getDesign().getDevice().getSwitchMatrixTypes();
-		HashSet<Tile> occupiedTiles = new HashSet<Tile>();
-		HashSet<Tile> tilesWithSLICEM = new HashSet<Tile>();
-		Collection<XdlInstance> instances = null;
-		Collection<XdlNet> nets = null;
-		Tile anchorTile = null;
+		HashSet<Tile> occupiedTiles = new HashSet<>();
+		HashSet<Tile> tilesWithSLICEM = new HashSet<>();
+		Collection<XdlInstance> instances;
+		Collection<XdlNet> nets;
+		Tile anchorTile;
 		int minRow = Integer.MAX_VALUE;
 		int minCol = Integer.MAX_VALUE;
 		int maxRow = -1;
@@ -301,8 +301,8 @@ public class GuiModuleInstance extends QGraphicsPolygonItem {
 
 	public void checkPlacement() {
 	
-		HashSet<GuiModuleInstance> prevCollidingGMIs = new HashSet<GuiModuleInstance>();
-		HashSet<GuiModuleInstance> newCollidingGMIs = new HashSet<GuiModuleInstance>();
+		HashSet<GuiModuleInstance> prevCollidingGMIs = new HashSet<>();
+		HashSet<GuiModuleInstance> newCollidingGMIs = new HashSet<>();
 		for(int i=0; i<occupiedTilesX.size(); i++){
 			HashSet<GuiModuleInstance> prevGMISet = scene.tileOccupantCount[occupiedTilesY.get(i)][occupiedTilesX.get(i)];
 			prevGMISet.remove(this);
@@ -475,7 +475,7 @@ public class GuiModuleInstance extends QGraphicsPolygonItem {
 
 	
 	public void setAnchorOffset() {
-		XdlInstance anchorInst = null;
+		XdlInstance anchorInst;
 		if (moduleInstance.getInstances().get(0).isPlaced()) {
 			anchorInst  = moduleInstance.getAnchor();
 		} else {

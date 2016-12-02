@@ -207,7 +207,7 @@ public final class LutConfig {
 		private String outputPin;
 		private LutContents contents;
 
-		public LutParserListener(int numInputs) {
+		LutParserListener(int numInputs) {
 			this.numInputs = numInputs;
 		}
 

@@ -47,7 +47,7 @@ public class CountingExample {
 	private static HashSet<WireType> wireTypesOfInterest = null;
 
 	static{
-		wireTypesOfInterest = new HashSet<WireType>();
+		wireTypesOfInterest = new HashSet<>();
 		// Example: Virtex 4 & 5 wire types
 		wireTypesOfInterest.add(WireType.DOUBLE);
 		wireTypesOfInterest.add(WireType.DOUBLE_TURN);
@@ -67,7 +67,7 @@ public class CountingExample {
 	 * @return The number of unique switch matrices used in the nets provided.
 	 */
 	public static int countSwitchMatricesUsed(Collection<XdlNet> nets){
-		HashSet<String> tiles = new HashSet<String>();
+		HashSet<String> tiles = new HashSet<>();
 		HashSet<TileType> intTypes = null;
 		for(XdlNet n : nets){
 			if(intTypes == null) {
@@ -92,7 +92,7 @@ public class CountingExample {
 	 * @return
 	 */
 	public static Map<WireType,Integer> countUsedWireLengths(Collection<XdlNet> nets){
-		HashMap<WireType, Integer> wireCounts = new HashMap<WireType, Integer>();
+		HashMap<WireType, Integer> wireCounts = new HashMap<>();
 		HashSet<TileType> intTypes = null;
 		Device dev = null;
 		// points
@@ -128,9 +128,9 @@ public class CountingExample {
 			if(we.getWireName(pipWire).contains("BEG")){
 				Integer count = wireCounts.get(pipWireType);
 				if(count == null){
-					wireCounts.put(pipWireType, new Integer(1));
+					wireCounts.put(pipWireType, 1);
 				}else{
-					wireCounts.put(pipWireType, new Integer(count.intValue()+1));
+					wireCounts.put(pipWireType, count + 1);
 				}
 			}
 		}

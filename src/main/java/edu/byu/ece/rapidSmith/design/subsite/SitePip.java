@@ -36,10 +36,9 @@ public final class SitePip extends PIP {
 			return false;
 		SitePip other = (SitePip) obj;
 
-		if (!Objects.equals(getSite(), other.getSite()))
-			return false;
-
-		return (getEndWire() == other.getEndWire() && getStartWire() == other.getStartWire());
+		return Objects.equals(getSite(), other.getSite()) &&
+				getEndWire() == other.getEndWire() &&
+				getStartWire() == other.getStartWire();
 	}
 
 	@Override

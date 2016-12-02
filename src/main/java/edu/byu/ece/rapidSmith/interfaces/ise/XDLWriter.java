@@ -225,7 +225,7 @@ public class XDLWriter {
 		}
 
 		List<XdlNet> nets = new ArrayList<>(design.getNets());
-		Collections.sort(nets, (o1, o2) -> o1.getName().compareTo(o2.getName()));
+		nets.sort(Comparator.comparing(XdlNet::getName));
 		for (XdlNet net : nets) {
 			out.append("  net \"" + net.getName() + "\" ");
 			if (!net.getType().equals(NetType.WIRE))
@@ -293,7 +293,7 @@ public class XDLWriter {
 			}
 
 			List<SiteType> types = new ArrayList<>(instTypeCount.keySet());
-			Collections.sort(types, (o1, o2) -> o1.name().compareTo(o2.name()));
+			types.sort(Comparator.comparing(Enum::name));
 			for (SiteType type : types) {
 				out.append("#   Number of " + type.toString() + "s: " + Integer.toString(instTypeCount.get(type)) + nl);
 			}
@@ -323,7 +323,7 @@ public class XDLWriter {
 
 	private void writePorts(Collection<XdlPort> ports) throws IOException {
 		List<XdlPort> sorted = new ArrayList<>(ports);
-		Collections.sort(sorted, (o1, o2) -> o1.getName().compareTo(o2.getName()));
+		sorted.sort(Comparator.comparing(XdlPort::getName));
 		for (XdlPort port : sorted) {
 			out.append("  port \"" + port.getName() + "\" \"" + port.getInstanceName() + "\" \"" + port.getPinName() + "\";" + nl);
 		}
@@ -381,7 +381,7 @@ public class XDLWriter {
 
 	private void writePips(Collection<PIP> pips, String ind) throws IOException {
 		List<PIP> netPips = new ArrayList<>(pips);
-		Collections.sort(netPips, new PIPComparator());
+		netPips.sort(new PIPComparator());
 		for (PIP pip : netPips)
 			out.append(ind + "pip " + pip.getTile().getName() + " " +
 					pip.getStartWireName() + " -> " + pip.getEndWireName() + " ," + nl);

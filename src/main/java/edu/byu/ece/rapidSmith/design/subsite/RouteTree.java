@@ -5,6 +5,7 @@ import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Connection;
 import edu.byu.ece.rapidSmith.device.SitePin;
 import edu.byu.ece.rapidSmith.device.Wire;
+import edu.byu.ece.rapidSmith.util.Exceptions;
 
 import java.util.*;
 
@@ -107,9 +108,9 @@ public final class RouteTree implements
 
 	public RouteTree addConnection(Connection c, RouteTree sink) {
 		if (sink.getSourceTree() != null)
-			throw new DesignAssemblyException("Sink tree already sourced");
+			throw new Exceptions.DesignAssemblyException("Sink tree already sourced");
 		if (!c.getSinkWire().equals(sink.getWire()))
-			throw new DesignAssemblyException("Connection does not match sink tree");
+			throw new Exceptions.DesignAssemblyException("Connection does not match sink tree");
 
 		sinkTrees.add(sink);
 		sink.setSourceTree(this);
@@ -163,12 +164,7 @@ public final class RouteTree implements
 	}
 
 	private boolean pruneChildren(Set<RouteTree> terminals) {
-		for (Iterator<RouteTree> iterator = sinkTrees.iterator(); iterator.hasNext(); ) {
-			RouteTree rt = iterator.next();
-			if (!rt.pruneChildren(terminals))
-				iterator.remove();
-		}
-
+		sinkTrees.removeIf(rt -> !rt.pruneChildren(terminals));
 		return !sinkTrees.isEmpty() || terminals.contains(this);
 	}
 	
@@ -184,7 +180,7 @@ public final class RouteTree implements
 	private class PrefixIterator implements Iterator<RouteTree> {
 		private Stack<RouteTree> stack;
 
-		public PrefixIterator() {
+		PrefixIterator() {
 			this.stack = new Stack<>();
 			this.stack.push(RouteTree.this);
 		}

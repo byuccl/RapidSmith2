@@ -428,8 +428,7 @@ public class XdlDesign extends AbstractDesign {
 	 * @return the new ModuleInstance
 	 */
 	public XdlModuleInstance createModuleInstance(String name, XdlModule module){
-		if(modules.get(module.getName()) == null)
-			modules.put(module.getName(), module);
+		modules.putIfAbsent(module.getName(), module);
 
 		XdlModuleInstance modInst = new XdlModuleInstance(name, this);
 		moduleInstances.put(modInst.getName(), modInst);

@@ -119,7 +119,7 @@ public class DesignExplorer extends QMainWindow{
 	 * @param fileToOpen The name of the design to open
 	 * @param traceFileToOpen Name of the trace report file (TWR) to load 
 	 */
-	public DesignExplorer(QWidget parent, String fileToOpen, String traceFileToOpen) {
+	private DesignExplorer(QWidget parent, String fileToOpen, String traceFileToOpen) {
 		super(parent);
 		
 		setupFileActions();

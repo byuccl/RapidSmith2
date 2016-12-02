@@ -30,7 +30,7 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		loadFromFile(filePath);
 	}
 
-	public void loadFromFile(Path filePath) throws IOException {
+	private void loadFromFile(Path filePath) throws IOException {
 		SAXBuilder builder = new SAXBuilder();
 		Document doc;
 		try {
@@ -143,7 +143,7 @@ public class CellLibrary implements Iterable<LibraryCell> {
 				pin.getPossibleBelPins().put(belId, possPins);
 			}
 		} else {
-			Set<LibraryPin> unmappedPins = new HashSet<LibraryPin>();
+			Set<LibraryPin> unmappedPins = new HashSet<>();
 			
 			// Create the bel pin mappings for each cell pin
 			for (Element belPinEl : belPinsEl.getChildren("pin")) {

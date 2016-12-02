@@ -1,13 +1,11 @@
 package edu.byu.ece.rapidSmith.examples2;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.MissingResourceException;
-
 import edu.byu.ece.edif.util.parse.ParseException;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.util.DotFilePrinter;
+
+import java.io.IOException;
 
 
 /**

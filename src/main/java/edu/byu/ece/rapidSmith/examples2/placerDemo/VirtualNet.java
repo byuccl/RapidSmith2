@@ -20,10 +20,10 @@ public class VirtualNet {
 	private int numSinks = 0;
 	private int scaleFactor = 0;
 	//current bounding box of the net
-	int top;
-	int bottom;
-	int right; 
-	int left;
+	private int top;
+	private int bottom;
+	private int right;
+	private int left;
 	
 	//ID to uniquely identify a net
 	private static int nextID = 0;

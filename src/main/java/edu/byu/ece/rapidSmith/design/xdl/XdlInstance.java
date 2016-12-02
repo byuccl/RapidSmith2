@@ -500,10 +500,9 @@ public class XdlInstance implements Serializable{
 	 * @param inst the instance to check
 	 * @return true if both instances are members of the same module instance
 	 */
-	public boolean isMemberOfSameModuleInstance(XdlInstance inst){
-		if(this.moduleInstance==null || inst.moduleInstance == null)
-			return false;
-		return this.moduleInstance.equals(inst.moduleInstance);
+	public boolean isMemberOfSameModuleInstance(XdlInstance inst) {
+		return !(this.moduleInstance == null || inst.moduleInstance == null) &&
+				this.moduleInstance.equals(inst.moduleInstance);
 	}
 	
 	/**

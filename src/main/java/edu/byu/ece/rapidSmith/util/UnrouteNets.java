@@ -36,9 +36,9 @@ import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;
 public class UnrouteNets {
 	
 	public static ArrayList<XdlNet> combineStaticNets(Collection<XdlNet> nets){
-		ArrayList<XdlNet> gndNets = new ArrayList<XdlNet>();
-		ArrayList<XdlNet> vccNets = new ArrayList<XdlNet>();
-		ArrayList<XdlNet> newNets = new ArrayList<XdlNet>();
+		ArrayList<XdlNet> gndNets = new ArrayList<>();
+		ArrayList<XdlNet> vccNets = new ArrayList<>();
+		ArrayList<XdlNet> newNets = new ArrayList<>();
 		for(XdlNet net : nets){
 			if(net.getType().equals(NetType.GND)) {
 				gndNets.add(net);

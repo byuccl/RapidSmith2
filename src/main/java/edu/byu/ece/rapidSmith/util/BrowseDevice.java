@@ -36,7 +36,7 @@ public class BrowseDevice{
 	public static void run(Device dev){
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		WireEnumerator we = dev.getWireEnumerator();
-		Tile t = null;
+		Tile t;
 		while(true){
 			System.out.println("Commands: ");
 			System.out.println(" 1: Get wire connections in tile");
@@ -110,7 +110,6 @@ public class BrowseDevice{
 							}
 							catch(Exception e){
 								System.out.println("Did not understand, try again.");
-								continue;
 							}
 							
 						}
