@@ -22,9 +22,11 @@ package edu.byu.ece.rapidSmith.device;
 
 
 import edu.byu.ece.rapidSmith.design.PIP;
+import edu.byu.ece.rapidSmith.device.TileDirection;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -37,6 +39,8 @@ import java.util.*;
  *         Created on: Apr 22, 2010
  */
 public class Tile implements Serializable {
+	/** Unique Serialization ID */
+	private static final long serialVersionUID = 4859877066322216633L;
 	/** The default unconnected sinkPin */
 	public static final SinkPin UNCONNECTED_SINKPIN = new SinkPin(-1, 0, 0);
 	private Device dev;
@@ -365,6 +369,28 @@ public class Tile implements Serializable {
 		}
 		return pips;
 	}
+	
+	/**
+	 * 
+	 * @param tile
+	 * @param direction
+	 * @return
+	 */
+	public Tile getAdjacentTile(TileDirection direction) {
+		switch(direction) 
+		{
+			case NORTH:
+				return dev.getTile(row - 1, column);
+			case SOUTH:
+				return dev.getTile(row + 1, column);
+			case WEST:
+				return dev.getTile(row, column - 1);
+			case EAST:
+				return dev.getTile(row, column + 1);
+			default: 
+				throw new AssertionError("Invalid Tile Direction"); 
+		}
+	}
 
 	/**
 	 * Used to compile the sinks for this tile during parsing, should not be called
@@ -435,11 +461,23 @@ public class Tile implements Serializable {
 	}
 
 	/**
-	 * Gets and returns the sources of all the primitive sites in this tile.
+	 * Gets and returns the sources of all the primitive sites in this tile.  This list
+	 * is lazily created.
 	 *
 	 * @return The source wires found in this tile.
 	 */
-	public int[] getSources() {
+	public List<Wire> getSources() {
+		return Arrays.stream(sources)
+				.mapToObj(w -> new TileWire(this, w))
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Used for device creation.
+	 *
+	 * @return The source wires found in this tile.
+	 */
+	public int[] getSourcesArray() {
 		return sources;
 	}
 
@@ -507,6 +545,8 @@ public class Tile implements Serializable {
 	}
 
 	private static class TileReplace implements Serializable {
+		/** Unique Serialization ID*/
+		private static final long serialVersionUID = 6902712216468702435L;
 		private String name;
 		private TileType type;
 		private Site[] primitiveSites;
@@ -515,6 +555,7 @@ public class Tile implements Serializable {
 		private HashMap<Integer, SinkPin> sinks;
 		private int[] sources;
 
+		@SuppressWarnings("unused")
 		private Tile readResolve() {
 			Tile tile = new Tile();
 			tile.setName(name);
@@ -535,6 +576,7 @@ public class Tile implements Serializable {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private TileReplace writeReplace() {
 		TileReplace repl = new TileReplace();
 		repl.name = name;

@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import edu.byu.ece.rapidSmith.design.subsite.Connection;
-
 /**
  * Wires represent a piece of metal on a device.  Wires are composed of two
  * components, a location such as a tile or primitive site where the tile resides
@@ -14,9 +12,8 @@ import edu.byu.ece.rapidSmith.design.subsite.Connection;
  */
 public interface Wire extends Serializable {
 	int getWireEnum();
-	default String getWireName() {
-		return getTile().getDevice().getWireEnumerator().getWireName(getWireEnum());
-	}
+	String getWireName();
+	String getFullWireName();
 	Tile getTile();
 	Site getSite();
 

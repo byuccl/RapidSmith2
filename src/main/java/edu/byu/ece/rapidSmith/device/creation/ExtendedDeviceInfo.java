@@ -3,7 +3,7 @@ package edu.byu.ece.rapidSmith.device.creation;
 import com.caucho.hessian.io.Hessian2Input;
 import com.caucho.hessian.io.Hessian2Output;
 import edu.byu.ece.rapidSmith.RSEnvironment;
-import edu.byu.ece.rapidSmith.design.subsite.Connection;
+import edu.byu.ece.rapidSmith.device.Connection;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.device.helper.HashPool;
 import edu.byu.ece.rapidSmith.device.helper.WireArray;

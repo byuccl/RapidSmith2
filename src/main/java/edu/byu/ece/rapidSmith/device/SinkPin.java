@@ -37,7 +37,7 @@ public class SinkPin implements Serializable{
 
 	/**
 	 * Constructs a new SinkPin object.
-	 * @param switchMatrixSinkWire the wire sourcing the sink
+	 * @param switchMatrixSinkWire the enum of the wire sourcing the sink
 	 * @param xOffset the tile offset in the X direction
 	 * @param yOffset the tile offset in the Y direction
 	 */

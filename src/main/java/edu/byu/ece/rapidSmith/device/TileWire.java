@@ -5,14 +5,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import edu.byu.ece.rapidSmith.design.subsite.Connection;
-
 /**
  * A wire inside a tile but outside a site.  This is part of the general
  * routing circuitry.  TileWires are composed of the tile the wire exists in
  * and the enumeration identifying the individual wire.
  */
 public class TileWire implements Wire, Serializable {
+
+	private static final long serialVersionUID = 5844788118958981887L;
 	private Tile tile;
 	private int wire;
 	
@@ -28,6 +28,16 @@ public class TileWire implements Wire, Serializable {
 		return tile;
 	}
 
+	@Override
+	public String getWireName() {
+		return tile.getDevice().getWireEnumerator().getWireName(wire);
+	}
+
+	@Override
+	public String getFullWireName() {
+		return getTile().getName() + "/" + getWireName();
+	}
+	
 	/**
 	 * Always returns null.
 	 */
@@ -156,5 +166,4 @@ public class TileWire implements Wire, Serializable {
 	public String toString() {
 		return tile.getName() + " " + tile.getDevice().getWireEnumerator().getWireName(wire);
 	}
-
 }

@@ -42,8 +42,12 @@ public class CellNet implements Serializable {
 	private Set<CellPin> routedSinks; 
 	/** Set to true if this net is contained within a single site's boundaries*/
 	private boolean isIntrasite;
+	/** Route status of the net*/
+	private RouteStatus routeStatus;
 	
 	// Physical route information
+	/** SitePin source of the net (i.e. where the net leaves the site)*/
+	private SitePin sourceSitePin;
 	/** Route Tree connecting to the source pin of the net*/
 	private RouteTree source;
 	/** List of intersite RouteTree objects for the net*/
@@ -273,20 +277,7 @@ public class CellNet implements Serializable {
 
 		pinsToAdd.forEach(this::connectToPin);
 	}
-	
-	public int getPseudoPinCount() {
 		
-		int pseudoPinCount = 0;
-		
-		for (CellPin pin : pins) {
-			if (pin.isPseudoPin()) {
-				pseudoPinCount++;
-			}
-		}
-		
-		return pseudoPinCount;
-	}
-	
 	/**
 	 * Adds a pin to this net.  It is an error to add multiple output pins
 	 * (excluding inout pins).
@@ -311,6 +302,22 @@ public class CellNet implements Serializable {
 				throw new DesignAssemblyException("Cannot create multiply-sourced net.");
 			sourcePin = pin;
 		}
+	}
+	
+	/**
+	 * Returns the number of pseudo pins connected to the net.
+	 */
+	public int getPseudoPinCount() {
+		
+		int pseudoPinCount = 0;
+		
+		for (CellPin pin : pins) {
+			if (pin.isPseudoPin()) {
+				pseudoPinCount++;
+			}
+		}
+		
+		return pseudoPinCount;
 	}
 
 	/**
@@ -472,6 +479,33 @@ public class CellNet implements Serializable {
 	 * **********************************/
 	
 	/**
+	 * Sets the {@link SitePin} source of the net. This is used to
+	 * set the source of a net when loading a Tincr Checkpoint. If you are
+	 * writing a intersite router, this will give you the site pin where the 
+	 * route needs to start.
+	 * @param sitePin {@link SitePin} 
+	 */
+	public void setSourceSitePin(SitePin sitePin) {
+		this.sourceSitePin = sitePin;
+	}
+	
+	/**
+	 * Gets the {@link SitePin} where this net is sourced.
+	 * @return {@link SitePin}
+	 */
+	public SitePin getSourceSitePin() {
+		return this.sourceSitePin;
+	}
+	
+	/**
+	 * Gets the {@link BelPin} where this net is sourced
+	 * @return {@link BelPin}
+	 */
+	public BelPin getSourceBelPin() {
+		return this.sourcePin.getMappedBelPin();
+	}
+	
+	/**
 	 * Returns a collection of pips that are used in this nets physical route
 	 * @return
 	 */
@@ -561,6 +595,17 @@ public class CellNet implements Serializable {
 			routedSinks = new HashSet<CellPin>();
 		}
 		routedSinks.add(cellPin);
+	}
+	
+	/**
+	 * Marks a cellPin attached to the net as unrouted. 
+	 * 
+	 * @param cellPin {@link CellPin}
+	 * @return <code>true</code> if the cellPin was successfully removed.  
+	 * 		<code>false</code> if the cellPin is not marked as a routed pin of the net.  
+	 */
+	public boolean removeRoutedSink(CellPin cellPin) {
+		return routedSinks.remove(cellPin);
 	}
 	
 	/**
@@ -712,7 +757,6 @@ public class CellNet implements Serializable {
 	
 	/**
 	 * Returns a list of RouteTree connected to sink SitePin objects
-	 * @return
 	 */
 	public List<RouteTree> getSinkSitePinRouteTrees() {
 		
@@ -806,24 +850,46 @@ public class CellNet implements Serializable {
 	}
 		
 	/**
-	 * Computes the current routing status based on the routed sink pins of the net. 
-	 * Possible statuses include: <br>
-	 * 1.) UNROUTED <br>
-	 * 2.) PARTIALLY_ROUTED <br>
-	 * 3.) FULLY_ROUTED <br> 
+	 * Returns the current route status of net without recomputing the status. If the routing has changed,
+	 * to recompute the route status first use {@link CellNet:computeRouteStatus}.
+	 * Possible statuses in include: <br>
+	 * 1.) UNROUTED - no sink cell pins have been routed <br>
+	 * 2.) PARTIALLY_ROUTED - some, but not all, sink cell pins that have been mapped to bel pins have been routed<br>
+	 * 3.) FULLY_ROUTED - all sink cell pins that are mapped to bel pins have been routed <br> 
+	 * 
+	 * @return The {@link RouteStatus} of the current net
+	 */
+	public RouteStatus getRouteStatus() {
+		return routeStatus;
+	}
+	
+	/**
+	 * Computes and stores the route status of the net. This function should be called to recompute the status
+	 * of the route if the routing structure has been modified and the . If the routing structure has not been modified,
+	 * then {@link CellNet:getRouteStatus} should be used instead. Possible statuses include: <br>
+	 * <br>
+	 * 1.) <b>UNROUTED</b> - no sink cell pins have been routed <br>
+	 * 2.) <b>PARTIALLY_ROUTED</b> - some, but not all, sink cell pins <b>that have been mapped to bel pins</b> have been routed<br>
+	 * 3.) <b>FULLY_ROUTED</b> - all sink cell pins <b>that are mapped to bel pins</b> have been routed <br> 
+	 * <br>
+	 * The complexity of this method is O(n) where n is the number of pins connected to the net.
 	 * 
 	 * @return The current RouteStatus of the net
 	 */
-	public RouteStatus getRouteStatus() {
+	public RouteStatus computeRouteStatus() {
+		
+		int subtractCount = sourcePin.isMapped() ? 1 : 0;
 		
 		if (routedSinks == null || routedSinks.isEmpty()) {
-			return RouteStatus.UNROUTED;
+			routeStatus = RouteStatus.UNROUTED;
 		}
-		else if (routedSinks.size() == pins.size() - 1 ) {
-			return RouteStatus.FULLY_ROUTED;
+		else if (routedSinks.size() == pins.stream().filter(CellPin::isMapped).count() - subtractCount) {
+			routeStatus = RouteStatus.FULLY_ROUTED;
 		}
 		else {
-			return RouteStatus.PARTIALLY_ROUTED;
+			routeStatus = RouteStatus.PARTIALLY_ROUTED;
 		}
+		
+		return routeStatus;
 	}
 }
