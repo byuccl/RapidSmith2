@@ -1,6 +1,7 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.device.BelId;
+import edu.byu.ece.rapidSmith.device.FamilyType;
 import edu.byu.ece.rapidSmith.device.PinDirection;
 import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
@@ -103,8 +104,10 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		Element belsEl = cellEl.getChild("bels");
 		for (Element belEl : belsEl.getChildren("bel")) {
 			Element id = belEl.getChild("id");
+			FamilyType family = FamilyType.valueOf(id.getChildText("family"));
+			String site_type = id.getChildText("site_type");
 			BelId belId = new BelId(
-					SiteType.valueOf(id.getChildText("primitive_type")),
+					SiteType.valueOf(family, site_type),
 					id.getChildText("name")
 			);
 			compatibleBels.add(belId);
@@ -143,7 +146,7 @@ public class CellLibrary implements Iterable<LibraryCell> {
 				pin.getPossibleBelPins().put(belId, possPins);
 			}
 		} else {
-			Set<LibraryPin> unmappedPins = new HashSet<LibraryPin>();
+			Set<LibraryPin> unmappedPins = new HashSet<>();
 			
 			// Create the bel pin mappings for each cell pin
 			for (Element belPinEl : belPinsEl.getChildren("pin")) {

@@ -372,7 +372,6 @@ public class Tile implements Serializable {
 	
 	/**
 	 * 
-	 * @param tile
 	 * @param direction
 	 * @return
 	 */

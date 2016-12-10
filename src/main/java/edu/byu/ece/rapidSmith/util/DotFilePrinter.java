@@ -14,8 +14,11 @@ import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
+import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.SiteType;
+import edu.byu.ece.rapidSmith.device.families.FamilyInfo;
+import edu.byu.ece.rapidSmith.device.families.FamilyInfos;
 
 /**
  * This class is used to print Dot files to visualize netlists in RapidSmith. <br>
@@ -47,9 +50,9 @@ public class DotFilePrinter {
 	 */
 	public DotFilePrinter(CellDesign design) {
 		this.design = design;
-		
+
 		// initialize dot configuration with default options
-		dotProperties = new HashMap<String,String>();
+		dotProperties = new HashMap<>();
 		dotProperties.put("rankdir", "LR");
 		dotProperties.put("concentrate", "true");
 	}
@@ -120,8 +123,6 @@ public class DotFilePrinter {
 	 * the specified DOT properties. Cells placed in the same site are clustered <br>
 	 * together.
 	 * 
-	 * @param design CellDesign 
-	 * @param dotProperties A map of top level graph properties for the dot file
 	 * @param outputFile Output .dot location (C:/example.dot)
 	 * @throws IOException
 	 */
@@ -136,8 +137,6 @@ public class DotFilePrinter {
 	 * Creates a DOT string that represents a placed netlist of the design. <br>
 	 * Cells placed in the same site are clustered together.
 	 * 
-	 * @param design CellDesign
-	 * @param dotProperties A map of top level graph properties for the dot file
 	 * @return
 	 */
 	public String getPlacementDotString() {
@@ -304,9 +303,10 @@ public class DotFilePrinter {
 		
 		dotBuilder.append("  subgraph cluster" + site.getName() + "{\n");
 		dotBuilder.append("    label=" + site.getName() + ";\n");
-	
+		FamilyInfo familyInfo = FamilyInfos.get(design.getFamily());
+
 		// format a slice to make it look good
-		if (site.getType() == SiteType.SLICEL || site.getType() == SiteType.SLICEM ) {
+		if (familyInfo.sliceSites().contains(site.getType())) {
 			formatSliceCluster(site, design.getCellsAtSite(site));
 		}
 		else {

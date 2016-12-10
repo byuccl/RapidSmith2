@@ -25,7 +25,6 @@ import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.design.xdl.XdlPin;
 import edu.byu.ece.rapidSmith.device.helper.HashPool;
 import edu.byu.ece.rapidSmith.primitiveDefs.PrimitiveDefList;
-import edu.byu.ece.rapidSmith.util.FamilyType;
 
 import java.io.Serializable;
 import java.util.*;
@@ -46,6 +45,7 @@ public class Device implements Serializable {
 	public static final String LATEST_DEVICE_FILE_VERSION = "1.0";
 	/** The current release of the tools */
 	public static final String rapidSmithVersion = "2.0.0";
+	private static final long serialVersionUID = 3980157455165403758L;
 
 	//========================================================================//
 	// Class Members
@@ -76,16 +76,8 @@ public class Device implements Serializable {
 	//========================================================================//
 	// Objects that are Populated After Parsing
 	//========================================================================//
-	/** Created on demand when user calls getPrimitiveSiteIndex(), where the ArrayList index is the ordinal of the PrimitiveType */
-	private List<Site[]> primitiveSiteIndex;
-	/** A set of all TileTypes that have switch matrices in them */
-	private HashSet<TileType> switchMatrixTypes;
-
-	private Set<SiteType> sliceTypes;
-	private Set<SiteType> bramTypes;
-	private Set<SiteType> fifoTypes;
-	private Set<SiteType> dspTypes;
-	private Set<SiteType> iobTypes;
+	/** Created on demand when user calls getSitesOfTypeMap(), where the ArrayList index is the ordinal of the PrimitiveType */
+	private Map<SiteType, ArrayList<Site>> sitesOfTypeMap;
 
 	/**
 	 * Constructor, initializes all objects to null
@@ -356,60 +348,6 @@ public class Device implements Serializable {
 		return pin.getInstance().getPrimitiveSite().getSitePin(pin.getName()).getExternalWire();
 	}
 
-	public void setSwitchMatrixTypes(HashSet<TileType> types) {
-		this.switchMatrixTypes = types;
-	}
-
-	/**
-	 * This will return a set of all unique TileTypes which are considered
-	 * to have a switch matrix or routing switch box in them.
-	 *
-	 * @return A set of all TileTypes which have a switch matrix in them.
-	 */
-	public HashSet<TileType> getSwitchMatrixTypes() {
-		return switchMatrixTypes;
-	}
-
-	public Set<SiteType> getSliceTypes() {
-		return sliceTypes;
-	}
-
-	public void setSliceTypes(Set<SiteType> sliceTypes) {
-		this.sliceTypes = sliceTypes;
-	}
-
-	public Set<SiteType> getBramTypes() {
-		return bramTypes;
-	}
-
-	public void setBramTypes(Set<SiteType> bramTypes) {
-		this.bramTypes = bramTypes;
-	}
-
-	public Set<SiteType> getFifoTypes() {
-		return fifoTypes;
-	}
-
-	public void setFifoTypes(Set<SiteType> fifoTypes) {
-		this.fifoTypes = fifoTypes;
-	}
-
-	public Set<SiteType> getDspTypes() {
-		return dspTypes;
-	}
-
-	public void setDspTypes(Set<SiteType> dspTypes) {
-		this.dspTypes = dspTypes;
-	}
-
-	public Set<SiteType> getIOBTypes() {
-		return iobTypes;
-	}
-
-	public void setIOBTypes(Set<SiteType> iobTypes) {
-		this.iobTypes = iobTypes;
-	}
-
 	/**
 	 * Returns the site templates for this device.
 	 * The site templates expose the BELs and routing structure of each
@@ -500,11 +438,11 @@ public class Device implements Serializable {
 	 * @return The data structure which stores all of the primitive sites
 	 * separated by type.
 	 */
-	private List<Site[]> getPrimitiveSiteIndex() {
-		if (primitiveSiteIndex == null) {
-			createPrimitiveSiteIndex();
+	private Map<SiteType, ArrayList<Site>> getSitesOfTypeMap() {
+		if (sitesOfTypeMap == null) {
+			createSitesOfTypeMap();
 		}
-		return primitiveSiteIndex;
+		return sitesOfTypeMap;
 	}
 
 	/**
@@ -517,12 +455,12 @@ public class Device implements Serializable {
 	 * @return An array of compatible sites suitable for placement of a
 	 * primitive of type type.
 	 */
-	public Site[] getAllCompatibleSites(SiteType type) {
+	public List<Site> getAllCompatibleSites(SiteType type) {
 		// Check if there are sites of the given type
 		List<Site> compatibleList = new ArrayList<>();
-		Site[] match = getAllSitesOfType(type);
+		List<Site> match = getAllSitesOfType(type);
 		if (match != null) {
-			compatibleList.addAll(Arrays.asList(match));
+			compatibleList.addAll(match);
 		}
 
 		// Check for other compatible site types
@@ -531,16 +469,16 @@ public class Device implements Serializable {
 			for (SiteType compatibleType : compatibleTypes) {
 				match = getAllSitesOfType(compatibleType);
 				if (match != null) {
-					compatibleList.addAll(Arrays.asList(match));
+					compatibleList.addAll(match);
 				}
 			}
 		}
 
-		// If there are no compatible sites, return null
+		// If there are no compatible sites, return empty list
 		if (compatibleList.size() == 0) {
-			return null;
+			return Collections.emptyList();
 		}
-		return compatibleList.toArray(new Site[compatibleList.size()]);
+		return compatibleList;
 	}
 
 	/**
@@ -549,8 +487,8 @@ public class Device implements Serializable {
 	 * @param type The primitive type of the site to get.
 	 * @return An array of all primitive sites in the device with primitive type type.
 	 */
-	public Site[] getAllSitesOfType(SiteType type) {
-		return getPrimitiveSiteIndex().get(type.ordinal());
+	public List<Site> getAllSitesOfType(SiteType type) {
+		return getSitesOfTypeMap().get(type);
 	}
 
 	//========================================================================//
@@ -589,32 +527,21 @@ public class Device implements Serializable {
 	 * The outer ArrayList uses the PrimitiveType.ordinal() value as the index for
 	 * each type of primitive site.
 	 */
-	private void createPrimitiveSiteIndex() {
-		List<List<Site>> tmp = new ArrayList<>(SiteType.values().length);
-		for (int i = 0; i < SiteType.values().length; i++) {
-			tmp.add(new ArrayList<>());
-		}
+	private void createSitesOfTypeMap() {
+		Map<SiteType, ArrayList<Site>> tmp = new HashMap<>();
 
 		for (int i = 0; i < this.rows; i++) {
 			for (int j = 0; j < this.columns; j++) {
 				Site[] sites = tiles[i][j].getPrimitiveSites();
 				if (sites == null) continue;
 				for (Site site : sites) {
-					tmp.get(site.getDefaultType().ordinal()).add(site);
+					tmp.computeIfAbsent(site.getDefaultType(), k -> new ArrayList<>()).add(site);
 				}
 			}
 		}
 
-		List<Site[]> index = new ArrayList<>();
-		for (List<Site> list : tmp) {
-			if (list.size() == 0) {
-				index.add(null);
-			} else {
-				Site[] tmpArray = new Site[list.size()];
-				index.add(list.toArray(tmpArray));
-			}
-		}
-		this.primitiveSiteIndex = index;
+		tmp.values().forEach(ArrayList::trimToSize);
+		this.sitesOfTypeMap = tmp;
 	}
 
 
@@ -729,6 +656,7 @@ public class Device implements Serializable {
 	   For Hessian compression.  Avoids writing duplicate data.
 	 */
 	protected static class DeviceReplace implements Serializable {
+		private static final long serialVersionUID = 945509107696820354L;
 		private String version;
 		private String partName;
 		private String family;
@@ -738,11 +666,6 @@ public class Device implements Serializable {
 		private WireEnumerator we;
 		private PrimitiveDefList primitiveDefs;
 		private HashSet<TileType> switchMatrixTypes;
-		private Set<SiteType> sliceTypes;
-		private Set<SiteType> bramTypes;
-		private Set<SiteType> fifoTypes;
-		private Set<SiteType> dspTypes;
-		private Set<SiteType> iobTypes;
 
 		public void readResolve(Device device) {
 			device.partName = partName;
@@ -762,12 +685,6 @@ public class Device implements Serializable {
 			for (SiteTemplate template : siteTemplates) {
 				device.siteTemplates.put(template.getType(), template);
 			}
-			device.switchMatrixTypes = switchMatrixTypes;
-			device.sliceTypes = sliceTypes;
-			device.bramTypes = bramTypes;
-			device.fifoTypes = fifoTypes;
-			device.dspTypes = dspTypes;
-			device.iobTypes = iobTypes;
 			device.we = we;
 			device.primitiveDefs = primitiveDefs;
 
@@ -800,11 +717,5 @@ public class Device implements Serializable {
 		repl.siteTemplates = siteTemplates.values();
 		repl.we = we;
 		repl.primitiveDefs = primitiveDefs;
-		repl.switchMatrixTypes = switchMatrixTypes;
-		repl.sliceTypes = sliceTypes;
-		repl.bramTypes = bramTypes;
-		repl.fifoTypes = fifoTypes;
-		repl.dspTypes = dspTypes;
-		repl.iobTypes = iobTypes;
 	}
 }

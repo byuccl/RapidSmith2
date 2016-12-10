@@ -2,7 +2,7 @@ package edu.byu.ece.rapidSmith;
 
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.util.EnvironmentException;
-import edu.byu.ece.rapidSmith.util.FamilyType;
+import edu.byu.ece.rapidSmith.device.FamilyType;
 import edu.byu.ece.rapidSmith.util.FileTools;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
 import org.jdom2.Document;
@@ -112,6 +112,13 @@ public class RSEnvironment {
 	 */
 	public Path getDevicePath() {
 		return rsPath.resolve("devices");
+	}
+
+	/**
+	 * @return the path to the java source files
+	 */
+	public Path getJavaPath() {
+		return rsPath.resolve("src").resolve("main").resolve("java");
 	}
 
 	/**

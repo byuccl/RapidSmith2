@@ -27,7 +27,7 @@ import com.trolltech.qt.gui.QTreeWidget;
 import com.trolltech.qt.gui.QTreeWidgetItem;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
-import edu.byu.ece.rapidSmith.util.FamilyType;
+import edu.byu.ece.rapidSmith.device.FamilyType;
 
 public class WidgetMaker {
 	
@@ -37,8 +37,8 @@ public class WidgetMaker {
 		treeWidget.setColumnCount(1);
 		treeWidget.setHeaderLabel(header);
 		
-		HashMap<FamilyType, QTreeWidgetItem> familyItems = new HashMap<FamilyType, QTreeWidgetItem>();
-		HashMap<String, QTreeWidgetItem> subFamilyItems = new HashMap<String, QTreeWidgetItem>();
+		HashMap<FamilyType, QTreeWidgetItem> familyItems = new HashMap<>();
+		HashMap<String, QTreeWidgetItem> subFamilyItems = new HashMap<>();
 
 		RSEnvironment env = RSEnvironment.defaultEnv();
 		for(String partName : env.getAvailableParts()){

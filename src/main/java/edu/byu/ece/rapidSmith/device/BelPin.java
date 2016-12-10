@@ -154,28 +154,4 @@ public final class BelPin implements Serializable {
 				"." + template.getName() +
 				"}";
 	}
-
-	public boolean drivesGeneralFabric() {
-		SiteTemplate site = bel.getSite().getTemplate(bel.getId().getPrimitiveType());
-
-		for (String sitePinName : getSitePinNames()) {
-			SitePinTemplate sitePin = site.getSitePin(sitePinName);
-			assert sitePin != null;
-			if (sitePin.drivesGeneralFabric())
-				return true;
-		}
-		return false;
-	}
-
-	public boolean drivenByGeneralFabric() {
-		SiteTemplate site = bel.getSite().getTemplate(bel.getId().getPrimitiveType());
-
-		for (String sitePinName : getSitePinNames()) {
-			SitePinTemplate sitePin = site.getSitePin(sitePinName);
-			assert sitePin != null;
-			if (sitePin.isDrivenByGeneralFabric())
-				return true;
-		}
-		return false;
-	}
 }

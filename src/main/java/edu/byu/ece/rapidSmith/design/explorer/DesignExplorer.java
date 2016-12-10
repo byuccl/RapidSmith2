@@ -23,9 +23,8 @@ package edu.byu.ece.rapidSmith.design.explorer;
 import com.trolltech.qt.core.Qt.WindowModality;
 import com.trolltech.qt.gui.*;
 import com.trolltech.qt.gui.QKeySequence.StandardKey;
-import edu.byu.ece.rapidSmith.RSEnvironment;
-import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
 import edu.byu.ece.rapidSmith.design.explorer.FilterWindow.FilterType;
+import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.gui.FileFilters;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
@@ -87,7 +86,6 @@ public class DesignExplorer extends QMainWindow{
 	protected static final String INSTANCES = "Instances";
 	protected static final String PIPS = "PIPS";
 	protected static final String MODULES = "Modules";
-	protected static final String MODULE_INSTANCES = "Module Instances";
 	protected static final String RESOURCE_REPORT = "Resource Report";
 	protected static final String PATH_DELAYS = "Path Delays";
 	protected static final String PATH_OFFSETS = "Path Offsets";
@@ -146,8 +144,7 @@ public class DesignExplorer extends QMainWindow{
 		tabs.addTab(netWindow, NETS);
 		tabs.addTab(instanceWindow, INSTANCES);
 		tabs.addTab(moduleWindow, MODULES);
-		tabs.addTab(moduleInstanceWindow, MODULE_INSTANCES);
-		
+
 		if(fileToOpen != null){
 			try {
 				internalOpenDesign(fileToOpen);

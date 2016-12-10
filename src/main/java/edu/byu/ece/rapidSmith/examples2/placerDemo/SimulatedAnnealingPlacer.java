@@ -3,11 +3,7 @@ package edu.byu.ece.rapidSmith.examples2.placerDemo;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
 
 import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
@@ -17,10 +13,7 @@ import edu.byu.ece.rapidSmith.design.subsite.CellPin;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.SiteType;
-import edu.byu.ece.rapidSmith.examples2.placerDemo.BramCluster;
-import edu.byu.ece.rapidSmith.examples2.placerDemo.CarryChainCluster;
-import edu.byu.ece.rapidSmith.examples2.placerDemo.SiteCluster;
-import edu.byu.ece.rapidSmith.examples2.placerDemo.VirtualNet;
+import edu.byu.ece.rapidSmith.device.families.Artix7;
 import edu.byu.ece.rapidSmith.interfaces.vivado.XdcPlacementInterface;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
@@ -41,7 +34,7 @@ public class SimulatedAnnealingPlacer {
 	private boolean viewCheckpoints = false; 
 	private String placementXdc = null;
 	
-	private HashMap <SiteType, Site[] > siteTypeMap = new HashMap <SiteType, Site[]>();  
+	private HashMap <SiteType, List<Site>> siteTypeMap = new HashMap <>();
 	//placement cost variables
 	private int cost; 
 	
@@ -53,11 +46,11 @@ public class SimulatedAnnealingPlacer {
 	public SimulatedAnnealingPlacer(Device device, CellDesign design) {
 		this.design = design;
 		this.device = device;
-		this.placeableSiteClusters = new ArrayList<SiteCluster>();
-		this.allSiteClusters = new ArrayList<SiteCluster>();
-		this.sitenameToClusterMap = new HashMap<Site, SiteCluster>();
+		this.placeableSiteClusters = new ArrayList<>();
+		this.allSiteClusters = new ArrayList<>();
+		this.sitenameToClusterMap = new HashMap<>();
 		this.netToCostMap = new int[design.getNets().size()];
-		this.siteTypeMap = new HashMap <SiteType, Site[]>();
+		this.siteTypeMap = new HashMap<>();
 		this.buildSiteClusters();
 	}
 	
@@ -110,8 +103,8 @@ public class SimulatedAnnealingPlacer {
 				SiteCluster scSource = siteToCluster.get(sourceSite);
 			
 				//populate the sink information
-				ArrayList<SiteCluster> sinks = new ArrayList<SiteCluster>();
-				HashSet<Site> usedSinkSites = new HashSet<Site>();
+				ArrayList<SiteCluster> sinks = new ArrayList<>();
+				HashSet<Site> usedSinkSites = new HashSet<>();
 				int sinkCount = 0;
 				for (CellPin sinkpin : net.getSinkPins() ) {
 					Site sinkSite = sinkpin.getCell().getAnchorSite(); 
@@ -188,8 +181,8 @@ public class SimulatedAnnealingPlacer {
 	 * Regular DSP's are created as regular Site Cluster objects 
 	 */
 	private HashMap<Site, SiteCluster> buildDSPCarryClusters() {
-		ArrayList<Cell> dspCells = new ArrayList<Cell>();
-		HashMap<Site, SiteCluster> siteToCluster = new HashMap<Site, SiteCluster>();
+		ArrayList<Cell> dspCells = new ArrayList<>();
+		HashMap<Site, SiteCluster> siteToCluster = new HashMap<>();
 		
 		//filter out all cells but dsp48 cells...maybe it would be better to walk through all of the sites, and filter out dsp sites...
 		//there are much fewer used sites than cells...but we are only doing this once so its not that big of a deal.
@@ -241,7 +234,7 @@ public class SimulatedAnnealingPlacer {
 	 *	Identifies and build carry chain clusters
 	 */
 	private HashMap<Site, SiteCluster> buildCarryChainClusters(Collection<Site> sites) {
-		HashMap<Site, SiteCluster> siteToCluster = new HashMap<Site, SiteCluster>();
+		HashMap<Site, SiteCluster> siteToCluster = new HashMap<>();
 		for (Site site: sites) {
 			//finding all starts to carry chains
 			try {	
@@ -331,13 +324,13 @@ public class SimulatedAnnealingPlacer {
 	}
 	
 	private boolean isBufgNet(CellNet net) {
-		if (net.getSourcePin().getCell().getAnchorSite().getType().equals(SiteType.BUFG)) {
+		if (net.getSourcePin().getCell().getAnchorSite().getType().equals(Artix7.SiteTypes.BUFG)) {
 			System.out.println("BUFG Net: " + net.getName());
 			return true;
 		}
 		else {
 			for (CellPin cp : net.getSinkPins()) {
-				if(cp.getCell().getAnchorSite().getType().equals(SiteType.BUFG)) {// || cp.getBelPin().getName().equals("CE")) {
+				if(cp.getCell().getAnchorSite().getType().equals(Artix7.SiteTypes.BUFG)) {// || cp.getBelPin().getName().equals("CE")) {
 					System.out.println("BUFG Net: " + net.getName());
 					return true;
 				}
@@ -386,10 +379,11 @@ public class SimulatedAnnealingPlacer {
 	}
 	
 	private boolean isBUFG(Site site) {		
-		return site.getType().equals(SiteType.BUFG);		
+		return site.getType().equals(Artix7.SiteTypes.BUFG);
 	}
-	private boolean isPLL(Site site) {		
-		return site.getType().equals(SiteType.PLLE2_ADV) || site.getType().equals(SiteType.PLL_ADV); 
+	private boolean isPLL(Site site) {
+		// TODO add PLL_ADV back in
+		return site.getType().equals(Artix7.SiteTypes.PLLE2_ADV) /*|| site.getType().equals(Artix7.SiteTypes.PLL_ADV )*/;
 	}
 	
 	/*
@@ -417,11 +411,11 @@ public class SimulatedAnnealingPlacer {
 			
 			SiteCluster cluster = this.placeableSiteClusters.get(next);
 			
-			Site[] compatible = siteTypeMap.get(cluster.getType());
-			int selection = rn.nextInt(compatible.length);
+			List<Site> compatible = siteTypeMap.get(cluster.getType());
+			int selection = rn.nextInt(compatible.size());
 
 			//check for an illegal move
-			if (cluster.makeMove(compatible[selection], this.sitenameToClusterMap, device) == false) {
+			if (!cluster.makeMove(compatible.get(selection), this.sitenameToClusterMap, device)) {
 				cluster.rejectMove();
 				continue;
 			}
@@ -523,11 +517,11 @@ public class SimulatedAnnealingPlacer {
 				SiteCluster cluster = this.placeableSiteClusters.get(next);
 				
 				//randomly choose a new location for the site cluster 
-				Site[] compatible = siteTypeMap.get(cluster.getType());//device.getAllCompatibleSites(cluster.getType());
-				int selection = rn.nextInt(compatible.length);
+				List<Site> compatible = siteTypeMap.get(cluster.getType());//device.getAllCompatibleSites(cluster.getType());
+				int selection = rn.nextInt(compatible.size());
 				
 				//make a move, and check to see if it's illegal 
-				if (cluster.makeMove(compatible[selection], this.sitenameToClusterMap, device) == false) {
+				if (!cluster.makeMove(compatible.get(selection), this.sitenameToClusterMap, device)) {
 					cluster.rejectMove();
 					continue;
 				}
@@ -595,7 +589,7 @@ public class SimulatedAnnealingPlacer {
 	 */
 	public void randomizePlacement() {
 		
-		HashMap<Site, SiteCluster> usedSites = new HashMap<Site, SiteCluster>();
+		HashMap<Site, SiteCluster> usedSites = new HashMap<>();
 		Random rn = new Random();
 		
 		for(SiteCluster sc: this.placeableSiteClusters) {
@@ -604,11 +598,11 @@ public class SimulatedAnnealingPlacer {
 			//}
 			while (true) {
 				//randomly select a site to place the cluster on
-				Site[] compatible = device.getAllCompatibleSites(sc.getType());
-				int selection = rn.nextInt(compatible.length);
+				List<Site> compatible = device.getAllCompatibleSites(sc.getType());
+				int selection = rn.nextInt(compatible.size());
 				
 				//check to see if the placement is valid
-				if(sc.placeRandomly(device, compatible[selection], usedSites))
+				if(sc.placeRandomly(device, compatible.get(selection), usedSites))
 					break;
 			}
 		}

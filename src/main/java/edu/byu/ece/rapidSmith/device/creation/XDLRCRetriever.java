@@ -21,7 +21,7 @@
 
 package edu.byu.ece.rapidSmith.device.creation;
 
-import edu.byu.ece.rapidSmith.util.FamilyType;
+import edu.byu.ece.rapidSmith.device.FamilyType;
 
 import java.nio.file.Path;
 import java.util.List;

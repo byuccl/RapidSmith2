@@ -20,21 +20,19 @@
  */
 package edu.byu.ece.rapidSmith.constraints;
 
-import edu.byu.ece.rapidSmith.device.SiteType;
-
 public class AreaGroupRange {
 	protected AreaGroupCoordinate lowerLeftCoordinate;
 	protected AreaGroupCoordinate upperRightCoordinate;
-	protected SiteType rangeType;
+	protected String rangeType;
 	protected String areaGroupName;
 	
-	public AreaGroupRange(SiteType rangeType, int ll_x, int ll_y, int ur_x, int ur_y) {
+	public AreaGroupRange(String rangeType, int ll_x, int ll_y, int ur_x, int ur_y) {
 		this.rangeType = rangeType;
 		setLLCoordinate(ll_x, ll_y);
 		setURCoordinate(ur_x, ur_y);
 	}
 	
-	public AreaGroupRange(String areaGroupName, SiteType rangeType, int ll_x, int ll_y, int ur_x, int ur_y) {
+	public AreaGroupRange(String areaGroupName, String rangeType, int ll_x, int ll_y, int ur_x, int ur_y) {
 		this.areaGroupName = areaGroupName;
 		this.rangeType = rangeType;
 		setLLCoordinate(ll_x, ll_y);
@@ -66,11 +64,11 @@ public class AreaGroupRange {
 		upperRightCoordinate = new AreaGroupCoordinate(x, y);
 	}
 	
-	public void setPrimitiveType(SiteType rangeType) {
+	public void setRangeType(String rangeType) {
 		this.rangeType = rangeType;
 	}
 	
-	public SiteType getPrimitiveType() {
+	public String getRangeType() {
 		return rangeType;
 	}
 	

@@ -27,7 +27,6 @@ import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.device.helper.*;
 import edu.byu.ece.rapidSmith.primitiveDefs.*;
 import edu.byu.ece.rapidSmith.util.EnvironmentException;
-import edu.byu.ece.rapidSmith.util.FamilyType;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
 import org.jdom2.Document;
@@ -139,7 +138,6 @@ public final class DeviceGenerator {
 		device.constructTileMap();
 		PrimitiveDefsCorrector.makeCorrections(device.getPrimitiveDefs(), familyInfo);
 		device.setSiteTemplates(createSiteTemplates());
-		setDistinguishedTypes(device, familyInfo);
 
 		MessageGenerator.briefMessage("Starting second pass");
 		parser.registerListener(new WireConnectionGeneratorListener());
@@ -177,43 +175,13 @@ public final class DeviceGenerator {
 		return device;
 	}
 
-	private static void setDistinguishedTypes(Device device, Document familyInfo) {
-		HashSet<TileType> smTypes = new HashSet<>();
-		Element rootElement = familyInfo.getRootElement();
-		Element smTypesEl = rootElement.getChild("switch_matrix_types");
-		for (Element smTypeEl : smTypesEl.getChildren("type")) {
-			TileType type = TileType.valueOf(smTypeEl.getText());
-			smTypes.add(type);
-		}
-		device.setSwitchMatrixTypes(smTypes);
-
-		device.setSliceTypes(new HashSet<>(4));
-		device.setBramTypes(new HashSet<>(4));
-		device.setFifoTypes(new HashSet<>(4));
-		device.setDspTypes(new HashSet<>(4));
-		device.setIOBTypes(new HashSet<>(4));
-
-		for (Element ptEl : rootElement.getChild("primitive_types").getChildren("primitive_type")) {
-			SiteType type = SiteType.valueOf(ptEl.getChildText("name"));
-			if (ptEl.getChild("is_slice") != null)
-				device.getSliceTypes().add(type);
-			if (ptEl.getChild("is_bram") != null)
-				device.getBramTypes().add(type);
-			if (ptEl.getChild("is_fifo") != null)
-				device.getFifoTypes().add(type);
-			if (ptEl.getChild("is_dsp") != null)
-				device.getDspTypes().add(type);
-			if (ptEl.getChild("is_iob") != null)
-				device.getIOBTypes().add(type);
-		}
-	}
-	
 	/**
 	 * Creates the templates for the primitive sites with information from the
 	 * primitive defs and device information file.
 	 */
 	private Map<SiteType, SiteTemplate> createSiteTemplates() {
 		Map<SiteType, SiteTemplate> siteTemplates = new HashMap<>();
+		FamilyType family = device.getFamily();
 
 		// Create a template for each primitive type
 		for (PrimitiveDef def : device.getPrimitiveDefs()) {
@@ -228,7 +196,7 @@ public final class DeviceGenerator {
 			Element compatTypesEl = ptEl.getChild("compatible_types");
 			if (compatTypesEl != null) {
 				List<SiteType> compatibleTypes = compatTypesEl.getChildren("compatible_type").stream()
-						.map(compatTypeEl -> SiteType.valueOf(compatTypeEl.getText()))
+						.map(compatTypeEl -> SiteType.valueOf(family, compatTypeEl.getText()))
 						.collect(Collectors.toList());
 				template.setCompatibleTypes(compatibleTypes.toArray(
 						new SiteType[compatibleTypes.size()]));
@@ -389,7 +357,7 @@ public final class DeviceGenerator {
 	 */
 	private Map <Integer, Set<Integer>> createBelRoutethroughs(SiteTemplate template, Element siteElement, WireHashMap wireMap) {
 		
-		Map <Integer, Set<Integer>> belRoutethroughMap = new HashMap<Integer, Set<Integer>>();
+		Map <Integer, Set<Integer>> belRoutethroughMap = new HashMap<>();
 		
 		for (Element belEl : siteElement.getChild("bels").getChildren("bel")) {
 			String belType = belEl.getChildText("type");
@@ -413,7 +381,7 @@ public final class DeviceGenerator {
 					// add the routethrough to the routethrough map; 
 					Set<Integer> sinkWires = belRoutethroughMap.get(startEnum);					
 					if (sinkWires == null) {
-						sinkWires = new HashSet<Integer>();
+						sinkWires = new HashSet<>();
 						belRoutethroughMap.put(startEnum, sinkWires);
 					}
 					sinkWires.add(endEnum);
@@ -915,10 +883,10 @@ public final class DeviceGenerator {
 		private SiteType currType;
 		private String currElement;
 
-		@Override
 		/**
 		 * Tracks special site pin wires.
 		 */
+		@Override
 		protected void enterPinWire(List<String> tokens) {
 			String externalName = stripTrailingParenthesis(tokens.get(3));
 
@@ -945,7 +913,7 @@ public final class DeviceGenerator {
 
 		@Override
 		protected void enterPrimitiveDef(List<String> tokens) {
-			currType = SiteType.valueOf(tokens.get(1));
+			currType = SiteType.valueOf(device.getFamily(), tokens.get(1));
 		}
 
 		@Override
@@ -1017,7 +985,7 @@ public final class DeviceGenerator {
 			int col = Integer.parseInt(tokens.get(2));
 			currTile = device.getTile(row, col);
 			currTile.setName(tokens.get(3));
-			currTile.setType(TileType.valueOf(tokens.get(4)));
+			currTile.setType(TileType.valueOf(device.getFamily(), tokens.get(4)));
 			currTile.setSinks(new HashMap<>());
 
 			tileSites = new ArrayList<>();
@@ -1032,14 +1000,15 @@ public final class DeviceGenerator {
 			site.setBondedType(BondedType.valueOf(tokens.get(3).toUpperCase()));
 
 			List<SiteType> alternatives = new ArrayList<>();
-			SiteType type = SiteType.valueOf(tokens.get(2));
+			SiteType type = SiteType.valueOf(device.getFamily(), tokens.get(2));
 			alternatives.add(type);
 
 			Element ptEl = getPrimitiveTypeEl(type);
 			Element alternativesEl = ptEl.getChild("alternatives");
 			if (alternativesEl != null) {
+				FamilyType family = device.getFamily();
 				alternatives.addAll(alternativesEl.getChildren("alternative").stream()
-						.map(alternativeEl -> SiteType.valueOf(alternativeEl.getChildText("name")))
+						.map(alternativeEl -> SiteType.valueOf(family, alternativeEl.getChildText("name")))
 						.collect(Collectors.toList()));
 			}
 
@@ -1131,7 +1100,8 @@ public final class DeviceGenerator {
 				endWireName = tokens.get(4);
 				Integer endWireEnum = we.getWireEnum(endWireName);
 				wc = wirePool.add(new WireConnection(endWireEnum, 0, 0, true));
-				SiteType type = SiteType.valueOf(tokens.get(6).substring(0, tokens.get(6).length() - 2));
+				String typeName = tokens.get(6).substring(0, tokens.get(6).length() - 2);
+				SiteType type = SiteType.valueOf(device.getFamily(), typeName);
 
 				String[] parts = tokens.get(5).split("-");
 				String inPin = parts[1];
@@ -1283,7 +1253,7 @@ public final class DeviceGenerator {
 		protected void enterPrimitiveDef(List<String> tokens) {
 			currDef = new PrimitiveDef();
 			String name = tokens.get(1).toUpperCase();
-			currDef.setType(SiteType.valueOf(name));
+			currDef.setType(SiteType.valueOf(device.getFamily(), name));
 
 			pins = new ArrayList<>(Integer.parseInt(tokens.get(2)));
 			elements = new ArrayList<>(Integer.parseInt(tokens.get(3)));

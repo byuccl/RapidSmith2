@@ -22,10 +22,7 @@ package edu.byu.ece.rapidSmith.examples;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
@@ -35,6 +32,8 @@ import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.TileType;
 import edu.byu.ece.rapidSmith.device.WireEnumerator;
 import edu.byu.ece.rapidSmith.device.WireType;
+import edu.byu.ece.rapidSmith.device.families.FamilyInfo;
+import edu.byu.ece.rapidSmith.device.families.FamilyInfos;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 
 /**
@@ -47,7 +46,7 @@ public class CountingExample {
 	private static HashSet<WireType> wireTypesOfInterest = null;
 
 	static{
-		wireTypesOfInterest = new HashSet<WireType>();
+		wireTypesOfInterest = new HashSet<>();
 		// Example: Virtex 4 & 5 wire types
 		wireTypesOfInterest.add(WireType.DOUBLE);
 		wireTypesOfInterest.add(WireType.DOUBLE_TURN);
@@ -67,12 +66,11 @@ public class CountingExample {
 	 * @return The number of unique switch matrices used in the nets provided.
 	 */
 	public static int countSwitchMatricesUsed(Collection<XdlNet> nets){
-		HashSet<String> tiles = new HashSet<String>();
-		HashSet<TileType> intTypes = null;
+		HashSet<String> tiles = new HashSet<>();
+		Set<TileType> intTypes = null;
 		for(XdlNet n : nets){
 			if(intTypes == null) {
-				// TODO Looks like getSwitchMatrixTypes should be static
-				intTypes = n.getSourceTile().getDevice().getSwitchMatrixTypes();
+				intTypes = loadIntTypes(n);
 			}
 			for(PIP p : n.getPIPs()){
 				if(intTypes.contains(p.getTile().getType())){
@@ -82,7 +80,14 @@ public class CountingExample {
 		}
 		return tiles.size();
 	}
-	
+
+	private static Set<TileType> loadIntTypes(XdlNet n) {
+		Set<TileType> intTypes;Device device = n.getSourceTile().getDevice();
+		FamilyInfo info = FamilyInfos.get(device.getFamily());
+		intTypes = info.switchboxTiles();
+		return intTypes;
+	}
+
 	/**
 	 * Counts the number of wires used based on their resource length.
 	 * Note: This method assumes that the nets are valid and routed 
@@ -92,15 +97,14 @@ public class CountingExample {
 	 * @return
 	 */
 	public static Map<WireType,Integer> countUsedWireLengths(Collection<XdlNet> nets){
-		HashMap<WireType, Integer> wireCounts = new HashMap<WireType, Integer>();
-		HashSet<TileType> intTypes = null;
+		HashMap<WireType, Integer> wireCounts = new HashMap<>();
+		Set<TileType> intTypes = null;
 		Device dev = null;
 		// points
 		
 		for(XdlNet n : nets){
 			if(intTypes == null) {
-				// TODO Looks like getSwitchMatrixTypes should be static
-				intTypes = n.getSourceTile().getDevice().getSwitchMatrixTypes();
+				intTypes = loadIntTypes(n);
 				dev = n.getSourceTile().getDevice();
 			}
 			for(PIP p : n.getPIPs()){

@@ -7,6 +7,7 @@ import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.Tile;
 import edu.byu.ece.rapidSmith.device.TileType;
+import edu.byu.ece.rapidSmith.device.families.Artix7;
 
 
 /**
@@ -31,7 +32,7 @@ public class DSPCarryCluster extends CarryChainCluster {
 	public boolean placeRandomly(Device device, Site site, HashMap<Site, SiteCluster> usedSites) {
 	
 		//System.out.println("Hello!");
-		HashMap<Site, SiteCluster> tmp = new HashMap<Site, SiteCluster>();
+		HashMap<Site, SiteCluster> tmp = new HashMap<>();
 		
 		if (usedSites.containsKey(site))
 			return false;
@@ -49,11 +50,11 @@ public class DSPCarryCluster extends CarryChainCluster {
 				nextTile = device.getTile(nextTile.getRow() - 1, nextTile.getColumn());
 				
 				//block between clock regions...skip to the next tile
-				if (nextTile.getType().equals(TileType.BRKH_DSP_R) || nextTile.getType().equals(TileType.BRKH_DSP_L) )
+				if (nextTile.getType().equals(Artix7.TileTypes.BRKH_DSP_R) || nextTile.getType().equals(Artix7.TileTypes.BRKH_DSP_L) )
 					nextTile = device.getTile(nextTile.getRow() - 1, nextTile.getColumn());
 				
 				//invalid placement... TODO: update this without using string comparisons...they are too slow!!
-				if (nextTile == null || nextTile.getType().equals(TileType.NULL) )
+				if (nextTile == null || nextTile.getType().equals(Artix7.TileTypes.NULL) )
 					return false;
 				
 				dspIndex = 0;
@@ -118,11 +119,11 @@ public class DSPCarryCluster extends CarryChainCluster {
 				swapTile = device.getTile(swapTile.getRow() - 1, swapTile.getColumn());
 				
 				//block between clock regions...skip to the next tile
-				if (swapTile.getType().equals(TileType.BRKH_DSP_R) || swapTile.getType().equals(TileType.BRKH_DSP_L) )
+				if (swapTile.getType().equals(Artix7.TileTypes.BRKH_DSP_R) || swapTile.getType().equals(Artix7.TileTypes.BRKH_DSP_L) )
 					swapTile = device.getTile(swapTile.getRow() - 1, swapTile.getColumn());
 				
 				//invalid placement... TODO: update this without using string comparisons...they are too slow!!
-				if (swapTile == null || swapTile.getType().equals(TileType.NULL) )
+				if (swapTile == null || swapTile.getType().equals(Artix7.TileTypes.NULL) )
 					return false;
 				
 				siteIndex = 0;
@@ -153,7 +154,7 @@ public class DSPCarryCluster extends CarryChainCluster {
 	@SuppressWarnings("unused")
 	private boolean isDSPTile(Tile tile){
 		TileType type = tile.getType();
-		return type.equals(TileType.DSP_L) || type.equals(TileType.DSP_R);
+		return type.equals(Artix7.TileTypes.DSP_L) || type.equals(Artix7.TileTypes.DSP_R);
 	}
 }
 

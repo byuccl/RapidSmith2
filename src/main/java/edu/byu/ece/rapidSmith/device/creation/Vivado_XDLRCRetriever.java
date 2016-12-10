@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
-import edu.byu.ece.rapidSmith.util.FamilyType;
+import edu.byu.ece.rapidSmith.device.FamilyType;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 /**
