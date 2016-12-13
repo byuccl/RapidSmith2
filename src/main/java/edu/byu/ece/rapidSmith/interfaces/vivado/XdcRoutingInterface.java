@@ -6,16 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import edu.byu.ece.rapidSmith.design.NetType;
@@ -259,14 +250,14 @@ public class XdcRoutingInterface {
 		
 		// Create a set of all used wires in the static net
 		Set<String> wiresInNet = new HashSet<>();
-		// TODO is this really supposed to leave out the first net.  If so, state why.
+		// The first token is either VCC or START_WIRES, not a wire name
 		for (int i = 1; i < wireToks.length; i++ ) {
 			String wireName = wireToks[i];
 			wiresInNet.add(wireName);
 		}
 		
 		// Recreate the routing structure for each of the start wires
-		// TODO is this really supposed to leave out the first net.  If so, state why.
+		// The first token is either VCC or START_WIRES, not a wire name
 		for (int i = 1; i < startWires.length; i++ ) {
 			String startWire = startWires[i];
 			RouteTree netRouteTree = recreateRoutingNetwork(net, startWire, wiresInNet);
@@ -287,11 +278,9 @@ public class XdcRoutingInterface {
 
 		Set<String> wiresInNet = new HashSet<>();
 
-		// TODO why start at 2?
+		// First 2 tokens are ROUTE <netName>
 		String startWire = toks[2];
-		for (int i = 2; i < toks.length; i++ ) {			
-			wiresInNet.add(toks[i]);
-		}
+		wiresInNet.addAll(Arrays.asList(toks).subList(2, toks.length));
 		
 		RouteTree netRouteTree = recreateRoutingNetwork(net, startWire, wiresInNet);
 		net.addIntersiteRouteTree(netRouteTree);		
@@ -504,19 +493,18 @@ public class XdcRoutingInterface {
 	 * @return
 	 */
 	private Iterator<BelPin> getPowerBelSourcesToSearch(Site site) {
-		// TODO an error here.  staticSourceMap contains SiteTypes, not sites
-		Set<String> staticSourcesInSite =  staticSourceMap.get(site);
-		
+		Set<String> staticSourcesInSite =  staticSourceMap.get(site.getType());
+
 		if (staticSourcesInSite == null) {
-			
+
 			staticSourcesInSite = site.getBels().stream()
 									.filter(bel -> bel.getName().contains("VCC") || bel.getName().contains("GND"))
 									.map(Bel::getName)
 									.collect(Collectors.toSet());
-			
+
 			staticSourceMap.put(site.getType(), staticSourcesInSite);
 		}
-		
+
 		return staticSourcesInSite.stream()
 							.map(site::getBel)
 							.flatMap(bel -> bel.getSources().stream())
@@ -622,8 +610,7 @@ public class XdcRoutingInterface {
 	 * 						{@link IntrasiteRouteBelPinSource} for more details
 	 * @param usedSiteWires
 	 */
-	// TODO should this be public or private?
-	public void buildIntrasiteRoute(IntrasiteRoute intrasiteRoute, Set<Integer> usedSiteWires) {
+	private void buildIntrasiteRoute(IntrasiteRoute intrasiteRoute, Set<Integer> usedSiteWires) {
 		
 		// Initialize the search
 		Set<Wire> visitedWires = new HashSet<>(); // used to prevent cycles
@@ -948,7 +935,6 @@ public class XdcRoutingInterface {
 	 * @param design Design with nets to export
 	 * @throws IOException
 	 */
-	// TODO public or private?
 	public void writeRoutingXDC(String xdcOut, CellDesign design) throws IOException {
 		
 		BufferedWriter fileout = new BufferedWriter (new FileWriter(xdcOut));
@@ -976,7 +962,6 @@ public class XdcRoutingInterface {
 	 * @param net CellNet to create a Vivado ROUTE string for
 	 * @return Vivado ROUTE string
 	 */
-	// TODO public or private
 	public static String getVivadoRouteString(CellNet net) {
 		
 		if (net.getType().equals(NetType.WIRE)) {
