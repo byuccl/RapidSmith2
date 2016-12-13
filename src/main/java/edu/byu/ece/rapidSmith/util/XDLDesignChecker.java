@@ -188,7 +188,7 @@ public class XDLDesignChecker{
 		MessageGenerator.printHeader("CHECKING FOR DUPLICATE PIP SINKS ... ");
 		for(XdlNet net : design.getNets()){
 			for(PIP pip : net.getPIPs()){
-				Wire n = new TileWire(pip.getTile(), pip.getEndWire());
+				Wire n = pip.getEndWire();
 				XdlNet tmp = pipSinks.get(n);
 				if(tmp == null){
 					pipSinks.put(n, net);
