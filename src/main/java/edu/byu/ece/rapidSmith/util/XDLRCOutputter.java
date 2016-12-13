@@ -212,27 +212,28 @@ public class XDLRCOutputter {
 				Collections.sort(wireNames);
 
 			for (String wireName : wireNames) {
-				int wire = we.getWireEnum(wireName);
+				Wire wire = new TileWire(tile, we.getWireEnum(wireName));
 				out.append(ind + ind + "(wire ");
 				out.append(wireName + " ");
 
-				List<WireConnection> nonPips = new ArrayList<>();
-				for (WireConnection wc : tile.getWireConnections(wire)) {
-					if (!wc.isPIP())
-						nonPips.add(wc);
+				List<Connection> nonPips = new ArrayList<>();
+				for (Connection c : wire.getWireConnections()) {
+					if (!c.isPip())
+						nonPips.add(c);
 				}
 				if (forceOrdering)
-					Collections.sort(nonPips, new WireConnectionComparator());
+					nonPips.sort(new ConnectionComparator());
 
 				out.append("" + nonPips.size());
 				if (nonPips.size() == 0) {
 					out.append(")" + nl);
 				} else {
 					out.append(nl);
-					for (WireConnection wc : nonPips) {
+					for (Connection c : nonPips) {
+						Wire sinkWire = c.getSinkWire();
 						out.append(ind + ind + ind + "(conn ");
-						out.append(wc.getTile(tile).getName() + " ");
-						out.append(we.getWireName(wc.getWire()) + ")" + nl);
+						out.append(sinkWire.getTile() + " ");
+						out.append(sinkWire.getWireName() + ")" + nl);
 					}
 					out.append(ind + ind + ")" + nl);
 				}
@@ -240,24 +241,24 @@ public class XDLRCOutputter {
 
 			int numPips = 0;
 			for (String wireName : wireNames) {
-				int sourceWire = we.getWireEnum(wireName);
+				Wire sourceWire = new TileWire(tile, we.getWireEnum(wireName));
 
-				List<WireConnection> pips = new ArrayList<>();
-				for (WireConnection wc : tile.getWireConnections(sourceWire)) {
-					if (wc.isPIP())
-						pips.add(wc);
+				List<Connection> pips = new ArrayList<>();
+				for (Connection c : sourceWire.getWireConnections()) {
+					if (c.isPip())
+						pips.add(c);
 				}
 				if (forceOrdering)
-					Collections.sort(pips, new WireConnectionComparator());
+					pips.sort(new ConnectionComparator());
 
-				for (WireConnection wc : pips) {
+				for (Connection c : pips) {
 					out.append(ind + ind + "(pip ");
 					out.append(tile.getName() + " ");
 					out.append(wireName + " ");
-					out.append(isBidirectionalPip(tile, sourceWire, wc) ? "=- " : "-> ");
-					out.append(we.getWireName(wc.getWire()));
+					out.append(isBidirectionalPip(sourceWire, c.getSinkWire()) ? "=- " : "-> ");
+					out.append(c.getSinkWire().getWireName());
 
-					PIPRouteThrough rt = tile.getDevice().getRouteThrough(sourceWire, wc.getWire());
+					PIPRouteThrough rt = tile.getDevice().getRouteThrough(sourceWire, c.getSinkWire());
 					if (rt != null) {
 						out.append(" (_ROUTETHROUGH-" + rt.getInPin() + "-");
 						out.append(rt.getOutPin() + " ");
@@ -279,19 +280,14 @@ public class XDLRCOutputter {
 		out.append(ind + ")" + nl);
 	}
 
-	private boolean isBidirectionalPip(Tile tile, int wire, WireConnection fwd) {
-		boolean isBidir = false;
-		WireConnection[] wcs = fwd.getTile(tile).getWireConnections(fwd.getWire());
-		if (wcs == null)
-			return false;
-		for (WireConnection rev : wcs) {
-			if (rev.getTile(fwd.getTile(tile)).equals(tile) &&
-					rev.getWire() == wire) {
-				isBidir = true;
-				break;
+	private boolean isBidirectionalPip(Wire sourceWire, Wire sinkWire) {
+		for (Connection rev : sinkWire.getWireConnections()) {
+			Wire sourceOfSink = rev.getSinkWire();
+			if (sourceWire.equals(sourceOfSink)) {
+				return true;
 			}
 		}
-		return isBidir;
+		return false;
 	}
 
 	private void writeSite(Site site, boolean writeWires) throws IOException {
@@ -773,12 +769,11 @@ public class XDLRCOutputter {
 		}
 	}
 
-	private class WireConnectionComparator implements Comparator<WireConnection> {
+	private class ConnectionComparator implements Comparator<Connection> {
 		@Override
-		public int compare(WireConnection o1, WireConnection o2) {
-			return Comparator.comparing(WireConnection::getRowOffset)
-					.thenComparing(WireConnection::getColumnOffset)
-					.thenComparing(o -> we.getWireName(o.getWire()))
+		public int compare(Connection o1, Connection o2) {
+			return Comparator.comparing((Connection o) -> o.getSinkWire().getTile().getName())
+					.thenComparing(o -> o.getSinkWire().getWireName())
 					.compare(o1, o2);
 		}
 	}

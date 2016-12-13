@@ -21,6 +21,7 @@
 package edu.byu.ece.rapidSmith.design.xdl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import edu.byu.ece.rapidSmith.design.PIP;
@@ -287,36 +288,32 @@ public class XdlModuleInstance {
 					MessageGenerator.briefError("Warning: Unable to return module instance "+ name +" back to original placement.");
 					return false;
 				}
-				PIP newPip = new PIP(newPipTile, pip.getStartWire(), pip.getEndWire());
-				//if(!newPipTile.hasPIP(newPip)){
-				//	return false;
-				//}
-				net.addPIP(newPip);
+				int startWire = pip.getStartWire().getWireEnum();
+				int endWire = pip.getEndWire().getWireEnum();
+
 				// Special cases for Virtex 5
-				if(newPip.getStartWire() == mCout && newPipTile.getType().equals(TileType.CLBLL)){
-					newPip.setStartWire(llCout);
-				}
-				else if(newPip.getStartWire() == llCout && newPipTile.getType().equals(TileType.CLBLM)){
-					newPip.setStartWire(mCout);
-				}
-				else if(newPip.getEndWire() == wl5beg_s0){
+				if(startWire == mCout && newPipTile.getType().equals(TileType.CLBLL)){
+					startWire = llCout;
+				} else if(startWire == llCout && newPipTile.getType().equals(TileType.CLBLM)) {
+					startWire = mCout;
+				} else if(endWire == wl5beg_s0) {
 					TileType check = dev.getTile(newPipTile.getRow(), newPipTile.getColumn()-1).getType();
 					TileType check2 = dev.getTile(newPipTile.getRow(), newPipTile.getColumn()-2).getType();
 					if(check.equals(TileType.INT_BUFS_R) || check2.equals(TileType.INT_BUFS_R)){
-						int currWire = wl5beg_s0;
-						WireConnection[] wcs = newPipTile.getWireConnections(currWire);
-						Tile currTile = newPipTile;
-						while(wcs.length == 1){
-							if(wcs[0].isPIP()){
-								net.addPIP(new PIP(currTile, currWire, wcs[0].getWire()));
+						Wire currWire = new TileWire(newPipTile, wl5beg_s0);
+						Collection<Connection> conns = currWire.getWireConnections();
+						while(conns.size() == 1){
+							Connection c = conns.iterator().next();
+							if (c.isPip()) {
+								net.addPIP(new PIP(currWire, c.getSinkWire()));
 							}
-							currTile = wcs[0].getTile(currTile);
-							currWire = wcs[0].getWire();
-							wcs = currTile.getWireConnections(currWire);
+							conns = currWire.getWireConnections();
 						}
 					}
 				}
-				
+
+				PIP newPip = new PIP(new TileWire(newPipTile, startWire), new TileWire(newPipTile, endWire));
+				net.addPIP(newPip);
 			}
 		}
 		return true;
