@@ -288,7 +288,7 @@ public class Device implements Serializable {
 	 *   route through
 	 */
 	public PIPRouteThrough getRouteThrough(Wire startWire, Wire endWire) {
-		return getRouteThrough(startWire, endWire);
+		return getRouteThrough(startWire.getWireEnum(), endWire.getWireEnum());
 	}
 
 	/**
