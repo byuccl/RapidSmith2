@@ -197,8 +197,7 @@ public class HandRouter{
 					}
 					if(wiresList.get(choice).isPip()){
 						Wire sourceWire = currTree.getWire();
-						path.add(new PIP(sourceWire.getTile(), sourceWire.getWireEnum(),
-								wiresList.get(choice).getSinkWire().getWireEnum()));
+						path.add(new PIP(sourceWire, wiresList.get(choice).getSinkWire()));
 					}
 
 					currTree = choices.get(choice);

@@ -397,8 +397,8 @@ public class FilterWindow extends QWidget{
 				for(PIP pip : net.getPIPs()){
 					ArrayList<QStandardItem> items = new ArrayList<>();
 					items.add(createNewHyperlinkItem(pip.getTile().getName(), pip));
-					items.add(new DesignItem(pip.getStartWireName(), pip));
-					items.add(new DesignItem(pip.getEndWireName(), pip));
+					items.add(new DesignItem(pip.getStartWire().getWireName(), pip));
+					items.add(new DesignItem(pip.getEndWire().getWireName(), pip));
 					subModels[1].appendRow(items);
 				}
 				subViews[1].setSortingEnabled(true);

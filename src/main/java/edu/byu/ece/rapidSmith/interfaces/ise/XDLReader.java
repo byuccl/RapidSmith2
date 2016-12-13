@@ -222,18 +222,17 @@ public final class XDLReader {
 				throw new ParseException("unrecognized tile: " + tileName);
 
 			WireEnumerator we = device.getWireEnumerator();
-			String sourceName = ctx.source.getText();
-			Integer sourceEnum = we.getWireEnum(sourceName);
-			if (sourceEnum == null)
-				throw new ParseException("unrecognized wire: " + sourceName);
-
-			String sinkName = ctx.sink.getText();
-			Integer sinkEnum = we.getWireEnum(sinkName);
-			if (sinkEnum == null)
-				throw new ParseException("unrecognized wire: " + sinkName);
-
-			PIP pip = new PIP(tile, sourceEnum, sinkEnum);
+			Wire sourceWire = getWireSafe(we, tile, ctx.source.getText());
+			Wire sinkWire = getWireSafe(we, tile, ctx.source.getText());
+			PIP pip = new PIP(sourceWire, sinkWire);
 			currNet.addPIP(pip);
+		}
+
+		private Wire getWireSafe(WireEnumerator we, Tile tile, String wireName) {
+			Integer wireEnum = we.getWireEnum(wireName);
+			if (wireEnum == null)
+				throw new ParseException("unrecognized wire: " + wireName);
+			return new TileWire(tile, wireEnum);
 		}
 
 		@Override

@@ -21,8 +21,7 @@
 package edu.byu.ece.rapidSmith.design;
 
 import edu.byu.ece.rapidSmith.device.Tile;
-import edu.byu.ece.rapidSmith.device.WireConnection;
-import edu.byu.ece.rapidSmith.device.WireEnumerator;
+import edu.byu.ece.rapidSmith.device.Wire;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -35,24 +34,12 @@ import java.util.Objects;
  * @author Chris Lavin
  *         Created on: Jun 22, 2010
  */
-public class PIP implements Comparable<PIP>, Serializable {
-
+public final class PIP implements Serializable {
 	private static final long serialVersionUID = 122367735864726588L;
-	/** The tile where this PIP is located */
-	private Tile tile;
-
-	private int startWire;
-	private int endWire;
-
-	/**
-	 * Constructs an empty PIP.
-	 */
-	public PIP() {
-
-	}
+	private Wire startWire;
+	private Wire endWire;
 
 	public PIP(PIP other) {
-		this.tile = other.tile;
 		this.startWire = other.startWire;
 		this.endWire = other.endWire;
 	}
@@ -60,14 +47,20 @@ public class PIP implements Comparable<PIP>, Serializable {
 	/**
 	 * Constructs a new PIP.
 	 *
-	 * @param tile the tile of this PIP
 	 * @param startWire the start wire of this PIP
 	 * @param endWire the end wire of this PIP
+	 * @throws NullPointerException if startWire or endWire is null
+	 * @throws IllegalArgumentException if startWire and endWire are in different tiles
 	 */
-	public PIP(Tile tile, int startWire, int endWire) {
+	public PIP(Wire startWire, Wire endWire) {
+		Objects.requireNonNull(startWire);
+		Objects.requireNonNull(endWire);
+
+		if (startWire.getTile() != endWire.getTile())
+			throw new IllegalArgumentException("startWire and endWire in different tiles");
+
 		this.startWire = startWire;
 		this.endWire = endWire;
-		this.tile = tile;
 	}
 
 	/**
@@ -75,25 +68,8 @@ public class PIP implements Comparable<PIP>, Serializable {
 	 *
 	 * @return the start wire enumeration
 	 */
-	public int getStartWire() {
+	public Wire getStartWire() {
 		return startWire;
-	}
-
-	/**
-	 * Returns the name of the start wire of this PIP.
-	 *
-	 * @return the name of the start wire of this PIP
-	 */
-	public String getStartWireName() {
-		return tile.getDevice().getWireEnumerator().getWireName(startWire);
-	}
-
-	/**
-	 * Sets the start wire of this PIP.
-	 * @param wire the enumeration of the start wire of this PIP
-	 */
-	public void setStartWire(int wire) {
-		this.startWire = wire;
 	}
 
 	/**
@@ -101,65 +77,26 @@ public class PIP implements Comparable<PIP>, Serializable {
 	 *
 	 * @return the end wire of this PIP
 	 */
-	public int getEndWire() {
+	public Wire getEndWire() {
 		return endWire;
 	}
 
 	/**
-	 * Returns the name of the end wire of this PIP.
-	 *
-	 * @return the name of the end wire of this PIP
-	 */
-	public String getEndWireName() {
-		return tile.getDevice().getWireEnumerator().getWireName(endWire);
-	}
-
-	/**
-	 * Sets the end wire of this PIP.
-	 * @param wire the enumeration of the end wire of this PIP
-	 */
-	public void setEndWire(int wire) {
-		this.endWire = wire;
-	}
-
-	/**
-	 * Returns the tile of this PIP.
-	 *
-	 * @return the tile where this PIP resides
+	 * @return the tile the PIP is in
 	 */
 	public Tile getTile() {
-		return tile;
-	}
-
-	/**
-	 * Sets the tile of this PIP.
-	 * @param tile the new tile for this PIP
-	 */
-	public void setTile(Tile tile) {
-		this.tile = tile;
-	}
-
-	/**
-	 * Returns an array of all possible wire connections that
-	 * can be made from the start wire of this PIP.  Keep in mind that some
-	 * of the wire connections that leave the tile are not PIPs.
-	 *
-	 * @return An array of all possible end wire connections from this PIP's
-	 * start wire
-	 */
-	public WireConnection[] getAllPossibleEndWires() {
-		return getTile().getWireConnections(getStartWire());
+		return startWire.getTile();
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(getEndWire() + getStartWire(), getTile());
+		return endWire.hashCode() + startWire.hashCode();
 	}
 
-	@Override
 	/**
 	 * PIPs are equal if they have the same tile, start wire, and end wire.
 	 */
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -169,17 +106,8 @@ public class PIP implements Comparable<PIP>, Serializable {
 			return false;
 		PIP other = (PIP) obj;
 
-		if (!Objects.equals(getTile(), other.getTile()))
-			return false;
-
-		return (getEndWire() == other.getEndWire() && getStartWire() == other.getStartWire()) ||
-				(getEndWire() == other.getStartWire() && getStartWire() == other.getEndWire());
-	}
-
-	@Deprecated
-	public int compareTo(PIP pip) throws ClassCastException {
-		return (this.tile.getName() + this.getStartWire() + this.getEndWire())
-				.compareTo(pip.tile.getName() + pip.getStartWire() + pip.getEndWire());
+		return (endWire.equals(other.endWire) && startWire.equals(other.startWire)) ||
+				(endWire.equals(other.startWire) && startWire.equals(other.endWire));
 	}
 
 	/**
@@ -189,8 +117,7 @@ public class PIP implements Comparable<PIP>, Serializable {
 	 * @return An XDL-compatible string of this PIP
 	 */
 	public String toString() {
-		WireEnumerator we = tile.getDevice().getWireEnumerator();
-		return "pip " + tile.getName() + " " + we.getWireName(getStartWire()) +
-				" -> " + we.getWireName(getEndWire());
+		return "pip " + startWire.getTile().getName() + " " + startWire.getWireName() +
+				" -> " + endWire.getWireName();
 	}
 }
