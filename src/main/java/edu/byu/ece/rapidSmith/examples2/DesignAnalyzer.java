@@ -1,10 +1,7 @@
 package edu.byu.ece.rapidSmith.examples2;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
@@ -133,7 +130,7 @@ public class DesignAnalyzer {
 				// Regular nets should have only a single route tree
 				assert(n.getIntersiteRouteTreeList().size() <= 1);
 				String s = createRoutingString(n, n.getSourceRouteTree(), true, true);
-				if (s == "")
+				if (Objects.equals(s, ""))
 					System.out.println("<<<Unrouted>>>");
 				else
 					System.out.println("Physical routing: { " + createRoutingString(n, n.getSourceRouteTree(), true, true) + " }"); 

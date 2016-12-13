@@ -40,7 +40,7 @@ public class XdcPlacementInterface {
 	public XdcPlacementInterface(CellDesign design, Device device) {
 		this.design = design;
 		this.device = device;
-		belPinToCellPinMap = new HashMap<BelPin, CellPin>();
+		belPinToCellPinMap = new HashMap<>();
 	}
 	
 	/**
@@ -299,11 +299,11 @@ public class XdcPlacementInterface {
 	private Collection<Cell> sortCellsForXdcExport(CellDesign design) {
 		
 		// cell bins
-		ArrayList<Cell> sorted = new ArrayList<Cell>(design.getCells().size());
-		ArrayList<Cell> lutCells = new ArrayList<Cell>();
-		ArrayList<Cell> carryCells = new ArrayList<Cell>();
-		ArrayList<Cell> ffCells = new ArrayList<Cell>();
-		ArrayList<Cell> ff5Cells = new ArrayList<Cell>();
+		ArrayList<Cell> sorted = new ArrayList<>(design.getCells().size());
+		ArrayList<Cell> lutCells = new ArrayList<>();
+		ArrayList<Cell> carryCells = new ArrayList<>();
+		ArrayList<Cell> ffCells = new ArrayList<>();
+		ArrayList<Cell> ff5Cells = new ArrayList<>();
 		
 		// traverse the cells and drop them in the correct bin
 		for (Cell cell : design.getCells()) {

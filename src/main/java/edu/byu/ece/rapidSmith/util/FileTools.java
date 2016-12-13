@@ -23,10 +23,7 @@ package edu.byu.ece.rapidSmith.util;
 import com.caucho.hessian.io.Deflation;
 import com.caucho.hessian.io.Hessian2Input;
 import com.caucho.hessian.io.Hessian2Output;
-import edu.byu.ece.rapidSmith.device.*;
-import org.jdom2.Document;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
+import edu.byu.ece.rapidSmith.device.Device;
 
 import java.io.*;
 import java.nio.channels.FileChannel;
@@ -65,8 +62,8 @@ public class FileTools {
 		try{
 			BufferedWriter bw = new BufferedWriter(new FileWriter(fileName));
 
-			for (int i = 0; i < lines.size(); i++) {
-				bw.write(lines.get(i) + nl);
+			for (String line : lines) {
+				bw.write(line + nl);
 			}
 
 			bw.close();
@@ -85,9 +82,9 @@ public class FileTools {
 	 * @return An ArrayList containing strings of each line in the file. 
 	 */
 	public static ArrayList<String> getLinesFromTextFile(String fileName){
-		String line = null;
+		String line;
 		BufferedReader br;
-		ArrayList<String> lines = new ArrayList<String>();
+		ArrayList<String> lines = new ArrayList<>();
 		try{
 			br = new BufferedReader(new FileReader(fileName));
 			
@@ -148,12 +145,9 @@ public class FileTools {
 	 * @param dirName Name of the directory to be created.
 	 * @return True if the directory was created or already exists, false otherwise.
 	 */
-	public static boolean makeDir(String dirName){
-		File dir = new File(dirName); 
-		if(!(dir.exists())){
-			return dir.mkdir();
-		}
-		return true;
+	public static boolean makeDir(String dirName) {
+		File dir = new File(dirName);
+		return dir.exists() || dir.mkdir();
 	}
 	
 	/**
@@ -206,7 +200,7 @@ public class FileTools {
 	    if (!success)
 	      throw new IllegalArgumentException("Delete: deletion failed");
 		
-		return success;
+		return true;
 	}
 	
 	/**
@@ -242,7 +236,7 @@ public class FileTools {
 	
 	/**
 	 * Delete the folder and recursively files and folders below
-	 * @param folderName
+	 * @param folderName name of the folder to delete
 	 * @return true for successful deletion, false otherwise
 	 */
 	public static boolean deleteFolder(String folderName){

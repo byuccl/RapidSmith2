@@ -708,11 +708,7 @@ public class DesignDiffer {
 
 		private void removeDifference(String[] property, int index) {
 			if (property.length == index + 1) {
-				for (Iterator<Difference> iterator = diffs.iterator(); iterator.hasNext(); ) {
-					Difference diff = iterator.next();
-					if (diff.getProperty().equals(property[index]))
-						iterator.remove();
-				}
+				diffs.removeIf(diff -> diff.getProperty().equals(property[index]));
 			} else {
 				for (Iterator<DifferenceTree> iterator = children.iterator(); iterator.hasNext(); ) {
 					DifferenceTree child = iterator.next();

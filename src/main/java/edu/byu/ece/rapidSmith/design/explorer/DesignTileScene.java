@@ -29,7 +29,6 @@ import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QPainterPath;
 import com.trolltech.qt.gui.QPen;
 
-import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.gui.TileScene;
 import edu.byu.ece.rapidSmith.timing.PathDelay;
@@ -43,20 +42,14 @@ public class DesignTileScene extends TileScene {
 
 	private float maxDelay = Float.MIN_VALUE;
 
-	public DesignTileScene(){
+	DesignTileScene(){
 		super();
 		currLines = new ArrayList<>();
 		wirePen = new QPen(QColor.yellow, 0.75, PenStyle.SolidLine);
 	}
 
-	public DesignTileScene(Device device, boolean hideTiles, boolean drawPrimitives){
-		super(device, hideTiles, drawPrimitives);
-		currLines = new ArrayList<>();
-		wirePen = new QPen(QColor.yellow, 0.25, PenStyle.SolidLine);
-	}
 
-
-	public void drawPath(ArrayList<WireJunction> conns, PathDelay pd){
+	void drawPath(ArrayList<WireJunction> conns, PathDelay pd){
 		double enumSize = we.getWires().length;
 		QPainterPath path = new QPainterPath();
 
@@ -88,7 +81,7 @@ public class DesignTileScene extends TileScene {
 		}
 	}
 
-	public void sortPaths(){
+	void sortPaths(){
 		PathItem[] paths = new PathItem[currLines.size()];
 		paths = currLines.toArray(paths);
 		Arrays.sort(paths);

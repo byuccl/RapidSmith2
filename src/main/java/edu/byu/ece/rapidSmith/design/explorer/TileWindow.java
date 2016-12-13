@@ -64,16 +64,16 @@ public class TileWindow extends QWidget{
 	/** The layout for the window */
 	private QGridLayout layout;
 	/** The sidebar view (for use with timing analysis) */
-	protected QGraphicsView sidebarView;
+	private QGraphicsView sidebarView;
 
-	protected TimingSlider slider;
+	TimingSlider slider;
 
-	protected QGraphicsScene sidebarScene;
+	private QGraphicsScene sidebarScene;
 	/**
 	 * Constructor
 	 * @param parent
 	 */
-	public TileWindow(QWidget parent){
+	TileWindow(QWidget parent){
 		super(parent);
 		scene = new DesignTileScene();
 		view = new TileView(scene);
@@ -123,7 +123,7 @@ public class TileWindow extends QWidget{
 	 * Moves the cursor to a new tile in the tile array.
 	 * @param tile The new tile to move the cursor to.
 	 */
-	public void moveToTile(String tile){
+	void moveToTile(String tile){
 		Tile t = design.getDevice().getTile(tile);
 		int tileSize = scene.getTileSize();
 		QSize size = this.frameSize();
@@ -136,7 +136,7 @@ public class TileWindow extends QWidget{
 		scene.updateCursor();
 	}
 
-	public void drawCriticalPaths(ArrayList<PathDelay> pathDelays){
+	void drawCriticalPaths(ArrayList<PathDelay> pathDelays){
 		DesignTileScene scn = scene;
 		for(PathDelay pd : pathDelays){
 			ArrayList<WireJunction> conns = new ArrayList<>();
@@ -159,7 +159,7 @@ public class TileWindow extends QWidget{
 		scn.sortPaths();
 	}
 
-	public ArrayList<WireJunction> getAllConnections(XdlNet net){
+	private ArrayList<WireJunction> getAllConnections(XdlNet net){
 		ArrayList<WireJunction> conns = new ArrayList<>();
 		Set<Wire> wireSet = new HashSet<>();
 		for(PIP p : net.getPIPs()){

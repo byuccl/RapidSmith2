@@ -58,8 +58,8 @@ public class WireConnectionLine extends QGraphicsLineItem{
 	 * @param tile The tile.
 	 * @param wire The wire.
 	 */
-	public WireConnectionLine(double x1, double y1, double x2, double y2, 
-			TileScene scene, Tile tile, int wire){
+	WireConnectionLine(double x1, double y1, double x2, double y2,
+	                   TileScene scene, Tile tile, int wire){
 		super(x1, y1, x2, y2);
 		this.scene = scene;
 		this.tile = tile;

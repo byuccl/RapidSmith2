@@ -217,9 +217,8 @@ public class TileAndPrimitiveEnumerator{
 
 	private void writePrimitiveTypeEnumFile(Path pathToSource) {
 		Path path = getPathToEnumFiles(pathToSource);
-		try {
-			BufferedWriter bw = Files.newBufferedWriter(
-					path.resolve( primitiveTypeName + ".java"), Charset.defaultCharset());
+		Path pathName = path.resolve(primitiveTypeName + ".java");
+		try(BufferedWriter bw = Files.newBufferedWriter(pathName, Charset.defaultCharset())) {
 			addHeaderToFile(bw);
 			bw.write("/**" + nl);
 			bw.write(" * This enum enumerates all of the Primitive types of the following FPGA families: " + nl);
@@ -246,7 +245,6 @@ public class TileAndPrimitiveEnumerator{
 			bw.write("\t\t\t}" + nl);
 
 			bw.write("}" + nl);
-			bw.close();
 		}
 		catch (IOException e) {
 			MessageGenerator.briefErrorAndExit("Problems writing class: " + primitiveTypeName);

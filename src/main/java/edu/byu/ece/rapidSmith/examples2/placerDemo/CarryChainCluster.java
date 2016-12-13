@@ -26,21 +26,21 @@ public class CarryChainCluster extends SiteCluster {
 	protected ArrayList<SiteCluster> dependent; 
 	protected int carryChainHeight;
 	
-	private static final HashSet<TileType> clbTileTypes = new HashSet<TileType> (
-		Arrays.asList ( 
-			TileType.CLBLL_L, 
-			TileType.CLBLL_R,
-			TileType.CLBLM_L, 
-			TileType.CLBLM_R, 
-			TileType.CLBLL, 
-			TileType.CLBLM
-		)
+	private static final HashSet<TileType> clbTileTypes = new HashSet<>(
+			Arrays.asList(
+					TileType.CLBLL_L,
+					TileType.CLBLL_R,
+					TileType.CLBLM_L,
+					TileType.CLBLM_R,
+					TileType.CLBLL,
+					TileType.CLBLM
+			)
 	);	
 	
 	public CarryChainCluster(Site start) {
 		super(start);
 
-		this.dependent = new ArrayList<SiteCluster>();
+		this.dependent = new ArrayList<>();
 	}
 	
 	public ArrayList<SiteCluster> getDependentSiteClusters() {
@@ -84,7 +84,7 @@ public class CarryChainCluster extends SiteCluster {
 	@Override
 	public boolean placeRandomly(Device device, Site site, HashMap<Site, SiteCluster> usedSites) {
 	
-		HashMap<Site, SiteCluster> tmp = new HashMap<Site, SiteCluster>();
+		HashMap<Site, SiteCluster> tmp = new HashMap<>();
 		
 		if (usedSites.containsKey(site))
 			return false;
@@ -188,7 +188,7 @@ public class CarryChainCluster extends SiteCluster {
 			//if(!swapSite.matchesSite(site))
 			//	return false;
 				
-			if (swapSiteCluster.swap(currentLOC) == false)  
+			if (!swapSiteCluster.swap(currentLOC))
 				return false;
 			
 			this.swappedWith.add(swapSiteCluster);
@@ -220,7 +220,7 @@ public class CarryChainCluster extends SiteCluster {
 			if (sitenameToCluster.containsKey(swapSite)) { //swapSite != null) { // && !this.swappedWith.contains(swapSite)) {	
 				swapSiteCluster = sitenameToCluster.get(swapSite);
 				
-				if (swapSiteCluster.swap(sc.getPrimitiveSite()) == false)
+				if (!swapSiteCluster.swap(sc.getPrimitiveSite()))
 					return false; 
 				
 				this.swappedWith.add(swapSiteCluster);

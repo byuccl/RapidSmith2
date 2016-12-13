@@ -59,8 +59,8 @@ public class XdlModuleInstance {
 		this.setDesign(design);
 		this.module = null;
 		this.setAnchor(null);
-		instances = new ArrayList<XdlInstance>();
-		nets = new ArrayList<XdlNet>();
+		instances = new ArrayList<>();
+		nets = new ArrayList<>();
 	}
 
 	/**
@@ -192,7 +192,7 @@ public class XdlModuleInstance {
 	 * @return A list of valid anchor sites for the module instance to be placed.
 	 */
 	public ArrayList<Site> getAllValidPlacements(){
-		ArrayList<Site> validSites = new ArrayList<Site>();
+		ArrayList<Site> validSites = new ArrayList<>();
 		Site originalSite = getAnchor().getPrimitiveSite();
 		XdlDesign design = getDesign();
 		Site[] sites = design.getDevice().getAllCompatibleSites(getAnchor().getType());
@@ -236,7 +236,7 @@ public class XdlModuleInstance {
 		
 		// save original placement in case new placement is invalid
 		HashMap<XdlInstance, Site> originalSites;
-		originalSites = isPlaced() ? new HashMap<XdlInstance, Site>() : null;
+		originalSites = isPlaced() ? new HashMap<>() : null;
 
 		//=======================================================//
 		/* Place instances at new location                       */

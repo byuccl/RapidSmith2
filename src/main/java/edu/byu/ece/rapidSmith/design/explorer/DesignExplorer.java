@@ -46,51 +46,51 @@ import java.util.ArrayList;
  */
 public class DesignExplorer extends QMainWindow{
 	/** Status Bar Label */
-	protected QLabel statusLabel;
+	private QLabel statusLabel;
 	/** Path to images in RapidSmith */
-	protected static String rsrcPath = "classpath:images";
+	private static String rsrcPath = "classpath:images";
 	/** Device of the current design that is open */
 	protected Device device;
 	/** The design that is current and active */
 	protected XdlDesign design;
 	/** Name of the Program */
-	protected static String title = "Design Explorer";
+	private static String title = "Design Explorer";
 	/** File Name of the current design that is open */
-	protected String currOpenFileName = null;
+	private String currOpenFileName = null;
 	/** Status Bar */
 	private QStatusBar statusBar;
 	/** Keeps track of the tabs within the application */
-	protected QTabWidget tabs;
+	QTabWidget tabs;
 	/** This is the tile view of the design */
-	protected TileWindow tileWindow;
+	TileWindow tileWindow;
 	/** This is the list of nets in the design */
-	protected FilterWindow netWindow;
+	FilterWindow netWindow;
 	/** This is the list of instances in the design */
-	protected FilterWindow instanceWindow;
+	FilterWindow instanceWindow;
 	/** This is the list of modules in the design */
-	protected FilterWindow moduleWindow;
+	FilterWindow moduleWindow;
 	/** This is the list of module instances in the design */
-	protected FilterWindow moduleInstanceWindow;
+	FilterWindow moduleInstanceWindow;
 	
 	/** This is the list of path delays in the design */
-	protected FilterWindow delayWindow;
+	private FilterWindow delayWindow;
 	/** This is the list of path offsets in the design */
-	protected FilterWindow offsetWindow;
+	private FilterWindow offsetWindow;
 	/** Optional path delays for the design, loaded from timing report (.TWR) */
-	protected ArrayList<PathDelay> delays;
+	ArrayList<PathDelay> delays;
 	/** Optional path offsets for the design, loaded from timing report (.TWR) */
-	protected ArrayList<PathOffset> offsets;
+	ArrayList<PathOffset> offsets;
 	
 	// Names of the tabs
-	protected static final String TILE_LAYOUT = "Tiles";
-	protected static final String NETS = "Nets";
-	protected static final String INSTANCES = "Instances";
-	protected static final String PIPS = "PIPS";
-	protected static final String MODULES = "Modules";
-	protected static final String MODULE_INSTANCES = "Module Instances";
-	protected static final String RESOURCE_REPORT = "Resource Report";
-	protected static final String PATH_DELAYS = "Path Delays";
-	protected static final String PATH_OFFSETS = "Path Offsets";
+	private static final String TILE_LAYOUT = "Tiles";
+	private static final String NETS = "Nets";
+	private static final String INSTANCES = "Instances";
+	private static final String PIPS = "PIPS";
+	private static final String MODULES = "Modules";
+	private static final String MODULE_INSTANCES = "Module Instances";
+	private static final String RESOURCE_REPORT = "Resource Report";
+	private static final String PATH_DELAYS = "Path Delays";
+	private static final String PATH_OFFSETS = "Path Offsets";
 	
 	
 	public static void main(String[] args){
@@ -119,7 +119,7 @@ public class DesignExplorer extends QMainWindow{
 	 * @param fileToOpen The name of the design to open
 	 * @param traceFileToOpen Name of the trace report file (TWR) to load 
 	 */
-	public DesignExplorer(QWidget parent, String fileToOpen, String traceFileToOpen) {
+	private DesignExplorer(QWidget parent, String fileToOpen, String traceFileToOpen) {
 		super(parent);
 		
 		setupFileActions();

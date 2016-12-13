@@ -3,6 +3,7 @@ package edu.byu.ece.rapidSmith.design.subsite;
 import edu.byu.ece.rapidSmith.design.AbstractDesign;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.Site;
+import edu.byu.ece.rapidSmith.util.Exceptions;
 
 import java.util.*;
 
@@ -208,14 +209,14 @@ public class CellDesign extends AbstractDesign {
 	public Cell addCell(Cell cell) {
 		Objects.requireNonNull(cell);
 		if (cell.isInDesign())
-			throw new DesignAssemblyException("Cell already in a design.");
+			throw new Exceptions.DesignAssemblyException("Cell already in a design.");
 
 		return registerCell(cell);
 	}
 
 	private Cell registerCell(Cell cell) {
 		if (hasCell(cell.getName()))
-			throw new DesignAssemblyException("Cell with name already exists in design.");
+			throw new Exceptions.DesignAssemblyException("Cell with name already exists in design.");
 
 		cell.setDesign(this);
 		cellMap.put(cell.getName(), cell);
@@ -232,7 +233,7 @@ public class CellDesign extends AbstractDesign {
 	public void removeCell(Cell cell) {
 		Objects.requireNonNull(cell);
 		if (cell.getDesign() != this)
-			throw new DesignAssemblyException("Cannot remove cell not in the design.");
+			throw new Exceptions.DesignAssemblyException("Cannot remove cell not in the design.");
 
 		removeCell_impl(cell);
 	}
@@ -254,7 +255,7 @@ public class CellDesign extends AbstractDesign {
 	public void disconnectCell(Cell cell) {
 		Objects.requireNonNull(cell);
 		if (cell.getDesign() != this)
-			throw new DesignAssemblyException("Cannot disconnect cell not in the design.");
+			throw new Exceptions.DesignAssemblyException("Cannot disconnect cell not in the design.");
 
 		disconnectCell_impl(cell);
 	}
@@ -316,14 +317,14 @@ public class CellDesign extends AbstractDesign {
 	public CellNet addNet(CellNet net) {
 		Objects.requireNonNull(net);
 		if (net.isInDesign())
-			throw new DesignAssemblyException("Cannot add net from another design.");
+			throw new Exceptions.DesignAssemblyException("Cannot add net from another design.");
 
 		return addNet_impl(net);
 	}
 
 	protected CellNet addNet_impl(CellNet net) {
 		if (hasNet(net.getName()))
-			throw new DesignAssemblyException("Net with name already exists in design.");
+			throw new Exceptions.DesignAssemblyException("Net with name already exists in design.");
 
 		if (net.isVCCNet()) {
 			// if (vccNet != null) {
@@ -355,7 +356,7 @@ public class CellDesign extends AbstractDesign {
 		if (net.getDesign() != this)
 			return;
 		if (!net.getPins().isEmpty())
-			throw new DesignAssemblyException("Cannot remove connected net.");
+			throw new Exceptions.DesignAssemblyException("Cannot remove connected net.");
 
 		removeNet_impl(net);
 	}
@@ -383,7 +384,7 @@ public class CellDesign extends AbstractDesign {
 	public void disconnectNet(CellNet net) {
 		Objects.requireNonNull(net);
 		if (net.getDesign() != this)
-			throw new DesignAssemblyException("Cannot disconnect net not in the design.");
+			throw new Exceptions.DesignAssemblyException("Cannot disconnect net not in the design.");
 
 		disconnectNet_impl(net);
 	}
@@ -497,13 +498,13 @@ public class CellDesign extends AbstractDesign {
 		Objects.requireNonNull(cell);
 		Objects.requireNonNull(anchor);
 		if (cell.getDesign() != this)
-			throw new DesignAssemblyException("Cannot place cell not in the design.");
+			throw new Exceptions.DesignAssemblyException("Cannot place cell not in the design.");
 		if (cell.isPlaced())
-			throw new DesignAssemblyException("Cannot re-place cell.");
+			throw new Exceptions.DesignAssemblyException("Cannot re-place cell.");
 
 		List<Bel> requiredBels = cell.getLibCell().getRequiredBels(anchor);
 		if (!canPlaceCellAt_impl(requiredBels))
-			throw new DesignAssemblyException("Cell already placed at location.");
+			throw new Exceptions.DesignAssemblyException("Cell already placed at location.");
 
 		placeCell_impl(cell, anchor, requiredBels);
 	}
@@ -533,7 +534,7 @@ public class CellDesign extends AbstractDesign {
 	public void unplaceCell(Cell cell) {
 		Objects.requireNonNull(cell);
 		if (cell.getDesign() != this)
-			throw new DesignAssemblyException("Cannot unplace cell not in the design.");
+			throw new Exceptions.DesignAssemblyException("Cannot unplace cell not in the design.");
 
 		unplaceCell_impl(cell);
 	}
@@ -592,7 +593,7 @@ public class CellDesign extends AbstractDesign {
 				for (CellPin cellPin : cell.getPins()) {
 					if (cellPin.getMappedBelPinCount() > 0) {
 						CellPin copyPin = cellCopy.getPin(cellPin.getName());
-						cellPin.getMappedBelPins().forEach(pin -> copyPin.mapToBelPin(pin));
+						cellPin.getMappedBelPins().forEach(copyPin::mapToBelPin);
 					}
 				}
 			}

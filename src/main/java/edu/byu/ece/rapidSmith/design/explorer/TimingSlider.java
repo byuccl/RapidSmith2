@@ -38,14 +38,14 @@ public class TimingSlider extends QSlider{
 	/**
 	 * @param scene
 	 */
-	public TimingSlider(DesignTileScene scene, QLineEdit textBox) {
+	TimingSlider(DesignTileScene scene, QLineEdit textBox) {
 		super();
 		this.scene = scene;
 		this.textBox = textBox;
 		
 	}
 
-	public void setDelays(){
+	void setDelays(){
 		minDelay = scene.getCurrLines().get(0).getPath().getDelay();
 		maxDelay = scene.getCurrLines().get(scene.getCurrLines().size()-1).getPath().getDelay();
 		updatePaths(99);
@@ -53,7 +53,7 @@ public class TimingSlider extends QSlider{
 	}
 	
 	public void updateText(String text){
-		if(selfCall == true){
+		if(selfCall){
 			selfCall = false;
 			return;
 		}
@@ -71,7 +71,7 @@ public class TimingSlider extends QSlider{
 	}
 	
 
-	public void updatePaths(Integer value){
+	private void updatePaths(Integer value){
 		float multiplier = scene.getCurrLines().size()/100;
 		int index = (int)(value*multiplier);
 		if(value == 0) index = 0;
@@ -82,7 +82,7 @@ public class TimingSlider extends QSlider{
 		updateLines(constraint);
 	}
 	
-	public void updateLines(float constraint){
+	private void updateLines(float constraint){
 		for(PathItem item : scene.getCurrLines()){
 			if(item.getPath().getDelay() > constraint){
 				item.setHighlighted();

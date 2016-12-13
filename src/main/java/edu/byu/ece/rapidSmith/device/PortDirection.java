@@ -32,19 +32,19 @@ public enum PortDirection {
 	public static boolean isInputPort(Cell portCell) {
 		
 		checkIsValidPort(portCell);
-		return ((PortDirection)portCell.getProperty("Dir").getValue()) == PortDirection.IN;
+		return portCell.getProperty("Dir").getValue() == PortDirection.IN;
 	}
 	
 	public static boolean isOutputPort(Cell portCell) {
 
 		checkIsValidPort(portCell);
-		return ((PortDirection)portCell.getProperty("Dir").getValue()) == PortDirection.OUT;
+		return portCell.getProperty("Dir").getValue() == PortDirection.OUT;
 	}
 	
 	public static boolean isInoutPort(Cell portCell) {
 
 		checkIsValidPort(portCell);
-		return ((PortDirection)portCell.getProperty("Dir").getValue()) == PortDirection.INOUT;
+		return portCell.getProperty("Dir").getValue() == PortDirection.INOUT;
 	}
 	
 	private static void checkIsValidPort(Cell portCell) {

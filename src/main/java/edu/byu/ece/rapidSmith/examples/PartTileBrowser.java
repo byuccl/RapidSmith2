@@ -120,7 +120,7 @@ public class PartTileBrowser extends QMainWindow{
 	}
 
 	@SuppressWarnings("unused")
-	private void showPart(QModelIndex qmIndex){
+	protected void showPart(QModelIndex qmIndex){
 		Object data = qmIndex.data(ItemDataRole.AccessibleDescriptionRole);
 		if( data != null){
 			if(currPartName.equals(data))
@@ -141,7 +141,7 @@ public class PartTileBrowser extends QMainWindow{
 			
 		}
 	}
-	void updateStatus() {
+	protected void updateStatus() {
 		int x = (int) scene.getCurrX();
 		int y = (int) scene.getCurrY();
 		if (x >= 0 && x < device.getColumns() && y >= 0 && y < device.getRows()){

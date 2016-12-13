@@ -36,24 +36,24 @@ public class WireHashMap implements Serializable {
 	/**
 	 * The default initial capacity - MUST be a power of two.
 	 */
-	static final int DEFAULT_INITIAL_CAPACITY = 16;
+	private static final int DEFAULT_INITIAL_CAPACITY = 16;
 
 	/**
 	 * The maximum capacity, used if a higher value is implicitly specified
 	 * by either of the constructors with arguments.
 	 * MUST be a power of two <= 1<<30.
 	 */
-	static final int MAXIMUM_CAPACITY = 1 << 30;
+	private static final int MAXIMUM_CAPACITY = 1 << 30;
 
 	/**
 	 * The load factor used when none specified in constructor.
 	 */
-	static final float DEFAULT_LOAD_FACTOR = 0.85f;
+	private static final float DEFAULT_LOAD_FACTOR = 0.85f;
 	
 	/**
 	 * The keys table. Length MUST Always be a power of two.
 	 */
-	public int[] keys;
+	private int[] keys;
 	
 	/**
 	 * The corresponding values table.
@@ -63,7 +63,7 @@ public class WireHashMap implements Serializable {
 	/**
 	 * The number of key-value mappings contained in this map.
 	 */
-	int size;
+	private int size;
 
 	// These variables are used to track the whether the caches are up to date.
 	// A cache is up to date if it is equivalent to the wireHashMapModification
@@ -81,14 +81,14 @@ public class WireHashMap implements Serializable {
 	 * The next size value at which to resize (capacity * load factor).
 	 * @serial
 	 */
-	int threshold;
+	private int threshold;
 
 	/**
 	 * The load factor for the hash table.
 	 *
 	 * @serial
 	 */
-	final float loadFactor;
+	private final float loadFactor;
 
 	private Integer hash;
 
@@ -96,7 +96,7 @@ public class WireHashMap implements Serializable {
 	 * @param capacity the set capacity for this hash map
 	 * @param loadFactor the load factor for this hash map before growing
 	 */
-	public WireHashMap(int capacity, float loadFactor){
+	private WireHashMap(int capacity, float loadFactor){
 		if (capacity < 0)
 			throw new IllegalArgumentException("Illegal initial capacity: " +
 											   capacity);
@@ -121,26 +121,8 @@ public class WireHashMap implements Serializable {
 		this.loadFactor = loadFactor;
 	}
 
-	public WireHashMap(int capacity){
-		this(capacity, DEFAULT_LOAD_FACTOR);
-	}
-	
 	public WireHashMap(){
 		this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR);
-	}
-
-	public WireHashMap(WireHashMap other) {
-		this(other.threshold, other.loadFactor);
-		for (Integer i : other.keySet()) {
-			put(i, other.get(i));
-		}
-	}
-
-	/**
-	 * Returns index for hash code h.
-	 */
-	static int indexFor(int h, int length) {
-		return h & (length-1);
 	}
 
 	/**

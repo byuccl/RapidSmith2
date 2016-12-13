@@ -40,9 +40,9 @@ public class TraceReportParser{
 	public static final String DELAY = "Delay:";
 	public static final String OFFSET = "Offset:";
 	
-	private BufferedReader br;
 	private XdlDesign design = null;
-	
+
+	private BufferedReader br;
 	private String line;
 
 	private ArrayList<PathDelay> pathDelays;
@@ -73,12 +73,11 @@ public class TraceReportParser{
 	}
 	
 	public void parseTWR(String twrFileName){
-		pathDelays = new ArrayList<PathDelay>();
-		pathOffsets = new ArrayList<PathOffset>();
+		pathDelays = new ArrayList<>();
+		pathOffsets = new ArrayList<>();
 		
-		try{
-			br = new BufferedReader(new FileReader(twrFileName));
-			
+		try (BufferedReader br = new BufferedReader(new FileReader(twrFileName))) {
+			this.br = br;
 			while((line = br.readLine()) != null){
 				if(line.startsWith(DELAY)){
 					pathDelays.add(parsePathStatement());
@@ -97,7 +96,7 @@ public class TraceReportParser{
 	}
 	
 	
-	private String[] getNextLineTokens(){
+	private String[] getNextLineTokens() {
 		line = null;
 		try {
 			line = br.readLine();
@@ -109,7 +108,7 @@ public class TraceReportParser{
 	
 	private PathOffset parseOffsetStatement(String line){
 		PathOffset curr = new PathOffset();
-		String[] parts = null;
+		String[] parts;
 
 		// Offset:                 -2.114ns (data path - clock path + uncertainty)
 		parts = line.split("\\s+");
@@ -149,7 +148,7 @@ public class TraceReportParser{
 	
 	private PathDelay parsePathStatement(){
 		PathDelay curr = new PathDelay();
-		String[] parts = null;
+		String[] parts;
 		
 		// Delay:                  4.867ns (data path - clock path skew + uncertainty)
 		parts = line.split("\\s+");
@@ -189,12 +188,12 @@ public class TraceReportParser{
 	}
 	
 	private ArrayList<PathElement> parsePathElements(){
-		ArrayList<PathElement> currPath = new ArrayList<PathElement>();
+		ArrayList<PathElement> currPath = new ArrayList<>();
 		String[] parts = null;
 		String dashedLine = "-------------------------------------------------";
 		// Move forward to the ------ line
 		while(!line.contains(dashedLine)){
-			parts = getNextLineTokens();
+			getNextLineTokens();
 		}		
 		parts = getNextLineTokens();
 		

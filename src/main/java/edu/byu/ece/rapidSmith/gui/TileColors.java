@@ -47,7 +47,7 @@ public class TileColors {
 	}
 	
 	static{
-		tileColors = new HashMap<TileType, QColor>();
+		tileColors = new HashMap<>();
 
 		tileColors.put(TileType.BBSTERM, QColor.darkGray);
 		tileColors.put(TileType.BBTERM, QColor.darkGray);

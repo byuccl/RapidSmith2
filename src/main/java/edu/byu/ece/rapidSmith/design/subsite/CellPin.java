@@ -138,7 +138,7 @@ public abstract class CellPin implements Serializable {
 	public boolean mapToBelPin(BelPin pin) {
 		
 		if (belPinMappingSet == null) {
-			belPinMappingSet = new HashSet<BelPin>();
+			belPinMappingSet = new HashSet<>();
 		}
 		
 		return belPinMappingSet.add(pin);
@@ -167,12 +167,8 @@ public abstract class CellPin implements Serializable {
 	 * @return <code>true</code> if the mapping {@code this} -> {@code pin} exists
 	 */
 	public boolean isMappedTo(BelPin pin) {
-		
-		if (belPinMappingSet == null) {
-			return false;
-		}
-		
-		return belPinMappingSet.contains(pin);
+		return belPinMappingSet != null && belPinMappingSet.contains(pin);
+
 	}
 	
 	/**

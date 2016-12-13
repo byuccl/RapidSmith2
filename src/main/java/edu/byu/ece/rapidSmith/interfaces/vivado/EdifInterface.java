@@ -73,8 +73,8 @@ public final class EdifInterface {
 	 */
 	public static CellDesign parseEdif(String edifFile, CellLibrary libCells) throws FileNotFoundException, ParseException {
 		
-		List<CellNet> vccNets = new ArrayList<CellNet>();
-		List<CellNet> gndNets = new ArrayList<CellNet>();
+		List<CellNet> vccNets = new ArrayList<>();
+		List<CellNet> gndNets = new ArrayList<>();
 		
 		// parse edif into the BYU edif tools data structures
 		EdifEnvironment top = EdifParser.translate(edifFile);
@@ -267,7 +267,7 @@ public final class EdifInterface {
 	 * Creates a list of RapidSmith cell properties from an EDIF property list
 	 */
 	private static List<Property> createCellProperties(PropertyList edifPropertyList) {
-		List<Property> cellProperties = new ArrayList<Property>();
+		List<Property> cellProperties = new ArrayList<>();
 		
 		if (edifPropertyList != null) {
 			for (String keyName : edifPropertyList.keySet()) {
@@ -319,7 +319,8 @@ public final class EdifInterface {
 		globalGNDNet.connectToPin(globalGND.getOutputPins().iterator().next());
 		
 		// Add all the VCC/GND sink pins to the global nets
-		List<CellNet> netsToRemove = new ArrayList<CellNet>();
+		// TODO this guy is created but never used
+		List<CellNet> netsToRemove = new ArrayList<>();
 		
 		for(CellNet net : vccNets) {
 			transferSinkPins(net, globalVCCNet);
@@ -332,13 +333,13 @@ public final class EdifInterface {
 		}
 			
 		// Remove the old VCC/GND cells from the list
-		List<Cell> cellsToRemove = new ArrayList<Cell>();
+		List<Cell> cellsToRemove = new ArrayList<>();
 		for (Cell cell : design.getCells()) {
 			if (cell.isVccSource() || cell.isGndSource()) {
 				cellsToRemove.add(cell);
 			}
 		}
-		cellsToRemove.forEach(cell -> design.removeCell(cell));
+		cellsToRemove.forEach(design::removeCell);
 		
 		// Add the new master cells/nets to the design
 		// TODO: add these as special nets in the design
@@ -381,7 +382,7 @@ public final class EdifInterface {
 		// create the edif cell library
 		EdifLibrary edifPrimitiveLibrary = new EdifLibrary(libManager, "hdi_primitives");
 		
-		HashMap<LibraryCell, EdifCell> cellMap = new HashMap<LibraryCell, EdifCell>();	
+		HashMap<LibraryCell, EdifCell> cellMap = new HashMap<>();
 		
 		for (LibraryCell libCell : getUniqueLibraryCellsInDesign(design)) {
 			EdifCell edifCell = createEdifLibraryCell(libCell, edifPrimitiveLibrary); 
@@ -415,7 +416,7 @@ public final class EdifInterface {
 	 */
 	private static HashSet<LibraryCell> getUniqueLibraryCellsInDesign(CellDesign design) {
 		
-		HashSet<LibraryCell> uniqueLibraryCells = new HashSet<LibraryCell>();
+		HashSet<LibraryCell> uniqueLibraryCells = new HashSet<>();
 		
 		for (Cell c : design.getCells()) {			
 			if (!c.isPort())
@@ -465,8 +466,8 @@ public final class EdifInterface {
 		
 		EdifCellInterface cellInterface = new EdifCellInterface(topLevelEdifCell);
 		
-		HashMap<String, Integer> portWidthMap = new HashMap<String, Integer>();
-		HashMap<String, Integer> portDirectionMap = new HashMap<String, Integer>();
+		HashMap<String, Integer> portWidthMap = new HashMap<>();
+		HashMap<String, Integer> portDirectionMap = new HashMap<>();
 		
 		for (Cell cell : design.getCells()) {
 			
@@ -619,8 +620,8 @@ public final class EdifInterface {
 		EdifCellInterface edifInterface = new EdifCellInterface(edifCell);
 		edifCell.setInterface(edifInterface);
 		
-		HashMap<String, Integer> pinWidthMap = new HashMap<String, Integer>();
-		HashMap<String, Integer> pinDirectionMap = new HashMap<String, Integer>();
+		HashMap<String, Integer> pinWidthMap = new HashMap<>();
+		HashMap<String, Integer> pinDirectionMap = new HashMap<>();
 		
 		// Assumption: Vivado pinnames are a series of alphanumberic characters, followed by an optional number within brackets (for busses)
 		// Examples: pin1, pin[2], name

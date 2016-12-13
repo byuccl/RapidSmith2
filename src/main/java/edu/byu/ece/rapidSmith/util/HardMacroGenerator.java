@@ -623,7 +623,7 @@ public class HardMacroGenerator {
 	
 	/**
 	 * Creates a register slice
-	 * @param name
+	 * @param name name for the new instance
 	 * @return the newly created slice instance
 	 */
 	private XdlInstance createRegisterSlice(String name){
@@ -669,12 +669,9 @@ public class HardMacroGenerator {
 	 * @return True if the pin is connected to an IOB, false otherwise.
 	 */
 	private boolean isPinConnectedToIOB(XdlPin pin){
-		if(pin.getInstance().getType().equals(SiteType.IOB)||
-			pin.getInstance().getType().equals(SiteType.IOBM)||
-			pin.getInstance().getType().equals(SiteType.IOBS)){
-			return true;
-		}
-		return false;
+		return pin.getInstance().getType().equals(SiteType.IOB) ||
+				pin.getInstance().getType().equals(SiteType.IOBM) ||
+				pin.getInstance().getType().equals(SiteType.IOBS);
 	}
 	
 	/**
@@ -905,8 +902,6 @@ public class HardMacroGenerator {
 		else{
 			net.getPins().remove(bufgPin);
 		}
-		
-		return;		
 	}
 	
 	/**
@@ -1055,7 +1050,7 @@ public class HardMacroGenerator {
 	
 	/**
 	 * Returns true if the given IOB is a tri-state buffer
-	 * @param instance
+	 * @param instance the IOB instance to check
 	 * @return True if tri-state
 	 */
 	public boolean isTriState(XdlInstance instance){

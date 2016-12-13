@@ -6,16 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import edu.byu.ece.rapidSmith.design.NetType;
@@ -69,8 +60,8 @@ public class XdcRoutingInterface {
 		this.device = device;
 		this.wireEnumerator = device.getWireEnumerator();
 		this.design = design;
-		this.sitePinToRouteMap = new HashMap<SitePin, IntrasiteRoute>();
-		this.staticSourceMap = new HashMap<SiteType, Set<String>>();
+		this.sitePinToRouteMap = new HashMap<>();
+		this.staticSourceMap = new HashMap<>();
 		this.belPinToCellPinMap = pinMap;
 		this.currentLineNumber = 0;
 	}
@@ -258,13 +249,15 @@ public class XdcRoutingInterface {
 		CellNet net = tryGetCellNet(wireToks[0]);
 		
 		// Create a set of all used wires in the static net
-		Set<String> wiresInNet = new HashSet<String>();
-		for (int i = 1; i < wireToks.length; i++ ) {			
+		Set<String> wiresInNet = new HashSet<>();
+		// The first token is either VCC or START_WIRES, not a wire name
+		for (int i = 1; i < wireToks.length; i++ ) {
 			String wireName = wireToks[i];
 			wiresInNet.add(wireName);
 		}
 		
 		// Recreate the routing structure for each of the start wires
+		// The first token is either VCC or START_WIRES, not a wire name
 		for (int i = 1; i < startWires.length; i++ ) {
 			String startWire = startWires[i];
 			RouteTree netRouteTree = recreateRoutingNetwork(net, startWire, wiresInNet);
@@ -283,12 +276,11 @@ public class XdcRoutingInterface {
 	private void processIntersiteRoute(String[] toks) {
 		CellNet net = tryGetCellNet(toks[1]);
 
-		Set<String> wiresInNet = new HashSet<String>(); 
-		
+		Set<String> wiresInNet = new HashSet<>();
+
+		// First 2 tokens are ROUTE <netName>
 		String startWire = toks[2];
-		for (int i = 2; i < toks.length; i++ ) {			
-			wiresInNet.add(toks[i]);
-		}
+		wiresInNet.addAll(Arrays.asList(toks).subList(2, toks.length));
 		
 		RouteTree netRouteTree = recreateRoutingNetwork(net, startWire, wiresInNet);
 		net.addIntersiteRouteTree(netRouteTree);		
@@ -310,9 +302,9 @@ public class XdcRoutingInterface {
 		
 		// initialize the routing data structure with the start wire
 		RouteTree start = initializeRoute(startWireName);
-		Queue<RouteTree> searchQueue = new LinkedList<RouteTree>();
-		Set<Wire> visited = new HashSet<Wire>();
-		Set<RouteTree> terminals = new HashSet<RouteTree>();
+		Queue<RouteTree> searchQueue = new LinkedList<>();
+		Set<Wire> visited = new HashSet<>();
+		Set<RouteTree> terminals = new HashSet<>();
 		
 		// initialize the search queue and visited wire set
 		searchQueue.add(start); 
@@ -400,7 +392,7 @@ public class XdcRoutingInterface {
 	 */
 	private void processLutRoutethroughs(String[] toks) {
 
-		this.belRoutethroughMap = new HashMap<Bel, BelRoutethrough>();
+		this.belRoutethroughMap = new HashMap<>();
 		
 		for (int i = 1; i < toks.length; i++) {
 			String[] routethroughToks = toks[i].split("/");			
@@ -426,7 +418,7 @@ public class XdcRoutingInterface {
 	private void processStaticSources(String[] toks) {
 		
 		if (toks.length > 1) {
-			this.staticSourceBels = new HashSet<Bel>();
+			this.staticSourceBels = new HashSet<>();
 		}
 		
 		for (int i = 1; i < toks.length; i++) {
@@ -437,7 +429,7 @@ public class XdcRoutingInterface {
 			Bel bel = tryGetBel(site, staticToks[1]);
 			BelPin sourcePin = tryGetBelPin(bel, staticToks[2]);
 			boolean routeFound = tryCreateStaticIntrasiteRoute(sourcePin, design.getUsedSitePipsAtSite(site));
-			assert (routeFound == true) : site.getName() + "/" + bel.getName() + "/" + sourcePin.getName();
+			assert routeFound : site.getName() + "/" + bel.getName() + "/" + sourcePin.getName();
 			staticSourceBels.add(bel);
 		}
 	}
@@ -452,7 +444,7 @@ public class XdcRoutingInterface {
 	 */
 	private void readUsedSitePips(Site site, String[] toks) {
 		
-		HashSet<Integer> usedSitePips = new HashSet<Integer>();
+		HashSet<Integer> usedSitePips = new HashSet<>();
 		
 		String namePrefix = "intrasite:" + site.getType() + "/";
 		
@@ -490,7 +482,7 @@ public class XdcRoutingInterface {
 	}
 	
 	/**
-	 * Searches through all {@link Bels} in the specified site, and returns an iterator to a 
+	 * Searches through all {@link Bel}s in the specified site, and returns an iterator to a
 	 * list of all BELs that are VCC or GND. 
 	 * 
 	 * TODO: Cache the information on a {@link SiteType} basis so that the search only happens
@@ -501,21 +493,20 @@ public class XdcRoutingInterface {
 	 * @return
 	 */
 	private Iterator<BelPin> getPowerBelSourcesToSearch(Site site) {
-	
-		Set<String> staticSourcesInSite =  staticSourceMap.get(site);
-		
+		Set<String> staticSourcesInSite =  staticSourceMap.get(site.getType());
+
 		if (staticSourcesInSite == null) {
-			
+
 			staticSourcesInSite = site.getBels().stream()
 									.filter(bel -> bel.getName().contains("VCC") || bel.getName().contains("GND"))
-									.map(bel -> bel.getName())
+									.map(Bel::getName)
 									.collect(Collectors.toSet());
-			
+
 			staticSourceMap.put(site.getType(), staticSourcesInSite);
 		}
-		
+
 		return staticSourcesInSite.stream()
-							.map(belName -> site.getBel(belName))
+							.map(site::getBel)
 							.flatMap(bel -> bel.getSources().stream())
 							.iterator();
 	}
@@ -567,7 +558,7 @@ public class XdcRoutingInterface {
 	}
 	
 	/**
-	 * Creates a route starting at the specified {@link BelPin}, and terminates in either BelPins of {@link SitePins}s.
+	 * Creates a route starting at the specified {@link BelPin}, and terminates in either BelPins of {@link SitePin}s.
 	 * The search is guided by the used site pips of the site. If no valid route is found, an exception is thrown 
 	 * 
 	 * @param pin Bel Pin to start the route
@@ -619,11 +610,11 @@ public class XdcRoutingInterface {
 	 * 						{@link IntrasiteRouteBelPinSource} for more details
 	 * @param usedSiteWires
 	 */
-	public void buildIntrasiteRoute(IntrasiteRoute intrasiteRoute, Set<Integer> usedSiteWires) {
+	private void buildIntrasiteRoute(IntrasiteRoute intrasiteRoute, Set<Integer> usedSiteWires) {
 		
 		// Initialize the search
-		Set<Wire> visitedWires = new HashSet<Wire>(); // used to prevent cycles
-		Queue<RouteTree> routeQueue = new LinkedList<RouteTree>();
+		Set<Wire> visitedWires = new HashSet<>(); // used to prevent cycles
+		Queue<RouteTree> routeQueue = new LinkedList<>();
 		
 		RouteTree startRoute = intrasiteRoute.getStartRoute();
 		Wire startWire = startRoute.getWire();
@@ -797,15 +788,17 @@ public class XdcRoutingInterface {
 	 */
 	private CellNet tryGetCellNet(String netName) {
 		
-		CellNet net = null; 
-		if (netName.equals("VCC")) {
-			net = design.getVccNet();
-		}
-		else if (netName.equals("GND")) {
-			net = design.getGndNet();
-		}
-		else {
-			net = design.getNet(netName);
+		CellNet net = null;
+		switch (netName) {
+			case "VCC":
+				net = design.getVccNet();
+				break;
+			case "GND":
+				net = design.getGndNet();
+				break;
+			default:
+				net = design.getNet(netName);
+				break;
 		}
 		
 		if (net == null) {
@@ -1003,7 +996,7 @@ public class XdcRoutingInterface {
 			if (children.size() == 0)
 				break;
 			
-			ArrayList<RouteTree> trueChildren = new ArrayList<RouteTree>();
+			ArrayList<RouteTree> trueChildren = new ArrayList<>();
 			for(RouteTree child: children) {
 				Connection c = child.getConnection();
 				if (c.isPip() || c.isRouteThrough()) {
@@ -1036,15 +1029,14 @@ public class XdcRoutingInterface {
 	 * @author Thomas Townsend
 	 */
 	public interface IntrasiteRoute {
-		
-		public boolean addBelPinSink(BelPin belPin, RouteTree terminal);
-		public boolean addSitePinSink(SitePin sitePin, RouteTree terminal);
-		public void pruneRoute();
-		public void applyRouting();
-		public boolean isValid();
-		public RouteTree getStartRoute();
-		public void setSinksAsRouted();
-		public boolean isValidBelPinSink(Wire currentWire);
+		boolean addBelPinSink(BelPin belPin, RouteTree terminal);
+		boolean addSitePinSink(SitePin sitePin, RouteTree terminal);
+		void pruneRoute();
+		void applyRouting();
+		boolean isValid();
+		RouteTree getStartRoute();
+		void setSinksAsRouted();
+		boolean isValidBelPinSink(Wire currentWire);
 	}
 	
 	/**
@@ -1062,8 +1054,8 @@ public class XdcRoutingInterface {
 		public IntrasiteRouteSitePinSource (SitePin source, CellNet net, boolean allowUnusedBelPinSinks) {
 			this.source = source;
 			this.net = net;
-			this.belPinSinks = new HashSet<BelPin>();
-			this.terminals = new HashSet<RouteTree>();
+			this.belPinSinks = new HashSet<>();
+			this.terminals = new HashSet<>();
 			this.route = new RouteTree(source.getInternalWire());
 			this.allowUnusedBelPins = allowUnusedBelPinSinks;
 		}
@@ -1184,9 +1176,9 @@ public class XdcRoutingInterface {
 			this.source = source;
 			this.isContained = isContained;
 			this.isStatic = isStatic;
-			this.belPinSinks = new HashSet<BelPin>();
-			this.sitePinSinks = new HashSet<SitePin>();
-			this.terminals = new HashSet<RouteTree>();
+			this.belPinSinks = new HashSet<>();
+			this.sitePinSinks = new HashSet<>();
+			this.terminals = new HashSet<>();
 			this.route = new RouteTree(source.getWire());
 		}
 
