@@ -11,8 +11,6 @@ public final class SitePinTemplate implements Serializable {
 	private SiteType primitiveType;
 	private PinDirection direction;
 	private int internalWire;
-	private boolean drivesGeneralFabric;
-	private boolean drivenByGeneralFabric;
 
 	public SitePinTemplate(String name, SiteType primitiveType) {
 		this.name = name;
@@ -49,22 +47,6 @@ public final class SitePinTemplate implements Serializable {
 
 	public boolean isOutput() {
 		return direction == PinDirection.OUT || direction == PinDirection.INOUT;
-	}
-
-	public boolean drivesGeneralFabric() {
-		return drivesGeneralFabric;
-	}
-
-	public void setDrivesGeneralFabric(boolean drivesGeneralFabric) {
-		this.drivesGeneralFabric = drivesGeneralFabric;
-	}
-
-	public boolean isDrivenByGeneralFabric() {
-		return drivenByGeneralFabric;
-	}
-
-	public void setDrivenByGeneralFabric(boolean drivenByGeneralFabric) {
-		this.drivenByGeneralFabric = drivenByGeneralFabric;
 	}
 
 	@Override

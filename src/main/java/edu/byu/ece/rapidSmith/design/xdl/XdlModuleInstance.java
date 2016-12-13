@@ -21,7 +21,6 @@
 package edu.byu.ece.rapidSmith.design.xdl;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 
 import edu.byu.ece.rapidSmith.design.PIP;
@@ -185,140 +184,7 @@ public class XdlModuleInstance {
 	public boolean isPlaced(){
 		return anchor.isPlaced();
 	}
-	
-	/**
-	 * Does a brute force search to find all valid locations of where this module
-	 * instance can be placed.  It returns the module instance to its original
-	 * location.
-	 * @return A list of valid anchor sites for the module instance to be placed.
-	 */
-	public ArrayList<Site> getAllValidPlacements(){
-		ArrayList<Site> validSites = new ArrayList<>();
-		Site originalSite = getAnchor().getPrimitiveSite();
-		XdlDesign design = getDesign();
-		Site[] sites = design.getDevice().getAllCompatibleSites(getAnchor().getType());
-		for(Site newAnchorSite : sites){
-			if(place(newAnchorSite, design.getDevice())){
-				validSites.add(newAnchorSite);
-				unplace();
-			}
-		}
-		
-		// Put hard macro back
-		if(originalSite != null) place(originalSite, design.getDevice());
-		
-		return validSites;
-	}
 
-	
-	/**
-	 * Places the module instance anchor at the newAnchorSite as well as all other 
-	 * instances and nets within the module instance at their relative offsets of the new site.
-	 * @param newAnchorSite The new site for the anchor of the module instance.
-	 * @param dev The device on which the module instance is being placed.
-	 * @return True if placement was successful, false otherwise.
-	 */
-	public boolean place(Site newAnchorSite, Device dev){
-		// Check if parameters are null
-		if(newAnchorSite == null || dev == null){
-			return false;
-		}
-		
-		// Do some error checking on the newAnchorSite
-		Site p = module.getAnchor().getPrimitiveSite();
-		Tile t = newAnchorSite.getTile();
-		Site newValidSite = Device.getCorrespondingPrimitiveSite(p, t);
-		if(!newAnchorSite.equals(newValidSite)){
-			//MessageGenerator.briefError("New anchor site (" + newAnchorSite.getName() +
-			//		") is incorrect.  Should be " + newValidSite.getName());
-			//this.unplace();
-			return false;
-		}
-		
-		// save original placement in case new placement is invalid
-		HashMap<XdlInstance, Site> originalSites;
-		originalSites = isPlaced() ? new HashMap<>() : null;
-
-		//=======================================================//
-		/* Place instances at new location                       */
-		//=======================================================//
-		for(XdlInstance inst : instances){
-			Site templateSite = inst.getModuleTemplateInstance().getPrimitiveSite();
-			Tile newTile = module.getCorrespondingTile(templateSite.getTile(), newAnchorSite.getTile(), dev);
-			Site newSite = Device.getCorrespondingPrimitiveSite(templateSite, newTile);
-
-			if(newSite == null){
-				//MessageGenerator.briefError("ERROR: No matching primitive site found." +
-				//	" (Template Primitive:"	+ templateSite.getName() + 
-				//	", Template Tile:" + templateSite.getTile() +
-				//	" => New Primitive:" + newSite + ", New Tile:" + newTile+")");
-				
-				// revert placement to original placement before method call
-				if(originalSites == null){
-					unplace();
-					return false;
-				}
-				for(XdlInstance i : originalSites.keySet()){
-					design.getInstance(i.getName()).place(originalSites.get(i));
-				}
-				return false;
-			}
-			
-			if(originalSites != null){ 
-				originalSites.put(inst, inst.getPrimitiveSite());
-			}
-			inst.place(newSite);
-		}
-		
-		//=======================================================//
-		/* Place net at new location                             */
-		//=======================================================//
-		WireEnumerator we = design.getDevice().getWireEnumerator();
-		int mCout = we.getWireEnum("M_COUT");
-		int llCout = we.getWireEnum("LL_COUT");
-		int wl5beg_s0 = we.getWireEnum("WL5BEG_S0");
-		for(XdlNet net : nets){
-			net.getPIPs().clear();
-			XdlNet templateNet = net.getModuleTemplateNet();
-			for(PIP pip : templateNet.getPIPs()){
-				Tile templatePipTile = pip.getTile();
-				Tile newPipTile = module.getCorrespondingTile(templatePipTile, newAnchorSite.getTile(), dev);
-				if(newPipTile == null){
-					unplace();
-					MessageGenerator.briefError("Warning: Unable to return module instance "+ name +" back to original placement.");
-					return false;
-				}
-				int startWire = pip.getStartWire().getWireEnum();
-				int endWire = pip.getEndWire().getWireEnum();
-
-				// Special cases for Virtex 5
-				if(startWire == mCout && newPipTile.getType().equals(TileType.CLBLL)){
-					startWire = llCout;
-				} else if(startWire == llCout && newPipTile.getType().equals(TileType.CLBLM)) {
-					startWire = mCout;
-				} else if(endWire == wl5beg_s0) {
-					TileType check = dev.getTile(newPipTile.getRow(), newPipTile.getColumn()-1).getType();
-					TileType check2 = dev.getTile(newPipTile.getRow(), newPipTile.getColumn()-2).getType();
-					if(check.equals(TileType.INT_BUFS_R) || check2.equals(TileType.INT_BUFS_R)){
-						Wire currWire = new TileWire(newPipTile, wl5beg_s0);
-						Collection<Connection> conns = currWire.getWireConnections();
-						while(conns.size() == 1){
-							Connection c = conns.iterator().next();
-							if (c.isPip()) {
-								net.addPIP(new PIP(currWire, c.getSinkWire()));
-							}
-							conns = currWire.getWireConnections();
-						}
-					}
-				}
-
-				PIP newPip = new PIP(new TileWire(newPipTile, startWire), new TileWire(newPipTile, endWire));
-				net.addPIP(newPip);
-			}
-		}
-		return true;
-	}
-	
 	/**
 	 * Removes all placement information and unroutes all nets of the module instance.
 	 */
@@ -333,19 +199,6 @@ public class XdlModuleInstance {
 		}
 	}
 
-	/**
-	 * This method will calculate and return the corresponding tile of a module instance.
-	 * for a new anchor location.
-	 * @param templateTile The tile in the module which acts as a template.
-	 * @param newAnchorTile This is the tile of the new anchor instance of the module instance.
-	 * @param dev The device which corresponds to this module instance.
-	 * @return The new tile of the module instance which corresponds to the templateTile, or null
-	 * if none exists.
-	 */
-	public Tile getCorrespondingTile(Tile templateTile, Tile newAnchorTile, Device dev){
-		return module.getCorrespondingTile(templateTile, newAnchorTile, dev);
-	}
-	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */

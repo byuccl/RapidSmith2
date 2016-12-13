@@ -70,7 +70,7 @@ public final class XDLReader {
 		public void enterInst(XDLParser.InstContext ctx) {
 			String name = stripQuotes(ctx.name.getText()).intern();
 			String typeName = stripQuotes(ctx.type.getText());
-			SiteType type = SiteType.valueOf(typeName);
+			SiteType type = SiteType.valueOf(device.getFamily(), typeName);
 			currInstance = new XdlInstance(name, type);
 			currInstance.setDesign(design);
 			if (currModule == null) {

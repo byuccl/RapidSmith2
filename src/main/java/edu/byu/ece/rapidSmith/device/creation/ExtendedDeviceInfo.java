@@ -29,8 +29,6 @@ public class ExtendedDeviceInfo implements Serializable {
 
 	private Map<String, WireHashMap> reversedWireHashMap = new HashMap<>(); // tile names to wirehashmap
 	private Map<SiteType, WireHashMap> reversedSubsiteRouting = new HashMap<>();
-	private Map<SiteType, Set<String>> pinsDrivingFabric = new HashMap<>(); // site template -> pin names
-	private Map<SiteType, Set<String>> pinsDrivenByFabric = new HashMap<>(); // site template -> pin names
 
 	public void buildExtendedInfo(Device device) {
 		System.out.println("started at " + new Date());
@@ -38,8 +36,6 @@ public class ExtendedDeviceInfo implements Serializable {
 		reverseSubsiteWires(device);
 		System.out.println("reversed done at " + new Date());
 		threadPool = Executors.newFixedThreadPool(8);
-		buildDrivesGeneralFabric(device);
-		buildDrivenByGeneralFabric(device);
 		threadPool.shutdown();
 		try {
 			threadPool.awaitTermination(2, TimeUnit.DAYS);
@@ -154,41 +150,6 @@ public class ExtendedDeviceInfo implements Serializable {
 		return wireHashMap;
 	}
 
-	private void buildDrivesGeneralFabric(Device device) {
-		for (Site site : device.getPrimitiveSites().values()) {
-			threadPool.execute(() -> buildDrivesForSite(device, site));
-		}
-	}
-
-	private void buildDrivesForSite(Device device, Site site) {
-		Map<SiteType, Set<String>> map = pinsDrivingFabric;
-		for (SiteType type : site.getPossibleTypes()) {
-			synchronized (map) {
-				map.putIfAbsent(type, new HashSet<>());
-			}
-			site.setType(type);
-			Set<String> pinSet = map.get(type);
-			for (SitePin sitePin : site.getSourcePins()) {
-				if (doesPinDriveGeneralFabric(device, sitePin)) {
-					if (pinSet == null)
-						System.out.println("null iwth " + type + " " + Objects.toString(sitePin));
-					try {
-						synchronized (pinSet) {
-							try {
-								pinSet.add(sitePin.getName());
-							} catch (Exception e) {
-								System.out.println("piSet " + Objects.toString(pinSet));
-								System.out.println("sitePin " + Objects.toString(sitePin));
-							}
-						}
-					} catch (Exception e) {
-						System.out.println("I just caught an exception here \n" + e);
-					}
-				}
-			}
-		}
-	}
-
 	private static class WireDistancePair {
 		public Wire wire;
 		int distance;
@@ -210,95 +171,6 @@ public class ExtendedDeviceInfo implements Serializable {
 		public int hashCode() {
 			return Objects.hash(wire);
 		}
-	}
-
-	private boolean doesPinDriveGeneralFabric(Device device, SitePin sitePin) {
-		Wire sourceWire = sitePin.getExternalWire();
-
-		Queue<WireDistancePair> queue = new LinkedList<>();
-		Set<Wire> queuedWires = new HashSet<>();
-		queue.add(new WireDistancePair(sourceWire, 0));
-		queuedWires.add(sourceWire);
-
-		while (!queue.isEmpty()) {
-			WireDistancePair wirePair = queue.poll();
-			Wire wire = wirePair.wire;
-			if (device.getSwitchMatrixTypes().contains(wire.getTile().getType()))
-				return true;
-
-			for (Connection c : wire.getWireConnections()) {
-				Wire sink = c.getSinkWire();
-				if (!queuedWires.contains(sink)) {
-					int newDistance = wirePair.distance;
-					if (!wire.getTile().equals(sink.getTile()))
-						newDistance += 1;
-					queuedWires.add(sink);
-					queue.add(new WireDistancePair(sink, newDistance));
-				}
-			}
-		}
-		return false;
-	}
-
-	private void buildDrivenByGeneralFabric(Device device) {
-		for (Site site : device.getPrimitiveSites().values()) {
-			threadPool.execute(() -> buildDrivenByForSite(device, site));
-		}
-	}
-
-	private void buildDrivenByForSite(Device device, Site site) {
-		Map<SiteType, Set<String>> map = pinsDrivenByFabric;
-		for (SiteType type : site.getPossibleTypes()) {
-			Set<String> pinSet;
-			synchronized (map) {
-				pinSet = map.computeIfAbsent(type, k -> new HashSet<>());
-			}
-			site.setType(type);
-			for (SitePin sitePin : site.getSinkPins()) {
-				if (isPinDrivenByGeneralFabric(device, sitePin)) {
-					try {
-						synchronized (pinSet) {
-							try {
-								pinSet.add(sitePin.getName());
-							} catch (Exception e) {
-								System.out.println("piSet " + Objects.toString(pinSet));
-								System.out.println("sitePin " + Objects.toString(sitePin));
-							}
-						}
-					} catch (Exception e) {
-						System.out.println("I just caught an exception here \n" + e);
-					}
-				}
-			}
-		}
-	}
-
-	private boolean isPinDrivenByGeneralFabric(Device device, SitePin sitePin) {
-		Wire sourceWire = sitePin.getExternalWire();
-
-		Queue<WireDistancePair> queue = new LinkedList<>();
-		Set<Wire> queuedWires = new HashSet<>();
-		queue.add(new WireDistancePair(sourceWire, 0));
-		queuedWires.add(sourceWire);
-
-		while (!queue.isEmpty()) {
-			WireDistancePair wirePair = queue.poll();
-			Wire wire = wirePair.wire;
-			if (device.getSwitchMatrixTypes().contains(wire.getTile().getType()))
-				return true;
-
-			for (Connection c : getReverseConnection(wire)) {
-				Wire sink = c.getSinkWire();
-				if (!queuedWires.contains(sink)) {
-					int newDistance = wirePair.distance;
-					if (!wire.getTile().equals(sink.getTile()))
-						newDistance += 1;
-					queuedWires.add(sink);
-					queue.add(new WireDistancePair(sink, newDistance));
-				}
-			}
-		}
-		return false;
 	}
 
 	private Iterable<Connection> getReverseConnection(Wire wire) {
@@ -328,35 +200,11 @@ public class ExtendedDeviceInfo implements Serializable {
 			SiteTemplate template = device.getSiteTemplate(type);
 			template.setReverseWireConnections(info.reversedSubsiteRouting.get(type));
 		}
-
-		for (SiteType type : info.pinsDrivingFabric.keySet()) {
-			SiteTemplate template = device.getSiteTemplate(type);
-			Set<String> pinsDrivingFabric = info.pinsDrivingFabric.get(type);
-			for (String pinName : pinsDrivingFabric) {
-				template.getSitePin(pinName).setDrivesGeneralFabric(true);
-			}
-			for (BelPinTemplate belPin : template.getBelPins().values()) {
-				if (belPin.getSitePins().stream().anyMatch(pinsDrivingFabric::contains))
-					belPin.setDrivesGeneralFabric(true);
-			}
-		}
-
-		for (SiteType type : info.pinsDrivenByFabric.keySet()) {
-			SiteTemplate template = device.getSiteTemplate(type);
-			Set<String> pinsDrivenByFabric = info.pinsDrivenByFabric.get(type);
-			for (String pinName : pinsDrivenByFabric) {
-				template.getSitePin(pinName).setDrivenByGeneralFabric(true);
-			}
-			for (BelPinTemplate belPin : template.getBelPins().values()) {
-				if (belPin.getSitePins().stream().anyMatch(pinsDrivenByFabric::contains))
-					belPin.setDrivenByGeneralFabric(true);
-			}
-		}
 	}
 
 	private static Path getExtendedInfoPath(Device device) {
 		RSEnvironment env = RSEnvironment.defaultEnv();
-		Path partFolderPath = env.getPartFolderPath(device.getFamilyType());
+		Path partFolderPath = env.getPartFolderPath(device.getFamily());
 		partFolderPath = partFolderPath.resolve(device.getPartName() + "_info.dat");
 		return partFolderPath;
 	}

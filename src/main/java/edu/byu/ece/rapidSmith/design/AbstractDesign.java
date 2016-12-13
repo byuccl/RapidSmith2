@@ -3,8 +3,7 @@ package edu.byu.ece.rapidSmith.design;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.SiteType;
-import edu.byu.ece.rapidSmith.util.FamilyType;
-import edu.byu.ece.rapidSmith.util.PartNameTools;
+import edu.byu.ece.rapidSmith.device.FamilyType;
 
 import java.io.Serializable;
 import java.util.*;
@@ -85,104 +84,13 @@ public abstract class AbstractDesign implements Serializable {
 	}
 
 	/**
-	 * Returns the all lower case exact Xilinx family name this design
-	 * targets (ex: qvirtex4 instead of virtex4).
-	 * DO NOT use exact family methods if it is to be used for accessing device
-	 * or wire enumeration files as RapidSmith does not generate files for devices
-	 * that have XDLRC compatible files.
-	 *
-	 * @return the exact Xilinx family name this design targets
-	 */
-	public String getExactFamilyName() {
-		return PartNameTools.getExactFamilyNameFromPart(partName);
-	}
-
-	/**
-	 * Returns the all lower case base family name this design targets.
-	 * This ensures compatibility with all RapidSmith files. For differentiating
-	 * family names (qvirtex4 rather than virtex4) use getExactFamilyName().
-	 *
-	 * @return the base family name of the part this design targets
-	 */
-	public String getFamilyName() {
-		return PartNameTools.getFamilyNameFromPart(partName);
-	}
-
-	/**
-	 * Returns the all lower case exact Xilinx family type this design targets
-	 * (ex: qvirtex4 instead of virtex4).
-	 * DO NOT use exact family methods if it is to be used for accessing device or
-	 * wire enumeration files as RapidSmith does not generate files for devices that
-	 * have XDLRC compatible files.
-	 *
-	 * @return the exact Xilinx family type this design targets
-	 */
-	public FamilyType getExactFamilyType() {
-		return PartNameTools.getExactFamilyTypeFromPart(partName);
-	}
-
-	/**
 	 * Returns the base family type this design targets.
 	 * This ensures compatibility with all RapidSmith files. For differentiating
 	 * family types (qvirtex4 rather than virtex4) use getExactFamilyType().
 	 *
 	 * @return the base family type of the part this design targets
 	 */
-	public FamilyType getFamilyType() {
-		return PartNameTools.getFamilyTypeFromPart(partName);
+	public FamilyType getFamily() {
+		return getDevice().getFamily();
 	}
-
-	static {
-		sliceTypes = new HashSet<>();
-		sliceTypes.add(SiteType.SLICE);
-		sliceTypes.add(SiteType.SLICEL);
-		sliceTypes.add(SiteType.SLICEM);
-		sliceTypes.add(SiteType.SLICEX);
-
-		dspTypes = new HashSet<>();
-		dspTypes.add(SiteType.DSP48);
-		dspTypes.add(SiteType.DSP48A);
-		dspTypes.add(SiteType.DSP48A1);
-		dspTypes.add(SiteType.DSP48E);
-		dspTypes.add(SiteType.DSP48E1);
-		dspTypes.add(SiteType.MULT18X18);
-		dspTypes.add(SiteType.MULT18X18SIO);
-
-		bramTypes = new HashSet<>();
-		bramTypes.add(SiteType.BLOCKRAM);
-		bramTypes.add(SiteType.FIFO16);
-		bramTypes.add(SiteType.FIFO18E1);
-		bramTypes.add(SiteType.FIFO36_72_EXP);
-		bramTypes.add(SiteType.FIFO36_EXP);
-		bramTypes.add(SiteType.FIFO36E1);
-		bramTypes.add(SiteType.RAMB16);
-		bramTypes.add(SiteType.RAMB16BWE);
-		bramTypes.add(SiteType.RAMB16BWER);
-		bramTypes.add(SiteType.RAMB18E1);
-		bramTypes.add(SiteType.RAMB18X2);
-		bramTypes.add(SiteType.RAMB18X2SDP);
-		bramTypes.add(SiteType.RAMB36_EXP);
-		bramTypes.add(SiteType.RAMB36E1);
-		bramTypes.add(SiteType.RAMB36SDP_EXP);
-		bramTypes.add(SiteType.RAMB8BWER);
-		bramTypes.add(SiteType.RAMBFIFO18);
-		bramTypes.add(SiteType.RAMBFIFO18_36);
-		bramTypes.add(SiteType.RAMBFIFO36);
-		bramTypes.add(SiteType.RAMBFIFO36E1);
-
-		iobTypes = new HashSet<>();
-		iobTypes.add(SiteType.IOB);
-		iobTypes.add(SiteType.IOB18);
-		iobTypes.add(SiteType.IOB18M);
-		iobTypes.add(SiteType.IOB18S);
-		iobTypes.add(SiteType.IOB33);
-		iobTypes.add(SiteType.IOB33M);
-		iobTypes.add(SiteType.IOB33S);
-		iobTypes.add(SiteType.IOB_USB);
-		iobTypes.add(SiteType.IOBLR);
-		iobTypes.add(SiteType.IOBM);
-		iobTypes.add(SiteType.IOBS);
-		iobTypes.add(SiteType.LOWCAPIOB);
-	}
-
 }

@@ -22,10 +22,7 @@ package edu.byu.ece.rapidSmith.examples;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
@@ -65,11 +62,10 @@ public class CountingExample {
 	 */
 	public static int countSwitchMatricesUsed(Collection<XdlNet> nets){
 		HashSet<String> tiles = new HashSet<>();
-		HashSet<TileType> intTypes = null;
+		Set<TileType> intTypes = null;
 		for(XdlNet n : nets){
 			if(intTypes == null) {
-				// TODO Looks like getSwitchMatrixTypes should be static
-				intTypes = n.getSourceTile().getDevice().getSwitchMatrixTypes();
+				intTypes = loadIntTypes(n);
 			}
 			for(PIP p : n.getPIPs()){
 				if(intTypes.contains(p.getTile().getType())){
@@ -79,7 +75,15 @@ public class CountingExample {
 		}
 		return tiles.size();
 	}
-	
+
+	private static Set<TileType> loadIntTypes(XdlNet n) {
+		Set<TileType> intTypes;
+		Device device = n.getSourceTile().getDevice();
+		FamilyInfo info = FamilyInfos.get(device.getFamily());
+		intTypes = info.switchboxTiles();
+		return intTypes;
+	}
+
 	/**
 	 * Counts the number of wires used based on their resource length.
 	 * Note: This method assumes that the nets are valid and routed 
@@ -90,14 +94,13 @@ public class CountingExample {
 	 */
 	public static Map<WireType,Integer> countUsedWireLengths(Collection<XdlNet> nets){
 		HashMap<WireType, Integer> wireCounts = new HashMap<>();
-		HashSet<TileType> intTypes = null;
+		Set<TileType> intTypes = null;
 		Device dev = null;
 		// points
 		
 		for(XdlNet n : nets){
 			if(intTypes == null) {
-				// TODO Looks like getSwitchMatrixTypes should be static
-				intTypes = n.getSourceTile().getDevice().getSwitchMatrixTypes();
+				intTypes = loadIntTypes(n);
 				dev = n.getSourceTile().getDevice();
 			}
 			for(PIP p : n.getPIPs()){

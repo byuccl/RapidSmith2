@@ -11,6 +11,7 @@ import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.Tile;
 import edu.byu.ece.rapidSmith.device.TileType;
+import edu.byu.ece.rapidSmith.device.families.Artix7;
 
 /**
  * Site cluster object used to represent SLICEL/M carry chains.
@@ -28,12 +29,10 @@ public class CarryChainCluster extends SiteCluster {
 	
 	private static final HashSet<TileType> clbTileTypes = new HashSet<>(
 			Arrays.asList(
-					TileType.CLBLL_L,
-					TileType.CLBLL_R,
-					TileType.CLBLM_L,
-					TileType.CLBLM_R,
-					TileType.CLBLL,
-					TileType.CLBLM
+					Artix7.TileTypes.CLBLL_L,
+					Artix7.TileTypes.CLBLL_R,
+					Artix7.TileTypes.CLBLM_L,
+					Artix7.TileTypes.CLBLM_R
 			)
 	);	
 	
@@ -208,7 +207,7 @@ public class CarryChainCluster extends SiteCluster {
 									
 			swapTile = device.getTile(swapTile.getRow() - 1, swapTile.getColumn());
 			
-			if (swapTile.getType().equals(TileType.BRKH_CLB))
+			if (swapTile.getType().equals(Artix7.TileTypes.BRKH_CLB))
 				swapTile = device.getTile(swapTile.getRow() - 1, swapTile.getColumn());
 			
 			//invalid placement (either a non-clb tile in the carry chain location, or we have gone off the edge of the chip)

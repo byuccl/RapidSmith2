@@ -30,29 +30,18 @@ import java.util.ArrayList;
 
 /**
  * This is a generic class which has several static methods to call Xilinx tools from within the RapidSmith
- * framework.  
+ * framework.
  * @author Chris Lavin
  */
 public class RunXilinxTools {
 
 	/** Environment Variable Name which points to the bin directory of ISE 10.1 or below */
 	public static final String xilinxLegacyPathVariableName = "XILINX_LEGACY_PATH";
-	
-	public static String getBinPathToLegacyXilinxTools(){
-		String path = System.getenv(xilinxLegacyPathVariableName);
-		if(path == null){
-			return "";
-		}
-		if(path.endsWith(File.separator)){
-			path.substring(0, path.length()-1);
-		}
-		return path;
-	}
-	
+
 	/**
 	 * Generates the brief version of the XDLRC file specified by partName.
 	 * @param partName The part name of the Xilinx device for which to generate the XDLRC file.
-	 * @param optionalOutputFileName Provides a way to generated a custom output file name.  If parameter is null, the 
+	 * @param optionalOutputFileName Provides a way to generated a custom output file name.  If parameter is null, the
 	 * output file name is [part name + _brief.xdlrc]
 	 * @return True if completed successfully, false otherwise.
 	 */
@@ -63,18 +52,18 @@ public class RunXilinxTools {
 	/**
 	 * Generates the full version of the XDLRC file specified by partName.
 	 * @param partName The part name of the Xilinx device for which to generate the XDLRC file.
-	 * @param optionalOutputFileName Provides a way to generated a custom output file name.  If parameter is null, the 
+	 * @param optionalOutputFileName Provides a way to generated a custom output file name.  If parameter is null, the
 	 * output file name is [part name + _full.xdlrc]
 	 * @return True if completed successfully, false otherwise.
 	 */
 	public static boolean generateFullXDLRCFile(String partName, String optionalOutputFileName){
 		return generateXDLRCFile(partName, optionalOutputFileName, false);
 	}
-	
+
 	/**
 	 * Generates the XDLRC file specified by partName.
 	 * @param partName The part name of the Xilinx device for which to generate the XDLRC file.
-	 * @param optionalOutputFileName Provides a way to generated a custom output file name.  If parameter is null, the 
+	 * @param optionalOutputFileName Provides a way to generated a custom output file name.  If parameter is null, the
 	 * output file name is [part name + _brief/_full.xdlrc]
 	 * @param briefFile Determines if it should generate a brief or full XDLRC file.
 	 * @return True if completed successfully, false otherwise.
@@ -83,33 +72,29 @@ public class RunXilinxTools {
 		String fileNameSuffix = briefFile ? "_brief.xdlrc" : "_full.xdlrc";
 		String defaultFileName = partName + fileNameSuffix;
 		String xdlrcFileName = optionalOutputFileName==null ? defaultFileName : optionalOutputFileName;
-		String commandParameters = briefFile ? "" : "-pips -all_conns "; 
+		String commandParameters = briefFile ? "" : "-pips -all_conns ";
 		String command = "xdl -report " + commandParameters + PartNameTools.removeSpeedGrade(partName) + " " + xdlrcFileName;
-		
-		if(PartNameTools.isFamilyTypeLegacy(PartNameTools.getFamilyTypeFromPart(partName))){
-			command = getBinPathToLegacyXilinxTools() + File.separator + command;
-		}
-		
+
 		// Check to see if the file already exists
 		if(new File(xdlrcFileName).exists()){
 			// It already exists
 			return true;
 		}
-		
+
 		try{
 			// Run the XDL command
 			Process p = Runtime.getRuntime().exec(command);
 			if(p.waitFor() != 0){
 				MessageGenerator.briefError("XDLRC Generation failed, 'xdl' execution failed." +
 						" COMMAND: " + command);
-				return false;				
+				return false;
 			}
 			if(p.exitValue() != 0){
-				MessageGenerator.briefError("XDLRC Generation failed, is the part \"" + 
+				MessageGenerator.briefError("XDLRC Generation failed, is the part \"" +
 						PartNameTools.removeSpeedGrade(partName) + "\" name valid?" + " COMMAND: " + command);
-				return false;	
+				return false;
 			}
-		} 
+		}
 		catch (IOException e){
 			e.printStackTrace();
 			MessageGenerator.briefError("XDLRC generation failed: error during 'xdl' execution.");
@@ -128,7 +113,7 @@ public class RunXilinxTools {
 	 * This method assumes single clock domain.
 	 * @param ncdFileName Name of the existing NCD file to get the clock period
 	 * from.
-	 * @return The minimum clock period in nanoseconds, or Float.MAX_VALUE if 
+	 * @return The minimum clock period in nanoseconds, or Float.MAX_VALUE if
 	 * none is found.
 	 */
 	public static float getMinClkPeriodFromTRCE(String ncdFileName){
@@ -141,7 +126,7 @@ public class RunXilinxTools {
 		}
 		return getMinClkPeriodFromTWRFile(twrFileName);
 	}
-	
+
 	/**
 	 * Parses a TWR file to get the minimum clock period.  Assumes
 	 * a single clock domain.
@@ -160,7 +145,7 @@ public class RunXilinxTools {
 				if(secondLine){
 					String[] parts = line.split("\\s+");
 					br.close();
-					return Float.parseFloat(parts[2].substring(0, parts[2].indexOf('|')));				
+					return Float.parseFloat(parts[2].substring(0, parts[2].indexOf('|')));
 				}
 				if(nextLine){
 					secondLine = true;
@@ -181,13 +166,13 @@ public class RunXilinxTools {
 		}
 		return Float.MAX_VALUE;
 	}
-	
-	
+
+
 	/**
 	 * A generic method to run a command from the system command line.
 	 * @param command The command to execute.  This method blocks until the command finishes.
-	 * @param verbose When true, it will first print to std.out the command and also all of the 
-	 * command's output (both std.out and std.err) to std.out.  
+	 * @param verbose When true, it will first print to std.out the command and also all of the
+	 * command's output (both std.out and std.err) to std.out.
 	 * @return The return value of the process if it terminated, if there was a problem it returns null.
 	 */
 	public static Integer runCommand(String command, boolean verbose){
@@ -214,7 +199,7 @@ public class RunXilinxTools {
 		}
 		return returnValue;
 	}
-	
+
 	/**
 	 * An easy way to just get one family of part names at a time.
 	 * See getPartNames(String[] familyNames, boolean includeSpeedGrades)
@@ -227,7 +212,7 @@ public class RunXilinxTools {
 		String[] family = {familyName};
 		return getPartNames(family, includeSpeedGrades);
 	}
-	
+
 	/**
 	 * Runs Xilinx PartGen to obtain all installed Xilinx FPGA part names for a given set of families.
 	 * @param familyNames Names of the Xilinx FPGA families (virtex4, virtex5, ...) to generate names for.
@@ -239,7 +224,7 @@ public class RunXilinxTools {
 		String pathToPartgen = "";
 		if(familyNames == null) return null;
 		String line;
-		String lastPartName = null;
+		String lastPartName;
 		String[] tokens;
 		Process p;
 		BufferedReader input;
@@ -248,14 +233,8 @@ public class RunXilinxTools {
 		try{
 			for(int i=0; i < familyNames.length; i++){
 				// Run partgen for each family
-				if(PartNameTools.isFamilyTypeLegacy(FamilyType.valueOf(familyNames[i].toUpperCase())))
-					pathToPartgen = getBinPathToLegacyXilinxTools() + File.separator;
-				else{
-					pathToPartgen = "";
-				}
-				p = Runtime.getRuntime().exec(pathToPartgen + executableName + familyNames[i]);
+				p = Runtime.getRuntime().exec(executableName + familyNames[i]);
 				input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-				tokens = null;
 				lastPartName = null;
 				while((line = input.readLine()) != null){
 					tokens = line.split("\\s+");
