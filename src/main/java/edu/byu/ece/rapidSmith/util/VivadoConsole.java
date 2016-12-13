@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.TimeoutException;
 
-import edu.byu.ece.rapidSmith.util.EnvironmentException;
-
 /**
  * Spawns a new child instance of Vivado in TCL mode and provides methods
  * to send TCL commands to the newly created process. The results of each command are
@@ -124,7 +122,7 @@ public class VivadoConsole {
 			vivadoProcess = processBuilder.start();
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new EnvironmentException("Cannot find vivado executable on PATH.");
+			throw new Exceptions.EnvironmentException("Cannot find vivado executable on PATH.");
 		}
 	}
 

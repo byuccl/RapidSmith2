@@ -23,10 +23,10 @@ package edu.byu.ece.rapidSmith.constraints;
 import edu.byu.ece.rapidSmith.device.SiteType;
 
 public class AreaGroupRange {
-	protected AreaGroupCoordinate lowerLeftCoordinate;
-	protected AreaGroupCoordinate upperRightCoordinate;
-	protected SiteType rangeType;
-	protected String areaGroupName;
+	private AreaGroupCoordinate lowerLeftCoordinate;
+	private AreaGroupCoordinate upperRightCoordinate;
+	private SiteType rangeType;
+	private String areaGroupName;
 	
 	public AreaGroupRange(SiteType rangeType, int ll_x, int ll_y, int ur_x, int ur_y) {
 		this.rangeType = rangeType;
@@ -43,11 +43,8 @@ public class AreaGroupRange {
 	
 	//TODO: are the x/y boundaries for area_groups inclusive, or exclusive?  Guessing inclusive for now; might cause problems later
 	public boolean containsPoint(int x, int y) {
-		if(x >= lowerLeftCoordinate.getX() && x <= upperRightCoordinate.getX() && 
-				y >= lowerLeftCoordinate.getY() && y <= upperRightCoordinate.getY())
-			return true;
-		else
-			return false;
+		return x >= lowerLeftCoordinate.getX() && x <= upperRightCoordinate.getX() &&
+				y >= lowerLeftCoordinate.getY() && y <= upperRightCoordinate.getY();
 	}
 	
 	public void setAreaGroupName(String areaGroupName) {

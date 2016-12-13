@@ -62,9 +62,9 @@ public class DeviceBrowser extends QMainWindow{
 	/** The label for the status bar at the bottom */
 	private QLabel statusLabel;
 	/** The current device loaded */
-	Device device;
+	private Device device;
 	/** The current wire enumerator */
-	WireEnumerator we;
+	private WireEnumerator we;
 	/** The current part name of the device loaded */
 	private String currPart;
 	/** This is the tree of parts to select */
@@ -76,9 +76,9 @@ public class DeviceBrowser extends QMainWindow{
 	/** This is the current tile that has been selected */
 	private Tile currTile = null;
 	
-	protected boolean hideTiles = false;
+	private boolean hideTiles = false;
 	
-	protected boolean drawPrimitives = true; 
+	private boolean drawPrimitives = true;
 	/**
 	 * Main method setting up the Qt environment for the program to run.
 	 * @param args the input arguments
@@ -95,7 +95,7 @@ public class DeviceBrowser extends QMainWindow{
 	 * Constructor which initializes the GUI and loads the first part found.
 	 * @param parent The Parent widget, used to add this window into other GUIs.
 	 */
-	public DeviceBrowser(QWidget parent){
+	private DeviceBrowser(QWidget parent){
 		super(parent);
 		
 		// set the title of the window
@@ -156,7 +156,7 @@ public class DeviceBrowser extends QMainWindow{
 		// Create the primitive site list window
 		primitiveList = new QTreeWidget();
 		primitiveList.setColumnCount(2);
-		ArrayList<String> headerList = new ArrayList<String>();
+		ArrayList<String> headerList = new ArrayList<>();
 		headerList.add("Site");
 		headerList.add("Type");
 		primitiveList.setHeaderLabels(headerList);
@@ -170,7 +170,7 @@ public class DeviceBrowser extends QMainWindow{
 		// Create the wire list window
 		wireList = new QTreeWidget();
 		wireList.setColumnCount(2);
-		ArrayList<String> headerList2 = new ArrayList<String>();
+		ArrayList<String> headerList2 = new ArrayList<>();
 		headerList2.add("Wire");
 		headerList2.add("Sink Connections");
 		wireList.setHeaderLabels(headerList2);
@@ -188,7 +188,7 @@ public class DeviceBrowser extends QMainWindow{
 	 * This method will draw all of the wire connections based on the wire given.
 	 * @param index The index of the wire in the wire list.
 	 */
-	public void wireDoubleClicked(QModelIndex index){
+	protected void wireDoubleClicked(QModelIndex index){
 		scene.clearCurrentLines();
 		if(currTile == null) return;
 		if(index.column() != 0) return;
@@ -214,7 +214,7 @@ public class DeviceBrowser extends QMainWindow{
 	 * This will update the primitive list window based on the current
 	 * selected tile.
 	 */
-	protected void updatePrimitiveList(){
+	private void updatePrimitiveList(){
 		primitiveList.clear();
 		if(currTile == null || currTile.getPrimitiveSites() == null) return;
 		for(Site ps : currTile.getPrimitiveSites()){
@@ -229,7 +229,7 @@ public class DeviceBrowser extends QMainWindow{
 	 * This will update the wire list window based on the current
 	 * selected tile.
 	 */
-	protected void updateWireList(){
+	private void updateWireList(){
 		wireList.clear();
 		if(currTile == null || currTile.getWireHashMap() == null) return;
 		for(Integer wire : currTile.getWireHashMap().keySet()) {

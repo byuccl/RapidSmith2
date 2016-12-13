@@ -51,7 +51,7 @@ public class MergeStaticNets {
 		XdlNet gnd = new XdlNet("GLOBAL_LOGIC0",NetType.GND);
 		XdlNet vcc = new XdlNet("GLOBAL_LOGIC1",NetType.VCC);
 		
-		ArrayList<XdlNet> netsToRemove = new ArrayList<XdlNet>();
+		ArrayList<XdlNet> netsToRemove = new ArrayList<>();
 		
 		for(XdlNet net : design.getNets()){
 			if(net.isStaticNet()){

@@ -121,10 +121,10 @@ public class SimpleLibraryCell extends LibraryCell {
 		this.sharedSiteProperties = sharedSiteProperties;
 	}
 
-	@Override
 	/**
 	 * Library cells with the same name are considered equals.
 	 */
+	@Override
 	public boolean equals(Object o) {
 		// I'd prefer this to be identity equals but I think that would break
 		// code somewhere.

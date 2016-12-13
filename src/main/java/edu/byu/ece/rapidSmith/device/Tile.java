@@ -22,7 +22,6 @@ package edu.byu.ece.rapidSmith.device;
 
 
 import edu.byu.ece.rapidSmith.design.PIP;
-import edu.byu.ece.rapidSmith.device.TileDirection;
 
 import java.io.Serializable;
 import java.util.*;
@@ -42,14 +41,14 @@ public class Tile implements Serializable {
 	/** Unique Serialization ID */
 	private static final long serialVersionUID = 4859877066322216633L;
 	/** The default unconnected sinkPin */
-	public static final SinkPin UNCONNECTED_SINKPIN = new SinkPin(-1, 0, 0);
+	private static final SinkPin UNCONNECTED_SINKPIN = new SinkPin(-1, 0, 0);
 	private Device dev;
 	/** XDL Name of the tile */
 	private String name;
 	/** XDL Tile Type (INT,CLB,...) */
 	private TileType type;
-	/** This is a list of the sinks within the tile (generally in the primitives) */
-	/** Absolute tile row number - the index into the device Tiles[][] array */
+	/** This is a list of the sinks within the tile (generally in the primitives)
+	    Absolute tile row number - the index into the device Tiles[][] array */
 	private int row;
 	/** Absolute tile column number - the index into the device Tiles[][] array */
 	private int column;

@@ -2,8 +2,10 @@ package edu.byu.ece.rapidSmith.util;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 
+import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
@@ -44,8 +46,6 @@ public final class RapidSmithDebug {
 		for(RouteTree r: rt.getSinkTrees()) {
 			printRouteTree(r, level);
 		}
-		level--; 
-		return;
 	}
 	
 	/**
@@ -70,7 +70,7 @@ public final class RapidSmithDebug {
 	 * @return A formatted TCL command that can be run directly in Vivado.
 	 */
 	public static String createHighlightWiresTclCommand(RouteTree routeTree) {
-		return createHighlightWiresTclCommand(Arrays.asList(routeTree));
+		return createHighlightWiresTclCommand(Collections.singletonList(routeTree));
 	}
 	
 	/**
@@ -115,7 +115,7 @@ public final class RapidSmithDebug {
 			pseudoPinCount += cell.getPseudoPinCount();
 			for (CellPin pin : cell.getPseudoPins()) {
 				System.out.print("Pseudo Pin: " + pin.getFullName() + " -> ");
-				pin.getMappedBelPins().forEach(belPin -> System.out.print(belPin));
+				pin.getMappedBelPins().forEach(System.out::print);
 				System.out.println();
 			}
 		}

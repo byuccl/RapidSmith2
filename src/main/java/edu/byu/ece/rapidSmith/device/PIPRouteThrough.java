@@ -61,7 +61,7 @@ public class PIPRouteThrough implements Serializable{
 	}
 
 	@Override
-	public boolean equals(Object obj){
+	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -69,11 +69,9 @@ public class PIPRouteThrough implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		PIPRouteThrough other = (PIPRouteThrough) obj;
-		if (!Objects.equals(inPin, other.inPin))
-			return false;
-		if (!Objects.equals(outPin, other.outPin))
-			return false;
-		return Objects.equals(type, other.type);
+		return Objects.equals(inPin, other.inPin) &&
+				Objects.equals(outPin, other.outPin) &&
+				Objects.equals(type, other.type);
 	}
 
 	/**

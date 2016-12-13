@@ -43,15 +43,15 @@ import edu.byu.ece.rapidSmith.device.Tile;
  * 
  */
 public class PartTileBrowserScene extends QGraphicsScene {
-	double currX, currY, prevX, prevY;
-	int tileSize, numCols, numRows;
-	double lineWidth;
-	Device device;
-	public Signal0 updateStatus = new Signal0();
+	private double currX, currY, prevX, prevY;
+	private int tileSize, numCols, numRows;
+	private double lineWidth;
+	private Device device;
+	Signal0 updateStatus = new Signal0();
 	private QGraphicsRectItem highlit;
 	private QImage qImage;
 
-	public PartTileBrowserScene(Device device) {
+	PartTileBrowserScene(Device device) {
 		this.device = device;
 		this.highlit = null;
 		this.prevX = 0;
@@ -187,11 +187,11 @@ public class PartTileBrowserScene extends QGraphicsScene {
 		}
 	}
 
-	public double getCurrX() {
+	double getCurrX() {
 		return currX;
 	}
 
-	public double getCurrY() {
+	double getCurrY() {
 		return currY;
 	}
 

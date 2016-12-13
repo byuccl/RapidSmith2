@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * This class will create the device and wire enumerator files 
@@ -54,7 +55,7 @@ public class Installer {
 		OptionParser parser = new OptionParser();
 		parser.accepts("env", "Output directory for generated device files").withRequiredArg();
 		parser.acceptsAll(Arrays.asList("force", "f"), "Overwrite existing device files");
-		parser.acceptsAll(Arrays.asList("ise"), "Generate XDLRC using ISE. Otherwise, it will use an existing XDLRC");
+		parser.acceptsAll(Collections.singletonList("ise"), "Generate XDLRC using ISE. Otherwise, it will use an existing XDLRC");
 		parser.accepts("ignore_disclaimer", "Ignores the disclaimer");
 		parser.nonOptions("<device or family> ...");
 

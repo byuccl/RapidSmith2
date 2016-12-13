@@ -31,6 +31,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
+
 /**
  *  Parses an XDLRC file and calls the added listener methods for each encountered
  *  parse element.  This parser is very brittle and expects the file to be
@@ -111,7 +113,7 @@ public class XDLRCParser {
 					return;
 			}
 		}
-		throw new XDLRCParseException();
+		throw new ParseException();
 	}
 
 	private void parseTiles() throws IOException {
@@ -130,7 +132,7 @@ public class XDLRCParser {
 					return;
 			}
 		}
-		throw new XDLRCParseException();
+		throw new ParseException();
 	}
 
 	private void parseTile() throws IOException {
@@ -164,7 +166,7 @@ public class XDLRCParser {
 					return;
 			}
 		}
-		throw new XDLRCParseException();
+		throw new ParseException();
 	}
 
 	private void parsePrimitiveSite() throws IOException {
@@ -186,7 +188,7 @@ public class XDLRCParser {
 					return;
 			}
 		}
-		throw new XDLRCParseException();
+		throw new ParseException();
 	}
 
 	private void parseWire() throws IOException {
@@ -214,7 +216,7 @@ public class XDLRCParser {
 					return;
 			}
 		}
-		throw new XDLRCParseException();
+		throw new ParseException();
 	}
 
 	private void parsePrimitiveDefs() throws IOException {
@@ -257,7 +259,7 @@ public class XDLRCParser {
 					return;
 			}
 		}
-		throw new XDLRCParseException();
+		throw new ParseException();
 	}
 
 	private void parseElement() throws IOException {
@@ -291,7 +293,7 @@ public class XDLRCParser {
 					return;
 			}
 		}
-		throw new XDLRCParseException();
+		throw new ParseException();
 	}
 
 	/**
@@ -303,7 +305,7 @@ public class XDLRCParser {
 			if (tokens.get(0).equals(token))
 				return;
 		}
-		throw new XDLRCParseException();
+		throw new ParseException();
 	}
 
 	/**
@@ -374,13 +376,5 @@ public class XDLRCParser {
 		}
 
 		return parts;
-	}
-
-	/**
-	 * Exception thrown if an unexpected sequence is found in the XDLRC file being
-	 * parsed.
-	 */
-	public class XDLRCParseException extends RuntimeException {
-		private static final long serialVersionUID = 1582349452382178318L;
 	}
 }

@@ -60,7 +60,7 @@ public class TileWire implements Wire, Serializable {
 		if (wireConnections == null)
 			return Collections.emptyList();
 		
-		return Arrays.asList(wireConnections).stream()
+		return Arrays.stream(wireConnections)
 				.map(wc -> Connection.getTileWireConnection(this, wc))
 				.collect(Collectors.toList());
 	}
@@ -104,7 +104,7 @@ public class TileWire implements Wire, Serializable {
 		if (wireConnections == null)
 			return Collections.emptyList();
 
-		return Arrays.asList(wireConnections).stream()
+		return Arrays.stream(wireConnections)
 				.map(wc -> Connection.getReveserTileWireConnection(this, wc))
 				.collect(Collectors.toList());
 	}

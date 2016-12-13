@@ -31,7 +31,7 @@ public class DSPCarryCluster extends CarryChainCluster {
 	public boolean placeRandomly(Device device, Site site, HashMap<Site, SiteCluster> usedSites) {
 	
 		//System.out.println("Hello!");
-		HashMap<Site, SiteCluster> tmp = new HashMap<Site, SiteCluster>();
+		HashMap<Site, SiteCluster> tmp = new HashMap<>();
 		
 		if (usedSites.containsKey(site))
 			return false;
@@ -89,14 +89,14 @@ public class DSPCarryCluster extends CarryChainCluster {
 			return false; 
 			
 		Tile swapTile = site.getTile();
-		Site swapSite = site;
+		Site swapSite;
 		SiteCluster swapSiteCluster; 
 		Site swapID = site;
 		
 		if (sitenameToCluster.containsKey(swapID)) { 					
 			swapSiteCluster = sitenameToCluster.get(swapID);
 				
-			if (swapSiteCluster.swap(currentLOC) == false)  
+			if (!swapSiteCluster.swap(currentLOC))
 				return false;
 			
 			this.swappedWith.add(swapSiteCluster);
@@ -136,7 +136,7 @@ public class DSPCarryCluster extends CarryChainCluster {
 			if (sitenameToCluster.containsKey(swapID)) {				
 				swapSiteCluster = sitenameToCluster.get(swapID);
 				
-				if (swapSiteCluster.swap(sc.getPrimitiveSite()) == false)
+				if (!swapSiteCluster.swap(sc.getPrimitiveSite()))
 					return false; 
 				
 				this.swappedWith.add(swapSiteCluster);

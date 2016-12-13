@@ -46,7 +46,7 @@ public class PathItem extends QGraphicsPathItem implements Comparable{
 	
 	private PathDelay pd;
 	
-	public PathItem(QPainterPath path, PathDelay pd){
+	PathItem(QPainterPath path, PathDelay pd){
 		super(path);
 		this.setPath(pd);
 		this.setZValue(this.zValue()+10);
@@ -67,14 +67,14 @@ public class PathItem extends QGraphicsPathItem implements Comparable{
 		}
 	}
 	
-	public void setHighlighted(){
+	void setHighlighted(){
 		constraintPen = highlighted;
 		if(!selected){
 			this.setPen(constraintPen);
 		}
 	}
 	
-	public void setUnhighlighted(){
+	void setUnhighlighted(){
 		constraintPen = unHighlighted;
 		if(!selected){
 			this.setPen(constraintPen);							

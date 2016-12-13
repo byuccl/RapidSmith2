@@ -28,12 +28,12 @@ public final class WireJunction {
 	private final Wire startWire;
 	private final Wire endWire;
 
-	public WireJunction(PIP p){
+	WireJunction(PIP p){
 		startWire = new TileWire(p.getTile(), p.getStartWire());
 		endWire = new TileWire(p.getTile(), p.getEndWire());
 	}
 
-	public WireJunction(Wire startWire, Wire endWire){
+	WireJunction(Wire startWire, Wire endWire){
 		this.startWire = startWire;
 		this.endWire = endWire;
 	}

@@ -5,18 +5,18 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 /**
 * Created by Haroldsen on 3/16/2015.
 */ /* Parse a lut configuration attribute value to a LUTConfiguration */
-public final class EqnParserVisitor {
-	public LutEquation visitEquation_only(LutEquationParser.Equation_onlyContext ctx) {
+final class EqnParserVisitor {
+	LutEquation visitEquation_only(LutEquationParser.Equation_onlyContext ctx) {
 		return visitEquation(ctx.equation());
 	}
 
-	public LutEquation visitEquation(LutEquationParser.EquationContext ctx) {
+	LutEquation visitEquation(LutEquationParser.EquationContext ctx) {
 		if (ctx.binary_eqn() != null)
 			return visitBinary_eqn(ctx.binary_eqn());
 		throw new AssertionError("Illegal tree structure");
 	}
 
-	public LutEquation visitBinary_eqn(LutEquationParser.Binary_eqnContext ctx) {
+	private LutEquation visitBinary_eqn(LutEquationParser.Binary_eqnContext ctx) {
 		LutEquation left;
 		if (ctx.input() != null)
 			left = visitInput(ctx.input());
@@ -40,7 +40,7 @@ public final class EqnParserVisitor {
 		return tree;
 	}
 
-	public OpType visitBinary_op(LutEquationParser.Binary_opContext ctx) {
+	private OpType visitBinary_op(LutEquationParser.Binary_opContext ctx) {
 		switch (((TerminalNode) ctx.getChild(0)).getSymbol().getType()) {
 			case LutEquationParser.AND:
 				return OpType.AND;
@@ -52,13 +52,13 @@ public final class EqnParserVisitor {
 		throw new AssertionError("Unrecognized operation");
 	}
 
-	public LutInput visitInput(LutEquationParser.InputContext ctx) {
+	private LutInput visitInput(LutEquationParser.InputContext ctx) {
 		LutInput lutInput = new LutInput(Integer.parseInt("" + ctx.INPUT().getText().charAt(1)));
 		lutInput.setInverted(ctx.INV() != null);
 		return lutInput;
 	}
 
-	public Constant visitStatic_value(LutEquationParser.Static_valueContext ctx) {
+	private Constant visitStatic_value(LutEquationParser.Static_valueContext ctx) {
 		if (ctx.getText().equals("0"))
 			return Constant.ZERO;
 		else if (ctx.getText().equals("1"))

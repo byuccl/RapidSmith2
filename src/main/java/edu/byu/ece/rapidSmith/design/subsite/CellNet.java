@@ -5,6 +5,7 @@ import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.PinDirection;
 import edu.byu.ece.rapidSmith.device.SitePin;
+import edu.byu.ece.rapidSmith.util.Exceptions;
 
 import java.io.Serializable;
 import java.util.*;
@@ -287,9 +288,9 @@ public class CellNet implements Serializable {
 	public void connectToPin(CellPin pin) {
 		Objects.requireNonNull(pin);
 		if (pins.contains(pin))
-			throw new DesignAssemblyException("Pin already exists in net.");
+			throw new Exceptions.DesignAssemblyException("Pin already exists in net.");
 		if (pin.getNet() != null)
-			throw new DesignAssemblyException("Pin already connected to net.");
+			throw new Exceptions.DesignAssemblyException("Pin already connected to net.");
 
 		pins.add(pin);
 		pin.setNet(this);
@@ -299,7 +300,7 @@ public class CellNet implements Serializable {
 		} else if (pin.getDirection() == PinDirection.OUT) {
 			assert sourcePin != null;
 			if (sourcePin.getDirection() == PinDirection.OUT)
-				throw new DesignAssemblyException("Cannot create multiply-sourced net.");
+				throw new Exceptions.DesignAssemblyException("Cannot create multiply-sourced net.");
 			sourcePin = pin;
 		}
 	}
@@ -326,7 +327,7 @@ public class CellNet implements Serializable {
 	 * @param pins Collection of pins to remove
 	 */
 	public void disconnectFromPins(Collection<CellPin> pins) {
-		pins.forEach(pin -> disconnectFromPin(pin));
+		pins.forEach(this::disconnectFromPin);
 	}
 
 	/**
@@ -344,7 +345,7 @@ public class CellNet implements Serializable {
 	 */
 	public void detachNet() { 
 		
-		pins.forEach(pin -> pin.clearNet());
+		pins.forEach(CellPin::clearNet);
 		
 		if (sourcePin != null) {
 			sourcePin = null;
@@ -363,7 +364,7 @@ public class CellNet implements Serializable {
 
 		boolean used = pins.remove(pin);
 		if (!used)
-			throw new DesignAssemblyException("Pin not found in net");
+			throw new Exceptions.DesignAssemblyException("Pin not found in net");
 
 		if (sourcePin == pin) {
 			sourcePin = null;
@@ -592,7 +593,7 @@ public class CellNet implements Serializable {
 		}
 		
 		if(routedSinks == null) {
-			routedSinks = new HashSet<CellPin>();
+			routedSinks = new HashSet<>();
 		}
 		routedSinks.add(cellPin);
 	}
@@ -647,7 +648,7 @@ public class CellNet implements Serializable {
 		Objects.requireNonNull(intersite);
 
 		if (intersiteRoutes == null) {
-			intersiteRoutes = new ArrayList<RouteTree>();
+			intersiteRoutes = new ArrayList<>();
 		}
 		this.intersiteRoutes.add(intersite);
 	}
@@ -706,7 +707,7 @@ public class CellNet implements Serializable {
 	public void addSinkRouteTree(BelPin bp, RouteTree route) {
 		
 		if (belPinToSinkRTMap == null) {
-			belPinToSinkRTMap = new HashMap<BelPin, RouteTree>();
+			belPinToSinkRTMap = new HashMap<>();
 		}
 		belPinToSinkRTMap.put(bp, route);
 	}
@@ -720,7 +721,7 @@ public class CellNet implements Serializable {
 	public void addSinkRouteTree(SitePin sp, RouteTree route) {
 		
 		if (sitePinToRTMap == null) {
-			sitePinToRTMap = new HashMap<SitePin, RouteTree>();
+			sitePinToRTMap = new HashMap<>();
 		}
 		sitePinToRTMap.put(sp, route);
 	}
@@ -798,7 +799,7 @@ public class CellNet implements Serializable {
 	 */
 	public Set <RouteTree> getSinkRouteTrees(CellPin cellPin) {
 		
-		Set<RouteTree> connectedRouteTrees = new HashSet<RouteTree>();
+		Set<RouteTree> connectedRouteTrees = new HashSet<>();
 		
 		for (BelPin belPin : cellPin.getMappedBelPins()) {
 			if (belPinToSinkRTMap.containsKey(belPin)) {
@@ -828,7 +829,7 @@ public class CellNet implements Serializable {
 	 */
 	public Set<BelPin> getBelPins() {
 		
-		Set<BelPin> connectedBelPins = new HashSet<BelPin>();
+		Set<BelPin> connectedBelPins = new HashSet<>();
 		
 		if (belPinToSinkRTMap != null) {
 			connectedBelPins.addAll(belPinToSinkRTMap.keySet());

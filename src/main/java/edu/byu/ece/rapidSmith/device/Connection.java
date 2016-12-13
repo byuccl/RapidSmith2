@@ -1,8 +1,8 @@
 package edu.byu.ece.rapidSmith.device;
 
 import edu.byu.ece.rapidSmith.design.PIP;
-import edu.byu.ece.rapidSmith.design.subsite.DesignAssemblyException;
 import edu.byu.ece.rapidSmith.design.subsite.SitePip;
+import edu.byu.ece.rapidSmith.util.Exceptions;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -234,7 +234,7 @@ public abstract class Connection implements Serializable {
 		@Override
 		public PIP getPip() {
 			if (!wc.isPIP())
-				throw new DesignAssemblyException("Attempting to create PIP " +
+				throw new Exceptions.DesignAssemblyException("Attempting to create PIP " +
 						"of non-PIP connection");
 			return new SitePip(sourceWire.getSite(), sourceWire.getWireEnum(), wc.getWire());
 		}

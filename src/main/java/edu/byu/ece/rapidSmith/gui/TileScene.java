@@ -81,7 +81,7 @@ public class TileScene extends QGraphicsScene{
 	/** The wire enumerator corresponding to this scene */
 	protected WireEnumerator we;
 	/** The signal which updates the status bar */
-	public Signal2<String, Tile> updateStatus = new Signal2<String, Tile>();
+	public Signal2<String, Tile> updateStatus = new Signal2<>();
 	/** The signal which is made when a mouse button is pressed */
 	public Signal0 mousePressed = new Signal0();
 	/** The current design associated with this scene */
@@ -141,8 +141,8 @@ public class TileScene extends QGraphicsScene{
 		System.gc();
 
 		if(device != null){
-			tileColumnTypesToHide = new HashSet<TileType>();
-			tileRowTypesToHide = new HashSet<TileType>();
+			tileColumnTypesToHide = new HashSet<>();
+			tileRowTypesToHide = new HashSet<>();
 
 			if(hideTiles){ 
 				populateTileTypesToHide();
@@ -162,7 +162,7 @@ public class TileScene extends QGraphicsScene{
 		tileOccupantCount = new HashSet[rows][cols];
 		for(int y=0;y<rows;y++){
 			for(int x=0;x<cols;x++){
-				tileOccupantCount[y][x] = new HashSet<GuiModuleInstance>();
+				tileOccupantCount[y][x] = new HashSet<>();
 			}
 		}
 	}
@@ -183,8 +183,8 @@ public class TileScene extends QGraphicsScene{
 		QPainter painter = new QPainter(qImage);
 
 		// Determine which columns and rows to not draw
-		TreeSet<Integer> colsToSkip = new TreeSet<Integer>();
-		TreeSet<Integer> rowsToSkip = new TreeSet<Integer>();
+		TreeSet<Integer> colsToSkip = new TreeSet<>();
+		TreeSet<Integer> rowsToSkip = new TreeSet<>();
 		for(Tile[] tileRow : device.getTiles()){
 			for(Tile tile : tileRow){
 				TileType type = tile.getType();
@@ -200,8 +200,8 @@ public class TileScene extends QGraphicsScene{
 		// Create new tile layout without hidden tiles
 		int i=0,j=0;
 		drawnTiles = new Tile[rows-rowsToSkip.size()][cols-colsToSkip.size()];
-		tileXMap = new HashMap<Tile, Integer>();
-		tileYMap = new HashMap<Tile, Integer>();
+		tileXMap = new HashMap<>();
+		tileYMap = new HashMap<>();
 		for(int row = 0; row < rows; row++) {
 			if(rowsToSkip.contains(row)) continue;
 			for (int col = 0; col < cols; col++) {

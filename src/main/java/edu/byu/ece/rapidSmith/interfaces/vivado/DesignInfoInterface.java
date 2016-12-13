@@ -29,7 +29,7 @@ public class DesignInfoInterface {
 	public static String parseInfoFile (String tcp) throws IOException {
 		
 		BufferedReader br = null;
-		String part = "";
+		String part;
 		
 		try {
 			br = new BufferedReader(new FileReader(tcp));

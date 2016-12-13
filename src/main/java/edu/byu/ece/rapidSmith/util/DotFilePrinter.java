@@ -49,7 +49,7 @@ public class DotFilePrinter {
 		this.design = design;
 		
 		// initialize dot configuration with default options
-		dotProperties = new HashMap<String,String>();
+		dotProperties = new HashMap<>();
 		dotProperties.put("rankdir", "LR");
 		dotProperties.put("concentrate", "true");
 	}
@@ -86,7 +86,7 @@ public class DotFilePrinter {
 	 */
 	public String getNetlistDotString() {
 	
-		nodeIds = new HashMap<String, Integer>();
+		nodeIds = new HashMap<>();
 		dotBuilder = new StringBuilder();
 			
 		// add the dot file header
@@ -120,8 +120,6 @@ public class DotFilePrinter {
 	 * the specified DOT properties. Cells placed in the same site are clustered <br>
 	 * together.
 	 * 
-	 * @param design CellDesign 
-	 * @param dotProperties A map of top level graph properties for the dot file
 	 * @param outputFile Output .dot location (C:/example.dot)
 	 * @throws IOException
 	 */
@@ -136,13 +134,11 @@ public class DotFilePrinter {
 	 * Creates a DOT string that represents a placed netlist of the design. <br>
 	 * Cells placed in the same site are clustered together.
 	 * 
-	 * @param design CellDesign
-	 * @param dotProperties A map of top level graph properties for the dot file
 	 * @return
 	 */
 	public String getPlacementDotString() {
 		
-		nodeIds = new HashMap<String, Integer>();
+		nodeIds = new HashMap<>();
 		dotBuilder = new StringBuilder();
 			
 		// add the dot file header
@@ -189,7 +185,7 @@ public class DotFilePrinter {
 	 */
 	public String getSiteDotString(Site site) {
 		
-		nodeIds = new HashMap<String, Integer>();
+		nodeIds = new HashMap<>();
 		dotBuilder = new StringBuilder();
 				
 		// add the dot file header

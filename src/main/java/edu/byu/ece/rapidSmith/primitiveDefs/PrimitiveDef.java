@@ -34,8 +34,8 @@ public class PrimitiveDef implements Serializable {
 
 	public PrimitiveDef(){
 		setType(null);
-		pins = new ArrayList<PrimitiveDefPin>();
-		elements = new ArrayList<PrimitiveElement>();
+		pins = new ArrayList<>();
+		elements = new ArrayList<>();
 	}
 	
 	public void addPin(PrimitiveDefPin p){

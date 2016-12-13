@@ -129,9 +129,9 @@ public class XDLRCOutputter {
 	 * @throws IOException if any IO errors occur while writing
 	 */
 	public void writeDevice(Device device, Set<Tile> tiles, Path outPath) throws IOException {
-		Writer bw = Files.newBufferedWriter(outPath, Charset.defaultCharset());
-		writeDevice(device, tiles, bw);
-		bw.close();
+		try(Writer bw = Files.newBufferedWriter(outPath, Charset.defaultCharset())) {
+			writeDevice(device, tiles, bw);
+		}
 	}
 
 	/**

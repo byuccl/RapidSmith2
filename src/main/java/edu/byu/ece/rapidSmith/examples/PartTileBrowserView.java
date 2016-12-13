@@ -38,14 +38,13 @@ import com.trolltech.qt.gui.QWheelEvent;
  */
 public class PartTileBrowserView extends QGraphicsView {
 
-	QPointF currCenter;
-	QPoint lastPan;
+	private QPoint lastPan;
 	private boolean rightPressed;
-	double zoomMin;
-	double zoomMax;
-	static double scaleFactor = 1.15;//how fast we zoom
+	private double zoomMin;
+	private double zoomMax;
+	private static double scaleFactor = 1.15;//how fast we zoom
 
-	public PartTileBrowserView(QGraphicsScene scene) {
+	PartTileBrowserView(QGraphicsScene scene) {
 		super(scene);
 		zoomMin = 0.05;
 		zoomMax = 30;
@@ -77,10 +76,10 @@ public class PartTileBrowserView extends QGraphicsView {
 		if (rightPressed) {
 			if (lastPan != null && !lastPan.isNull()) {
 				// Get how much we panned
-				QPointF s1 = mapToScene(new QPoint((int) lastPan.x(),
-						(int) lastPan.y()));
-				QPointF s2 = mapToScene(new QPoint((int) event.pos().x(),
-						(int) event.pos().y()));
+				QPointF s1 = mapToScene(new QPoint(lastPan.x(),
+						lastPan.y()));
+				QPointF s2 = mapToScene(new QPoint(event.pos().x(),
+						event.pos().y()));
 				QPointF delta = new QPointF(s1.x() - s2.x(), s1.y() - s2.y());
 				lastPan = event.pos();
 				// Scroll the scrollbars ie. do the pan

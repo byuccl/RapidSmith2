@@ -385,7 +385,7 @@ public final class DeviceGenerator {
 	 */
 	private Map <Integer, Set<Integer>> createBelRoutethroughs(SiteTemplate template, Element siteElement, WireHashMap wireMap) {
 		
-		Map <Integer, Set<Integer>> belRoutethroughMap = new HashMap<Integer, Set<Integer>>();
+		Map <Integer, Set<Integer>> belRoutethroughMap = new HashMap<>();
 		
 		for (Element belEl : siteElement.getChild("bels").getChildren("bel")) {
 			String belType = belEl.getChildText("type");
@@ -407,11 +407,7 @@ public final class DeviceGenerator {
 					assert (startEnum != null && endEnum != null) : "Intrasite wirename not found";
 					
 					// add the routethrough to the routethrough map; 
-					Set<Integer> sinkWires = belRoutethroughMap.get(startEnum);					
-					if (sinkWires == null) {
-						sinkWires = new HashSet<Integer>();
-						belRoutethroughMap.put(startEnum, sinkWires);
-					}
+					Set<Integer> sinkWires = belRoutethroughMap.computeIfAbsent(startEnum, k -> new HashSet<>());
 					sinkWires.add(endEnum);
 				}
 			}
@@ -461,11 +457,7 @@ public final class DeviceGenerator {
 			wireMap.put(srcWire, wcs);
 
 			XdlAttribute attr = new XdlAttribute(elName, "", pin.getInternalName());
-			Map<Integer, XdlAttribute> sinkMap = muxes.get(srcWire);
-			if (sinkMap == null) {
-				sinkMap = new HashMap<>();
-				muxes.put(srcWire, sinkMap);
-			}
+			Map<Integer, XdlAttribute> sinkMap = muxes.computeIfAbsent(srcWire, k -> new HashMap<>());
 			sinkMap.put(sinkWire, attr);
 		}
 	}
@@ -505,11 +497,7 @@ public final class DeviceGenerator {
 
 			Integer source = getPinSource(def, conn);
 			Integer sink = getPinSink(def, conn);
-			List<WireConnection> wcs = wcsMap.get(source);
-			if (wcs == null) {
-				wcs = new ArrayList<>();
-				wcsMap.put(source, wcs);
-			}
+			List<WireConnection> wcs = wcsMap.computeIfAbsent(source, k -> new ArrayList<>());
 			wcs.add(new WireConnection(sink, 0, 0, false));
 		}
 		return wcsMap;
@@ -892,10 +880,10 @@ public final class DeviceGenerator {
 		private SiteType currType;
 		private String currElement;
 
-		@Override
 		/**
 		 * Tracks special site pin wires.
 		 */
+		@Override
 		protected void enterPinWire(List<String> tokens) {
 			String externalName = stripTrailingParenthesis(tokens.get(3));
 
@@ -1251,7 +1239,7 @@ public final class DeviceGenerator {
 		private ArrayList<PrimitiveDefPin> pins;
 		private ArrayList<PrimitiveElement> elements;
 
-		public PrimitiveDefsListener() {
+		PrimitiveDefsListener() {
 			defs = new PrimitiveDefList();
 			device.setPrimitiveDefs(defs);
 		}

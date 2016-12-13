@@ -1,10 +1,7 @@
 package edu.byu.ece.rapidSmith;
 
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.util.FamilyType;
-import edu.byu.ece.rapidSmith.util.FileTools;
-import edu.byu.ece.rapidSmith.util.PartNameTools;
-import edu.byu.ece.rapidSmith.util.EnvironmentException;
+import edu.byu.ece.rapidSmith.util.*;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
@@ -40,7 +37,7 @@ public class RSEnvironment {
 	 * {@link #setDefaultEnv(RSEnvironment)}, this environment will default to
 	 * the environment returned by calling {@link #RSEnvironment()}.
 	 * @return the default RapidSmith environment
-	 * @throws EnvironmentException if the environment is not set and the default
+	 * @throws Exceptions.EnvironmentException if the environment is not set and the default
 	 *   environment cannot be obtained
 	 */
 	public static RSEnvironment defaultEnv() {
@@ -61,9 +58,9 @@ public class RSEnvironment {
 	 * Returns a new RapidSmith environment based on the system "RAPIDSMITH_PATH"
 	 * variable.  This method first looks for the variable in the JVM properties and if not
 	 * found, searches the environment variables.  If the variable is not found in either
-	 * location, this method throws an {@link EnvironmentException}.
+	 * location, this method throws an {@link Exceptions.EnvironmentException}.
 	 *
-	 * @throws EnvironmentException if the path to the RapidSmith environment cannot be
+	 * @throws Exceptions.EnvironmentException if the path to the RapidSmith environment cannot be
 	 *   found
 	 */
 	public RSEnvironment() {
@@ -74,7 +71,7 @@ public class RSEnvironment {
 			String property = System.getenv(RSPATH_ENV_VARIABLE);
 			rsPath = Paths.get(property);
 		} else {
-			throw new EnvironmentException(RSPATH_ENV_VARIABLE +
+			throw new Exceptions.EnvironmentException(RSPATH_ENV_VARIABLE +
 					" environment variable is not set.");
 		}
 	}

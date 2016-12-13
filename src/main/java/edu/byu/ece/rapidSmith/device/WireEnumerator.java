@@ -1,9 +1,6 @@
 package edu.byu.ece.rapidSmith.device;
 
-import edu.byu.ece.rapidSmith.primitiveDefs.PrimitiveDefList;
-
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 

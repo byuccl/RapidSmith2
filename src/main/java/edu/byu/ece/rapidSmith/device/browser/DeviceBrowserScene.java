@@ -47,7 +47,7 @@ import edu.byu.ece.rapidSmith.gui.TileScene;
  */
 public class DeviceBrowserScene extends TileScene{
 	/**	 */
-	public Signal1<Tile> updateTile = new Signal1<>();
+	Signal1<Tile> updateTile = new Signal1<>();
 	/**	 */
 	private QPen wirePen;
 	/**	 */
@@ -60,7 +60,7 @@ public class DeviceBrowserScene extends TileScene{
 	private ArrayList<NumberedHighlightedTile> currentTiles = new ArrayList<>();
 
 
-	public DeviceBrowserScene(Device device, boolean hideTiles, boolean drawPrimitives, DeviceBrowser browser){
+	DeviceBrowserScene(Device device, boolean hideTiles, boolean drawPrimitives, DeviceBrowser browser){
 		super(device, hideTiles, drawPrimitives);
 		currLines = new ArrayList<>();
 		wirePen = new QPen(QColor.yellow, 0.25, PenStyle.SolidLine);
@@ -77,7 +77,7 @@ public class DeviceBrowserScene extends TileScene{
 		addItem(line);
 	}
 
-	public void clearCurrentLines(){
+	void clearCurrentLines(){
 		for(QGraphicsLineItem line : currLines){
 			this.removeItem(line);
 			line.dispose();
@@ -85,7 +85,7 @@ public class DeviceBrowserScene extends TileScene{
 		currLines.clear();
 	}
 
-	public void drawWire(Tile src, int wireSrc, Tile dst, int wireDst){
+	void drawWire(Tile src, int wireSrc, Tile dst, int wireDst){
 		double enumSize = we.getWires().length;
 		double x1 = (double) tileXMap.get(src)*tileSize  + (wireSrc%tileSize);
 		double y1 = (double) tileYMap.get(src)*tileSize  + (wireSrc*tileSize)/enumSize;
@@ -100,7 +100,7 @@ public class DeviceBrowserScene extends TileScene{
 		currLines.add(line);
 	}
 
-	public void drawConnectingWires(Tile tile, int wire){
+	void drawConnectingWires(Tile tile, int wire){
 		clearCurrentLines();
 		if(tile == null) return;
 		if(tile.getWireConnections(wire) == null) return;

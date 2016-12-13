@@ -50,7 +50,7 @@ public class SiteWire implements Wire, Serializable {
 		if (wireConnections == null)
 			return Collections.emptyList();
 
-		return Arrays.asList(wireConnections).stream()
+		return Arrays.stream(wireConnections)
 				.map(wc -> Connection.getSiteWireConnection(this, wc))
 				.collect(Collectors.toList());
 	}

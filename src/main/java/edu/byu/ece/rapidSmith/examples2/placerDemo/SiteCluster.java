@@ -49,10 +49,10 @@ public class SiteCluster {
 		this.previousLOC = start;
 		this.currentTile = start.getTile();
 		this.sitetype = start.getType();
-		this.cells = new ArrayList<Cell>();
-		this.bels = new ArrayList<String>();
-		this.nets = new HashSet<VirtualNet>();
-		this.swappedWith = new ArrayList<SiteCluster>();
+		this.cells = new ArrayList<>();
+		this.bels = new ArrayList<>();
+		this.nets = new HashSet<>();
+		this.swappedWith = new ArrayList<>();
 		this.hasMoved = false;
 	}
 	
@@ -80,7 +80,7 @@ public class SiteCluster {
 			return this.nets;
 		}
 		else {
-			HashSet<VirtualNet> affectedNets = new HashSet<VirtualNet>(this.nets);
+			HashSet<VirtualNet> affectedNets = new HashSet<>(this.nets);
 	
 			for(SiteCluster sc : this.swappedWith) 
 				affectedNets.addAll(sc.getNets());
@@ -195,7 +195,7 @@ public class SiteCluster {
 			//Tile t1 = swapSite.getPrimitiveSite().getTile();
 			//Tile t2 = site.getTile();
 						
-			if (swapSite.swap(currentLOC) == false) 
+			if (!swapSite.swap(currentLOC))
 				return false;
 			
 			this.swappedWith.add(swapSite);

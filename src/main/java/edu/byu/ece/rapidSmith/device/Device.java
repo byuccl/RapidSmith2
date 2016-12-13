@@ -440,33 +440,6 @@ public class Device implements Serializable {
 		return getSiteTemplate(id.getPrimitiveType()).getBelTemplates().get(id.getName());
 	}
 
-//	/**
-//	 * This will creating a routing node from the pin given.
-//	 *
-//	 * @param pin The pin to create the routing node from.
-//	 * @return A new node populated with the pin's tile and wire. The parent
-//	 * field is null and level is zero.
-//	 */
-//	public Node getNodeFromPin(Pin pin) {
-//		Integer wire = getPrimitiveExternalPin(pin);
-//		if (wire == null) return null;
-//		return new Node(pin.getTile(), wire, null, 0);
-//	}
-
-//	/**
-//	 * This will creating a routing node from the pin given.
-//	 *
-//	 * @param pin The pin to create the routing node from.
-//	 * @return A new node populated with the pin's tile and wire. The parent
-//	 * field is null and level is zero.
-//	 */
-//	public Node getNodeFromPin(Pin pin, Node parent, int level) {
-//		Integer wire = getPrimitiveExternalPin(pin);
-//		if (wire == null) return null;
-//		return new Node(pin.getTile(), wire, parent, level);
-//	}
-
-
 	/**
 	 * A method to get the corresponding primitive site for current in a different tile.
 	 * For example in a Virtex 4, there are 4 slices in a CLB tile, when moving a hard macro

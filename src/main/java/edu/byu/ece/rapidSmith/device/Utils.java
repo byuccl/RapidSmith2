@@ -97,7 +97,7 @@ public class Utils{
 	}
 
 	static{
-		clbs = new HashSet<TileType>();
+		clbs = new HashSet<>();
 		clbs.add(TileType.CLB);
 		clbs.add(TileType.CLBLL);
 		clbs.add(TileType.CLBLM);
@@ -108,7 +108,7 @@ public class Utils{
 		clbs.add(TileType.CLBLM_L);
 		clbs.add(TileType.CLBLM_R);
 		
-		dsps = new HashSet<TileType>();
+		dsps = new HashSet<>();
 		dsps.add(TileType.DSP);
 		dsps.add(TileType.DSP_L);
 		dsps.add(TileType.DSP_R);
@@ -118,7 +118,7 @@ public class Utils{
 		dsps.add(TileType.BRAMSITE2);
 		dsps.add(TileType.BRAMSITE2_BRK);
 		
-		brams = new HashSet<TileType>();
+		brams = new HashSet<>();
 		brams.add(TileType.BRAM);
 		brams.add(TileType.BRAM_L);
 		brams.add(TileType.BRAM_R);
@@ -131,7 +131,7 @@ public class Utils{
 		brams.add(TileType.BRAMSITE2_BRK);
 		brams.add(TileType.MBRAM);
 
-		ints = new HashSet<TileType>();
+		ints = new HashSet<>();
 		ints.add(TileType.INT);
 		ints.add(TileType.INT_L);
 		ints.add(TileType.INT_R);
