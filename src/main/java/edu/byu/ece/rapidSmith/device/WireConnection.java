@@ -35,6 +35,7 @@ import java.io.Serializable;
  *
  */
 public class WireConnection implements Serializable, Comparable<WireConnection>{
+	private static final long serialVersionUID = 8614891405695500370L;
 	/** The wire enumeration value of the wire to be connected to */
 	private int wire;
 	/** The tile row offset from the source wire's tile */

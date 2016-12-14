@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class ExtendedDeviceInfo implements Serializable {
+	private static final long serialVersionUID = -459840872618980717L;
 	private transient ExecutorService threadPool;
 
 	private transient final HashPool<WireConnection> connPool = new HashPool<>();

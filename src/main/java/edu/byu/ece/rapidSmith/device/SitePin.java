@@ -12,6 +12,7 @@ import java.util.Objects;
  *  @see edu.byu.ece.rapidSmith.device.Site
  */
 public final class SitePin implements Serializable {
+	private static final long serialVersionUID = -7522129253921515308L;
 	// The site this pin resides on
 	private final Site site;
 	// The template that describes this pin

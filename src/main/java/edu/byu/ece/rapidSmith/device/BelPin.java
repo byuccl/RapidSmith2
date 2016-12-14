@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
  *  the pin exists on.
  */
 public final class BelPin implements Serializable {
+	private static final long serialVersionUID = -402693921202343025L;
 	// The BEL this pin exists on
 	private final Bel bel;
 	// The backing template for this BEL pin
