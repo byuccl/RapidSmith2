@@ -1,4 +1,4 @@
-package edu.byu.ece.rapidSmith.device.helper;
+package edu.byu.ece.rapidSmith.device.creation;
 
 import edu.byu.ece.rapidSmith.device.SiteType;
 
