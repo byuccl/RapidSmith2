@@ -45,20 +45,17 @@ public static void main(String[] args) {
         Bitstream bitstream = null;
         try {
             bitstream = BitstreamParser.parseBitstream(args[0]);
-        } catch (BitstreamParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (BitstreamParseException | IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
-        XilinxConfigurationSpecification spec = DeviceLookup.lookupPartV4V5V6withPackageName(bitstream.getHeader().getPartName());
+
+    XilinxConfigurationSpecification spec = DeviceLookup.lookupPartV4V5V6withPackageName(bitstream.getHeader().getPartName());
         
         FrameAddressRegister far = new FrameAddressRegister(spec);
         
-        Set<Integer> topRows = new HashSet<Integer>();
-        Set<Integer> bottomRows = new HashSet<Integer>();
+        Set<Integer> topRows = new HashSet<>();
+        Set<Integer> bottomRows = new HashSet<>();
         
         PacketList packets = bitstream.getPackets();
         for (Packet p : packets) {

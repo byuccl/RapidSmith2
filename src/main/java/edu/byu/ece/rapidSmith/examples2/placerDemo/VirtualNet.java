@@ -27,7 +27,7 @@ public class VirtualNet {
 	
 	//ID to uniquely identify a net
 	private static int nextID = 0;
-	private int uniqueID;
+	private final int uniqueID;
 	
 	public VirtualNet() {
 		//sinks = new ArrayList<SiteCluster>();

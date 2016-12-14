@@ -8,8 +8,8 @@ import java.util.Objects;
  *
  */
 public class SiteProperty {
-	private SiteType siteType;
-	private String propertyName;
+	private final SiteType siteType;
+	private final String propertyName;
 
 	public SiteProperty(SiteType siteType, String propertyName) {
 		this.siteType = siteType;

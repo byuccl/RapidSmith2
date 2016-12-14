@@ -131,7 +131,7 @@ public class BitstreamHeader {
     public List<Byte> getHeaderBytesWithoutLength(){
     	Character nullChar = 0;
         
-        List<Byte> bytes = new ArrayList<Byte>();
+        List<Byte> bytes = new ArrayList<>();
     	
     	// Field 1, 2 bytes length, 9 bytes data
     	addByteArrayField(bytes, INIT_HEADER_BYTES);
@@ -185,21 +185,16 @@ public class BitstreamHeader {
 	 * @return A string representing the header object
 	 */
 	public String toXML(){
-		StringBuffer output = new StringBuffer();
-		output.append("\n");
-
-		output.append("Field 1 (Initial Header)  : <" + INIT_HEADER + "> 0x" 
-				+ BitstreamUtils.toHexString(INIT_HEADER) + "\n");
-		output.append("Field 2 (Source NCD file) : <" + _sourceNCDFileName + "> 0x"
-				+ BitstreamUtils.toHexString(_sourceNCDFileName) + "\n");
-		output.append("Field 3 (Device name)     : <" + this._partName + "> 0x"
-				+ BitstreamUtils.toHexString(_partName) + "\n");
-		output.append("Field 4 (Date created)    : <" + this._dateCreated + "> 0x"
-				+ BitstreamUtils.toHexString(_dateCreated) + "\n");
-		output.append("Field 5 (Time created)    : <" + this._timeCreated + "> 0x"
-				+ BitstreamUtils.toHexString(_timeCreated) + "\n");
-		
-		return output.toString();
+		return "\n" + "Field 1 (Initial Header)  : <" + INIT_HEADER + "> 0x" +
+				BitstreamUtils.toHexString(INIT_HEADER) + "\n" +
+				"Field 2 (Source NCD file) : <" + _sourceNCDFileName + "> 0x" +
+				BitstreamUtils.toHexString(_sourceNCDFileName) + "\n" +
+				"Field 3 (Device name)     : <" + this._partName + "> 0x" +
+				BitstreamUtils.toHexString(_partName) + "\n" +
+				"Field 4 (Date created)    : <" + this._dateCreated + "> 0x" +
+				BitstreamUtils.toHexString(_dateCreated) + "\n" +
+				"Field 5 (Time created)    : <" + this._timeCreated + "> 0x" +
+				BitstreamUtils.toHexString(_timeCreated) + "\n";
 	}
 	
 	
@@ -229,7 +224,7 @@ public class BitstreamHeader {
      * @return An ArrayList of the lower bytes of the characters in the string.
      */
     protected static ArrayList<Byte> getLowerBytes(String s){
-    	ArrayList<Byte> bytes = new ArrayList<Byte>();
+    	ArrayList<Byte> bytes = new ArrayList<>();
     	int len = s.length();
     	for(int i=0; i < len; i++){
     		bytes.add( ((Integer)(s.charAt(i) & 0xff)).byteValue() );

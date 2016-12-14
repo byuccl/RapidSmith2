@@ -118,7 +118,7 @@ public class BitstreamParser {
         PacketList packets = new PacketList();
         int i = numHeaderBytes;
     	while(i < _bytes.size()) {
-    	    List<Integer> data = new ArrayList<Integer>();
+    	    List<Integer> data = new ArrayList<>();
     		
     	    // get packet header
     	    int header = getWordAsInt(_bytes,i);
@@ -166,7 +166,7 @@ public class BitstreamParser {
     }
 
     protected List<Byte> getHeaderUpToSyncBytes() {
-        List<Byte> headerUpToSyncBytes = new ArrayList<Byte>();
+        List<Byte> headerUpToSyncBytes = new ArrayList<>();
     	int i = 0;
     	int syncPosition= 0;
     	while(syncPosition < SYNC_SEQUENCE.length && i < _bytes.size()) {
@@ -199,10 +199,9 @@ public class BitstreamParser {
     	b = bytes.get(start + 1);
     	c = bytes.get(start + 2);
     	d = bytes.get(start + 3);
-    	
-    	int tmp =  (((a & 0xff) << 24) | ((b & 0xff) << 16) |
+
+	    return (((a & 0xff) << 24) | ((b & 0xff) << 16) |
     			((c & 0xff) << 8) | (d & 0xff));
-    	return tmp;
     }
 
     protected void loadFile() throws IOException {
@@ -326,15 +325,13 @@ public class BitstreamParser {
 		if(_bytes.get(i).intValue() != 0x65){  
 			throw new BitstreamParseException("Strange header input processing field 'e'");
 		}
-		
-		BitstreamHeader header = new BitstreamHeader(sourceNCDFileName, partName, dateCreated, timeCreated);
-		
-		return header;
+
+		return new BitstreamHeader(sourceNCDFileName, partName, dateCreated, timeCreated);
 	}
 
 	
 	protected Bitstream _bitstream;
 	protected InputStream _istream;
-	protected ArrayList<Byte> _bytes = new ArrayList<Byte>();
+	protected ArrayList<Byte> _bytes = new ArrayList<>();
 
 }

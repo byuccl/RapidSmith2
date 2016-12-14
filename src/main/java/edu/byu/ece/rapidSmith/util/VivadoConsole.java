@@ -89,7 +89,7 @@ public class VivadoConsole {
 	 * @param runDirectory Directory to run the Vivado process in
 	 */
 	private void init(String runDirectory, boolean throwOnError) {
-		returnBuffer = new LinkedList<String>();
+		returnBuffer = new LinkedList<>();
 		createVivadoProcess(runDirectory);
 		// start the thread that reads Vivado's output
 		readThread = new VivadoReadThread(this, vivadoProcess, throwOnError);
@@ -152,7 +152,7 @@ public class VivadoConsole {
 		// Read the result from the return buffer and store it into a list
 		List<String> returnList;
 		synchronized (returnBuffer) {
-			returnList = new ArrayList<String>(); 
+			returnList = new ArrayList<>();
 			while (!returnBuffer.isEmpty()) {
 				returnList.add(returnBuffer.poll());
 			}
@@ -175,9 +175,7 @@ public class VivadoConsole {
 				throw new TimeoutException("Command \"" + cmd +  "\" timed out.");
 			}
 			
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (TimeoutException e) {
+		} catch (InterruptedException | TimeoutException e) {
 			e.printStackTrace();
 		}
 	}

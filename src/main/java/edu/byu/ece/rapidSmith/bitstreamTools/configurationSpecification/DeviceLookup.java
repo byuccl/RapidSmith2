@@ -52,7 +52,7 @@ public class DeviceLookup {
      * it is needed) and saved for later use.
      */
     protected DeviceLookup() {
-        _libraries = new ArrayList<PartLibrary>(3);
+        _libraries = new ArrayList<>(3);
         _libraries.add(new V4PartLibrary());
         _libraries.add(new V5PartLibrary());
         _libraries.add(new V6PartLibrary()); 

@@ -257,8 +257,7 @@ public class BitstreamOptionParser extends OptionParser {
 		
 		if (options.has(PART_OPTION)) {
 			// Assume that this is a root part name
-			String cmdPartName = (String) options.valueOf(PART_OPTION);
-			partName = cmdPartName;
+			partName = (String) options.valueOf(PART_OPTION);
 		}
 		
 		partInfo = DeviceLookup.lookupPartV4V5V6(partName);

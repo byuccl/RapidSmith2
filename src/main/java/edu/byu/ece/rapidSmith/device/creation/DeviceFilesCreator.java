@@ -40,8 +40,8 @@ import java.nio.file.Path;
  * Made more generic to allow non-ISE XDLRC files.
  */
 public class DeviceFilesCreator {
-	private XDLRCRetriever xdlrcRetriever;
-	private RSEnvironment env;
+	private final XDLRCRetriever xdlrcRetriever;
+	private final RSEnvironment env;
 
 	public DeviceFilesCreator(XDLRCRetriever xdlrcRetriever, RSEnvironment env) {
 		this.xdlrcRetriever = xdlrcRetriever;

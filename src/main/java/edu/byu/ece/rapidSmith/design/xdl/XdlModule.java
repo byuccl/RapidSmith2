@@ -49,17 +49,15 @@ public class XdlModule implements Serializable{
 	/** This is the anchor of the module */
 	private XdlInstance anchor;
 	/** Ports on the module */
-	private HashMap<String, XdlPort> portMap;
+	private final HashMap<String, XdlPort> portMap;
 	/** Instances which are part of the module */
-	private HashMap<String,XdlInstance> instanceMap;
+	private final HashMap<String,XdlInstance> instanceMap;
 	/** Nets of the module */
-	private HashMap<String,XdlNet> netMap;
+	private final HashMap<String,XdlNet> netMap;
 	/** Keeps track of the minimum clock period of this module */
 	private float minClkPeriod = Float.MAX_VALUE;
 	/** Provides a catch-all map to store information about hard macro */
 	private HashMap<String, ArrayList<String>> metaDataMap;
-	
-	private ArrayList<Site> validPlacements;
 
 	/**
 	 * Empty constructor, strings are null, everything else is initialized
@@ -71,7 +69,6 @@ public class XdlModule implements Serializable{
 		portMap = new HashMap<>();
 		instanceMap = new HashMap<>();
 		netMap = new HashMap<>();
-		validPlacements = new ArrayList<>();
 	}
 	
 	/**

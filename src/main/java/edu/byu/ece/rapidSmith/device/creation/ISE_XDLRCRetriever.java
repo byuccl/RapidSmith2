@@ -37,7 +37,7 @@ import java.util.Set;
  */
 public class ISE_XDLRCRetriever implements XDLRCRetriever {
 	// Set of files generated that should be deleted during cleanup
-	private Set<Path> generatedFiles = new HashSet<>();
+	private final Set<Path> generatedFiles = new HashSet<>();
 
 	// Gets all of the parts in the family from partgen
 	public List<String> getPartsInFamily(FamilyType family) {

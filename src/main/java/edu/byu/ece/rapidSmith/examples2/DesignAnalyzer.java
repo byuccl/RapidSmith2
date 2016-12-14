@@ -23,7 +23,7 @@ public class DesignAnalyzer {
 	public static final String CANONICAL_PART_NAME = "xc7a100tcsg324";
 	public static final String CELL_LIBRARY = "cellLibrary.xml";
 	
-	public static void main(String[] args) throws IOException, ParseException {
+	public static void main(String[] args) throws IOException {
 		
 		if (args.length < 1) {
 			System.err.println("Usage: DesignAnalyzer tincrCheckpointName");
@@ -52,7 +52,7 @@ public class DesignAnalyzer {
 	public static void printCellBelMappings(CellDesign design) {
 		System.out.println("\nSome Cell/Bel Mappings:");
 		int i=0;
-		Set<String> cells = new HashSet<String>();
+		Set<String> cells = new HashSet<>();
 		for (Cell c : design.getCells()) {
 			if (cells.contains(c.getLibCell().getName()))
 				continue;

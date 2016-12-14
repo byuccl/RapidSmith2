@@ -29,7 +29,7 @@ package edu.byu.ece.rapidSmith.bitstreamTools.configuration;
  */
 public class FPGAOperation {
 
-	public enum OPERATORS { XOR, AND, OR, NOT, MASK };
+	public enum OPERATORS { XOR, AND, OR, NOT, MASK }
 
 	public static void ANDoperation(FPGA fpga1, FPGA fpga2) {
 		operation(fpga1,fpga2, OPERATORS.AND);

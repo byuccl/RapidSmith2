@@ -48,7 +48,7 @@ public class PlacerDemo {
 	
 	private static Device device;
 	
-	public static void classSetup() throws IOException {
+	public static void classSetup() {
 		device = RSEnvironment.defaultEnv().getDevice(CANONICAL_PART_NAME);
 	}
 	
@@ -67,10 +67,10 @@ public class PlacerDemo {
 	// fir.tcp
 	// counter16bit.tcp (Research/Tincr)
 	// 5bit_adder.tcp
-	public static void main(String[] args) throws IOException, ParseException, EdifNameConflictException, InvalidEdifNameException {
+	public static void main(String[] args) throws IOException {
 		
 		// Parse the input arguments
-		ArrayList<String> pathArgs = new ArrayList<String>();
+		ArrayList<String> pathArgs = new ArrayList<>();
 		boolean interactiveMode = parseArgs(args, pathArgs);
 		String tcpDirectory = pathArgs.get(0);
 		String vivadoInstanceDirectory = pathArgs.size() == 2 ? pathArgs.get(1) : ".";

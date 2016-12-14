@@ -155,9 +155,7 @@ public class RunXilinxTools {
 		} catch (FileNotFoundException e) {
 			MessageGenerator.briefError("Could not find file: " + twrFileName);
 			e.printStackTrace();
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (NumberFormatException | IOException e) {
 			e.printStackTrace();
 		}
 		return Float.MAX_VALUE;
@@ -224,45 +222,43 @@ public class RunXilinxTools {
 		String[] tokens;
 		Process p;
 		BufferedReader input;
-		ArrayList<String> partNames = new ArrayList<String>();
-		ArrayList<String> speedGrades = new ArrayList<String>();
+		ArrayList<String> partNames = new ArrayList<>();
+		ArrayList<String> speedGrades = new ArrayList<>();
 		try{
-			for(int i=0; i < familyNames.length; i++){
+			for (String familyName : familyNames) {
 				// Run partgen for each family
-				p = Runtime.getRuntime().exec(executableName + familyNames[i]);
+				p = Runtime.getRuntime().exec(executableName + familyName);
 				input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 				lastPartName = null;
-				while((line = input.readLine()) != null){
+				while ((line = input.readLine()) != null) {
 					tokens = line.split("\\s+");
-					if(tokens.length > 0 && tokens[0].startsWith("x")){
+					if (tokens.length > 0 && tokens[0].startsWith("x")) {
 						lastPartName = tokens[0];
-						if(includeSpeedGrades && tokens[1].equals("SPEEDS:")){
+						if (includeSpeedGrades && tokens[1].equals("SPEEDS:")) {
 							speedGrades.clear();
 							int j = 2;
-							while(j < tokens.length && !tokens[j].equals("(Minimum") && tokens[j].startsWith("-")){
+							while (j < tokens.length && !tokens[j].equals("(Minimum") && tokens[j].startsWith("-")) {
 								speedGrades.add(tokens[j]);
 								j++;
 							}
 						}
-					}
-					else if(lastPartName != null){
-						if(includeSpeedGrades && !speedGrades.isEmpty()){
-							for(String speedGrade : speedGrades){
-								partNames.add(lastPartName+tokens[1]+speedGrade);
+					} else if (lastPartName != null) {
+						if (includeSpeedGrades && !speedGrades.isEmpty()) {
+							for (String speedGrade : speedGrades) {
+								partNames.add(lastPartName + tokens[1] + speedGrade);
 							}
-						}
-						else{
-							partNames.add(lastPartName+tokens[1]);							
+						} else {
+							partNames.add(lastPartName + tokens[1]);
 						}
 					}
 				}
-				
-				if(p.waitFor() != 0){
+
+				if (p.waitFor() != 0) {
 					MessageGenerator.briefError("Part name generation failed: partgen failed to execute " +
-							"correctly.  Check spelling and make sure the families: " + 
-							MessageGenerator.createStringFromArray(familyNames) + 
-							System.getProperty("line.separator")+"are installed.");
-					return null;				 
+							"correctly.  Check spelling and make sure the families: " +
+							MessageGenerator.createStringFromArray(familyNames) +
+							System.getProperty("line.separator") + "are installed.");
+					return null;
 				}
 			}
 		} 

@@ -34,40 +34,40 @@ import java.util.regex.Pattern;
  */
 public class WireExpressions {
 	// Regular Expressions
-	private Pattern north;
-	private Pattern south;
-	private Pattern east;
-	private Pattern west;
-	private Pattern horizontal;
-	private Pattern vertical;
-	private Pattern eastSouth;
-	private Pattern eastNorth;
-	private Pattern northEast;
-	private Pattern northWest;
-	private Pattern southEast;
-	private Pattern southWest;
-	private Pattern westNorth;
-	private Pattern westSouth;
-	private Pattern internal;
+	private final Pattern north;
+	private final Pattern south;
+	private final Pattern east;
+	private final Pattern west;
+	private final Pattern horizontal;
+	private final Pattern vertical;
+	private final Pattern eastSouth;
+	private final Pattern eastNorth;
+	private final Pattern northEast;
+	private final Pattern northWest;
+	private final Pattern southEast;
+	private final Pattern southWest;
+	private final Pattern westNorth;
+	private final Pattern westSouth;
+	private final Pattern internal;
 
-	private Pattern omux;
-	private Pattern doubleType;
-	private Pattern hex;
-	private Pattern longType;
-	private Pattern clk;
-	private Pattern bounce;
-	private Pattern omux_output;
-	private Pattern to_bufg;
-	private Pattern pent;
-	private Pattern double_turn;
-	private Pattern pent_turn;
-	private Pattern int_sink;
-	private Pattern int_source;
-	private Pattern int_conn;
-	private Pattern triple;
-	private Pattern hept;
-	private Pattern triple_turn;
-	private Pattern hept_turn;
+	private final Pattern omux;
+	private final Pattern doubleType;
+	private final Pattern hex;
+	private final Pattern longType;
+	private final Pattern clk;
+	private final Pattern bounce;
+	private final Pattern omux_output;
+	private final Pattern to_bufg;
+	private final Pattern pent;
+	private final Pattern double_turn;
+	private final Pattern pent_turn;
+	private final Pattern int_sink;
+	private final Pattern int_source;
+	private final Pattern int_conn;
+	private final Pattern triple;
+	private final Pattern hept;
+	private final Pattern triple_turn;
+	private final Pattern hept_turn;
 
 	public WireExpressions() {
 		// These patterns are mostly compatible for the Virtex 4 and 5

@@ -29,11 +29,11 @@ import java.io.Serializable;
  */
 public class SinkPin implements Serializable{
 	/** Keeps track of the wire which drives this sink from the nearest switch matrix */
-	public int switchMatrixSinkWire;
+	public final int switchMatrixSinkWire;
 	
 	/** Keeps track of the switch matrix which drives this sink
 	 * &lt;31-16: X Tile Offset, 15-0: Y Tile Offset&gt; */
-	public int switchMatrixTileOffset;
+	public final int switchMatrixTileOffset;
 
 	/**
 	 * Constructs a new SinkPin object.
@@ -91,7 +91,7 @@ public class SinkPin implements Serializable{
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(Object obj){
+	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -99,11 +99,8 @@ public class SinkPin implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		SinkPin other = (SinkPin) obj;
-		if (switchMatrixSinkWire != other.switchMatrixSinkWire)
-			return false;
-		if (switchMatrixTileOffset != other.switchMatrixTileOffset)
-			return false;
-		return true;
+		return switchMatrixSinkWire == other.switchMatrixSinkWire &&
+				switchMatrixTileOffset == other.switchMatrixTileOffset;
 	}
 	
 	public String toString(){

@@ -28,27 +28,27 @@ import java.util.Map;
 public class XilinxPartgenDescription {
 
     public XilinxPartgenDescription(List<String> partNames, List<List<String>> validPackages, List<List<String>> validSpeedGrades) {
-        _partNames = new ArrayList<String>(partNames);
+        _partNames = new ArrayList<>(partNames);
         
-        _validPackages = new LinkedHashMap<String, List<String>>();
-        _validSpeedGrades = new LinkedHashMap<String, List<String>>();
+        _validPackages = new LinkedHashMap<>();
+        _validSpeedGrades = new LinkedHashMap<>();
         int i = 0;
         for (String partName : _partNames) {
-            _validPackages.put(partName, new ArrayList<String>(validPackages.get(i)));
-            _validSpeedGrades.put(partName, new ArrayList<String>(validSpeedGrades.get(i)));
+            _validPackages.put(partName, new ArrayList<>(validPackages.get(i)));
+            _validSpeedGrades.put(partName, new ArrayList<>(validSpeedGrades.get(i)));
             i++;
         }
     }
 
     public List<String> getPartNames() {
-        return new ArrayList<String>(_partNames);
+        return new ArrayList<>(_partNames);
     }
     
     public List<String> getValidPackagesForPart(String partName) {
         List<String> result = null;
         List<String> packages = _validPackages.get(partName);
         if (packages != null) {
-            result = new ArrayList<String>(packages);
+            result = new ArrayList<>(packages);
         }
         return result;
     }
@@ -57,7 +57,7 @@ public class XilinxPartgenDescription {
         List<String> result = null;
         List<String> speedGrades = _validSpeedGrades.get(partName);
         if (speedGrades != null) {
-            result = new ArrayList<String>(speedGrades);
+            result = new ArrayList<>(speedGrades);
         }
         return result;
     }

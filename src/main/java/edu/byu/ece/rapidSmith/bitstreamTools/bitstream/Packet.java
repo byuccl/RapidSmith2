@@ -49,7 +49,7 @@ public class Packet extends ConfigurationData {
     
     public Packet(int header, int data) throws BitstreamException {
         _header = header;
-        _data = new ArrayList<Integer>(1);
+        _data = new ArrayList<>(1);
         _data.set(0, data);
         setFieldsFromHeader(_header);
     }
@@ -108,7 +108,7 @@ public class Packet extends ConfigurationData {
      */
 	@Override
     public ArrayList<Byte> toByteArray() {
-    	ArrayList<Byte> ba = new ArrayList<Byte>();
+    	ArrayList<Byte> ba = new ArrayList<>();
     	ba.addAll(BitstreamUtils.ToByteArray(_header));
     	for(Integer i : _data) {
     		ba.addAll(BitstreamUtils.ToByteArray(i));
@@ -122,7 +122,7 @@ public class Packet extends ConfigurationData {
      */
     @Override
 	public String toString() {
-		String string = new String();
+		String string = "";
 		string += "<packet>\n";
 		string += "\t<packet_header>";
 		string += Integer.toHexString(_header);
@@ -153,8 +153,8 @@ public class Packet extends ConfigurationData {
     
 	public String toString(boolean printHeader) {
 
-		String string = new String();
-		String extraInfo = new String();
+		String string = "";
+		String extraInfo = "";
 		
 		// Packet summary
 		string += _opcode;
@@ -194,7 +194,7 @@ public class Packet extends ConfigurationData {
             // this exception won't happen because we know we are using a type 1 packet
             // (the exception is raised for type NONE)
         }
-        List<Integer> data = new ArrayList<Integer>(1);
+        List<Integer> data = new ArrayList<>(1);
         data.add(dataWord);
         Packet result = null;
         try {
@@ -218,7 +218,7 @@ public class Packet extends ConfigurationData {
             // this exception won't happen because we know we are using a type 1 packet
             // (the exception is raised for type NONE)
         }
-        List<Integer> data = new ArrayList<Integer>(2);
+        List<Integer> data = new ArrayList<>(2);
         data.add(dataWord1);
         data.add(dataWord2);
         Packet result = null;
@@ -247,7 +247,7 @@ public class Packet extends ConfigurationData {
             // this exception won't happen because we know we are using a type 1 packet
             // (the exception is raised for type NONE)
         }
-        List<Integer> data = new ArrayList<Integer>(0);
+        List<Integer> data = new ArrayList<>(0);
         Packet result = null;
         try {
             result = new Packet(header, data);
@@ -281,7 +281,7 @@ public class Packet extends ConfigurationData {
             // this exception won't happen because we know we are using a type 1 packet
             // (the exception is raised for type NONE)
         }
-        List<Integer> data = new ArrayList<Integer>(0);
+        List<Integer> data = new ArrayList<>(0);
         Packet result = null;
         result = new Packet(header, data);
         return result;

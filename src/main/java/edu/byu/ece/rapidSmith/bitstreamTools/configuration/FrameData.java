@@ -203,7 +203,7 @@ public class FrameData {
 	public List<Integer> getAllFrameWords() {
 		Arrays.asList(_words);
 		
-		ArrayList<Integer> li = new ArrayList<Integer>(_words.length);
+		ArrayList<Integer> li = new ArrayList<>(_words.length);
 		for (int i = 0; i < size(); i++)
 			li.add(_words[i]);
 		return li;
@@ -330,7 +330,7 @@ public class FrameData {
 	public String toString() {
 		int numberOfWordColumns = 8;
 		
-		StringBuffer string = new StringBuffer();
+		StringBuilder string = new StringBuilder();
 		int frameSize = _words.length;
 		
 		if (!isEmpty()) {

@@ -25,11 +25,8 @@ public class ImportExportExample {
 	/**
 	 * @param args
 	 * @throws IOException
-	 * @throws ParseException
-	 * @throws EdifNameConflictException
-	 * @throws InvalidEdifNameException
 	 */
-	public static void main(String[] args) throws IOException, ParseException, EdifNameConflictException, InvalidEdifNameException {
+	public static void main(String[] args) throws IOException {
 		if (args.length < 1) {
 			System.err.println("Usage: ImportExportExample tincrCheckpointName");
 			System.exit(1);

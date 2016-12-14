@@ -130,7 +130,7 @@ public final class SiteTemplate implements Serializable {
 		}
 
 		Set<Integer> sinks = belRoutethroughMap.get(startWire);
-		return sinks == null ? false : sinks.contains(endWire);
+		return sinks != null && sinks.contains(endWire);
 	}
 
 	@Override

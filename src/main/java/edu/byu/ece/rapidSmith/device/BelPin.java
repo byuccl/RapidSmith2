@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
  */
 public final class BelPin implements Serializable {
 	// The BEL this pin exists on
-	private Bel bel;
+	private final Bel bel;
 	// The backing template for this BEL pin
-	private BelPinTemplate template;
+	private final BelPinTemplate template;
 
 	BelPin(Bel bel, BelPinTemplate template) {
 		this.bel = bel;
