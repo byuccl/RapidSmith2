@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import edu.byu.ece.rapidSmith.design.*;
-import edu.byu.ece.rapidSmith.device.Connection;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
 import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
