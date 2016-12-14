@@ -106,7 +106,7 @@ public class BRAMPartialBitstreams {
 
 		// 5. Write the bitstream to a file
 		// TODO: create an Ostream
-		FileOutputStream fos = null;
+		FileOutputStream fos;
 		try {
 			fos = new FileOutputStream("test.dat");
 			//bitstream.outputRawBitstream(fos);

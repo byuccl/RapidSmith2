@@ -193,7 +193,7 @@ public class BitstreamParser {
      * @param start This is a byte offset into the file at which the data for a packet can be created.
      */
     public static int getWordAsInt(ArrayList<Byte> bytes, int start) {
-    	byte a,b,c,d = 0;
+    	byte a,b,c,d;
     	
     	a = bytes.get(start);
     	b = bytes.get(start + 1);
@@ -216,7 +216,7 @@ public class BitstreamParser {
      * The main function for parsing the bitstream file.
      */
     protected Bitstream parseFile() throws BitstreamParseException {
-    	Bitstream result = null;
+    	Bitstream result;
     	BitstreamHeader header = parseHeader();
     	int numHeaderBytes = 0;
     	if (header != null) {
@@ -226,7 +226,7 @@ public class BitstreamParser {
     	if (dummySyncData == null) {
     	    throw new BitstreamParseException("Error: unrecognized dummy/sync word section");
     	}
-    	PacketList packets = null;
+    	PacketList packets;
     	try {
             packets = createBody(numHeaderBytes + dummySyncData.getDataSize());
         } catch (BitstreamException e) {
@@ -248,9 +248,9 @@ public class BitstreamParser {
 	 * @return true if parsing was performed correctly, false otherwise.
 	 */
 	protected BitstreamHeader parseHeader() throws BitstreamParseException {
-		int i = 0; // headerByte index pointer
+		int i; // headerByte index pointer
 
-		String tmp = "";
+		String tmp;
 		
 		// First we need to make sure the header indicator is the right length
 		int initHeaderLength = BitstreamHeader.INIT_HEADER_BYTES.length;

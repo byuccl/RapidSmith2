@@ -264,7 +264,7 @@ public class Packet extends ConfigurationData {
      * @throws BitstreamException 
      */
     public static Packet buildMultiWordType1Packet(PacketOpcode opcode, RegisterType registerType, List<Integer> data) throws BitstreamException {
-        int header = 0;
+        int header;
         header = getHeader(PacketType.ONE, opcode, registerType, data.size());
         return new Packet(header, data);        
     }
@@ -282,7 +282,7 @@ public class Packet extends ConfigurationData {
             // (the exception is raised for type NONE)
         }
         List<Integer> data = new ArrayList<>(0);
-        Packet result = null;
+        Packet result;
         result = new Packet(header, data);
         return result;
 	}
@@ -291,7 +291,7 @@ public class Packet extends ConfigurationData {
      * Create a multi-word type 2 packet
      */
     public static Packet buildMultiWordType2Packet(PacketOpcode opcode, List<Integer> data) throws BitstreamException {
-        int header = 0;
+        int header;
         header = getHeader(PacketType.TWO, opcode, RegisterType.NONE, data.size());
         return new Packet(header, data);
     }

@@ -335,7 +335,7 @@ public class FrameData {
 		
 		if (!isEmpty()) {
 			int wordNumber = 0;
-			int column = 0;
+			int column;
 			while(wordNumber < frameSize) {
 				for (column = 0; column < numberOfWordColumns && wordNumber < frameSize; column++) {
 					string.append(BitstreamUtils.toHexString(_words[wordNumber]) + " ");

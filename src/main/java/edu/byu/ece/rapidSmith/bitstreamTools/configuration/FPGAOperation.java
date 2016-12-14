@@ -58,12 +58,12 @@ public class FPGAOperation {
 		if (fpga2 != null)
 			fpga2.setFAR(0);
 
-		Frame f = null;
+		Frame f;
 		do {
 			f = fpga1.getCurrentFrame();
 			FrameData fd = f.getData();
 
-			Frame g = null;
+			Frame g;
 			FrameData gd = null;
 			
 			if (fpga2 != null) {

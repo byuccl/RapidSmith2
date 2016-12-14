@@ -39,8 +39,8 @@ public class BitstreamUtils {
 		StringBuilder buf = new StringBuilder();
 		char[] hexChars = {'0', '1', '2', '3', '4', '5', '6', '7',
 						   '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-		int high = 0;
-		int low = 0;
+		int high;
+		int low;
 		
 		high = ((b & 0xf0) >> 4);
 		low = (b & 0x0f);
@@ -59,8 +59,8 @@ public class BitstreamUtils {
 		char[] hexChars = {'0', '1', '2', '3', '4', '5', '6', '7',
 						   '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 		int len = block.length;
-		int high = 0;
-		int low = 0;
+		int high;
+		int low;
 		for (int i = 0; i < len; i++) {
 			high = ((block[i] & 0xf0) >> 4);
 			low = (block[i] & 0x0f);
@@ -85,8 +85,8 @@ public class BitstreamUtils {
 		char[] hexChars = {'0', '1', '2', '3', '4', '5', '6', '7',
 						   '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 		int len = block.length;
-		int high = 0;
-		int low = 0;
+		int high;
+		int low;
 		for (int i = 0; i < len; i++) {
 			high = ((block[i] & 0xf0) >> 4);
 			low = (block[i] & 0x0f);

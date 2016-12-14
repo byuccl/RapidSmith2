@@ -136,7 +136,7 @@ public class RunXilinxTools {
 		BufferedReader br;
 		try {
 			br = new BufferedReader(new FileReader(twrFileName));
-			String line = null;
+			String line;
 			while((line = br.readLine()) != null){
 				if(secondLine){
 					String[] parts = line.split("\\s+");
@@ -171,7 +171,7 @@ public class RunXilinxTools {
 	 */
 	public static Integer runCommand(String command, boolean verbose){
 		if(verbose) System.out.println(command);
-		int returnValue = 0;
+		int returnValue;
 		try {
 			Process p = Runtime.getRuntime().exec(command);
 			StreamGobbler input = new StreamGobbler(p.getInputStream(), verbose);

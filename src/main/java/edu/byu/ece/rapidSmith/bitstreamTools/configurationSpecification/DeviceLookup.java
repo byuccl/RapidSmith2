@@ -127,7 +127,7 @@ public class DeviceLookup {
     public static XilinxConfigurationSpecification lookupPartFromBitstream(Bitstream bitstream) {
 
     	XilinxConfigurationSpecification partInfo = null;
-    	String partName = null;
+    	String partName;
     	
     	// first see if the part can be 
     	if (bitstream.getHeader() != null) {

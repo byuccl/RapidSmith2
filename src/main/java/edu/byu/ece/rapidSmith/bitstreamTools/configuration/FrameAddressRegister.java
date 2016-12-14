@@ -144,7 +144,7 @@ public class FrameAddressRegister {
 	 */
 	public int getConsecutiveAddress() {
 		int address = 0;
-		int i=0;
+		int i;
 		// add addresses of block types that are *before* the current block type
 		for (i = 0; i < blockType; i++)
 			address += getFramesPerFARBlockType(configSpec, i);

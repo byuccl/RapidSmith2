@@ -244,7 +244,7 @@ public abstract class XilinxDeviceClassGenerator {
         BufferedInputStream buffer;
         DataInputStream data;
 
-        int thisByte = 0x00;
+        int thisByte;
         String result = null;
         try {
             input = new FileInputStream(bitstreamFileName);

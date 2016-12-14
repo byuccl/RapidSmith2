@@ -302,7 +302,7 @@ public abstract class BitstreamGenerator {
      * 
      */
 	public static int writeBitstreamToBIT(Bitstream bit, String outputFilename) {
-		FileOutputStream out=null;
+		FileOutputStream out;
 		try {
 			out = new FileOutputStream(new File(outputFilename));
 		} catch (FileNotFoundException e) {
