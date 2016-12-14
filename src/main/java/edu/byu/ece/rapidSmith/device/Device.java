@@ -650,17 +650,16 @@ public class Device implements Serializable {
 		private static final long serialVersionUID = 945509107696820354L;
 		private String version;
 		private String partName;
-		private String family;
+		private FamilyType family;
 		private Tile[][] tiles;
 		private Map<Integer, Map<Integer, PIPRouteThrough>> routeThroughMap;
 		private Collection<SiteTemplate> siteTemplates;
 		private WireEnumerator we;
 		private PrimitiveDefList primitiveDefs;
-		private HashSet<TileType> switchMatrixTypes;
 
 		public void readResolve(Device device) {
 			device.partName = partName;
-			device.family = family != null ? FamilyType.valueOf(family) : null;
+			device.family = family;
 			device.tiles = tiles;
 			device.rows = tiles.length;
 			device.columns = tiles[0].length;
@@ -702,7 +701,7 @@ public class Device implements Serializable {
 	public void writeReplace(DeviceReplace repl) {
 		repl.version = LATEST_DEVICE_FILE_VERSION;
 		repl.partName = partName;
-		repl.family = family.name();
+		repl.family = family;
 		repl.tiles = tiles;
 		repl.routeThroughMap = routeThroughMap;
 		repl.siteTemplates = siteTemplates.values();

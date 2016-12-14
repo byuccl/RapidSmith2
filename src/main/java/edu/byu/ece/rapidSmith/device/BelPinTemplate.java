@@ -13,6 +13,7 @@ import java.util.TreeSet;
  *  @see edu.byu.ece.rapidSmith.device.BelPin
  */
 public final class BelPinTemplate implements Serializable {
+	private static final long serialVersionUID = -1112760770804694136L;
 	private String name;
 	// BEL id for the pins this template backs
 	private BelId id;

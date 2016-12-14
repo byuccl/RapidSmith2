@@ -49,7 +49,8 @@ public class WireHashMap implements Serializable {
 	 * The load factor used when none specified in constructor.
 	 */
 	private static final float DEFAULT_LOAD_FACTOR = 0.85f;
-	
+	private static final long serialVersionUID = -1457572150224638234L;
+
 	/**
 	 * The keys table. Length MUST Always be a power of two.
 	 */
@@ -252,6 +253,7 @@ public class WireHashMap implements Serializable {
 	}
 
 	private static class WireHashMapReplace implements Serializable {
+		private static final long serialVersionUID = -7320168883881265737L;
 		private int arrSize;
 		private float loadFactor;
 		private int[] keys;
