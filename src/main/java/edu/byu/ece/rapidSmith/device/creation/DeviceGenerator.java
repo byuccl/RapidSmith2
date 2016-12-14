@@ -26,7 +26,7 @@ import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.device.helper.*;
 import edu.byu.ece.rapidSmith.primitiveDefs.*;
-import edu.byu.ece.rapidSmith.util.EnvironmentException;
+import edu.byu.ece.rapidSmith.util.Exceptions;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
 import org.jdom2.Document;
@@ -859,7 +859,7 @@ public final class DeviceGenerator {
 			try {
 				familyInfo = env.loadFamilyInfo(family);
 			} catch (IOException|JDOMException e) {
-				throw new EnvironmentException("Failed to load family information file", e);
+				throw new Exceptions.EnvironmentException("Failed to load family information file", e);
 			}
 			device.setFamily(family);
 		}

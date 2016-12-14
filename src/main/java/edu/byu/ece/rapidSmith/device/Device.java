@@ -435,13 +435,15 @@ public class Device implements Serializable {
 	}
 
 	/**
-	 * This method will get all compatible primitive sites for a particular
-	 * primitive type in this device.  For example, a SLICEL can be placed at
-	 * all SLICEL sites AND all SLICEM sites.  If the type given were SLICEL,
-	 * this method would return an array of all SLICEL and SLICEM sites.
+	 * This method will return all compatible sites for a particular site type in
+	 * this device.  For example, a SLICEL can be placed at all SLICEL sites and
+	 * all SLICEM sites.  If the type given were SLICEL, this method would return
+	 * a list of all SLICEL and SLICEM sites.
 	 *
-	 * @param type The type for which to find compatible primitive sites.
-	 * @return An array of compatible sites suitable for placement of a
+	 * Note -- The list is rebuilt each method call.
+	 *
+	 * @param type the type for which to find compatible primitive sites.
+	 * @return a list of compatible sites suitable for placement of a
 	 * primitive of type type.
 	 */
 	public List<Site> getAllCompatibleSites(SiteType type) {

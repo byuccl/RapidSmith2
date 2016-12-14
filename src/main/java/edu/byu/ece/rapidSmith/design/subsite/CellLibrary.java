@@ -105,7 +105,7 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		for (Element belEl : belsEl.getChildren("bel")) {
 			Element id = belEl.getChild("id");
 			FamilyType family = FamilyType.valueOf(id.getChildText("family"));
-			String site_type = id.getChildText("site_type");
+			String site_type = id.getChildText("primitive_type");
 			BelId belId = new BelId(
 					SiteType.valueOf(family, site_type),
 					id.getChildText("name")

@@ -27,6 +27,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static edu.byu.ece.rapidSmith.util.Exceptions.*;
+
 /**
  *
  */

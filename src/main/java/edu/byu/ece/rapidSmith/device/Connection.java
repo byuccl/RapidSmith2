@@ -8,6 +8,8 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import static edu.byu.ece.rapidSmith.util.Exceptions.*;
+
 /**
  *
  */

@@ -34,10 +34,6 @@ import java.util.ArrayList;
  * @author Chris Lavin
  */
 public class RunXilinxTools {
-
-	/** Environment Variable Name which points to the bin directory of ISE 10.1 or below */
-	public static final String xilinxLegacyPathVariableName = "XILINX_LEGACY_PATH";
-
 	/**
 	 * Generates the brief version of the XDLRC file specified by partName.
 	 * @param partName The part name of the Xilinx device for which to generate the XDLRC file.
@@ -62,7 +58,7 @@ public class RunXilinxTools {
 
 	/**
 	 * Generates the XDLRC file specified by partName.
-	 * @param partName The part name of the Xilinx device for which to generate the XDLRC file.
+	 * @param partName The part name of the Xilinx device for which to generate the XDLRC\ file.
 	 * @param optionalOutputFileName Provides a way to generated a custom output file name.  If parameter is null, the
 	 * output file name is [part name + _brief/_full.xdlrc]
 	 * @param briefFile Determines if it should generate a brief or full XDLRC file.
