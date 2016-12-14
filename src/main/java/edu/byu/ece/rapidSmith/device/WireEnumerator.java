@@ -143,7 +143,8 @@ public class WireEnumerator implements Serializable {
        For Hessian compression.  Avoids writing duplicate data.
      */
     private static class WireEnumeratorReplace implements Serializable {
-        private String[] wires;
+	    private static final long serialVersionUID = -2476200871171034998L;
+	    private String[] wires;
         private WireType[] wireTypes;
         private WireDirection[] wireDirections;
 
