@@ -20,10 +20,8 @@
  */
 package edu.byu.ece.rapidSmith.util;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class FileConverter {
 	
@@ -150,33 +148,15 @@ public class FileConverter {
 		return success ? nmcFileName : null;
 	}
 
-	
-	/**
-	 * Converts xdlFileName to an NCD file called ncdFileName.  It uses the -force option by default.
-	 * @param xdlFile The input XDL file
-	 * @param ncdFile The output NCD file
-	 * @return True if operation was successful, false otherwise.
-	 */
-	public static boolean convertXDL2NCD(Path xdlFile, Path ncdFile){
-		return convertXDL2NCD(xdlFile, ncdFile, false);
-	}
-	
 	/**
 	 * Converts xdlFileName to an NCD file called ncdFileName.  It uses the 
 	 * -force option by default.
 	 * @param xdlFile The input XDL file
 	 * @param ncdFile The output NCD file
-	 * @param useLegacyTools Flag indicating if the method should use the 
-	 * legacy xdl tool (10.1 or earlier as specified by environment variable
-	 *  XILINX_LEGACY_PATH. If the environment variable is not set, it defaults
-	 *  to regular tools on PATH.
 	 * @return True if operation was successful, false otherwise.
 	 */
-	public static boolean convertXDL2NCD(Path xdlFile, Path ncdFile, boolean useLegacyTools){
+	public static boolean convertXDL2NCD(Path xdlFile, Path ncdFile){
 		String command = "xdl -xdl2ncd -force " + xdlFile + " " + ncdFile;
-		if(useLegacyTools){
-			command = RunXilinxTools.getBinPathToLegacyXilinxTools() + File.separator + command;
-		}
 		// Generate NCD
 		try {
 			Process p = Runtime.getRuntime().exec(command);
@@ -188,7 +168,7 @@ public class FileConverter {
 				if(p.waitFor() != 0){
 					throw new IOException();
 				}
-			} 
+			}
 			catch (InterruptedException e){
 				e.printStackTrace();
 				MessageGenerator.briefError("Unknown Error While converting " +

@@ -9,6 +9,7 @@ import edu.byu.ece.rapidSmith.design.subsite.CellPin;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.SiteType;
+import edu.byu.ece.rapidSmith.device.families.Artix7;
 import edu.byu.ece.rapidSmith.interfaces.vivado.XdcPlacementInterface;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
@@ -33,7 +34,7 @@ public class SimulatedAnnealingPlacer {
 	private boolean viewCheckpoints = false; 
 	private String placementXdc = null;
 	
-	private HashMap <SiteType, Site[] > siteTypeMap = new HashMap<>();
+	private HashMap<SiteType, List<Site>> siteTypeMap = new HashMap<>();
 	//placement cost variables
 	private int cost; 
 	
@@ -323,13 +324,13 @@ public class SimulatedAnnealingPlacer {
 	}
 	
 	private boolean isBufgNet(CellNet net) {
-		if (net.getSourcePin().getCell().getAnchorSite().getType().equals(SiteType.BUFG)) {
+		if (net.getSourcePin().getCell().getAnchorSite().getType().equals(Artix7.SiteTypes.BUFG)) {
 			System.out.println("BUFG Net: " + net.getName());
 			return true;
 		}
 		else {
 			for (CellPin cp : net.getSinkPins()) {
-				if(cp.getCell().getAnchorSite().getType().equals(SiteType.BUFG)) {// || cp.getBelPin().getName().equals("CE")) {
+				if(cp.getCell().getAnchorSite().getType().equals(Artix7.SiteTypes.BUFG)) {// || cp.getBelPin().getName().equals("CE")) {
 					System.out.println("BUFG Net: " + net.getName());
 					return true;
 				}
@@ -378,10 +379,11 @@ public class SimulatedAnnealingPlacer {
 	}
 	
 	private boolean isBUFG(Site site) {		
-		return site.getType().equals(SiteType.BUFG);		
+		return site.getType().equals(Artix7.SiteTypes.BUFG);
 	}
-	private boolean isPLL(Site site) {		
-		return site.getType().equals(SiteType.PLLE2_ADV) || site.getType().equals(SiteType.PLL_ADV); 
+	private boolean isPLL(Site site) {
+		// TODO add PLL_ADV back in
+		return site.getType().equals(Artix7.SiteTypes.PLLE2_ADV) /*|| site.getType().equals(Artix7.SiteTypes.PLL_ADV )*/;
 	}
 	
 	/*
@@ -409,11 +411,11 @@ public class SimulatedAnnealingPlacer {
 			
 			SiteCluster cluster = this.placeableSiteClusters.get(next);
 			
-			Site[] compatible = siteTypeMap.get(cluster.getType());
-			int selection = rn.nextInt(compatible.length);
+			List<Site> compatible = siteTypeMap.get(cluster.getType());
+			int selection = rn.nextInt(compatible.size());
 
 			//check for an illegal move
-			if (!cluster.makeMove(compatible[selection], this.sitenameToClusterMap, device)) {
+			if (!cluster.makeMove(compatible.get(selection), this.sitenameToClusterMap, device)) {
 				cluster.rejectMove();
 				continue;
 			}
@@ -515,11 +517,11 @@ public class SimulatedAnnealingPlacer {
 				SiteCluster cluster = this.placeableSiteClusters.get(next);
 				
 				//randomly choose a new location for the site cluster 
-				Site[] compatible = siteTypeMap.get(cluster.getType());//device.getAllCompatibleSites(cluster.getType());
-				int selection = rn.nextInt(compatible.length);
+				List<Site> compatible = siteTypeMap.get(cluster.getType());//device.getAllCompatibleSites(cluster.getType());
+				int selection = rn.nextInt(compatible.size());
 				
 				//make a move, and check to see if it's illegal 
-				if (!cluster.makeMove(compatible[selection], this.sitenameToClusterMap, device)) {
+				if (!cluster.makeMove(compatible.get(selection), this.sitenameToClusterMap, device)) {
 					cluster.rejectMove();
 					continue;
 				}
@@ -596,11 +598,11 @@ public class SimulatedAnnealingPlacer {
 			//}
 			while (true) {
 				//randomly select a site to place the cluster on
-				Site[] compatible = device.getAllCompatibleSites(sc.getType());
-				int selection = rn.nextInt(compatible.length);
+				List<Site> compatible = device.getAllCompatibleSites(sc.getType());
+				int selection = rn.nextInt(compatible.size());
 				
 				//check to see if the placement is valid
-				if(sc.placeRandomly(device, compatible[selection], usedSites))
+				if(sc.placeRandomly(device, compatible.get(selection), usedSites))
 					break;
 			}
 		}

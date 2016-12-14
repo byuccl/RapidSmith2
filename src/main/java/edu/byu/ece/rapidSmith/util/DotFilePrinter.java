@@ -14,8 +14,11 @@ import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
+import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.SiteType;
+import edu.byu.ece.rapidSmith.device.families.FamilyInfo;
+import edu.byu.ece.rapidSmith.device.families.FamilyInfos;
 
 /**
  * This class is used to print Dot files to visualize netlists in RapidSmith. <br>
@@ -47,7 +50,7 @@ public class DotFilePrinter {
 	 */
 	public DotFilePrinter(CellDesign design) {
 		this.design = design;
-		
+
 		// initialize dot configuration with default options
 		dotProperties = new HashMap<>();
 		dotProperties.put("rankdir", "LR");
@@ -300,9 +303,10 @@ public class DotFilePrinter {
 		
 		dotBuilder.append("  subgraph cluster" + site.getName() + "{\n");
 		dotBuilder.append("    label=" + site.getName() + ";\n");
-	
+		FamilyInfo familyInfo = FamilyInfos.get(design.getFamily());
+
 		// format a slice to make it look good
-		if (site.getType() == SiteType.SLICEL || site.getType() == SiteType.SLICEM ) {
+		if (familyInfo.sliceSites().contains(site.getType())) {
 			formatSliceCluster(site, design.getCellsAtSite(site));
 		}
 		else {

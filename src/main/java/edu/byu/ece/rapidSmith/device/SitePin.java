@@ -116,12 +116,4 @@ public final class SitePin implements Serializable {
 	public SitePinTemplate getTemplate() {
 		return template;
 	}
-
-	public boolean drivesGeneralFabric() {
-		return getTemplate().drivesGeneralFabric();
-	}
-
-	public boolean drivenByGeneralFabric() {
-		return getTemplate().isDrivenByGeneralFabric();
-	}
 }

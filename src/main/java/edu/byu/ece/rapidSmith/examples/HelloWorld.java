@@ -22,6 +22,7 @@ package edu.byu.ece.rapidSmith.examples;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 
 import edu.byu.ece.rapidSmith.design.*;
@@ -46,11 +47,12 @@ public class HelloWorld{
 		// When we set the part name, it loads the corresponding Device and WireEnumerator
 		// Always include package and speed grade with the part name
 		design.setPartName("xc4vfx12ff668-10");
-		
+		FamilyType family = FamilyType.valueOf("VIRTEX4");
+
 		// Create a new instance
 		XdlInstance myInstance = new XdlInstance();
 		myInstance.setName("Bob");
-		myInstance.setType(SiteType.SLICEL);
+		myInstance.setType(SiteType.valueOf(family, "SLICEL"));
 		// We need to add the instance to the design so it knows about it
 		design.addInstance(myInstance);
 		// Make the F LUT an Inverter Gate
@@ -80,7 +82,7 @@ public class HelloWorld{
 		}
 		
 		// Another way to find valid primitive sites if we want to use an exclusive site type
-		Site[] allSitesOfTypeSLICEL = design.getDevice().getAllSitesOfType(bob.getType());
+		List<Site> allSitesOfTypeSLICEL = design.getDevice().getAllSitesOfType(bob.getType());
 		for(Site site : allSitesOfTypeSLICEL){
 			// Let's also make sure we don't place bob on a site that is already used
 			if(!design.isPrimitiveSiteUsed(site)){
@@ -94,7 +96,7 @@ public class HelloWorld{
 		// Let's create an IOB to drive our Inverter gate in Bob's LUT
 		XdlInstance myIOB = new XdlInstance();
 		myIOB.setName("input");
-		myIOB.setType(SiteType.IOB);
+		myIOB.setType(SiteType.valueOf(family, "IOB"));
 		design.addInstance(myIOB);
 		// These are typical attributes that need to be set to configure the IOB
 		// the way you like it

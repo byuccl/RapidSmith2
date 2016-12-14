@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import edu.byu.ece.rapidSmith.device.families.FamilyInfo;
+import edu.byu.ece.rapidSmith.device.families.FamilyInfos;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -743,7 +745,7 @@ public abstract class ImportTest {
 	 */
 	private boolean isSinglePortSite(Site site, CellDesign design) {
 		
-		if (!isIobPad(site)) {
+		if (!isIobPad(design.getDevice(), site)) {
 			return false;
 		}
 		
@@ -753,22 +755,14 @@ public abstract class ImportTest {
 	
 	/**
 	 * Returns <code>true</code> if the specified site is an IOB type.
+	 * @param device
 	 * @param site {@code Site}
 	 */
-	private boolean isIobPad(Site site) {
+	private boolean isIobPad(Device device, Site site) {
 		SiteType siteType = site.getType();
-		
-		switch(siteType) {
-			case IOB18:
-			case IOB18M:
-			case IOB18S:
-			case IOB33:
-			case IOB33M:
-			case IOB33S:
-				return true;
-			default:
-				return false;
-		}
+
+		FamilyInfo familyInfo = FamilyInfos.get(device.getFamily());
+		return familyInfo.ioSites().contains(siteType);
 	}
 
 	/**
