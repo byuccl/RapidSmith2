@@ -21,11 +21,6 @@
 package edu.byu.ece.rapidSmith.design.xdl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-
-import edu.byu.ece.rapidSmith.design.PIP;
-import edu.byu.ece.rapidSmith.device.*;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 /**
  * There is no direct representation of a module instance in XDL. Each member of
