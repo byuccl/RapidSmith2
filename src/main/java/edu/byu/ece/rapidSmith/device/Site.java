@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
  * @author Chris Lavin
  */
 public final class Site implements Serializable{
+	private static final long serialVersionUID = -3823244747162695622L;
 	/** Name of the primitive site with X and Y coordinates (ie. SLICE_X0Y0) */
 	private String name;
 	/** The index in the tile's list of PrimitiveSites */
@@ -651,6 +652,7 @@ public final class Site implements Serializable{
 	   Class and method for optimized Hessian serialization.
 	 */
 	private static class PrimitiveSiteReplace implements Serializable {
+		private static final long serialVersionUID = 3178000777471034057L;
 		/** Name of the primitive site with X and Y coordinates (ie. SLICE_X0Y0) */
 		private String name;
 		private SiteType[] possibleTypes;

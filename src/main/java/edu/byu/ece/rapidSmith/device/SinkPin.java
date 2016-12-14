@@ -28,6 +28,7 @@ import java.io.Serializable;
  * Created on: Jul 13, 2010
  */
 public class SinkPin implements Serializable{
+	private static final long serialVersionUID = -5703024365023251315L;
 	/** Keeps track of the wire which drives this sink from the nearest switch matrix */
 	public int switchMatrixSinkWire;
 	

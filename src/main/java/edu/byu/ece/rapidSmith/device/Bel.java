@@ -15,6 +15,7 @@ import java.util.stream.Stream;
  *  method on the site of the desired BEL.
  */
 public final class Bel implements Serializable {
+	private static final long serialVersionUID = -4092803033961128002L;
 	// The backing template for this BEL
 	private BelTemplate template;
 	// The site the BEL exists in

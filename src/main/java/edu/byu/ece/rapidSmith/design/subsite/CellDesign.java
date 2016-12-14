@@ -21,6 +21,7 @@ import java.util.*;
  *  back to XDL.
  */
 public class CellDesign extends AbstractDesign {
+	private static final long serialVersionUID = -807318199842395826L;
 	/** This is a list of all the cells in the design */
 	private Map<String, Cell> cellMap;
 	/** A map used to keep track of all used primitive sites used by the design */

@@ -28,6 +28,8 @@ import java.util.Iterator;
 public class PrimitiveDefList
 		extends HashMap<SiteType, PrimitiveDef>
 		implements Iterable<PrimitiveDef> {
+	private static final long serialVersionUID = -1588900480965715590L;
+
 	public PrimitiveDef getPrimitiveDef(SiteType type){
 		return get(type);
 	}

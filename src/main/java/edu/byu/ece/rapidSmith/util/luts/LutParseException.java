@@ -4,6 +4,8 @@ package edu.byu.ece.rapidSmith.util.luts;
  * Created by Haroldsen on 3/14/2015.
  */
 public class LutParseException extends RuntimeException {
+	private static final long serialVersionUID = 7630112317695417852L;
+
 	public LutParseException() {
 		super();
 	}
