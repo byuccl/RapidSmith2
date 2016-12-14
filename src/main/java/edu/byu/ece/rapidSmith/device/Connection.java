@@ -1,7 +1,6 @@
 package edu.byu.ece.rapidSmith.device;
 
 import edu.byu.ece.rapidSmith.design.PIP;
-import edu.byu.ece.rapidSmith.util.Exceptions;
 
 import java.io.Serializable;
 import java.util.Collection;
