@@ -21,8 +21,6 @@ public final class BelPinTemplate implements Serializable {
 	private Set<String> sitePins;
 	// Wire the BEL pin connects to
 	private int wire;
-	private boolean drivesGeneralFabric = false;
-	private boolean drivenByGeneralFabric = false;
 
 	public BelPinTemplate(BelId id, String name) {
 		this.name = name;
@@ -71,22 +69,6 @@ public final class BelPinTemplate implements Serializable {
 
 	public void setWire(int wire) {
 		this.wire = wire;
-	}
-
-	public boolean drivesGeneralFabric() {
-		return drivesGeneralFabric;
-	}
-
-	public void setDrivesGeneralFabric(boolean value) {
-		this.drivesGeneralFabric = value;
-	}
-
-	public boolean isDrivenByGeneralFabric() {
-		return drivenByGeneralFabric;
-	}
-
-	public void setDrivenByGeneralFabric(boolean value) {
-		this.drivenByGeneralFabric = value;
 	}
 
 	@Override

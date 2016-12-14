@@ -21,14 +21,17 @@
 
 package edu.byu.ece.rapidSmith.device.creation;
 
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.device.helper.*;
 import edu.byu.ece.rapidSmith.primitiveDefs.*;
+import edu.byu.ece.rapidSmith.util.Exceptions;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -96,13 +99,12 @@ public final class DeviceGenerator {
 	 * path.
 	 *
 	 * @param xdlrcPath path to the XDLRC file for the device
-	 * @param familyInfo XML containing extended family info
+	 * @param env the RapidSmith environment for this part
 	 * @return the generated Device representation
 	 */
-	public Device generate(Path xdlrcPath, Document familyInfo) {
+	public Device generate(Path xdlrcPath, RSEnvironment env) {
 		MessageGenerator.briefMessage("Generating device for file " + xdlrcPath.getFileName());
 
-		this.familyInfo = familyInfo;
 		this.device = new Device();
 		this.we = new WireEnumerator();
 		this.device.setWireEnumerator(we);
@@ -125,6 +127,7 @@ public final class DeviceGenerator {
 		// wires need to know the source and sink tiles.
 		XDLRCParser parser = new XDLRCParser();
 		MessageGenerator.briefMessage("Starting first pass");
+		parser.registerListener(new FamilyTypeListener(env));
 		parser.registerListener(new WireEnumeratorListener());
 		parser.registerListener(new TileAndSiteGeneratorListener());
 		parser.registerListener(new PrimitiveDefsListener());
@@ -139,7 +142,6 @@ public final class DeviceGenerator {
 		device.constructTileMap();
 		PrimitiveDefsCorrector.makeCorrections(device.getPrimitiveDefs(), familyInfo);
 		device.setSiteTemplates(createSiteTemplates());
-		setDistinguishedTypes(device, familyInfo);
 
 		MessageGenerator.briefMessage("Starting second pass");
 		parser.registerListener(new WireConnectionGeneratorListener());
@@ -177,43 +179,13 @@ public final class DeviceGenerator {
 		return device;
 	}
 
-	private static void setDistinguishedTypes(Device device, Document familyInfo) {
-		HashSet<TileType> smTypes = new HashSet<>();
-		Element rootElement = familyInfo.getRootElement();
-		Element smTypesEl = rootElement.getChild("switch_matrix_types");
-		for (Element smTypeEl : smTypesEl.getChildren("type")) {
-			TileType type = TileType.valueOf(smTypeEl.getText());
-			smTypes.add(type);
-		}
-		device.setSwitchMatrixTypes(smTypes);
-
-		device.setSliceTypes(new HashSet<>(4));
-		device.setBramTypes(new HashSet<>(4));
-		device.setFifoTypes(new HashSet<>(4));
-		device.setDspTypes(new HashSet<>(4));
-		device.setIOBTypes(new HashSet<>(4));
-
-		for (Element ptEl : rootElement.getChild("primitive_types").getChildren("primitive_type")) {
-			SiteType type = SiteType.valueOf(ptEl.getChildText("name"));
-			if (ptEl.getChild("is_slice") != null)
-				device.getSliceTypes().add(type);
-			if (ptEl.getChild("is_bram") != null)
-				device.getBramTypes().add(type);
-			if (ptEl.getChild("is_fifo") != null)
-				device.getFifoTypes().add(type);
-			if (ptEl.getChild("is_dsp") != null)
-				device.getDspTypes().add(type);
-			if (ptEl.getChild("is_iob") != null)
-				device.getIOBTypes().add(type);
-		}
-	}
-	
 	/**
 	 * Creates the templates for the primitive sites with information from the
 	 * primitive defs and device information file.
 	 */
 	private Map<SiteType, SiteTemplate> createSiteTemplates() {
 		Map<SiteType, SiteTemplate> siteTemplates = new HashMap<>();
+		FamilyType family = device.getFamily();
 
 		// Create a template for each primitive type
 		for (PrimitiveDef def : device.getPrimitiveDefs()) {
@@ -228,7 +200,7 @@ public final class DeviceGenerator {
 			Element compatTypesEl = ptEl.getChild("compatible_types");
 			if (compatTypesEl != null) {
 				List<SiteType> compatibleTypes = compatTypesEl.getChildren("compatible_type").stream()
-						.map(compatTypeEl -> SiteType.valueOf(compatTypeEl.getText()))
+						.map(compatTypeEl -> SiteType.valueOf(family, compatTypeEl.getText()))
 						.collect(Collectors.toList());
 				template.setCompatibleTypes(compatibleTypes.toArray(
 						new SiteType[compatibleTypes.size()]));
@@ -874,6 +846,25 @@ public final class DeviceGenerator {
 		return "intrasite:" + type.name() + "/" + element + "." + pinName;
 	}
 
+	private final class FamilyTypeListener extends XDLRCParserListener {
+		private RSEnvironment env;
+
+		public FamilyTypeListener(RSEnvironment env) {
+			this.env = env;
+		}
+
+		@Override
+		protected void enterXdlResourceReport(List<String> tokens) {
+			FamilyType family = FamilyType.valueOf(tokens.get(3).toUpperCase());
+			try {
+				familyInfo = env.loadFamilyInfo(family);
+			} catch (IOException|JDOMException e) {
+				throw new Exceptions.EnvironmentException("Failed to load family information file", e);
+			}
+			device.setFamily(family);
+		}
+	}
+
 	private final class WireEnumeratorListener extends XDLRCParserListener {
 		private static final int PIN_SET_CAPACITY = 10000;
 
@@ -914,7 +905,7 @@ public final class DeviceGenerator {
 
 		@Override
 		protected void enterPrimitiveDef(List<String> tokens) {
-			currType = SiteType.valueOf(tokens.get(1));
+			currType = SiteType.valueOf(device.getFamily(), tokens.get(1));
 		}
 
 		@Override
@@ -986,7 +977,7 @@ public final class DeviceGenerator {
 			int col = Integer.parseInt(tokens.get(2));
 			currTile = device.getTile(row, col);
 			currTile.setName(tokens.get(3));
-			currTile.setType(TileType.valueOf(tokens.get(4)));
+			currTile.setType(TileType.valueOf(device.getFamily(), tokens.get(4)));
 			currTile.setSinks(new HashMap<>());
 
 			tileSites = new ArrayList<>();
@@ -1001,14 +992,15 @@ public final class DeviceGenerator {
 			site.setBondedType(BondedType.valueOf(tokens.get(3).toUpperCase()));
 
 			List<SiteType> alternatives = new ArrayList<>();
-			SiteType type = SiteType.valueOf(tokens.get(2));
+			SiteType type = SiteType.valueOf(device.getFamily(), tokens.get(2));
 			alternatives.add(type);
 
 			Element ptEl = getPrimitiveTypeEl(type);
 			Element alternativesEl = ptEl.getChild("alternatives");
 			if (alternativesEl != null) {
+				FamilyType family = device.getFamily();
 				alternatives.addAll(alternativesEl.getChildren("alternative").stream()
-						.map(alternativeEl -> SiteType.valueOf(alternativeEl.getChildText("name")))
+						.map(alternativeEl -> SiteType.valueOf(family, alternativeEl.getChildText("name")))
 						.collect(Collectors.toList()));
 			}
 
@@ -1100,7 +1092,8 @@ public final class DeviceGenerator {
 				endWireName = tokens.get(4);
 				Integer endWireEnum = we.getWireEnum(endWireName);
 				wc = wirePool.add(new WireConnection(endWireEnum, 0, 0, true));
-				SiteType type = SiteType.valueOf(tokens.get(6).substring(0, tokens.get(6).length() - 2));
+				String typeName = tokens.get(6).substring(0, tokens.get(6).length() - 2);
+				SiteType type = SiteType.valueOf(device.getFamily(), typeName);
 
 				String[] parts = tokens.get(5).split("-");
 				String inPin = parts[1];
@@ -1253,7 +1246,7 @@ public final class DeviceGenerator {
 		protected void enterPrimitiveDef(List<String> tokens) {
 			currDef = new PrimitiveDef();
 			String name = tokens.get(1).toUpperCase();
-			currDef.setType(SiteType.valueOf(name));
+			currDef.setType(SiteType.valueOf(device.getFamily(), name));
 
 			pins = new ArrayList<>(Integer.parseInt(tokens.get(2)));
 			elements = new ArrayList<>(Integer.parseInt(tokens.get(3)));

@@ -36,14 +36,12 @@ import com.trolltech.qt.gui.QSplitter;
 import com.trolltech.qt.gui.QWidget;
 
 import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
-import edu.byu.ece.rapidSmith.design.xdl.XdlModuleInstance;
 import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
 import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.device.Connection;
 import edu.byu.ece.rapidSmith.device.Tile;
 import edu.byu.ece.rapidSmith.device.TileWire;
 import edu.byu.ece.rapidSmith.device.Wire;
-import edu.byu.ece.rapidSmith.gui.GuiModuleInstance;
 import edu.byu.ece.rapidSmith.gui.TileView;
 import edu.byu.ece.rapidSmith.timing.PathDelay;
 import edu.byu.ece.rapidSmith.timing.PathElement;
@@ -112,11 +110,6 @@ public class TileWindow extends QWidget{
 		scene.setDesign(this.design);
 		scene.initializeScene(true, true);
 		scene.setDevice(design.getDevice());
-
-		// Create hard macro blocks
-		for(XdlModuleInstance mi : design.getModuleInstances()){
-			scene.addItem(new GuiModuleInstance(mi, scene, false));
-		}
 	}
 
 	/**

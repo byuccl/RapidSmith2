@@ -1,4 +1,3 @@
-
 package edu.byu.ece.rapidSmith.util;
 
 /**
@@ -15,6 +14,8 @@ public class Exceptions {
 	 * @author Thomas Townsend
 	 */
 	public static class ParseException extends RuntimeException {
+		private static final long serialVersionUID = 9155970893540903136L;
+
 		public ParseException() {
 			super();
 		}
@@ -40,16 +41,31 @@ public class Exceptions {
 	 * Exception caused by an improperly initialized RapidSmith environment.
 	 */
 	public static class EnvironmentException extends RuntimeException {
+		private static final long serialVersionUID = -7823708332406385920L;
+
 		public EnvironmentException(String message) {
 			super(message);
 		}
 
+		public EnvironmentException(String message, Throwable cause) {
+			super(message, cause);
+		}
+
+		public EnvironmentException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+			super(message, cause, enableSuppression, writableStackTrace);
+		}
+
+		public EnvironmentException(Throwable cause) {
+			super(cause);
+		}
 	}
 
 	/**
 	 *
 	 */
 	public static class DesignAssemblyException extends RuntimeException {
+		private static final long serialVersionUID = -5103058575363941027L;
+
 		public DesignAssemblyException() {
 			super();
 		}

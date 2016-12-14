@@ -22,6 +22,7 @@ package edu.byu.ece.rapidSmith.placer;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Random;
 
 import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
@@ -42,15 +43,15 @@ public class RandomPlacer{
     // Place all unplaced instances
     for(XdlInstance i : design.getInstances()){
 	    if(i.isPlaced()) continue;
-	    Site[] sites = design.getDevice().getAllCompatibleSites(i.getType());
-	    int idx = rng.nextInt(sites.length);
+	    List<Site> sites = design.getDevice().getAllCompatibleSites(i.getType());
+	    int idx = rng.nextInt(sites.size());
 	    int watchDog = 0;
 	    // Find a free primitive site
-	    while(design.isPrimitiveSiteUsed(sites[idx])){
-	    	if(++idx > sites.length) idx = 0;
-	    	if(++watchDog > sites.length) MessageGenerator.briefErrorAndExit("Placement failed.");
+	    while(design.isPrimitiveSiteUsed(sites.get(idx))){
+	    	if(++idx > sites.size()) idx = 0;
+	    	if(++watchDog > sites.size()) MessageGenerator.briefErrorAndExit("Placement failed.");
 	    }
-	    i.place(sites[idx]);
+	    i.place(sites.get(idx));
     }
     
     // Save the placed design

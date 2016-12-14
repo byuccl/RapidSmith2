@@ -170,8 +170,6 @@ public class UCFParser {
 		String group_name = c.substring(UPPERCASE.indexOf("AREA_GROUP ") + 12, UPPERCASE.length() - 1);
 //		System.out.println("parseAreaGroupRange(): group_name:" + group_name);
 		
-		String range_type_string;
-		SiteType range_type;
 		int ll_x = Integer.parseInt(range_string.substring(range_string.indexOf("X") + 1, range_string.indexOf("Y")));
 		int ll_y = Integer.parseInt(range_string.substring(range_string.indexOf("Y") + 1, range_string.indexOf(":")));
 		int ur_x = Integer.parseInt(range_string.substring(range_string.lastIndexOf("X") + 1, range_string.lastIndexOf("Y")));
@@ -179,17 +177,10 @@ public class UCFParser {
 		
 //		System.out.println("ll coordinate: (" + ll_x + ", " + ll_y + ")");
 //		System.out.println("ur coordinate: (" + ur_x + ", " + ur_y + ")");
-		
-		range_type_string = range_string.substring(0, range_string.indexOf("_X"));
+
+		String range_type = range_string.substring(0, range_string.indexOf("_X"));
 //		System.out.println("parseAreaGroupRange(): range_type:" + range_type_string);
 		
-		//TODO: Will have to expand this at some point in the future
-		if(range_type_string.equals("RAMB18"))
-			range_type = SiteType.RAMB18E1;
-		else if(range_type_string.equals("RAMB36"))
-			range_type = SiteType.RAMB36E1;
-		else
-			range_type = SiteType.valueOf(range_type_string);
 		new_constraint.addAreaGroupRange(new AreaGroupRange(group_name, range_type, ll_x, ll_y, ur_x, ur_y));
 	}
 		

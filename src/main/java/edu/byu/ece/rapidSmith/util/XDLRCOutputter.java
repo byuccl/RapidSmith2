@@ -154,7 +154,7 @@ public class XDLRCOutputter {
 		out.append("# =======================================================" + nl);
 		out.append("(xdl_resource_report v0.2 ");
 		out.append(device.getPartName() + " ");
-		out.append(device.getFamilyType().name().toLowerCase() + nl);
+		out.append(device.getFamily().name().toLowerCase() + nl);
 		out.append("# **************************************************************************" + nl);
 		out.append("# *                                                                        *" + nl);
 		out.append("# * Tile Resources                                                         *" + nl);
@@ -179,7 +179,7 @@ public class XDLRCOutputter {
 		if (buildDefsFromTemplates) {
 			defs = device.getSiteTemplates().values().stream()
 					.map(this::createPrimitiveDef)
-					.collect(Collectors.toCollection(ArrayList::new));
+					.collect(Collectors.toCollection(ArrayList<PrimitiveDef>::new));
 		} else {
 			defs = new ArrayList<>(device.getPrimitiveDefs().values());
 		}
@@ -736,10 +736,10 @@ public class XDLRCOutputter {
 				// removing duplicates
 				tiles = new LinkedHashSet<>();
 				//noinspection unchecked,RedundantCast
-				for (String tileName : (List<String>) options.valuesOf("tile")) {
+				for (Object tileName : options.valuesOf("tile")) {
 					Pattern pattern = null;
 					try {
-						pattern = Pattern.compile(tileName);
+						pattern = Pattern.compile((String) tileName);
 					} catch (PatternSyntaxException e) {
 						System.err.println("Could not compile pattern " + tileName);
 						System.exit(-4);

@@ -1,12 +1,12 @@
 package edu.byu.ece.rapidSmith.util;
 
+import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.*;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -351,7 +351,6 @@ public class DeviceDiffer {
 		WireType testWireType = weTest.getWireType(weTest.getWireEnum(weGold.getWireName(wc.getWire())));
 		return (goldWireType == WireType.SITE_SOURCE || goldWireType == WireType.SITE_SINK) &&
 				!(testWireType == WireType.SITE_SOURCE || testWireType == WireType.SITE_SINK);
-
 	}
 
 	private boolean filterWireConnectionFixes2(WireConnection wc) {
@@ -361,7 +360,6 @@ public class DeviceDiffer {
 		WireType goldWireType = weGold.getWireType(weGold.getWireEnum(sinkName));
 		return (goldWireType == WireType.SITE_SOURCE || goldWireType == WireType.SITE_SINK) &&
 				weTest.getWireType(weTest.getWireEnum(sinkName)) == WireType.LONG;
-
 	}
 
 	private void diffWireConnections(WireConnection[] gold, WireConnection[] test) {
@@ -533,21 +531,15 @@ public class DeviceDiffer {
 	}
 
 	public static void main(String[] args) {
-		Path rsGoldDir = Paths.get(args[0]);
-		Path rsTestDir = Paths.get(args[1]);
+		RSEnvironment rsGoldEnv = new RSEnvironment(Paths.get(args[0]));
+		RSEnvironment rsTestEnv = new RSEnvironment(Paths.get(args[1]));
 		String partName = args[2];
 		boolean verbose = false;
 		if (args.length > 3)
 			verbose = Boolean.getBoolean(args[3]);
 
-		String familyName = PartNameTools.getFamilyNameFromPart(partName);
-		partName = PartNameTools.removeSpeedGrade(partName);
-
-		Device goldDevice = new Device();
-//		goldDevice.readDeviceFromCompactFile(goldDeviceFile.toString());
-
-		Device testDevice = new Device();
-//		testDevice.readDeviceFromCompactFile(testDeviceFile.toString());
+		Device goldDevice = rsGoldEnv.getDevice(partName);
+		Device testDevice = rsTestEnv.getDevice(partName);
 
 		DeviceDiffer differ = new DeviceDiffer(verbose);
 		differ.setGold(goldDevice);

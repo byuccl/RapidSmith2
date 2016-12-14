@@ -293,7 +293,7 @@ public class XDLWriter {
 			}
 
 			List<SiteType> types = new ArrayList<>(instTypeCount.keySet());
-			types.sort(Comparator.comparing(Enum::name));
+			types.sort(Comparator.comparing(SiteType::name));
 			for (SiteType type : types) {
 				out.append("#   Number of " + type.toString() + "s: " + Integer.toString(instTypeCount.get(type)) + nl);
 			}

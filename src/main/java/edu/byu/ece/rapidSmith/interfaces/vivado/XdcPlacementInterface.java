@@ -48,8 +48,6 @@ public class XdcPlacementInterface {
 	 * to the RapidSmith2 Cell Design.
 	 *  
 	 * @param xdcFile Placement.xdc file
-	 * @param design Design to apply placement
-	 * @param device Device which the design is implemented on
 	 * @throws IOException
 	 */
 	public void parsePlacementXDC(String xdcFile) throws IOException {
@@ -85,7 +83,7 @@ public class XdcPlacementInterface {
 		
 		// TODO: add a check to see that the sitetype is a valid option for the site
 		String siteType = toks[3]; 
-		site.setType(SiteType.valueOf(siteType));
+		site.setType(SiteType.valueOf(device.getFamily(), siteType));
 		
 		Bel bel = tryGetBel(site, toks[4]);
 		
@@ -174,7 +172,7 @@ public class XdcPlacementInterface {
 	 * Tries to retrieve a CellPin object on the specified Cell parameter.
 	 * If the pin does not exist, a ParseException is thrown.
 	 * 
-	 * @param Cell Cell which the pin is attached
+	 * @param cell Cell which the pin is attached
 	 * @param pinName Name of the pin
 	 * @return CellPin
 	 */
@@ -254,7 +252,6 @@ public class XdcPlacementInterface {
 	 * This file can be imported into Vivado to constrain the cells to a physical location
 	 * 
 	 * @param xdcOut Output placement.xdc file location
-	 * @param design Design with cells to export
 	 * @throws IOException
 	 */
 	public void writePlacementXDC(String xdcOut) throws IOException {

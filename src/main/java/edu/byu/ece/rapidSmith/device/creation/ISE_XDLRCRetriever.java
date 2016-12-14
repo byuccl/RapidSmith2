@@ -21,7 +21,7 @@
 package edu.byu.ece.rapidSmith.device.creation;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
-import edu.byu.ece.rapidSmith.util.FamilyType;
+import edu.byu.ece.rapidSmith.device.FamilyType;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import edu.byu.ece.rapidSmith.util.RunXilinxTools;
 
@@ -52,8 +52,7 @@ public class ISE_XDLRCRetriever implements XDLRCRetriever {
 	// Gets the path to the XDLRC file located in the RapidSmith device location.
 	// If the file already exists, mark it as such so it is not later deleted.
 	public Path getXDLRCFileForPart(String part) {
-		Path xdlrcFile = RSEnvironment.defaultEnv().getPartFolderPath(part)
-				.resolve(part + "_full.xdlrc");
+		Path xdlrcFile = RSEnvironment.defaultEnv().getDevicePath().resolve(part + "_full.xdlrc");
 
 		if (Files.isRegularFile(xdlrcFile))
 			return xdlrcFile;

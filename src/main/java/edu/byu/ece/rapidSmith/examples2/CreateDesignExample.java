@@ -7,18 +7,17 @@ import edu.byu.ece.rapidSmith.device.BelId;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.SiteType;
+import edu.byu.ece.rapidSmith.device.families.Artix7;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CreateDesignExample {
-
 /**
  * A simple class to illustrate creating designs in RapidSmith2.
  * @author Brent Nelson
  */
-
+public class CreateDesignExample {
 	/**
 	 * @param args
 	 * @throws IOException
@@ -90,7 +89,7 @@ public class CreateDesignExample {
 		// There are 2 ways to do this.  
 		// The first (and simpler) way is when you know exactly where you want to place it.
 		// Get the first SLICEL in the device's SLICEL sites
-		Site slice = device.getAllSitesOfType(SiteType.SLICEL)[0];
+		Site slice = device.getAllSitesOfType(Artix7.SiteTypes.SLICEL).get(0);
 		// Place the cell onto the A6LUT of that site
 		design.placeCell(invcell, slice.getBel("A6LUT"));
 		// Now, let's un-place the cell since we are next going to re-place it using the 2nd method
@@ -112,7 +111,7 @@ public class CreateDesignExample {
 		// Grab the first primitive site type in the list (should be SLICEL since the list is sorted)
 		SiteType sitetype = anchorsitetypes.get(0);
 		// Get the first SLICEL in the device's SLICEL sites
-		slice = device.getAllSitesOfType(sitetype)[0];
+		slice = device.getAllSitesOfType(sitetype).get(0);
 		// Place the invcell on a suitable LUT (the first one found that is suitable)
 		// Get a list of the ones which have the primitive site type matching above (which will be SLICEL or SLICEM)
 		anchors = invcell.getPossibleAnchors().stream()

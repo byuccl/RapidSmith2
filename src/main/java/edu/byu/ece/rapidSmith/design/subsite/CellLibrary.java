@@ -1,6 +1,7 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.device.BelId;
+import edu.byu.ece.rapidSmith.device.FamilyType;
 import edu.byu.ece.rapidSmith.device.PinDirection;
 import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
@@ -103,8 +104,10 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		Element belsEl = cellEl.getChild("bels");
 		for (Element belEl : belsEl.getChildren("bel")) {
 			Element id = belEl.getChild("id");
+			FamilyType family = FamilyType.valueOf(id.getChildText("family"));
+			String site_type = id.getChildText("primitive_type");
 			BelId belId = new BelId(
-					SiteType.valueOf(id.getChildText("primitive_type")),
+					SiteType.valueOf(family, site_type),
 					id.getChildText("name")
 			);
 			compatibleBels.add(belId);
