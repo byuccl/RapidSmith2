@@ -18,11 +18,10 @@
  * get a copy of the license at <http://www.gnu.org/licenses/>.
  * 
  */
-package edu.byu.ece.rapidSmith.device.helper;
+package edu.byu.ece.rapidSmith.device.creation;
 
-import edu.byu.ece.rapidSmith.device.WireConnection;
-
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A helper class to help remove duplicate objects and reduce memory usage and file
@@ -30,22 +29,23 @@ import java.util.Arrays;
  *
  * @author Chris Lavin
  */
-public class WireArray {
+public class TileSources {
 	/**
-	 * An array of wires
+	 * Sources of the tile
 	 */
-	public final WireConnection[] array;
+	public final int[] sources;
+	private final Set<Integer> set;
+
 	private Integer hash = null;
 
-	/**
-	 * Constructor
-	 *
-	 * @param array The Array of wires that correspond to this object.
-	 */
-	public WireArray(WireConnection[] array) {
-		if (array == null)
-			array = new WireConnection[0];
-		this.array = array;
+	public TileSources(int[] sources) {
+		if (sources == null)
+			sources = new int[0];
+		this.sources = sources;
+
+		set = new HashSet<>();
+		for (int src : sources)
+			set.add(src);
 	}
 
 	/* (non-Javadoc)
@@ -54,7 +54,7 @@ public class WireArray {
 	@Override
 	public int hashCode() {
 		if (hash == null) {
-			hash = Arrays.deepHashCode(array);
+			hash = set.hashCode();
 		}
 		return hash;
 	}
@@ -66,12 +66,10 @@ public class WireArray {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
+		if (obj == null || getClass() != obj.getClass())
 			return false;
 
-		WireArray other = (WireArray) obj;
-		return Arrays.deepEquals(array, other.array);
+		TileSources other = (TileSources) obj;
+		return set.equals(other.set);
 	}
 }
