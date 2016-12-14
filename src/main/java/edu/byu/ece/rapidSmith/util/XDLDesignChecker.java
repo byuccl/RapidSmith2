@@ -33,7 +33,6 @@ import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
 import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
-import edu.byu.ece.rapidSmith.device.TileWire;
 import edu.byu.ece.rapidSmith.device.Wire;
 
 /**
