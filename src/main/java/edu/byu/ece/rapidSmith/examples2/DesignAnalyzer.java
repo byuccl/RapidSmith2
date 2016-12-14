@@ -5,7 +5,6 @@ import java.util.*;
 
 import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
-import edu.byu.ece.edif.util.parse.ParseException;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
