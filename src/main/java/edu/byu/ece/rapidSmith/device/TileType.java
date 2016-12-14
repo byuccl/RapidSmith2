@@ -93,12 +93,10 @@ public final class TileType implements Comparable<TileType>, Serializable {
 		Objects.requireNonNull(name);
 
 		name = name.toUpperCase();
-		Map<String, TileType> familyTypes = types.computeIfAbsent(family, k -> new HashMap<>());
-		return familyTypes.computeIfAbsent(name, k -> {
-			synchronized (types) {
-				return new TileType(family, k, nextOrdinal++);
-			}
-		});
+		synchronized (types) {
+			Map<String, TileType> familyTypes = types.computeIfAbsent(family, k -> new HashMap<>());
+			return familyTypes.computeIfAbsent(name, k -> new TileType(family, k, nextOrdinal++));
+		}
 	}
 
 	private static class TileTypeReplace implements Serializable {
