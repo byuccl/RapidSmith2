@@ -60,7 +60,7 @@ public class UCFParser {
 	 * @return A list of Constraint objects representing the constraints 
 	 */
 	public ArrayList<Constraint> parseUCF(String fileName){
-		ArrayList<Constraint> constraints = new ArrayList<Constraint>();
+		ArrayList<Constraint> constraints = new ArrayList<>();
 		line = 0;
 		try {
 			reader = new BufferedInputStream(new FileInputStream(fileName));

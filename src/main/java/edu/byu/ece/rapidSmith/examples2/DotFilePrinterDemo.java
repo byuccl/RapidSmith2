@@ -22,9 +22,8 @@ public class DotFilePrinterDemo {
 	/**
 	 * @param args
 	 * @throws IOException 
-	 * @throws ParseException 
 	 */
-	public static void main(String[] args) throws IOException, ParseException {
+	public static void main(String[] args) throws IOException {
 
 		if (args.length != 1) {
 			System.err.println("Usage: java DotFilePrinterDemo checkpointName");

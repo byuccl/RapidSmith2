@@ -19,16 +19,16 @@ import java.util.*;
 
 public class SimulatedAnnealingPlacer {
 	
-	private CellDesign design;
-	private Device device;
-	private ArrayList<SiteCluster> placeableSiteClusters;
-	private ArrayList<SiteCluster> allSiteClusters;
+	private final CellDesign design;
+	private final Device device;
+	private final ArrayList<SiteCluster> placeableSiteClusters;
+	private final ArrayList<SiteCluster> allSiteClusters;
 	private HashMap<Site, SiteCluster> sitenameToClusterMap;
-	private int[] netToCostMap; 
+	private final int[] netToCostMap;
 	
 	// Update these as you like to see the annealing aspects of the placer
 	// The last element in the array should always be 0!
-	private double[] checkpointTimes = {.30, .10, .05, .01, .005, 0};
+	private final double[] checkpointTimes = {.30, .10, .05, .01, .005, 0};
 	private int currentCheckpointTime = 0; 
 	private BufferedWriter vivadoOut = null;
 	private boolean viewCheckpoints = false; 

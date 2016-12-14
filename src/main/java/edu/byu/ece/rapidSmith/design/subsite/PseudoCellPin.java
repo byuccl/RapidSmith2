@@ -25,11 +25,11 @@ public class PseudoCellPin extends CellPin {
 	/** Unqiue Serial Version for this class */
 	private static final long serialVersionUID = -4765068478025538798L;
 	/** Name of the pseudo pin */
-	private String name;
+	private final String name;
 	/** Direction of the pseudo pin relative to the cell*/
-	private PinDirection direction;
+	private final PinDirection direction;
 	/** {@link CellPinType} of the pin*/
-	private CellPinType pinType;
+	private final CellPinType pinType;
 		
 	/**
 	 * PseudoCellPin Constructor. Creates a floating pseudo cell pin that does not

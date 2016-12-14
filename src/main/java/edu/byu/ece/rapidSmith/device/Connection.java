@@ -46,8 +46,8 @@ public abstract class Connection implements Serializable {
 
 	// TODO: Update this to have a cache of created wires?
 	private final static class TileWireConnection extends Connection {
-		private TileWire sourceWire;
-		private WireConnection wc;
+		private final TileWire sourceWire;
+		private final WireConnection wc;
 		private TileWire sinkWire;
 		
 		public TileWireConnection(TileWire sourceWire, WireConnection wc) {
@@ -123,8 +123,8 @@ public abstract class Connection implements Serializable {
 	}
 
 	private final static class ReverseTileWireConnection extends Connection {
-		private TileWire sourceWire;
-		private WireConnection wc;
+		private final TileWire sourceWire;
+		private final WireConnection wc;
 
 		public ReverseTileWireConnection(TileWire sourceWire, WireConnection wc) {
 			this.sourceWire = sourceWire;
@@ -193,8 +193,8 @@ public abstract class Connection implements Serializable {
 	}
 
 	private final static class SiteWireConnection extends Connection {
-		private SiteWire sourceWire;
-		private WireConnection wc;
+		private final SiteWire sourceWire;
+		private final WireConnection wc;
 
 		public SiteWireConnection(SiteWire sourceWire, WireConnection wc) {
 			this.sourceWire = sourceWire;
@@ -266,7 +266,7 @@ public abstract class Connection implements Serializable {
 	}
 
 	private final static class TileToSiteConnection extends Connection {
-		private SitePin pin;
+		private final SitePin pin;
 
 		public TileToSiteConnection(SitePin pin) {
 			this.pin = pin;
@@ -332,7 +332,7 @@ public abstract class Connection implements Serializable {
 	}
 
 	private final static class SiteToTileConnection extends Connection {
-		private SitePin pin;
+		private final SitePin pin;
 
 		public SiteToTileConnection(SitePin pin) {
 			this.pin = pin;
@@ -398,7 +398,7 @@ public abstract class Connection implements Serializable {
 	}
 
 	private final static class Terminal extends Connection {
-		private BelPin belPin;
+		private final BelPin belPin;
 
 		public Terminal(BelPin belPin) {
 			this.belPin = belPin;

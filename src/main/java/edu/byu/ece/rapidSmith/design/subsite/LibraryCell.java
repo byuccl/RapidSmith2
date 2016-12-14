@@ -12,7 +12,7 @@ import java.util.Objects;
  *  Provides a template of possible cells for a design.
  */
 public abstract class LibraryCell implements Serializable {
-	private String name;
+	private final String name;
 
 	public LibraryCell(String name) {
 		Objects.nonNull(name);

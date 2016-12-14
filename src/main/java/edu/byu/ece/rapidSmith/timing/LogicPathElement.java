@@ -32,7 +32,7 @@ public class LogicPathElement extends PathElement implements Serializable{
 	/** The instance or physical resource */
 	private XdlInstance instance;
 	/** The logical resources (FFs,...) part of this path element */
-	private ArrayList<String> logicalResources = new ArrayList<String>();
+	private ArrayList<String> logicalResources = new ArrayList<>();
 	
 	
 	/**

@@ -34,7 +34,7 @@ public class WireArray {
 	/**
 	 * An array of wires
 	 */
-	public WireConnection[] array;
+	public final WireConnection[] array;
 	private Integer hash = null;
 
 	/**

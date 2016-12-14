@@ -593,7 +593,7 @@ public class FilterWindow extends QWidget{
 	 * @param index Index of the data that was clicked on.
 	 */
 	protected void onHover(QModelIndex index){
-		if(((String)index.data()).equals("")){
+		if(index.data().equals("")){
 			view.setCursor(arrow);
 			if(subViews != null && subViews.length > 0){
 				subViews[0].setCursor(arrow);

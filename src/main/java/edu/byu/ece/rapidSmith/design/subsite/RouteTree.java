@@ -15,10 +15,10 @@ import java.util.*;
 public final class RouteTree implements
 		Comparable<RouteTree>, Iterable<RouteTree> {
 	private RouteTree sourceTree; // Do I want bidirectional checks?
-	private Wire wire;
+	private final Wire wire;
 	private Connection connection;
 	private int cost; // for routers
-	private Collection<RouteTree> sinkTrees = new ArrayList<>(1);
+	private final Collection<RouteTree> sinkTrees = new ArrayList<>(1);
 
 	public RouteTree(Wire wire) {
 		this.wire = wire;
@@ -154,7 +154,7 @@ public final class RouteTree implements
 	}
 
 	public boolean prune(RouteTree terminal) {
-		Set<RouteTree> toPrune = new HashSet<RouteTree>();
+		Set<RouteTree> toPrune = new HashSet<>();
 		toPrune.add(terminal);
 		return prune(toPrune);
 	}
@@ -178,7 +178,7 @@ public final class RouteTree implements
 	}
 
 	private class PrefixIterator implements Iterator<RouteTree> {
-		private Stack<RouteTree> stack;
+		private final Stack<RouteTree> stack;
 
 		PrefixIterator() {
 			this.stack = new Stack<>();

@@ -13,11 +13,11 @@ import java.util.Objects;
  */
 public final class SitePin implements Serializable {
 	// The site this pin resides on
-	private Site site;
+	private final Site site;
 	// The template that describes this pin
-	private SitePinTemplate template;
+	private final SitePinTemplate template;
 	// the tile wire that connects to this pin
-	private int externalWire;
+	private final int externalWire;
 
 	SitePin(Site site, SitePinTemplate template, int externalWire) {
 		this.site = site;

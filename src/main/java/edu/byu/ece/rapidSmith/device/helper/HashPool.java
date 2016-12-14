@@ -34,8 +34,8 @@ import java.util.Iterator;
  * @param <E> The type of object to use.
  */
 public class HashPool<E> implements Iterable<E> {
-	private HashMap<E, Integer> map;
-	private ArrayList<E> enumeration;
+	private final HashMap<E, Integer> map;
+	private final ArrayList<E> enumeration;
 
 	public HashPool() {
 		map = new HashMap<>(512, 0.4f);

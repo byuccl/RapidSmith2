@@ -85,11 +85,10 @@ public final class RapidSmithDebug {
 		String cmd = "select [get_wires {";
 		
 		for(RouteTree rt : routeTrees) {
-			Iterator<RouteTree> it = rt.getFirstSource().iterator();
-			
-			while (it.hasNext()) {
-				Wire w = it.next().getWire();
-				cmd += w.getTile().getName() + "/" + w.getWireName() + " "; 
+
+			for (RouteTree routeTree : rt.getFirstSource()) {
+				Wire w = routeTree.getWire();
+				cmd += w.getTile().getName() + "/" + w.getWireName() + " ";
 			}
 		}
 		cmd += "}]";

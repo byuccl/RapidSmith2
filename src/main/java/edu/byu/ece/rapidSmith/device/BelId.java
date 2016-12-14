@@ -31,8 +31,8 @@ import java.util.Objects;
  *  primitive site type.  BelId objects are immutable.
  */
 public final class BelId implements Serializable {
-	private SiteType primitiveType;
-	private String name;
+	private final SiteType primitiveType;
+	private final String name;
 
 	/**
 	 * Constructs a new BelId object.

@@ -68,7 +68,7 @@ public abstract class AbstractConfigurationSpecification implements XilinxConfig
     }
     
     public String toString(int printLevel) {
-        String str = new String();
+        String str = "";
         
         str += "Family:" + getDeviceFamily() + "\n";
         str += "Device:" + getDeviceName() + "\n";

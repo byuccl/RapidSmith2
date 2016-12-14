@@ -84,7 +84,7 @@ public class BitstreamDiff {
 		
 		cmdLineParser.accepts(COMPARE_BITSTREAM_OPTION, COMPARE_BITSTREAM_OPTION_HELP).withRequiredArg().ofType(String.class);		
 		cmdLineParser.accepts(COMPARE_READBACK_OPTION, 
-				COMPARE_READBACK_OPTION_HELP).withRequiredArg().ofType(String.class);;
+				COMPARE_READBACK_OPTION_HELP).withRequiredArg().ofType(String.class);
 		cmdLineParser.accepts(MASK_BITSTREAM_OPTION, 
 				MASK_BITSTREAM_OPTION_HELP);
 
@@ -162,7 +162,7 @@ public class BitstreamDiff {
 			System.exit(1);
 		}
 
-		ArrayList<Integer> diffFARs = new ArrayList<Integer>();
+		ArrayList<Integer> diffFARs = new ArrayList<>();
 		
 		FrameAddressRegister far = new FrameAddressRegister(spec1);
 		

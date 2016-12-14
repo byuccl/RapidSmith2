@@ -37,12 +37,12 @@ public class BlockTypeInstance {
     
     public BlockTypeInstance(BlockType blockType, List<BlockSubType> columnLayout) {
         _blockType = blockType;
-        _columnLayout = new ArrayList<BlockSubType>(columnLayout);
+        _columnLayout = new ArrayList<>(columnLayout);
     }
     
     public BlockTypeInstance(BlockType blockType, BlockSubType[] columnLayout) {
         _blockType = blockType;
-        _columnLayout = new ArrayList<BlockSubType>(Arrays.asList(columnLayout));
+        _columnLayout = new ArrayList<>(Arrays.asList(columnLayout));
     }
     
     public int getNumColumns() {

@@ -41,7 +41,7 @@ import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
  */
 public class XDLRCParser {
 	// List of listeners to call when a parser element is detected
-	private List<XDLRCParserListener> listeners;
+	private final List<XDLRCParserListener> listeners;
 
 	// XDLRC input stream reader
 	private BufferedReader in;

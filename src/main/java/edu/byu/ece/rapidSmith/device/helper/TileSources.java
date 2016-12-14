@@ -33,8 +33,8 @@ public class TileSources {
 	/**
 	 * Sources of the tile
 	 */
-	public int[] sources;
-	private Set<Integer> set;
+	public final int[] sources;
+	private final Set<Integer> set;
 
 	private Integer hash = null;
 

@@ -9,7 +9,7 @@ import java.util.*;
  *
  */
 public class WireTraverser<WC extends WireTraverser.WireObject> {
-	private Comparator<WC> comparator;
+	private final Comparator<WC> comparator;
 	private PriorityQueue<WC> pq;
 	protected Set<Wire> searchedWires;
 	protected boolean forward;
@@ -93,7 +93,7 @@ public class WireTraverser<WC extends WireTraverser.WireObject> {
 	}
 
 	public static class WireWrapper implements WireTraverser.WireObject {
-		private Wire wire;
+		private final Wire wire;
 
 		public WireWrapper(Wire wire) {
 			this.wire = wire;

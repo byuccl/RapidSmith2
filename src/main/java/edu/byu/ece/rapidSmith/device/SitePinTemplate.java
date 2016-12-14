@@ -7,8 +7,8 @@ import java.util.Objects;
  *
  */
 public final class SitePinTemplate implements Serializable {
-	private String name;
-	private SiteType primitiveType;
+	private final String name;
+	private final SiteType primitiveType;
 	private PinDirection direction;
 	private int internalWire;
 

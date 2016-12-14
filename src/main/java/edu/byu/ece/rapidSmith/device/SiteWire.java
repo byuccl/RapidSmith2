@@ -11,8 +11,8 @@ import java.util.stream.Stream;
 public class SiteWire implements Wire, Serializable {
 
 	private static final long serialVersionUID = -3466670995491249683L;
-	private Site site;
-	private int wire;
+	private final Site site;
+	private final int wire;
 
 	public SiteWire(Site site, int wire) {
 		this.site = site;
@@ -81,7 +81,7 @@ public class SiteWire implements Wire, Serializable {
 		if (wireConnections == null)
 			return Collections.emptyList();
 
-		return Arrays.asList(wireConnections).stream()
+		return Arrays.stream(wireConnections)
 				.map(wc -> Connection.getSiteWireConnection(this, wc))
 				.collect(Collectors.toList());
 	}

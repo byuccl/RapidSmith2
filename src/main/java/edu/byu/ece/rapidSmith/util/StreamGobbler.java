@@ -26,8 +26,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public class StreamGobbler extends Thread{
-    InputStream is;
-    boolean verbose;
+    final InputStream is;
+    final boolean verbose;
     public StreamGobbler(InputStream is, boolean verbose){
         this.is = is;
         this.verbose = verbose;
