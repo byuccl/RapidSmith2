@@ -31,6 +31,7 @@ import java.util.Objects;
  * @author Chris Lavin
  */
 public class PIPRouteThrough implements Serializable{
+	private static final long serialVersionUID = 2235025719133598059L;
 	/** The type of primitive where a route through exists */
 	private SiteType type;
 	/** The input pin of the route through */

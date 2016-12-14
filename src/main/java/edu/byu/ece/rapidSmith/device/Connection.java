@@ -14,6 +14,8 @@ import static edu.byu.ece.rapidSmith.util.Exceptions.*;
  *
  */
 public abstract class Connection implements Serializable {
+	private static final long serialVersionUID = 3236104431137672033L;
+
 	public static Connection getTileWireConnection(
 			TileWire sourceWire, WireConnection wc
 	) {
@@ -46,6 +48,7 @@ public abstract class Connection implements Serializable {
 
 	// TODO: Update this to have a cache of created wires?
 	private final static class TileWireConnection extends Connection {
+		private static final long serialVersionUID = 7549238102833227662L;
 		private final TileWire sourceWire;
 		private final WireConnection wc;
 		private TileWire sinkWire;
@@ -193,6 +196,7 @@ public abstract class Connection implements Serializable {
 	}
 
 	private final static class SiteWireConnection extends Connection {
+		private static final long serialVersionUID = -6889841775729826036L;
 		private final SiteWire sourceWire;
 		private final WireConnection wc;
 
@@ -266,6 +270,7 @@ public abstract class Connection implements Serializable {
 	}
 
 	private final static class TileToSiteConnection extends Connection {
+		private static final long serialVersionUID = -5352375975919207638L;
 		private final SitePin pin;
 
 		public TileToSiteConnection(SitePin pin) {
@@ -332,6 +337,7 @@ public abstract class Connection implements Serializable {
 	}
 
 	private final static class SiteToTileConnection extends Connection {
+		private static final long serialVersionUID = 6090945282983450142L;
 		private final SitePin pin;
 
 		public SiteToTileConnection(SitePin pin) {
@@ -398,6 +404,7 @@ public abstract class Connection implements Serializable {
 	}
 
 	private final static class Terminal extends Connection {
+		private static final long serialVersionUID = 5789458862592782873L;
 		private final BelPin belPin;
 
 		public Terminal(BelPin belPin) {

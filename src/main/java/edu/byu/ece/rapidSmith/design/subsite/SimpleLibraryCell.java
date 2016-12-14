@@ -12,6 +12,7 @@ import java.util.Objects;
  *
  */
 public class SimpleLibraryCell extends LibraryCell {
+	private static final long serialVersionUID = 6378678352365270213L;
 	/** List of types of BELs cells of this type can be placed on */
 	private List<BelId> compatibleBels;
 	/** List of LibraryPins of this LibraryCell */
