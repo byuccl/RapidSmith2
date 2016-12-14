@@ -102,7 +102,7 @@ public final class EdifInterface {
 		
 		for ( EdifPort port : topInterface.getPortList() ) {
 			
-			String libraryPortType = null;
+			String libraryPortType;
 			
 			if (port.isInOut()) {
 				libraryPortType = "IOPORT";
@@ -285,7 +285,7 @@ public final class EdifInterface {
 	 */
 	private static Object getValueFromEdifType(EdifTypedValue typedValue) {
 		
-		Object value = null; 
+		Object value;
 		if (typedValue instanceof IntegerTypedValue) {
 			value = ((IntegerTypedValue)typedValue).getIntegerValue();
 		}

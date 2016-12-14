@@ -189,7 +189,7 @@ public class TraceReportParser{
 	
 	private ArrayList<PathElement> parsePathElements(){
 		ArrayList<PathElement> currPath = new ArrayList<>();
-		String[] parts = null;
+		String[] parts;
 		String dashedLine = "-------------------------------------------------";
 		// Move forward to the ------ line
 		while(!line.contains(dashedLine)){

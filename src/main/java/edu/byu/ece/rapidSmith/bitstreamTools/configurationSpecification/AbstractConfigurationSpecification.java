@@ -105,13 +105,13 @@ public abstract class AbstractConfigurationSpecification implements XilinxConfig
 
     public static String getBlockSubtype(XilinxConfigurationSpecification spec, int blockType, int column) {
         List<BlockType> types = spec.getBlockTypes();
-        BlockType type = null;
+        BlockType type;
         if (blockType < types.size())
             type = types.get(blockType);
         else
             return null;
         List<BlockSubType> layout = spec.getBlockSubTypeLayout(type);
-        BlockSubType subType = null;
+        BlockSubType subType;
         if (column < layout.size()) {
             subType = layout.get(column);
         } else {
@@ -122,13 +122,13 @@ public abstract class AbstractConfigurationSpecification implements XilinxConfig
     
     public BlockSubType getBlockSubtype(XilinxConfigurationSpecification spec, FrameAddressRegister far) {
         List<BlockType> types = spec.getBlockTypes();
-        BlockType type = null;
+        BlockType type;
         if (far.getBlockType() < types.size())
             type = types.get(far.getBlockType());
         else
             return null;
         List<BlockSubType> layout = spec.getBlockSubTypeLayout(type);
-        BlockSubType subType = null;
+        BlockSubType subType;
         if (far.getColumn() < layout.size()) {
             subType = layout.get(far.getColumn());
         } else {

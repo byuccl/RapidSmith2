@@ -204,7 +204,7 @@ public class BitstreamManipulation {
 
 		// create the bitstream
 		Bitstream newBitstream = null;
-		BitstreamHeader newHeader = null;
+		BitstreamHeader newHeader;
 
 		
 
@@ -300,7 +300,7 @@ public class BitstreamManipulation {
 	}//end main
 	
 	public static int writeBitstreamToBIT(Bitstream bit, String outputFilename) {
-		FileOutputStream out=null;
+		FileOutputStream out;
 		try {
 			out = new FileOutputStream(new File(outputFilename));
 		} catch (FileNotFoundException e) {

@@ -76,7 +76,7 @@ public class Constraint{
 			e.printStackTrace();
 			return false;
 		}
-		String token = null;
+		String token;
 		switch(statementType){
 			case INST: 
 			case NET:

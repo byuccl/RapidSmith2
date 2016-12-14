@@ -161,7 +161,7 @@ public class TestTools {
             String fullName = partName + desc.getValidPackagesForPart(partName).get(0) + desc.getValidSpeedGradesForPart(partName).get(0);
             
             // Generate small XDL design
-            FileWriter fw = null;
+            FileWriter fw;
             try {
                 fw = new FileWriter(xdlFile);
                 fw.write("design \"top\" " + fullName + " v3.2 , cfg \"\";");
@@ -222,7 +222,7 @@ public class TestTools {
         String fullName = partName;//+ desc.getValidPackagesForPart(partName).get(0) + desc.getValidSpeedGradesForPart(partName).get(0);
         
         // Generate small XDL design
-        FileWriter fw = null;
+        FileWriter fw;
         try {
             fw = new FileWriter(xdlFile);
             fw.write("design \"top\" " + fullName + " v3.2 , cfg \"\";");
@@ -249,7 +249,7 @@ public class TestTools {
     }
     
     public static XilinxPartgenDescription getPartgenDescription(String architecture) {
-        XilinxPartgenDescription result = null;
+        XilinxPartgenDescription result;
 
         List<String> partNames = new ArrayList<>();
         List<List<String>> validPackages = new ArrayList<>();

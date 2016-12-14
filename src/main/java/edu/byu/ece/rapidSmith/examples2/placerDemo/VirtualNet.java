@@ -160,10 +160,12 @@ public class VirtualNet {
 	public int hashCode() {
 		return this.uniqueID;
 	}
-	
+
 	@Override
-	public boolean equals(Object obj) {
-		VirtualNet other = (VirtualNet) obj;
-		return this.uniqueID == other.uniqueID;
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		VirtualNet that = (VirtualNet) o;
+		return uniqueID == that.uniqueID;
 	}
 }

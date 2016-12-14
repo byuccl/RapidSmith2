@@ -112,7 +112,7 @@ public class Bitstream {
      * bitstream has one.
      */
     public List<Byte> getRawBytes() {
-        List<Byte> result = null;
+        List<Byte> result;
         if (hasHeader()) {
             result = getRawBytesWithHeader();
         }
@@ -311,16 +311,16 @@ public class Bitstream {
         PrintWriter pw = new PrintWriter(os);
         
         List<Byte> bytes = new ArrayList<>();
-        int i = 0; // Byte array index pointer
-        int j = 0; // Modulo counter
-        int length = 0; // length of bitstream
-        int tmp = 0; // Current byte
+        int i; // Byte array index pointer
+        int j; // Modulo counter
+        int length; // length of bitstream
+        int tmp; // Current byte
         int byte_count = 16; // Number of bytes per line
         int starting_address = 0x00;
         int sba_address = 0x00;
         int record_type = 0x00;
         int checksum = 0x00;
-        String line = "";
+        String line;
 
         i = 0;
         bytes = addDummyAndSyncWords(bytes);

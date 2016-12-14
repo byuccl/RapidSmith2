@@ -102,7 +102,7 @@ public class XdcRoutingInterface {
 		// try-with-resources to guarantee no resource leakage
 		try (LineNumberReader br = new LineNumberReader(new BufferedReader(new FileReader(xdcFile)))) {
 		
-			String line = null;
+			String line;
 			while ((line = br.readLine()) != null) {
 				this.currentLineNumber = br.getLineNumber();
 				String[] toks = line.split("\\s+");
@@ -788,7 +788,7 @@ public class XdcRoutingInterface {
 	 */
 	private CellNet tryGetCellNet(String netName) {
 		
-		CellNet net = null;
+		CellNet net;
 		switch (netName) {
 			case "VCC":
 				net = design.getVccNet();

@@ -54,7 +54,7 @@ public class XdcPlacementInterface {
 		
 		currentFile = xdcFile;
 		LineNumberReader br = new LineNumberReader(new BufferedReader(new FileReader(xdcFile)));
-		String line = null;
+		String line;
 		
 		while ((line = br.readLine()) != null) {
 			currentLineNumber = br.getLineNumber();

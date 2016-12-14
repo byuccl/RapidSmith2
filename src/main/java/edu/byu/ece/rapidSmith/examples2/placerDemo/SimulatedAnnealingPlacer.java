@@ -498,10 +498,10 @@ public class SimulatedAnnealingPlacer {
 		
 		long start = System.currentTimeMillis();	
 		int size = this.placeableSiteClusters.size();
-		int next = 0, moves = 0, accepted = 0, total_moves = 0;
+		int next, moves, accepted, total_moves = 0;
 		int movesAtTemp = 10000;
 		
-		double percentAccepted = 0;
+		double percentAccepted;
 		//int test = 0;
 		do {	
 			moves = 0;

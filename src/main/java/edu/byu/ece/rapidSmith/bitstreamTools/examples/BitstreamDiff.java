@@ -115,14 +115,14 @@ public class BitstreamDiff {
 		/////////////////////////////////////////////////////////////////////
 		// 1. Get base FPGA object
 		/////////////////////////////////////////////////////////////////////
-		FPGA fpga1 = null;		
+		FPGA fpga1;
 		fpga1 = cmdLineParser.createFPGAFromBitstreamOrReadbackFileExitOnError(options);
 		XilinxConfigurationSpecification part = fpga1.getDeviceSpecification();
 		
 		/////////////////////////////////////////////////////////////////////
 		// 2. Get compare FPGA object
 		/////////////////////////////////////////////////////////////////////
-		FPGA fpga2 = null;
+		FPGA fpga2;
 		fpga2 = cmdLineParser.createFPGAFromBitstreamOrReadbackFileExitOnError(options, 
 				COMPARE_READBACK_OPTION,
 				COMPARE_BITSTREAM_OPTION, part);

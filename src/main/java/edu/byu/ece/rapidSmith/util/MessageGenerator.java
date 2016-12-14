@@ -183,7 +183,7 @@ public class MessageGenerator{
 		try{
 			ch = System.in.read();
 			while(ch != 'y' && ch != 'n' && ch != 'Y' && ch != 'N'){
-				while((ch = System.in.read()) != '\n');
+				while(System.in.read() != '\n');
 				System.out.print("Would you like to continue(y/n)? ");
 				ch = System.in.read();
 			}
