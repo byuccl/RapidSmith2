@@ -80,12 +80,10 @@ public final class SiteType implements Comparable<SiteType>, Serializable {
 		Objects.requireNonNull(name);
 
 		name = name.toUpperCase();
-		Map<String, SiteType> familyTypes = types.computeIfAbsent(family, k -> new HashMap<>());
-		return familyTypes.computeIfAbsent(name, k -> {
-			synchronized (types) {
-				return new SiteType(family, k, nextOrdinal++);
-			}
-		});
+		synchronized (types) {
+			Map<String, SiteType> familyTypes = types.computeIfAbsent(family, k -> new HashMap<>());
+			return familyTypes.computeIfAbsent(name, k -> new SiteType(family, k, nextOrdinal++));
+		}
 	}
 
 	private static class SiteTypeReplace implements Serializable {
