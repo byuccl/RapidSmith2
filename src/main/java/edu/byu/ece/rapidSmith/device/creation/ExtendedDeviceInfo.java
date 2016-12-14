@@ -5,8 +5,7 @@ import com.caucho.hessian.io.Hessian2Output;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.Connection;
 import edu.byu.ece.rapidSmith.device.*;
-import edu.byu.ece.rapidSmith.device.helper.HashPool;
-import edu.byu.ece.rapidSmith.device.helper.WireArray;
+import edu.byu.ece.rapidSmith.util.HashPool;
 import edu.byu.ece.rapidSmith.util.FileTools;
 
 import java.io.IOException;

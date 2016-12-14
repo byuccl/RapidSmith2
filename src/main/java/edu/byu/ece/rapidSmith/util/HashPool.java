@@ -18,7 +18,7 @@
  * get a copy of the license at <http://www.gnu.org/licenses/>.
  * 
  */
-package edu.byu.ece.rapidSmith.device.helper;
+package edu.byu.ece.rapidSmith.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
