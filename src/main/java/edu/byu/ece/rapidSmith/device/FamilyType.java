@@ -71,11 +71,9 @@ public final class FamilyType implements Comparable<FamilyType>, Serializable {
 		Objects.requireNonNull(name);
 
 		name = name.toUpperCase();
-		return types.computeIfAbsent(name, k -> {
-			synchronized (types) {
-				return new FamilyType(k, nextOrdinal++);
-			}
-		});
+		synchronized (types) {
+			return types.computeIfAbsent(name, k -> new FamilyType(k, nextOrdinal++));
+		}
 	}
 
 	private static class FamilyTypeReplace implements Serializable {
