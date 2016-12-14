@@ -192,7 +192,7 @@ public class SiteCluster {
 			//if (!swapSite.matchesSite(site))
 			//	return false;
 				
-			//Tile t1 = swapSite.getPrimitiveSite().getTile();
+			//Tile t1 = swapSite.getSite().getTile();
 			//Tile t2 = site.getTile();
 						
 			if (!swapSite.swap(currentLOC))

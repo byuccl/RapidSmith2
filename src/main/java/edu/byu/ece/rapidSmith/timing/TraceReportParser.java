@@ -221,7 +221,7 @@ public class TraceReportParser{
 						}
 						((RoutingPathElement)currElement).setNet(net);
 						for(XdlPin p : net.getPins()){
-							if(p.getName().equals(pinName) && p.getInstance().getPrimitiveSiteName().equals(primitiveSiteName)){
+							if(p.getName().equals(pinName) && p.getInstance().getSiteName().equals(primitiveSiteName)){
 								currElement.setPin(p);
 								break;
 							}

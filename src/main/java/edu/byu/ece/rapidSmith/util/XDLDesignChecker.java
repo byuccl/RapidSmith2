@@ -149,17 +149,17 @@ public class XDLDesignChecker{
 		MessageGenerator.printHeader("CHECKING FOR UNIQUE PRIMITIVE PLACEMENTS ... ");
 		HashMap<Site, XdlInstance> usedSites = new HashMap<>();
 		for(XdlInstance inst : design.getInstances()){
-			if(inst.getPrimitiveSite() == null){
+			if(inst.getSite() == null){
 				System.out.println("Warning: " + inst.getName() +" is unplaced.");
 			}
-			else if(usedSites.containsKey(inst.getPrimitiveSite())){
-				System.out.println("ERROR: Placement conflict at site: " + inst.getPrimitiveSiteName() +" (tile: "+inst.getTile()+")");
+			else if(usedSites.containsKey(inst.getSite())){
+				System.out.println("ERROR: Placement conflict at site: " + inst.getSiteName() +" (tile: "+inst.getTile()+")");
 				System.out.println("  Involving at least these two instances:");
 				System.out.println("    " + inst.getName());
-				System.out.println("    " + usedSites.get(inst.getPrimitiveSite()).getName());
+				System.out.println("    " + usedSites.get(inst.getSite()).getName());
 			}
 			else{
-				usedSites.put(inst.getPrimitiveSite(), inst);
+				usedSites.put(inst.getSite(), inst);
 			}
 		}
 
