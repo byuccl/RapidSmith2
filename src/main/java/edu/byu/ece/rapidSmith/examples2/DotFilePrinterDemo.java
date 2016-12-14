@@ -1,5 +1,4 @@
 package edu.byu.ece.rapidSmith.examples2;
-import edu.byu.ece.edif.util.parse.ParseException;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;

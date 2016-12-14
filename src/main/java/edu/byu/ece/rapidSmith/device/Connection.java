@@ -125,6 +125,7 @@ public abstract class Connection implements Serializable {
 	}
 
 	private final static class ReverseTileWireConnection extends Connection {
+		private static final long serialVersionUID = -3585646572632532927L;
 		private final TileWire sourceWire;
 		private final WireConnection wc;
 

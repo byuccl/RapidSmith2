@@ -1,29 +1,20 @@
 package edu.byu.ece.rapidSmith.examples2.placerDemo;
 
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-
+import edu.byu.ece.rapidSmith.RSEnvironment;
+import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
+import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
+import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
+import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import edu.byu.ece.edif.core.EdifNameConflictException;
-import edu.byu.ece.edif.core.InvalidEdifNameException;
-import edu.byu.ece.edif.util.parse.ParseException;
-import edu.byu.ece.rapidSmith.RSEnvironment;
-import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
-import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
-import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
+
+import java.io.*;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Simulated Annealing placer demo for FPL. The demo can be run in interactive mode (-I) <br>

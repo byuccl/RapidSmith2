@@ -2,7 +2,6 @@ package edu.byu.ece.rapidSmith.util;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;

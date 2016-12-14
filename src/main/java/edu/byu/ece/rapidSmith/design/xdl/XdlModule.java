@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import edu.byu.ece.rapidSmith.device.Site;
-
 /**
  * This class represents the modules as found in XDL.  They are used to describe
  * hard macros and RPMs and instances of each.
