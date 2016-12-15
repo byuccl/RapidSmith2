@@ -75,13 +75,13 @@ public class VirtualNet {
 	public int updateCost() {
 		
 		if (source.hasMoved()) 
-			updateBoundingBox(source.getPrimitiveSite().getTile());
+			updateBoundingBox(source.getSite().getTile());
 		
 		for (int i = 0; i < this.numSinks; i++) {
 			SiteCluster sc = sinks[i];
 			
 			if (sc.hasMoved()) 
-				updateBoundingBox(sc.getPrimitiveSite().getTile());
+				updateBoundingBox(sc.getSite().getTile());
 		}
 		
 		this.cost =  ((top - bottom) + (right - left)); // * scaleFactor 

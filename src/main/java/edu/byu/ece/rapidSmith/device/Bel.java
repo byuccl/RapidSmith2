@@ -31,7 +31,7 @@ public final class Bel implements Serializable {
 	/**
 	 * Creates a new BEL in the given site backed by the given template.
 	 *
-	 * Use PrimitiveSite.getBel to create a new BEL
+	 * Use Site.getBel to create a new BEL
 	 */
 	Bel(Site site, BelTemplate template) {
 		assert site != null;

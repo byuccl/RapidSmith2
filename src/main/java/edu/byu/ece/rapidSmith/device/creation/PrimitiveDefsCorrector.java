@@ -10,13 +10,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import static edu.byu.ece.rapidSmith.util.Exceptions.FileFormatException;
+
 /**
  *
  */
 public class PrimitiveDefsCorrector {
 	public static void makeCorrections(PrimitiveDefList defs, Document deviceInfo) {
 		for (PrimitiveDef def : defs) {
-			Element ptEl = getPrimitiveTypeEl(deviceInfo, def.getType());
+			Element ptEl = getSiteTypeEl(deviceInfo, def.getType());
 			Element correctionsEl = ptEl.getChild("corrections");
 			if (correctionsEl == null) // no corrections for this primitive type
 				continue;
@@ -160,13 +162,12 @@ public class PrimitiveDefsCorrector {
 
 	}
 
-	private static Element getPrimitiveTypeEl(Document deviceInfo, SiteType type) {
-		Element primitiveTypesEl = deviceInfo.getRootElement().getChild("primitive_types");
-		for (Element primitiveTypeEl : primitiveTypesEl.getChildren("primitive_type")) {
-			if (primitiveTypeEl.getChildText("name").equals(type.name()))
-				return primitiveTypeEl;
+	private static Element getSiteTypeEl(Document deviceInfo, SiteType type) {
+		Element siteTypesEl = deviceInfo.getRootElement().getChild("site_types");
+		for (Element siteTypeEl : siteTypesEl.getChildren("site_type")) {
+			if (siteTypeEl.getChildText("name").equals(type.name()))
+				return siteTypeEl;
 		}
-		assert false;
-		return null;
+		throw new FileFormatException("no site type " + type.name() + " in familyInfo.xml");
 	}
 }

@@ -195,10 +195,10 @@ public class XDLRCOutputter {
 	private void writeTile(Tile tile) throws IOException {
 		out.append(ind + "(tile " + tile.getRow() + " " + tile.getColumn() + " " +
 				tile.getName() + " " + tile.getType() + " " +
-				(tile.getPrimitiveSites() == null ? "0" : tile.getPrimitiveSites().length) + nl);
+				(tile.getSites() == null ? "0" : tile.getSites().length) + nl);
 		int numPinWires = 0;
-		if (tile.getPrimitiveSites() != null) {
-			for (Site site : tile.getPrimitiveSites()) {
+		if (tile.getSites() != null) {
+			for (Site site : tile.getSites()) {
 				writeSite(site, writeWires);
 				numPinWires += site.getSourcePins().size() + site.getSinkPins().size();
 			}

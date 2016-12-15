@@ -63,7 +63,7 @@ public class DesignAnalyzer {
 			if (c.getPossibleAnchors().size() == 0)
 				System.out.println("    This cell cannot be placed.");
 			for (BelId b : c.getPossibleAnchors()) {
-				System.out.println("    Can be placed onto sites of type " + b.getPrimitiveType() + " on Bels of type " + b.getName());
+				System.out.println("    Can be placed onto sites of type " + b.getSiteType() + " on Bels of type " + b.getName());
 			}
 		}
 	}

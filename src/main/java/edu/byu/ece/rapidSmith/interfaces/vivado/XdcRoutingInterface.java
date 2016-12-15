@@ -751,7 +751,7 @@ public class XdcRoutingInterface {
 	 */
 	private Site tryGetSite(String siteName) {
 		
-		Site site = device.getPrimitiveSite(siteName);
+		Site site = device.getSite(siteName);
 		
 		if (site == null) {
 			throw new ParseException("Site \"" + siteName + "\" not found in the current device. \n" 

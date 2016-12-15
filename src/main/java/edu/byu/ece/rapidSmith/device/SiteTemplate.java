@@ -7,15 +7,15 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- *  Template to back primitive sites that contains information common to
- *  all primitive sites of a specific type.
+ *  Template to back sites that contains information common to
+ *  all sites of a specific type.
  */
 public final class SiteTemplate implements Serializable {
 	// The type of this site template
 	private SiteType type;
 	// The templates for the BELs in this site template
 	private Map<String, BelTemplate> belTemplates;
-	// Primitive types that can be placed on sites of this type
+	// Site types that can be placed on sites of this type
 	private SiteType[] compatibleTypes;
 	// The intrasite routing graph structure
 	private WireHashMap routing;
@@ -135,7 +135,7 @@ public final class SiteTemplate implements Serializable {
 
 	@Override
 	public String toString() {
-		return "PrimitiveTemplate{" +
+		return "SiteTemplate{" +
 				"type=" + type +
 				'}';
 	}

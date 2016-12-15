@@ -27,31 +27,31 @@ import java.util.Objects;
 /**
  *  Identifier for a unique BEL name (SLICEL/AFF, SLICEM/F7MUX, etc) in the device.
  *
- *  The identifier consists of a primitive type and the name of the BEL within the
- *  primitive site type.  BelId objects are immutable.
+ *  The identifier consists of a site type and the name of the BEL within the
+ *  site.  BelId objects are immutable.
  */
 public final class BelId implements Serializable {
-	private SiteType primitiveType;
+	private SiteType siteType;
 	private String name;
 
 	/**
 	 * Constructs a new BelId object.
 	 *
-	 * @param primitiveType the primitive type of the BEL id
+	 * @param siteType the site type of the BEL id
 	 * @param name the name of the BEL within the site
 	 */
-	public BelId(SiteType primitiveType, String name) {
-		this.primitiveType = primitiveType;
+	public BelId(SiteType siteType, String name) {
+		this.siteType = siteType;
 		this.name = name;
 	}
 
 	/**
-	 * Returns the primitive type portion of this id.
+	 * Returns the site type portion of this id.
 	 *
-	 * @return the primitive type
+	 * @return the site type
 	 */
-	public SiteType getPrimitiveType() {
-		return primitiveType;
+	public SiteType getSiteType() {
+		return siteType;
 	}
 
 	/**
@@ -65,7 +65,7 @@ public final class BelId implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return primitiveType.hashCode() * 31 + name.hashCode();
+		return siteType.hashCode() * 31 + name.hashCode();
 	}
 
 	@Override
@@ -77,11 +77,11 @@ public final class BelId implements Serializable {
 			return false;
 		}
 		final BelId other = (BelId) obj;
-		return Objects.equals(this.primitiveType, other.primitiveType) && Objects.equals(this.name, other.name);
+		return Objects.equals(this.siteType, other.siteType) && Objects.equals(this.name, other.name);
 	}
 
 	@Override
 	public String toString() {
-		return primitiveType + "/" + name ;
+		return siteType + "/" + name ;
 	}
 }

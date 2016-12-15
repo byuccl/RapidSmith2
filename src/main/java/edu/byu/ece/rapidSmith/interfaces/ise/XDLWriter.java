@@ -146,7 +146,7 @@ public class XDLWriter {
 				out.append("# instance \"" + mi.getName() + "\" \"" + mi.getModule().getName() + "\" , ");
 				if (mi.getAnchor() != null && mi.getAnchor().isPlaced()) {
 					out.append("placed " + mi.getAnchor().getTile().getName() + " " +
-							mi.getAnchor().getPrimitiveSiteName() + " ;" + nl);
+							mi.getAnchor().getSiteName() + " ;" + nl);
 				} else {
 					out.append("unplaced  ;" + nl);
 				}
@@ -336,7 +336,7 @@ public class XDLWriter {
 		for (XdlInstance inst : sorted) {
 			out.append(ind + "inst \"" + inst.getName() + "\" \"" + inst.getType().name() + "\",");
 			if (inst.isPlaced())
-				out.append("placed " + inst.getTile().getName() +	" " + inst.getPrimitiveSiteName());
+				out.append("placed " + inst.getTile().getName() +	" " + inst.getSiteName());
 			else
 				out.append("unplaced");
 			out.append("  ,");

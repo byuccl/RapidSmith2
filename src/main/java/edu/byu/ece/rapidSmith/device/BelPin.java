@@ -99,7 +99,7 @@ public final class BelPin implements Serializable {
 	 * @see #getSitePinNames()
 	 */
 	public Set<SitePin> getSitePins() {
-		bel.getSite().setType(bel.getId().getPrimitiveType());
+		bel.getSite().setType(bel.getId().getSiteType());
 		if (template.getSitePins() == null)
 			return Collections.emptySet();
 		Set<SitePin> sitePins = new HashSet<>();

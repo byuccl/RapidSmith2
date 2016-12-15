@@ -425,7 +425,7 @@ public abstract class ImportTest {
 		String[] tclBelPinNames = belPinString.split("\\s+");
 		for (String tclBelPinName : tclBelPinNames) {
 			String[] belPinToks = tclBelPinName.split("/");
-			Site site = device.getPrimitiveSite(belPinToks[0]);
+			Site site = device.getSite(belPinToks[0]);
 			Bel bel = site.getBel(belPinToks[1]);
 			BelPin belPin = bel.getBelPin(belPinToks[2]);
 			

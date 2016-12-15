@@ -25,15 +25,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * This class represents the primitive sites found in XDLRC files.  Theses
- * represent places on the FPGA where a particular instance of a primitive (or
- * XDL 'inst') can reside.
+ * This class represents the sites found in a Xilinx device.  Sites are a collection
+ * of closely interconnected BELs.
  * @author Chris Lavin
  */
 public final class Site implements Serializable{
-	/** Name of the primitive site with X and Y coordinates (ie. SLICE_X0Y0) */
+	/** Name of the site with X and Y coordinates (ie. SLICE_X0Y0) */
 	private String name;
-	/** The index in the tile's list of PrimitiveSites */
+	/** The index in the tile's list of Sites */
 	private int index;
 	/** The tile where this site resides */
 	private Tile tile;
@@ -48,18 +47,18 @@ public final class Site implements Serializable{
 	/** List of possible types for this site. */
 	private SiteType[] possibleTypes;
 	/**
-	 * A map of the external wire each pin connects to for each primitive type this
+	 * A map of the external wire each pin connects to for each site type this
 	 * site can be represented as.
 	 */
 	private Map<SiteType, Map<String, Integer>> externalWires;
 	/**
 	 * Map of the site pin each wire connecting to the site connects to for each
-	 * primitive type this site can be represented as.
+	 * site type this site can be represented as.
 	 */
 	private Map<SiteType, Map<Integer, SitePinTemplate>> externalWireToPinNameMap;
 
 	/**
-	 * Constructor unnamed, tileless primitive site.
+	 * Constructor unnamed, tileless site.
 	 */
 	public Site(){
 		name = null;
@@ -69,15 +68,15 @@ public final class Site implements Serializable{
 	}
 	
 	/**
-	 * Returns the name of this primitive site (ex: SLICE_X4Y6).
-	 * @return the unique name of this primitive site.
+	 * Returns the name of this site (ex: SLICE_X4Y6).
+	 * @return the unique name of this site.
 	 */
 	public String getName(){
 		return name;
 	}
 	
 	/**
-	 * Sets the name of this primitive site (ex: SLICE_X5Y7).
+	 * Sets the name of this site (ex: SLICE_X5Y7).
 	 * Also infers the XY coordinates for this site based on the name.
 	 * @param name the name to set.
 	 */
@@ -99,7 +98,7 @@ public final class Site implements Serializable{
 	}
 
 	/**
-	 * Returns the index of this site in it tile's PrimitiveSite list.
+	 * Returns the index of this site in it tile's Site list.
 	 * @return this site's index
 	 */
 	public int getIndex() {
@@ -107,7 +106,7 @@ public final class Site implements Serializable{
 	}
 
 	/**
-	 * Sets the index of this site in its tile's PrimitiveSite list.
+	 * Sets the index of this site in its tile's Site list.
 	 * @param index index of this site
 	 */
 	public void setIndex(int index) {
@@ -115,15 +114,15 @@ public final class Site implements Serializable{
 	}
 
 	/**
-	 * Returns the tile in which this primitive site exists.
-	 * @return the tile in which this primitive site exists
+	 * Returns the tile in which this site exists.
+	 * @return the tile in which this site exists
 	 */
 	public Tile getTile(){
 		return tile;
 	}
 	
 	/**
-	 * Sets the tile in which this primitive site exists.
+	 * Sets the tile in which this site exists.
 	 * @param location the tile location for this site
 	 */
 	public void setTile(Tile location){
@@ -151,8 +150,8 @@ public final class Site implements Serializable{
 	}
 
 	/**
-	 * Returns the current type of this primitive site.
-	 * @return the current type of this primitive site
+	 * Returns the current type of this site.
+	 * @return the current type of this site
 	 */
 	public SiteType getType(){
 		return getTemplate().getType();
@@ -165,7 +164,7 @@ public final class Site implements Serializable{
 	 * <p>
 	 * This method obtains the site template from its device, therefore, the
 	 * site must already exist in a tile which exists in a device.
-	 * @param type the new primitive type for this site
+	 * @param type the new type for this site
 	 */
 	public void setType(SiteType type) {
 		template = getTile().getDevice().getSiteTemplate(type);
@@ -184,7 +183,7 @@ public final class Site implements Serializable{
 	}
 
 	/**
-	 * Returns an array containing the valid primitive types that this site can be
+	 * Returns an array containing the valid types that this site can be
 	 * treated as.
 	 *
 	 * @return the possible types for this site
@@ -292,7 +291,7 @@ public final class Site implements Serializable{
 	}
 
 	public Bel getBel(BelId belId) {
-		return getBel(getTemplate(belId.getPrimitiveType()), belId.getName());
+		return getBel(getTemplate(belId.getSiteType()), belId.getName());
 	}
 
 	private Bel getBel(SiteTemplate template, String belName) {
@@ -303,12 +302,12 @@ public final class Site implements Serializable{
 	}
 
 	/**
-	 * Returns PrimitiveTypes that are compatible with the default site type.
+	 * Returns SiteTypes that are compatible with the default site type.
 	 * Compatible types are different that possible types.  These are types
 	 * that the site type cannot be changed to, but instances of the type be
 	 * placed on them.
 	 *
-	 * @return PrimitiveTypes that are compatible with the default site type
+	 * @return SiteTypes that are compatible with the default site type
 	 */
 	public SiteType[] getCompatibleTypes() {
 		return getDefaultTemplate().getCompatibleTypes();
@@ -567,7 +566,7 @@ public final class Site implements Serializable{
 
 	/**
 	 * Sets the mapping of pin names to externally connected wires for each possible
-	 * primitive type this site can take.
+	 * type this site can take.
 	 * Used for device creation
 	 * @param externalWires the mapping of pin names to externally connected wires
 	 */
@@ -577,7 +576,7 @@ public final class Site implements Serializable{
 
 	/**
 	 * Returns the mapping of pin names to externally connected wires for each
-	 * possible primitive type this site can take.
+	 * possible type this site can take.
 	 * @return the mapping of pin names to externally connected wires
 	 */
 	public Map<SiteType, Map<String, Integer>> getExternalWires() {
@@ -590,7 +589,7 @@ public final class Site implements Serializable{
 
 	/**
 	 * Sets the mapping of wires to the names of the pins the wires connect to for
-	 * each possible primitive type this site can take.
+	 * each possible type this site can take.
 	 * @param externalWireToPinNameMap the mapping of wires to pin names
 	 */
 	public void setExternalWireToPinNameMap(
@@ -600,15 +599,15 @@ public final class Site implements Serializable{
 
 	// Site compatibility
 	/**
-	 * This method will check if the PrimitiveType otherType can be placed
-	 * at this primitive site.  Most often only if they are
+	 * This method will check if the SiteType otherType can be placed
+	 * at this site.  Most often only if they are
 	 * equal can this be true.  However there are a few special cases that require
 	 * extra handling.  For example a SLICEL can reside in a SLICEM site but not 
 	 * vice versa.  
-	 * @param otherType The primitive type to try to place on this site.
-	 * @return True if otherType can be placed at this primitive site, false otherwise.
+	 * @param otherType The site type to try to place on this site.
+	 * @return True if otherType can be placed at this site, false otherwise.
 	 */
-	public boolean isCompatiblePrimitiveType(SiteType otherType){
+	public boolean isCompatibleSiteType(SiteType otherType){
 		for (SiteType compat : getCompatibleTypes())
 			if (compat == otherType)
 				return true;
@@ -628,18 +627,18 @@ public final class Site implements Serializable{
 	
 	/**
 	 * This method gets the type of otherSite and calls the other method
-	 * public boolean isCompatiblePrimitiveType(PrimitiveType otherType);
+	 * public boolean isCompatibleSiteType(SiteType otherType);
 	 * See that method for more information.
 	 * @param otherSite The other site to see if its type is compatible with this site.
 	 * @return True if compatible, false otherwise.
 	 */
-	public boolean isCompatiblePrimitiveType(Site otherSite){
-		return isCompatiblePrimitiveType(otherSite.getType());
+	public boolean isCompatibleSiteType(Site otherSite){
+		return isCompatibleSiteType(otherSite.getType());
 	}
 
 	@Override
 	public String toString() {
-		return "{PrimitiveSite " + name + "}";
+		return "{Site " + name + "}";
 	}
 
 	@Override
@@ -650,8 +649,8 @@ public final class Site implements Serializable{
 	/*
 	   Class and method for optimized Hessian serialization.
 	 */
-	private static class PrimitiveSiteReplace implements Serializable {
-		/** Name of the primitive site with X and Y coordinates (ie. SLICE_X0Y0) */
+	private static class SiteReplace implements Serializable {
+		/** Name of the site with X and Y coordinates (ie. SLICE_X0Y0) */
 		private String name;
 		private SiteType[] possibleTypes;
 		private Map<SiteType, Map<String, Integer>> externalWires;
@@ -669,8 +668,8 @@ public final class Site implements Serializable{
 	}
 
 	@SuppressWarnings("UnusedDeclaration")
-	private PrimitiveSiteReplace writeReplace() {
-		PrimitiveSiteReplace repl = new PrimitiveSiteReplace();
+	private SiteReplace writeReplace() {
+		SiteReplace repl = new SiteReplace();
 		repl.name = name;
 		repl.possibleTypes = possibleTypes;
 		repl.externalWires = externalWires;

@@ -210,15 +210,6 @@ public class XdlPin implements Serializable, Cloneable {
 		return net;
 	}
 	
-	/**
-	 * Get the concatenated primitiveSiteName.PinName (ex. SLICE_X1Y2.C1)
-	 * name for the pin.  This pin name is unique throughout the device.
-	 * @return the primitive site name  pin name
-	 */
-	public String getPrimitiveSitePinName(){
-		return instance.getPrimitiveSiteName() + "." + name;
-	}
-
 	@Override
 	public String toString(){
 		return pinType.name().toLowerCase() +

@@ -60,8 +60,8 @@ public class DeviceBrowserScene extends TileScene{
 	private ArrayList<NumberedHighlightedTile> currentTiles = new ArrayList<>();
 
 
-	DeviceBrowserScene(Device device, boolean hideTiles, boolean drawPrimitives, DeviceBrowser browser){
-		super(device, hideTiles, drawPrimitives);
+	DeviceBrowserScene(Device device, boolean hideTiles, boolean drawSites, DeviceBrowser browser){
+		super(device, hideTiles, drawSites);
 		currLines = new ArrayList<>();
 		wirePen = new QPen(QColor.yellow, 0.25, PenStyle.SolidLine);
 		this.browser = browser;

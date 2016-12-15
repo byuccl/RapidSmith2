@@ -99,7 +99,7 @@ public class HandRouter{
 		ArrayList<RouteTree> sources = new ArrayList<>();
 
 		// Add the original source from the net
-		Wire w = dev.getPrimitiveExternalPin(net.getSource());
+		Wire w = getExternalPin(net.getSource());
 		sources.add(new RouteTree(w));
 
 		// In this loop we'll route each sink pin of the net separately
@@ -110,7 +110,7 @@ public class HandRouter{
 
 			// Here is where we create the current sink that we intend to target in this
 			//routing iteration.
-			Wire sink = dev.getPrimitiveExternalPin(sinkPin);
+			Wire sink = getExternalPin(sinkPin);
 
 			MessageGenerator.printHeader("Current Sink: " + sink);
 
@@ -213,6 +213,18 @@ public class HandRouter{
 		// Apply the PIPs we have choosen to the net
 		net.setPIPs(pipList);
 	}
+
+	/**
+	 * Returns the external wire on the instance pin.
+	 *
+	 * @param pin the pin to get the external name from.
+	 * @return the wire enumeration of the internal pin on the site of pin.
+	 */
+	private static TileWire getExternalPin(XdlPin pin) {
+		return pin.getInstance().getSite().getSitePin(pin.getName()).getExternalWire();
+	}
+
+
 
 	/**
 	 * Saves the design to a file.
