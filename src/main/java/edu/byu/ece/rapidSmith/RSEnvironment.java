@@ -93,7 +93,6 @@ public class RSEnvironment {
 
 	private void loadSupportedParts() {
 		for (FamilyType family : getAvailableFamilies()) {
-			Path partFolderPath = getPartFolderPath(family);
 			for (String part : getAvailableParts(family)) {
 				supportedParts.put(part, family);
 			}
@@ -179,7 +178,8 @@ public class RSEnvironment {
 	 * @return the path of the folder where the parts files resides
 	 */
 	public Path getPartFolderPath(String partName) {
-		return getPartFolderPath(getFamilyTypeFromPart(partName));
+		String canonicalName = PartNameTools.removeSpeedGrade(partName);
+		return getPartFolderPath(getFamilyTypeFromPart(canonicalName));
 	}
 
 	/**
@@ -285,6 +285,7 @@ public class RSEnvironment {
 	}
 
 	public FamilyType getFamilyTypeFromPart(String partName) {
-		return supportedParts.get(partName);
+		String canonicalName = PartNameTools.removeSpeedGrade(partName);
+		return supportedParts.get(canonicalName);
 	}
 }
