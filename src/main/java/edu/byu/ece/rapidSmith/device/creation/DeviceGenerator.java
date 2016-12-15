@@ -25,6 +25,7 @@ import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.primitiveDefs.*;
+import edu.byu.ece.rapidSmith.util.HashPool;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
 import org.jdom2.Document;
