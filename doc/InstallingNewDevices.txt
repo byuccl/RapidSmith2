@@ -1,0 +1,351 @@
+OVERVIEW
+--------
+
+RapidSmith and RapidSmith2 both derive their device information from
+XDLRC files.  However, these huge files must be processed and
+compressed to be usable by either system.  In the process, these
+programs correct problems with the XDLRC information and also create a
+collection of important additional information they require.
+
+The processes for RaidSmith and RapidSmith2 are sightly different.
+This document will focus on RapidSmith2.
+
+The big-picture steps to installing a new device or device family into
+RapidSmith2 is as follows (note that as a user you do not have to do
+a number of the steps):
+
+1. Create a familyInfo.xml file.  This is an XML file that contains a
+listing of the various primitive site types within the FPGA device.
+Tincr and Tcl scripts can be used to obtain much of the information
+needed for this file automatically.  This is only done once for supported
+families and therefore this should exist.
+
+2. Create a cellLibrary.xml file.  This is an XML file that describes 
+the various cells which are found in the netlists for a given device
+family.  This can be automatically created using TCL scripts.  It is not 
+used in the remaining steps below but must be loaded when a device and 
+design are loaded in RapidSmith2.  This is only done once for supported 
+families and therefore this should exist. 
+
+3. Produce an XDLRC file.  For Virtex7 and earlier devices, this can
+be done using the following command in ISE: "xdl -report -pips
+-all_conns <devname>".  For Ultrascale and later devices the XDLRC
+file will have to be created using Tincr.  You will have to do this - 
+how to do it is documented below.
+
+4. Once the XDLRC file and familyInfo.xml file are created, the
+Installer program within package edu.byu.ece.rapidSmith.util can be
+run and it will generate the needed device files for RapidSmith2.
+Running this program for the smallest Artix7 part takes about a half
+hour on a multi-core i7 machine.
+
+Generating an XDLRC File
+------------------------
+As mentioned, this can be done from ISE using the command:
+
+        xdl -report -pips -all_conns <devname> 
+
+For Ultrascale and later devices you have to use the Tincr package to
+generate an XDLRC file.  The Tincr project is a separate project at
+Github (https://github.com/byuccl/tincr.git).  Once it is installed
+and working, you generate an XDLRC file using the following command
+inside the Vivado interactive Tcl shell:
+
+tincr::write_xdlrc -part xc7a100tcsg324 -max_processes 1 -primitive_defs xc7a100tcsg324_full.xdlrc
+
+The -max_processes tells the tool how many threads to use to generate
+the file in parallel.  There have been issues with it hanging when
+this is set to greater than 1.
+
+The successful completion of this command relies on the existence of a
+set of primitive definitions (primitive_defs) for a given family.
+These must be manually created and are stored in the cache directory
+of Tincr.  Given that they exist, they are folded into the XDLRC file
+when the above command is run.  They currently exist for the V7 family
+(artix7, kintex7, virtex7).  If you desire to generate device files
+for other families you must currently contact BYU to see if primitive
+definition files have been created for that family.
+
+Running The Installer
+---------------------
+Once the XDLRC file has been created (and a familyInfo.xml file for
+your technology is available), the Installer program within package
+edu.byu.ece.rapidSmith.util can be run and it will generate the needed
+device files for RapidSmith2.  Running this program for the smallest
+Artix7 part takes about a half hour on a multi-core i7 machine.
+
+- The installer requires a parameter be passed which is the part name
+  (such as xc7a100t-csg324).
+
+- The VM also needs some arguments when running (such as
+  --XstartOnFirstThread Xmx14G) where 14G is the memory to give - set
+  it to most of the RAM on your machine,
+  
+The result of this process should be 2 files with .dat extensions.
+The first is a *_db.dat file and the second is a *_info.dat file.
+These constitute the device file required by RapidSmith2.
+ 
+--------------------------------------------------------------------
+As a user desiring to generate new device files for RapidSmith2, you
+may quit reading here.  The following is information used to support
+new families of devices, a task that is currently done by BYU.
+--------------------------------------------------------------------
+
+
+Generating A familyInfo.xml File
+--------------------------------
+As mentioned, the Virtex6 familyInfo_brent.xml family file
+has been heavily commented and should be carefully looked at to
+understand how to create such a file for another family.
+
+For many (most?) site types, when going between Virtex6 and Virtex7,
+if the name remains the same the structure remains the same between
+the two technologies.  An example is BUFGCDTRL.  Thus, one strategy
+for understanding the familyInfo.xml file is to find site types with
+the same name between the two technologies and then look at the
+Virtex7 site in the Vivado GUI while looking at the Virtex6
+familyInfo.xml file.
+
+Often, Virtex7 has a site type that is an augmented version of the
+Virtex6 site and so comparing the Virtex6 XML file to the GUI can be
+helpful. An example of this is IOB vs. IOB33.   Another example is
+OLOGICE1 in Virtex6 and OLOGICE3 in Virtex7.
+
+NOTE: much of the information in this guide duplicates what is in the
+Virtex6 familyInfo.xml file.  However, there are differences so read
+this and also that file.
+
+GENERATE THE FRAMEWORK
+----------------------
+
+The Tcl program "sitesandbels.tcl" will generate the major portion of
+the file.  It will do the following:
+
+- For each primitive site, generate a primitive type record for its
+  primary type and populate it with the list of BELS contained in that
+  primitive type.  
+
+- If the primitive type is of one of the special types (slices, dsps,
+  iobs, etc) it will add a tag to mark this.  The determination of
+  this is given by some simple rules based on the type name.  This may
+  or may not be sufficient for new technologies (the script is easily
+  modifiable).
+
+- It also generates a corrections section based on whether it thinks
+  the primary type might need them.
+
+ - It then does the same thing but for alternative types for the
+   primitive sites.  The main difference is it does not output
+   possible alternatives of alternatives.
+
+- Finally, if you read the code to sitesandbels.tcl you will find that
+  it generates declarations for all the types Tcl can find for it, but
+  that there are additional types that need to exist.  If not, an
+  error will be thrown early in the Installer process.  The code
+  actually has some hard-coded types that need to be included based on
+  trial-and-error for Virtex7.  Other technologies may have their own
+  lists.
+
+MODIFYING THE GENERATED FILE
+----------------------------
+
+- Next, you must manually edit the generated file.  In the process you
+  will: (a) remove alternate types that don't reallize exist and (b)
+  edit the corrections.
+
+- You need to understand alternate types to proceed.
+
+- Each primitive site in the FPGA has at least one primitive type
+  which can be place onto it.  This is called the "primary type" for the
+  site.  However, some sites can be changed to one or more alternative
+  types.  For example, the primary type for a BUFGCLK primitive site is
+  the BUFGCLK type.  But, an alternative type for that site is a BUFG
+  type (since a BUFGCLK can be used as a BUFG as well).
+
+- A primitive site can have its type changed using the call:
+
+      tincr::sites::set_type NEWTYPE
+
+- However, when sites are configured to one of their alternate types, their
+  BELs, site pins, etc. will change.
+
+- The changes in BELs when this happens are easy to determine.  The
+  sitesandbels.tcl script has code to print the BELs for both primary
+  and alternate types.
+
+- When doing the primary types for physical sites, the
+  sitesandbels.tcl script looks to see if there are any alternative
+  types for this physical site.  In some cases there are - IOB33S is
+  an example. However, in some cases the query returns a list of
+  alternative types which are wrong.  An example of this is IPAD. This
+  is an alternative type for IOB33 but also is the primary type for
+  some other physical sites such as IPAD_X1Y0 in part
+  xc7a100t-csg324-1. When queried, this site returns a whole list of
+  alternate types.  But, when you go into the GUI and look at it, this
+  physical site has no alternative types.  Thus, one cannot tell from
+  Tcl calls whether a physical site like this really has alternatives.
+
+- The upshot is that for each site output that lists alternatives, one
+  must go into the GUI and look at the actual site.  The way to do
+  this would be to do this (this is not real Tcl code but some of this
+  has to be done manually have to do manually, would love to automate
+  this):
+
+    foreach k in $keys where the familyInfo_new.xml file shows alternatives
+      set s [dict get $dict $k]
+      select_objects $s
+      hit F9 to zoom to selected object
+      hit CTRL-E to bring up object the Site Properties window
+      look in the Site Properties windows to see if alternative types can be selected
+
+- Based on this, you will remove some <alternative> records in the
+  generated file (for ones that don't really exist).  An example is
+  for IOB33.  It lists a bunch of alternatives but there really aren't
+  any.
+
+- For the alternative types that remain, when the site is changed to
+  them, the site pins may also change.  
+
+- For a site which has alternative types, the familyInfo.xml file
+  will contain an <alternatives> section. For each alternative, the
+  alternative type will be given followed by a pinmaps declaration.
+  Often, this is empty, meaning that there is no change in site pins
+  when the site is configured to the alternative type.  If there is a
+  change in site pins, this will be included in the pinmaps section.
+
+- An example of when there is a change of site pins is when an IOBS is
+  configured to be of alternative type IPAD.  The IOBS has many pins,
+  the IPAD has only one.  The mapping provided in the <pinmaps> list
+  gives the name of a pin in the alternative type ("<name>O</name>" for
+  example) and the pin in the original base type it is replacing
+  ("<map>PADOUT</map>" for example).
+
+- The above example may suggest that if a pinmaps section exists, it
+  must contain all the pins in the new alternative type and all the
+  old ones disappear.  This is not the case.  Rather, any pin that
+  remaps a wire to a new pin name must be replaced.  In the Virtex6
+  file, check out the primitive type ILOGICE1.  It has an alternative
+  site type of ISERDESE1.  Note that a single pin (SR) from ILOGICE1
+  has been remapped (to RST), even though many of the old pins remain
+  used.  The single pin remapped is simply to show that the old SR pin
+  is now known as RST.
+
+- The changes in site pins for alternative types cannot currently be
+  determined using Tcl (Brad White has posted to the Tcl user group to
+  understand if this is a bug).  Thus, these remappings must be
+  determined manually.  The simplest way to do this is using the
+  Vivado GUI.
+
+- Once you have the Site Properties window for a site up as described
+  above, you can compare the pins between the primary type and the
+  alternative thpe.
+
+- This can be unwieldy.  My current approach is to do a screen capture
+  or printout of the entire site so I can see all the pins.  I then
+  change to one of the alternative types and do a screen capture of it
+  or print it.  I then compare them side-by-side to see if any pins
+  have been remapped.  Looking at IOBS (primary) and IPAD
+  (alternative) in Virtex6 and then comparing to IOB33S (primary) and
+  IPAD (alternative) in Virtex7 will help you understand what to look
+  for.  If you see any that change, you need to add <pin> records to
+  the <pinmaps> section.
+
+- Fr example, find and look at an IOB33S.  Note the site pins.  Then,
+  change the type to IPAD and look at the site pins.  You will see
+  that pin PADOUT in the IOB33S and the O pin in the IPAD share the
+  same node and that is what is put into the pinmaps section.
+
+- Looking at the Virtex6 alternatives and pinmaps will provide
+  guidance on how this is to be done in other families (there are lots
+  of similarities between families).
+
+- It is interesting that in previous families, a SLICEM could be
+  configured as a SLICEL.  However, in Virtex7 in Vivado that does not
+  seem to be the case.  That is, selecting a SLICEM does not show that
+  it has any alternative types.  <<<?This seems odd?>>>
+
+- A possible problem (talking with Travis) is what to do if an
+  alternative type has new pins mapped to new wires that didn't exist
+  for the primary type.  He says this shouldn't happen but I think I
+  found it somewhere (forgot where).  If it does occur, need to decide
+  what to do - Travis says RS2 won't work with this without some
+  modifications.
+
+COMPATIBLE SITE TYPES
+---------------------
+
+- There are compatible site types delarations which state that a site
+  type can be placed onto a site of another type.  This seems to be
+  the "opposite" of the alternative type relationship.  This could use
+  some more clarification.  <<<?Ask Travis?>>>
+
+CORRECTIONS
+-----------
+
+- It is possible that "corrections" may be needed to the XDLRC file's
+  information to make it compatible with RapidSmith2.  There are a
+  number of standard corrections that need to be done.
+
+- The new_element tag is used to add CFG options to sites which are
+  missing them.  This is needed when converting to/from XDL and ISE,
+  but is not needed when going to/from EDIF and Vivado.  It is to
+  provide configuration string mappings.  You should be able to ignore
+  this. 
+
+- The pin_direction tag is used to change the directions on pins.
+  This is needed only for the pads and is used to change input pins to
+  inout pins.  This can be created by looking through the pad cells in
+  the Vivado GUI to obtain this information.  You need to change this
+  for the pad cells.  Compare to V6 to understand.
+
+- The modify_element tag is used to tag wiring MUXes that show up in
+  the XDLRC as BELs.  That is, XDLRC declares some wiring MUXes as
+  BELs when in reality they are not BELs but rather are wiring MUXes.
+  Examining the Virtex6 instances of the modify_element will show
+  that, with one exception, the structures tagged have the string
+  "USED" at the end of the name.  The sitesandbels.tcl script outputs
+  these based on what it can see but what it outputs needs editing.
+  It generates these for any BEL which has routing PIPs in it.  That
+  is, the tool reports lots of routing muxes as BELs which is
+  incorrect.  So, what sitesandbels outputs is mostly correct.  The
+  problem is that it tags the LUTs as routing muxes (because they have
+  routing pips in them for when they are used as route-throughs).  You
+  need to untag the LUTs by removing the modify_element tags for them.
+
+- The polarity_selector tag is used to mark inverting MUXes in sites.
+  For example, if you look in the Virtex-6 FPGA CLB User Guide from
+  Xilinx and then look at the SLICEM and SLICEL diagrams, you will see
+  a MUX on the CLK input wire.  It can be programmed to pass either
+  CLK or the inverse of CLK into the SLICE.  Note that no inverter is
+  actually drawn but rather just a bubble on the 2nd input to the MUX.
+  These typically have INV on the end of the name.  The
+  polarity_selector tag is used to mark these for the tools' benefit
+  since no actual inverter shows up in the list of BELs.  The
+  sitesandbels.tcl script outputs these as well and they seem to
+  be correct.
+
+- The sitesandbels.tcl script tries to populate the produced file by
+  finding all structures inside the site that contain site pips.
+  These are typically either polarity_selectors or muxes (but not
+  always since LUTs and some other things show up as well).
+
+- Thus, to handle the last 2 corrections (modify_element and
+  polarity_selector), you just go through the generated file and find
+  where sitesandbels.tcl has generated placeholder code.  Looking in
+  the GUI will tell you which (one or both) of these generated
+  placeholders you should delete.
+
+- Then, find the INOUT pins in the PAD cells, add them, and you are
+  done. 
+
+
+========================================================================
+Problems encountered:
+
+- Sometimes what Tcl says  is different from what the GUI says.  Some
+  alternatives are not correct.  They have been commented out as
+  INVALID in the V7 familyInfo.xml file.
+
+- The LUTs in the SLICEL and SLICEM primitives were all tagged as
+  routing muxes in what sitesandbels outputs.  These tags need to be
+  commented out.

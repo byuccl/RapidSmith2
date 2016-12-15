@@ -38,8 +38,13 @@ public class LutRoutethroughInserter {
 	private static final String ROUTETHROUGH_NAME = "rapidSmithRoutethrough";
 	private int routethroughID;
 	private Collection<CellNet> netsToAdd = new ArrayList<>();
-	private List<Cell> cellsToAdd = new ArrayList<>();
 	
+	/**
+	 * Creates a new LutRoutethrough inserter object
+	 * @param design {@link CellDesign}
+	 * @param libCells {@link CellLibrary}
+	 * @param pinMap A map from {@link BelPin} to the {@link CellPin} that is mapped onto it
+	 */
 	public LutRoutethroughInserter(CellDesign design, CellLibrary libCells, Map<BelPin, CellPin> pinMap) {
 		this.design = design; 
 		this.libCells = libCells;
@@ -48,6 +53,11 @@ public class LutRoutethroughInserter {
 		this.belPinToCellPinMap = pinMap;
 	}
 	
+	/**
+	 * Creates a new LutRoutethrough inserter object
+	 * @param design {@link CellDesign}
+	 * @param libCells {@link CellLibrary}
+	 */
 	public LutRoutethroughInserter(CellDesign design, CellLibrary libCells) {
 		this.design = design; 
 		this.libCells = libCells;
@@ -170,8 +180,6 @@ public class LutRoutethroughInserter {
 		design.placeCell(buffer, rtBel);
 		buffer.getPin("I0").mapToBelPin(rtSource);
 		buffer.getPin("O").mapToBelPin(buffer.getPin("O").getPossibleBelPins().get(0));
-		
-		cellsToAdd.add(buffer);
 	}
 	
 	/**
