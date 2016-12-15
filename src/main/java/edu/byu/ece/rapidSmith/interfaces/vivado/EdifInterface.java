@@ -318,18 +318,13 @@ public final class EdifInterface {
 		globalVCCNet.connectToPin(globalVCC.getOutputPins().iterator().next());
 		globalGNDNet.connectToPin(globalGND.getOutputPins().iterator().next());
 		
-		// Add all the VCC/GND sink pins to the global nets
-		// TODO this guy is created but never used
-		List<CellNet> netsToRemove = new ArrayList<>();
-		
+		// Add all VCC/GND sink pins to the global nets
 		for(CellNet net : vccNets) {
 			transferSinkPins(net, globalVCCNet);
-			netsToRemove.add(net);
 		}
 		
 		for(CellNet net : gndNets) {
 			transferSinkPins(net, globalGNDNet);
-			netsToRemove.add(net);
 		}
 			
 		// Remove the old VCC/GND cells from the list
@@ -340,9 +335,8 @@ public final class EdifInterface {
 			}
 		}
 		cellsToRemove.forEach(design::removeCell);
-		
+				
 		// Add the new master cells/nets to the design
-		// TODO: add these as special nets in the design
 		design.addCell(globalVCC);
 		design.addNet(globalVCCNet);
 		design.addCell(globalGND);

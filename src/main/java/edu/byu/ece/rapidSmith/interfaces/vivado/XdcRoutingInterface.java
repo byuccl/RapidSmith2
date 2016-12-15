@@ -280,7 +280,9 @@ public class XdcRoutingInterface {
 
 		// First 2 tokens are ROUTE <netName>
 		String startWire = toks[2];
-		wiresInNet.addAll(Arrays.asList(toks).subList(2, toks.length));
+		for (int i = 2; i < toks.length; i++ ) {			
+			wiresInNet.add(toks[i]);
+		}
 		
 		RouteTree netRouteTree = recreateRoutingNetwork(net, startWire, wiresInNet);
 		net.addIntersiteRouteTree(netRouteTree);		
@@ -493,8 +495,9 @@ public class XdcRoutingInterface {
 	 * @return
 	 */
 	private Iterator<BelPin> getPowerBelSourcesToSearch(Site site) {
+		
 		Set<String> staticSourcesInSite =  staticSourceMap.get(site.getType());
-
+		
 		if (staticSourcesInSite == null) {
 
 			staticSourcesInSite = site.getBels().stream()
