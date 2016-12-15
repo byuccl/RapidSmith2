@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
@@ -109,7 +108,7 @@ public final class VivadoInterface {
 	 */
 	private static void parseConstraintsXDC(CellDesign design, String constraintPath) {
 				
-		try (LineNumberReader br = new LineNumberReader(new BufferedReader(new FileReader(constraintPath)))) {
+		try (BufferedReader br = new BufferedReader(new FileReader(constraintPath))) {
 			
 			String line = null;
 			// add the design constraints to the design
@@ -131,7 +130,7 @@ public final class VivadoInterface {
 			}
 			
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new Exceptions.ParseException(e);
 		}
 	}
 		
