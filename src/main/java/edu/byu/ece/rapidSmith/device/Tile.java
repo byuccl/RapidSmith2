@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 /**
  * This class represents the same information found and described in XDLRC files concerning
  * Xilinx FPGA tiles.  The representation given by XDLRC files is that every FPGA is described
- * as a 2D array of Tiles, each with a set of primitive sites, and hence sources, sinks and wires
+ * as a 2D array of Tiles, each with a set of sites, and hence sources, sinks and wires
  * to connect tiles together and wires within.
  *
  * @author Chris Lavin
@@ -47,7 +47,7 @@ public class Tile implements Serializable {
 	private String name;
 	/** XDL Tile Type (INT,CLB,...) */
 	private TileType type;
-	/** This is a list of the sinks within the tile (generally in the primitives)
+	/** This is a list of the sinks within the tile (generally in the sites)
 	    Absolute tile row number - the index into the device Tiles[][] array */
 	private int row;
 	/** Absolute tile column number - the index into the device Tiles[][] array */
@@ -56,15 +56,15 @@ public class Tile implements Serializable {
 	private int tileYCoordinate;
 	/** This is the X coordinate in the tile name (ex: 0 in INT_X0Y5) */
 	private int tileXCoordinate;
-	/** An array of primitiveSites located within the tile (null if none) */
-	private Site[] primitiveSites;
+	/** An array of sites located within the tile (null if none) */
+	private Site[] sites;
 	/** This variable holds all the wires and their connections within the tile */
 	private WireHashMap wireConnections;
 
 	private WireHashMap reverseWireConnections;
 	/** Reference to this tile's device object */
 	private HashMap<Integer, SinkPin> sinks;
-	/** This is a list of the sources within the tile (generally in the primitives) */
+	/** This is a list of the sources within the tile (generally in the sites) */
 	private int[] sources;
 	/**
 	 * Map of the wires to the index of the site the wire connects to.  This is
@@ -226,26 +226,26 @@ public class Tile implements Serializable {
 	}
 
 	/**
-	 * Gets and returns the primitive site array for this tile.
+	 * Gets and returns the site array for this tile.
 	 *
-	 * @return An array of primitive sites present in this tile.
+	 * @return An array of sites present in this tile.
 	 */
-	public Site[] getPrimitiveSites() {
-		return primitiveSites;
+	public Site[] getSites() {
+		return sites;
 	}
 
-	public Site getPrimitiveSite(int siteIndex) {
-		return getPrimitiveSites()[siteIndex];
+	public Site getSite(int siteIndex) {
+		return getSites()[siteIndex];
 	}
 
 	/**
-	 * Sets the primitive sites present in this tile, should not be called during
+	 * Sets the sites present in this tile, should not be called during
 	 * normal usage.
 	 *
-	 * @param primitiveSites The new primitive sites.
+	 * @param sites The new sites.
 	 */
-	public void setPrimitiveSites(Site[] primitiveSites) {
-		this.primitiveSites = primitiveSites;
+	public void setSites(Site[] sites) {
+		this.sites = sites;
 	}
 
 	/* Routing description methods */
@@ -461,7 +461,7 @@ public class Tile implements Serializable {
 	}
 
 	/**
-	 * Gets and returns the sources of all the primitive sites in this tile.  This list
+	 * Gets and returns the sources of all the sites in this tile.  This list
 	 * is lazily created.
 	 *
 	 * @return The source wires found in this tile.
@@ -500,7 +500,7 @@ public class Tile implements Serializable {
 		if (wireSites == null || !wireSites.containsKey(wire))
 			return null;
 		Integer siteIndex = wireSites.get(wire);
-		Site site = getPrimitiveSites()[siteIndex];
+		Site site = getSites()[siteIndex];
 		return site.getSitePinOfExternalWire(site.getType(), wire);
 	}
 
@@ -508,7 +508,7 @@ public class Tile implements Serializable {
 		if (wireSites == null || !wireSites.containsKey(wire))
 			return null;
 		Integer siteIndex = wireSites.get(wire);
-		Site site = getPrimitiveSites()[siteIndex];
+		Site site = getSites()[siteIndex];
 		return site.getSitePinOfExternalWire(siteType, wire);
 	}
 
@@ -549,7 +549,7 @@ public class Tile implements Serializable {
 		private static final long serialVersionUID = 6902712216468702435L;
 		private String name;
 		private TileType type;
-		private Site[] primitiveSites;
+		private Site[] sites;
 		private WireHashMap wireConnections;
 		private WireHashMap reverseConnections;
 		private HashMap<Integer, SinkPin> sinks;
@@ -560,11 +560,11 @@ public class Tile implements Serializable {
 			Tile tile = new Tile();
 			tile.setName(name);
 			tile.type = type;
-			tile.primitiveSites = primitiveSites;
-			if (primitiveSites != null) {
-				for (int i = 0; i < primitiveSites.length; i++) {
-					primitiveSites[i].setIndex(i);
-					primitiveSites[i].setTile(tile);
+			tile.sites = sites;
+			if (sites != null) {
+				for (int i = 0; i < sites.length; i++) {
+					sites[i].setIndex(i);
+					sites[i].setTile(tile);
 				}
 			}
 			tile.wireConnections = wireConnections;
@@ -581,7 +581,7 @@ public class Tile implements Serializable {
 		TileReplace repl = new TileReplace();
 		repl.name = name;
 		repl.type = type;
-		repl.primitiveSites = primitiveSites;
+		repl.sites = sites;
 		repl.wireConnections = wireConnections;
 		repl.reverseConnections = reverseWireConnections;
 		repl.sinks = sinks;

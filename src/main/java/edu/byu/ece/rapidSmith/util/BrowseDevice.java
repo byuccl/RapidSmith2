@@ -119,11 +119,11 @@ public class BrowseDevice{
 						t = dev.getTile(br.readLine().trim());
 						System.out.println("Choosen Tile: " + t.getName());
 
-						if(t.getPrimitiveSites() == null){
+						if(t.getSites() == null){
 							System.out.println(t.getName() + " has no primitive sites.");
 						}
 						else{
-							for(Site p : t.getPrimitiveSites()){
+							for(Site p : t.getSites()){
 								System.out.println("  " + p.getName());
 							}
 						}
@@ -132,7 +132,7 @@ public class BrowseDevice{
 					case 6:
 						System.out.println("Enter tile name: ");
 						String siteName = br.readLine().trim();
-						Site site = dev.getPrimitiveSite(siteName);
+						Site site = dev.getSite(siteName);
 						if(site == null){
 							System.out.println("No primitive site called \"" + siteName +  "\" exists.");
 						}

@@ -47,7 +47,7 @@ public class RandomPlacer{
 	    int idx = rng.nextInt(sites.size());
 	    int watchDog = 0;
 	    // Find a free primitive site
-	    while(design.isPrimitiveSiteUsed(sites.get(idx))){
+	    while(design.isSiteUsed(sites.get(idx))){
 	    	if(++idx > sites.size()) idx = 0;
 	    	if(++watchDog > sites.size()) MessageGenerator.briefErrorAndExit("Placement failed.");
 	    }

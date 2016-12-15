@@ -173,7 +173,7 @@ public class DesignDiffer {
 					inst2 = design2.getInstance(inst1.getName());
 					break;
 				case BY_LOCATION :
-					inst2 = design2.getInstanceAtPrimitiveSite(inst1.getPrimitiveSite());
+					inst2 = design2.getInstanceAtSite(inst1.getSite());
 					break;
 			}
 			if (inst2 == null) {
@@ -190,7 +190,7 @@ public class DesignDiffer {
 						diffs.add(Difference.addition("instance", inst2.getName()));
 					break;
 				case BY_LOCATION :
-					if (design1.getInstanceAtPrimitiveSite(inst2.getPrimitiveSite()) == null)
+					if (design1.getInstanceAtSite(inst2.getSite()) == null)
 						diffs.add(Difference.addition("instance", inst2.getName()));
 					break;
 			}
@@ -425,13 +425,13 @@ public class DesignDiffer {
 		// compare site
 		if (inst1.isPlaced()) {
 			if (inst2.isPlaced()) {
-				if (!inst1.getPrimitiveSite().getName().equals(inst2.getPrimitiveSite().getName()))
-					diffs.add(Difference.change("site", inst1.getPrimitiveSite().getName(), inst2.getPrimitiveSite().getName()));
+				if (!inst1.getSite().getName().equals(inst2.getSite().getName()))
+					diffs.add(Difference.change("site", inst1.getSite().getName(), inst2.getSite().getName()));
 			} else {
-				diffs.add(Difference.change("site", inst1.getPrimitiveSite().getName(), "unplaced"));
+				diffs.add(Difference.change("site", inst1.getSite().getName(), "unplaced"));
 			}
 		} else if (inst2.isPlaced()) {
-			diffs.add(Difference.change("site", "unplaced", inst2.getPrimitiveSite().getName()));
+			diffs.add(Difference.change("site", "unplaced", inst2.getSite().getName()));
 		}
 
 		// compare pins
@@ -570,8 +570,8 @@ public class DesignDiffer {
 				if (!pin.getInstanceName().equals(pinId.pin.getInstanceName()))
 					return false;
 			else if (matchInstanceMethod == MatchInstanceMethod.BY_LOCATION)
-				if (!pin.getInstance().getPrimitiveSite().equals(
-						pinId.pin.getInstance().getPrimitiveSite()))
+				if (!pin.getInstance().getSite().equals(
+						pinId.pin.getInstance().getSite()))
 					return false;
 			else
 				throw new AssertionError("Unknown Match Instance Method");
@@ -585,7 +585,7 @@ public class DesignDiffer {
 			if (matchInstanceMethod == MatchInstanceMethod.BY_NAME)
 				result = 31 * result + pin.getInstanceName().hashCode();
 			else if (matchInstanceMethod == MatchInstanceMethod.BY_LOCATION)
-				result = 31 * result + pin.getInstance().getPrimitiveSite().hashCode();
+				result = 31 * result + pin.getInstance().getSite().hashCode();
 			else
 				throw new AssertionError("Unknown Match Instance Method");
 
@@ -598,7 +598,7 @@ public class DesignDiffer {
 			if (matchInstanceMethod == MatchInstanceMethod.BY_NAME)
 				result += pin.getInstanceName();
 			else if (matchInstanceMethod == MatchInstanceMethod.BY_LOCATION)
-				result += pin.getInstance().getPrimitiveSite().getName();
+				result += pin.getInstance().getSite().getName();
 
 			return result + "/" + pin.getName();
 		}
@@ -606,8 +606,8 @@ public class DesignDiffer {
 
 	private DifferenceTree diffPins(XdlPin pin1, XdlPin pin2) {
 		DifferenceTree diffs = new DifferenceTree(pin1.getName(), "pin");
-		if (pin1.getPinType() != pin2.getPinType())
-			diffs.add(Difference.change("type", pin1.getPinType().toString(), pin2.getPinType().toString()));
+		if (pin1.getDirection() != pin2.getDirection())
+			diffs.add(Difference.change("type", pin1.getDirection().toString(), pin2.getDirection().toString()));
 		return diffs;
 	}
 
