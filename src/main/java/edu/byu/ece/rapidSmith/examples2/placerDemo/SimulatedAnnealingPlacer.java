@@ -309,7 +309,7 @@ public class SimulatedAnnealingPlacer {
 		//TODO: play with load factor and other parameters of the hash map?
 		
 		for (SiteCluster sc: this.placeableSiteClusters) {
-			SiteType sitetype = sc.getPrimitiveSite().getType(); 
+			SiteType sitetype = sc.getSite().getType();
 			if(!siteTypeMap.containsKey(sitetype)) 
 				siteTypeMap.put(sitetype, device.getAllCompatibleSites(sitetype));
 		}
@@ -612,8 +612,8 @@ public class SimulatedAnnealingPlacer {
 		//check that BRAMs have initially been placed in a valid configurations 
 		for (SiteCluster sc: this.placeableSiteClusters) {
 			if(sc instanceof BramCluster) {
-				if((sitenameToClusterMap.containsKey(sc.getCurrentTile().getPrimitiveSite(0))  || sitenameToClusterMap.containsKey(sc.getCurrentTile().getPrimitiveSite(1))) 
-						&& sitenameToClusterMap.containsKey(sc.getCurrentTile().getPrimitiveSite(2))) {
+				if((sitenameToClusterMap.containsKey(sc.getCurrentTile().getSite(0))  || sitenameToClusterMap.containsKey(sc.getCurrentTile().getSite(1)))
+						&& sitenameToClusterMap.containsKey(sc.getCurrentTile().getSite(2))) {
 					System.out.println("BRAM 18 and 36 being occupied at the same time!!");
 					throw new UnsupportedOperationException();
 				}

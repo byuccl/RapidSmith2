@@ -59,7 +59,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>DCI</primitive_type>
+            <site_type>DCI</site_type>
             <name>DCI</name>
           </id>
         </bel>
@@ -84,49 +84,49 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>GLOBALSIG</primitive_type>
+            <site_type>GLOBALSIG</site_type>
             <name>GSAVEANDUP</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>GLOBALSIG</primitive_type>
+            <site_type>GLOBALSIG</site_type>
             <name>GWEANDDOWN</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>GLOBALSIG</primitive_type>
+            <site_type>GLOBALSIG</site_type>
             <name>GHIGHANDUP</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>GLOBALSIG</primitive_type>
+            <site_type>GLOBALSIG</site_type>
             <name>GSRANDDOWN</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>GLOBALSIG</primitive_type>
+            <site_type>GLOBALSIG</site_type>
             <name>GSAVEANDDOWN</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>GLOBALSIG</primitive_type>
+            <site_type>GLOBALSIG</site_type>
             <name>GHIGHANDDOWN</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>GLOBALSIG</primitive_type>
+            <site_type>GLOBALSIG</site_type>
             <name>GWEANDUP</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>GLOBALSIG</primitive_type>
+            <site_type>GLOBALSIG</site_type>
             <name>GSRANDUP</name>
           </id>
         </bel>
@@ -144,61 +144,61 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>GLOBALSIG</primitive_type>
+            <site_type>GLOBALSIG</site_type>
             <name>DOWN1_VCC</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>GLOBALSIG</primitive_type>
+            <site_type>GLOBALSIG</site_type>
             <name>UP2_VCC</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>GLOBALSIG</primitive_type>
+            <site_type>GLOBALSIG</site_type>
             <name>UP1_VCC</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>GLOBALSIG</primitive_type>
+            <site_type>GLOBALSIG</site_type>
             <name>DOWN2_VCC</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>TIEOFF</primitive_type>
+            <site_type>TIEOFF</site_type>
             <name>HARD1VCC</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>CYINITVCC</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>CEUSEDVCC</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>CYINITVCC</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>CEUSEDVCC</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>A6LUT</name>
           </id>
           <pins>
@@ -210,7 +210,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>B6LUT</name>
           </id>
           <pins>
@@ -222,7 +222,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>C6LUT</name>
           </id>
           <pins>
@@ -234,7 +234,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>D6LUT</name>
           </id>
           <pins>
@@ -246,7 +246,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>A6LUT</name>
           </id>
           <pins>
@@ -258,7 +258,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>B6LUT</name>
           </id>
           <pins>
@@ -270,7 +270,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>C6LUT</name>
           </id>
           <pins>
@@ -282,7 +282,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>D6LUT</name>
           </id>
           <pins>
@@ -294,7 +294,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>A5LUT</name>
           </id>
           <pins>
@@ -306,7 +306,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>B5LUT</name>
           </id>
           <pins>
@@ -318,7 +318,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>C5LUT</name>
           </id>
           <pins>
@@ -330,7 +330,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>D5LUT</name>
           </id>
           <pins>
@@ -342,7 +342,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>A5LUT</name>
           </id>
           <pins>
@@ -354,7 +354,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>B5LUT</name>
           </id>
           <pins>
@@ -366,7 +366,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>C5LUT</name>
           </id>
           <pins>
@@ -378,7 +378,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>D5LUT</name>
           </id>
           <pins>
@@ -402,73 +402,73 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>GLOBALSIG</primitive_type>
+            <site_type>GLOBALSIG</site_type>
             <name>UP1_GND</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>GLOBALSIG</primitive_type>
+            <site_type>GLOBALSIG</site_type>
             <name>DOWN1_GND</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>GLOBALSIG</primitive_type>
+            <site_type>GLOBALSIG</site_type>
             <name>UP2_GND</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>GLOBALSIG</primitive_type>
+            <site_type>GLOBALSIG</site_type>
             <name>DOWN2_GND</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>ILOGICE1</primitive_type>
+            <site_type>ILOGICE1</site_type>
             <name>D2OBYP_TSMUX_GND</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>ILOGICE1</primitive_type>
+            <site_type>ILOGICE1</site_type>
             <name>D2OFFBYP_TSMUX_GND</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>TIEOFF</primitive_type>
+            <site_type>TIEOFF</site_type>
             <name>HARD0GND</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>CYINITGND</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>SRUSEDGND</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>CYINITGND</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>SRUSEDGND</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>A6LUT</name>
           </id>
           <pins>
@@ -480,7 +480,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>B6LUT</name>
           </id>
           <pins>
@@ -492,7 +492,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>C6LUT</name>
           </id>
           <pins>
@@ -504,7 +504,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>D6LUT</name>
           </id>
           <pins>
@@ -516,7 +516,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>A6LUT</name>
           </id>
           <pins>
@@ -528,7 +528,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>B6LUT</name>
           </id>
           <pins>
@@ -540,7 +540,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>C6LUT</name>
           </id>
           <pins>
@@ -552,7 +552,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>D6LUT</name>
           </id>
           <pins>
@@ -564,7 +564,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>A5LUT</name>
           </id>
           <pins>
@@ -576,7 +576,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>B5LUT</name>
           </id>
           <pins>
@@ -588,7 +588,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>C5LUT</name>
           </id>
           <pins>
@@ -600,7 +600,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>D5LUT</name>
           </id>
           <pins>
@@ -612,7 +612,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>A5LUT</name>
           </id>
           <pins>
@@ -624,7 +624,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>B5LUT</name>
           </id>
           <pins>
@@ -636,7 +636,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>C5LUT</name>
           </id>
           <pins>
@@ -648,7 +648,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>D5LUT</name>
           </id>
           <pins>
@@ -683,7 +683,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>GLOBALSIG</primitive_type>
+            <site_type>GLOBALSIG</site_type>
             <name>GLOBALSIG</name>
           </id>
         </bel>
@@ -740,7 +740,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>BSCAN</primitive_type>
+            <site_type>BSCAN</site_type>
             <name>BSCAN</name>
           </id>
         </bel>
@@ -777,7 +777,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>IBUFDS_GTXE1</primitive_type>
+            <site_type>IBUFDS_GTXE1</site_type>
             <name>IBUFDS_GTXE1</name>
           </id>
         </bel>
@@ -802,7 +802,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>BUFIODQS</primitive_type>
+            <site_type>BUFIODQS</site_type>
             <name>BUFIODQS</name>
           </id>
         </bel>
@@ -923,7 +923,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>ISERDESE1</primitive_type>
+            <site_type>ISERDESE1</site_type>
             <name>ISERDESE1</name>
           </id>
         </bel>
@@ -1072,7 +1072,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>USR_ACCESS</primitive_type>
+            <site_type>USR_ACCESS</site_type>
             <name>USR_ACCESS</name>
           </id>
         </bel>
@@ -1105,7 +1105,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>DNA_PORT</primitive_type>
+            <site_type>DNA_PORT</site_type>
             <name>DNA_PORT</name>
           </id>
         </bel>
@@ -1142,7 +1142,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>PMVIOB</primitive_type>
+            <site_type>PMVIOB</site_type>
             <name>PMVIOB</name>
           </id>
         </bel>
@@ -1239,7 +1239,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>IODELAYE1</primitive_type>
+            <site_type>IODELAYE1</site_type>
             <name>IODELAYE1</name>
           </id>
         </bel>
@@ -2592,7 +2592,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>TEMAC_SINGLE</primitive_type>
+            <site_type>TEMAC_SINGLE</site_type>
             <name>TEMAC_SINGLE</name>
           </id>
         </bel>
@@ -2637,7 +2637,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>CFG_IO_ACCESS</primitive_type>
+            <site_type>CFG_IO_ACCESS</site_type>
             <name>CFG_IO_ACCESS</name>
           </id>
         </bel>
@@ -2654,19 +2654,19 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>IOB</primitive_type>
+            <site_type>IOB</site_type>
             <name>PULL</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>IOBM</primitive_type>
+            <site_type>IOBM</site_type>
             <name>PULL</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>IOBS</primitive_type>
+            <site_type>IOBS</site_type>
             <name>PULL</name>
           </id>
         </bel>
@@ -2691,19 +2691,19 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>IOB</primitive_type>
+            <site_type>IOB</site_type>
             <name>INBUF</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>IOBM</primitive_type>
+            <site_type>IOBM</site_type>
             <name>INBUF</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>IOBS</primitive_type>
+            <site_type>IOBS</site_type>
             <name>INBUF</name>
           </id>
         </bel>
@@ -2728,13 +2728,13 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>IOB</primitive_type>
+            <site_type>IOB</site_type>
             <name>OUTBUF</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>IOBS</primitive_type>
+            <site_type>IOBS</site_type>
             <name>OUTBUF</name>
           </id>
         </bel>
@@ -2751,31 +2751,31 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>IOB</primitive_type>
+            <site_type>IOB</site_type>
             <name>PAD</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>IOBM</primitive_type>
+            <site_type>IOBM</site_type>
             <name>PAD</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>IOBS</primitive_type>
+            <site_type>IOBS</site_type>
             <name>PAD</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>OPAD</primitive_type>
+            <site_type>OPAD</site_type>
             <name>PAD</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>IPAD</primitive_type>
+            <site_type>IPAD</site_type>
             <name>PAD</name>
           </id>
         </bel>
@@ -2848,7 +2848,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>STARTUP</primitive_type>
+            <site_type>STARTUP</site_type>
             <name>STARTUP</name>
           </id>
         </bel>
@@ -2877,7 +2877,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>BUFR</primitive_type>
+            <site_type>BUFR</site_type>
             <name>BUFR</name>
           </id>
         </bel>
@@ -3014,7 +3014,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>OSERDESE1</primitive_type>
+            <site_type>OSERDESE1</site_type>
             <name>OSERDESE1</name>
           </id>
         </bel>
@@ -3035,7 +3035,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>BUFO</primitive_type>
+            <site_type>BUFO</site_type>
             <name>BUFO</name>
           </id>
         </bel>
@@ -3060,7 +3060,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>IBUFDS_GTHE1</primitive_type>
+            <site_type>IBUFDS_GTHE1</site_type>
             <name>IBUFDS_GTHE1</name>
           </id>
         </bel>
@@ -3089,7 +3089,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>IOBM</primitive_type>
+            <site_type>IOBM</site_type>
             <name>OUTBUF</name>
           </id>
         </bel>
@@ -3862,7 +3862,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>SYSMON</primitive_type>
+            <site_type>SYSMON</site_type>
             <name>SYSMON</name>
           </id>
         </bel>
@@ -3903,7 +3903,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>OLOGICE1</primitive_type>
+            <site_type>OLOGICE1</site_type>
             <name>TFF</name>
           </id>
           <attributes>
@@ -3935,7 +3935,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>OLOGICE1</primitive_type>
+            <site_type>OLOGICE1</site_type>
             <name>OUTFF</name>
           </id>
           <attributes>
@@ -3982,7 +3982,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>OLOGICE1</primitive_type>
+            <site_type>OLOGICE1</site_type>
             <name>MISR</name>
           </id>
         </bel>
@@ -4663,7 +4663,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>PPR_FRAME</primitive_type>
+            <site_type>PPR_FRAME</site_type>
             <name>PPR_FRAME</name>
           </id>
         </bel>
@@ -4684,7 +4684,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>IOBS</primitive_type>
+            <site_type>IOBS</site_type>
             <name>O_ININV</name>
           </id>
         </bel>
@@ -4705,7 +4705,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>BUFG</primitive_type>
+            <site_type>BUFG</site_type>
             <name>BUFG</name>
           </id>
         </bel>
@@ -4846,7 +4846,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>EFUSE_USR</primitive_type>
+            <site_type>EFUSE_USR</site_type>
             <name>EFUSE_USR</name>
           </id>
         </bel>
@@ -5299,7 +5299,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>FIFO18E1</primitive_type>
+            <site_type>FIFO18E1</site_type>
             <name>FIFO18E1</name>
           </id>
         </bel>
@@ -6340,7 +6340,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>FIFO36E1</primitive_type>
+            <site_type>FIFO36E1</site_type>
             <name>FIFO36E1</name>
           </id>
         </bel>
@@ -6357,7 +6357,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>KEY_CLEAR</primitive_type>
+            <site_type>KEY_CLEAR</site_type>
             <name>KEY_CLEAR</name>
           </id>
         </bel>
@@ -13686,7 +13686,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>PCIE_2_0</primitive_type>
+            <site_type>PCIE_2_0</site_type>
             <name>PCIE_2_0</name>
           </id>
         </bel>
@@ -13727,7 +13727,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>IDELAYCTRL</primitive_type>
+            <site_type>IDELAYCTRL</site_type>
             <name>IDELAYCTRL</name>
           </id>
         </bel>
@@ -13768,7 +13768,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>PMVBRAM</primitive_type>
+            <site_type>PMVBRAM</site_type>
             <name>PMVBRAM</name>
           </id>
         </bel>
@@ -13789,13 +13789,13 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>OPAD</primitive_type>
+            <site_type>OPAD</site_type>
             <name>OPAD</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>IPAD</primitive_type>
+            <site_type>IPAD</site_type>
             <name>IPAD</name>
           </id>
         </bel>
@@ -17996,7 +17996,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>GTHE1_QUAD</primitive_type>
+            <site_type>GTHE1_QUAD</site_type>
             <name>GTHE1_QUAD</name>
           </id>
         </bel>
@@ -18673,7 +18673,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>MMCM_ADV</primitive_type>
+            <site_type>MMCM_ADV</site_type>
             <name>MMCM_ADV</name>
           </id>
         </bel>
@@ -19818,7 +19818,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>RAMB36E1</primitive_type>
+            <site_type>RAMB36E1</site_type>
             <name>RAMB36E1</name>
           </id>
         </bel>
@@ -19839,7 +19839,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>DCIRESET</primitive_type>
+            <site_type>DCIRESET</site_type>
             <name>DCIRESET</name>
           </id>
         </bel>
@@ -20364,7 +20364,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>RAMB18E1</primitive_type>
+            <site_type>RAMB18E1</site_type>
             <name>RAMB18E1</name>
           </id>
         </bel>
@@ -20413,7 +20413,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>BUFGCTRL</primitive_type>
+            <site_type>BUFGCTRL</site_type>
             <name>BUFGCTRL</name>
           </id>
         </bel>
@@ -22410,7 +22410,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>GTXE1</primitive_type>
+            <site_type>GTXE1</site_type>
             <name>GTXE1</name>
           </id>
           <attributes>
@@ -24149,7 +24149,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>DSP48E1</primitive_type>
+            <site_type>DSP48E1</site_type>
             <name>DSP48E1</name>
           </id>
         </bel>
@@ -24170,7 +24170,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>CAPTURE</primitive_type>
+            <site_type>CAPTURE</site_type>
             <name>CAPTURE</name>
           </id>
         </bel>
@@ -24455,7 +24455,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>ICAP</primitive_type>
+            <site_type>ICAP</site_type>
             <name>ICAP</name>
           </id>
         </bel>
@@ -25892,7 +25892,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>RAMBFIFO36E1</primitive_type>
+            <site_type>RAMBFIFO36E1</site_type>
             <name>RAMBFIFO36E1</name>
           </id>
         </bel>
@@ -25921,25 +25921,25 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>F7AMUX</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>F7BMUX</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>F7AMUX</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>F7BMUX</name>
           </id>
         </bel>
@@ -25968,13 +25968,13 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>F8MUX</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>F8MUX</name>
           </id>
         </bel>
@@ -26003,13 +26003,13 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>ILOGICE1</primitive_type>
+            <site_type>ILOGICE1</site_type>
             <name>D2OFFBYP_SRC</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>ILOGICE1</primitive_type>
+            <site_type>ILOGICE1</site_type>
             <name>D2OBYP_SRC</name>
           </id>
         </bel>
@@ -26054,7 +26054,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>ILOGICE1</primitive_type>
+            <site_type>ILOGICE1</site_type>
             <name>IFF</name>
           </id>
           <attributes>
@@ -26285,7 +26285,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>FRAME_ECC</primitive_type>
+            <site_type>FRAME_ECC</site_type>
             <name>FRAME_ECC</name>
           </id>
         </bel>
@@ -26310,7 +26310,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>BUFHCE</primitive_type>
+            <site_type>BUFHCE</site_type>
             <name>BUFHCE</name>
           </id>
         </bel>
@@ -26343,7 +26343,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>B5FF</name>
           </id>
           <attributes>
@@ -26367,7 +26367,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>A5FF</name>
           </id>
           <attributes>
@@ -26391,7 +26391,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>D5FF</name>
           </id>
           <attributes>
@@ -26415,7 +26415,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>C5FF</name>
           </id>
           <attributes>
@@ -26439,7 +26439,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>B5FF</name>
           </id>
           <attributes>
@@ -26463,7 +26463,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>A5FF</name>
           </id>
           <attributes>
@@ -26487,7 +26487,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>D5FF</name>
           </id>
           <attributes>
@@ -26511,7 +26511,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>C5FF</name>
           </id>
           <attributes>
@@ -26535,7 +26535,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>AFF</name>
           </id>
           <attributes>
@@ -26559,7 +26559,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>BFF</name>
           </id>
           <attributes>
@@ -26583,7 +26583,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>CFF</name>
           </id>
           <attributes>
@@ -26607,7 +26607,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>DFF</name>
           </id>
           <attributes>
@@ -26631,7 +26631,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>AFF</name>
           </id>
           <attributes>
@@ -26655,7 +26655,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>BFF</name>
           </id>
           <attributes>
@@ -26679,7 +26679,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>CFF</name>
           </id>
           <attributes>
@@ -26703,7 +26703,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>DFF</name>
           </id>
           <attributes>
@@ -26765,7 +26765,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>A6LUT</name>
           </id>
           <pins>
@@ -26773,43 +26773,43 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>B6LUT</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>C6LUT</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>D6LUT</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>A6LUT</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>B6LUT</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>C6LUT</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>D6LUT</name>
           </id>
         </bel>
@@ -26853,7 +26853,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>A6LUT</name>
           </id>
           <pins>
@@ -26861,19 +26861,19 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>B6LUT</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>C6LUT</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>D6LUT</name>
           </id>
         </bel>
@@ -26914,7 +26914,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>A5LUT</name>
           </id>
           <pins>
@@ -26922,19 +26922,19 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>B5LUT</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>C5LUT</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>D5LUT</name>
           </id>
         </bel>
@@ -27030,7 +27030,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>A6LUT</name>
           </id>
            <attributes>
@@ -27046,7 +27046,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>B6LUT</name>
           </id>
            <attributes>
@@ -27062,7 +27062,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>C6LUT</name>
           </id>
            <attributes>
@@ -27078,7 +27078,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>D6LUT</name>
           </id>
            <attributes>
@@ -27160,7 +27160,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>A5LUT</name>
           </id>
            <attributes>
@@ -27176,7 +27176,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>B5LUT</name>
           </id>
            <attributes>
@@ -27192,7 +27192,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>C5LUT</name>
           </id>
            <attributes>
@@ -27208,7 +27208,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>D5LUT</name>
           </id>
            <attributes>
@@ -27252,7 +27252,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>DFF</name>
           </id>
           <attributes>
@@ -27276,7 +27276,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>BFF</name>
           </id>
           <attributes>
@@ -27300,7 +27300,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>AFF</name>
           </id>
           <attributes>
@@ -27324,7 +27324,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>CFF</name>
           </id>
           <attributes>
@@ -27348,7 +27348,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>DFF</name>
           </id>
           <attributes>
@@ -27372,7 +27372,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>BFF</name>
           </id>
           <attributes>
@@ -27396,7 +27396,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>AFF</name>
           </id>
           <attributes>
@@ -27420,7 +27420,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>CFF</name>
           </id>
           <attributes>
@@ -27478,31 +27478,31 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>B5LUT</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>C5LUT</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>D5LUT</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>A5LUT</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>B6LUT</name>
           </id>
           <pins>
@@ -27514,7 +27514,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>C6LUT</name>
           </id>
           <pins>
@@ -27526,7 +27526,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>D6LUT</name>
           </id>
           <pins>
@@ -27538,7 +27538,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>A6LUT</name>
           </id>
           <pins>
@@ -27550,31 +27550,31 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>B5LUT</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>C5LUT</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>D5LUT</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>A5LUT</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>B6LUT</name>
           </id>
           <pins>
@@ -27586,7 +27586,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>C6LUT</name>
           </id>
           <pins>
@@ -27598,7 +27598,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>D6LUT</name>
           </id>
           <pins>
@@ -27610,7 +27610,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>A6LUT</name>
           </id>
           <pins>
@@ -27701,13 +27701,13 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>SLICEL</primitive_type>
+            <site_type>SLICEL</site_type>
             <name>CARRY4</name>
           </id>
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>CARRY4</name>
           </id>
         </bel>
@@ -27760,7 +27760,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>PMV</primitive_type>
+            <site_type>PMV</site_type>
             <name>PMV</name>
           </id>
         </bel>
@@ -27848,7 +27848,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>A6LUT</name>
           </id>
           <attributes>
@@ -27874,7 +27874,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>B6LUT</name>
           </id>
           <attributes>
@@ -27900,7 +27900,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>D6LUT</name>
           </id>
           <attributes>
@@ -27926,7 +27926,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>C6LUT</name>
           </id>
           <attributes>
@@ -28018,7 +28018,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>B5LUT</name>
           </id>
           <attributes>
@@ -28044,7 +28044,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>C5LUT</name>
           </id>
           <attributes>
@@ -28070,7 +28070,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>D5LUT</name>
           </id>
           <attributes>
@@ -28096,7 +28096,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>A5LUT</name>
           </id>
           <attributes>
@@ -28122,7 +28122,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>B6LUT</name>
           </id>
           <attributes>
@@ -28148,7 +28148,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>C6LUT</name>
           </id>
           <attributes>
@@ -28174,7 +28174,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>D6LUT</name>
           </id>
           <attributes>
@@ -28200,7 +28200,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>A6LUT</name>
           </id>
           <attributes>
@@ -28308,7 +28308,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>A6LUT</name>
           </id>
           <attributes>
@@ -28334,7 +28334,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>B6LUT</name>
           </id>
           <attributes>
@@ -28360,7 +28360,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>D6LUT</name>
           </id>
           <attributes>
@@ -28386,7 +28386,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>C6LUT</name>
           </id>
           <attributes>
@@ -28478,7 +28478,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>B5LUT</name>
           </id>
           <attributes>
@@ -28504,7 +28504,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>C5LUT</name>
           </id>
           <attributes>
@@ -28530,7 +28530,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>D5LUT</name>
           </id>
           <attributes>
@@ -28556,7 +28556,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>A5LUT</name>
           </id>
           <attributes>
@@ -28582,7 +28582,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>B6LUT</name>
           </id>
           <attributes>
@@ -28608,7 +28608,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>C6LUT</name>
           </id>
           <attributes>
@@ -28634,7 +28634,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>D6LUT</name>
           </id>
           <attributes>
@@ -28660,7 +28660,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>A6LUT</name>
           </id>
           <attributes>
@@ -28740,7 +28740,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>A6LUT</name>
           </id>
           <attributes>
@@ -28786,7 +28786,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>B6LUT</name>
           </id>
           <attributes>
@@ -28832,7 +28832,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>D6LUT</name>
           </id>
           <attributes>
@@ -28878,7 +28878,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>C6LUT</name>
           </id>
           <attributes>
@@ -28966,7 +28966,7 @@
       <bels>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>B5LUT</name>
           </id>
           <attributes>
@@ -29008,7 +29008,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>C5LUT</name>
           </id>
           <attributes>
@@ -29050,7 +29050,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>D5LUT</name>
           </id>
           <attributes>
@@ -29092,7 +29092,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>A5LUT</name>
           </id>
           <attributes>
@@ -29134,7 +29134,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>B6LUT</name>
           </id>
           <attributes>
@@ -29176,7 +29176,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>C6LUT</name>
           </id>
           <attributes>
@@ -29218,7 +29218,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>D6LUT</name>
           </id>
           <attributes>
@@ -29260,7 +29260,7 @@
         </bel>
         <bel>
           <id>
-            <primitive_type>SLICEM</primitive_type>
+            <site_type>SLICEM</site_type>
             <name>A6LUT</name>
           </id>
           <attributes>

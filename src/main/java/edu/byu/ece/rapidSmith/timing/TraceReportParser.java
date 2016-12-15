@@ -203,7 +203,7 @@ public class TraceReportParser{
 			String pinName = parts[1].substring(parts[1].indexOf('.')+1);
 			if(parts.length > 2){
 				if(parts[2].equals("net")){
-					String primitiveSiteName = parts[1].substring(0, parts[1].indexOf('.'));
+					String siteName = parts[1].substring(0, parts[1].indexOf('.'));
 
 					currElement = new RoutingPathElement();
 					currElement.setType("net");
@@ -221,7 +221,7 @@ public class TraceReportParser{
 						}
 						((RoutingPathElement)currElement).setNet(net);
 						for(XdlPin p : net.getPins()){
-							if(p.getName().equals(pinName) && p.getInstance().getPrimitiveSiteName().equals(primitiveSiteName)){
+							if(p.getName().equals(pinName) && p.getInstance().getSiteName().equals(siteName)){
 								currElement.setPin(p);
 								break;
 							}

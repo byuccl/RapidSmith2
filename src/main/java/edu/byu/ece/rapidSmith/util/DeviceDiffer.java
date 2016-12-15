@@ -139,59 +139,59 @@ public class DeviceDiffer {
 			differences.add("column", "" + gold.getColumn(), "" + test.getColumn());
 		}
 
-		diffPrimitiveSites(gold, test);
+		diffSites(gold, test);
 		diffTilesSources(gold, test);
 		diffTileSinks(gold, test);
 		diffWireHashMaps(gold.getWireHashMap(), test.getWireHashMap());
 	}
 
-	private void diffPrimitiveSites(Tile gold, Tile test) {
-		if (gold.getPrimitiveSites() == null) {
-			if (test.getPrimitiveSites() != null) {
-				for (Site site : test.getPrimitiveSites()) {
+	private void diffSites(Tile gold, Tile test) {
+		if (gold.getSites() == null) {
+			if (test.getSites() != null) {
+				for (Site site : test.getSites()) {
 					differences.add("primitive_site", "none", site.getName());
 				}
 			}
 		} else {
-			if (test.getPrimitiveSites() == null) {
-				for (Site site : gold.getPrimitiveSites()) {
+			if (test.getSites() == null) {
+				for (Site site : gold.getSites()) {
 					differences.add("primitive_site", site.getName(), "none");
 				}
 			} else {
-				int numGoldSites = gold.getPrimitiveSites().length;
-				int numTestSites = test.getPrimitiveSites().length;
+				int numGoldSites = gold.getSites().length;
+				int numTestSites = test.getSites().length;
 				int i, j;
 				for (i = 0, j = 0; i < numGoldSites && j < numTestSites; i++, j++) {
-					Site goldSite = gold.getPrimitiveSites()[i];
-					Site testSite = test.getPrimitiveSites()[j];
+					Site goldSite = gold.getSites()[i];
+					Site testSite = test.getSites()[j];
 					if (!goldSite.getName().equals(testSite.getName())) {
 						boolean matched = false;
 						int m = i, n = j;
 						for (; n < numTestSites && !matched; n++) {
-							matched = goldSite.getName().equals(test.getPrimitiveSites()[n].getName());
+							matched = goldSite.getName().equals(test.getSites()[n].getName());
 						}
 						if (!matched)
 							n = j;
 						for (; m < numTestSites && !matched; m++) {
-							matched = gold.getPrimitiveSites()[m].getName().equals(testSite.getName());
+							matched = gold.getSites()[m].getName().equals(testSite.getName());
 						}
 						if (!matched)
 							m = i;
 						i = m;
 						j = n;
-						goldSite = gold.getPrimitiveSites()[i];
-						testSite = test.getPrimitiveSites()[j];
+						goldSite = gold.getSites()[i];
+						testSite = test.getSites()[j];
 					}
-					diffPrimitiveSite(goldSite, testSite);
+					diffSite(goldSite, testSite);
 				}
 
 				for (; i < numGoldSites; i++) {
 					differences.add("primitive_site ",
-							gold.getPrimitiveSites()[i].getName(), "none");
+							gold.getSites()[i].getName(), "none");
 				}
 				for (; j < numTestSites; j++) {
 					differences.add("primitive_site ",
-							"none", test.getPrimitiveSites()[j].getName());
+							"none", test.getSites()[j].getName());
 				}
 			}
 		}
@@ -269,9 +269,9 @@ public class DeviceDiffer {
 		}
 	}
 
-	private void diffPrimitiveSite(Site gold, Site test) {
+	private void diffSite(Site gold, Site test) {
 		String siteName = gold.getName();
-		differences.down("primitive site", siteName);
+		differences.down("site", siteName);
 
 		if (!gold.getName().equals(test.getName())) {
 			differences.add("name", gold.getName(), test.getName());

@@ -61,7 +61,7 @@ public class DSPCarryCluster extends CarryChainCluster {
 			}
 			
 			//System.out.println(swapTile.getName() + " " + swapTile.getType());
-			aboveSite = nextTile.getPrimitiveSite(dspIndex);
+			aboveSite = nextTile.getSite(dspIndex);
 				
 			if(usedSites.containsKey(aboveSite)) 
 				return false;
@@ -130,14 +130,14 @@ public class DSPCarryCluster extends CarryChainCluster {
 			}
 			
 			//System.out.println(swapTile.getName() + " " + swapTile.getType());
-			swapSite = swapTile.getPrimitiveSite(siteIndex);
+			swapSite = swapTile.getSite(siteIndex);
 			
 			//check to see if there is currently anything at that location..if there is than perform a swap
 			swapID = swapSite;
 			if (sitenameToCluster.containsKey(swapID)) {				
 				swapSiteCluster = sitenameToCluster.get(swapID);
 				
-				if (!swapSiteCluster.swap(sc.getPrimitiveSite()))
+				if (!swapSiteCluster.swap(sc.getSite()))
 					return false; 
 				
 				this.swappedWith.add(swapSiteCluster);

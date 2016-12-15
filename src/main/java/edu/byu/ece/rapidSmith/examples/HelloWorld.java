@@ -65,17 +65,17 @@ public class HelloWorld{
 		XdlInstance bob = design.getInstance("Bob");
 		
 		// Let's find a primitive site for our instance Bob
-		Map<String, Site> primitiveSites = design.getDevice().getPrimitiveSites();
-		for(Site site : primitiveSites.values()){
+		Map<String, Site> sites = design.getDevice().getSites();
+		for(Site site : sites.values()){
 			// Some primitive sites can have more than one type reside at the site, such as SLICEM 
 			// sites which can also have SLICELs placed there.  Checking if the site is compatible
 			// makes sure you get the best possible chance of finding a place for bob to live.
-			if(site.isCompatiblePrimitiveType(bob.getType())){
+			if(site.isCompatibleSiteType(bob.getType())){
 				// Let's also make sure we don't place bob on a site that is already used
-				if(!design.isPrimitiveSiteUsed(site)){
+				if(!design.isSiteUsed(site)){
 					bob.place(site);
 					System.out.println("We placed bob on tile: " + bob.getTile() +
-							" and site: " + bob.getPrimitiveSiteName());
+							" and site: " + bob.getSiteName());
 					break;
 				}
 			}
@@ -85,10 +85,10 @@ public class HelloWorld{
 		List<Site> allSitesOfTypeSLICEL = design.getDevice().getAllSitesOfType(bob.getType());
 		for(Site site : allSitesOfTypeSLICEL){
 			// Let's also make sure we don't place bob on a site that is already used
-			if(!design.isPrimitiveSiteUsed(site)){
+			if(!design.isSiteUsed(site)){
 				bob.place(site);
 				System.out.println("We placed bob on tile: " + bob.getTile() +
-						" and site: " + bob.getPrimitiveSiteName());
+						" and site: " + bob.getSiteName());
 				break;
 			}
 		}
@@ -104,7 +104,7 @@ public class HelloWorld{
 		myIOB.addAttribute(new XdlAttribute("IOATTRBOX","","LVCMOS25"));
 		// Another way to find a primitive site is by name, this is the pin name 
 		// that you might find in a UCF file
-		myIOB.place(design.getDevice().getPrimitiveSite("C17"));
+		myIOB.place(design.getDevice().getSite("C17"));
 		
 		// Let's also create a new net to connect the two pins
 		XdlNet fred = new XdlNet();

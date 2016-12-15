@@ -104,7 +104,7 @@ public class CreateDesignExample {
 		//    Pull the actual site types out of these BelId objects and collect them into a sorted list without duplicates 
 		//    (the resulting list should contain just SLICEL and SLICEM)
 		List<SiteType> anchorsitetypes = anchors.stream()
-				.map(BelId::getPrimitiveType)
+				.map(BelId::getSiteType)
 				.distinct()
 				.sorted()
 				.collect(Collectors.toList());
@@ -115,7 +115,7 @@ public class CreateDesignExample {
 		// Place the invcell on a suitable LUT (the first one found that is suitable)
 		// Get a list of the ones which have the primitive site type matching above (which will be SLICEL or SLICEM)
 		anchors = invcell.getPossibleAnchors().stream()
-				.filter(t -> t.getPrimitiveType() == sitetype)
+				.filter(t -> t.getSiteType() == sitetype)
 				.collect(Collectors.toList());
 		// Place the cell on the bel of the first one
 		design.placeCell(invcell, slice.getBel(anchors.get(0).getName()));
@@ -125,7 +125,7 @@ public class CreateDesignExample {
 		//       to ensure good packing and routability.
 		// But, in this case it doesn't really matter, the design will be routable.
 		anchors = ffcell.getPossibleAnchors().stream()
-				.filter(t -> t.getPrimitiveType() == sitetype)
+				.filter(t -> t.getSiteType() == sitetype)
 				.collect(Collectors.toList());
 		design.placeCell(ffcell, slice.getBel(anchors.get(0).getName()));
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////

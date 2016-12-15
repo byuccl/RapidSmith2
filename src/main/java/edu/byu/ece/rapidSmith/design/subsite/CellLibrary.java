@@ -105,7 +105,7 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		for (Element belEl : belsEl.getChildren("bel")) {
 			Element id = belEl.getChild("id");
 			FamilyType family = FamilyType.valueOf(id.getChildText("family"));
-			String site_type = id.getChildText("primitive_type");
+			String site_type = id.getChildText("site_type");
 			BelId belId = new BelId(
 					SiteType.valueOf(family, site_type),
 					id.getChildText("name")
@@ -115,7 +115,7 @@ public class CellLibrary implements Iterable<LibraryCell> {
 			loadPinMapFromXml(libCell, belEl, belId);
 
 			Map<String, SiteProperty> siteProperties = sitePropertiesMap.computeIfAbsent(
-					belId.getPrimitiveType(), k -> new HashMap<>());
+					belId.getSiteType(), k -> new HashMap<>());
 			Map<String, SiteProperty> sharedSiteProperties = new HashMap<>();
 			sharedSitePropertiesMap.put(belId, sharedSiteProperties);
 			Element attrsEl = belEl.getChild("attributes");
@@ -127,7 +127,7 @@ public class CellLibrary implements Iterable<LibraryCell> {
 						if (rename == null)
 							rename = attrName;
 						SiteProperty siteProperty = siteProperties.computeIfAbsent(
-								rename, k -> new SiteProperty(belId.getPrimitiveType(), k));
+								rename, k -> new SiteProperty(belId.getSiteType(), k));
 						sharedSiteProperties.put(attrName, siteProperty);
 					}
 				}
