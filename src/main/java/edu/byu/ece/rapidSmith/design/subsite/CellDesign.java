@@ -4,6 +4,7 @@ import edu.byu.ece.rapidSmith.design.AbstractDesign;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.util.Exceptions;
+import edu.byu.ece.rapidSmith.interfaces.vivado.XdcConstraint;
 
 import java.util.*;
 
@@ -36,6 +37,8 @@ public class CellDesign extends AbstractDesign {
 	private CellNet vccNet;
 	/** The GND RapidSmith net */
 	private CellNet gndNet;
+	/** List of Vivado constraints on the design **/
+	private List<XdcConstraint> vivadoConstraints;
 	
 	/**
 	 * Constructor which initializes all member data structures. Sets name and
@@ -572,6 +575,25 @@ public class CellDesign extends AbstractDesign {
 		return this.usedSitePipsMap.getOrDefault(ps, Collections.emptySet());
 	}
 
+	/**
+	 * Returns a list of XDC contraints on the design.
+	 */
+	public List<XdcConstraint> getVivadoConstraints() {
+		return this.vivadoConstraints;
+	}
+	
+	/**
+	 * Add an XDC constraint to the design
+	 * @param constraint {@link XdcConstraint} to add to the design
+	 */
+	public void addVivadoConstraint(XdcConstraint constraint) {
+		
+		if (this.vivadoConstraints == null) {
+			vivadoConstraints = new ArrayList<>();
+		}
+		vivadoConstraints.add(constraint);
+	}
+	
 	/**
 	 * Unplaces the design.  The design is first unrouted.
 	 */
