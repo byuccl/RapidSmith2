@@ -402,7 +402,7 @@ public class XdlInstance implements Serializable{
 	 * This method is used for Module creation only.  DO NOT use.
 	 * @see #place(Site)
 	 */
-	void setSiteUnsafe(Site site){
+	public void setSiteUnsafe(Site site){
 		this.site = site;
 	}
 
