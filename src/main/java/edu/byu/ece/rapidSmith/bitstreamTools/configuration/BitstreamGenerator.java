@@ -92,7 +92,7 @@ public abstract class BitstreamGenerator {
     {
     	// Create a data object that contains all of the frame data
         int initial_far_address = frames.get(0).getFrameAddress();
-        ArrayList<Integer> data = new ArrayList<Integer>();
+        ArrayList<Integer> data = new ArrayList<>();
         for (Frame i : frames) {
             data.addAll(i.getData().getAllFrameWords());
         }
@@ -177,7 +177,7 @@ public abstract class BitstreamGenerator {
 		boolean isIdle = true;     // When true, we are looking for a frame with data
 		boolean validFAR = true;
 		
-		ArrayList<Integer> data = new ArrayList<Integer>();
+		ArrayList<Integer> data = new ArrayList<>();
 		while(validFAR) {
 			if (DEBUG) {
 				FrameAddressRegister far = fpga.getFAR();
@@ -242,7 +242,7 @@ public abstract class BitstreamGenerator {
 				}
 				
 				isIdle = true;
-				data = new ArrayList<Integer>();
+				data = new ArrayList<>();
 			} else {
 				if (DEBUG) System.out.print("Empty frame - looking for data");				
 			}
@@ -302,7 +302,7 @@ public abstract class BitstreamGenerator {
      * 
      */
 	public static int writeBitstreamToBIT(Bitstream bit, String outputFilename) {
-		FileOutputStream out=null;
+		FileOutputStream out;
 		try {
 			out = new FileOutputStream(new File(outputFilename));
 		} catch (FileNotFoundException e) {

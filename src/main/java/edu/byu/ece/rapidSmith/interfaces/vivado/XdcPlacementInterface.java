@@ -31,11 +31,11 @@ import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
  */
 public class XdcPlacementInterface {
 
-	private CellDesign design;
-	private Device device;
+	private final CellDesign design;
+	private final Device device;
 	private int currentLineNumber;
 	private String currentFile;
-	private Map<BelPin, CellPin> belPinToCellPinMap; 
+	private final Map<BelPin, CellPin> belPinToCellPinMap;
 	
 	public XdcPlacementInterface(CellDesign design, Device device) {
 		this.design = design;
@@ -54,7 +54,7 @@ public class XdcPlacementInterface {
 		
 		currentFile = xdcFile;
 		LineNumberReader br = new LineNumberReader(new BufferedReader(new FileReader(xdcFile)));
-		String line = null;
+		String line;
 		
 		while ((line = br.readLine()) != null) {
 			currentLineNumber = br.getLineNumber();

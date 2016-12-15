@@ -3,10 +3,8 @@ package edu.byu.ece.rapidSmith.device.creation;
 import com.caucho.hessian.io.Hessian2Input;
 import com.caucho.hessian.io.Hessian2Output;
 import edu.byu.ece.rapidSmith.RSEnvironment;
-import edu.byu.ece.rapidSmith.device.Connection;
 import edu.byu.ece.rapidSmith.device.*;
-import edu.byu.ece.rapidSmith.device.helper.HashPool;
-import edu.byu.ece.rapidSmith.device.helper.WireArray;
+import edu.byu.ece.rapidSmith.util.HashPool;
 import edu.byu.ece.rapidSmith.util.FileTools;
 
 import java.io.IOException;
@@ -21,6 +19,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class ExtendedDeviceInfo implements Serializable {
+	private static final long serialVersionUID = -459840872618980717L;
 	private transient ExecutorService threadPool;
 
 	private transient final HashPool<WireConnection> connPool = new HashPool<>();

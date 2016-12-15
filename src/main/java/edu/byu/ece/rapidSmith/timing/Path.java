@@ -38,7 +38,7 @@ public abstract class Path {
 	/** The uncertainty in the clock as determined by Xilinx trce */
 	private float clockUncertainty;
 	/** List of physical / logical resources */
-	private ArrayList<PathElement> maxDataPath = new ArrayList<PathElement>();	
+	private ArrayList<PathElement> maxDataPath = new ArrayList<>();
 	
 	/**
 	 * @return the source

@@ -22,11 +22,9 @@ package edu.byu.ece.rapidSmith.constraints;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 /**
@@ -60,7 +58,7 @@ public class UCFParser {
 	 * @return A list of Constraint objects representing the constraints 
 	 */
 	public ArrayList<Constraint> parseUCF(String fileName){
-		ArrayList<Constraint> constraints = new ArrayList<Constraint>();
+		ArrayList<Constraint> constraints = new ArrayList<>();
 		line = 0;
 		try {
 			reader = new BufferedInputStream(new FileInputStream(fileName));

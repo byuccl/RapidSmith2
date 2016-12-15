@@ -77,12 +77,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-2", "-1", };
 			_topRows = 1;
 			_bottomRows = 2;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -99,12 +99,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-3", "-2", "-1", };
 			_topRows = 2;
 			_bottomRows = 2;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -121,12 +121,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-3", "-2", "-1", };
 			_topRows = 2;
 			_bottomRows = 2;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTX, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTX, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -143,12 +143,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-3", "-2", "-1", };
 			_topRows = 2;
 			_bottomRows = 2;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -165,12 +165,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-3", "-2", "-1", };
 			_topRows = 2;
 			_bottomRows = 2;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, IOB, CLK, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, IOB, CLK, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -187,12 +187,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-3", "-2", "-1", };
 			_topRows = 3;
 			_bottomRows = 3;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -209,12 +209,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-3", "-2", "-1", };
 			_topRows = 3;
 			_bottomRows = 3;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -231,12 +231,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-3", "-2", "-1", };
 			_topRows = 3;
 			_bottomRows = 3;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, IOB, CLK, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, IOB, CLK, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -253,12 +253,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-3", "-2", "-1", };
 			_topRows = 4;
 			_bottomRows = 4;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTX, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTX, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -275,12 +275,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-3", "-2", "-1", };
 			_topRows = 3;
 			_bottomRows = 3;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -297,12 +297,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-3", "-2", "-1", };
 			_topRows = 3;
 			_bottomRows = 3;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -319,12 +319,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-2", "-1", };
 			_topRows = 4;
 			_bottomRows = 4;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, IOB, CLK, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, IOB, CLK, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -341,12 +341,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-3", "-2", "-1", };
 			_topRows = 4;
 			_bottomRows = 4;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTX, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTX, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -363,12 +363,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-3", "-2", "-1", };
 			_topRows = 4;
 			_bottomRows = 4;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -385,12 +385,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-3", "-2", "-1", };
 			_topRows = 4;
 			_bottomRows = 4;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -407,12 +407,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-3", "-2", "-1", };
 			_topRows = 5;
 			_bottomRows = 5;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTX, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTX, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -429,12 +429,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-2", "-1", };
 			_topRows = 5;
 			_bottomRows = 5;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						GTX, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTX, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							GTX, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTX, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -451,12 +451,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-3", "-2", "-1", };
 			_topRows = 4;
 			_bottomRows = 4;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -473,12 +473,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-3", "-2", "-1", };
 			_topRows = 4;
 			_bottomRows = 4;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -495,12 +495,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-2", "-1", };
 			_topRows = 6;
 			_bottomRows = 6;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTX, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTX, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -517,12 +517,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-2", "-1", };
 			_topRows = 4;
 			_bottomRows = 4;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -539,12 +539,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-2", "-1", };
 			_topRows = 4;
 			_bottomRows = 4;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -561,12 +561,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-2", "-1", };
 			_topRows = 6;
 			_bottomRows = 6;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, IOB, CLK, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, IOB, CLK, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -583,12 +583,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-2", "-1", };
 			_topRows = 6;
 			_bottomRows = 6;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						GTX, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTX, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							GTX, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTX, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -605,12 +605,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-2", "-1", };
 			_topRows = 6;
 			_bottomRows = 6;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();
@@ -627,12 +627,12 @@ public class V5PartLibrary extends PartLibrary {
 			_validSpeedGrades = new String[] {"-2", "-1", };
 			_topRows = 6;
 			_bottomRows = 6;
-			_blockTypeLayouts = new ArrayList<BlockTypeInstance>(Arrays.asList(new BlockTypeInstance[] {
-					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[] {
-						IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD, 
+			_blockTypeLayouts = new ArrayList<>(Arrays.asList(new BlockTypeInstance[]{
+					new BlockTypeInstance(LOGIC_INTERCONNECT_BLOCKTYPE, new BlockSubType[]{
+							IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, DSP, CLB, CLB, DSP, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, IOB, CLK, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, CLB, CLB, CLB, CLB, IOB, CLB, CLB, CLB, CLB, BRAMINTERCONNECT, GTP, LOGIC_OVERHEAD,
 					}),
-					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[] {
-						BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD, 
+					new BlockTypeInstance(BRAM_CONTENT_BLOCKTYPE, new BlockSubType[]{
+							BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMCONTENT, BRAMOVERHEAD,
 					}),
 			}));
 			_overallColumnLayout = _blockTypeLayouts.get(0).getColumnLayout();

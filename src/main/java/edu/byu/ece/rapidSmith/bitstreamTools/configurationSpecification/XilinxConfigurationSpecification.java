@@ -40,46 +40,46 @@ import edu.byu.ece.rapidSmith.bitstreamTools.configuration.FrameAddressRegister;
 public interface XilinxConfigurationSpecification {
 
     // Specific for a given device family
-    public String getDeviceFamily();
-    public int getFrameSize();
-    public List<BlockType> getBlockTypes(); 
-    public DummySyncData getSyncData();
-    public BlockType getBRAMContentBlockType();
-    public BlockType getLogicBlockType();
+    String getDeviceFamily();
+    int getFrameSize();
+    List<BlockType> getBlockTypes();
+    DummySyncData getSyncData();
+    BlockType getBRAMContentBlockType();
+    BlockType getLogicBlockType();
     
-    public BitstreamGenerator getBitstreamGenerator();
+    BitstreamGenerator getBitstreamGenerator();
     
     // FAR addressing
-    public int getMinorMask();
-    public int getMinorBitPos();
-    public int getColumnMask();
-    public int getColumnBitPos();
-    public int getRowMask();
-    public int getRowBitPos();
-    public int getTopBottomMask();
-    public int getTopBottomBitPos();
-    public int getBlockTypeMask();
-    public int getBlockTypeBitPos();    
+    int getMinorMask();
+    int getMinorBitPos();
+    int getColumnMask();
+    int getColumnBitPos();
+    int getRowMask();
+    int getRowBitPos();
+    int getTopBottomMask();
+    int getTopBottomBitPos();
+    int getBlockTypeMask();
+    int getBlockTypeBitPos();
     
     // specific for a given device within a family  
-    public String getDeviceName();
-    public String[] getValidPackages();
-    public String[] getValidSpeedGrades();
-    public String getStringDeviceIDCode();
-    public int getIntDeviceIDCode();
-    public int getTopNumberOfRows();
-    public int getBottomNumberOfRows();
+    String getDeviceName();
+    String[] getValidPackages();
+    String[] getValidSpeedGrades();
+    String getStringDeviceIDCode();
+    int getIntDeviceIDCode();
+    int getTopNumberOfRows();
+    int getBottomNumberOfRows();
     
-    public List<BlockSubType> getBlockSubTypeLayout(BlockType bt);
-    public int getBlockTypeFromFAR(int farAddress);
-    public int getTopBottomFromFAR(int farAddress);
-    public int getRowFromFAR(int farAddress);
-    public int getColumnFromFAR(int farAddress);
-    public int getMinorFromFAR(int farAddress);
-    public List<BlockSubType> getOverallColumnLayout();
-    public List<BlockTypeInstance> getBlockTypeInstances();
+    List<BlockSubType> getBlockSubTypeLayout(BlockType bt);
+    int getBlockTypeFromFAR(int farAddress);
+    int getTopBottomFromFAR(int farAddress);
+    int getRowFromFAR(int farAddress);
+    int getColumnFromFAR(int farAddress);
+    int getMinorFromFAR(int farAddress);
+    List<BlockSubType> getOverallColumnLayout();
+    List<BlockTypeInstance> getBlockTypeInstances();
     
-    public BlockSubType getBlockSubtype(XilinxConfigurationSpecification spec, FrameAddressRegister far);
+    BlockSubType getBlockSubtype(XilinxConfigurationSpecification spec, FrameAddressRegister far);
 }
 
 /* Ideas for making this more general:

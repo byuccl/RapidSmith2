@@ -24,7 +24,6 @@ package edu.byu.ece.rapidSmith.device.creation;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
 import edu.byu.ece.rapidSmith.device.*;
-import edu.byu.ece.rapidSmith.device.helper.*;
 import edu.byu.ece.rapidSmith.primitiveDefs.*;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
@@ -70,8 +69,8 @@ public final class DeviceGenerator {
 	private Document familyInfo;
 
 	private static final int PIP_CAPACITY = 40000;
-	private Set<String> pipSources = new HashSet<>(PIP_CAPACITY);
-	private Set<String> pipSinks = new HashSet<>(PIP_CAPACITY);
+	private final Set<String> pipSources = new HashSet<>(PIP_CAPACITY);
+	private final Set<String> pipSinks = new HashSet<>(PIP_CAPACITY);
 
 	/** Keeps track of each unique Wire object in the device */
 	private HashPool<WireConnection> wirePool;
@@ -848,7 +847,7 @@ public final class DeviceGenerator {
 	}
 
 	private final class FamilyTypeListener extends XDLRCParserListener {
-		private RSEnvironment env;
+		private final RSEnvironment env;
 
 		public FamilyTypeListener(RSEnvironment env) {
 			this.env = env;
@@ -869,9 +868,9 @@ public final class DeviceGenerator {
 	private final class WireEnumeratorListener extends XDLRCParserListener {
 		private static final int PIN_SET_CAPACITY = 10000;
 
-		private Set<String> wireSet = new TreeSet<>();
-		private Set<String> inpinSet = new HashSet<>(PIN_SET_CAPACITY);
-		private Set<String> outpinSet = new HashSet<>(PIN_SET_CAPACITY);
+		private final Set<String> wireSet = new TreeSet<>();
+		private final Set<String> inpinSet = new HashSet<>(PIN_SET_CAPACITY);
+		private final Set<String> outpinSet = new HashSet<>(PIN_SET_CAPACITY);
 
 		private SiteType currType;
 		private String currElement;
@@ -1031,10 +1030,6 @@ public final class DeviceGenerator {
 		private Tile currTile;
 		private int currTileWire;
 		private boolean currTileWireIsSource;
-
-		@Override
-		protected void enterXdlResourceReport(List<String> tokens) {
-		}
 
 		@Override
 		protected void enterTile(List<String> tokens) {
@@ -1232,7 +1227,7 @@ public final class DeviceGenerator {
 	}
 
 	private class PrimitiveDefsListener extends XDLRCParserListener {
-		private PrimitiveDefList defs;
+		private final PrimitiveDefList defs;
 		private PrimitiveDef currDef;
 		private PrimitiveElement currElement;
 		private ArrayList<PrimitiveDefPin> pins;

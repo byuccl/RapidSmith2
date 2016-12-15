@@ -31,8 +31,9 @@ import java.util.Objects;
  *  site.  BelId objects are immutable.
  */
 public final class BelId implements Serializable {
-	private SiteType siteType;
-	private String name;
+	private static final long serialVersionUID = -4845391283243751324L;
+	private final SiteType siteType;
+	private final String name;
 
 	/**
 	 * Constructs a new BelId object.

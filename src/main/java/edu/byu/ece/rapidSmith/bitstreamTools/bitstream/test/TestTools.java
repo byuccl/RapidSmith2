@@ -54,24 +54,19 @@ public class TestTools {
             try {
                 Process p = Runtime.getRuntime().exec("promgen -u 0 " + inputBit.getAbsolutePath() + " -o " + inputMcs.getAbsolutePath());
                 p.waitFor();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (InterruptedException e) {
+            } catch (IOException | InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            
+
             // generate output .bit and output .mcs
             Bitstream inputBitstream = null;
             try {
                 inputBitstream = BitstreamParser.parseBitstream(inputBit);
-            } catch (BitstreamParseException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (BitstreamParseException | IOException e) {
                 e.printStackTrace();
             }
-            
+
             FileOutputStream os_bit = null;
             try {
                 os_bit = new FileOutputStream(outputBit);
@@ -91,41 +86,31 @@ public class TestTools {
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-            
-            try {
-                inputBitstream.writeBitstreamToMCS(os_mcs);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            
+
+            inputBitstream.writeBitstreamToMCS(os_mcs);
+
             // compare bitstreams
             boolean bitMatch = false;
             try {
                 Process p = Runtime.getRuntime().exec("diff " + inputBit.getAbsolutePath() + " " + outputBit.getAbsolutePath());
                 int result = p.waitFor();
                 bitMatch = (result == 0);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (InterruptedException e) {
+            } catch (IOException | InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            
+
             // compare mcs files
             boolean mcsMatch = false;
             try {
                 Process p = Runtime.getRuntime().exec("diff " + inputMcs.getAbsolutePath() + " " + outputMcs.getAbsolutePath());
                 int result = p.waitFor();
                 mcsMatch = (result == 0);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (InterruptedException e) {
+            } catch (IOException | InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            
+
             if (bitMatch && mcsMatch) {
                 System.out.println(".bit and .mcs files match for part: " + partName);
             }
@@ -176,7 +161,7 @@ public class TestTools {
             String fullName = partName + desc.getValidPackagesForPart(partName).get(0) + desc.getValidSpeedGradesForPart(partName).get(0);
             
             // Generate small XDL design
-            FileWriter fw = null;
+            FileWriter fw;
             try {
                 fw = new FileWriter(xdlFile);
                 fw.write("design \"top\" " + fullName + " v3.2 , cfg \"\";");
@@ -196,14 +181,11 @@ public class TestTools {
                 while((input.readLine()) != null){
                 }
                 p.waitFor();
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.exit(1);
-            } catch (InterruptedException e) {
+            } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
                 System.exit(1);
             }
-            
+
         }
         
         baseTempFile.delete();
@@ -240,7 +222,7 @@ public class TestTools {
         String fullName = partName;//+ desc.getValidPackagesForPart(partName).get(0) + desc.getValidSpeedGradesForPart(partName).get(0);
         
         // Generate small XDL design
-        FileWriter fw = null;
+        FileWriter fw;
         try {
             fw = new FileWriter(xdlFile);
             fw.write("design \"top\" " + fullName + " v3.2 , cfg \"\";");
@@ -260,26 +242,23 @@ public class TestTools {
             while((input.readLine()) != null){
             }
             p.waitFor();
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             System.exit(1);
         }
     }
     
     public static XilinxPartgenDescription getPartgenDescription(String architecture) {
-        XilinxPartgenDescription result = null;
+        XilinxPartgenDescription result;
 
-        List<String> partNames = new ArrayList<String>();
-        List<List<String>> validPackages = new ArrayList<List<String>>();
-        List<List<String>> validSpeedGrades = new ArrayList<List<String>>();
+        List<String> partNames = new ArrayList<>();
+        List<List<String>> validPackages = new ArrayList<>();
+        List<List<String>> validSpeedGrades = new ArrayList<>();
         
         BufferedReader input;
         Process p;
         String line;
-        ArrayList<String> output = new ArrayList<String>();
+        ArrayList<String> output = new ArrayList<>();
         try {
             p = Runtime.getRuntime().exec("partgen -arch " + architecture);
             input = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -315,8 +294,8 @@ public class TestTools {
 
                 // Now we should be on the line with the part name
                 partNames.add(tokens[0]);
-                List<String> currValidPackages = new ArrayList<String>();
-                List<String> currValidSpeedGrades = new ArrayList<String>();
+                List<String> currValidPackages = new ArrayList<>();
+                List<String> currValidSpeedGrades = new ArrayList<>();
 
                 // Add the speed grades
                 for(String token : tokens){

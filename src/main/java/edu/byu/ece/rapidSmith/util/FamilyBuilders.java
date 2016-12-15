@@ -426,9 +426,9 @@ public class FamilyBuilders {
 	}
 
 	private static class FamilyInfoData {
-		LinkedHashSet<String> supportedParts = new LinkedHashSet<>();
-		LinkedHashSet<String> tileTypes = new LinkedHashSet<>();
-		LinkedHashSet<String> siteTypes = new LinkedHashSet<>();
+		final LinkedHashSet<String> supportedParts = new LinkedHashSet<>();
+		final LinkedHashSet<String> tileTypes = new LinkedHashSet<>();
+		final LinkedHashSet<String> siteTypes = new LinkedHashSet<>();
 	}
 
 	private void addFamiliesToInfosClass(Set<FamilyType> families, RSEnvironment env) throws IOException {

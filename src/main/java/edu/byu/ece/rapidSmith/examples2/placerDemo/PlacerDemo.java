@@ -1,29 +1,20 @@
 package edu.byu.ece.rapidSmith.examples2.placerDemo;
 
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-
+import edu.byu.ece.rapidSmith.RSEnvironment;
+import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
+import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
+import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
+import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import edu.byu.ece.edif.core.EdifNameConflictException;
-import edu.byu.ece.edif.core.InvalidEdifNameException;
-import edu.byu.ece.edif.util.parse.ParseException;
-import edu.byu.ece.rapidSmith.RSEnvironment;
-import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
-import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
-import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
+
+import java.io.*;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Simulated Annealing placer demo for FPL. The demo can be run in interactive mode (-I) <br>
@@ -48,7 +39,7 @@ public class PlacerDemo {
 	
 	private static Device device;
 	
-	public static void classSetup() throws IOException {
+	public static void classSetup() {
 		device = RSEnvironment.defaultEnv().getDevice(CANONICAL_PART_NAME);
 	}
 	
@@ -67,10 +58,10 @@ public class PlacerDemo {
 	// fir.tcp
 	// counter16bit.tcp (Research/Tincr)
 	// 5bit_adder.tcp
-	public static void main(String[] args) throws IOException, ParseException, EdifNameConflictException, InvalidEdifNameException {
+	public static void main(String[] args) throws IOException {
 		
 		// Parse the input arguments
-		ArrayList<String> pathArgs = new ArrayList<String>();
+		ArrayList<String> pathArgs = new ArrayList<>();
 		boolean interactiveMode = parseArgs(args, pathArgs);
 		String tcpDirectory = pathArgs.get(0);
 		String vivadoInstanceDirectory = pathArgs.size() == 2 ? pathArgs.get(1) : ".";

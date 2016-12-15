@@ -7,8 +7,9 @@ import java.util.Objects;
  *
  */
 public final class SitePinTemplate implements Serializable {
-	private String name;
-	private SiteType siteType;
+	private static final long serialVersionUID = 4547857938761572358L;
+	private final String name;
+	private final SiteType siteType;
 	private PinDirection direction;
 	private int internalWire;
 

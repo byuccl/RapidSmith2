@@ -4,6 +4,7 @@ package edu.byu.ece.rapidSmith.examples2.placerDemo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Objects;
 
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
@@ -257,8 +258,10 @@ public class SiteCluster {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		SiteCluster other = (SiteCluster) obj;
-		return currentLOC == other.currentLOC;
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		SiteCluster that = (SiteCluster) o;
+		return Objects.equals(currentLOC, that.currentLOC);
 	}
 }

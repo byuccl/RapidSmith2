@@ -54,7 +54,7 @@ public class XdlInstance implements Serializable{
 	/** A list of nets to which this instance is connected */
 	private HashSet<XdlNet> netList;
 	/** A list of all pins on this instance which are connected in nets */
-	private Map<String, XdlPin> pinMap;
+	private final Map<String, XdlPin> pinMap;
 	/** Name of the module instance which this instance belongs to */
 	private XdlModuleInstance moduleInstance;
 	/** The module template (or definition) this instance is a member of */

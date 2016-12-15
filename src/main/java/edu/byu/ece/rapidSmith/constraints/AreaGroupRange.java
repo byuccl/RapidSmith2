@@ -70,14 +70,9 @@ public class AreaGroupRange {
 	}
 	
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append(areaGroupName + " ");
-		sb.append(rangeType + "_");
-		sb.append(lowerLeftCoordinate.toString());
-		sb.append(":");
-		sb.append(upperRightCoordinate.toString());
-		
-		return sb.toString();
+		return areaGroupName + " " + rangeType + "_" +
+				lowerLeftCoordinate.toString() + ":" +
+				upperRightCoordinate.toString();
 	}
 
 	protected class AreaGroupCoordinate {

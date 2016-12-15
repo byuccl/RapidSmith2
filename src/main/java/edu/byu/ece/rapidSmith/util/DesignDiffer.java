@@ -552,7 +552,7 @@ public class DesignDiffer {
 	}
 
 	private class PinId {
-		private XdlPin pin;
+		private final XdlPin pin;
 
 		private PinId(XdlPin pin) {
 			this.pin = pin;
@@ -619,10 +619,10 @@ public class DesignDiffer {
 	}
 
 	public static class Difference {
-		private DifferenceType type;
-		private String property;
-		private String expected;
-		private String actual;
+		private final DifferenceType type;
+		private final String property;
+		private final String expected;
+		private final String actual;
 
 		private Difference(DifferenceType type, String property, String expected, String actual) {
 			this.type = type;
@@ -677,10 +677,10 @@ public class DesignDiffer {
 
 	public static class DifferenceTree {
 		private static final String nl = System.lineSeparator();
-		private String levelName;
-		private String levelType;
-		private List<Difference> diffs = new ArrayList<>();
-		private List<DifferenceTree> children = new ArrayList<>();
+		private final String levelName;
+		private final String levelType;
+		private final List<Difference> diffs = new ArrayList<>();
+		private final List<DifferenceTree> children = new ArrayList<>();
 
 		public DifferenceTree(String levelName, String levelType) {
 			this.levelName = levelName;

@@ -16,7 +16,7 @@ import edu.byu.ece.rapidSmith.device.Tile;
  */
 
 public class BramCluster extends SiteCluster {
-	private boolean isRAMB36;
+	private final boolean isRAMB36;
 	private boolean isEmptySwap;
 	
 	public BramCluster(Site start) {

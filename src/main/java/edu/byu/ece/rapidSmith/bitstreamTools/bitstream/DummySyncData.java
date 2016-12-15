@@ -50,14 +50,14 @@ public class DummySyncData extends ConfigurationData {
     public static final byte[] SYNC_DATA = new byte[] {(byte) 0xAA, (byte) 0x99, (byte) 0x55, (byte) 0x66};
     
     public DummySyncData(byte[] bytes) {
-        _data = new ArrayList<Byte>(bytes.length);
+        _data = new ArrayList<>(bytes.length);
         for (Byte b : bytes) {
             _data.add(b);
         }        
     }
     
     public DummySyncData(List<Byte> bytes) {
-    	_data = new ArrayList<Byte>(bytes);
+    	_data = new ArrayList<>(bytes);
     }
     
     /**
@@ -94,7 +94,7 @@ public class DummySyncData extends ConfigurationData {
     }
     
     public List<Byte> getData() {
-        return new ArrayList<Byte>(_data);
+        return new ArrayList<>(_data);
     }
     
     public int getDataSize() {

@@ -202,7 +202,7 @@ public class BitstreamOptionParser extends OptionParser {
 	public FPGA createFPGAFromBitstreamOrReadbackFileExitOnError(OptionSet options, String readback_raw_file_option,
 			String regular_bitstream_file_option, XilinxConfigurationSpecification part) {
 
-		FPGA fpga = null;
+		FPGA fpga;
 		
 		if(options.has(readback_raw_file_option)){
 			// get data from a readback file
@@ -245,7 +245,7 @@ public class BitstreamOptionParser extends OptionParser {
 	 */
 	public XilinxConfigurationSpecification getPartInfoExitOnError(OptionSet options, Bitstream bitstream, boolean printMessage) {
 
-		XilinxConfigurationSpecification partInfo = null;
+		XilinxConfigurationSpecification partInfo;
 
 		// first see if the part can be found from the bitstream
 		String partName = null;
@@ -257,8 +257,7 @@ public class BitstreamOptionParser extends OptionParser {
 		
 		if (options.has(PART_OPTION)) {
 			// Assume that this is a root part name
-			String cmdPartName = (String) options.valueOf(PART_OPTION);
-			partName = cmdPartName;
+			partName = (String) options.valueOf(PART_OPTION);
 		}
 		
 		partInfo = DeviceLookup.lookupPartV4V5V6(partName);
@@ -276,7 +275,7 @@ public class BitstreamOptionParser extends OptionParser {
 	
 	public XilinxConfigurationSpecification getRequiredPartInfoExitOnError(OptionSet options) {
 
-		XilinxConfigurationSpecification partInfo = null;
+		XilinxConfigurationSpecification partInfo;
 
 		if (!options.has(PART_OPTION)) {
 			System.err.println("No part specified");

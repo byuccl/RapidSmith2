@@ -294,9 +294,9 @@ public class FilterWindow extends QWidget{
             		items.add(new DesignItem(module.getName(), module));
             		items.add(new DesignItem(module.getAnchor().getName(), module));
             		items.add(createNewHyperlinkItem(module.getAnchor().getSiteName(), module));
-	        		items.add(new DesignItem(String.format("%5d", module.getInstances().size(), module)));
-	        		items.add(new DesignItem(String.format("%5d", module.getNets().size(), module)));
-	        		items.add(new DesignItem(String.format("%5d", module.getPorts().size(), module)));
+	        		items.add(new DesignItem(String.format("%5d", module.getInstances().size()), module));
+	        		items.add(new DesignItem(String.format("%5d", module.getNets().size()), module));
+	        		items.add(new DesignItem(String.format("%5d", module.getPorts().size()), module));
 	        		model.appendRow(items);
 		        }
 	            break;
@@ -325,7 +325,7 @@ public class FilterWindow extends QWidget{
             		items.add(new DesignItem(pd.getSource(), pd));
             		items.add(new DesignItem(pd.getDestination(), pd));
             		items.add(new DesignItem(String.format("%5.3f", pd.getDataPathDelay()) + "ns", pd));
-            		items.add(new DesignItem(String.format("%5d", pd.getLevelsOfLogic(), pd)));
+            		items.add(new DesignItem(String.format("%5d", pd.getLevelsOfLogic()), pd));
             		model.appendRow(items);
             	}
 				break;
@@ -340,9 +340,9 @@ public class FilterWindow extends QWidget{
             		items.add(new DesignItem(po.getSource(), po));
             		items.add(new DesignItem(po.getDestination(), po));
             		items.add(new DesignItem(String.format("%5.3f", po.getDataPathDelay()) + "ns", po));
-            		items.add(new DesignItem(String.format("%5d", po.getLevelsOfLogic(), po)));
+            		items.add(new DesignItem(String.format("%5d", po.getLevelsOfLogic()), po));
             		items.add(new DesignItem(String.format("%5.3f", po.getClockPathDelay()) + "ns", po));
-            		items.add(new DesignItem(String.format("%5d", po.getClockLevelsOfLogic(), po)));
+            		items.add(new DesignItem(String.format("%5d", po.getClockLevelsOfLogic()), po));
             		model.appendRow(items);
             	}
 				break;
@@ -487,7 +487,7 @@ public class FilterWindow extends QWidget{
 							ArrayList<QStandardItem> items = new ArrayList<>();
 							items.add(createNewHyperlinkItem(lpe.getInstance().getSiteName() + "." + (lpe.getPin()==null ? "<null>":lpe.getPin().getName()), pd));
 							items.add(new DesignItem(lpe.getType(), pd));
-							items.add(new DesignItem(String.format("%5.3f", lpe.getDelay(), pd)));
+							items.add(new DesignItem(String.format("%5.3f", lpe.getDelay()), pd));
 							items.add(createNewHyperlinkItem(lpe.getInstance().getName(), pd));
 							subModels[0].appendRow(items);
 						}
@@ -496,7 +496,7 @@ public class FilterWindow extends QWidget{
 							ArrayList<QStandardItem> items = new ArrayList<>();
 							items.add(createNewHyperlinkItem(rpe.getPin().getInstance().getSiteName() + "." + rpe.getPin().getName(), pd));
 							items.add(new DesignItem(rpe.getType() + " (fanout=" + rpe.getNet().getFanOut() + ")", pd));
-							items.add(new DesignItem(String.format("%5.3f", rpe.getDelay(), pd)));
+							items.add(new DesignItem(String.format("%5.3f", rpe.getDelay()), pd));
 							items.add(createNewHyperlinkItem(rpe.getNet().getName(), pd));
 							subModels[0].appendRow(items);
 						}
@@ -593,7 +593,7 @@ public class FilterWindow extends QWidget{
 	 * @param index Index of the data that was clicked on.
 	 */
 	protected void onHover(QModelIndex index){
-		if(((String)index.data()).equals("")){
+		if(index.data().equals("")){
 			view.setCursor(arrow);
 			if(subViews != null && subViews.length > 0){
 				subViews[0].setCursor(arrow);

@@ -22,6 +22,7 @@ package edu.byu.ece.rapidSmith.design.explorer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import com.trolltech.qt.core.Qt.PenStyle;
 import com.trolltech.qt.gui.QBrush;
@@ -86,9 +87,7 @@ public class DesignTileScene extends TileScene {
 		paths = currLines.toArray(paths);
 		Arrays.sort(paths);
 		currLines.clear();
-		for(PathItem p : paths){
-			currLines.add(p);
-		}
+		Collections.addAll(currLines, paths);
 	}
 	
 	/*public void drawWire(Connection conn){

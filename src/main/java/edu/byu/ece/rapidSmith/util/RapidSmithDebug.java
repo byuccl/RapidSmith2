@@ -1,9 +1,7 @@
 package edu.byu.ece.rapidSmith.util;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
@@ -85,11 +83,10 @@ public final class RapidSmithDebug {
 		String cmd = "select [get_wires {";
 		
 		for(RouteTree rt : routeTrees) {
-			Iterator<RouteTree> it = rt.getFirstSource().iterator();
-			
-			while (it.hasNext()) {
-				Wire w = it.next().getWire();
-				cmd += w.getTile().getName() + "/" + w.getWireName() + " "; 
+
+			for (RouteTree routeTree : rt.getFirstSource()) {
+				Wire w = routeTree.getWire();
+				cmd += w.getTile().getName() + "/" + w.getWireName() + " ";
 			}
 		}
 		cmd += "}]";

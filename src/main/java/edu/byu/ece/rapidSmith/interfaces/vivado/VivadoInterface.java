@@ -118,13 +118,10 @@ public final class VivadoInterface {
 		try {
 			EdifInterface.writeEdif(edifOut, design);
 		} 
-		catch (EdifNameConflictException e) {
+		catch (EdifNameConflictException | InvalidEdifNameException e) {
 			throw new AssertionError(e); 
 		}
-		catch (InvalidEdifNameException e) {
-			throw new AssertionError(e);
-		}
-		
+
 		String partInfoOut = Paths.get(tcpDirectory, "design.info").toString();
 		DesignInfoInterface.writeInfoFile(partInfoOut, device.getPartName());
 				

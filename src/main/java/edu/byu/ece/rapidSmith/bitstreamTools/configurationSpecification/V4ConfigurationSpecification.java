@@ -34,7 +34,7 @@ import edu.byu.ece.rapidSmith.bitstreamTools.configuration.V4BitstreamGenerator;
 public class V4ConfigurationSpecification extends AbstractConfigurationSpecification {
     
     public V4ConfigurationSpecification() {
-        _blockTypes = new ArrayList<BlockType>(Arrays.asList(new BlockType[] {LOGIC_BLOCK_TYPE, BRAM_INTERCONNECT_BLOCK_TYPE, BRAM_BLOCK_TYPE}));
+        _blockTypes = new ArrayList<>(Arrays.asList(new BlockType[]{LOGIC_BLOCK_TYPE, BRAM_INTERCONNECT_BLOCK_TYPE, BRAM_BLOCK_TYPE}));
         _deviceFamily = V4_FAMILY_NAME;
         _frameSize = V4_FRAME_SIZE;
         _dummySyncData = DummySyncData.V4_STANDARD_DUMMY_SYNC_DATA;
@@ -77,9 +77,9 @@ public class V4ConfigurationSpecification extends AbstractConfigurationSpecifica
     public static final BlockSubType BRAMCONTENT = new BlockSubType("BRAMCONTENT",64); 
     public static final BlockSubType BRAMOVERHEAD = new BlockSubType("BRAMOVERHEAD",2);
     
-    public static final BlockType LOGIC_BLOCK_TYPE = new BlockType("LOGIC", new LinkedHashSet<BlockSubType>(Arrays.asList(new BlockSubType[] {IOB, CLB, DSP, CLK, MGT, LOGIC_OVERHEAD})));
-    public static final BlockType BRAM_BLOCK_TYPE = new BlockType("BRAM", new LinkedHashSet<BlockSubType>(Arrays.asList(new BlockSubType[] {BRAMCONTENT, BRAMOVERHEAD})));
-    public static final BlockType BRAM_INTERCONNECT_BLOCK_TYPE = new BlockType("BRAMINTERCONNECT", new LinkedHashSet<BlockSubType>(Arrays.asList(new BlockSubType[] {BRAMINTERCONNECT, BRAMOVERHEAD})));
+    public static final BlockType LOGIC_BLOCK_TYPE = new BlockType("LOGIC", new LinkedHashSet<>(Arrays.asList(new BlockSubType[]{IOB, CLB, DSP, CLK, MGT, LOGIC_OVERHEAD})));
+    public static final BlockType BRAM_BLOCK_TYPE = new BlockType("BRAM", new LinkedHashSet<>(Arrays.asList(new BlockSubType[]{BRAMCONTENT, BRAMOVERHEAD})));
+    public static final BlockType BRAM_INTERCONNECT_BLOCK_TYPE = new BlockType("BRAMINTERCONNECT", new LinkedHashSet<>(Arrays.asList(new BlockSubType[]{BRAMINTERCONNECT, BRAMOVERHEAD})));
 
 }
 

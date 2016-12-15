@@ -41,8 +41,8 @@ import java.util.Collections;
  * @author Chris Lavin
  */
 public class Installer {
-	public static String nl = System.getProperty("line.separator");
-	public static String disclaimer = 
+	public static final String nl = System.getProperty("line.separator");
+	public static final String disclaimer =
 		"This material is based upon work supported by the National" + nl + 
 		"Science Foundation under Grant No. 0801876 and 1265957. Any opinions," + nl + 
 		"findings, and conclusions or recommendations expressed in this" + nl + 

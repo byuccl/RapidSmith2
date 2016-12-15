@@ -44,7 +44,7 @@ public class ExecutableRevision {
 	public static String getSVNVersion() {
 		String svn = SVN_VERSION;
 		
-		int beginIndex = new String("$Revision:").length() + 1;
+		int beginIndex = "$Revision:".length() + 1;
 		int endIndex = SVN_VERSION.length()-2;
 		return svn.substring(beginIndex, endIndex);
 	}
@@ -52,7 +52,7 @@ public class ExecutableRevision {
 	public static String getSVNDate() {
 		String svn = SVN_DATE;
 		
-		int beginIndex = new String("$Date:").length() + 1;
+		int beginIndex = "$Date:".length() + 1;
 		int endIndex = SVN_DATE.length()-2;
 		return svn.substring(beginIndex, endIndex);		
 	}

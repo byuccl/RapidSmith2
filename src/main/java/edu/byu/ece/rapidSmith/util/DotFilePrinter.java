@@ -14,9 +14,7 @@ import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
-import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Site;
-import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.device.families.FamilyInfo;
 import edu.byu.ece.rapidSmith.device.families.FamilyInfos;
 
@@ -40,7 +38,7 @@ public class DotFilePrinter {
 	private StringBuilder dotBuilder;
 	private BufferedWriter outputStream; 
 	private final Map<String,String> dotProperties; 
-	private CellDesign design;
+	private final CellDesign design;
 	private static final int MAX_FANOUT = 10;
 	
 	/**
@@ -205,7 +203,7 @@ public class DotFilePrinter {
 	}
 	
 	private boolean isCellPinInSite(CellPin pin, Site site) { 
-		return (pin == null) ? false : pin.getCell().getAnchorSite().equals(site);
+		return pin != null && pin.getCell().getAnchorSite().equals(site);
 	}
 	
 	/*

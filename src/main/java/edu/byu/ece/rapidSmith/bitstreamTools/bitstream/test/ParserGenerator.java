@@ -53,13 +53,11 @@ public class ParserGenerator {
         Bitstream bs = null;
         try {
             bs = BitstreamParser.parseBitstream(inputName);
-        } catch (BitstreamParseException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (BitstreamParseException | IOException e) {
             e.printStackTrace();
         }
-        
-        FileOutputStream os_bit = null;
+
+	    FileOutputStream os_bit = null;
         try {
             os_bit = new FileOutputStream(new File(outputName));
         } catch (FileNotFoundException e) {
@@ -78,11 +76,7 @@ public class ParserGenerator {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        
-        try {
-            bs.writeBitstreamToMCS(os_mcs);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        bs.writeBitstreamToMCS(os_mcs);
     }
 }

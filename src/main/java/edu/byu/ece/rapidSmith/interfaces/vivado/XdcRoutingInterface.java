@@ -36,12 +36,12 @@ import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
  */
 public class XdcRoutingInterface {
 
-	private Device device;
-	private CellDesign design;
-	private WireEnumerator wireEnumerator;
-	private HashMap<SitePin, IntrasiteRoute> sitePinToRouteMap;
-	private Map<BelPin, CellPin> belPinToCellPinMap;
-	private Map<SiteType, Set<String>> staticSourceMap;
+	private final Device device;
+	private final CellDesign design;
+	private final WireEnumerator wireEnumerator;
+	private final HashMap<SitePin, IntrasiteRoute> sitePinToRouteMap;
+	private final Map<BelPin, CellPin> belPinToCellPinMap;
+	private final Map<SiteType, Set<String>> staticSourceMap;
 	private Set<Bel> staticSourceBels;
 	private int currentLineNumber;
 	private String currentFile;
@@ -102,7 +102,7 @@ public class XdcRoutingInterface {
 		// try-with-resources to guarantee no resource leakage
 		try (LineNumberReader br = new LineNumberReader(new BufferedReader(new FileReader(xdcFile)))) {
 		
-			String line = null;
+			String line;
 			while ((line = br.readLine()) != null) {
 				this.currentLineNumber = br.getLineNumber();
 				String[] toks = line.split("\\s+");
@@ -788,7 +788,7 @@ public class XdcRoutingInterface {
 	 */
 	private CellNet tryGetCellNet(String netName) {
 		
-		CellNet net = null;
+		CellNet net;
 		switch (netName) {
 			case "VCC":
 				net = design.getVccNet();
@@ -1119,9 +1119,9 @@ public class XdcRoutingInterface {
 		public void setSinksAsRouted() {
 			// TODO: only do this for used bel pins
 			belPinSinks.stream()
-						.filter(belPin -> belPinToCellPinMap.containsKey(belPin))
-						.map(belPin -> belPinToCellPinMap.get(belPin))
-						.forEach(cellPin -> net.addRoutedSink(cellPin));
+						.filter(belPinToCellPinMap::containsKey)
+						.map(belPinToCellPinMap::get)
+						.forEach(net::addRoutedSink);
 		}
 
 		@Override

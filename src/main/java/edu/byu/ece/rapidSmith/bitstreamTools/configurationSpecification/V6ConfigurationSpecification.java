@@ -30,7 +30,7 @@ public class V6ConfigurationSpecification extends V56ConfigurationSpecification 
 
     public V6ConfigurationSpecification() {
         super();
-        _blockTypes = new ArrayList<BlockType>(Arrays.asList(new BlockType[] {LOGIC_INTERCONNECT_BLOCKTYPE, BRAM_CONTENT_BLOCKTYPE}));
+        _blockTypes = new ArrayList<>(Arrays.asList(new BlockType[]{LOGIC_INTERCONNECT_BLOCKTYPE, BRAM_CONTENT_BLOCKTYPE}));
         _deviceFamily = V6_FAMILY_NAME;
         _frameSize = V6_FRAME_SIZE;
         _bramContentBlockType = BRAM_CONTENT_BLOCKTYPE;
@@ -52,19 +52,19 @@ public class V6ConfigurationSpecification extends V56ConfigurationSpecification 
 	public static final BlockSubType BRAMCONTENT = new BlockSubType("BRAMCONTENT",128); 
 	public static final BlockSubType BRAMOVERHEAD = new BlockSubType("BRAMOVERHEAD",2); 
 
-	public static final BlockType LOGIC_INTERCONNECT_BLOCKTYPE = new BlockType("LOGIC", new LinkedHashSet<BlockSubType>(Arrays.asList(
+	public static final BlockType LOGIC_INTERCONNECT_BLOCKTYPE = new BlockType("LOGIC", new LinkedHashSet<>(Arrays.asList(
 			new BlockSubType[]{
-			IOB, 
-			CLB, 
-			DSP, 
-			CLK, 
-			GTX,
-			GTH,
-			BRAMINTERCONNECT,
-			LOGIC_OVERHEAD })));
+					IOB,
+					CLB,
+					DSP,
+					CLK,
+					GTX,
+					GTH,
+					BRAMINTERCONNECT,
+					LOGIC_OVERHEAD})));
 	
-	public static final BlockType BRAM_CONTENT_BLOCKTYPE = new BlockType("BRAM", new LinkedHashSet<BlockSubType>(Arrays.asList(
+	public static final BlockType BRAM_CONTENT_BLOCKTYPE = new BlockType("BRAM", new LinkedHashSet<>(Arrays.asList(
 			new BlockSubType[]{
-			BRAMCONTENT, 
-			BRAMOVERHEAD })));	
+					BRAMCONTENT,
+					BRAMOVERHEAD})));
 }

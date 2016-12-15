@@ -64,7 +64,7 @@ public class BRAMPartialBitstreams {
 
 		// TODO: Create data packets here
 		final int size = 1312;
-		List<Integer> data = new ArrayList<Integer>(size);
+		List<Integer> data = new ArrayList<>(size);
 		for (int i = 0; i < size; i++ )
 			data.add(0);
 
@@ -106,7 +106,7 @@ public class BRAMPartialBitstreams {
 
 		// 5. Write the bitstream to a file
 		// TODO: create an Ostream
-		FileOutputStream fos = null;
+		FileOutputStream fos;
 		try {
 			fos = new FileOutputStream("test.dat");
 			//bitstream.outputRawBitstream(fos);

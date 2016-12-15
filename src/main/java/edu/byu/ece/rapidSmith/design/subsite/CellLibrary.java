@@ -18,7 +18,7 @@ import java.util.*;
  *  Contains a set of cells for a design.
  */
 public class CellLibrary implements Iterable<LibraryCell> {
-	private Map<String, LibraryCell> library;
+	private final Map<String, LibraryCell> library;
 	private LibraryCell vccSource;
 	private LibraryCell gndSource;
 

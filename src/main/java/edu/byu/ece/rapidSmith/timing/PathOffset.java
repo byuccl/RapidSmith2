@@ -31,7 +31,7 @@ public class PathOffset extends Path{
 	/** Delay estimated for the clock path */
 	private float clockPathDelay;
 	/** List of physical / logical resources */
-	private ArrayList<PathElement> minDataPath = new ArrayList<PathElement>();	
+	private ArrayList<PathElement> minDataPath = new ArrayList<>();
 	
 	/**
 	 * @return the offset

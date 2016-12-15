@@ -25,7 +25,6 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -61,16 +60,16 @@ public abstract class XilinxDeviceClassGenerator {
      */
     protected XilinxDeviceClassGenerator(String architecture, int rowMask, int rowBitPos, int topBottomMask, int topBottomBitPos) {
 
-        _partGenOutput = new ArrayList<String>();
-        _partNames = new ArrayList<String>();
-        _validPackages = new ArrayList<List<String>>();
-        _validSpeedGrades = new ArrayList<List<String>>();
-        _deviceIDCodes = new ArrayList<String>();
-        _logicLayouts = new ArrayList<List<BlockSubType>>();
-        _bramInterconnectLayouts = new ArrayList<List<BlockSubType>>();
-        _bramContentLayouts = new ArrayList<List<BlockSubType>>();
-        _numTopRows = new ArrayList<Integer>();
-        _numBottomRows = new ArrayList<Integer>();
+        _partGenOutput = new ArrayList<>();
+        _partNames = new ArrayList<>();
+        _validPackages = new ArrayList<>();
+        _validSpeedGrades = new ArrayList<>();
+        _deviceIDCodes = new ArrayList<>();
+        _logicLayouts = new ArrayList<>();
+        _bramInterconnectLayouts = new ArrayList<>();
+        _bramContentLayouts = new ArrayList<>();
+        _numTopRows = new ArrayList<>();
+        _numBottomRows = new ArrayList<>();
         _architecture = architecture;
         
         _rowMask = rowMask;
@@ -197,16 +196,13 @@ public abstract class XilinxDeviceClassGenerator {
                 Bitstream bitstream = null;
                 try {
                     bitstream = BitstreamParser.parseBitstream(kFilePrefix + ".bit");
-                } catch (BitstreamParseException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (IOException e) {
+                } catch (BitstreamParseException | IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
 
-                Set<Integer> topRows = new HashSet<Integer>();
-                Set<Integer> bottomRows = new HashSet<Integer>();
+                Set<Integer> topRows = new HashSet<>();
+                Set<Integer> bottomRows = new HashSet<>();
 
                 PacketList packets = bitstream.getPackets();
                 for (Packet packet : packets) {
@@ -248,7 +244,7 @@ public abstract class XilinxDeviceClassGenerator {
         BufferedInputStream buffer;
         DataInputStream data;
 
-        int thisByte = 0x00;
+        int thisByte;
         String result = null;
         try {
             input = new FileInputStream(bitstreamFileName);
@@ -278,13 +274,7 @@ public abstract class XilinxDeviceClassGenerator {
                 result = "0" + result;
             }
             data.close();
-        } 
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-            System.err.println("Error parsing bitstream " + bitstreamFileName);
-            System.exit(1);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Error parsing bitstream " + bitstreamFileName);
             System.exit(1);
@@ -315,8 +305,8 @@ public abstract class XilinxDeviceClassGenerator {
 
                 // Now we should be on the line with the part name
                 _partNames.add(tokens[0]);
-                List<String> currValidPackages = new ArrayList<String>();
-                List<String> currValidSpeedGrades = new ArrayList<String>();
+                List<String> currValidPackages = new ArrayList<>();
+                List<String> currValidSpeedGrades = new ArrayList<>();
 
                 // Add the speed grades
                 for(String token : tokens){
@@ -351,7 +341,7 @@ public abstract class XilinxDeviceClassGenerator {
         BufferedReader input;
         Process p;
         String line;
-        ArrayList<String> output = new ArrayList<String>();
+        ArrayList<String> output = new ArrayList<>();
         try {
             p = Runtime.getRuntime().exec("partgen -arch " + arch);
             input = new BufferedReader(new InputStreamReader(p.getInputStream()));

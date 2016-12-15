@@ -137,16 +137,14 @@ public class FrameAddressRegister {
 	}
 	
 	public boolean validFARAddress() {
-		if (blockType >= configSpec.getBlockTypes().size())		
-			return false;
-		return true;
+		return blockType < configSpec.getBlockTypes().size();
 	}
 	/**
 	 * Convert the current FAR address into a consecutive address
 	 */
 	public int getConsecutiveAddress() {
 		int address = 0;
-		int i=0;
+		int i;
 		// add addresses of block types that are *before* the current block type
 		for (i = 0; i < blockType; i++)
 			address += getFramesPerFARBlockType(configSpec, i);
@@ -268,19 +266,16 @@ public class FrameAddressRegister {
 	public String toString(int level) {
 		if (level == 0)
 			return getHexAddress();
-				
-		StringBuffer sb = new StringBuffer();
 
 		// Print address
-		sb.append("FAR="+BitstreamUtils.toHexString(getAddress())+", ");
-				// Print top & bottom
-		sb.append(AbstractConfigurationSpecification.getTopBottom(top_bottom));
-		sb.append(" Type=" + AbstractConfigurationSpecification.getBlockType(configSpec, blockType) + " ("+blockType+")");		
-		sb.append(", Row="+ row);
-		sb.append(", Column=" + column +" (" +
-				AbstractConfigurationSpecification.getBlockSubtype(configSpec, blockType, column) + "),");
-		sb.append(" Minor="+ minor);
-		return sb.toString();			
+		// Print top & bottom
+		return "FAR=" + BitstreamUtils.toHexString(getAddress()) + ", " +
+				AbstractConfigurationSpecification.getTopBottom(top_bottom) +
+				" Type=" + AbstractConfigurationSpecification.getBlockType(configSpec, blockType) + " (" + blockType + ")" +
+				", Row=" + row +
+				", Column=" + column + " (" +
+				AbstractConfigurationSpecification.getBlockSubtype(configSpec, blockType, column) + ")," +
+				" Minor=" + minor;
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
@@ -344,14 +339,12 @@ public class FrameAddressRegister {
 	public static int getFramesPerConfigurationBlock(XilinxConfigurationSpecification spec, int blockNum, int column) {
 		BlockType type = spec.getBlockTypes().get(blockNum);
 		BlockSubType subType = spec.getBlockSubTypeLayout(type).get(column);
-		int result = subType.getFramesPerConfigurationBlock();
-		return result;
+		return subType.getFramesPerConfigurationBlock();
 	}
 
 	public static int getNumberOfColumns(XilinxConfigurationSpecification spec, int blockNum) {
 	    BlockType type = spec.getBlockTypes().get(blockNum);
-	    int result = spec.getBlockSubTypeLayout(type).size();
-	    return result;
+		return spec.getBlockSubTypeLayout(type).size();
 	}
 
 	public static int getNumberOfFramesPerBlockRow(XilinxConfigurationSpecification spec, int blockNum) {

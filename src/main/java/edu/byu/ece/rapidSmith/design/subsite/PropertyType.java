@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Type of a property specifying its source and type.
  */
-public class PropertyType {
+public final class PropertyType {
 	private static final Map<String, PropertyType> propertyTypes = new HashMap<>();
 
 	/** A property stemming from XDL */
@@ -18,7 +18,7 @@ public class PropertyType {
 	/** EDIF Properties */
 	public static final PropertyType EDIF = registerType("EDIF");
 
-	private String name;
+	private final String name;
 
 	private PropertyType(String propertyName) {
 		this.name = propertyName;
