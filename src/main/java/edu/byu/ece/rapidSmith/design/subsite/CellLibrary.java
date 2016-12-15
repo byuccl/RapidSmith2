@@ -4,6 +4,7 @@ import edu.byu.ece.rapidSmith.device.BelId;
 import edu.byu.ece.rapidSmith.device.FamilyType;
 import edu.byu.ece.rapidSmith.device.PinDirection;
 import edu.byu.ece.rapidSmith.device.SiteType;
+import edu.byu.ece.rapidSmith.util.Exceptions;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -21,6 +22,7 @@ public class CellLibrary implements Iterable<LibraryCell> {
 	private final Map<String, LibraryCell> library;
 	private LibraryCell vccSource;
 	private LibraryCell gndSource;
+	private FamilyType familyType; 
 
 	public CellLibrary() {
 		this.library = new HashMap<>();
@@ -41,12 +43,32 @@ public class CellLibrary implements Iterable<LibraryCell> {
 			return;
 		}
 
+		// get the family of the cell library.
+		readFamilyType(doc.getRootElement().getChild("family"));
+		
 		Element cellsEl = doc.getRootElement().getChild("cells");
 		Map<SiteType, Map<String, SiteProperty>> sitePropertiesMap = new HashMap<>();
 		for (Element cellEl : cellsEl.getChildren("cell")) {
 			loadCellFromXml(cellEl, sitePropertiesMap);
 		}
 	}
+	
+	/**
+	 * Reads the "family" tag from the cellLibrary.xml file and stores its value.
+	 * This tag is necessary to get handles to the proper site type later on in the parsing
+	 * process.
+	 * @param familyEl family element in the cellLibray.xml
+	 */
+	private void readFamilyType(Element familyEl) {
+		
+		if (familyEl == null) {
+			// TODO: replace this exception with the proper exception. 
+			throw new Exceptions.FileFormatException("<family> tag not found in cellLibrary.xml file");
+		}
+		
+		this.familyType = FamilyType.valueOf(familyEl.getValue()); 
+	}
+	
 
 	private void loadCellFromXml(
 			Element cellEl, Map<SiteType, Map<String, SiteProperty>> sitePropertiesMap
@@ -104,10 +126,10 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		Element belsEl = cellEl.getChild("bels");
 		for (Element belEl : belsEl.getChildren("bel")) {
 			Element id = belEl.getChild("id");
-			FamilyType family = FamilyType.valueOf(id.getChildText("family"));
+			
 			String site_type = id.getChildText("site_type");
 			BelId belId = new BelId(
-					SiteType.valueOf(family, site_type),
+					SiteType.valueOf(familyType, site_type),
 					id.getChildText("name")
 			);
 			compatibleBels.add(belId);

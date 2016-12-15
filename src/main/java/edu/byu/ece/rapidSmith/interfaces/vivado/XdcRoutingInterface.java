@@ -448,7 +448,7 @@ public class XdcRoutingInterface {
 		
 		HashSet<Integer> usedSitePips = new HashSet<>();
 		
-		String namePrefix = "intrasite:" + site.getType() + "/";
+		String namePrefix = "intrasite:" + site.getType().name() + "/";
 		
 		//list of site pip wires that are used...
 		for(int i = 2; i < toks.length; i++) {
