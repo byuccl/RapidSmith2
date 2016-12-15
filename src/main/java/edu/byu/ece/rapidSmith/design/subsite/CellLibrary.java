@@ -63,7 +63,7 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		
 		if (familyEl == null) {
 			// TODO: replace this exception with the proper exception. 
-			throw new Exceptions.ParseException("Family value not found in cellLibrary.xml file");
+			throw new Exceptions.FileFormatException("<family> tag not found in cellLibrary.xml file");
 		}
 		
 		this.familyType = FamilyType.valueOf(familyEl.getValue()); 

@@ -178,8 +178,7 @@ public class RSEnvironment {
 	 * @return the path of the folder where the parts files resides
 	 */
 	public Path getPartFolderPath(String partName) {
-		String canonicalName = PartNameTools.removeSpeedGrade(partName);
-		return getPartFolderPath(getFamilyTypeFromPart(canonicalName));
+		return getPartFolderPath(getFamilyTypeFromPart(partName));
 	}
 
 	/**
