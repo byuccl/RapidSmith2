@@ -33,7 +33,7 @@ import edu.byu.ece.rapidSmith.bitstreamTools.configurationSpecification.XilinxCo
 
 public class CheckFrameECC{
 
-	private static HashSet<Integer> bits = new HashSet<Integer>();
+	private static HashSet<Integer> bits = new HashSet<>();
 	private static int altECC;
 	private static int bitNumber;
 	/*
@@ -47,12 +47,12 @@ public class CheckFrameECC{
 		block[2] = (byte)( (integer >> 8) & 0x000000FF );
 		block[3] = (byte)( integer & 0x000000FF );
 		
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		char[] hexChars = {'0', '1', '2', '3', '4', '5', '6', '7',
 						   '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 		int len = block.length;
-		int high = 0;
-		int low = 0;
+		int high;
+		int low;
 		for (int i = 0; i < len; i++) {
 			high = ((block[i] & 0xf0) >> 4);
 			low = (block[i] & 0x0f);
@@ -87,7 +87,7 @@ public class CheckFrameECC{
 	public static String getBinaryFrameString(Frame frame){
 		StringBuilder string = new StringBuilder(1792);
 		StringBuilder data = new StringBuilder(512);
-		int i = 0;
+		int i;
 		
 			for(i=0; i < frame.getData().getAllFrameWords().size(); i++){
 				data.append(toHexString(frame.getData().getFrameWord(i)));
@@ -131,7 +131,7 @@ public class CheckFrameECC{
 	}
 	
 	public static int calculateFrameECCBits(Frame frame, Frame mask, XilinxConfigurationSpecification spec){
-		int xored = 0;
+		int xored;
 		int hcode = 0;
 		int count = 0;
 		xored = 704;

@@ -12,7 +12,8 @@ import java.util.Objects;
  *  Provides a template of possible cells for a design.
  */
 public abstract class LibraryCell implements Serializable {
-	private String name;
+	private static final long serialVersionUID = -7850247997306342388L;
+	private final String name;
 
 	public LibraryCell(String name) {
 		Objects.nonNull(name);

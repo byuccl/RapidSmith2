@@ -21,7 +21,6 @@
 package edu.byu.ece.rapidSmith.design.explorer;
 
 import edu.byu.ece.rapidSmith.design.PIP;
-import edu.byu.ece.rapidSmith.device.TileWire;
 import edu.byu.ece.rapidSmith.device.Wire;
 
 public final class WireJunction {

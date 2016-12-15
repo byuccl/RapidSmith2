@@ -11,6 +11,7 @@ import java.util.*;
  *  all primitive sites of a specific type.
  */
 public final class SiteTemplate implements Serializable {
+	private static final long serialVersionUID = -5857292063197088427L;
 	// The type of this site template
 	private SiteType type;
 	// The templates for the BELs in this site template
@@ -130,7 +131,7 @@ public final class SiteTemplate implements Serializable {
 		}
 
 		Set<Integer> sinks = belRoutethroughMap.get(startWire);
-		return sinks == null ? false : sinks.contains(endWire);
+		return sinks != null && sinks.contains(endWire);
 	}
 
 	@Override
@@ -189,6 +190,7 @@ public final class SiteTemplate implements Serializable {
 
 	// for hessian compression
 	private static class SiteTemplateReplace implements Serializable  {
+		private static final long serialVersionUID = 4409516349602480310L;
 		private SiteType type;
 		private Collection<BelTemplate> belTemplates;
 		private SiteType[] compatibleTypes;

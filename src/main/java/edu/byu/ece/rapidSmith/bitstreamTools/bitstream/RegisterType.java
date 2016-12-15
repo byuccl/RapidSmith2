@@ -138,7 +138,7 @@ public enum RegisterType {
 
 	private static String CTL0DataToString(int data)
 	{
-		String string = new String();
+		String string = "";
 		
 		int bitmask;
 		
@@ -198,7 +198,7 @@ public enum RegisterType {
 	
 	private static String COR0DataToString(int data)
 	{
-		String string = new String();
+		String string = "";
 		
 		int bitmask;
 		
@@ -278,7 +278,7 @@ public enum RegisterType {
 	
 	private static String COR1DataToString(int data)
 	{
-		String string = new String();
+		String string = "";
 		
 		int bitmask;
 		
@@ -319,7 +319,7 @@ public enum RegisterType {
 	
 	private static String CMDDataToString(int data)
 	{
-		String string = new String();
+		String string = "";
 		
 		switch(data)
 		{
@@ -350,7 +350,7 @@ public enum RegisterType {
 	
 	private static String WBSTARDataToString(int data)
 	{
-		String string = new String();
+		String string = "";
 		
 		int bitmask;
 		
@@ -374,7 +374,7 @@ public enum RegisterType {
 		
 	private static String TIMERDataToString(int data)
 	{
-		String string = new String();
+		String string = "";
 		
 		int bitmask;
 		

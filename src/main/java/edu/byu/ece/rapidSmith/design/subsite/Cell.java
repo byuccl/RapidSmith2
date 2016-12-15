@@ -22,7 +22,7 @@ public class Cell {
 	/** The CellDesign this cell exists in */
 	private CellDesign design;
 	/** Type of the cell (LUT6, FF, DSP48, ...) */
-	private LibraryCell libCell;
+	private final LibraryCell libCell;
 	/** IO Bondedness for this pad cells.  Use internal for non-IO pad cells. */
 	private BondedType bonded;
 	/** BEL in the device this site is placed on */
@@ -30,7 +30,7 @@ public class Cell {
 	/** Properties of the cell */		
 	private Map<Object, Property> properties;
 	/** Mapping of pin names to CellPin objects of this cell */
-	private Map<String, CellPin> pinMap;
+	private final Map<String, CellPin> pinMap;
 	/**	Set of pseudo pins attached to the cell */
 	private Set<CellPin> pseudoPins;
 
@@ -210,7 +210,7 @@ public class Cell {
 		}
 		
 		if ( pseudoPins == null ) {
-			pseudoPins = new HashSet<CellPin>(5);
+			pseudoPins = new HashSet<>(5);
 		}
 		
 		CellPin pseudoPin = new PseudoCellPin(pinName, dir);

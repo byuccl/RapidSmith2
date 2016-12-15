@@ -8,8 +8,8 @@ public enum BondedType {
 	UNBONDED("unbonded"),
 	INTERNAL("internal");
 
-	private String string;
-	private BondedType(String string) {
+	private final String string;
+	BondedType(String string) {
 		this.string = string;
 	}
 

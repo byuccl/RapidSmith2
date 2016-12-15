@@ -27,7 +27,7 @@ public class VirtualNet {
 	
 	//ID to uniquely identify a net
 	private static int nextID = 0;
-	private int uniqueID;
+	private final int uniqueID;
 	
 	public VirtualNet() {
 		//sinks = new ArrayList<SiteCluster>();
@@ -160,10 +160,12 @@ public class VirtualNet {
 	public int hashCode() {
 		return this.uniqueID;
 	}
-	
+
 	@Override
-	public boolean equals(Object obj) {
-		VirtualNet other = (VirtualNet) obj;
-		return this.uniqueID == other.uniqueID;
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		VirtualNet that = (VirtualNet) o;
+		return uniqueID == that.uniqueID;
 	}
 }

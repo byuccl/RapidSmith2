@@ -65,8 +65,7 @@ public class TimingSlider extends QSlider{
 			setSliderPosition(index);
 			updateLines(constraint);
 		}
-		catch(NumberFormatException e){
-			return;
+		catch(NumberFormatException ignored){
 		}
 	}
 	

@@ -75,7 +75,7 @@ public class ReadbackFPGA extends FPGA {
 		
 		// Read the bytes into a list
 		int numBytes = istream.available();
-		ArrayList<Byte> bytes = new ArrayList<Byte> (numBytes);
+		ArrayList<Byte> bytes = new ArrayList<>(numBytes);
 	    for(int i = 0; i < numBytes; i++) {
 	    		bytes.add((byte)istream.read());
 	    }
@@ -84,7 +84,7 @@ public class ReadbackFPGA extends FPGA {
 	    
 	    // Create a list 
 	    int numWords = bytes.size() / 4;
-	    ArrayList<Integer> data = new ArrayList<Integer>(numWords);
+	    ArrayList<Integer> data = new ArrayList<>(numWords);
 		for (int j = 0; j < numWords; j++) {
 		    data.add(BitstreamParser.getWordAsInt(bytes, (j*4)));
 		}

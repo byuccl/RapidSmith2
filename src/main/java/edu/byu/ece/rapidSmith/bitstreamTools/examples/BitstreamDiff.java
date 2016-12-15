@@ -84,7 +84,7 @@ public class BitstreamDiff {
 		
 		cmdLineParser.accepts(COMPARE_BITSTREAM_OPTION, COMPARE_BITSTREAM_OPTION_HELP).withRequiredArg().ofType(String.class);		
 		cmdLineParser.accepts(COMPARE_READBACK_OPTION, 
-				COMPARE_READBACK_OPTION_HELP).withRequiredArg().ofType(String.class);;
+				COMPARE_READBACK_OPTION_HELP).withRequiredArg().ofType(String.class);
 		cmdLineParser.accepts(MASK_BITSTREAM_OPTION, 
 				MASK_BITSTREAM_OPTION_HELP);
 
@@ -115,14 +115,14 @@ public class BitstreamDiff {
 		/////////////////////////////////////////////////////////////////////
 		// 1. Get base FPGA object
 		/////////////////////////////////////////////////////////////////////
-		FPGA fpga1 = null;		
+		FPGA fpga1;
 		fpga1 = cmdLineParser.createFPGAFromBitstreamOrReadbackFileExitOnError(options);
 		XilinxConfigurationSpecification part = fpga1.getDeviceSpecification();
 		
 		/////////////////////////////////////////////////////////////////////
 		// 2. Get compare FPGA object
 		/////////////////////////////////////////////////////////////////////
-		FPGA fpga2 = null;
+		FPGA fpga2;
 		fpga2 = cmdLineParser.createFPGAFromBitstreamOrReadbackFileExitOnError(options, 
 				COMPARE_READBACK_OPTION,
 				COMPARE_BITSTREAM_OPTION, part);
@@ -162,7 +162,7 @@ public class BitstreamDiff {
 			System.exit(1);
 		}
 
-		ArrayList<Integer> diffFARs = new ArrayList<Integer>();
+		ArrayList<Integer> diffFARs = new ArrayList<>();
 		
 		FrameAddressRegister far = new FrameAddressRegister(spec1);
 		

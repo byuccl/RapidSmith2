@@ -197,7 +197,7 @@ public abstract class LutEquation {
 
 	// A product form of the equation
 	private static class MatchProduct {
-		MatchValue[] value;
+		final MatchValue[] value;
 
 		MatchProduct(int numInputs) {
 			value  = new MatchValue[numInputs];

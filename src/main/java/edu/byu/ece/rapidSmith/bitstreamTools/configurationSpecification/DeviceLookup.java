@@ -52,7 +52,7 @@ public class DeviceLookup {
      * it is needed) and saved for later use.
      */
     protected DeviceLookup() {
-        _libraries = new ArrayList<PartLibrary>(3);
+        _libraries = new ArrayList<>(3);
         _libraries.add(new V4PartLibrary());
         _libraries.add(new V5PartLibrary());
         _libraries.add(new V6PartLibrary()); 
@@ -127,7 +127,7 @@ public class DeviceLookup {
     public static XilinxConfigurationSpecification lookupPartFromBitstream(Bitstream bitstream) {
 
     	XilinxConfigurationSpecification partInfo = null;
-    	String partName = null;
+    	String partName;
     	
     	// first see if the part can be 
     	if (bitstream.getHeader() != null) {

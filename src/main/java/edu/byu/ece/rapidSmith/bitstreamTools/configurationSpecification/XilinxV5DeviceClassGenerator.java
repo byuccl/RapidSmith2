@@ -147,10 +147,10 @@ public class XilinxV5DeviceClassGenerator extends XilinxDeviceClassGenerator {
             generateBriefXDLRCFile(partName, _xdlrcFile);
             
             //int currNumRows = 0;
-            List<BlockSubType> currLogicLayout = new ArrayList<BlockSubType>();
-            List<BlockSubType> currBramContentLayout = new ArrayList<BlockSubType>();
+            List<BlockSubType> currLogicLayout = new ArrayList<>();
+            List<BlockSubType> currBramContentLayout = new ArrayList<>();
             
-            Map<Integer, BlockSubType> columnMap = new TreeMap<Integer, BlockSubType>();
+            Map<Integer, BlockSubType> columnMap = new TreeMap<>();
             
             try {
                 in = new BufferedReader(new FileReader(_xdlrcFile));
@@ -167,27 +167,34 @@ public class XilinxV5DeviceClassGenerator extends XilinxDeviceClassGenerator {
     
                         String name = tokens[5];
                         int column = Integer.parseInt(tokens[3]);
-                        
-                        if (name.equals("LIOB") || name.equals("RIOB") || name.equals("CIOB")) {
-                            columnMap.put(column, V5ConfigurationSpecification.IOB);
-                        }
-                        else if (name.equals("CLBLM") || name.equals("CLBLL")) {
-                            columnMap.put(column, V5ConfigurationSpecification.CLB);
-                        }
-                        else if (name.equals("DSP")) {
-                            columnMap.put(column, V5ConfigurationSpecification.DSP);
-                        }
-                        else if (name.equals("CLKV")) {
-                            columnMap.put(column, V5ConfigurationSpecification.CLK);
-                        }
-                        else if (name.equals("GTX") || name.equals("GTX_L_TERM_INT")) {
-                            columnMap.put(column, V5ConfigurationSpecification.GTX);
-                        }
-                        else if (name.equals("GT3")) {
-                            columnMap.put(column, V5ConfigurationSpecification.GTP);
-                        }
-                        else if (name.equals("BRAM") || name.equals("PCIE_BRAM")) {
-                            columnMap.put(column, V5ConfigurationSpecification.BRAMINTERCONNECT);
+
+                        switch (name) {
+                            case "LIOB":
+                            case "RIOB":
+                            case "CIOB":
+                                columnMap.put(column, V5ConfigurationSpecification.IOB);
+                                break;
+                            case "CLBLM":
+                            case "CLBLL":
+                                columnMap.put(column, V5ConfigurationSpecification.CLB);
+                                break;
+                            case "DSP":
+                                columnMap.put(column, V5ConfigurationSpecification.DSP);
+                                break;
+                            case "CLKV":
+                                columnMap.put(column, V5ConfigurationSpecification.CLK);
+                                break;
+                            case "GTX":
+                            case "GTX_L_TERM_INT":
+                                columnMap.put(column, V5ConfigurationSpecification.GTX);
+                                break;
+                            case "GT3":
+                                columnMap.put(column, V5ConfigurationSpecification.GTP);
+                                break;
+                            case "BRAM":
+                            case "PCIE_BRAM":
+                                columnMap.put(column, V5ConfigurationSpecification.BRAMINTERCONNECT);
+                                break;
                         }
                         
                     }

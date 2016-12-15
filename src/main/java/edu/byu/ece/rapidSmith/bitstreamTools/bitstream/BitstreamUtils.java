@@ -36,11 +36,11 @@ public class BitstreamUtils {
 	 */
 	public static String toHexString(byte b)
 	{
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		char[] hexChars = {'0', '1', '2', '3', '4', '5', '6', '7',
 						   '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-		int high = 0;
-		int low = 0;
+		int high;
+		int low;
 		
 		high = ((b & 0xf0) >> 4);
 		low = (b & 0x0f);
@@ -55,12 +55,12 @@ public class BitstreamUtils {
 	 */
 	public static String toHexString(byte[] block)
 	{
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		char[] hexChars = {'0', '1', '2', '3', '4', '5', '6', '7',
 						   '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 		int len = block.length;
-		int high = 0;
-		int low = 0;
+		int high;
+		int low;
 		for (int i = 0; i < len; i++) {
 			high = ((block[i] & 0xf0) >> 4);
 			low = (block[i] & 0x0f);
@@ -81,12 +81,12 @@ public class BitstreamUtils {
 		block[2] = (byte)( (integer >> 8) & 0x000000FF );
 		block[3] = (byte)( integer & 0x000000FF );
 		
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		char[] hexChars = {'0', '1', '2', '3', '4', '5', '6', '7',
 						   '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 		int len = block.length;
-		int high = 0;
-		int low = 0;
+		int high;
+		int low;
 		for (int i = 0; i < len; i++) {
 			high = ((block[i] & 0xf0) >> 4);
 			low = (block[i] & 0x0f);
@@ -102,9 +102,8 @@ public class BitstreamUtils {
 	public static byte toByte(String string)
 	{
 		assert string.length() == 2;
-		byte b = (byte) ((byte) ( decodeHexChar( string.charAt(0) ) << 4 ) 
-				              | (byte)( decodeHexChar( string.charAt(1) )      ));
-		return b;		
+		return (byte) ((byte) ( decodeHexChar( string.charAt(0) ) << 4 )
+				              | decodeHexChar( string.charAt(1) ));
 	}//end toByte
 	
 	/*
@@ -160,7 +159,7 @@ public class BitstreamUtils {
 	 */
 	public static String toHexString(String s){
 		char[] hexChar = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
-		StringBuffer sb = new StringBuffer(s.length() * 2);
+		StringBuilder sb = new StringBuilder(s.length() * 2);
 		for(int i=0; i<s.length();i++){
 			sb.append( hexChar[(s.charAt(i) & 0xf0) >>> 4]);
 			sb.append( hexChar[(s.charAt(i) & 0x0f)]);
@@ -206,7 +205,7 @@ public class BitstreamUtils {
 	//Takes in a 32-bit integer and converts it into an ArrayList of bytes
 	public static ArrayList<Byte> ToByteArray(int i)
 	{
-		ArrayList<Byte> ba = new ArrayList<Byte>();
+		ArrayList<Byte> ba = new ArrayList<>();
 		int mask = 0x000000FF;
 		int tmp = i >>> 24;
 			tmp &= mask;
@@ -237,11 +236,11 @@ public class BitstreamUtils {
 		if (bytes.size() % 4 != 0) {
 			throw new IllegalArgumentException("Integer Array can only be created from byte arrays where size%4 is 0");
 		}
-		ArrayList<Integer> integers = new ArrayList<Integer>();
+		ArrayList<Integer> integers = new ArrayList<>();
 		for (int index = 0; index < bytes.size(); index += 4) {
-			integers.add(new Integer(((bytes.get(index) << 24) & 0xff000000)
+			integers.add(((bytes.get(index) << 24) & 0xff000000)
 					| ((bytes.get(index + 1) << 16) & 0xff0000) | ((bytes.get(index + 2) << 8) & 0xff00)
-					| (bytes.get(index + 3) & 0xff)));
+					| (bytes.get(index + 3) & 0xff));
 		}
 		return integers;
 	}
