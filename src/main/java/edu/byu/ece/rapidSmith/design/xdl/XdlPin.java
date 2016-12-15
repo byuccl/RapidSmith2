@@ -23,8 +23,11 @@ package edu.byu.ece.rapidSmith.design.xdl;
 import java.io.Serializable;
 import java.util.Objects;
 
-import edu.byu.ece.rapidSmith.design.PinType;
+import edu.byu.ece.rapidSmith.device.PinDirection;
 import edu.byu.ece.rapidSmith.device.Tile;
+import edu.byu.ece.rapidSmith.util.Exceptions;
+
+import static edu.byu.ece.rapidSmith.util.Exceptions.*;
 
 /**
  *  This class represents the sources and sinks found in net declarations 
@@ -37,7 +40,7 @@ public class XdlPin implements Serializable, Cloneable {
 	private static final long serialVersionUID = -6675131973998249758L;
 
 	/** The type of pin (directionality), in/out/inout */
-	private PinType pinType;
+	private PinDirection direction;
 	/** The internal pin name on the instance this pin refers to */
 	private String name;
 	/** The instance where the pin is located */
@@ -51,7 +54,7 @@ public class XdlPin implements Serializable, Cloneable {
 	 * Constructor setting things to null and false.
 	 */
 	public XdlPin(){
-		this.pinType = null;
+		this.direction = null;
 		this.name = null;
 		this.setInstance(null);
 		this.port = null;
@@ -65,7 +68,7 @@ public class XdlPin implements Serializable, Cloneable {
 	 * @param instance the instance where the pin resides
 	 */
 	public XdlPin(boolean isOutputPin, String pinName, XdlInstance instance){
-		this.pinType = isOutputPin ? PinType.OUTPIN : PinType.INPIN;
+		this.direction = isOutputPin ? PinDirection.OUT : PinDirection.IN;
 		this.name = pinName;
 		this.setInstance(instance);
 		this.port = null;
@@ -73,12 +76,12 @@ public class XdlPin implements Serializable, Cloneable {
 
 	/**
 	 * Creates a pin from parameters
-	 * @param pinType allows specification of an inout pin
+	 * @param direction allows specification of an inout pin
 	 * @param pinName the name of the pin on the instance (internal name)
 	 * @param instance the instance where the pin resides
 	 */
-	public XdlPin(PinType pinType, String pinName, XdlInstance instance){
-		this.pinType = pinType;
+	public XdlPin(PinDirection direction, String pinName, XdlInstance instance){
+		setDirection(direction);
 		this.name = pinName;
 		this.setInstance(instance);
 		this.port = null;
@@ -88,9 +91,27 @@ public class XdlPin implements Serializable, Cloneable {
 	 * @return true if the pin is an outpin
 	 */
 	public boolean isOutPin(){
-		return this.pinType == PinType.OUTPIN;
+		return this.direction == PinDirection.OUT;
 	}
-	
+
+	/**
+	 * Returns the type of this pin.
+	 * @return the type of this pin
+	 */
+	public PinDirection getDirection(){
+		return this.direction;
+	}
+
+	/**
+	 * Sets the type of this pin.
+	 * @param direction the type of this pin
+	 */
+	public void setDirection(PinDirection direction){
+		if (direction == PinDirection.INOUT)
+			throw new DesignAssemblyException("direction cannot be inout");
+		this.direction = direction;
+	}
+
 	/**
 	 * Returns the pin name of the pin.
 	 * @return the pin name (internal instance pin name)
@@ -132,15 +153,7 @@ public class XdlPin implements Serializable, Cloneable {
 	public Tile getTile(){
 		return instance.getTile();
 	}
-	
-	/**
-	 * Sets the direction of the pin.
-	 * @param dir the direction (true=outpin, false=inpin)
-	 */
-	public void setIsOutputPin(boolean dir){
-		this.pinType = dir ? PinType.OUTPIN : PinType.INPIN;
-	}
-	
+
 	/**
 	 * Sets the name of the pin.
 	 * @param name the new name of this pin
@@ -221,7 +234,7 @@ public class XdlPin implements Serializable, Cloneable {
 
 	@Override
 	public String toString(){
-		return pinType.name().toLowerCase() +
+		return direction.name().toLowerCase() +
 			instance.getName() + "\" " + this.name;
 	}
 
@@ -233,7 +246,7 @@ public class XdlPin implements Serializable, Cloneable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((instance == null) ? 0 : instance.hashCode());
-		result = prime * result + pinType.hashCode();
+		result = prime * result + direction.hashCode();
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
@@ -251,23 +264,7 @@ public class XdlPin implements Serializable, Cloneable {
 			return false;
 		XdlPin other = (XdlPin) obj;
 		return Objects.equals(getInstance(), other.getInstance()) &&
-				Objects.equals(getPinType(), other.getPinType()) &&
+				Objects.equals(getDirection(), other.getDirection()) &&
 				Objects.equals(getName(), other.getName());
-	}
-
-	/**
-	 * Returns the type of this pin.
-	 * @return the type of this pin
-	 */
-	public PinType getPinType(){
-		return this.pinType;
-	}
-
-	/**
-	 * Sets the type of this pin.
-	 * @param pinType the type of this pin
-	 */
-	public void setPinType(PinType pinType){
-		this.pinType = pinType;
 	}
 }

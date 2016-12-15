@@ -375,7 +375,7 @@ public class XDLWriter {
 		List<XdlPin> sorted = new ArrayList<>(pins);
 		sorted.sort(Comparator.comparing(XdlPin::getName));
 		for (XdlPin pin : sorted)
-			out.append(ind + pin.getPinType().name().toLowerCase() + " \"" +
+			out.append(ind + pin.getDirection().name().toLowerCase() + " \"" +
 					pin.getInstanceName() + "\" " + pin.getName() + " ," + nl);
 	}
 

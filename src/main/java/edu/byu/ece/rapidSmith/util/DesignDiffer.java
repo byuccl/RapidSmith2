@@ -606,8 +606,8 @@ public class DesignDiffer {
 
 	private DifferenceTree diffPins(XdlPin pin1, XdlPin pin2) {
 		DifferenceTree diffs = new DifferenceTree(pin1.getName(), "pin");
-		if (pin1.getPinType() != pin2.getPinType())
-			diffs.add(Difference.change("type", pin1.getPinType().toString(), pin2.getPinType().toString()));
+		if (pin1.getDirection() != pin2.getDirection())
+			diffs.add(Difference.change("type", pin1.getDirection().toString(), pin2.getDirection().toString()));
 		return diffs;
 	}
 

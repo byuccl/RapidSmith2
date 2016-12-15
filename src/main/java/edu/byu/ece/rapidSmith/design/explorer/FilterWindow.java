@@ -386,7 +386,7 @@ public class FilterWindow extends QWidget{
 				// Populate Pins
 				for(XdlPin pin : net.getPins()){
 					ArrayList<QStandardItem> items = new ArrayList<>();
-					items.add(new DesignItem(pin.getPinType().toString().toLowerCase(), pin));
+					items.add(new DesignItem(pin.getDirection().toString().toLowerCase(), pin));
 					items.add(createNewHyperlinkItem(pin.getInstanceName(), pin)); 
 					items.add(new DesignItem(pin.getName(), pin));
 					subModels[0].appendRow(items);
