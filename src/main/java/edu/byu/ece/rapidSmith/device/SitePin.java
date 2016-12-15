@@ -7,7 +7,7 @@ import java.util.Objects;
  *  This class represents a pin on a site and provides information necessary
  *  to switch between intersite and intrasite routing networks.  Site pins
  *  are created on demand through different getPin methods in the
- *  PrimitiveSite class.
+ *  Site class.
  *
  *  @see edu.byu.ece.rapidSmith.device.Site
  */
@@ -35,13 +35,13 @@ public final class SitePin implements Serializable {
 	}
 
 	/**
-	 * Gets the PrimitiveType of the site this pin was created for.
-	 * This may be different than the current type of the primitive site as the
+	 * Gets the SiteType of the site this pin was created for.
+	 * This may be different than the current type of the site as the
 	 * site's type may have been updated since this pin was created.
-	 * @return the PrimitiveType of the site this pin was created for
+	 * @return the SiteType of the site this pin was created for
 	 */
-	public SiteType getPrimitiveType() {
-		return template.getPrimitiveType();
+	public SiteType getSiteType() {
+		return template.getSiteType();
 	}
 
 	/**

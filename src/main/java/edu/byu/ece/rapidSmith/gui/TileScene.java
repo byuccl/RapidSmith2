@@ -109,31 +109,31 @@ public class TileScene extends QGraphicsScene{
 	 * Creates a new tile scene with a design. 
 	 * @param design The design and device to associate with this scene.
 	 * @param hideTiles A flag to hide/show certain tiles to make the fabric appear more homogeneous.
-	 * @param drawPrimitives A flag to draw boxes to represent primitives. 
+	 * @param drawSites A flag to draw boxes to represent primitives. 
 	 */
-	public TileScene(XdlDesign design, boolean hideTiles, boolean drawPrimitives){
+	public TileScene(XdlDesign design, boolean hideTiles, boolean drawSites){
 		setDesign(design);
-		initializeScene(hideTiles, drawPrimitives);
+		initializeScene(hideTiles, drawSites);
 	}
 	
 	/**
 	 * Creates a new tile scene with a device. 
 	 * @param device The device to associate with this scene.
 	 * @param hideTiles A flag to hide/show certain tiles to make the fabric appear more homogeneous.
-	 * @param drawPrimitives A flag to draw boxes to represent primitives. 
+	 * @param drawSites A flag to draw boxes to represent primitives. 
 	 */
-	public TileScene(Device device, boolean hideTiles, boolean drawPrimitives){
+	public TileScene(Device device, boolean hideTiles, boolean drawSites){
 		setDevice(device);
-		initializeScene(hideTiles, drawPrimitives);
+		initializeScene(hideTiles, drawSites);
 	}
 	
 	/**
 	 * Initializes the scene
 	 * @param hideTiles hide the tiles?
-	 * @param drawPrimitives draw the primtives?
+	 * @param drawSites draw the primtives?
 	 */
 	@SuppressWarnings("unchecked")
-	public void initializeScene(boolean hideTiles, boolean drawPrimitives){
+	public void initializeScene(boolean hideTiles, boolean drawSites){
 		this.clear();
 		prevX = 0;
 		prevY = 0;
@@ -153,14 +153,14 @@ public class TileScene extends QGraphicsScene{
 			cols = device.getColumns();
 			sceneSize = new QSize((cols + 1) * (tileSize + 1), (rows + 1) * (tileSize + 1));
 			setSceneRect(new QRectF(new QPointF(0, 0), new QSizeF(sceneSize)));
-			drawFPGAFabric(drawPrimitives);
+			drawFPGAFabric(drawSites);
 		} 
 		else{
 			setSceneRect(new QRectF(0, 0, tileSize + 1, tileSize + 1));
 		}
 	}
 	
-	private void drawFPGAFabric(boolean drawPrimitives){
+	private void drawFPGAFabric(boolean drawSites){
 		setBackgroundBrush(new QBrush(QColor.black));
 		
 		//Create transparent QPixmap that accepts hovers 
@@ -244,7 +244,7 @@ public class TileScene extends QGraphicsScene{
 				int rectY = y * tileSize;
 				int rectSide = tileSize - 2 * offset;
 
-				if(drawPrimitives){
+				if(drawSites){
 					if (familyInfo.clbTiles().contains(tileType)) {
 						drawCLB(painter, rectX, rectY, rectSide);
 					} else if (familyInfo.switchboxTiles().contains(tileType)) {

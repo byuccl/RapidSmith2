@@ -9,21 +9,21 @@ import java.util.Objects;
 public final class SitePinTemplate implements Serializable {
 	private static final long serialVersionUID = 4547857938761572358L;
 	private final String name;
-	private final SiteType primitiveType;
+	private final SiteType siteType;
 	private PinDirection direction;
 	private int internalWire;
 
-	public SitePinTemplate(String name, SiteType primitiveType) {
+	public SitePinTemplate(String name, SiteType siteType) {
 		this.name = name;
-		this.primitiveType = primitiveType;
+		this.siteType = siteType;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public SiteType getPrimitiveType() {
-		return primitiveType;
+	public SiteType getSiteType() {
+		return siteType;
 	}
 
 	public int getInternalWire() {
@@ -54,13 +54,13 @@ public final class SitePinTemplate implements Serializable {
 	public String toString() {
 		return "SitePinTemplate{" +
 				"name='" + name + '\'' +
-				", primitiveType=" + primitiveType +
+				", siteType=" + siteType +
 				'}';
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(name, primitiveType, direction, internalWire);
+		return Objects.hash(name, siteType, direction, internalWire);
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public final class SitePinTemplate implements Serializable {
 		}
 		SitePinTemplate other = (SitePinTemplate) obj;
 		return Objects.equals(this.name, other.name) &&
-				Objects.equals(this.primitiveType, other.primitiveType) &&
+				Objects.equals(this.siteType, other.siteType) &&
 				Objects.equals(this.direction, other.direction) &&
 				Objects.equals(this.internalWire, other.internalWire);
 	}

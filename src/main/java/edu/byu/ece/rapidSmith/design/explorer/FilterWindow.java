@@ -277,8 +277,8 @@ public class FilterWindow extends QWidget{
             		ArrayList<QStandardItem> items = new ArrayList<>();
             		items.add(new DesignItem(instance.getName(), instance));
             		items.add(new DesignItem(instance.getType().toString(), instance));
-            		items.add(createNewHyperlinkItem(instance.getPrimitiveSiteName(), instance));
-            		items.add(createNewHyperlinkItem(instance.getPrimitiveSite()==null ? null : instance.getPrimitiveSite().getTile().toString(), instance));	            		
+            		items.add(createNewHyperlinkItem(instance.getSiteName(), instance));
+            		items.add(createNewHyperlinkItem(instance.getSite()==null ? null : instance.getSite().getTile().toString(), instance));
             		items.add(createNewHyperlinkItem(instance.getModuleInstanceName(), instance));
             		items.add(createNewHyperlinkItem(instance.getModuleTemplate()==null ? null : instance.getModuleTemplate().getName(), instance));
 	        		model.appendRow(items);
@@ -293,7 +293,7 @@ public class FilterWindow extends QWidget{
             		ArrayList<QStandardItem> items = new ArrayList<>();
             		items.add(new DesignItem(module.getName(), module));
             		items.add(new DesignItem(module.getAnchor().getName(), module));
-            		items.add(createNewHyperlinkItem(module.getAnchor().getPrimitiveSiteName(), module));
+            		items.add(createNewHyperlinkItem(module.getAnchor().getSiteName(), module));
 	        		items.add(new DesignItem(String.format("%5d", module.getInstances().size()), module));
 	        		items.add(new DesignItem(String.format("%5d", module.getNets().size()), module));
 	        		items.add(new DesignItem(String.format("%5d", module.getPorts().size()), module));
@@ -309,7 +309,7 @@ public class FilterWindow extends QWidget{
 	        		ArrayList<QStandardItem> items = new ArrayList<>();
             		items.add(new DesignItem(moduleInstance.getName(), moduleInstance));
             		items.add(new DesignItem(moduleInstance.getAnchor().getName(), moduleInstance));
-            		items.add(createNewHyperlinkItem(moduleInstance.getAnchor().getPrimitiveSiteName(), moduleInstance));
+            		items.add(createNewHyperlinkItem(moduleInstance.getAnchor().getSiteName(), moduleInstance));
             		items.add(createNewHyperlinkItem(moduleInstance.getModule().getName(), moduleInstance));
 	        		model.appendRow(items);
 		        }
@@ -433,7 +433,7 @@ public class FilterWindow extends QWidget{
 				
 				// check for hyperlinks
 				if(index.column() == 2){
-					switchToTileTab(explorer.device.getPrimitiveSite(data).getTile().getName());
+					switchToTileTab(explorer.device.getSite(data).getTile().getName());
 				}
 				else if(index.column() == 3){
 					switchToTileTab(data);
@@ -450,13 +450,13 @@ public class FilterWindow extends QWidget{
 				break;
 			case MODULES:
 				if(index.column() == 2) {
-					String tileName = explorer.device.getPrimitiveSite(data).getTile().getName();
+					String tileName = explorer.device.getSite(data).getTile().getName();
 					switchToTileTab(tileName);
 				}
 				break;
 			case MODULE_INSTANCES:
 				if(index.column() == 2){
-					String tileName = explorer.device.getPrimitiveSite(data).getTile().getName();
+					String tileName = explorer.device.getSite(data).getTile().getName();
 					switchToTileTab(tileName);
 				}
 				else if(index.column() == 3) switchToModuleTab((String)index.data());
@@ -464,7 +464,7 @@ public class FilterWindow extends QWidget{
 			case DELAYS:
 				if(index.model().objectName().equals("Max")){
 					if(index.column() == 0){
-						Tile t = explorer.device.getPrimitiveSite(data.substring(0, data.indexOf('.'))).getTile();
+						Tile t = explorer.device.getSite(data.substring(0, data.indexOf('.'))).getTile();
 						switchToTileTab(t.getName());
 					}
 					else if(index.column() == 3){
@@ -485,7 +485,7 @@ public class FilterWindow extends QWidget{
 						if(pe.getClass().equals(LogicPathElement.class)){
 							LogicPathElement lpe = (LogicPathElement) pe;
 							ArrayList<QStandardItem> items = new ArrayList<>();
-							items.add(createNewHyperlinkItem(lpe.getInstance().getPrimitiveSiteName() + "." + (lpe.getPin()==null ? "<null>":lpe.getPin().getName()), pd));
+							items.add(createNewHyperlinkItem(lpe.getInstance().getSiteName() + "." + (lpe.getPin()==null ? "<null>":lpe.getPin().getName()), pd));
 							items.add(new DesignItem(lpe.getType(), pd));
 							items.add(new DesignItem(String.format("%5.3f", lpe.getDelay()), pd));
 							items.add(createNewHyperlinkItem(lpe.getInstance().getName(), pd));
@@ -494,7 +494,7 @@ public class FilterWindow extends QWidget{
 						else{
 							RoutingPathElement rpe = (RoutingPathElement) pe;
 							ArrayList<QStandardItem> items = new ArrayList<>();
-							items.add(createNewHyperlinkItem(rpe.getPin().getInstance().getPrimitiveSiteName() + "." + rpe.getPin().getName(), pd));
+							items.add(createNewHyperlinkItem(rpe.getPin().getInstance().getSiteName() + "." + rpe.getPin().getName(), pd));
 							items.add(new DesignItem(rpe.getType() + " (fanout=" + rpe.getNet().getFanOut() + ")", pd));
 							items.add(new DesignItem(String.format("%5.3f", rpe.getDelay()), pd));
 							items.add(createNewHyperlinkItem(rpe.getNet().getName(), pd));
@@ -506,7 +506,7 @@ public class FilterWindow extends QWidget{
 			case OFFSETS:
 				if(index.model().objectName().equals("Max")){
 					if(index.column() == 0){
-						Tile t = explorer.device.getPrimitiveSite(data.substring(0, data.indexOf('.'))).getTile();
+						Tile t = explorer.device.getSite(data.substring(0, data.indexOf('.'))).getTile();
 						switchToTileTab(t.getName());
 					}
 					else if(index.column() == 3){
@@ -520,7 +520,7 @@ public class FilterWindow extends QWidget{
 				}
 				else if(index.model().objectName().equals("Min")){
 					if(index.column() == 0){
-						Tile t = explorer.device.getPrimitiveSite(data.substring(0, data.indexOf('.'))).getTile();
+						Tile t = explorer.device.getSite(data.substring(0, data.indexOf('.'))).getTile();
 						switchToTileTab(t.getName());
 					}
 					else if(index.column() == 3){
@@ -544,7 +544,7 @@ public class FilterWindow extends QWidget{
 						if(pe.getClass().equals(LogicPathElement.class)){
 							LogicPathElement lpe = (LogicPathElement) pe;
 							ArrayList<QStandardItem> items = new ArrayList<>();
-							items.add(createNewHyperlinkItem(lpe.getInstance().getPrimitiveSiteName() + "." + lpe.getPin().getName(), pd2));
+							items.add(createNewHyperlinkItem(lpe.getInstance().getSiteName() + "." + lpe.getPin().getName(), pd2));
 							items.add(new DesignItem(lpe.getType(), pd2));
 							items.add(new DesignItem(String.format("%5.3f", lpe.getDelay()), pd2));
 							items.add(createNewHyperlinkItem(lpe.getInstance().getName(), pd2));
@@ -553,7 +553,7 @@ public class FilterWindow extends QWidget{
 						else{
 							RoutingPathElement rpe = (RoutingPathElement) pe;
 							ArrayList<QStandardItem> items = new ArrayList<>();
-							items.add(createNewHyperlinkItem(rpe.getPin().getInstance().getPrimitiveSiteName() + "." + rpe.getPin().getName(), pd2));
+							items.add(createNewHyperlinkItem(rpe.getPin().getInstance().getSiteName() + "." + rpe.getPin().getName(), pd2));
 							items.add(new DesignItem(rpe.getType() + " (fanout=" + rpe.getNet().getFanOut() + ")", pd2));
 							items.add(new DesignItem(String.format("%5.3f", rpe.getDelay()), pd2));
 							items.add(createNewHyperlinkItem(rpe.getNet().getName(), pd2));
@@ -565,7 +565,7 @@ public class FilterWindow extends QWidget{
 						if(pe.getClass().equals(LogicPathElement.class)){
 							LogicPathElement lpe = (LogicPathElement) pe;
 							ArrayList<QStandardItem> items = new ArrayList<>();
-							items.add(createNewHyperlinkItem(lpe.getInstance().getPrimitiveSiteName() + "." + lpe.getPin().getName(), pd2));
+							items.add(createNewHyperlinkItem(lpe.getInstance().getSiteName() + "." + lpe.getPin().getName(), pd2));
 							items.add(new DesignItem(lpe.getType(), pd2));
 							items.add(new DesignItem(String.format("%5.3f", lpe.getDelay()), pd2));
 							items.add(createNewHyperlinkItem(lpe.getInstance().getName(), pd2));
@@ -574,7 +574,7 @@ public class FilterWindow extends QWidget{
 						else{
 							RoutingPathElement rpe = (RoutingPathElement) pe;
 							ArrayList<QStandardItem> items = new ArrayList<>();
-							items.add(createNewHyperlinkItem(rpe.getPin().getInstance().getPrimitiveSiteName() + "." + rpe.getPin().getName(), pd2));
+							items.add(createNewHyperlinkItem(rpe.getPin().getInstance().getSiteName() + "." + rpe.getPin().getName(), pd2));
 							items.add(new DesignItem(rpe.getType() + " (fanout=" + rpe.getNet().getFanOut() + ")", pd2));
 							items.add(new DesignItem(String.format("%5.3f", rpe.getDelay()), pd2));
 							items.add(createNewHyperlinkItem(rpe.getNet().getName(), pd2));

@@ -99,7 +99,7 @@ public class CarryChainCluster extends SiteCluster {
 			if (aboveTile == null || !aboveTile.getName().startsWith("CLB"))
 				return false;
 			
-			Site aboveSite = aboveTile.getPrimitiveSite(sliceIndex);
+			Site aboveSite = aboveTile.getSite(sliceIndex);
 			if(usedSites.containsKey(aboveSite)) 
 				return false;
 			
@@ -214,12 +214,12 @@ public class CarryChainCluster extends SiteCluster {
 			if (swapTile == null || !isCLBTile(swapTile)) //!currentTile.getName().startsWith("CL")) 
 				return false;
 						
-			swapSite = swapTile.getPrimitiveSite(siteIndex);
+			swapSite = swapTile.getSite(siteIndex);
 						
 			if (sitenameToCluster.containsKey(swapSite)) { //swapSite != null) { // && !this.swappedWith.contains(swapSite)) {	
 				swapSiteCluster = sitenameToCluster.get(swapSite);
 				
-				if (!swapSiteCluster.swap(sc.getPrimitiveSite()))
+				if (!swapSiteCluster.swap(sc.getSite()))
 					return false; 
 				
 				this.swappedWith.add(swapSiteCluster);
@@ -247,7 +247,7 @@ public class CarryChainCluster extends SiteCluster {
 		//remove carry chain pieces from used site map
 		//sitenameToCluster.remove(this.currentLOC.getName());
 		//for(SiteCluster sc: this.dependent) {
-		//	sitenameToCluster.remove(sc.getPrimitiveSite().getName());	
+		//	sitenameToCluster.remove(sc.getSite().getName());
 		//}
 		
 		//Tile swapTile = device.getTile(site.getTile().getRow() + offset, site.getTile().getColumn()); 
@@ -257,7 +257,7 @@ public class CarryChainCluster extends SiteCluster {
 	
 		//old code start
 		int siteIndex = site.getIndex();
-		//Site newSite = swapTile.getPrimitiveSite(siteIndex);
+		//Site newSite = swapTile.getSite(siteIndex);
 		
 		//if (sitenameToCluster.containsKey(newSite)) {
 		//	return false;
@@ -275,7 +275,7 @@ public class CarryChainCluster extends SiteCluster {
 			if (swapTile == null || !swapTile.getName().startsWith("CLB"))
 				return false;
 		
-			Site swapSite = swapTile.getPrimitiveSite(siteIndex); 
+			Site swapSite = swapTile.getSite(siteIndex);
 
 			if (sitenameToCluster.containsKey(swapSite))
 				return false;
@@ -293,7 +293,7 @@ public class CarryChainCluster extends SiteCluster {
 		System.out.println("CarryChain:\n\t" + this.currentLOC.getName() + " " + this.cells.get(0));
 		
 		for(SiteCluster carry : this.dependent)
-			System.out.println("\t" + carry.getPrimitiveSite().getName() + " " + carry.cells.get(0));
+			System.out.println("\t" + carry.getSite().getName() + " " + carry.cells.get(0));
 	}
 	
 	

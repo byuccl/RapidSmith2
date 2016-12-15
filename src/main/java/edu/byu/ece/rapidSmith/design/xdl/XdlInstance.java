@@ -49,7 +49,7 @@ public class XdlInstance implements Serializable{
 	private transient XdlDesign design;
 	/** All of the attributes in this instance */
 	private Map<String, XdlAttribute> attributes;
-	/** This is a site of where the primitive will reside */
+	/** This is a site of where the instance will reside */
 	private Site site;
 	/** A list of nets to which this instance is connected */
 	private HashSet<XdlNet> netList;
@@ -123,7 +123,7 @@ public class XdlInstance implements Serializable{
 
 	/**
 	 * Returns the type of this instance (such as "SLICEL" or "SLICEM")
-	 * @return the PrimitiveType of this instance
+	 * @return the SiteType of this instance
 	 */
 	public SiteType getType(){
 		return type;
@@ -131,7 +131,7 @@ public class XdlInstance implements Serializable{
 
 	/**
 	 * Sets the type of this instance.
-	 * @param type the PrimitiveType for this instance
+	 * @param type the SiteType for this instance
 	 */
 	public void setType(SiteType type){
 		this.type = type;
@@ -348,10 +348,10 @@ public class XdlInstance implements Serializable{
 	}
 
 	/**
-	 * Returns the PrimitiveSite for this instance.
-	 * @return the PrimitiveSite or null if it is not placed.
+	 * Returns the Site for this instance.
+	 * @return the Site or null if it is not placed.
 	 */
-	public Site getPrimitiveSite(){
+	public Site getSite(){
 		return site;
 	}
 
@@ -360,7 +360,7 @@ public class XdlInstance implements Serializable{
 	 * @return the name of the site this instance is placed at or null if this
 	 *   instance is unplaced
 	 */
-	public String getPrimitiveSiteName(){
+	public String getSiteName(){
 		if(site == null){
 			return null;
 		}
@@ -380,11 +380,11 @@ public class XdlInstance implements Serializable{
 	 * @return true if the instance is placed
 	 */
 	public boolean isPlaced(){
-		return getPrimitiveSite() != null;
+		return getSite() != null;
 	}
 
 	/**
-	 * Places the primitive at the site specified.
+	 * Places the instance at the site specified.
 	 * If this instance is already placed, it will first be unplaced.  This method
 	 * will update the design if the design is set.  The bonded status of this
 	 * instance is also cleared.
@@ -392,17 +392,17 @@ public class XdlInstance implements Serializable{
 	 */
 	public void place(Site site){
 		if(this.site != null && design != null){
-			design.releasePrimitiveSite(this.site);
+			design.releaseSite(this.site);
 		}
-		setPrimitiveSite(site);
-		if(design != null) design.setPrimitiveSiteUsed(site, this);
+		setSite(site);
+		if(design != null) design.setSiteUsed(site, this);
 	}
 
 	/**
 	 * This method is used for Module creation only.  DO NOT use.
 	 * @see #place(Site)
 	 */
-	public void setSite(Site site){
+	void setSiteUnsafe(Site site){
 		this.site = site;
 	}
 
@@ -411,15 +411,15 @@ public class XdlInstance implements Serializable{
 	 * this method will update the design to reflect this operation.
 	 */
 	public void unPlace(){
-		if(design != null) design.releasePrimitiveSite(site);
-		setPrimitiveSite(null);
+		if(design != null) design.releaseSite(site);
+		setSite(null);
 	}
 
 	// sets the site and updates the design if set
-	private void setPrimitiveSite(Site site){
+	private void setSite(Site site){
 		if(site != null){
 			this.site = site;
-			if(design != null) design.setPrimitiveSiteUsed(site, this);
+			if(design != null) design.setSiteUsed(site, this);
 		}
 
 		this.site = site;

@@ -47,7 +47,7 @@ import edu.byu.ece.rapidSmith.util.MessageGenerator;
  * This class creates an interactive Xilinx FPGA device browser for all of the
  * devices currently installed on RapidSmith.  It provides the user with a 2D view
  * of all tile array in the device.  Allows each tile to be selected (double click)
- * and populate the primitive site and wire lists.  Wire connections can also be drawn
+ * and populate the site and wire lists.  Wire connections can also be drawn
  * by selecting a specific wire in the tile (from the list) and the program will draw
  * all connections that can be made from that wire.  The wire positions on the tile
  * are determined by a hash and are not related to FPGA Editor positions.   
@@ -69,8 +69,8 @@ public class DeviceBrowser extends QMainWindow{
 	private String currPart;
 	/** This is the tree of parts to select */
 	private QTreeWidget treeWidget;
-	/** This is the list of primitive sites in the current tile selected */
-	private QTreeWidget primitiveList;
+	/** This is the list of sites in the current tile selected */
+	private QTreeWidget siteList;
 	/** This is the list of wires in the current tile selected */
 	private QTreeWidget wireList;
 	/** This is the current tile that has been selected */
@@ -78,7 +78,7 @@ public class DeviceBrowser extends QMainWindow{
 	
 	private boolean hideTiles = false;
 	
-	private boolean drawPrimitives = true;
+	private boolean drawSites = true;
 	/**
 	 * Main method setting up the Qt environment for the program to run.
 	 * @param args the input arguments
@@ -120,7 +120,7 @@ public class DeviceBrowser extends QMainWindow{
 		we = device.getWireEnumerator();
 
 		// Setup the scene and view for the GUI
-		scene = new DeviceBrowserScene(device, hideTiles, drawPrimitives, this);
+		scene = new DeviceBrowserScene(device, hideTiles, drawSites, this);
 		view = new TileView(scene);
 		setCentralWidget(view);
 
@@ -142,7 +142,7 @@ public class DeviceBrowser extends QMainWindow{
 	/**
 	 * Populates the treeWidget with the various parts and families of devices
 	 * currently available in this installation of RapidSmith.  It also creates
-	 * the windows for the primitive site list and wire list.
+	 * the windows for the site list and wire list.
 	 */
 	private void initializeSideBar(){
 		treeWidget = WidgetMaker.createAvailablePartTreeWidget("Select a part...");
@@ -153,17 +153,17 @@ public class DeviceBrowser extends QMainWindow{
 		dockWidget.setFeatures(DockWidgetFeature.DockWidgetMovable);
 		addDockWidget(DockWidgetArea.LeftDockWidgetArea, dockWidget);
 		
-		// Create the primitive site list window
-		primitiveList = new QTreeWidget();
-		primitiveList.setColumnCount(2);
+		// Create the site list window
+		siteList = new QTreeWidget();
+		siteList.setColumnCount(2);
 		ArrayList<String> headerList = new ArrayList<>();
 		headerList.add("Site");
 		headerList.add("Type");
-		primitiveList.setHeaderLabels(headerList);
-		primitiveList.setSortingEnabled(true);
+		siteList.setHeaderLabels(headerList);
+		siteList.setSortingEnabled(true);
 		
-		QDockWidget dockWidget2 = new QDockWidget(tr("Primitive List"), this);
-		dockWidget2.setWidget(primitiveList);
+		QDockWidget dockWidget2 = new QDockWidget(tr("Site List"), this);
+		dockWidget2.setWidget(siteList);
 		dockWidget2.setFeatures(DockWidgetFeature.DockWidgetMovable);
 		addDockWidget(DockWidgetArea.LeftDockWidgetArea, dockWidget2);
 		
@@ -206,22 +206,22 @@ public class DeviceBrowser extends QMainWindow{
 	 */
 	protected void updateTile(Tile tile){
 		currTile = tile;
-		updatePrimitiveList();
+		updateSiteList();
 		updateWireList();
 	}
 	
 	/**
-	 * This will update the primitive list window based on the current
+	 * This will update the site list window based on the current
 	 * selected tile.
 	 */
-	private void updatePrimitiveList(){
-		primitiveList.clear();
-		if(currTile == null || currTile.getPrimitiveSites() == null) return;
-		for(Site ps : currTile.getPrimitiveSites()){
+	private void updateSiteList(){
+		siteList.clear();
+		if(currTile == null || currTile.getSites() == null) return;
+		for(Site ps : currTile.getSites()){
 			QTreeWidgetItem treeItem = new QTreeWidgetItem();
 			treeItem.setText(0, ps.getName());
 			treeItem.setText(1, ps.getType().toString());
-			primitiveList.insertTopLevelItem(0, treeItem);
+			siteList.insertTopLevelItem(0, treeItem);
 		}
 	}
 
@@ -256,7 +256,7 @@ public class DeviceBrowser extends QMainWindow{
 			device = RSEnvironment.defaultEnv().getDevice(currPart);
 			we = device.getWireEnumerator();
 			scene.setDevice(device);
-			scene.initializeScene(hideTiles, drawPrimitives);
+			scene.initializeScene(hideTiles, drawSites);
 			statusLabel.setText("Loaded: "+currPart.toUpperCase());
 		}
 	}

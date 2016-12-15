@@ -74,34 +74,34 @@ public class BramCluster extends SiteCluster {
 			if(isRAMB36) {	
 				Tile swapTile = site.getTile();
 				
-				Site bram18one = swapTile.getPrimitiveSite(0);		
+				Site bram18one = swapTile.getSite(0);
 				if (sitenameToCluster.containsKey(bram18one)) {
 					SiteCluster swapSite = sitenameToCluster.get(bram18one);
-					swapSite.swap(this.currentTile.getPrimitiveSite(0)); 
+					swapSite.swap(this.currentTile.getSite(0));
 					this.swappedWith.add(swapSite);
 				}
 				
-				Site bram18two = swapTile.getPrimitiveSite(1);
+				Site bram18two = swapTile.getSite(1);
 				if (sitenameToCluster.containsKey(bram18two)) {
 					SiteCluster swapSite = sitenameToCluster.get(bram18two);
-					swapSite.swap(this.currentTile.getPrimitiveSite(1)); 
+					swapSite.swap(this.currentTile.getSite(1));
 					this.swappedWith.add(swapSite);
 				}
 			}
 			else {	
 				Tile swapTile = site.getTile();
 				
-				Site bram36 = swapTile.getPrimitiveSite(2);		
+				Site bram36 = swapTile.getSite(2);
 				if (sitenameToCluster.containsKey(bram36)) {
 					SiteCluster swapSite = sitenameToCluster.get(bram36);
-					swapSite.swap(this.currentTile.getPrimitiveSite(2)); 
+					swapSite.swap(this.currentTile.getSite(2));
 					this.swappedWith.add(swapSite);
 					
 					//Also need to swap the original RAMB18 partner site if applicable
-					Site bram18 = currentTile.getPrimitiveSite(1 - currentLOC.getIndex());
+					Site bram18 = currentTile.getSite(1 - currentLOC.getIndex());
 					if (sitenameToCluster.containsKey(bram18)) {
 						swapSite = sitenameToCluster.get(bram18);
-						swapSite.swap(swapTile.getPrimitiveSite(1 - site.getIndex()));
+						swapSite.swap(swapTile.getSite(1 - site.getIndex()));
 						this.swappedWith.add(swapSite);
 					}
 				}				
@@ -125,15 +125,15 @@ public class BramCluster extends SiteCluster {
 		
 		if(isRAMB36) {
 			Tile selectedTile = site.getTile();
-			Site bram18one = selectedTile.getPrimitiveSite(0);
-			Site bram18two = selectedTile.getPrimitiveSite(1);
+			Site bram18one = selectedTile.getSite(0);
+			Site bram18two = selectedTile.getSite(1);
 			
 			if(usedSites.containsKey(bram18one) || usedSites.containsKey(bram18two))
 				return false;
 		}
 		else {
 			Tile selectedTile = site.getTile();
-			Site bram36 = selectedTile.getPrimitiveSite(2);
+			Site bram36 = selectedTile.getSite(2);
 			
 			if(usedSites.containsKey(bram36))
 				return false;

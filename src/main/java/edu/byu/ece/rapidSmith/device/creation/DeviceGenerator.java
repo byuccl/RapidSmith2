@@ -25,7 +25,6 @@ import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.primitiveDefs.*;
-import edu.byu.ece.rapidSmith.util.Exceptions;
 import edu.byu.ece.rapidSmith.util.HashPool;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
@@ -37,6 +36,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static edu.byu.ece.rapidSmith.util.Exceptions.EnvironmentException;
+import static edu.byu.ece.rapidSmith.util.Exceptions.FileFormatException;
 
 /**
  * Generates a new device through parsing the device's XDLRC representation.
@@ -189,7 +191,7 @@ public final class DeviceGenerator {
 
 		// Create a template for each primitive type
 		for (PrimitiveDef def : device.getPrimitiveDefs()) {
-			Element ptEl = getPrimitiveTypeEl(def.getType());
+			Element ptEl = getSiteTypeEl(def.getType());
 
 			SiteTemplate template = new SiteTemplate();
 			template.setType(def.getType());
@@ -531,14 +533,13 @@ public final class DeviceGenerator {
 	 * @param type the type of the element to retrieve
 	 * @return the JDOM element for the requested primitive type
 	 */
-	private Element getPrimitiveTypeEl(SiteType type) {
-		Element primitiveTypesEl = familyInfo.getRootElement().getChild("primitive_types");
-		for (Element primitiveTypeEl : primitiveTypesEl.getChildren("primitive_type")) {
-			if (primitiveTypeEl.getChild("name").getText().equals(type.name()))
-				return primitiveTypeEl;
+	private Element getSiteTypeEl(SiteType type) {
+		Element siteTypesEl = familyInfo.getRootElement().getChild("site_types");
+		for (Element siteTypeEl : siteTypesEl.getChildren("site_type")) {
+			if (siteTypeEl.getChild("name").getText().equals(type.name()))
+				return siteTypeEl;
 		}
-		assert false;
-		return null;
+		throw new FileFormatException("no site type " + type.name() + " in familyInfo.xml");
 	}
 
 	private Map<Tile, Map<Integer, Set<WireConnection>>> getWCsToAdd() {
@@ -859,7 +860,7 @@ public final class DeviceGenerator {
 			try {
 				familyInfo = env.loadFamilyInfo(family);
 			} catch (IOException|JDOMException e) {
-				throw new Exceptions.EnvironmentException("Failed to load family information file", e);
+				throw new EnvironmentException("Failed to load family information file", e);
 			}
 			device.setFamily(family);
 		}
@@ -995,7 +996,7 @@ public final class DeviceGenerator {
 			SiteType type = SiteType.valueOf(device.getFamily(), tokens.get(2));
 			alternatives.add(type);
 
-			Element ptEl = getPrimitiveTypeEl(type);
+			Element ptEl = getSiteTypeEl(type);
 			Element alternativesEl = ptEl.getChild("alternatives");
 			if (alternativesEl != null) {
 				FamilyType family = device.getFamily();
@@ -1013,12 +1014,12 @@ public final class DeviceGenerator {
 
 		@Override
 		protected void exitTile(List<String> tokens) {
-			// Create an array of primitive sites (more compact than ArrayList)
+			// Create an array of sites (more compact than ArrayList)
 			if (tileSites.size() > 0) {
-				currTile.setPrimitiveSites(tileSites.toArray(
+				currTile.setSites(tileSites.toArray(
 						new Site[tileSites.size()]));
 			} else {
-				currTile.setPrimitiveSites(null);
+				currTile.setSites(null);
 			}
 
 			currTile = null;
@@ -1139,7 +1140,7 @@ public final class DeviceGenerator {
 
 		@Override
 		protected void enterPrimitiveSite(List<String> tokens) {
-			currSite = device.getPrimitiveSite(tokens.get(1));
+			currSite = device.getSite(tokens.get(1));
 			externalPinWires = new HashMap<>();
 		}
 
@@ -1203,7 +1204,7 @@ public final class DeviceGenerator {
 		}
 
 		private Element getPinmapElement(SiteType altType, String sitePin) {
-			Element ptEl = getPrimitiveTypeEl(currSite.getPossibleTypes()[0]);
+			Element ptEl = getSiteTypeEl(currSite.getPossibleTypes()[0]);
 			Element alternativesEl = ptEl.getChild("alternatives");
 			Element altEl = null;
 			for (Element altTmpEl : alternativesEl.getChildren("alternative")) {

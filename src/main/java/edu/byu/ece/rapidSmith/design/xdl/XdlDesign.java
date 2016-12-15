@@ -48,10 +48,10 @@ public class XdlDesign extends AbstractDesign {
 	private HashMap<String,XdlModule> modules;
 	/** Keeps track of module instances and groups them according to module instance name */
 	private HashMap<String,XdlModuleInstance> moduleInstances;
-	/** This is a list of all the instances of primitives and macros in the design */
+	/** This is a list of all the instances and macros in the design */
 	private HashMap<String,XdlInstance> instances;
-	/** A map used to keep track of all used primitive sites used by the design */
-	private HashMap<Site,XdlInstance> usedPrimitiveSites;
+	/** A map used to keep track of all sites used by the design */
+	private HashMap<Site,XdlInstance> usedSites;
 	/** This is a list of all the nets in the design */
 	private HashMap<String,XdlNet> nets;
 	/** A flag designating if this is a design or hard macro */
@@ -89,7 +89,7 @@ public class XdlDesign extends AbstractDesign {
 	private void init() {
 		modules = new HashMap<>();
 		instances = new HashMap<>();
-		usedPrimitiveSites = new HashMap<>();
+		usedSites = new HashMap<>();
 		nets = new HashMap<>();
 		attributes = new ArrayList<>();
 		isHardMacro = false;
@@ -251,7 +251,7 @@ public class XdlDesign extends AbstractDesign {
 	 */
 	public void addInstance(XdlInstance inst){
 		if(inst.isPlaced()){
-			setPrimitiveSiteUsed(inst.getPrimitiveSite(), inst);
+			setSiteUsed(inst.getSite(), inst);
 		}
 		inst.setDesign(this);
 		instances.put(inst.getName(), inst);
@@ -294,7 +294,7 @@ public class XdlDesign extends AbstractDesign {
 			}
 		}
 		instances.remove(instance.getName());
-		releasePrimitiveSite(instance.getPrimitiveSite());
+		releaseSite(instance.getSite());
 		instance.setDesign(null);
 		instance.setNetList(null);
 		return true;
@@ -528,12 +528,12 @@ public class XdlDesign extends AbstractDesign {
 	}
 
 	/**
-	 * Checks if the specified primitive site is used in this design.
+	 * Checks if the specified  site is used in this design.
 	 * @param site the site to check for
-	 * @return true if this design uses the specified primitive site
+	 * @return true if this design uses the specified  site
 	 */
-	public boolean isPrimitiveSiteUsed(Site site){
-		return usedPrimitiveSites.containsKey(site);
+	public boolean isSiteUsed(Site site){
+		return usedSites.containsKey(site);
 	}
 
 	/**
@@ -541,38 +541,38 @@ public class XdlDesign extends AbstractDesign {
 	 * @param site the site of the desired instance
 	 * @return the instance at the specified site, or null if the site is unoccupied
 	 */
-	public XdlInstance getInstanceAtPrimitiveSite(Site site){
-		return usedPrimitiveSites.get(site);
+	public XdlInstance getInstanceAtSite(Site site){
+		return usedSites.get(site);
 	}
 
 	/**
-	 * Returns the set of used primitive sites occupied by this
+	 * Returns the set of used  sites occupied by this
 	 * design's instances and module instances.
-	 * @return the set of used primitive sites in this design
+	 * @return the set of used  sites in this design
 	 */
-	public Set<Site> getUsedPrimitiveSites(){
-		return usedPrimitiveSites.keySet();
+	public Set<Site> getUsedSites(){
+		return usedSites.keySet();
 	}
 
 	/**
-	 * Marks a primitive site as used by a particular instance.
+	 * Marks a  site as used by a particular instance.
 	 * @param site the site to be marked as used
-	 * @param inst the instance using the site or null if the primitive site
+	 * @param inst the instance using the site or null if the  site
 	 * is null
 	 * @return the instance previously at the specified site
 	 */
-	XdlInstance setPrimitiveSiteUsed(Site site, XdlInstance inst){
+	XdlInstance setSiteUsed(Site site, XdlInstance inst){
 		if(site == null) return null;
-		return usedPrimitiveSites.put(site, inst);
+		return usedSites.put(site, inst);
 	}
 
 	/**
-	 * Removes the instance at the specified primitive site freeing up the site.
+	 * Removes the instance at the specified site freeing up the site.
 	 * @param site the site to free
 	 * @return the instance previously at the specified site
 	 */
-	XdlInstance releasePrimitiveSite(Site site){
-		return usedPrimitiveSites.remove(site);
+	XdlInstance releaseSite(Site site){
+		return usedSites.remove(site);
 	}
 
 	/**

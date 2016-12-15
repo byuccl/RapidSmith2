@@ -86,4 +86,31 @@ public class Exceptions {
 			super(message, cause, enableSuppression, writableStackTrace);
 		}
 	}
+
+	/**
+	 * Exception thrown if a file is improperly formatted or missing required information.
+	 */
+	public static class FileFormatException extends RuntimeException {
+		private static final long serialVersionUID = 3766973011461070251L;
+
+		public FileFormatException() {
+			super();
+		}
+
+		public FileFormatException(String message) {
+			super(message);
+		}
+
+		public FileFormatException(String message, Throwable cause) {
+			super(message, cause);
+		}
+
+		public FileFormatException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+			super(message, cause, enableSuppression, writableStackTrace);
+		}
+
+		public FileFormatException(Throwable cause) {
+			super(cause);
+		}
+	}
 }

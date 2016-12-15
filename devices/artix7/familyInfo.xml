@@ -6,11 +6,11 @@
     <type>INT_R</type>
   </switch_matrix_types>
 
-  <primitive_types>
+  <site_types>
 
     <!-- Do the base sites -->
 
-    <primitive_type>
+    <site_type>
       <name>BSCAN</name>
       <bels>
         <bel>
@@ -20,9 +20,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>BUFGCTRL</name>
       <alternatives>
         <alternative>
@@ -45,9 +45,9 @@
         <polarity_selector> <name>S0INV</name> </polarity_selector>
         <polarity_selector> <name>S1INV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>BUFHCE</name>
       <bels>
         <bel>
@@ -58,9 +58,9 @@
       <corrections>
         <polarity_selector> <name>CEINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>BUFIO</name>
       <bels>
         <bel>
@@ -70,9 +70,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>BUFMRCE</name>
       <bels>
         <bel>
@@ -83,9 +83,9 @@
       <corrections>
         <polarity_selector> <name>CEINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>BUFR</name>
       <bels>
         <bel>
@@ -95,9 +95,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>CAPTURE</name>
       <bels>
         <bel>
@@ -107,9 +107,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>DCIRESET</name>
       <bels>
         <bel>
@@ -119,9 +119,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>DNA_PORT</name>
       <bels>
         <bel>
@@ -131,9 +131,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>DSP48E1</name>
       <is_dsp/>
       <bels>
@@ -162,9 +162,9 @@
         <polarity_selector> <name>OPMODE5INV</name> </polarity_selector>
         <polarity_selector> <name>OPMODE6INV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>EFUSE_USR</name>
       <bels>
         <bel>
@@ -174,9 +174,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>FIFO18E1</name>
       <is_fifo/>
       <alternatives>
@@ -377,9 +377,9 @@
         <polarity_selector> <name>WRCLKINV</name> </polarity_selector>
         <polarity_selector> <name>WRENINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>FRAME_ECC</name>
       <bels>
         <bel>
@@ -389,9 +389,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>GTPE2_CHANNEL</name>
       <bels>
         <bel>
@@ -418,9 +418,9 @@
         <polarity_selector> <name>TXUSRCLK2INV</name> </polarity_selector>
         <polarity_selector> <name>TXUSRCLKINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>GTPE2_COMMON</name>
       <bels>
         <bel>
@@ -438,9 +438,9 @@
         <polarity_selector> <name>PMASCANCLK0INV</name> </polarity_selector>
         <polarity_selector> <name>PMASCANCLK1INV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>IBUFDS_GTE2</name>
       <bels>
         <bel>
@@ -451,9 +451,9 @@
       <corrections>
         <polarity_selector> <name>CLKTESTSIGINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>ICAP</name>
       <bels>
         <bel>
@@ -463,9 +463,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>IDELAYCTRL</name>
       <bels>
         <bel>
@@ -475,9 +475,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>IDELAYE2</name>
       <alternatives>
 	<!-- alt INVALID
@@ -499,9 +499,9 @@
         <polarity_selector> <name>DATAININV</name> </polarity_selector>
         <polarity_selector> <name>IDATAININV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>ILOGICE3</name>
       <alternatives>
         <alternative>
@@ -563,9 +563,9 @@
           <polarity_selector> <name>ZHOLD_IFF_INV</name> </polarity_selector>
 	  -->
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>IN_FIFO</name>
       <bels>
         <bel>
@@ -575,9 +575,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>IOB33</name>
       <is_iob/>
       <compatible_types>
@@ -642,9 +642,9 @@
         <modify_element>    <name>PADOUTUSED</name> <type>mux</type> </modify_element>
         <modify_element>    <name>TUSED</name> <type>mux</type> </modify_element>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>IOB33M</name>
       <is_iob/>
       <alternatives>
@@ -710,9 +710,9 @@
         <modify_element>    <name>TUSED</name> <type>mux</type> </modify_element>
         <modify_element>    <name>T_OUTUSED</name> <type>mux</type> </modify_element>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>IOB33S</name>
       <is_iob/>
       <alternatives>
@@ -781,9 +781,9 @@
         <modify_element>    <name>PADOUTUSED</name> <type>mux</type> </modify_element>
         <modify_element>    <name>TINMUX</name> <type>mux</type> </modify_element>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>IPAD</name>
       <compatible_types>
         <compatible_type>IOB33M</compatible_type>
@@ -825,9 +825,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>MMCME2_ADV</name>
       <bels>
         <bel>
@@ -842,9 +842,9 @@
         <polarity_selector> <name>PWRDWNINV</name> </polarity_selector>
         <polarity_selector> <name>RSTINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>OLOGICE3</name>
       <alternatives>
         <alternative>
@@ -897,9 +897,9 @@
         <modify_element>    <name>TREVUSED</name> <type>mux</type> </modify_element>
         <modify_element>    <name>TSRUSED</name> <type>mux</type> </modify_element>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>OPAD</name>
       <bels>
         <bel>
@@ -913,9 +913,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>OUT_FIFO</name>
       <bels>
         <bel>
@@ -925,9 +925,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>PCIE_2_1</name>
       <bels>
         <bel>
@@ -937,9 +937,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>PHASER_IN_PHY</name>
       <alternatives>
         <alternative>
@@ -962,9 +962,9 @@
       <corrections>
         <polarity_selector> <name>RSTINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>PHASER_OUT_PHY</name>
       <alternatives>
         <alternative>
@@ -987,9 +987,9 @@
       <corrections>
         <polarity_selector> <name>RSTINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>PHASER_REF</name>
       <bels>
         <bel>
@@ -1001,9 +1001,9 @@
         <polarity_selector> <name>PWRDWNINV</name> </polarity_selector>
         <polarity_selector> <name>RSTINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>PHY_CONTROL</name>
       <bels>
         <bel>
@@ -1013,9 +1013,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>PLLE2_ADV</name>
       <bels>
         <bel>
@@ -1028,9 +1028,9 @@
         <polarity_selector> <name>PWRDWNINV</name> </polarity_selector>
         <polarity_selector> <name>RSTINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>PMV2</name>
       <bels>
         <bel>
@@ -1040,9 +1040,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>RAMB18E1</name>
       <is_bram/>
       <compatible_types>
@@ -1075,9 +1075,9 @@
         <polarity_selector> <name>RSTREGARSTREGINV</name> </polarity_selector>
         <polarity_selector> <name>RSTREGBINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>RAMBFIFO36E1</name>
       <is_bram/>
       <is_fifo/>
@@ -1529,9 +1529,9 @@
         <polarity_selector> <name>RSTREGBLINV</name> </polarity_selector>
         <polarity_selector> <name>RSTREGBUINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>SLICEL</name>
       <is_slice/>
       <bels>
@@ -1883,9 +1883,9 @@
         <modify_element>    <name>PRECYINIT</name> <type>mux</type> </modify_element>
         <modify_element>    <name>SRUSEDMUX</name> <type>mux</type> </modify_element>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>SLICEM</name>
       <is_slice/>
       <bels>
@@ -2243,9 +2243,9 @@
         <modify_element>    <name>WA8USED</name> <type>mux</type> </modify_element>
         <modify_element>    <name>WEMUX</name> <type>mux</type> </modify_element>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>STARTUP</name>
       <bels>
         <bel>
@@ -2255,9 +2255,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>TIEOFF</name>
       <bels>
         <bel>
@@ -2271,9 +2271,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>USR_ACCESS</name>
       <bels>
         <bel>
@@ -2283,9 +2283,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>XADC</name>
       <bels>
         <bel>
@@ -2297,12 +2297,12 @@
         <polarity_selector> <name>CONVSTCLKINV</name> </polarity_selector>
         <polarity_selector> <name>DCLKINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
 
     <!-- Do the alternative sites for the base sites -->
 
-    <primitive_type>
+    <site_type>
       <name>BUFG</name>
       <compatible_types>
         <compatible_type>BUFGCTRL</compatible_type>
@@ -2315,9 +2315,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>IDELAYE2_FINEDELAY</name>
       <bels>
         <bel>
@@ -2330,9 +2330,9 @@
         <polarity_selector> <name>DATAININV</name> </polarity_selector>
         <polarity_selector> <name>IDATAININV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>ILOGICE2</name>
       <bels>
         <bel>
@@ -2370,9 +2370,9 @@
         <modify_element>    <name>REVUSED</name> <type>mux</type> </modify_element>
         <modify_element>    <name>SRUSED</name> <type>mux</type> </modify_element>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>ISERDESE2</name>
       <compatible_types>
 	<compatible_type>ILOGICE3</compatible_type>
@@ -2392,10 +2392,10 @@
         <polarity_selector> <name>OCLKBINV</name> </polarity_selector>
         <polarity_selector> <name>OCLKINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
 <!-- ERROR: the next two site types seem to not exist but Tcl says they do.
-    <primitive_type>
+    <site_type>
       <name>IOB18M</name>
       <is_iob/>
       <bels>
@@ -2430,9 +2430,9 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>IOB18S</name>
       <is_iob/>
       <bels>
@@ -2471,10 +2471,10 @@
       </bels>
       <corrections>
       </corrections>
-    </primitive_type>
+    </site_type>
     -->
     
-    <primitive_type>
+    <site_type>
       <name>OLOGICE2</name>
       <compatible_types>
 	<compatible_type>OLOGICE3</compatible_type>
@@ -2514,9 +2514,9 @@
         <modify_element>    <name>TREVUSED</name> <type>mux</type> </modify_element>
         <modify_element>    <name>TSRUSED</name> <type>mux</type> </modify_element>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>OSERDESE2</name>
       <compatible_types>
 	<compatible_type>OLOGICE3</compatible_type>
@@ -2547,9 +2547,9 @@
         <polarity_selector> <name>T3INV</name> </polarity_selector>
         <polarity_selector> <name>T4INV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>PHASER_IN</name>
       <compatible_types>
 	<compatible_type>PHASER_IN_PHY</compatible_type>
@@ -2563,9 +2563,9 @@
       <corrections>
         <polarity_selector> <name>RSTINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>PHASER_IN_ADV</name>
       <compatible_types>
 	<compatible_type>PHASER_IN_PHY</compatible_type>
@@ -2579,9 +2579,9 @@
       <corrections>
         <polarity_selector> <name>RSTINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>PHASER_OUT</name>
       <compatible_types>
 	<compatible_type>PHASER_OUT_PHY</compatible_type>
@@ -2595,9 +2595,9 @@
       <corrections>
         <polarity_selector> <name>RSTINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>PHASER_OUT_ADV</name>
       <compatible_types>
 	<compatible_type>PHASER_OUT_PHY</compatible_type>
@@ -2611,9 +2611,9 @@
       <corrections>
         <polarity_selector> <name>RSTINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>FIFO36E1</name>
       <compatible_types>
         <compatible_type>RAMBFIFO36E1</compatible_type>
@@ -2640,9 +2640,9 @@
         <polarity_selector> <name>WRENLINV</name> </polarity_selector>
         <polarity_selector> <name>WRENUINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
-    <primitive_type>
+    <site_type>
       <name>RAMB36E1</name>
       <is_bram/>
       <compatible_types>
@@ -2676,70 +2676,70 @@
         <polarity_selector> <name>RSTREGBLINV</name> </polarity_selector>
         <polarity_selector> <name>RSTREGBUINV</name> </polarity_selector>
       </corrections>
-    </primitive_type>
+    </site_type>
 
     
     
 
     <!-- Do the site types that don't appear in the tincr::sites::unique list -->
 
-    <primitive_type> <name>AMS_ADC</name>
+    <site_type> <name>AMS_ADC</name>
     <bels>
       <bel>
         <name>AMS_ADC</name>
         <type>AMS_ADC</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>AMS_DAC</name>
+    </site_type>
+    <site_type> <name>AMS_DAC</name>
     <bels>
       <bel>
         <name>AMS_DAC</name>
         <type>AMS_DAC</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>BSCAN_JTAG_MONE2</name>
+    </site_type>
+    <site_type> <name>BSCAN_JTAG_MONE2</name>
     <bels>
       <bel>
         <name>BSCAN_JTAG_MONE2</name>
         <type>BSCAN_JTAG_MONE2</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>BUFG</name>
+    </site_type>
+    <site_type> <name>BUFG</name>
     <bels>
       <bel>
         <name>BUFG</name>
         <type>BUFG</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>BUFG_LB</name>
+    </site_type>
+    <site_type> <name>BUFG_LB</name>
     <bels>
       <bel>
         <name>BUFG_LB</name>
         <type>BUFG_LB</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>DRP_AMS_ADC</name>
+    </site_type>
+    <site_type> <name>DRP_AMS_ADC</name>
     <bels>
       <bel>
         <name>DRP_AMS_ADC</name>
         <type>DRP_AMS_ADC</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>DRP_AMS_DAC</name>
+    </site_type>
+    <site_type> <name>DRP_AMS_DAC</name>
     <bels>
       <bel>
         <name>DRP_AMS_DAC</name>
         <type>DRP_AMS_DAC</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>FIFO36E1</name>
+    </site_type>
+    <site_type> <name>FIFO36E1</name>
     <is_fifo/>
     <bels>
       <bel>
@@ -2747,64 +2747,64 @@
         <type>FIFO36E1</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>GLOBALSIG</name>
+    </site_type>
+    <site_type> <name>GLOBALSIG</name>
     <bels>
       <bel>
         <name>GLOBALSIG</name>
         <type>GLOBALSIG</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>GTHE2_CHANNEL</name>
+    </site_type>
+    <site_type> <name>GTHE2_CHANNEL</name>
     <bels>
       <bel>
         <name>GTHE2_CHANNEL</name>
         <type>GTHE2_CHANNEL</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>GTHE2_COMMON</name>
+    </site_type>
+    <site_type> <name>GTHE2_COMMON</name>
     <bels>
       <bel>
         <name>GTHE2_COMMON</name>
         <type>GTHE2_COMMON</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>GTXE2_CHANNEL</name>
+    </site_type>
+    <site_type> <name>GTXE2_CHANNEL</name>
     <bels>
       <bel>
         <name>GTXE2_CHANNEL</name>
         <type>GTXE2_CHANNEL</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>GTXE2_COMMON</name>
+    </site_type>
+    <site_type> <name>GTXE2_COMMON</name>
     <bels>
       <bel>
         <name>GTXE2_COMMON</name>
         <type>GTXE2_COMMON</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>GTZE2_OCTAL</name>
+    </site_type>
+    <site_type> <name>GTZE2_OCTAL</name>
     <bels>
       <bel>
         <name>GTZE2_OCTAL</name>
         <type>GTZE2_OCTAL</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>IDELAYE2_FINEDELAY</name>
+    </site_type>
+    <site_type> <name>IDELAYE2_FINEDELAY</name>
     <bels>
       <bel>
         <name>IDELAYE2_FINEDELAY</name>
         <type>IDELAYE2_FINEDELAY</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>ILOGICE2</name>
+    </site_type>
+    <site_type> <name>ILOGICE2</name>
     <compatible_types>
       <compatible_type>ILOGICE3</compatible_type>
     </compatible_types>
@@ -2814,8 +2814,8 @@
         <type>ILOGICE2</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>IOB</name>
+    </site_type>
+    <site_type> <name>IOB</name>
     <is_iob/>
     <bels>
       <bel>
@@ -2823,8 +2823,8 @@
         <type>IOB</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>IOB18</name>
+    </site_type>
+    <site_type> <name>IOB18</name>
     <is_iob/>
     <bels>
       <bel>
@@ -2832,8 +2832,8 @@
         <type>IOB18</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>IOB18M</name>
+    </site_type>
+    <site_type> <name>IOB18M</name>
     <is_iob/>
     <bels>
       <bel>
@@ -2841,8 +2841,8 @@
         <type>IOB18M</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>IOB18S</name>
+    </site_type>
+    <site_type> <name>IOB18S</name>
     <is_iob/>
     <bels>
       <bel>
@@ -2850,8 +2850,8 @@
         <type>IOB18S</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>IOBM</name>
+    </site_type>
+    <site_type> <name>IOBM</name>
     <is_iob/>
     <bels>
       <bel>
@@ -2859,8 +2859,8 @@
         <type>IOBM</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>IOBS</name>
+    </site_type>
+    <site_type> <name>IOBS</name>
     <is_iob/>
     <bels>
       <bel>
@@ -2868,96 +2868,96 @@
         <type>IOBS</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>ISERDESE2</name>
+    </site_type>
+    <site_type> <name>ISERDESE2</name>
     <bels>
       <bel>
         <name>ISERDESE2</name>
         <type>ISERDESE2</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>KEY_CLEAR</name>
+    </site_type>
+    <site_type> <name>KEY_CLEAR</name>
     <bels>
       <bel>
         <name>KEY_CLEAR</name>
         <type>KEY_CLEAR</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>ODELAYE2</name>
+    </site_type>
+    <site_type> <name>ODELAYE2</name>
     <bels>
       <bel>
         <name>ODELAYE2</name>
         <type>ODELAYE2</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>ODELAYE2_FINEDELAY</name>
+    </site_type>
+    <site_type> <name>ODELAYE2_FINEDELAY</name>
     <bels>
       <bel>
         <name>ODELAYE2_FINEDELAY</name>
         <type>ODELAYE2_FINEDELAY</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>OLOGICE2</name>
+    </site_type>
+    <site_type> <name>OLOGICE2</name>
     <bels>
       <bel>
         <name>OLOGICE2</name>
         <type>OLOGICE2</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>OSERDESE2</name>
+    </site_type>
+    <site_type> <name>OSERDESE2</name>
     <bels>
       <bel>
         <name>OSERDESE2</name>
         <type>OSERDESE2</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>PCIE_3_0</name>
+    </site_type>
+    <site_type> <name>PCIE_3_0</name>
     <bels>
       <bel>
         <name>PCIE_3_0</name>
         <type>PCIE_3_0</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>PHASER_IN</name>
+    </site_type>
+    <site_type> <name>PHASER_IN</name>
     <bels>
       <bel>
         <name>PHASER_IN</name>
         <type>PHASER_IN</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>PHASER_IN_ADV</name>
+    </site_type>
+    <site_type> <name>PHASER_IN_ADV</name>
     <bels>
       <bel>
         <name>PHASER_IN_ADV</name>
         <type>PHASER_IN_ADV</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>PHASER_OUT</name>
+    </site_type>
+    <site_type> <name>PHASER_OUT</name>
     <bels>
       <bel>
         <name>PHASER_OUT</name>
         <type>PHASER_OUT</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>PHASER_OUT_ADV</name>
+    </site_type>
+    <site_type> <name>PHASER_OUT_ADV</name>
     <bels>
       <bel>
         <name>PHASER_OUT_ADV</name>
         <type>PHASER_OUT_ADV</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>RAMB36E1</name>
+    </site_type>
+    <site_type> <name>RAMB36E1</name>
     <is_bram/>
     <bels>
       <bel>
@@ -2965,82 +2965,82 @@
         <type>RAMB36E1</type>
       </bel>
     </bels>
-    </primitive_type>
+    </site_type>
     
     
 
     <!-- Do the site types that appear in the XDLRC as primitive sites that this code doesn't pick up -->
 
-    <primitive_type> <name>CFG_IO_ACCESS</name>
+    <site_type> <name>CFG_IO_ACCESS</name>
     <bels>
       <bel>
         <name>CFG_IO_ACCESS</name>
         <type>CFG_IO_ACCESS</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>GCLK_TEST_BUF</name>
+    </site_type>
+    <site_type> <name>GCLK_TEST_BUF</name>
     <bels>
       <bel>
         <name>GCLK_TEST_BUF</name>
         <type>GCLK_TEST_BUF</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>MTBF2</name>
+    </site_type>
+    <site_type> <name>MTBF2</name>
     <bels>
       <bel>
         <name>MTBF2</name>
         <type>MTBF2</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>PMV</name>
+    </site_type>
+    <site_type> <name>PMV</name>
     <bels>
       <bel>
         <name>PMV</name>
         <type>PMV</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>PMV2_SVT</name>
+    </site_type>
+    <site_type> <name>PMV2_SVT</name>
     <bels>
       <bel>
         <name>PMV2_SVT</name>
         <type>PMV2_SVT</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>PMVBRAM</name>
+    </site_type>
+    <site_type> <name>PMVBRAM</name>
     <bels>
       <bel>
         <name>PMVBRAM</name>
         <type>PMVBRAM</type>
       </bel>
     </bels>
-    </primitive_type>
-    <primitive_type> <name>PMVIOB</name>
+    </site_type>
+    <site_type> <name>PMVIOB</name>
     <bels>
       <bel>
         <name>PMVIOB</name>
         <type>PMVIOB</type>
       </bel>
     </bels>
-    </primitive_type>
+    </site_type>
     
     
 
     <!-- Do the site types that are simply needed but show up nowhere - not sure where they would come from so I add them here -->
 
-    <primitive_type> <name>DCI</name>
+    <site_type> <name>DCI</name>
     <bels>
       <bel>
         <name>DCI</name>
         <type>DCI</type>
       </bel>
     </bels>
-    </primitive_type>
-  </primitive_types>
+    </site_type>
+  </site_types>
 </device_description>
 
 
