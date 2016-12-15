@@ -148,7 +148,7 @@ public class XilinxV4DeviceClassGenerator extends XilinxDeviceClassGenerator {
          * 
          * The inner list is the overall list of column types for the part.
          */
-        _overallColumnLayouts = new ArrayList<List<BlockSubType>>();
+        _overallColumnLayouts = new ArrayList<>();
         
         for (String partName : _partNames) {
             System.out.println("Generating/parsing .xdlrc for " + partName);
@@ -156,10 +156,10 @@ public class XilinxV4DeviceClassGenerator extends XilinxDeviceClassGenerator {
             generateBriefXDLRCFile(partName, _xdlrcFile);
             
             //int currNumRows = 0;
-            List<BlockSubType> currLogicLayout = new ArrayList<BlockSubType>();
-            List<BlockSubType> currBramInterconnectLayout = new ArrayList<BlockSubType>();
-            List<BlockSubType> currBramContentLayout = new ArrayList<BlockSubType>();
-            List<BlockSubType> currOverallColumnLayout = new ArrayList<BlockSubType>();
+            List<BlockSubType> currLogicLayout = new ArrayList<>();
+            List<BlockSubType> currBramInterconnectLayout = new ArrayList<>();
+            List<BlockSubType> currBramContentLayout = new ArrayList<>();
+            List<BlockSubType> currOverallColumnLayout = new ArrayList<>();
             
             try {
                 in = new BufferedReader(new FileReader(_xdlrcFile));

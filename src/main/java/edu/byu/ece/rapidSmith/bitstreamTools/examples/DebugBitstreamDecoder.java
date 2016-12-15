@@ -54,19 +54,16 @@ public class DebugBitstreamDecoder {
         Bitstream bitstream = null;
         try {
             bitstream = BitstreamParser.parseBitstream(args[0]);
-        } catch (BitstreamParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (BitstreamParseException | IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
-        XilinxConfigurationSpecification spec = DeviceLookup.lookupPartV4V5V6withPackageName(bitstream.getHeader().getPartName());
+
+	    XilinxConfigurationSpecification spec = DeviceLookup.lookupPartV4V5V6withPackageName(bitstream.getHeader().getPartName());
         
         FrameAddressRegister far = new FrameAddressRegister(spec);
         
-        Map<Integer, Integer> columnMap = new LinkedHashMap<Integer, Integer>();
+        Map<Integer, Integer> columnMap = new LinkedHashMap<>();
         
         PacketList packets = bitstream.getPackets();
         for (Packet p : packets) {
@@ -85,17 +82,12 @@ public class DebugBitstreamDecoder {
         
         
         
-        Map<Integer, List<BlockSubType>> frameCountMap = new LinkedHashMap<Integer, List<BlockSubType>>();
+        Map<Integer, List<BlockSubType>> frameCountMap = new LinkedHashMap<>();
 
         for (BlockType bt : spec.getBlockTypes()) {
             for (BlockSubType bst : bt.getValidBlockSubTypes()) {
                 int frameCount = bst.getFramesPerConfigurationBlock();
-                List<BlockSubType> stList = frameCountMap.get(frameCount);
-                if (stList == null) {
-                    stList = new ArrayList<BlockSubType>();
-                    frameCountMap.put(frameCount, stList);
-                }
-                stList.add(bst);
+                frameCountMap.computeIfAbsent(frameCount, k -> new ArrayList<>()).add(bst);
             }
         }
         

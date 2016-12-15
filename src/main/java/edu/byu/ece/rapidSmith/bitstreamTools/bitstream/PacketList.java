@@ -38,7 +38,7 @@ import java.util.List;
 public class PacketList extends ConfigurationData implements Iterable<Packet> {
 	
     public PacketList() {
-        _packets = new ArrayList<Packet>();
+        _packets = new ArrayList<>();
     }
     
     public boolean add(Packet packet) {
@@ -68,7 +68,7 @@ public class PacketList extends ConfigurationData implements Iterable<Packet> {
 	 */
     @Override
 	public List<Byte> toByteArray(){
-		List<Byte> bytes = new ArrayList<Byte>();
+		List<Byte> bytes = new ArrayList<>();
 		
 		int size = _packets.size();
 		for(int i = 0; i < size; i++){
@@ -91,7 +91,7 @@ public class PacketList extends ConfigurationData implements Iterable<Packet> {
 	 * and indicate how many there are rather than listing them individually.
 	 */
 	public String toString(boolean groupNOPs) {
-		String string = new String();
+		String string = "";
 		int size = _packets.size();
 		int nop_count = 0;
 		
@@ -152,7 +152,7 @@ public class PacketList extends ConfigurationData implements Iterable<Packet> {
 
 
 	public String toXML() {
-		String string = new String();
+		String string = "";
 		int size = _packets.size();
 		int i = 0;
 		int numNOPs = 0;

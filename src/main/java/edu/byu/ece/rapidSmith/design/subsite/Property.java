@@ -5,7 +5,7 @@ package edu.byu.ece.rapidSmith.design.subsite;
  * to indicate the source and use of the property.
  */
 public class Property {
-	private Object key;
+	private final Object key;
 	private PropertyType type;
 	private Object value;
 

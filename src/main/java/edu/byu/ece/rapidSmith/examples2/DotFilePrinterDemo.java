@@ -1,5 +1,4 @@
 package edu.byu.ece.rapidSmith.examples2;
-import edu.byu.ece.edif.util.parse.ParseException;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
@@ -22,9 +21,8 @@ public class DotFilePrinterDemo {
 	/**
 	 * @param args
 	 * @throws IOException 
-	 * @throws ParseException 
 	 */
-	public static void main(String[] args) throws IOException, ParseException {
+	public static void main(String[] args) throws IOException {
 
 		if (args.length != 1) {
 			System.err.println("Usage: java DotFilePrinterDemo checkpointName");

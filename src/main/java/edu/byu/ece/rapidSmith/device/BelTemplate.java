@@ -7,10 +7,11 @@ import java.util.*;
  *  A template that backs BELs of each BEL id in the device.
  */
 public final class BelTemplate implements Serializable {
+	private static final long serialVersionUID = 2908083429845269712L;
 	private int hashCode = 0;
-	private BelId id;
+	private final BelId id;
 	// Type of the BEL, not a part of XDLRC
-	private String type;
+	private final String type;
 	// BelPinTemplates for each pin on the BEL
 	private Map<String, BelPinTemplate> sources = new HashMap<>();
 	private Map<String, BelPinTemplate> sinks = new HashMap<>();

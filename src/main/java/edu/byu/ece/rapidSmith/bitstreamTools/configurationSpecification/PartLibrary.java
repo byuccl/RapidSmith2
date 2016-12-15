@@ -31,7 +31,7 @@ import java.util.List;
 public abstract class PartLibrary {
 
 	public PartLibrary() {
-		_parts = new ArrayList<XilinxConfigurationSpecification>();
+		_parts = new ArrayList<>();
 		addParts();
 	}
 
@@ -75,7 +75,7 @@ public abstract class PartLibrary {
 	}
 
 	public List<XilinxConfigurationSpecification> getParts() {
-		return new ArrayList<XilinxConfigurationSpecification>(_parts);
+		return new ArrayList<>(_parts);
 	}
 	
 	protected void addPart(XilinxConfigurationSpecification spec) {

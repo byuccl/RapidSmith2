@@ -84,7 +84,7 @@ public class Bitstream {
      * to call whether or not the bitstream has a header.
      */
     public List<Byte> getRawBytesNoHeader() {
-        List<Byte> bytes = new ArrayList<Byte>();
+        List<Byte> bytes = new ArrayList<>();
         // Add sync word at top of file
         bytes = addDummyAndSyncWords(bytes);
         
@@ -112,7 +112,7 @@ public class Bitstream {
      * bitstream has one.
      */
     public List<Byte> getRawBytes() {
-        List<Byte> result = null;
+        List<Byte> result;
         if (hasHeader()) {
             result = getRawBytesWithHeader();
         }
@@ -193,7 +193,7 @@ public class Bitstream {
     }
     
     public String toString(boolean printHeaderSummary, boolean printHeaderData) {
-    	String str = new String();
+    	String str = "";
     	
     	if (printHeaderSummary) {
     		if (hasHeader()) {
@@ -266,7 +266,7 @@ public class Bitstream {
      * Get an XML representation of the bitstream.
      */
     public String toXMLString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
     
         
     
@@ -306,21 +306,21 @@ public class Bitstream {
      * This is an older method copied from Ben Sellers/Chris Lavin's old tools and
      * has not yet been tested in the new bitstream tools.
      */
-    public void writeBitstreamToMCS(OutputStream os) throws IOException {
+    public void writeBitstreamToMCS(OutputStream os) {
         
         PrintWriter pw = new PrintWriter(os);
         
-        List<Byte> bytes = new ArrayList<Byte>();
-        int i = 0; // Byte array index pointer
-        int j = 0; // Modulo counter
-        int length = 0; // length of bitstream
-        int tmp = 0; // Current byte
+        List<Byte> bytes = new ArrayList<>();
+        int i; // Byte array index pointer
+        int j; // Modulo counter
+        int length; // length of bitstream
+        int tmp; // Current byte
         int byte_count = 16; // Number of bytes per line
         int starting_address = 0x00;
         int sba_address = 0x00;
         int record_type = 0x00;
         int checksum = 0x00;
-        String line = "";
+        String line;
 
         i = 0;
         bytes = addDummyAndSyncWords(bytes);

@@ -147,10 +147,10 @@ public class XilinxV6DeviceClassGenerator extends XilinxDeviceClassGenerator {
             generateBriefXDLRCFile(partName, _xdlrcFile);
             
             //int currNumRows = 0;
-            List<BlockSubType> currLogicLayout = new ArrayList<BlockSubType>();
-            List<BlockSubType> currBramContentLayout = new ArrayList<BlockSubType>();
+            List<BlockSubType> currLogicLayout = new ArrayList<>();
+            List<BlockSubType> currBramContentLayout = new ArrayList<>();
             
-            Map<Integer, BlockSubType> columnMap = new TreeMap<Integer, BlockSubType>();
+            Map<Integer, BlockSubType> columnMap = new TreeMap<>();
             
             try {
                 in = new BufferedReader(new FileReader(_xdlrcFile));
@@ -167,24 +167,30 @@ public class XilinxV6DeviceClassGenerator extends XilinxDeviceClassGenerator {
     
                         String name = tokens[5];
                         int column = Integer.parseInt(tokens[3]);
-                        
-                        if (name.equals("LIOI") || name.equals("RIOI")) {
-                            columnMap.put(column, V6ConfigurationSpecification.IOB);
-                        }
-                        else if (name.equals("CLBLM") || name.equals("CLBLL")) {
-                            columnMap.put(column, V6ConfigurationSpecification.CLB);
-                        }
-                        else if (name.equals("DSP")) {
-                            columnMap.put(column, V6ConfigurationSpecification.DSP);
-                        }
-                        else if (name.equals("CMT_TOP")) {
-                            columnMap.put(column, V6ConfigurationSpecification.CLK);
-                        }
-                        else if (name.equals("GTX") || name.equals("GTH_L_TOP") || name.equals("GTH_L_BOT")) {
-                            columnMap.put(column, V6ConfigurationSpecification.GTX);
-                        }
-                        else if (name.equals("BRAM")) {
-                            columnMap.put(column, V6ConfigurationSpecification.BRAMINTERCONNECT);
+
+                        switch (name) {
+                            case "LIOI":
+                            case "RIOI":
+                                columnMap.put(column, V6ConfigurationSpecification.IOB);
+                                break;
+                            case "CLBLM":
+                            case "CLBLL":
+                                columnMap.put(column, V6ConfigurationSpecification.CLB);
+                                break;
+                            case "DSP":
+                                columnMap.put(column, V6ConfigurationSpecification.DSP);
+                                break;
+                            case "CMT_TOP":
+                                columnMap.put(column, V6ConfigurationSpecification.CLK);
+                                break;
+                            case "GTX":
+                            case "GTH_L_TOP":
+                            case "GTH_L_BOT":
+                                columnMap.put(column, V6ConfigurationSpecification.GTX);
+                                break;
+                            case "BRAM":
+                                columnMap.put(column, V6ConfigurationSpecification.BRAMINTERCONNECT);
+                                break;
                         }
                         
                     }

@@ -25,12 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import edu.byu.ece.rapidSmith.design.PIP;
-import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.Site;
-import edu.byu.ece.rapidSmith.device.Tile;
-import edu.byu.ece.rapidSmith.device.TileType;
-
 /**
  * This class represents the modules as found in XDL.  They are used to describe
  * hard macros and RPMs and instances of each.
@@ -49,17 +43,15 @@ public class XdlModule implements Serializable{
 	/** This is the anchor of the module */
 	private XdlInstance anchor;
 	/** Ports on the module */
-	private HashMap<String, XdlPort> portMap;
+	private final HashMap<String, XdlPort> portMap;
 	/** Instances which are part of the module */
-	private HashMap<String,XdlInstance> instanceMap;
+	private final HashMap<String,XdlInstance> instanceMap;
 	/** Nets of the module */
-	private HashMap<String,XdlNet> netMap;
+	private final HashMap<String,XdlNet> netMap;
 	/** Keeps track of the minimum clock period of this module */
 	private float minClkPeriod = Float.MAX_VALUE;
 	/** Provides a catch-all map to store information about hard macro */
 	private HashMap<String, ArrayList<String>> metaDataMap;
-	
-	private ArrayList<Site> validPlacements;
 
 	/**
 	 * Empty constructor, strings are null, everything else is initialized
@@ -71,7 +63,6 @@ public class XdlModule implements Serializable{
 		portMap = new HashMap<>();
 		instanceMap = new HashMap<>();
 		netMap = new HashMap<>();
-		validPlacements = new ArrayList<>();
 	}
 	
 	/**

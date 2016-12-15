@@ -29,7 +29,7 @@ package edu.byu.ece.rapidSmith.bitstreamTools.configuration;
  */
 public class FPGAOperation {
 
-	public enum OPERATORS { XOR, AND, OR, NOT, MASK };
+	public enum OPERATORS { XOR, AND, OR, NOT, MASK }
 
 	public static void ANDoperation(FPGA fpga1, FPGA fpga2) {
 		operation(fpga1,fpga2, OPERATORS.AND);
@@ -58,12 +58,12 @@ public class FPGAOperation {
 		if (fpga2 != null)
 			fpga2.setFAR(0);
 
-		Frame f = null;
+		Frame f;
 		do {
 			f = fpga1.getCurrentFrame();
 			FrameData fd = f.getData();
 
-			Frame g = null;
+			Frame g;
 			FrameData gd = null;
 			
 			if (fpga2 != null) {

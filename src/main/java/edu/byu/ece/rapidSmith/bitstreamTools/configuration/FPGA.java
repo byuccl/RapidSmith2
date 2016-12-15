@@ -20,10 +20,7 @@
  */
 package edu.byu.ece.rapidSmith.bitstreamTools.configuration;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import edu.byu.ece.rapidSmith.bitstreamTools.bitstream.Bitstream;
 import edu.byu.ece.rapidSmith.bitstreamTools.bitstream.Packet;
@@ -55,7 +52,7 @@ public class FPGA {
 		//configData = new FrameData[frameAddress.getNumberOfFrames()];
 		configData = new Frame[FrameAddressRegister.getNumberOfFrames(spec)];
 		int frameSize = spec.getFrameSize();
-		frameMap = new HashMap<Integer, Integer>();
+		frameMap = new HashMap<>();
 		frameAddress.setFAR(0);
 		for (int i = 0; i < configData.length; i++) {
 			int currentFAR = frameAddress.getAddress();
@@ -241,7 +238,7 @@ public class FPGA {
 	 */
 	public Frame getFrame(int farAddress) {
 		//int index = FrameAddressRegister.getConsecutiveAddress(spec,farAddress);
-		int index = frameMap.get(new Integer(farAddress));
+		int index = frameMap.get(farAddress);
 		if (index >= configData.length)
 			return null;
 		return configData[index];
@@ -258,14 +255,13 @@ public class FPGA {
 	}
 	
 	public ArrayList<Frame> getAllFrames() {
-		ArrayList<Frame> frames = new ArrayList<Frame>(configData.length);
-		for (int i = 0; i < configData.length; i++)
-			frames.add(configData[i]);
+		ArrayList<Frame> frames = new ArrayList<>(configData.length);
+		Collections.addAll(frames, configData);
 		return frames;
 	}
 
 	public ArrayList<Frame> getConfiguredFrames() {
-		ArrayList<Frame> configuredFrames = new ArrayList<Frame>();
+		ArrayList<Frame> configuredFrames = new ArrayList<>();
 		for (int i = 0; i < configData.length; i++) 
 			if (configData[i].isConfigured())
 				configuredFrames.add(configData[i]);
@@ -274,7 +270,7 @@ public class FPGA {
 	
 	public List<Frame> getConsecutiveFrames(int farAddress, int numFrames) {
 		int c_far = FrameAddressRegister.getConsecutiveAddress(spec, farAddress);
-		List<Frame> frames = new ArrayList<Frame>(numFrames);
+		List<Frame> frames = new ArrayList<>(numFrames);
 		for (int i = 0; i < numFrames; i++)
 			frames.add(configData[c_far+i]);
 		return frames;
@@ -291,7 +287,7 @@ public class FPGA {
 	 * Return the contents of a set of continuous frames as a String.
 	 */
 	public String getFrameContents(int startFrame, int numberOfFrames) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		XilinxConfigurationSpecification partInfo = getDeviceSpecification();
 		FrameAddressRegister far = new FrameAddressRegister(partInfo, startFrame);
 
@@ -335,7 +331,7 @@ public class FPGA {
 			return null;
 		}
 
-		ArrayList<Integer> dFrames = new ArrayList<Integer>();
+		ArrayList<Integer> dFrames = new ArrayList<>();
 		FrameAddressRegister far = new FrameAddressRegister(spec);
 		
 		for (; far.validFARAddress(); far.incrementFAR()) {
@@ -362,8 +358,7 @@ public class FPGA {
 	
 	
 	public String getFrameData() {
-		String str = spec.getDeviceName() + "\n";
-		return str;
+		return spec.getDeviceName() + "\n";
 	}
 	
 	protected void init() {

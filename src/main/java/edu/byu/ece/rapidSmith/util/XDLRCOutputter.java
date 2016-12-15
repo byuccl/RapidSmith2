@@ -184,7 +184,7 @@ public class XDLRCOutputter {
 			defs = new ArrayList<>(device.getPrimitiveDefs().values());
 		}
 		if (forceOrdering)
-			Collections.sort(defs, Comparator.comparing(o -> o.getType().name()));
+			defs.sort(Comparator.comparing(o -> o.getType().name()));
 		for (PrimitiveDef def : defs) {
 			writePrimitiveDef(def);
 		}
@@ -335,7 +335,7 @@ public class XDLRCOutputter {
 
 		List<PrimitiveDefPin> pins = new ArrayList<>(def.getPins());
 		if (forceOrdering)
-			Collections.sort(pins, Comparator.comparing(PrimitiveDefPin::getExternalName));
+			pins.sort(Comparator.comparing(PrimitiveDefPin::getExternalName));
 		for (PrimitiveDefPin pin : pins) {
 			out.append(ind + ind + "(pin ");
 			out.append(pin.getInternalName() + " ");
@@ -344,7 +344,7 @@ public class XDLRCOutputter {
 
 		List<PrimitiveElement> els = new ArrayList<>(def.getElements());
 		if (forceOrdering)
-			Collections.sort(els, Comparator.comparing(PrimitiveElement::getName));
+			els.sort(Comparator.comparing(PrimitiveElement::getName));
 		for (PrimitiveElement el : els) {
 			out.append(ind + ind + "(element ");
 			out.append(el.getName() + " ");
@@ -357,7 +357,7 @@ public class XDLRCOutputter {
 
 			List<PrimitiveDefPin> elPins = new ArrayList<>(el.getPins());
 			if (forceOrdering)
-				Collections.sort(elPins, Comparator.comparing(PrimitiveDefPin::getExternalName));
+				elPins.sort(Comparator.comparing(PrimitiveDefPin::getExternalName));
 			for (PrimitiveDefPin pin : el.getPins()) {
 				out.append(ind + ind + ind + "(pin ");
 				out.append(pin.getExternalName() + " ");
@@ -377,7 +377,7 @@ public class XDLRCOutputter {
 
 			List<PrimitiveConnection> conns = new ArrayList<>(el.getConnections());
 			if (forceOrdering) {
-				Collections.sort(conns, Comparator.comparing(PrimitiveConnection::getElement0)
+				conns.sort(Comparator.comparing(PrimitiveConnection::getElement0)
 						.thenComparing(PrimitiveConnection::getPin0)
 						.thenComparing(PrimitiveConnection::getElement1)
 						.thenComparing(PrimitiveConnection::getPin1));
@@ -402,8 +402,8 @@ public class XDLRCOutputter {
 	}
 
 	private static class Pin {
-		public PrimitiveElement element;
-		public String pin;
+		public final PrimitiveElement element;
+		public final String pin;
 
 		private Pin(PrimitiveElement el, String pin) {
 			this.element = el;
@@ -662,8 +662,8 @@ public class XDLRCOutputter {
 	}
 
 	private static class Arguments {
-		private OptionParser parser;
-		private String[] args;
+		private final OptionParser parser;
+		private final String[] args;
 		private Device device;
 		private Set<Tile> tiles;
 		private boolean writeWires;

@@ -72,7 +72,7 @@ public class Frame {
 	}
 	
 	public String toString() {
-		StringBuffer string = new StringBuffer();
+		StringBuilder string = new StringBuilder();
 		if (!configured) {
 			return "Not Configured";
 		}
@@ -89,7 +89,7 @@ public class Frame {
 	// Remove?
 	public String toXML()
 	{
-		StringBuffer string = new StringBuffer();
+		StringBuilder string = new StringBuilder();
 		string.append("<frame>");
 		if (configured)
 			string.append(data.toString());

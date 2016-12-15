@@ -118,7 +118,7 @@ public class BitstreamParser {
         PacketList packets = new PacketList();
         int i = numHeaderBytes;
     	while(i < _bytes.size()) {
-    	    List<Integer> data = new ArrayList<Integer>();
+    	    List<Integer> data = new ArrayList<>();
     		
     	    // get packet header
     	    int header = getWordAsInt(_bytes,i);
@@ -166,7 +166,7 @@ public class BitstreamParser {
     }
 
     protected List<Byte> getHeaderUpToSyncBytes() {
-        List<Byte> headerUpToSyncBytes = new ArrayList<Byte>();
+        List<Byte> headerUpToSyncBytes = new ArrayList<>();
     	int i = 0;
     	int syncPosition= 0;
     	while(syncPosition < SYNC_SEQUENCE.length && i < _bytes.size()) {
@@ -193,16 +193,15 @@ public class BitstreamParser {
      * @param start This is a byte offset into the file at which the data for a packet can be created.
      */
     public static int getWordAsInt(ArrayList<Byte> bytes, int start) {
-    	byte a,b,c,d = 0;
+    	byte a,b,c,d;
     	
     	a = bytes.get(start);
     	b = bytes.get(start + 1);
     	c = bytes.get(start + 2);
     	d = bytes.get(start + 3);
-    	
-    	int tmp =  (((a & 0xff) << 24) | ((b & 0xff) << 16) |
+
+	    return (((a & 0xff) << 24) | ((b & 0xff) << 16) |
     			((c & 0xff) << 8) | (d & 0xff));
-    	return tmp;
     }
 
     protected void loadFile() throws IOException {
@@ -217,7 +216,7 @@ public class BitstreamParser {
      * The main function for parsing the bitstream file.
      */
     protected Bitstream parseFile() throws BitstreamParseException {
-    	Bitstream result = null;
+    	Bitstream result;
     	BitstreamHeader header = parseHeader();
     	int numHeaderBytes = 0;
     	if (header != null) {
@@ -227,7 +226,7 @@ public class BitstreamParser {
     	if (dummySyncData == null) {
     	    throw new BitstreamParseException("Error: unrecognized dummy/sync word section");
     	}
-    	PacketList packets = null;
+    	PacketList packets;
     	try {
             packets = createBody(numHeaderBytes + dummySyncData.getDataSize());
         } catch (BitstreamException e) {
@@ -249,9 +248,9 @@ public class BitstreamParser {
 	 * @return true if parsing was performed correctly, false otherwise.
 	 */
 	protected BitstreamHeader parseHeader() throws BitstreamParseException {
-		int i = 0; // headerByte index pointer
+		int i; // headerByte index pointer
 
-		String tmp = "";
+		String tmp;
 		
 		// First we need to make sure the header indicator is the right length
 		int initHeaderLength = BitstreamHeader.INIT_HEADER_BYTES.length;
@@ -326,15 +325,13 @@ public class BitstreamParser {
 		if(_bytes.get(i).intValue() != 0x65){  
 			throw new BitstreamParseException("Strange header input processing field 'e'");
 		}
-		
-		BitstreamHeader header = new BitstreamHeader(sourceNCDFileName, partName, dateCreated, timeCreated);
-		
-		return header;
+
+		return new BitstreamHeader(sourceNCDFileName, partName, dateCreated, timeCreated);
 	}
 
 	
 	protected Bitstream _bitstream;
 	protected InputStream _istream;
-	protected ArrayList<Byte> _bytes = new ArrayList<Byte>();
+	protected ArrayList<Byte> _bytes = new ArrayList<>();
 
 }
