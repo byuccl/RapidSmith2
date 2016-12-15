@@ -118,7 +118,7 @@ public final class XDLReader {
 						default: throw new AssertionError("illegal enum value");
 					}
 				} else {
-					currInstance.setSite(site);
+					currInstance.setSiteUnsafe(site);
 				}
 			}
 		}
