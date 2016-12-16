@@ -53,19 +53,20 @@ public final class VivadoInterface {
 			throw new AssertionError("Specified directory is not a TINCR checkpoint.");
 		}
 			
-		// setup the cell library and the device based on the part in the TCP file
+		// load the device
 		String partName = DesignInfoInterface.parseInfoFile(Paths.get(tcp, "design.info").toString());
-		CellLibrary libCells = new CellLibrary(RSEnvironment.defaultEnv()
-				.getPartFolderPath(partName)
-				.resolve(CELL_LIBRARY_NAME));
+		
 		Device device = RSEnvironment.defaultEnv().getDevice(partName);
 		
-		// TODO: throw an exception here if the we can't find the device
-
 		if (device == null) {
 			throw new Exceptions.EnvironmentException("Device files for part: " + partName + " cannot be found.");
 		}
-		
+
+		// load the cell library
+		CellLibrary libCells = new CellLibrary(RSEnvironment.defaultEnv()
+				.getPartFolderPath(partName)
+				.resolve(CELL_LIBRARY_NAME));
+				
 		// create the RS2 netlist
 		String edifFile = Paths.get(tcp, "netlist.edf").toString();
 		CellDesign design;
@@ -120,8 +121,6 @@ public final class VivadoInterface {
 				// Skip commented lines
 				if (trimmed.startsWith("#") || trimmed.length() < 1)
 					continue;
-				
-				System.out.println(trimmed);
 				
 				// assuming a space after the command TODO: make sure this assumption is correct
 				int index = trimmed.indexOf(" ");
