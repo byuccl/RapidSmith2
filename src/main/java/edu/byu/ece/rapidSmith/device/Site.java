@@ -336,6 +336,43 @@ public final class Site implements Serializable{
 	}
 
 	/**
+	 * Returns the wire in this site with the given name.  This method does not
+	 * guarantee that the requested wire exists in this site.
+	 * @param wireName the name of the wire to get
+	 * @return the wire in this site with the given name
+	 */
+	public SiteWire getWire(String wireName) {
+		Device device = getTile().getDevice();
+		Integer wireEnum = device.getWireEnumerator().getWireEnum(wireName);
+		if (wireEnum == null)
+			return null;
+		return new SiteWire(this, wireEnum);
+	}
+
+	/**
+	 * @param wireName name of wire to query for
+	 * @return true if the wire with the given name exists in this site
+	 */
+	public boolean hasWire(String wireName) {
+		return hasWire(getTemplate(), wireName);
+	}
+
+	/**
+	 * @param wireName name of wire to query for
+	 * @return true if the wire with the given name exists in this site configured
+	 *   as [type]
+	 */
+	public boolean hasWire(SiteType type, String wireName) {
+		return hasWire(getTemplate(type), wireName);
+	}
+
+	private boolean hasWire(SiteTemplate template, String wireName) {
+		Device device = getTile().getDevice();
+		Integer wireEnum = device.getWireEnumerator().getWireEnum(wireName);
+		return wireEnum != null && template.getRouting().keySet().contains(wireEnum);
+	}
+
+	/**
 	 * Returns the wire connections sourced by the specified wire.
 	 *
 	 * @param wire the source wire
