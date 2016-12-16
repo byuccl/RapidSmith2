@@ -41,8 +41,6 @@ import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.gui.TileView;
 import edu.byu.ece.rapidSmith.gui.WidgetMaker;
-import edu.byu.ece.rapidSmith.util.Exceptions;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 /**
  * This class creates an interactive Xilinx FPGA device browser for all of the

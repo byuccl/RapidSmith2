@@ -39,7 +39,6 @@ import com.trolltech.qt.gui.QDockWidget.DockWidgetFeature;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.gui.WidgetMaker;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 /**
  * This class is an example of how RapidSmith could be used to build

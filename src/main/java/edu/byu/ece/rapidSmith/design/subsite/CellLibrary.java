@@ -5,7 +5,6 @@ import edu.byu.ece.rapidSmith.device.FamilyType;
 import edu.byu.ece.rapidSmith.device.PinDirection;
 import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.util.Exceptions;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;

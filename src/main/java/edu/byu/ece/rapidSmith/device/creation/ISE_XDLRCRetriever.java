@@ -22,7 +22,6 @@ package edu.byu.ece.rapidSmith.device.creation;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.FamilyType;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import edu.byu.ece.rapidSmith.util.RunXilinxTools;
 
 import java.io.IOException;

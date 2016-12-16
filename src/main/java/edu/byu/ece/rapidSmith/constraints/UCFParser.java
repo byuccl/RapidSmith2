@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import edu.byu.ece.rapidSmith.util.Exceptions;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 /**
  * This is an elementary UCF parser which will create an array of Constraint

@@ -22,7 +22,6 @@ package edu.byu.ece.rapidSmith.timing;
 
 import java.io.BufferedReader;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -34,7 +33,6 @@ import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
 import edu.byu.ece.rapidSmith.design.xdl.XdlPin;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 import edu.byu.ece.rapidSmith.util.Exceptions;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 public class TraceReportParser{
 	

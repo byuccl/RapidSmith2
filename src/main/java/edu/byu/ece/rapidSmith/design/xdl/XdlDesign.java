@@ -22,7 +22,6 @@ package edu.byu.ece.rapidSmith.design.xdl;
 
 import edu.byu.ece.rapidSmith.design.AbstractDesign;
 import edu.byu.ece.rapidSmith.device.Site;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 import java.util.*;
 

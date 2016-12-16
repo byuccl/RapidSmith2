@@ -25,7 +25,6 @@ import java.util.Objects;
 
 import edu.byu.ece.rapidSmith.device.PinDirection;
 import edu.byu.ece.rapidSmith.device.Tile;
-import edu.byu.ece.rapidSmith.util.Exceptions;
 
 import static edu.byu.ece.rapidSmith.util.Exceptions.*;
 

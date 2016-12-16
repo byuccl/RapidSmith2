@@ -44,7 +44,6 @@ import edu.byu.ece.rapidSmith.design.subsite.Property;
 import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
 import edu.byu.ece.rapidSmith.device.PinDirection;
 import edu.byu.ece.rapidSmith.device.PortDirection;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
 /**
