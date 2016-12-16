@@ -25,7 +25,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
+import edu.byu.ece.rapidSmith.util.Exceptions;
 
 /**
  * This is an elementary UCF parser which will create an array of Constraint
@@ -46,12 +46,14 @@ public class UCFParser {
 	 */
 	public Constraint createConsraint(String constraint){
 		Constraint c = new Constraint();
-		if(!c.setConstraintString(constraint)){
-			MessageGenerator.briefErrorAndExit("Error: Failed parsing constraint: <" + constraint + ">, on line: " + line);
+		try {
+			c.setConstraintString(constraint);
+		} catch (Exceptions.ParseException e) {
+			throw new Exceptions.ParseException(e.getCause() + " on line " + line, e);
 		}
 		return c;
 	}
-	
+
 	/**
 	 * This is the main method to parse a UCF file
 	 * @param fileName Name of the UCF file to parse

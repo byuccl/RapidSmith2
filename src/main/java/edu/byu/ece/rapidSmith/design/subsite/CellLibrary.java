@@ -5,7 +5,6 @@ import edu.byu.ece.rapidSmith.device.FamilyType;
 import edu.byu.ece.rapidSmith.device.PinDirection;
 import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.util.Exceptions;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -28,20 +27,15 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		this.library = new HashMap<>();
 	}
 
-	public CellLibrary(Path filePath) throws IOException {
+	public CellLibrary(Path filePath) throws IOException, JDOMException {
 		this.library = new HashMap<>();
 		loadFromFile(filePath);
 	}
 
-	private void loadFromFile(Path filePath) throws IOException {
+	private void loadFromFile(Path filePath) throws IOException, JDOMException {
 		SAXBuilder builder = new SAXBuilder();
 		Document doc;
-		try {
-			doc = builder.build(filePath.toFile());
-		} catch (JDOMException e) {
-			MessageGenerator.briefError("Failed to read file");
-			return;
-		}
+		doc = builder.build(filePath.toFile());
 
 		// get the family of the cell library.
 		readFamilyType(doc.getRootElement().getChild("family"));

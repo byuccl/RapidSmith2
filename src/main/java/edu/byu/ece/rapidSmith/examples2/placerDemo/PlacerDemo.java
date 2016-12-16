@@ -10,6 +10,7 @@ import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import org.jdom2.JDOMException;
 
 import java.io.*;
 import java.nio.file.Paths;
@@ -70,8 +71,14 @@ public class PlacerDemo {
 		System.out.println("Loading Device...");
 		classSetup();
 		
-		System.out.println("Loading Design...");			
-		TincrCheckpoint tcp = VivadoInterface.loadTCP(tcpDirectory);
+		System.out.println("Loading Design...");
+		TincrCheckpoint tcp = null;
+		try {
+			tcp = VivadoInterface.loadTCP(tcpDirectory);
+		} catch (JDOMException e) {
+			System.out.println("Error loading tcp file");
+			e.printStackTrace();
+		}
 		CellDesign design = tcp.getDesign();
 		
 		// create a stream to vivado if in interactive mode

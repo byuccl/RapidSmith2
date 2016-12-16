@@ -47,6 +47,7 @@ dependencies {
     compile 'net.sourceforge.argparse4j:argparse4j:0.7.0'
     compile 'net.sf.jopt-simple:jopt-simple:5.0.2'
     compile 'com.github.javaparser:javaparser-core:3.0.0-RC.1'
+    compile 'ch.qos.logback:logback-classic:1.0.13'
 
     testCompile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
     testCompile "org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion"

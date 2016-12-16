@@ -26,7 +26,6 @@ import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.primitiveDefs.*;
 import edu.byu.ece.rapidSmith.util.HashPool;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -104,8 +103,8 @@ public final class DeviceGenerator {
 	 * @param env the RapidSmith environment for this part
 	 * @return the generated Device representation
 	 */
-	public Device generate(Path xdlrcPath, RSEnvironment env) {
-		MessageGenerator.briefMessage("Generating device for file " + xdlrcPath.getFileName());
+	public Device generate(Path xdlrcPath, RSEnvironment env) throws IOException {
+		System.out.println("Generating device for file " + xdlrcPath.getFileName());
 
 		this.device = new Device();
 		this.we = new WireEnumerator();
@@ -128,7 +127,7 @@ public final class DeviceGenerator {
 		// and the second to gather the wires.  Two parses are required since the
 		// wires need to know the source and sink tiles.
 		XDLRCParser parser = new XDLRCParser();
-		MessageGenerator.briefMessage("Starting first pass");
+		System.out.println("Starting first pass");
 		parser.registerListener(new FamilyTypeListener(env));
 		parser.registerListener(new WireEnumeratorListener());
 		parser.registerListener(new TileAndSiteGeneratorListener());
@@ -137,7 +136,7 @@ public final class DeviceGenerator {
 		try {
 			parser.parse(xdlrcPath);
 		} catch (IOException e) {
-			MessageGenerator.briefErrorAndExit("Error handling file " + xdlrcPath);
+			throw new IOException("Error handling file " + xdlrcPath, e);
 		}
 		parser.clearListeners();
 
@@ -145,14 +144,14 @@ public final class DeviceGenerator {
 		PrimitiveDefsCorrector.makeCorrections(device.getPrimitiveDefs(), familyInfo);
 		device.setSiteTemplates(createSiteTemplates());
 
-		MessageGenerator.briefMessage("Starting second pass");
+		System.out.println("Starting second pass");
 		parser.registerListener(new WireConnectionGeneratorListener());
 		parser.registerListener(new SourceAndSinkListener());
 		parser.registerListener(new XDLRCParseProgressListener());
 		try {
 			parser.parse(xdlrcPath);
 		} catch (IOException e) {
-			MessageGenerator.briefErrorAndExit("Error handling file " + xdlrcPath);
+			throw new IOException("Error handling file " + xdlrcPath, e);
 		}
 
 		Map<Tile, Map<Integer, Set<WireConnection>>> wcsToAdd = getWCsToAdd();
@@ -176,7 +175,7 @@ public final class DeviceGenerator {
 		sinksPool = null;
 		tileSinkMapPool = null;
 
-		MessageGenerator.briefMessage("Finishing device creation process");
+		System.out.println("Finishing device creation process");
 
 		return device;
 	}

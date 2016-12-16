@@ -22,7 +22,6 @@ package edu.byu.ece.rapidSmith.timing;
 
 import java.io.BufferedReader;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -33,7 +32,7 @@ import edu.byu.ece.rapidSmith.design.xdl.XdlInstance;
 import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
 import edu.byu.ece.rapidSmith.design.xdl.XdlPin;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
+import edu.byu.ece.rapidSmith.util.Exceptions;
 
 public class TraceReportParser{
 	
@@ -67,12 +66,12 @@ public class TraceReportParser{
 		parseTWR(twrFileName, design);
 	}
 	
-	public void parseTWR(String twrFileName, XdlDesign design){
+	public void parseTWR(String twrFileName, XdlDesign design) throws IOException {
 		this.design = design;
 		parseTWR(twrFileName);
 	}
 	
-	public void parseTWR(String twrFileName){
+	public void parseTWR(String twrFileName) throws IOException {
 		pathDelays = new ArrayList<>();
 		pathOffsets = new ArrayList<>();
 		
@@ -86,12 +85,6 @@ public class TraceReportParser{
 					pathOffsets.add(parseOffsetStatement(line));
 				}
 			}
-		}
-		catch(FileNotFoundException e){
-			MessageGenerator.briefErrorAndExit("TraceReportParser ERROR: Could not find file: " + twrFileName);
-		} 
-		catch(IOException e){
-			MessageGenerator.briefErrorAndExit("TraceReportParser ERROR: Could not read from file: " + twrFileName);
 		}
 	}
 	
@@ -216,8 +209,7 @@ public class TraceReportParser{
 					if(design != null){
 						XdlNet net = design.getNet(parts[5+offset]);
 						if(net == null){
-							MessageGenerator.briefErrorAndExit("This net \"" + parts[4+offset] +
-							"\" is null.");
+							throw new Exceptions.FileFormatException("no net \"" + parts[4+offset] + "in design");
 						}
 						((RoutingPathElement)currElement).setNet(net);
 						for(XdlPin p : net.getPins()){
@@ -245,14 +237,11 @@ public class TraceReportParser{
 						XdlInstance instance = design.getInstance(parts[4]);
 						((LogicPathElement)currElement).setInstance(instance);
 						if(instance == null){
-							MessageGenerator.briefErrorAndExit("This instance \"" + parts[4] +
-							"\" is null.");
+							throw new Exceptions.FileFormatException("no instance \"" + parts[4] + " in design");
 						}
 						XdlPin p = instance.getPin(pinName);
 						if(p == null){
-							//System.out.println("Problem Getting Pin: " + parts[1]);
-							//System.out.println("Line: " + line);
-							//System.exit(1);
+							throw new Exceptions.FileFormatException("no pin \"" + pinName + " in instance " + parts[4]);
 						}
 						currElement.setPin(p);						
 					}

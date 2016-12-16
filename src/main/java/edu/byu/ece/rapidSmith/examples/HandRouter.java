@@ -246,7 +246,8 @@ public class HandRouter{
 	
 	public static void main(String[] args) throws IOException {
 		if(args.length != 2){
-			MessageGenerator.briefMessageAndExit("USAGE: <input.xdl|input.ncd> <output.xdl|output.ncd>");
+			System.out.println("USAGE: <input.xdl|input.ncd> <output.xdl|output.ncd>");
+			System.exit(1);
 		}
 		HandRouter hr = new HandRouter(args[0]);
 
