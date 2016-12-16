@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import edu.byu.ece.rapidSmith.device.families.FamilyInfo;
 import edu.byu.ece.rapidSmith.device.families.FamilyInfos;
+import org.jdom2.JDOMException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -143,7 +144,7 @@ public abstract class ImportTest {
 	 * and loading the DCP into Vivado when the test is first run. 
 	 */
 	@BeforeEach
-	public void initializeTest() {
+	public void initializeTest() throws JDOMException {
 		
 		if (initialized == false) {
 			debugPrint("Loading TCP...");
@@ -164,7 +165,7 @@ public abstract class ImportTest {
 	 * @param tcpCheckpointFile checkpoint file name
 	 * @return Newly created {@link TincrCheckpoint} object
 	 */
-	private static TincrCheckpoint loadTCP(String tcpCheckpointFile) {
+	private static TincrCheckpoint loadTCP(String tcpCheckpointFile) throws JDOMException {
 		TincrCheckpoint tcp = null;
 		try {
 			tcp = VivadoInterface.loadTCP(testDirectory.resolve("TCP").resolve(tcpCheckpointFile).toString(), true);			
