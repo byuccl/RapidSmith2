@@ -35,6 +35,10 @@ public class Exceptions {
 		public ParseException(Throwable cause) {
 			super(cause);
 		}
+
+		public ParseException(String expected, String actual) {
+			super("expected " + expected + ", got " + actual);
+		}
 	}
 
 	/**

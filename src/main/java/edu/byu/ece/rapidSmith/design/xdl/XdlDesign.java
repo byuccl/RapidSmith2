@@ -22,7 +22,6 @@ package edu.byu.ece.rapidSmith.design.xdl;
 
 import edu.byu.ece.rapidSmith.design.AbstractDesign;
 import edu.byu.ece.rapidSmith.device.Site;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 import java.util.*;
 
@@ -593,7 +592,7 @@ public class XdlDesign extends AbstractDesign {
 	 */
 	public void flattenDesign(){
 		if(isHardMacro){
-			MessageGenerator.briefError("ERROR: Cannot flatten a hard macro design");
+			System.err.println("ERROR: Cannot flatten a hard macro design");
 			return;
 		}
 		for(XdlModuleInstance mi : moduleInstances.values()){

@@ -8,6 +8,7 @@ import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.device.families.Artix7;
+import org.jdom2.JDOMException;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,7 +23,7 @@ public class CreateDesignExample {
 	 * @param args
 	 * @throws IOException
 	 */
-	public static void main(String[] args) throws IOException{
+	public static void main(String[] args) throws IOException, JDOMException {
 
 		System.out.println("Starting CreateDesignExample...\n");
 

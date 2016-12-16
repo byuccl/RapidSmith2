@@ -5,6 +5,7 @@ import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
+import org.jdom2.JDOMException;
 
 import java.io.IOException;
 
@@ -23,7 +24,7 @@ public class ImportExportExample {
 	 * @param args
 	 * @throws IOException
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, JDOMException {
 		if (args.length < 1) {
 			System.err.println("Usage: ImportExportExample tincrCheckpointName");
 			System.exit(1);

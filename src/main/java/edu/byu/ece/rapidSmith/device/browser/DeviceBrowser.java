@@ -41,7 +41,6 @@ import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.gui.TileView;
 import edu.byu.ece.rapidSmith.gui.WidgetMaker;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 /**
  * This class creates an interactive Xilinx FPGA device browser for all of the
@@ -106,16 +105,11 @@ public class DeviceBrowser extends QMainWindow{
 		// Gets the available parts in RapidSmith and populates the selection tree
 		List<String> parts = RSEnvironment.defaultEnv().getAvailableParts();
 		if(parts.size() < 1){
-			MessageGenerator.briefErrorAndExit("Error: No available parts. " +
-					"Please generate part database files.");
+			System.err.println("No available parts.  Please generate part database files.");
+			System.exit(1);
 		}
-		if(parts.contains("xc6vcx75tff784")){
-			currPart = "xc6vcx75tff784";
-		}
-		else{
-			currPart = parts.get(0);
-		}
-		
+		currPart = parts.get(0);
+
 		device = RSEnvironment.defaultEnv().getDevice(currPart);
 		we = device.getWireEnumerator();
 

@@ -140,7 +140,8 @@ public class XDLDesignChecker{
 		
 	public static void main(String[] args) throws IOException {
 		if(args.length != 1){
-			MessageGenerator.briefMessageAndExit("USAGE: <input.xdl>");
+			System.out.println("USAGE: <input.xdl>");
+			System.exit(1);
 		}
 
 		XdlDesign design = new XDLReader().readDesign(Paths.get(args[0]));

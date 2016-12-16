@@ -30,7 +30,8 @@ import java.nio.file.Paths;
 public class FlattenDesign {
 	public static void main(String[] args) throws IOException {
 		if(args.length != 2){
-			MessageGenerator.briefMessageAndExit("USAGE: <inputDesign.xdl> <flattenedDesign.xdl>");
+			System.out.println("USAGE: <inputDesign.xdl> <flattenedDesign.xdl>");
+			System.exit(1);
 		}
 		XdlDesign d = new XDLReader().readDesign(Paths.get(args[0]));
 		d.flattenDesign();

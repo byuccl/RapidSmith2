@@ -149,12 +149,17 @@ public class DesignExplorer extends QMainWindow{
 			try {
 				internalOpenDesign(fileToOpen);
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.err.println("Error loading design file");
+				System.exit(2);
 			}
 		}
 		
 		if(traceFileToOpen != null){
-			internalLoadDesignTimingInfo(traceFileToOpen);
+			try {
+				internalLoadDesignTimingInfo(traceFileToOpen);
+			} catch (IOException e) {
+				System.err.println("Failed to load trace file");
+			}
 		}
 		
 		if(currOpenFileName == null) {
@@ -199,7 +204,7 @@ public class DesignExplorer extends QMainWindow{
 	/**
 	 * Opens a file chooser dialog to load a TWR (timing report) file.
 	 */
-	protected void loadDesignTimingInfo(){
+	protected void loadDesignTimingInfo() throws IOException {
 		String fileName = QFileDialog.getOpenFileName(this, "Choose corresponding timing report...",
 				".", FileFilters.twrFilter);
 		if(fileName.endsWith(".twr")){
@@ -211,7 +216,7 @@ public class DesignExplorer extends QMainWindow{
 	 * Loads the timing report fileName into the delay and offset windows.
 	 * @param fileName Name of the TWR (timing report) file to load.
 	 */
-	private void internalLoadDesignTimingInfo(String fileName){
+	private void internalLoadDesignTimingInfo(String fileName) throws IOException {
 		TraceReportParser parser = new TraceReportParser();
 		parser.parseTWR(fileName, design);
 		delays = parser.getPathDelays();

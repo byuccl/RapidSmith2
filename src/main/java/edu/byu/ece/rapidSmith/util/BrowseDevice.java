@@ -152,7 +152,8 @@ public class BrowseDevice{
 	public static void main(String[] args){
 		MessageGenerator.printHeader(" RapidSmith Device Browser");		
 		if(args.length != 1){
-			MessageGenerator.briefMessageAndExit("USAGE: <device part name, ex: xc4vfx12ff668 >");
+			System.out.println("USAGE: <device part name, ex: xc4vfx12ff668 >");
+			System.exit(1);
 		}
 		Device dev = RSEnvironment.defaultEnv().getDevice(args[0]);
 

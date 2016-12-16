@@ -39,7 +39,6 @@ import com.trolltech.qt.gui.QDockWidget.DockWidgetFeature;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.gui.WidgetMaker;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 /**
  * This class is an example of how RapidSmith could be used to build
@@ -88,7 +87,8 @@ public class PartTileBrowser extends QMainWindow{
 		createTreeView();
 		List<String> parts = RSEnvironment.defaultEnv().getAvailableParts();
 		if(parts.size() < 1){
-			MessageGenerator.briefErrorAndExit("Error: No available parts. Please generate part database files.");
+			System.err.println("Error: No available parts. Please generate part database files.");
+			System.exit(1);
 		}
 		currPartName = parts.get(0);
 		device = RSEnvironment.defaultEnv().getDevice(currPartName);
