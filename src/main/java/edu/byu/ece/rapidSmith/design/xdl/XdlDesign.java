@@ -593,7 +593,7 @@ public class XdlDesign extends AbstractDesign {
 	 */
 	public void flattenDesign(){
 		if(isHardMacro){
-			MessageGenerator.briefError("ERROR: Cannot flatten a hard macro design");
+			System.err.println("ERROR: Cannot flatten a hard macro design");
 			return;
 		}
 		for(XdlModuleInstance mi : moduleInstances.values()){

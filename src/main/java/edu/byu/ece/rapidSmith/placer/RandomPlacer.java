@@ -20,17 +20,16 @@
  */
 package edu.byu.ece.rapidSmith.placer;
 
+import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
+import edu.byu.ece.rapidSmith.design.xdl.XdlInstance;
+import edu.byu.ece.rapidSmith.device.Site;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
+import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;
+
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Random;
-
-import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
-import edu.byu.ece.rapidSmith.design.xdl.XdlInstance;
-import edu.byu.ece.rapidSmith.device.*;
-import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
-import edu.byu.ece.rapidSmith.interfaces.ise.XDLWriter;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 public class RandomPlacer{
   public static void main(String[] args) throws IOException {
@@ -49,7 +48,10 @@ public class RandomPlacer{
 	    // Find a free primitive site
 	    while(design.isSiteUsed(sites.get(idx))){
 	    	if(++idx > sites.size()) idx = 0;
-	    	if(++watchDog > sites.size()) MessageGenerator.briefErrorAndExit("Placement failed.");
+	    	if(++watchDog > sites.size()) {
+			    System.err.println("Placement failed.");
+			    System.exit(1);
+		    }
 	    }
 	    i.place(sites.get(idx));
     }

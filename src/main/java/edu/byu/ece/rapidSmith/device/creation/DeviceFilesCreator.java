@@ -22,7 +22,6 @@ package edu.byu.ece.rapidSmith.device.creation;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -54,7 +53,7 @@ public class DeviceFilesCreator {
 	 * device file, then cleans up any created input files.
 	 * @param part the part to create the device for
 	 */
-	public void createDevice(String part) {
+	public void createDevice(String part) throws IOException, DeviceCreationException {
 		// Create XDLRC File if it already hasn't been created
 		System.out.println("Retrieving XDLRC file");
 		Path xdlrcFilePath = xdlrcRetriever.getXDLRCFileForPart(part);
@@ -73,12 +72,12 @@ public class DeviceFilesCreator {
 		}
 
 		// Delete XDLRC file
-		MessageGenerator.briefMessage("Cleaning up XDLRC file.");
+		System.out.println("Cleaning up XDLRC file.");
 		xdlrcRetriever.cleanupXDLRCFile(part, xdlrcFilePath);
 
 		// Building extended device info
-		MessageGenerator.briefMessage("Building extended info.");
+		System.out.println("Building extended info.");
 		new ExtendedDeviceInfo().buildExtendedInfo(device);
-		MessageGenerator.briefMessage("Finished writing extended info.");
+		System.out.println("Finished writing extended info.");
 	}
 }

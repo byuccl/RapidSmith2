@@ -23,6 +23,7 @@ package edu.byu.ece.rapidSmith.device.creation;
 
 import edu.byu.ece.rapidSmith.device.FamilyType;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -47,7 +48,7 @@ public interface XDLRCRetriever {
 	 * @param part the part to get the XDLRC file for
 	 * @return the path to the created XDLRC
 	 */
-	Path getXDLRCFileForPart(String part);
+	Path getXDLRCFileForPart(String part) throws DeviceCreationException;
 
 	/**
 	 * The XDLRC file for the part is no longer needed and may be cleaned up.
@@ -55,5 +56,5 @@ public interface XDLRCRetriever {
 	 * @param part name of the part to clean up
 	 * @param filePath path to the create XDLRC file
 	 */
-	void cleanupXDLRCFile(String part, Path filePath);
+	void cleanupXDLRCFile(String part, Path filePath) throws IOException;
 }

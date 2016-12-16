@@ -20,6 +20,9 @@
  */
 package edu.byu.ece.rapidSmith.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -81,24 +84,24 @@ public class RunXilinxTools {
 			// Run the XDL command
 			Process p = Runtime.getRuntime().exec(command);
 			if(p.waitFor() != 0){
-				MessageGenerator.briefError("XDLRC Generation failed, 'xdl' execution failed." +
+				System.err.println("XDLRC Generation failed, 'xdl' execution failed." +
 						" COMMAND: " + command);
 				return false;
 			}
 			if(p.exitValue() != 0){
-				MessageGenerator.briefError("XDLRC Generation failed, is the part \"" +
+				System.err.println("XDLRC Generation failed, is the part \"" +
 						PartNameTools.removeSpeedGrade(partName) + "\" name valid?" + " COMMAND: " + command);
 				return false;
 			}
 		}
 		catch (IOException e){
 			e.printStackTrace();
-			MessageGenerator.briefError("XDLRC generation failed: error during 'xdl' execution.");
+			System.err.println("XDLRC generation failed: error during 'xdl' execution.");
 			return false;
 		}
 		catch (InterruptedException e){
 			e.printStackTrace();
-			MessageGenerator.briefError("XDLRC generation failed: process interrupted.");
+			System.err.println("XDLRC generation failed: process interrupted.");
 			return false;
 		}
 		return true;
@@ -109,16 +112,15 @@ public class RunXilinxTools {
 	 * This method assumes single clock domain.
 	 * @param ncdFileName Name of the existing NCD file to get the clock period
 	 * from.
-	 * @return The minimum clock period in nanoseconds, or Float.MAX_VALUE if
+	 * @return The minimum clock period in nanoseconds, or null if
 	 * none is found.
 	 */
-	public static float getMinClkPeriodFromTRCE(String ncdFileName){
+	public static Float getMinClkPeriodFromTRCE(String ncdFileName) throws IOException {
 		String twrFileName = ncdFileName.replace(".ncd", ".twr");
 		String cmd = "trce -a -v 100 " + ncdFileName + " -o " + twrFileName;
 		int returnValue = runCommand(cmd, false);
 		if(returnValue != 0){
-			MessageGenerator.briefError("trce command failed: " + cmd);
-			return Float.MAX_VALUE;
+			return null;
 		}
 		return getMinClkPeriodFromTWRFile(twrFileName);
 	}
@@ -128,19 +130,16 @@ public class RunXilinxTools {
 	 * a single clock domain.
 	 * @param twrFileName Name of the TWR file to parse.
 	 * @return The number of nanoseconds of the minimum clock period
-	 * or Float.MAX_VALUE if none found.
+	 * or null if none found.
 	 */
-	public static float getMinClkPeriodFromTWRFile(String twrFileName){
+	public static Float getMinClkPeriodFromTWRFile(String twrFileName) throws IOException {
 		boolean nextLine = false;
 		boolean secondLine = false;
-		BufferedReader br;
-		try {
-			br = new BufferedReader(new FileReader(twrFileName));
+		try(BufferedReader br = new BufferedReader(new FileReader(twrFileName))) {
 			String line;
 			while((line = br.readLine()) != null){
 				if(secondLine){
 					String[] parts = line.split("\\s+");
-					br.close();
 					return Float.parseFloat(parts[2].substring(0, parts[2].indexOf('|')));
 				}
 				if(nextLine){
@@ -151,14 +150,10 @@ public class RunXilinxTools {
 					nextLine = true;
 				}
 			}
-			br.close();
-		} catch (FileNotFoundException e) {
-			MessageGenerator.briefError("Could not find file: " + twrFileName);
-			e.printStackTrace();
-		} catch (NumberFormatException | IOException e) {
-			e.printStackTrace();
+		} catch (NumberFormatException e) {
+			return null;
 		}
-		return Float.MAX_VALUE;
+		return null;
 	}
 
 
@@ -183,12 +178,12 @@ public class RunXilinxTools {
 				p.destroy();
 			} catch (InterruptedException e){
 				e.printStackTrace();
-				MessageGenerator.briefError("ERROR: The command was interrupted: \"" + command + "\"");
+				System.err.println("ERROR: The command was interrupted: \"" + command + "\"");
 				return null;
 			}
 		} catch (IOException e){
 			e.printStackTrace();
-			MessageGenerator.briefError("ERROR: In running the command\"" + command + "\"");
+			System.err.println("ERROR: The command was interrupted: \"" + command + "\"");
 			return null;
 		}
 		return returnValue;
@@ -254,22 +249,24 @@ public class RunXilinxTools {
 				}
 
 				if (p.waitFor() != 0) {
-					MessageGenerator.briefError("Part name generation failed: partgen failed to execute " +
+					Logger logger = LoggerFactory.getLogger(RunXilinxTools.class);
+					String msg = "Part name generation failed: partgen failed to execute " +
 							"correctly.  Check spelling and make sure the families: " +
 							MessageGenerator.createStringFromArray(familyNames) +
-							System.getProperty("line.separator") + "are installed.");
+							System.getProperty("line.separator") + "are installed.";
+					logger.error(msg);
 					return null;
 				}
 			}
 		} 
 		catch (IOException e){
-			e.printStackTrace();
-			MessageGenerator.briefError("Part name generation failed: error reading partgen output.");
+			Logger logger = LoggerFactory.getLogger(RunXilinxTools.class);
+			logger.error("Part name generation failed: error reading partgen output.", e);
 			return null;
 		}
 		catch (InterruptedException e){
-			e.printStackTrace();
-			MessageGenerator.briefError("Part name generation failed: interruption during partgen.");
+			Logger logger = LoggerFactory.getLogger(RunXilinxTools.class);
+			logger.error("Part name generation failed: interruption during partgen.", e);
 			return null;
 		}
 		return partNames;

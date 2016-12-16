@@ -21,8 +21,6 @@
 
 package edu.byu.ece.rapidSmith.device.creation;
 
-import edu.byu.ece.rapidSmith.util.MessageGenerator;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -47,8 +45,6 @@ public class XDLRCParser {
 	private BufferedReader in;
 	// Tokens detected on the line
 	private List<String> tokens;
-	// Location of the XDLRC file
-	private Path filePath;
 
 	/**
 	 * Creates a new XDLRC parser.
@@ -63,17 +59,17 @@ public class XDLRCParser {
 	 * @throws IOException if an error occurs while opening or reading the file
 	 */
 	public void parse(Path xdlrcFilePath) throws IOException {
-		loadFile(xdlrcFilePath);
-
-		// (xdl_resource_report <version> <part> <family>
-		findMatch("(xdl_resource_report");
-		List<String> xdlReportTokens = tokens;
-		for (XDLRCParserListener listener : listeners)
-			listener.enterXdlResourceReport(tokens);
-		parseXdlResourceReport();
-		for (XDLRCParserListener listener : listeners)
-			listener.exitXdlResourceReport(xdlReportTokens);
-		closeFile();
+		try (BufferedReader in = Files.newBufferedReader(xdlrcFilePath, Charset.defaultCharset())) {
+			this.in = in;
+			// (xdl_resource_report <version> <part> <family>
+			findMatch("(xdl_resource_report");
+			List<String> xdlReportTokens = tokens;
+			for (XDLRCParserListener listener : listeners)
+				listener.enterXdlResourceReport(tokens);
+			parseXdlResourceReport();
+			for (XDLRCParserListener listener : listeners)
+				listener.exitXdlResourceReport(xdlReportTokens);
+		}
 	}
 
 	/**
@@ -309,29 +305,10 @@ public class XDLRCParser {
 	}
 
 	/**
-	 * Loads a new file into a buffered reader.
-	 * @param xdlrcFilePath Name of the file to load
-	 */
-	private void loadFile(Path xdlrcFilePath) throws IOException {
-		this.filePath = xdlrcFilePath;
-		try {
-			in = Files.newBufferedReader(xdlrcFilePath, Charset.defaultCharset());
-		} catch (IOException e) {
-			MessageGenerator.briefError("Error opening file " + xdlrcFilePath);
-			throw e;
-		}
-	}
-
-	/**
 	 * Closes the current reader
 	 */
 	private void closeFile() throws IOException {
-		try {
-			in.close();
-		} catch (IOException e) {
-			MessageGenerator.briefError("Error closing file " + filePath);
-			throw e;
-		}
+		in.close();
 	}
 
 	/**
@@ -340,12 +317,7 @@ public class XDLRCParser {
 	private boolean readLine() throws IOException {
 		// read next line
 		String line;
-		try {
-			line = in.readLine();
-		} catch (IOException e) {
-			MessageGenerator.briefError("Error reading line in file " + filePath);
-			throw e;
-		}
+		line = in.readLine();
 
 		// check if end of file
 		if (line == null) {

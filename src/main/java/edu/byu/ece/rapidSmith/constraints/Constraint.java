@@ -22,6 +22,8 @@ package edu.byu.ece.rapidSmith.constraints;
 
 import java.util.ArrayList;
 
+import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
+
 /**
  * This class is to represent a constraint within a UCF file.
  * Created on: May 5, 2011
@@ -58,27 +60,24 @@ public class Constraint{
 	public Constraint(String constraint){
 		setConstraintString(constraint);
 	}
-	
+
 	/**
-	 * This will parse the current constraint string into the various members of 
+	 * This will parse the current constraint string into the various members of
 	 * the constraint object.
-	 * @return True if it was able to successfully parse the string correctly, or
-	 * false otherwise.
 	 */
-	private boolean parseConstraint(){
+	private void parseConstraint(){
 		ArrayList<String> tokens = getConstraintTokens();
 		values = new ArrayList<>();
 		// Populate StatementType
 		try{
-			statementType = StatementType.valueOf(tokens.get(0).toUpperCase());			
+			statementType = StatementType.valueOf(tokens.get(0).toUpperCase());
 		}
 		catch(IllegalArgumentException e){
-			e.printStackTrace();
-			return false;
+			throw new ParseException("<StatementType>", tokens.get(0));
 		}
 		String token;
 		switch(statementType){
-			case INST: 
+			case INST:
 			case NET:
 			case PIN:
 				// Populate Name
@@ -88,23 +87,20 @@ public class Constraint{
 				if(token.equals("OFFSET")){
 					token = token + "_" + tokens.get(4).toUpperCase();
 				}
-				try{			
+				try{
 					constraintType = ConstraintType.valueOf(token);
 				}
 				catch(IllegalArgumentException e){
-					e.printStackTrace();
-					System.out.println(tokens.toString());
-					System.out.println(constraint);
-					System.exit(1);
-					return false;
-				}				
+					throw new ParseException("<ConstraintType>", token);
+				}
 				// Check for the equals sign
 				if(tokens.size() >= 4){
 					token = tokens.get(3).toUpperCase();
-					if(!token.equals("="))return false;
-					
+					if(!token.equals("="))
+						throw new ParseException("'='", tokens.get(3));
+
 					for(int i = 4; i < tokens.size(); i++){
-						values.add(tokens.get(i));							
+						values.add(tokens.get(i));
 					}
 				}
 				break;
@@ -117,12 +113,14 @@ public class Constraint{
 				// Populate Name
 				name = tokens.get(1);
 				// Check that name starts with TS
-				if(!name.toUpperCase().startsWith("TS"))return false;
-				
+				if(!name.toUpperCase().startsWith("TS"))
+					throw new ParseException("'TS'", tokens.get(1));
+
 				// Check for the equals sign
 				token = tokens.get(2).toUpperCase();
-				if(!token.equals("="))return false;
-				
+				if(!token.equals("="))
+					throw new ParseException("'='", tokens.get(2));
+
 				// Populate ConstraintType
 				token = tokens.get(3).toUpperCase();
 				if(token.equals("FROM")){
@@ -131,42 +129,33 @@ public class Constraint{
 					else
 						token = token + "_TO";
 				}
-				try{			
-					constraintType = ConstraintType.valueOf(token);			
+				try{
+					constraintType = ConstraintType.valueOf(token);
 				}
 				catch(IllegalArgumentException e){
-					e.printStackTrace();
-					System.out.println(tokens.toString());
-					System.out.println(constraint);
-					System.exit(1);
-					return false;
+					throw new ParseException("<ConstraintType>", token);
 				}
 
 				for(int i = 4; i < tokens.size(); i++){
 					if(!tokens.get(i).equals("FROM") && !tokens.get(i).equals("THRU") && !tokens.get(i).equals("TO")){
-						values.add(tokens.get(i));						
+						values.add(tokens.get(i));
 					}
 				}
-				
+
 				break;
 			case AREA_GROUP:
 				name = tokens.get(2);
-				
-				try{			
+
+				try{
 					constraintType = ConstraintType.valueOf(tokens.get(0));
 				}
 				catch(IllegalArgumentException e){
-					e.printStackTrace();
-					System.out.println(tokens.toString());
-					System.out.println(constraint);
-					System.exit(1);
-					return false;
+					throw new ParseException("<ConstraintType>", tokens.get(2));
 				}
 				break;
 		}
-		return true;
 	}
-	
+
 	/**
 	 * This will separate a constraint string into is various parts for easier
 	 * parsing. 
@@ -215,8 +204,7 @@ public class Constraint{
 		}
 		return matchList;
 	}
-	
-	
+
 	/**
 	 * @return the statementType
 	 */
@@ -247,7 +235,7 @@ public class Constraint{
 	public ConstraintType getConstraintType() {
 		return constraintType;
 	}
-	/**
+	/**7
 	 * @param constraintType the constraintType to set
 	 */
 	public void setConstraintType(ConstraintType constraintType) {
@@ -261,11 +249,10 @@ public class Constraint{
 	}
 	/**
 	 * @param constraintString the constraintString to set
-	 * @return True if it was able to successfully parse the string correctly, false otherwise.
 	 */
-	public boolean setConstraintString(String constraintString){
+	public void setConstraintString(String constraintString){
 		this.constraint = constraintString;
-		return parseConstraint();
+		parseConstraint();
 	}
 
 	/**

@@ -26,20 +26,15 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		this.library = new HashMap<>();
 	}
 
-	public CellLibrary(Path filePath) throws IOException {
+	public CellLibrary(Path filePath) throws IOException, JDOMException {
 		this.library = new HashMap<>();
 		loadFromFile(filePath);
 	}
 
-	private void loadFromFile(Path filePath) throws IOException {
+	private void loadFromFile(Path filePath) throws IOException, JDOMException {
 		SAXBuilder builder = new SAXBuilder();
 		Document doc;
-		try {
-			doc = builder.build(filePath.toFile());
-		} catch (JDOMException e) {
-			MessageGenerator.briefError("Failed to read file");
-			return;
-		}
+		doc = builder.build(filePath.toFile());
 
 		Element cellsEl = doc.getRootElement().getChild("cells");
 		Map<SiteType, Map<String, SiteProperty>> sitePropertiesMap = new HashMap<>();

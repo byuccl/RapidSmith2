@@ -23,67 +23,6 @@ package edu.byu.ece.rapidSmith.util;
 import java.io.IOException;
 
 public class MessageGenerator{
-	
-	/**
-	 * Used as a general way to create an error message and send it to
-	 * std.err. Prints the stack trace from this point and exits the 
-	 * program.
-	 * @param msg The message to print to standard error
-	 */
-	public static void generalErrorAndExit(String msg){
-		generalError(msg);
-		System.exit(1);
-	}
-	
-	/**
-	 * Used as a general way to create an error message and send it to
-	 * std.err. Prints the stack trace from this point.
-	 * @param msg The message to print to standard error
-	 */
-	public static void generalError(String msg){
-		System.err.println(msg);
-		Exception e = new Exception();
-		e.printStackTrace();		
-	}
-	
-	/**
-	 * Used as a general way to create an error message and send it to
-	 * std.err. Exits the program.
-	 * @param msg The message to print to standard error
-	 */
-	public static void briefErrorAndExit(String msg){
-		briefError(msg);
-		System.exit(1);
-	}
-	
-	/**
-	 * Used as a general way to create an error message and send it to
-	 * std.err. 
-	 * @param msg The message to print to standard error
-	 */
-	public static void briefError(String msg){
-		System.err.println(msg);
-	}
-	
-	/**
-	 * Used as a general way to create a message and send it to
-	 * std.out. Exits the program with return value of 0.
-	 * @param msg The message to print to standard outs
-	 */
-	public static void briefMessageAndExit(String msg){
-		briefMessage(msg);
-		System.exit(0);
-	}
-	
-	/**
-	 * Used as a general way to create a message and send it to
-	 * std.out. 
-	 * @param msg The message to print to standard out
-	 */
-	public static void briefMessage(String msg){
-		System.out.println(msg);
-	}
-	
 	/**
 	 * Prompts the user to press any key to continue execution.
 	 */
@@ -154,22 +93,16 @@ public class MessageGenerator{
 	 * This will prompt the user to type y or n to either continue
 	 * with a process or to exit.
 	 */
-	public static void promptToContinue(){
+	public static void promptToContinue() throws IOException {
 		System.out.print("Would you like to continue(y/n)? ");
-		int ch;
-		try{
+		int ch = System.in.read();
+		while(ch != 'y' && ch != 'n' && ch != 'Y' && ch != 'N'){
+			while(System.in.read() != '\n');
+			System.out.print("Would you like to continue(y/n)? ");
 			ch = System.in.read();
-			while(ch != 'y' && ch != 'n' && ch != 'Y' && ch != 'N'){
-				while(System.in.read() != '\n');
-				System.out.print("Would you like to continue(y/n)? ");
-				ch = System.in.read();
-			}
-			if (ch != 'y' && ch != 'Y') {
-				System.exit(1);
-			}
 		}
-		catch(IOException e){
-			briefErrorAndExit("Error reading user input");
+		if (ch != 'y' && ch != 'Y') {
+			System.exit(1);
 		}
 	}
 	
@@ -177,22 +110,16 @@ public class MessageGenerator{
 	 * This will prompt the user to type y or n to either continue
 	 * with a process or to exit.
 	 */
-	public static void agreeToContinue(){
+	public static void agreeToContinue() throws IOException {
 		System.out.print("(y/n)? ");
-		int ch;
-		try{
+		int ch = System.in.read();
+		while(ch != 'y' && ch != 'n' && ch != 'Y' && ch != 'N'){
+			while(System.in.read() != '\n');
+			System.out.print("Would you like to continue(y/n)? ");
 			ch = System.in.read();
-			while(ch != 'y' && ch != 'n' && ch != 'Y' && ch != 'N'){
-				while(System.in.read() != '\n');
-				System.out.print("Would you like to continue(y/n)? ");
-				ch = System.in.read();
-			}
-			if (ch != 'y' && ch != 'Y') {
-				System.exit(1);
-			}
 		}
-		catch(IOException e){
-			briefErrorAndExit("Error reading user input");
+		if (ch != 'y' && ch != 'Y') {
+			System.exit(1);
 		}
 	}
 }

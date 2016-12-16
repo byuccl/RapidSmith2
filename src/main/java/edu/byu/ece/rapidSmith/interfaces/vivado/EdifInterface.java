@@ -139,7 +139,7 @@ public final class EdifInterface {
 	private static void processEdifCells(CellDesign design, Collection<EdifCellInstance> edifCellInstances, CellLibrary libCells) {
 		// TODO: think about throwing an error or warning here
 		if (edifCellInstances == null || edifCellInstances.size() == 0) {
-			MessageGenerator.generalError("[Warning] No cells found in the edif netlist");
+			System.err.println("[Warning] No cells found in the edif netlist");
 			return;
 		}
 		
@@ -164,7 +164,7 @@ public final class EdifInterface {
 	private static void processEdifNets(CellDesign design, Collection<EdifNet> edifNets, List<CellNet> vccNets, List<CellNet> gndNets) {
 		 
 		if (edifNets == null || edifNets.size() == 0) {
-			MessageGenerator.briefError("[Warning] No nets found in the edif netlist");
+			System.err.println("[Warning] No nets found in the edif netlist");
 			return;
 		}
 		
@@ -178,7 +178,7 @@ public final class EdifInterface {
 			Collection<EdifPortRef> sources = net.getSourcePortRefs(false, true);
 			
 			if (sources.size() == 0) {
-				MessageGenerator.briefError("[Warning] No source for net " + net.getOldName());
+				System.err.println("[Warning] No source for net " + net.getOldName());
 				design.addNet(cn);
 				continue;
 			}

@@ -51,27 +51,22 @@ public class ISE_XDLRCRetriever implements XDLRCRetriever {
 
 	// Gets the path to the XDLRC file located in the RapidSmith device location.
 	// If the file already exists, mark it as such so it is not later deleted.
-	public Path getXDLRCFileForPart(String part) {
+	public Path getXDLRCFileForPart(String part) throws DeviceCreationException {
 		Path xdlrcFile = RSEnvironment.defaultEnv().getDevicePath().resolve(part + "_full.xdlrc");
 
 		if (Files.isRegularFile(xdlrcFile))
 			return xdlrcFile;
 		if(!RunXilinxTools.generateFullXDLRCFile(part, xdlrcFile.toString())){
-			MessageGenerator.briefErrorAndExit("Failed generating part " + part +
-					".  Exiting from XDLRC Generation failure.");
+			throw new DeviceCreationException("Failed generating part " + part + ".");
 		}
 		generatedFiles.add(xdlrcFile);
 		return xdlrcFile;
 	}
 
-	public void cleanupXDLRCFile(String part, Path xdlrcFile) {
+	public void cleanupXDLRCFile(String part, Path xdlrcFile) throws IOException {
 		// Only delete if the files we generated
 		if (generatedFiles.contains(xdlrcFile)) {
-			try {
-				Files.deleteIfExists(xdlrcFile);
-			} catch (IOException e) {
-				MessageGenerator.briefError("Failed trying to delete file " + xdlrcFile.toString());
-			}
+			Files.deleteIfExists(xdlrcFile);
 		}
 	}
 }

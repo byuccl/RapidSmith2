@@ -14,6 +14,7 @@ import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.BelId;
 import edu.byu.ece.rapidSmith.device.SitePin;
+import org.jdom2.JDOMException;
 
 public class DesignAnalyzer {
 	
@@ -22,7 +23,7 @@ public class DesignAnalyzer {
 	public static final String CANONICAL_PART_NAME = "xc7a100tcsg324";
 	public static final String CELL_LIBRARY = "cellLibrary.xml";
 	
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, JDOMException {
 		
 		if (args.length < 1) {
 			System.err.println("Usage: DesignAnalyzer tincrCheckpointName");

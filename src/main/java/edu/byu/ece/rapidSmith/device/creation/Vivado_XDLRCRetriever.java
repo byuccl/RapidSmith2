@@ -25,12 +25,12 @@ public class Vivado_XDLRCRetriever implements XDLRCRetriever {
 	}
 
 	@Override
-	public Path getXDLRCFileForPart(String part) {
+	public Path getXDLRCFileForPart(String part) throws DeviceCreationException {
 		Path xdlrcFile = RSEnvironment.defaultEnv().getDevicePath().resolve(part + "_full.xdlrc");
 		
 		//if the file doesn't exist, then throw an error and 
 		if (!Files.isRegularFile(xdlrcFile)) {
-			MessageGenerator.briefErrorAndExit("ERROR: XDLRC file " + xdlrcFile + " does not exist. Generate this file before continuing.");
+			throw new DeviceCreationException("XDLRC file " + xdlrcFile + " does not exist.");
 		}
 		return xdlrcFile;
 	}

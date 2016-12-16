@@ -57,20 +57,14 @@ public class FileTools {
 	 * @param lines The ArrayList of Strings to be written
 	 * @param fileName Name of the text file to save the ArrayList to
 	 */
-	public static void writeLinesToTextFile(ArrayList<String> lines, String fileName) {
+	public static void writeLinesToTextFile(ArrayList<String> lines, String fileName) throws IOException {
 		String nl = System.getProperty("line.separator");
-		try{
-			BufferedWriter bw = new BufferedWriter(new FileWriter(fileName));
-
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))){
 			for (String line : lines) {
 				bw.write(line + nl);
 			}
 
 			bw.close();
-		}
-		catch(IOException e){
-			MessageGenerator.briefErrorAndExit("Error writing file: " +
-					fileName + File.separator + e.getMessage());
 		}
 	}
 	
@@ -81,25 +75,16 @@ public class FileTools {
 	 * @param fileName Name of the text file to get parts from
 	 * @return An ArrayList containing strings of each line in the file. 
 	 */
-	public static ArrayList<String> getLinesFromTextFile(String fileName){
+	public static ArrayList<String> getLinesFromTextFile(String fileName) throws IOException {
 		String line;
-		BufferedReader br;
 		ArrayList<String> lines = new ArrayList<>();
-		try{
-			br = new BufferedReader(new FileReader(fileName));
-			
+		try (BufferedReader br = new BufferedReader(new FileReader(fileName))){
 			while((line = br.readLine()) != null){
 				lines.add(line);
 			}
 			br.close();
 		}
-		catch(FileNotFoundException e){
-			MessageGenerator.briefErrorAndExit("ERROR: Could not find file: " + fileName);
-		} 
-		catch(IOException e){
-			MessageGenerator.briefErrorAndExit("ERROR: Could not read from file: " + fileName);
-		}
-		
+
 		return lines;
 	}
 	
@@ -271,37 +256,14 @@ public class FileTools {
 	 * @param dst Destination file to write to
 	 * @return True if operation was successful, false otherwise.
 	 */
-	public static boolean copyFile(String src, String dst){
-	    FileChannel inChannel = null;
-	    FileChannel outChannel = null;
-	    boolean success = true;
-		try {
-			inChannel = new FileInputStream(new File(src)).getChannel();
-			outChannel = new FileOutputStream(new File(dst)).getChannel();
+	public static boolean copyFile(String src, String dst) throws IOException {
+		try (
+				FileChannel inChannel = new FileInputStream(new File(src)).getChannel();
+				FileChannel outChannel = new FileOutputStream(new File(dst)).getChannel()
+		) {
 			inChannel.transferTo(0, inChannel.size(), outChannel);
-		} 
-		catch (FileNotFoundException e){
-			e.printStackTrace();
-			MessageGenerator.briefError("ERROR could not find/access file(s): " + src + " and/or " + dst);
-			success = false;
-		} 
-		catch (IOException e){
-			MessageGenerator.briefError("ERROR copying file: " + src + " to " + dst);
-			success = false;
 		}
-		finally {
-			try {
-				if(inChannel != null)
-					inChannel.close();
-				if(outChannel != null) 
-					outChannel.close();
-			} 
-			catch (IOException e) {
-				MessageGenerator.briefError("Error closing files involved in copying: " + src + " and " + dst);
-				success = false;
-			}
-		}
-		return success;
+		return true;
 	}
 	
 	/**
@@ -313,7 +275,7 @@ public class FileTools {
 	 * @param recursive A flag denoting if the sub folders of source should be copied.
 	 * @return True if operation was successful, false otherwise.
 	 */
-	public static boolean copyFolder(String srcDirectoryPath, String dstDirectoryPath, boolean recursive){
+	public static boolean copyFolder(String srcDirectoryPath, String dstDirectoryPath, boolean recursive) throws IOException {
 		File srcDirectory = new File(srcDirectoryPath);
 		File dstDirectory = new File(dstDirectoryPath + File.separator + srcDirectory.getName());
 		if(srcDirectory.exists() && srcDirectory.isDirectory()){
@@ -335,8 +297,7 @@ public class FileTools {
 			}
 			return true;
 		}
-		MessageGenerator.briefError("ERROR: copyFolder() - Cannot find directory: " + srcDirectoryPath);
-		return false;
+		throw new FileNotFoundException(srcDirectory.getPath());
 	}
 	
 	/**
@@ -349,13 +310,10 @@ public class FileTools {
 	 * copied.
 	 * @return True if operation is successful, false otherwise.
 	 */
-	public static boolean copyFolderContents(String src, String dst, boolean recursive){
+	public static boolean copyFolderContents(String src, String dst, boolean recursive) throws IOException {
 		File srcDirectory = new File(src);
 		File dstDirectory = new File(dst);
 		if(srcDirectory.exists() && srcDirectory.isDirectory()){
-			if(!dstDirectory.exists()){
-				MessageGenerator.briefError("ERROR: Could find destination directory " + dstDirectory.getAbsolutePath());
-			}
 			for(File file : srcDirectory.listFiles()){
 				if(!file.isDirectory()){
 					if(!copyFile(file.getAbsolutePath(), dstDirectory.getAbsolutePath() + File.separator + file.getName())){
@@ -364,16 +322,13 @@ public class FileTools {
 				}
 				else if(file.isDirectory() && recursive){
 					if(!copyFolder(file.getAbsolutePath(), dst, true)){
-						MessageGenerator.briefError("ERROR: While copying folder " + file.getAbsolutePath() +
-								" to " + dst + File.separator + file.getName());
 						return false;
 					}
 				}
 			}
 			return true;
 		}
-		MessageGenerator.briefError("ERROR: copyFolderContents() - Cannot find directory: " + src);
-		return false;
+		throw new FileNotFoundException(srcDirectory.getPath());
 	}
 	
 	//===================================================================================//

@@ -43,7 +43,8 @@ public class MergeStaticNets {
 
 	public static void main(String[] args) throws IOException {
 		if(args.length != 2){
-			MessageGenerator.briefMessageAndExit("USAGE: <input.xdl> <output.xdl>");
+			System.out.println("USAGE: <input.xdl> <output.xdl>");
+			System.exit(1);
 		}
 
 		XdlDesign design = new XDLReader().readDesign(Paths.get(args[0]));

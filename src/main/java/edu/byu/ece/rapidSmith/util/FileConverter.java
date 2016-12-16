@@ -20,6 +20,9 @@
  */
 package edu.byu.ece.rapidSmith.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -69,11 +72,12 @@ public class FileConverter {
 				}
 				p.destroy();
 			} catch (InterruptedException e) {
-				MessageGenerator.briefError("ERROR: InterruptedException in convertNGC2NDF()");
+				Logger logger = LoggerFactory.getLogger(FileConverter.class);
+				logger.warn("Unexpected InterruptedException", e);
 				return false;
 			}
 		} catch (IOException e) {
-			MessageGenerator.briefError("NDF Generation failed.  Are the Xilinx tools on your path?" +
+			System.err.println("NDF Generation failed.  Are the Xilinx tools on your path?" +
 					"COMMAND: \""+ command +"\"");
 			return false;
 		}		
@@ -112,12 +116,12 @@ public class FileConverter {
 				}
 				p.destroy();
 			} catch (InterruptedException e) {
-				MessageGenerator.briefError("ERROR: InterruptedException in convertNCD2XDL()");
+				Logger logger = LoggerFactory.getLogger(FileConverter.class);
+				logger.warn("Unexpected InterruptedException", e);
 				return false;
 			}
 		} catch (IOException e) {
-			MessageGenerator.briefError("XDL Generation failed.  Are the Xilinx tools on your path?" +
-					"COMMAND: \""+ command +"\"");
+			System.err.println("XDL Generation failed.  Are the Xilinx tools on your path?");
 			return false;
 		}		
 		return true;
@@ -170,17 +174,13 @@ public class FileConverter {
 				}
 			}
 			catch (InterruptedException e){
-				e.printStackTrace();
-				MessageGenerator.briefError("Unknown Error While converting " +
-						"XDL to NCD/NMC.");
+				Logger logger = LoggerFactory.getLogger(FileConverter.class);
+				logger.warn("Unexpected InterruptedException", e);
 				return false;
 			}
 			p.destroy();
 		} catch (IOException e) {
-			MessageGenerator.briefError("NCD/NMC Generation failed.  " +
-					"Are the Xilinx tools on your path?" + 
-					System.getProperty("line.separator") +  
-					"  COMMAND: \""+ command +"\"");
+			System.err.println("NCD/NMC Generation failed.  Are the Xilinx tools on your path?");
 			return false;
 		}		
 		return true;

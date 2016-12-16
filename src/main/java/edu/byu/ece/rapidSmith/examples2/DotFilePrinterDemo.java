@@ -3,6 +3,7 @@ import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.util.DotFilePrinter;
+import org.jdom2.JDOMException;
 
 import java.io.IOException;
 
@@ -22,7 +23,7 @@ public class DotFilePrinterDemo {
 	 * @param args
 	 * @throws IOException 
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 
 		if (args.length != 1) {
 			System.err.println("Usage: java DotFilePrinterDemo checkpointName");
@@ -35,7 +36,13 @@ public class DotFilePrinterDemo {
 		System.out.println("Loading Device and Design...");		
 		// replace with your file location
 		String checkpoint = args[0];
-		TincrCheckpoint tcp = VivadoInterface.loadTCP(checkpoint);
+		TincrCheckpoint tcp = null;
+		try {
+			tcp = VivadoInterface.loadTCP(checkpoint);
+		} catch (JDOMException|IOException e) {
+			System.err.println("Failed loading TCP");
+			e.printStackTrace();
+		}
 		CellDesign design = tcp.getDesign();
 	
 		System.out.println("Printing DOT file...");
@@ -43,10 +50,20 @@ public class DotFilePrinterDemo {
 		DotFilePrinter dotFilePrinter = new DotFilePrinter(design);
 		// replace with your file location
 		String fileout = "netlist.dot";
-		dotFilePrinter.printPlacementDotFile(fileout);
-		
+		try {
+			dotFilePrinter.printPlacementDotFile(fileout);
+		} catch (IOException e) {
+			System.err.println("Failed writing dot file out");
+			e.printStackTrace();
+		}
+
 		// dot gives the best results, but the GraphViz program used to render can be changed
-		displayDotFile(fileout);
+		try {
+			displayDotFile(fileout);
+		} catch (IOException e) {
+			System.err.println("Could not display output");
+			e.printStackTrace();
+		}
 
 		System.out.println("\nDone...");
 	}
