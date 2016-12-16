@@ -299,6 +299,30 @@ public class Tile implements Serializable {
 	}
 
 	/**
+	 * Returns the wire in this tile with the given name.  This method does not
+	 * guarantee that the requested wire exists in this tile.
+	 * @param wireName the name of the wire to get
+	 * @return the wire in this tile with the given name
+	 */
+	public TileWire getWire(String wireName) {
+		Integer wireEnum = getDevice().getWireEnumerator().getWireEnum(wireName);
+		if (wireEnum == null)
+			return null;
+		return new TileWire(this, wireEnum);
+	}
+
+	/**
+	 * @param wireName name of wire to query for
+	 * @return true if the wire with the given name exists in this tile
+	 */
+	public boolean hasWire(String wireName) {
+		// TODO wireConnections.keySet method creates a hashSet.  We can speed this
+		// up by adding a containsKey to the WireConnections class
+		Integer wireEnum = getDevice().getWireEnumerator().getWireEnum(wireName);
+		return wireEnum != null && wireConnections.keySet().contains(wireEnum);
+	}
+
+	/**
 	 * This will get all of the wire connections that can be
 	 * made from the given wire in this tile.
 	 *
