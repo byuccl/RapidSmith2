@@ -6,9 +6,7 @@ import edu.byu.ece.rapidSmith.primitiveDefs.*;
 import org.jdom2.Document;
 import org.jdom2.Element;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import static edu.byu.ece.rapidSmith.util.Exceptions.FileFormatException;
 
@@ -37,66 +35,91 @@ public class PrimitiveDefsCorrector {
 		}
 	}
 
-	private static void fixPolarityMux(PrimitiveDef def, Element psEl) {
-		PrimitiveElement el = def.getElement(psEl.getChildText("name"));
-		if (el == null)
-			assert false;
+	/**
+	 * Converts the polarity mux element from a mux to a configuration.  The
+	 * polarity muxes take a single input, and provides an option to either pass
+	 * the signal or invert it.
+	 *
+	 *     |---- A  /-|   |-- O1
+	 * S --|       |PS|---|-- O2
+	 *     |-- A_B  \_|   |-- ...
+	 *
+	 * To convert this mux, we will change the polarity selector mux (PS) to a
+	 * configuration, and then connect the source (S) to each output(O1, O2, ...).
+	 * @param def the primitive def the polarity mux is in
+	 * @param polarityMuxEl the corrections element describing the change to be made
+	 */
+	private static void fixPolarityMux(PrimitiveDef def, Element polarityMuxEl) {
+		// get the polarity mux element
+		PrimitiveElement muxElement = def.getElement(polarityMuxEl.getChildText("name"));
+		assert muxElement != null;
 
-		PrimitiveElement sourceEl = null;
-		String sourcePin = null;
-		Map<PrimitiveElement, String> sinks = new HashMap<>();
-		for (PrimitiveConnection c : el.getConnections()) {
+		// find the source pin and all of the sinks of the polarity mux
+		Pin sourcePin = null;
+		Set<Pin> sinks = new HashSet<>();
+		for (PrimitiveConnection c : muxElement.getConnections()) {
 			if (c.isForwardConnection()) {
 				PrimitiveElement sinkEl = def.getElement(c.getElement1());
 				String sinkPin = c.getPin1();
-				assert !sinks.containsKey(sinkEl);
-				sinks.put(sinkEl, sinkPin);
+				sinks.add(new Pin(sinkEl, sinkPin));
 			} else {
-				sourceEl = def.getElement(c.getElement1());
-				sourcePin = c.getPin1();
+				PrimitiveElement sourceEl = def.getElement(c.getElement1());
+				sourcePin = new Pin(sourceEl, c.getPin1());
 			}
 		}
+		// make sure we found something
 		assert sinks.size() > 0;
-		assert sourceEl != null;
+		assert sourcePin != null;
 
-		el.getPins().clear();
-		el.setMux(false);
-		el.setConfiguration(true);
-		el.setConnections(null);
+		// disconnect the polarity mux and configure it as a configuration
+		muxElement.getPins().clear();
+		muxElement.setMux(false);
+		muxElement.setConfiguration(true);
+		muxElement.getConnections().clear();
 
-		String opinName = null;
-		Iterator<PrimitiveConnection> it = sourceEl.getConnections().iterator();
+		// remove all connections from the source to the polarity mux
+		Iterator<PrimitiveConnection> it = sourcePin.element.getConnections().iterator();
 		while(it.hasNext()) {
 			PrimitiveConnection c = it.next();
-			if (!c.isForwardConnection())
-				continue;
-			if (c.getElement1().equals(el.getName()) && !c.getPin1().endsWith("_B")) {
-				opinName = c.getPin1();
-				it.remove();
-			}
-		}
-		assert opinName != null;
-		for (Map.Entry<PrimitiveElement, String> sink : sinks.entrySet()) {
-			PrimitiveConnection c = new PrimitiveConnection();
-			c.setElement0(sourceEl.getName());
-			c.setPin0(opinName);
-			c.setForwardConnection(true);
-			c.setElement1(sink.getKey().getName());
-			c.setPin1(sink.getValue());
-			sourceEl.addConnection(c);
-		}
-
-		for (PrimitiveElement sinkEl : sinks.keySet()) {
-			it = sinkEl.getConnections().iterator();
-			while(it.hasNext()) {
-				PrimitiveConnection c = it.next();
-				if (c.isForwardConnection())
-					continue;
-				if (c.getElement1().equals(el.getName())) {
-					c.setElement1(sourceEl.getName());
-					c.setPin1(sourcePin);
+			if (c.isForwardConnection()) {
+				if (c.getElement1().equals(muxElement.getName())) {
+					it.remove();
 				}
 			}
+		}
+
+		// remove all connections from the sinks to the polarity mux
+		for (Pin sinkPin : sinks) {
+			it = sinkPin.element.getConnections().iterator();
+			while (it.hasNext()) {
+				PrimitiveConnection c = it.next();
+				if (!c.isForwardConnection()) {
+					if (c.getElement1().equals(muxElement.getName())) {
+						it.remove();
+					}
+				}
+			}
+		}
+
+		// create connections from the source to every sink
+		for (Pin sinkPin : sinks) {
+			// create a forward connection from the source to the sink
+			PrimitiveConnection sourceConn = new PrimitiveConnection();
+			sourceConn.setElement0(sourcePin.element.getName());
+			sourceConn.setPin0(sourcePin.pin);
+			sourceConn.setForwardConnection(true);
+			sourceConn.setElement1(sinkPin.element.getName());
+			sourceConn.setPin1(sinkPin.pin);
+			sourcePin.element.addConnection(sourceConn);
+
+			// create a backward connection from the sink to the source
+			PrimitiveConnection sinkConn = new PrimitiveConnection();
+			sinkConn.setElement0(sinkPin.element.getName());
+			sinkConn.setPin0(sinkPin.pin);
+			sinkConn.setForwardConnection(false);
+			sinkConn.setElement1(sourcePin.element.getName());
+			sinkConn.setPin1(sourcePin.pin);
+			sinkPin.element.addConnection(sinkConn);
 		}
 	}
 
@@ -169,5 +192,29 @@ public class PrimitiveDefsCorrector {
 				return siteTypeEl;
 		}
 		throw new FileFormatException("no site type " + type.name() + " in familyInfo.xml");
+	}
+
+	private static class Pin {
+		PrimitiveElement element;
+		String pin;
+
+		public Pin(PrimitiveElement element, String pin) {
+			this.element = element;
+			this.pin = pin;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			Pin pin1 = (Pin) o;
+			return Objects.equals(element, pin1.element) &&
+					Objects.equals(pin, pin1.pin);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(element, pin);
+		}
 	}
 }
