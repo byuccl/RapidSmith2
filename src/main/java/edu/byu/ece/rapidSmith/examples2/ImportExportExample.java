@@ -65,9 +65,9 @@ public class ImportExportExample {
 		CellLibrary libCells = tcp.getLibCells();
 		String partName = tcp.getPartName();
 		
-		// Do some manipulations
-		System.out.println("Modifying the design...");
-		// Do something here
+		// Do some manipulations, in this case just print out the design
+		System.out.println("\nPrinting out the design...");
+		DesignAnalyzer.prettyPrintDesign(design);
 		
 		// Write out TINCR Checkpoint
 		System.out.println("Exporting Modified Design...");
