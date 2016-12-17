@@ -14,4 +14,6 @@
 /testdesigns/*.jou
 /testdesigns/*.log
 /testdesigns/*.dmp
+**/~$*.docx
+
 
