@@ -297,11 +297,7 @@ public class Tile implements Serializable {
 	 * @return Collection of TileWire objects.
 	 */
 	public Collection<Wire> getWires() {
-		Collection<Wire> conns = new ArrayList<Wire>();
-		for (Integer w : wireConnections.keySet()) {
-			conns.add(new TileWire(this, w));
-		}
-		return conns;
+		return wireConnections.keySet().stream().map(w -> new TileWire(this, w)).collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	/**
