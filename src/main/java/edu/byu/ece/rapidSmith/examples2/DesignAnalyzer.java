@@ -69,6 +69,11 @@ public class DesignAnalyzer {
 	}
 	
 	
+	/**
+	 * Print out a formatted representation of a design to help visualize it.  Another way of visualizing designs is illustrated
+	 * in the DotFilePrinterDemo program in the examples2 directory.  
+	 * @param design The design to be pretty printed.
+	 */
 	public static void prettyPrintDesign(CellDesign design) {
 		// Print the cells
 		for (Cell c : design.getCells()) {
@@ -139,32 +144,44 @@ public class DesignAnalyzer {
 	}		
 		
 
-	// Given a pointer to the head of a RouteTree, format up a string to represent it.
-	// This works for either intra-site routes as well as inter-site routes
+	// 
+	/**
+	 * Given a pointer to the head of a RouteTree, format up a string to represent it.
+	   This works for either intra-site routes as well as inter-site routes
+	 * @param n The net being traversed
+	 * @param rt The RouteTree object we are currently at in the physical route.
+	 * @param head An indication if we are just starting a wire so we can be sure to print out that segment. 
+	 * @param inside An indication of whether we are inside a site or outside.  Physical wires start inside sites and go until they hit site pins, 
+	 * at which point they enter the global routing fabric.  They eventually hit site pins again at which point they re-enter sites.  They then
+	 * continue until they hit BEL pins, which are the sink pins of the physical route.
+	 * @return A string representing the physical route.  It is similar in many ways to XIlinx Directed Routing strings but have been enhanced 
+	 * to show where the route enters and exits sites as well as a description of the sink pins where it terminates.
+	 */
 	public static String createRoutingString(CellNet n, RouteTree rt, boolean head, boolean inside) {
 		String s="";
 
 		if (rt == null)  return s;
 
+		// A RouteTree object contains a collection of RouteTree objects which represent the downstream segments making up the route.
+		// If this collection has more than element, it represents that the physical wire brances at this point.
 		Collection<RouteTree> sinkTrees = rt.getSinkTrees();
 		
 		// Always print first wire at the head of a net's RouteTree. The format is "tileName/wireName".
 		if (head)
-			s = rt.getWire().getTile().getName() + "/" + rt.getWire().getWireName();
+			s = rt.getWire().getFullWireName();
 
-		// The connection between this RouteTree and its upstream predecessor may be a programmable 
-		//   connection (PIP or route-through) or it may be a non-programmable connection.  
-		// Look upstream and, if it is a programmable connection, include it.
+		// The connection member of the RouteTree object describes the connection between this RouteTree and its predecessor.
+		// The connection may be a programmable connection (PIP or route-through) or it may be a non-programmable connection.  
+		// Look upstream and, if it was a programmable connection, include it.
 		else if (rt.getConnection().isPip() || rt.getConnection().isRouteThrough())
-			s = " " + rt.getWire().getTile().getName() + "/" + rt.getWire().getWireName();
+			s = " " + rt.getWire().getFullWireName();
 		// It is a non-programmable connection - append it in parens.
 		else  
 			s += "(" + rt.getWire().getWireName() + ")";
 
 		// Now, let's look downstream and see where to go and what to print
-
 		// If it is a leaf cell then let's print the site or bel pin attached.  In the case of a site pin, continue following it.
-		if(rt.isLeaf())	 {
+		if (rt.isLeaf())	 {
 			SitePin sp = rt.getConnectingSitePin();
 			if (sp != null) {
 				if (inside) 
@@ -174,7 +191,7 @@ public class DesignAnalyzer {
 					// Follow the route from the general routing fabric and into a site
 					s += " SitePin{" + sp + "} <<leaving general routing fabric, entering site>> " + createRoutingString(n, n.getSinkRouteTree(sp), true, inside);
 			}
-			// If not a site pin, see if it is a BEL pin (it should be)
+			// If not a site pin, see if it is a BEL pin (it should be).  Print the BEL pin.
 			else {
 				BelPin bp = rt.getConnectingBelPin();
 				assert (bp != null);
@@ -182,7 +199,7 @@ public class DesignAnalyzer {
 			}
 		}
 
-		// Otherwise, if it is not a leaf route tree, then iterate across the sink trees and print them
+		// Otherwise, if it is not a leaf route tree, then iterate across its sink trees and print them
 		for (Iterator<RouteTree> it = sinkTrees.iterator(); it.hasNext(); ) {
 			RouteTree sink = it.next();
 
@@ -190,7 +207,7 @@ public class DesignAnalyzer {
 			// Don't enclose this in {}'s, just list it as the next wire segment. 
 			if (sinkTrees.size() == 1) 
 				s += createRoutingString(n, sink, false, inside);
-			// Otherwise, this is a branch of the wire, so enclose it in { }'s to mark that the wire is branching.
+			// Otherwise, this is a branch of the wire, so enclose it in { }'s to mark that it represents a branch in the wire.
 			else {
 				s += " {" + createRoutingString(n, sink, false, inside) + " }";
 			}
