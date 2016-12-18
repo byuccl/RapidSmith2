@@ -156,12 +156,12 @@ public class Device implements Serializable {
 	}
 
 	/**
-	 * Returns the 2D array of tiles that define the layout of this device.
+	 * Returns a collection of all tiles in this device.
 	 *
 	 * @return the tiles of this device.
 	 */
-	public Tile[][] getTiles() {
-		return tiles;
+	public Collection<Tile> getTiles() {
+		return Collections.unmodifiableCollection(tileMap.values());
 	}
 
 	/**
