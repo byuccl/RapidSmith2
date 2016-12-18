@@ -323,8 +323,10 @@ public final class Site implements Serializable{
 	 *
 	 * @return the wires in the site which source wire connections
 	 */
-	public Set<Integer> getWires() {
-		return getWires(getTemplate());
+	public Collection<Wire> getWires() {
+		return getWires(getTemplate()).stream()
+				.map(i -> new SiteWire(this, i))
+				.collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	public Set<Integer> getWires(SiteType type) {
