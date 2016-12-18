@@ -96,10 +96,8 @@ public class ExtendedDeviceInfo implements Serializable {
 
 	private void reverseWireHashMap(Device device) {
 		threadPool = Executors.newFixedThreadPool(8);
-		for (Tile[] arr : device.getTiles()) {
-			for (Tile tile : arr) {
-				threadPool.execute(() -> getReverseMapForTile(device, tile));
-			}
+		for (Tile tile : device.getTiles()) {
+			threadPool.execute(() -> getReverseMapForTile(device, tile));
 		}
 		threadPool.shutdown();
 		try {
@@ -112,18 +110,16 @@ public class ExtendedDeviceInfo implements Serializable {
 
 	private void getReverseMapForTile(Device device, Tile tile) {
 		Map<Integer, List<WireConnection>> reverseMap = new HashMap<>();
-		for (Tile[] srcArr : device.getTiles()) {
-			for (Tile srcTile : srcArr) {
-				for (int srcWire : srcTile.getWires()) {
-					for (WireConnection c : srcTile.getWireConnections(srcWire)) {
-						if (c.getTile(srcTile) == tile) {
-							WireConnection reverse = new WireConnection(
-									srcWire, -c.getRowOffset(),
-									-c.getColumnOffset(), c.isPIP());
-							WireConnection pooled = connPool.add(reverse);
-							reverseMap.computeIfAbsent(c.getWire(), k -> new ArrayList<>())
-									.add(pooled);
-						}
+		for (Tile srcTile : device.getTiles()) {
+			for (int srcWire : srcTile.getWires()) {
+				for (WireConnection c : srcTile.getWireConnections(srcWire)) {
+					if (c.getTile(srcTile) == tile) {
+						WireConnection reverse = new WireConnection(
+								srcWire, -c.getRowOffset(),
+								-c.getColumnOffset(), c.isPIP());
+						WireConnection pooled = connPool.add(reverse);
+						reverseMap.computeIfAbsent(c.getWire(), k -> new ArrayList<>())
+								.add(pooled);
 					}
 				}
 			}
