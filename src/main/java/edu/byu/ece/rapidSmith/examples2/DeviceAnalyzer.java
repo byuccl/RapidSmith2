@@ -1,21 +1,22 @@
 package edu.byu.ece.rapidSmith.examples2;
 
-import java.io.IOException;
-import java.util.Collection;
-
-import org.jdom2.JDOMException;
-
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.Connection;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Tile;
-import edu.byu.ece.rapidSmith.device.Wire;
+import edu.byu.ece.rapidSmith.device.TileWire;
+import org.jdom2.JDOMException;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
+
 
 public class DeviceAnalyzer {
 	
 	static Device device;
 
-	public static void main(String[] args) throws IOException, JDOMException{
+	public static void main(String[] args) throws IOException, JDOMException {
 
 		msg("Starting DeviceAnalyzer...\n");
 
