@@ -99,10 +99,9 @@ public final class DeviceGenerator {
 	 * path.
 	 *
 	 * @param xdlrcPath path to the XDLRC file for the device
-	 * @param env the RapidSmith environment for this part
 	 * @return the generated Device representation
 	 */
-	public Device generate(Path xdlrcPath, RSEnvironment env) throws IOException {
+	public Device generate(Path xdlrcPath) throws IOException {
 		System.out.println("Generating device for file " + xdlrcPath.getFileName());
 
 		this.device = new Device();
@@ -127,7 +126,7 @@ public final class DeviceGenerator {
 		// wires need to know the source and sink tiles.
 		XDLRCParser parser = new XDLRCParser();
 		System.out.println("Starting first pass");
-		parser.registerListener(new FamilyTypeListener(env));
+		parser.registerListener(new FamilyTypeListener());
 		parser.registerListener(new WireEnumeratorListener());
 		parser.registerListener(new TileAndSiteGeneratorListener());
 		parser.registerListener(new PrimitiveDefsListener());
@@ -846,17 +845,11 @@ public final class DeviceGenerator {
 	}
 
 	private final class FamilyTypeListener extends XDLRCParserListener {
-		private final RSEnvironment env;
-
-		public FamilyTypeListener(RSEnvironment env) {
-			this.env = env;
-		}
-
 		@Override
 		protected void enterXdlResourceReport(List<String> tokens) {
 			FamilyType family = FamilyType.valueOf(tokens.get(3).toUpperCase());
 			try {
-				familyInfo = env.loadFamilyInfo(family);
+				familyInfo = RSEnvironment.defaultEnv().loadFamilyInfo(family);
 			} catch (IOException|JDOMException e) {
 				throw new EnvironmentException("Failed to load family information file", e);
 			}

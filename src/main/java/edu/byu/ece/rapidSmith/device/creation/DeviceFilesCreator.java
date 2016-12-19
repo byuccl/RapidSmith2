@@ -39,32 +39,29 @@ import java.nio.file.Path;
  */
 public class DeviceFilesCreator {
 	private final XDLRCRetriever xdlrcRetriever;
-	private final RSEnvironment env;
 
-	public DeviceFilesCreator(XDLRCRetriever xdlrcRetriever, RSEnvironment env) {
+	public DeviceFilesCreator(XDLRCRetriever xdlrcRetriever) {
 		this.xdlrcRetriever = xdlrcRetriever;
-		this.env = env;
 	}
 
 	/**
 	 * Creates the specified device.
 	 * This method obtains the needed input files, parses them, writes the created
 	 * device file, then cleans up any created input files.
-	 * @param part the part to create the device for
 	 */
-	public void createDevice(String part) throws IOException, DeviceCreationException {
+	public void createDevice() throws IOException, DeviceCreationException {
 		// Create XDLRC File if it already hasn't been created
 		System.out.println("Retrieving XDLRC file");
-		Path xdlrcFilePath = xdlrcRetriever.getXDLRCFileForPart(part);
+		Path xdlrcFilePath = xdlrcRetriever.getXDLRCFile();
 
 		// Initialize Parser
 		DeviceGenerator generator = new DeviceGenerator();
-		Device device = generator.generate(xdlrcFilePath, env);
+		Device device = generator.generate(xdlrcFilePath);
 
 		// Write the Device to File
 		System.out.println("Writing device to compact file");
 		try {
-			env.writeDeviceFile(device);
+			RSEnvironment.defaultEnv().writeDeviceFile(device);
 		} catch (IOException e) {
 			System.err.println("Failed writing device to disk.");
 			e.printStackTrace();
@@ -72,7 +69,7 @@ public class DeviceFilesCreator {
 
 		// Delete XDLRC file
 		System.out.println("Cleaning up XDLRC file.");
-		xdlrcRetriever.cleanupXDLRCFile(part, xdlrcFilePath);
+		xdlrcRetriever.cleanupXDLRCFile();
 
 		// Building extended device info
 		System.out.println("Building extended info.");
