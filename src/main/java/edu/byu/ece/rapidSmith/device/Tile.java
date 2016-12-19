@@ -291,10 +291,12 @@ public class Tile implements Serializable {
 		}
 	}
 
-	public Set<Integer> getWires() {
-		if (wireConnections == null)
-			return Collections.emptySet();
-		return wireConnections.keySet();
+	/**
+	 * Create Collection of TileWire objects for each wire in the tile.
+	 * @return Collection of TileWire objects.
+	 */
+	public Collection<Wire> getWires() {
+		return wireConnections.keySet().stream().map(w -> new TileWire(this, w)).collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	/**
