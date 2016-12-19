@@ -323,17 +323,17 @@ public final class Site implements Serializable{
 	 * @return the wires in the site which source wire connections
 	 */
 	public Collection<Wire> getWires() {
-		return getWires(getTemplate()).stream()
-				.map(i -> new SiteWire(this, i))
-				.collect(Collectors.toCollection(ArrayList::new));
+		return getWires(getTemplate());
 	}
 
-	public Set<Integer> getWires(SiteType type) {
+	public Collection<Wire> getWires(SiteType type) {
 		return getWires(getTemplate(type));
 	}
 
-	public Set<Integer> getWires(SiteTemplate template) {
-		return template.getWires();
+	public Collection<Wire> getWires(SiteTemplate template) {
+		return template.getWires().stream()
+				.map(i -> new SiteWire(this, i))
+				.collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	/**
