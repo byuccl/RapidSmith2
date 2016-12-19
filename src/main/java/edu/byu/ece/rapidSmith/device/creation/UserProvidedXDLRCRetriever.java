@@ -22,12 +22,7 @@ package edu.byu.ece.rapidSmith.device.creation;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-
-import edu.byu.ece.rapidSmith.RSEnvironment;
-import edu.byu.ece.rapidSmith.device.FamilyType;
 
 /**
  *	TODO: In the future it would be nice if this could be integrated with TINCR and Vivado,
