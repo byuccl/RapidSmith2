@@ -74,13 +74,17 @@ edu.byu.ece.rapidSmith.util can be run and it will generate the needed
 device files for RapidSmith2.  Running this program for the smallest
 Artix7 part takes about a half hour on a multi-core i7 machine.
 
-- The installer requires a parameter be passed which is the part name
-  (such as xc7a100t-csg324).
+- The installer requires a parameter be passed which is the location
+  of the XDLRC file.
 
 - The VM also needs some arguments when running (such as
   --XstartOnFirstThread Xmx14G) where 14G is the memory to give - set
   it to most of the RAM on your machine,
-  
+
+For the current example, the command would be:
+
+  java -Xmx14G <directory/containing/xdlrc>/xc7a100tcsg324_full.xdlrc
+
 The result of this process should be 2 files with .dat extensions.
 The first is a *_db.dat file and the second is a *_info.dat file.
 These constitute the device file required by RapidSmith2.
