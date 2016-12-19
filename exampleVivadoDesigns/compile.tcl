@@ -47,7 +47,7 @@ proc compile_hdl_to_checkpoint_files {top} {
     puts "Writing rscp"
     tincr::write_rscp $top
     puts "All done..."
-    #	close_design
+    close_project
 
     }
 
