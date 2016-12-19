@@ -30,7 +30,8 @@ import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -226,7 +227,7 @@ public class XDLRCOutputter {
 
 		if (writeWires) {
 			List<String> wireNames = tile.getWires().stream()
-					.map(we::getWireName)
+					.map(Wire::getWireName)
 					.collect(Collectors.toCollection(ArrayList<String>::new));
 			if (forceOrdering)
 				Collections.sort(wireNames);

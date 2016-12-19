@@ -24,8 +24,8 @@ import com.caucho.hessian.io.Hessian2Input;
 import com.caucho.hessian.io.Hessian2Output;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.*;
-import edu.byu.ece.rapidSmith.util.HashPool;
 import edu.byu.ece.rapidSmith.util.FileTools;
+import edu.byu.ece.rapidSmith.util.HashPool;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -111,11 +111,12 @@ public class ExtendedDeviceInfo implements Serializable {
 	private void getReverseMapForTile(Device device, Tile tile) {
 		Map<Integer, List<WireConnection>> reverseMap = new HashMap<>();
 		for (Tile srcTile : device.getTiles()) {
-			for (int srcWire : srcTile.getWires()) {
-				for (WireConnection c : srcTile.getWireConnections(srcWire)) {
+			for (Wire srcWire : srcTile.getWires()) {
+				int srcEnum = srcWire.getWireEnum();
+				for (WireConnection c : srcTile.getWireConnections(srcEnum)) {
 					if (c.getTile(srcTile) == tile) {
 						WireConnection reverse = new WireConnection(
-								srcWire, -c.getRowOffset(),
+								srcEnum, -c.getRowOffset(),
 								-c.getColumnOffset(), c.isPIP());
 						WireConnection pooled = connPool.add(reverse);
 						reverseMap.computeIfAbsent(c.getWire(), k -> new ArrayList<>())
