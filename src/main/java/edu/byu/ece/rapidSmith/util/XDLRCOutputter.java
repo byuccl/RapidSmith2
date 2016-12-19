@@ -764,8 +764,9 @@ public class XDLRCOutputter {
 						System.err.println("Could not compile pattern " + tileName);
 						System.exit(-4);
 					}
-					for (Tile[] tileArray : device.getTiles()) {
-						for (Tile tile : tileArray) {
+					for (int row = 0; row < device.getRows(); row++) {
+						for (int col = 0; col < device.getColumns(); col++) {
+							Tile tile = device.getTile(0, 0);
 							if (pattern.matcher(tile.getName()).matches()) {
 								tiles.add(tile);
 							}
