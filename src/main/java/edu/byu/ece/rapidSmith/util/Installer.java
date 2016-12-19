@@ -21,19 +21,18 @@ package edu.byu.ece.rapidSmith.util;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.creation.DeviceCreationException;
-import edu.byu.ece.rapidSmith.device.creation.DeviceFilesCreator;
-import edu.byu.ece.rapidSmith.device.creation.ISE_XDLRCRetriever;
-import edu.byu.ece.rapidSmith.device.creation.Vivado_XDLRCRetriever;
-import joptsimple.OptionException;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
+import edu.byu.ece.rapidSmith.device.creation.*;
+import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.impl.Arguments;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import net.sourceforge.argparse4j.inf.Namespace;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.Objects;
 
 /**
  * This class will create the device and wire enumerator files 
@@ -52,51 +51,28 @@ public class Installer {
 	public static void main(String[] args){
 		MessageGenerator.printHeader("RapidSmith Release " + Device.rapidSmithVersion + " - Installer");
 
-		OptionParser parser = new OptionParser();
-		parser.accepts("env", "Output directory for generated device files").withRequiredArg();
-		parser.acceptsAll(Arrays.asList("force", "f"), "Overwrite existing device files");
-		parser.acceptsAll(Collections.singletonList("ise"), "Generate XDLRC using ISE. Otherwise, it will use an existing XDLRC");
-		parser.accepts("ignore_disclaimer", "Ignores the disclaimer");
-		parser.nonOptions("<device or family> ...");
+		ArgumentParser parser = buildArgParser();
 
-		OptionSet options = null;
+		Namespace options = null;
 		try {
-			options = parser.parse(args);
-		} catch (OptionException e) {
-			try {
-				parser.printHelpOn(System.err);
-			} catch (IOException ignored) {
-			}
+			options = parser.parseArgs(args);
+		} catch (ArgumentParserException e) {
+			parser.handleError(e);
 			System.exit(-1);
 		}
 
-		RSEnvironment env;
-		if (options.has("env"))
-			env = new RSEnvironment(Paths.get((String) options.valueOf("env")));
-		else
-			env = RSEnvironment.defaultEnv();
-		boolean forceRebuild = options.has("force");
-		boolean generateFromISE = options.has("ise");
-
-		if (options.nonOptionArguments().size() < 1) {
-			try {
-				parser.printHelpOn(System.err);
-			} catch (IOException ignored) {
-			}
-			System.exit(-1);
-		}
-
+		RSEnvironment env = RSEnvironment.defaultEnv();
 		long timeStart = System.currentTimeMillis();
 
 		System.out.println("DISCLAIMER:");
 		System.out.println(disclaimer + nl + nl);
 
-		if (options.has("ignore_disclaimer")) {
-			System.out.println("By using this software you agree to the GPLv2 license" + nl +
-					"agreement accompanying this software (/docs/gpl2.txt)");
+		if (options.getBoolean("ignore_disclaimer")) {
+			System.out.println("By using this software you agree to the GPLv3 license" + nl +
+					"agreement accompanying this software (/docs/LICENSE.GPL3.TXT)");
 		} else {
-			System.out.println("Have you read the above disclaimer and agree to the GPLv2 license" + nl +
-					"agreement accompanying this software (/docs/gpl2.txt)");
+			System.out.println("Have you read the above disclaimer and agree to the GPLv3 license" + nl +
+					"agreement accompanying this software (/docs/LICENSE.GPL3.TXT)");
 			try {
 				MessageGenerator.agreeToContinue();
 			} catch (IOException e) {
@@ -109,56 +85,59 @@ public class Installer {
 
 		// Check if user supplied file with parameters
 		ArrayList<String> partNames = new ArrayList<>();
-		for(Object oname : options.nonOptionArguments()) {
-			String name = (String) oname;
-			name = name.toLowerCase();
-			if(name.startsWith("x")){
-				partNames.add(name);
-			}
-			else{
-				name = name.toUpperCase();
-				partNames.addAll(RunXilinxTools.getPartNames(name, false));
-			}
-			
-			for(String partName : partNames) {
-				if (!forceRebuild) {
-					Device device;
-					try {
-						device = env.getDevice(partName);
-					} catch (Exception ignored) {
-						device = null;
-					}
-					if (device != null) {
-						System.out.println("File already exists for part " + partName +
-								".  Use --force to overwrite.");
-						continue;
-					}
-				}
-				System.out.println("Creating files for " + partName);
-				
-				DeviceFilesCreator creator;
-				if (generateFromISE) {
-					creator = new DeviceFilesCreator(new ISE_XDLRCRetriever(), env);
-				} else { 
-					creator = new DeviceFilesCreator(new Vivado_XDLRCRetriever(), env);
-				}
+		for(Object opart : options.getList("device")) {
+			String part = (String) opart;
 
-				try {
-					creator.createDevice(partName);
-				} catch (IOException e) {
-					System.err.println("Encountered error handling file");
-					System.err.println(e.getMessage());
-					e.printStackTrace();
-				} catch (DeviceCreationException e) {
-					System.err.println("Error creating device file");
-					System.err.println(e.getMessage());
-					e.printStackTrace();
-				}
+			XDLRCRetriever retriever;
+			switch (options.getString("generate")) {
+				case "file":
+					Path xdlrcFile = Paths.get(part);
+					retriever = new UserProvidedXDLRCRetriever(xdlrcFile);
+					System.out.println("Creating device from file " + part);
+					break;
+				case "ise":
+					retriever = new ISE_XDLRCRetriever(part);
+					System.out.println("Creating device for " + part);
+					break;
+				default:
+					System.err.println("Invalid generate option");
+					System.exit(-1);
+					throw new AssertionError();
+			}
+
+			try {
+				DeviceFilesCreator creator = new DeviceFilesCreator(retriever);
+				creator.createDevice();
+			} catch (IOException e) {
+				System.err.println("Encountered error handling file");
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+			} catch (DeviceCreationException e) {
+				System.err.println("Error creating device file");
+				System.err.println(e.getMessage());
+				e.printStackTrace();
 			}
 		}
 		System.out.println("END: " + FileTools.getTimeString());
 		System.out.println("Time Elapsed: " + (System.currentTimeMillis() - timeStart)/60000.0 + " minutes");
 		MessageGenerator.printHeader("Installer Completed Successfully!");
+	}
+
+	private static ArgumentParser buildArgParser() {
+		ArgumentParser parser = ArgumentParsers.newArgumentParser("RapidSmith Installer")
+				.defaultHelp(true)
+				.description("Adds support to RapidSmith for a device.");
+		parser.addArgument("--generate")
+				.choices("file", "ise")
+				.setDefault("file")
+				.help("Generate the XDLRC part");
+		parser.addArgument("--ignore_disclaimer")
+				.action(Arguments.storeTrue())
+				.help("Ignore the disclaimer");
+		parser.addArgument("device")
+				.nargs("+")
+				.help("XDLRC file or device");
+		return parser;
 	}
 }
 
