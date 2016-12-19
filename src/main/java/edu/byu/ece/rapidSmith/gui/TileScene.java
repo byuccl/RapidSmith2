@@ -177,18 +177,16 @@ public class TileScene extends QGraphicsScene{
 		// Determine which columns and rows to not draw
 		TreeSet<Integer> colsToSkip = new TreeSet<>();
 		TreeSet<Integer> rowsToSkip = new TreeSet<>();
-		for(Tile[] tileRow : device.getTiles()){
-			for(Tile tile : tileRow){
-				TileType type = tile.getType();
-				if(tileColumnTypesToHide.contains(type)){
-					colsToSkip.add(tile.getColumn());
-				}
-				if(tileRowTypesToHide.contains(type)){
-					rowsToSkip.add(tile.getRow());
-				}
+		for(Tile tile : device.getTiles()){
+			TileType type = tile.getType();
+			if(tileColumnTypesToHide.contains(type)){
+				colsToSkip.add(tile.getColumn());
+			}
+			if(tileRowTypesToHide.contains(type)){
+				rowsToSkip.add(tile.getRow());
 			}
 		}
-		
+
 		// Create new tile layout without hidden tiles
 		int i=0,j=0;
 		drawnTiles = new Tile[rows-rowsToSkip.size()][cols-colsToSkip.size()];
