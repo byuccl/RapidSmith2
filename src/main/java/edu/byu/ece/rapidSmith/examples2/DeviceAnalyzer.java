@@ -17,7 +17,6 @@ import java.util.HashSet;
 
 import edu.byu.ece.rapidSmith.device.Wire;
 
-
 public class DeviceAnalyzer {
 	
 	static Device device;
