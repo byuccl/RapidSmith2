@@ -20,11 +20,8 @@
 
 package edu.byu.ece.rapidSmith.device.creation;
 
-import edu.byu.ece.rapidSmith.device.FamilyType;
-
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 
 /**
  * Interface providing methods for retrieving, creating if necessary,
@@ -33,27 +30,15 @@ import java.util.List;
  */
 public interface XDLRCRetriever {
 	/**
-	 * Returns all of the parts in the family for this device.
-	 *
-	 * @param family the family to get the part for
-	 * @return list containing the names of all parts in the specified family
-	 */
-	List<String> getPartsInFamily(FamilyType family);
-
-	/**
 	 * Returns the path to the XDLRC file for the specified part.  Create it if
 	 * it does not exist.
 	 *
-	 * @param part the part to get the XDLRC file for
 	 * @return the path to the created XDLRC
 	 */
-	Path getXDLRCFileForPart(String part) throws DeviceCreationException;
+	Path getXDLRCFile() throws DeviceCreationException;
 
 	/**
 	 * The XDLRC file for the part is no longer needed and may be cleaned up.
-	 *
-	 * @param part name of the part to clean up
-	 * @param filePath path to the create XDLRC file
 	 */
-	void cleanupXDLRCFile(String part, Path filePath) throws IOException;
+	void cleanupXDLRCFile() throws IOException;
 }
