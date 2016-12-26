@@ -20,24 +20,17 @@
 package edu.byu.ece.rapidSmith.device.browser;
 
 
+import com.trolltech.qt.core.Qt.MouseButton;
+import com.trolltech.qt.core.Qt.PenStyle;
+import com.trolltech.qt.gui.*;
+import edu.byu.ece.rapidSmith.device.*;
+import edu.byu.ece.rapidSmith.gui.NumberedHighlightedTile;
+import edu.byu.ece.rapidSmith.gui.TileScene;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
-
-import com.trolltech.qt.core.Qt.MouseButton;
-import com.trolltech.qt.core.Qt.PenStyle;
-import com.trolltech.qt.gui.QAction;
-import com.trolltech.qt.gui.QBrush;
-import com.trolltech.qt.gui.QColor;
-import com.trolltech.qt.gui.QGraphicsLineItem;
-import com.trolltech.qt.gui.QGraphicsSceneMouseEvent;
-import com.trolltech.qt.gui.QMenu;
-import com.trolltech.qt.gui.QPen;
-
-import edu.byu.ece.rapidSmith.device.*;
-import edu.byu.ece.rapidSmith.gui.NumberedHighlightedTile;
-import edu.byu.ece.rapidSmith.gui.TileScene;
 
 /**
  * This class was written specifically for the DeviceBrowser class.  It
@@ -112,11 +105,9 @@ public class DeviceBrowserScene extends TileScene{
 		HashMap<Tile, Integer> reachabilityMap = new HashMap<>();
 
 		Queue<Wire> queue = new LinkedList<>();
-		for(Integer wire : t.getWires()){
-			WireConnection[] connections = t.getWireConnections(wire);
-			if(connections == null) continue;
-			for(WireConnection wc : connections){
-				Wire w = new TileWire(wc.getTile(t), wc.getWire());
+		for(Wire wire : t.getWires()){
+			for(Connection c : wire.getWireConnections()){
+				Wire w = c.getSinkWire();
 				queue.add(w);
 				level.put(w, 0);
 			}
