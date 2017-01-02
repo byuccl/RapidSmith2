@@ -78,21 +78,15 @@ public final class DeviceGenerator {
 	/** Keeps track of all PIPRouteThrough objects */
 	private HashPool<PIPRouteThrough> routeThroughPool;
 	/** Keeps Track of all unique Sinks that exist in Tiles */
-	private HashPool<HashMap<Integer, SinkPin>> tileSinkMapPool;
-	/** Keeps track of all unique sinks that exist in tiles */
-	private HashPool<SinkPin> sinksPool;
+	private HashPool<UnorderedIntArray> tileSinksPool;
 	/** Keeps Track of all unique Sources Lists that exist in Tiles */
-	private HashPool<TileSources> tileSourcesPool;
+	private HashPool<UnorderedIntArray> tileSourcesPool;
 	/** Keeps Track of all unique Wire Lists that exist in Tiles */
 	private HashPool<WireHashMap> tileWiresPool;
-	/** The number of source wires each wires */
-	private Map<Tile, Map<Integer, Integer>> wireSourcesCount;
 
 	private HashPool<Map<String, Integer>> externalWiresPool;
 	private HashPool<Map<SiteType, Map<String, Integer>>> externalWiresMapPool;
 	private HashPool<AlternativeTypes> alternativeTypesPool;
-
-	private HashSet<IntPair> routethroughs;
 
 	/**
 	 * Generates and returns the Device created from the XDLRC at the specified
@@ -111,15 +105,12 @@ public final class DeviceGenerator {
 		this.wirePool = new HashPool<>();
 		this.wireArrayPool = new HashPool<>();
 		this.routeThroughPool = new HashPool<>();
-		this.tileSinkMapPool = new HashPool<>();
-		this.sinksPool = new HashPool<>();
+		this.tileSinksPool = new HashPool<>();
 		this.tileSourcesPool = new HashPool<>();
 		this.tileWiresPool = new HashPool<>();
 		this.externalWiresPool = new HashPool<>();
 		this.externalWiresMapPool = new HashPool<>();
 		this.alternativeTypesPool = new HashPool<>();
-
-		this.routethroughs = new HashSet<>();
 
 		// Requires a two part iteration, the first to obtain the tiles and sites,
 		// and the second to gather the wires.  Two parses are required since the
@@ -168,10 +159,7 @@ public final class DeviceGenerator {
 		// free unneeded pools for garbage collection when done with
 		routeThroughPool = null;
 		tileSourcesPool = null;
-
-		populateSinkPins();
-		sinksPool = null;
-		tileSinkMapPool = null;
+		tileSinksPool = null;
 
 		System.out.println("Finishing device creation process");
 
@@ -717,120 +705,6 @@ public final class DeviceGenerator {
 	}
 
 	/**
-	 * Finds the switch matrix tile which leads to the sink pin.  This information
-	 * is useful during routing to determine what switch matrix we really want to
-	 * be targeting.
-	 */
-	private void populateSinkPins() {
-		buildWireSourcesCountMap();
-
-		Stack<Wire> stack = new Stack<>();
-		for (Tile tile : device.getTileMap().values()) {
-			for (Integer wireEnum : wireSourcesCount.get(tile).keySet()) {
-				// if 0, then any sink of this wire is unconnected to
-				// the device unless it is a source
-				// if 1, then this wire has a source that would itself be the source
-				// of any sinks on the wire.
-				// Tile sources, however, are always evaluated.
-				Wire wire = new TileWire(tile, wireEnum);
-				int numSources = wireSourcesCount.get(tile).get(wireEnum);
-				if (numSources <= 1 && !arrayContains(tile.getSourcesArray(), wire.getWireEnum()))
-					continue;
-
-				addSinkWiresToTraverse(stack, wire);
-				findAndAddSinkPins(stack, wire);
-			}
-		}
-
-		// clean up the sources
-		for (Tile tile : device.getTileMap().values())
-			tile.setSinks(tileSinkMapPool.add(tile.getSinks()));
-	}
-
-	// Pathetic that this function doesn't exist in Java
-	private static boolean arrayContains(int[] array, int value) {
-		boolean isSource = false;
-		for (int source : array)
-			isSource |= (source == value);
-		return isSource;
-	}
-
-	private void findAndAddSinkPins(Stack<Wire> stack, Wire srcWire) {
-		// this wire might be a multi-sourced sinkPin
-		checkAndAddSinkPin(srcWire, srcWire);
-
-		while (!stack.isEmpty()) {
-			Wire curWire = stack.pop();
-
-			// Check if we've found a sink and add its pin
-			checkAndAddSinkPin(srcWire, curWire);
-
-			addSinkWiresToTraverse(stack, curWire);
-		}
-	}
-
-	private void checkAndAddSinkPin(Wire srcWire, Wire curWire) {
-		Tile curTile = curWire.getTile();
-		Tile srcTile = srcWire.getTile();
-		if (curTile.getSinks().containsKey(curWire.getWireEnum())) {
-			int xOffset = (srcTile.getColumn() - curTile.getColumn());
-			int yOffset = (srcTile.getRow() - curTile.getRow());
-
-			SinkPin sinkPin = new SinkPin(srcWire.getWireEnum(), xOffset, yOffset);
-			curTile.getSinks().put(curWire.getWireEnum(), sinksPool.add(sinkPin));
-		}
-	}
-
-	private void addSinkWiresToTraverse(Stack<Wire> stack, Wire curWire) {
-		Tile curTile = curWire.getTile();
-		WireConnection[] wcs = curTile.getWireConnections(curWire.getWireEnum());
-		if (wcs == null) return;
-		for (WireConnection wc : wcs) {
-			final Tile destTile = wc.getTile(curTile);
-			final int destWire = wc.getWire();
-
-			// Don't search through route throughs
-			if (routethroughs.contains(new IntPair(curWire.getWireEnum(), wc.getWire())))
-				continue;
-
-			if (wireSourcesCount.get(destTile).get(destWire) == 1) {
-				stack.push(new TileWire(destTile, destWire));
-			}
-		}
-	}
-
-	/**
-	 * Creates a map storing the number of sources for each wire in the device.
-	 */
-	private void buildWireSourcesCountMap() {
-		wireSourcesCount = new HashMap<>(device.getTileMap().size());
-		for (Tile tile : device.getTileMap().values()) {
-			wireSourcesCount.put(tile, new HashMap<>());
-			for (Wire i : tile.getWires())
-				wireSourcesCount.get(tile).put(i.getWireEnum(), 0);
-		}
-		for (Tile srcTile : device.getTileMap().values()) {
-			if (srcTile.getWireHashMap() == null)
-				continue;
-			for (Wire wire : srcTile.getWires()) {
-				int wireEnum = wire.getWireEnum();
-				for (WireConnection wc : srcTile.getWireConnections(wireEnum)) {
-					Tile sinkTile = wc.getTile(srcTile);
-					Integer sinkWire = wc.getWire();
-
-					// Don't include routethroughs in count
-					if (routethroughs.contains(new IntPair(wireEnum, sinkWire)))
-						continue;
-					int count = 0;
-					if (wireSourcesCount.get(sinkTile).containsKey(sinkWire))
-						count = wireSourcesCount.get(sinkTile).get(sinkWire);
-					wireSourcesCount.get(sinkTile).put(sinkWire, count + 1);
-				}
-			}
-		}
-	}
-
-	/**
 	 * Remove duplicate wire resources in the tile.
 	 */
 	private void removeDuplicateTileResources(Tile tile) {
@@ -976,7 +850,6 @@ public final class DeviceGenerator {
 			currTile = device.getTile(row, col);
 			currTile.setName(tokens.get(3));
 			currTile.setType(TileType.valueOf(device.getFamily(), tokens.get(4)));
-			currTile.setSinks(new HashMap<>());
 
 			tileSites = new ArrayList<>();
 		}
@@ -1096,7 +969,6 @@ public final class DeviceGenerator {
 				PIPRouteThrough currRouteThrough = new PIPRouteThrough(type, inPin, outPin);
 				currRouteThrough = routeThroughPool.add(currRouteThrough);
 				device.addRouteThrough(startWire, endWireEnum, currRouteThrough);
-				routethroughs.add(new IntPair(startWire, endWireEnum));
 			}
 			currTile.addConnection(startWire, wc);
 		}
@@ -1106,6 +978,7 @@ public final class DeviceGenerator {
 		private Tile currTile;
 		private Site currSite;
 		private Set<Integer> tileSources;
+		private Set<Integer> tileSinks;
 		private Map<String, Integer> externalPinWires;
 
 		@Override
@@ -1115,23 +988,16 @@ public final class DeviceGenerator {
 			currTile = device.getTile(row, col);
 
 			tileSources = new TreeSet<>();
+			tileSinks = new TreeSet<>();
 		}
 
 		@Override
 		protected void exitTile(List<String> tokens) {
-			// We're converting the set of Integer objects to an int array
-			// so we need to do this the long way
-			int[] sourcesArray = new int[tileSources.size()];
-			Iterator<Integer> it = tileSources.iterator();
-			int i = 0;
-			while (it.hasNext()) {
-				sourcesArray[i++] = it.next();
-			}
+			currTile.setSources(tileSourcesPool.add(new UnorderedIntArray(tileSources)).array());
+			currTile.setSinks(tileSinksPool.add(new UnorderedIntArray(tileSinks)).array());
 
-			// Remove duplicates
-			TileSources tileSources = new TileSources(sourcesArray);
-			currTile.setSources(tileSourcesPool.add(tileSources).sources);
-
+			tileSources = null;
+			tileSinks = null;
 			currTile = null;
 		}
 
@@ -1150,7 +1016,7 @@ public final class DeviceGenerator {
 			externalPinWires.put(name, we.getWireEnum(externalWireName));
 
 			if (direction == PinDirection.IN) {
-				currTile.addSink(we.getWireEnum(externalWireName));
+				tileSinks.add(we.getWireEnum(externalWireName));
 			} else {
 				tileSources.add(we.getWireEnum(externalWireName));
 			}
@@ -1185,8 +1051,8 @@ public final class DeviceGenerator {
 			externalPinWiresMap = externalWiresMapPool.add(externalPinWiresMap);
 			currSite.setExternalWires(externalPinWiresMap);
 
+			externalPinWires = null;
 			currSite = null;
-
 		}
 
 		private Integer getExternalWireForSitePin(SiteType altType, String sitePin) {
@@ -1313,30 +1179,6 @@ public final class DeviceGenerator {
 			c.setElement1(tokens.get(4));
 			c.setPin1(tokens.get(5).substring(0, tokens.get(5).length() - 1));
 			currElement.addConnection(c);
-		}
-	}
-
-	private static class IntPair {
-		private final int first;
-		private final int second;
-
-		public IntPair(int first, int second) {
-			this.first = first;
-			this.second = second;
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
-			IntPair intPair = (IntPair) o;
-			return first == intPair.first &&
-					second == intPair.second;
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hash(first, second);
 		}
 	}
 }

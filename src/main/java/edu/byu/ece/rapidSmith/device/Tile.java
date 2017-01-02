@@ -39,8 +39,6 @@ import java.util.stream.Collectors;
 public class Tile implements Serializable {
 	/** Unique Serialization ID */
 	private static final long serialVersionUID = 4859877066322216633L;
-	/** The default unconnected sinkPin */
-	private static final SinkPin UNCONNECTED_SINKPIN = new SinkPin(-1, 0, 0);
 	private Device dev;
 	/** XDL Name of the tile */
 	private String name;
@@ -62,7 +60,7 @@ public class Tile implements Serializable {
 
 	private WireHashMap reverseWireConnections;
 	/** Reference to this tile's device object */
-	private HashMap<Integer, SinkPin> sinks;
+	private int[] sinks;
 	/** This is a list of the sources within the tile (generally in the sites) */
 	private int[] sources;
 	/**
@@ -418,23 +416,13 @@ public class Tile implements Serializable {
 	}
 
 	/**
-	 * Used to compile the sinks for this tile during parsing, should not be called
-	 * during normal usage.
-	 *
-	 * @param sink The new sink to add. The SinkPin created is initialized to -1,0.
+	 * @return a list containing the wires connecting to sink site pins
+	 * for this tile.
 	 */
-	public void addSink(int sink) {
-		sinks.put(sink, UNCONNECTED_SINKPIN);
-	}
-
-	/**
-	 * Gets and returns the HashMap containing the sinks for this tile.  The keys are
-	 * the actual sink wires and the values are the SinkPin objects.
-	 *
-	 * @return The HashMap of sink wire mappings in this tile.
-	 */
-	public HashMap<Integer, SinkPin> getSinks() {
-		return sinks;
+	public List<Wire> getSinks() {
+		return Arrays.stream(sinks)
+				.mapToObj(w -> new TileWire(this, w))
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -443,46 +431,8 @@ public class Tile implements Serializable {
 	 *
 	 * @param sinks The new sinks to set for this tile.
 	 */
-	public void setSinks(HashMap<Integer, SinkPin> sinks) {
+	public void setSinks(int[] sinks) {
 		this.sinks = sinks;
-	}
-
-	/**
-	 * Returns the wire last wire with only a single source that sources the
-	 * specified sink.  Any route attempting to reach the sink must pass through
-	 * the returned wire to get there.  Generally, this wire will be the wire
-	 * leaving a switch matrix which sources the sink.  This is useful for routing
-	 * as it indicates the tile that the router should really be targeting to get
-	 * to the sink.
-	 * <p>
-	 * If the sink is unsourced, returns null.
-	 * @param sink the sink wire of interest
-	 * @return the furthest wire that is the sole source of the sink
-	 */
-	public SinkPin getSinkPin(Integer sink) {
-		return sinks == null ? null : sinks.get(sink);
-	}
-
-	/**
-	 * Used to compile the sources for this tile during parsing, should not be called
-	 * during normal usage.
-	 *
-	 * @param source The new source to add.
-	 */
-	public void addSource(int source) {
-		if (this.sources == null) {
-			int[] tmp = new int[1];
-			tmp[0] = source;
-			this.sources = tmp;
-		} else {
-			int i;
-			int[] tmp = new int[this.sources.length + 1];
-			for (i = 0; i < this.sources.length; i++) {
-				tmp[i] = sources[i];
-			}
-			tmp[i] = source;
-			this.sources = tmp;
-		}
 	}
 
 	/**
@@ -577,7 +527,7 @@ public class Tile implements Serializable {
 		private Site[] sites;
 		private WireHashMap wireConnections;
 		private WireHashMap reverseConnections;
-		private HashMap<Integer, SinkPin> sinks;
+		private int[] sinks;
 		private int[] sources;
 
 		@SuppressWarnings("unused")
