@@ -114,10 +114,6 @@ public class HandRouter{
 
 			// Almost all routes must pass through a particular switch matrix and wire to arrive
 			// at the particular sink.  Here we obtain that information to help us target the routing.
-			SinkPin sp = sink.getTile().getSinkPin(sink.getWireEnum());
-			Wire switchMatrixSink = new TileWire(sp.getSwitchMatrixTile(sink.getTile()), sink.getWireEnum());
-			System.out.println("** Sink must pass through switch matrix: " + switchMatrixSink + " **");
-
 			while(!finishedRoute){
 				// Here we prompt the user to choose a source to start the route from.  If this
 				// is the first tile we are routing in this net there will only be one choice.
@@ -148,12 +144,7 @@ public class HandRouter{
 				}
 
 				// Print out some information about the sink we are targeting
-				if(sink.getTile().getSinks().get(sink.getWireEnum()).switchMatrixSinkWire == -1){
-					System.out.println("\n\nSINK: " + sink + " " + net.getName());
-				} else {
-					System.out.println("\n\nSINK: " + sink + " " + net.getName()
-							+ " thru(" + switchMatrixSink + ")");
-				}
+				System.out.println("\n\nSINK: " + sink + " " + net.getName());
 
 				// Print out a part of the corresponding PIP that we have chosen
 				System.out.println("  pip " + currTree.getWire() + " -> ");

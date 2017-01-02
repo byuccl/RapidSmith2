@@ -240,47 +240,15 @@ public class DeviceDiffer {
 	private void diffTileSinks(Tile gold, Tile test) {
 		Set<String> sinks = new HashSet<>();
 		if (test.getSinks() != null) {
-			sinks.addAll(test.getSinks().keySet().stream()
-					.map(weTest::getWireName)
+			sinks.addAll(test.getSinks().stream()
+					.map(Wire::getWireName)
 					.collect(Collectors.toList()));
 		}
 		if (gold.getSinks() != null) {
-			for (Integer sink : gold.getSinks().keySet()) {
-				String sinkName = weGold.getWireName(sink);
+			for (Wire sink : gold.getSinks()) {
+				String sinkName = sink.getWireName();
 				if (!sinks.remove(sinkName)) {
 					differences.add("sinkPin", sinkName, "none");
-//				} else if (gold.getSinkPin(sink).switchMatrixSinkWire == -1) {
-//					// removed for v0.4 vs v0.5 testing
-//					if (test.getSinkPin(weTest.getWireEnum(sinkName)).switchMatrixSinkWire != -1) {
-//						differences.down("sinkPin", sinkName);
-//						differences.add("switchbox" + sinkName, "no switchbox source", weTest.getWireName(
-//								test.getSinkPin(weTest.getWireEnum(sinkName))
-//								.switchMatrixSinkWire));
-//						differences.up();
-//					}
-//				} else if (test.getSinkPin(weTest.getWireEnum(sinkName)).switchMatrixSinkWire == -1) {
-//					differences.down("sinkPin", sinkName);
-//					differences.add("switchbox", weGold.getWireName(gold.getSinkPin(sink).switchMatrixSinkWire),
-//							"no switchbox source");
-//					differences.up();
-//				} else {
-//					differences.down("sinkPin", sinkName);
-//					String goldSwitchMatrixWire = weGold.getWireName(
-//							gold.getSinkPin(sink).switchMatrixSinkWire);
-//					String testSwitchMatrixWire = weTest.getWireName(
-//							test.getSinkPin(weTest.getWireEnum(sinkName)).switchMatrixSinkWire);
-//					if (!goldSwitchMatrixWire.equals(testSwitchMatrixWire)) {
-//						differences.add("sinkMatrixWire", goldSwitchMatrixWire, testSwitchMatrixWire);
-//					}
-//
-//					int goldSwitchMatrixOffset = gold.getSinkPin(sink).switchMatrixTileOffset;
-//					int testSwitchMatrixOffset = test.getSinkPin(
-//							weTest.getWireEnum(sinkName)).switchMatrixTileOffset;
-//					if (goldSwitchMatrixOffset != testSwitchMatrixOffset) {
-//						differences.add("sinkMatrixOffset", "" + goldSwitchMatrixOffset,
-//								"" + testSwitchMatrixOffset);
-//					}
-//					differences.up();
 				}
 			}
 		}
