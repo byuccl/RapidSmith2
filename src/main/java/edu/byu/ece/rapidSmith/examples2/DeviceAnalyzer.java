@@ -42,14 +42,14 @@ public class DeviceAnalyzer {
 		msg("\n===========================\nSelected tile " + t.toString());
 		msg("Its row and column numbers are: [" + t.getRow() + ", " + t.getColumn() + "]");
 		
-		/*
+		
 		// Build each wire and print its statistics
 		Collection<Wire> wires = t.getWires();
 		msg("There are " + wires.size() + " wires in this tile...");
 		for (Wire tw : wires) {
 			printWire(tw);
 		}
-		*/
+		
 		msg("Done...");
 	}
 	
