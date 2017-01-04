@@ -10,7 +10,9 @@ collection of important additional information they require.
 This document will describe the process using RapidSmith2.  Note that
 a single Artix7 device file and supporting metadata files have been
 included in the RapidSmith2 distribution in the devices/artix7
-directory. 
+directory.  As a result, you can learn and experiment with RapidSmith2
+using that provided device file and need only be concerned with
+generating new device files when you require a different device.
 
 The big-picture steps to installing a new device or device family into
 RapidSmith2 is as follows (note that as a user you do not have to do
@@ -20,29 +22,26 @@ a number of the steps):
 listing of the various primitive site types within the FPGA device.
 Tincr and Tcl scripts can be used to obtain much of the information
 needed for this file automatically.  <<This is only done once for a
-given family and already exists in the distribution for the artix7
+given family and already exists in the distribution for the Artix 7
 family in the devices/artix7 directory.>>
 
 2. Create a cellLibrary.xml file.  This is an XML file that describes
 the various cells which are found in the netlists for a given device
 family.  This can be automatically created using TCL scripts.  It is
-not used in the remaining steps below but must be loaded when a device
-and design are loaded in RapidSmith2.  <<This is only done once for a
-given family and already exists in the distribution for the artix7
-family in the devices/artix7 directory.>>
+not used in the remaining steps below but must be created so it can be
+loaded when a device and design are loaded in RapidSmith2.  <<The
+creation of a cellLibrary.xml file is only done once for a given
+family and already exists in the distribution for the Artix 7 family in
+the devices/artix7 directory.>>
 
-3. Produce an XDLRC file.  For Virtex7 and earlier devices, this can
+3. Create an XDLRC file.  For Series 7 and earlier devices, this can
 be done using the following command in ISE: "xdl -report -pips
--all_conns <devname>".  For Ultrascale and later devices the XDLRC
-file will have to be created using Tincr.  You will have to do this -
-it is relatively straightforward for additional devices in the Xilinx
-V7 family and more involved for the first device from a different
-family.  How to do it for an already-supported family (Xilinx V7 by
-defauilt) is documented below.
+-all_conns <devname>".  For Ultrascale and later devices, the XDLRC
+file will have to be created using Tincr.  
 
 4. The Installer program within package edu.byu.ece.rapidSmith.util is
 then run and it will generate the needed device files for RapidSmith2.
-Running this program for the smallest Artix7 part takes about a half
+Running this program for the smallest Artix 7 part takes about a half
 hour on a multi-core i7 machine.
 
 Generating an XDLRC File
@@ -65,12 +64,13 @@ this is set to greater than 1.
 
 The successful completion of this command relies on the existence of a
 set of primitive definitions (primitive_defs) for a given family.
-These must be manually created and are stored in the cache directory
-of Tincr.  Given that they exist, they are folded into the XDLRC file
-when the above command is run.  They currently exist for the V7 family
-(artix7, kintex7, virtex7).  If you desire to generate device files
-for other families you must currently contact BYU to see if primitive
-definition files have been created for that family.
+These must be manually created once per family and are stored in the
+cache directory of Tincr.  Given that they exist, they are folded into
+the XDLRC file when the above command is run.  They currently exist
+for the Series 7 family (artix7, kintex7, virtex7).  If you desire to
+generate device files for other families you must currently contact
+BYU to see if primitive definition files have been created for that
+family.
 
 Running The Installer
 ---------------------
@@ -78,25 +78,22 @@ Once the XDLRC file has been created (and a familyInfo.xml file for
 your technology is available), the Installer program within package
 edu.byu.ece.rapidSmith.util can be run and it will generate the needed
 device files for RapidSmith2.  Running this program for the smallest
-Artix7 part takes about a half hour on a multi-core i7 machine.
+Artix 7 part takes about a half hour on a multi-core i7 machine.
 
-- The installer requires a parameter be passed which is the part name
-  (such as xc7a100tcsg324).
+- The installer requires a parameter be passed which is the full path name
+  to the xdlrc file (such as
+  "/Users/smith/Documents/git/RapidSmith2/devices/artix7/xc7a100tcsg324_full.xdlrc").
 
-- The installer will then expect the corresponding XDLRC file to be
-  located in the devices directory of RapidSmith2 to be of the form:
-  xc7a100tcsg324-full.xdlrc.  It will deposit the resulting device
-  files into the devices/familyName directory (devices/artix7 for the
-  example above)
-
-- The "--force" argument to the installer will instruct it to
-  overwrite any existing device file.
+- The installer will then deposit the resulting device files into the
+  devices/familyName directory (devices/artix7 for the example
+  above).  It determines the appropriate familyName to use from the
+  contents of the XDLRC file.
 
 - The VM also requires some arguments when running (such as
 --XstartOnFirstThread Xmx14G) where 14G is the memory to give - set it
 to most of the RAM on your machine,
   
-The result of this process should be 2 files with .dat extensions.
+The result of this process will be 2 files with .dat extensions.
 The first is a *_db.dat file (which is the basic device file) and the
 second is a *_info.dat file (which contains extended device
 information such as reverse wire mappings).  Loading a device file in
@@ -106,15 +103,16 @@ device package for details).
 
  
 --------------------------------------------------------------------
-As a user desiring to generate new device files for RapidSmith2, you
-may quit reading here.  The following is information used to support
-new families of devices, a task that is currently done by BYU.
+As a user desiring to generate new device files for an
+already-supported family in RapidSmith2, you may quit reading here.
+The following is information used to support new families of devices,
+a task that is currently done by BYU.
 --------------------------------------------------------------------
 
 << This is currently old information because RapidSmith2 is undergoing
-changes in how the following two XML files are generated (it will be
-~100% automated) .  The following text will be updated when those
-changes are complete.>>
+changes in how the following two XML files are generated (it will
+eventually be ~100% automated) .  The following text will be updated
+when those changes are complete.>>
 
 Generating A familyInfo.xml File >>
 
