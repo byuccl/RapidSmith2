@@ -20,6 +20,7 @@
 package edu.byu.ece.rapidSmith.device.creation;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -28,23 +29,44 @@ import java.util.Set;
  *
  * @author Chris Lavin
  */
-public class TileSources {
+final class UnorderedIntArray {
 	/**
 	 * Sources of the tile
 	 */
-	public final int[] sources;
+	private int[] array;
 	private final Set<Integer> set;
 
-	private Integer hash = null;
+	private int hash = 0;
 
-	public TileSources(int[] sources) {
-		if (sources == null)
-			sources = new int[0];
-		this.sources = sources;
+	UnorderedIntArray(int[] array) {
+		if (array == null)
+			array = new int[0];
+		this.array = array;
 
 		set = new HashSet<>();
-		for (int src : sources)
-			set.add(src);
+		for (int element : array)
+			set.add(element);
+	}
+
+	UnorderedIntArray(Set<Integer> set) {
+		this.set = set;
+	}
+
+	public int[] array() {
+		if (this.array == null) {
+			this.array = buildArrayFromSet(this.set);
+		}
+		return this.array;
+	}
+
+	private static int[] buildArrayFromSet(Set<Integer> set) {
+		int[] array = new int[set.size()];
+		Iterator<Integer> it = set.iterator();
+		int i = 0;
+		while (it.hasNext()) {
+			array[i++] = it.next();
+		}
+		return array;
 	}
 
 	/* (non-Javadoc)
@@ -52,7 +74,7 @@ public class TileSources {
 	 */
 	@Override
 	public int hashCode() {
-		if (hash == null) {
+		if (hash == 0) {
 			hash = set.hashCode();
 		}
 		return hash;
@@ -68,7 +90,9 @@ public class TileSources {
 		if (obj == null || getClass() != obj.getClass())
 			return false;
 
-		TileSources other = (TileSources) obj;
+		UnorderedIntArray other = (UnorderedIntArray) obj;
+		if (this.hashCode() != other.hashCode())
+			return false;
 		return set.equals(other.set);
 	}
 }
