@@ -1,4 +1,4 @@
-package edu.byu.ece.rapidSmith.examples2;
+package edu.byu.ece.rapidSmith.examples;
 
 import java.io.IOException;
 import java.util.Collection;

@@ -471,7 +471,7 @@ file \fil{\$RAPIDSMITH\_PATH/doc/InstallingNewDevices.txt}.
 \section{Example RS2 Programs and Sample Vivado Designs}
 
 A variety of example programs can be found in the
-\pkg{edu.byu.edu.rapidSmith.examples2} package in the RS2 installation.
+\pkg{edu.byu.edu.rapidSmith.examples} package in the RS2 installation.
 They have been heavily commented and so provide a means to learn the RS2 API by
 example as we believe this is much better than reading a lot of text trying to
 teach you what you need to know.
@@ -523,7 +523,7 @@ creating this app.
 
 \subsection{The \pgm{DesignAnalyzer} Test Program}
 This program, along with a number of other example programs, is located in the\\
-\pkg{edu.byu.ece.rapidSmith.examples2} package.  After loading a design from a
+\pkg{edu.byu.ece.rapidSmith.examples} package.  After loading a design from a
 checkpoint, it simply walks the design data structure, printing out what it
 finds as it goes.  As such, it provides a nice example of a number of things
 which would be useful for getting started with RS2:
@@ -537,12 +537,12 @@ which would be useful for getting started with RS2:
 \end{itemize}
 
 \subsection{The \pgm{DeviceAnalyzer} Test Program}
-This program is also located in the \pkg{edu.byu.ece.rapidSmith.examples2}
+This program is also located in the \pkg{edu.byu.ece.rapidSmith.examples}
 package.  It is designed as a simple getting started program and demonstrates
 how to query and print tiles in a device, wires in a tile, etc.
 
 \subsection{Other Test Programs}
-See the README.txt file in the \pkg{edu.byu.ece.rapidSmith.examples2} package
+See the README.txt file in the \pkg{edu.byu.ece.rapidSmith.examples} package
 directory.  It outlines the other test programs there which may be useful in
 coming up to speed on RS2. 
 
@@ -601,7 +601,7 @@ which serves as a template for its construction.
 setting the Cell’s anchor value to point to the BEL it resides on.  If you know
 where you want a Cell placed you can just place it there.  On the other hand,
 RS2 provides a way to identify the Site/BEL combinations where a Cell could be
-placed.  See the program \pgm{CreateDesignExample} in the \dir{examples2}
+placed.  See the program \pgm{CreateDesignExample} in the \dir{examples}
 directory for an illustration of how to do it both ways.
 \item Cell objects have pins on their periphery where CellNets connect to.
 \item The top-level ports of a design are tied to \cls{IPORT}, \cls{OPORT}, or
@@ -689,11 +689,11 @@ properties you should know:
   up the VCC or GND route.
   \item Once a CellNet’s physical routing has been created as a RouteTree, that
   is converted to a directed routing string when RS2 designs are exported from
-  RS2 back into Vivado.  The DesignAnalyzer program in the examples2 directory
+  RS2 back into Vivado.  The DesignAnalyzer program in the examples directory
   gives an example of tracing out the RouteTrees which represent a physically
   routed wire.                       
 \end{itemize}
-The program \pgm{DesignAnalyzer} in the \pkg{edu.byu.ece.rapidSmith.examples2}
+The program \pgm{DesignAnalyzer} in the \pkg{edu.byu.ece.rapidSmith.examples}
 package provides an illustration of how to traverse a physically routed CellNet.  This
 is done in its \sbr{createRoutingString()} method.  This method starts by
 getting the RouteTree object associated with the source pin for the given CellNet.  It then
@@ -765,7 +765,7 @@ wires (called PIPs).
 \section{Importing/Exporting Designs Between Vivado and RS2}
 
 Importing and export designs between Vivado and RS2 is straightforward.  See the
-program edu.byu.ece.rapidSmith.examples2.ImportExportExample for an illustration
+program edu.byu.ece.rapidSmith.examples.ImportExportExample for an illustration
 of how to do this.
 
 \section{Bitstreams in RS2}

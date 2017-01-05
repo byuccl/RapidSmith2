@@ -18,7 +18,7 @@
  * also get a copy of the license at <http://www.gnu.org/licenses/>.
  */
 
-package edu.byu.ece.rapidSmith.examples2;
+package edu.byu.ece.rapidSmith.examples;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.NetType;
