@@ -1,2 +1,1 @@
-RapidSmith2 with Vivado Integration. This project is currently the staging ground for getting RapidSmith2 ready for release. The target release date is end of summer 2016.
-
+RapidSmith2 - the Vivado successor to RapidSmith. Released Jan 4, 2017 - initially expect frequent updates to the documentation (daily basis?). Pull changes regularly to get the latest.
