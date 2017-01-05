@@ -18,7 +18,7 @@
  * also get a copy of the license at <http://www.gnu.org/licenses/>.
  */
 
-package edu.byu.ece.rapidSmith.examples2.placerDemo;
+package edu.byu.ece.rapidSmith.examples.placerDemo;
 
 
 import edu.byu.ece.rapidSmith.design.NetType;
