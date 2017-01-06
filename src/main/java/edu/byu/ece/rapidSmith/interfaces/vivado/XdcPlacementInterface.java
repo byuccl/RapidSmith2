@@ -113,7 +113,7 @@ public class XdcPlacementInterface {
 	private void applyCellPinMappings(String[] toks) {
 		
 		Cell cell = tryGetPlacedCell(toks[1]);
-		Bel bel = cell.getAnchor();
+		Bel bel = cell.getBel();
 		
 		for (int i = 2; i < toks.length; i++) {
 			String[] pinmap = toks[i].split(":");
@@ -281,8 +281,8 @@ public class XdcPlacementInterface {
 		//TODO: Assuming that the logical design has not been modified...can no longer assume this with insertion/deletion
 		for (Cell cell : sortCellsForXdcExport(design)) {
 						
-			Site ps = cell.getAnchorSite();
-			Bel b = cell.getAnchor();
+			Site ps = cell.getSite();
+			Bel b = cell.getBel();
 			String cellname = cell.getName();
 			
 			// ports need a package pin reference, and aren't placed in Vivado
@@ -331,7 +331,7 @@ public class XdcPlacementInterface {
 			}
 			
 			String libCellName = cell.getLibCell().getName();
-			String belName = cell.getAnchor().getName();
+			String belName = cell.getBel().getName();
 			
 			if (belName.endsWith("LUT")) {
 				lutCells.add(cell); 

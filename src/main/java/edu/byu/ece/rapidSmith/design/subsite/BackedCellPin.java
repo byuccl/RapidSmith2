@@ -83,7 +83,7 @@ public class BackedCellPin extends CellPin {
 
 	@Override
 	public List<BelPin> getPossibleBelPins() {
-		return getPossibleBelPins(getCell().getAnchor());
+		return getPossibleBelPins(getCell().getBel());
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public class BackedCellPin extends CellPin {
 	@Override
 	public List<String> getPossibleBelPinNames() {
 		Cell cell = getCell();
-		return (cell.isPlaced()) ? getPossibleBelPinNames(cell.getAnchor().getId()) 
+		return (cell.isPlaced()) ? getPossibleBelPinNames(cell.getBel().getId())
 								: Collections.emptyList(); 
 	}
 

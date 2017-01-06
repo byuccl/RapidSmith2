@@ -567,9 +567,9 @@ public class CellDesign extends AbstractDesign {
 		assert cell.getDesign() == this;
 		assert cell.isPlaced();
 
-		Site site = cell.getAnchorSite();
+		Site site = cell.getSite();
 		Map<Bel, Cell> sitePlacementMap = placementMap.get(site);
-		sitePlacementMap.remove(cell.getAnchor());
+		sitePlacementMap.remove(cell.getBel());
 		if (sitePlacementMap.size() == 0)
 			placementMap.remove(site);
 		cell.unplace();
@@ -632,7 +632,7 @@ public class CellDesign extends AbstractDesign {
 			Cell cellCopy = cell.deepCopy();
 			designCopy.addCell(cellCopy);
 			if (cell.isPlaced()) {
-				designCopy.placeCell(cellCopy, cell.getAnchor());
+				designCopy.placeCell(cellCopy, cell.getBel());
 				for (CellPin cellPin : cell.getPins()) {
 					if (cellPin.getMappedBelPinCount() > 0) {
 						CellPin copyPin = cellCopy.getPin(cellPin.getName());

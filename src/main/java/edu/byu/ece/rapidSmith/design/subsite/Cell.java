@@ -46,7 +46,7 @@ public class Cell {
 	/** IO Bondedness for this pad cells.  Use internal for non-IO pad cells. */
 	private BondedType bonded;
 	/** BEL in the device this site is placed on */
-	private Bel anchor;
+	private Bel bel;
 	/** Properties of the cell */		
 	private Map<Object, Property> properties;
 	/** Mapping of pin names to CellPin objects of this cell */
@@ -69,7 +69,7 @@ public class Cell {
 		this.bonded = BondedType.INTERNAL;
 
 		this.design = null;
-		this.anchor = null;
+		this.bel = null;
 		this.properties = null;
 		
 		this.pinMap = new HashMap<>();
@@ -166,7 +166,7 @@ public class Cell {
 	 * Returns true if this cell is placed on a BEL.
 	 */
 	public final boolean isPlaced() {
-		return anchor != null;
+		return bel != null;
 	}
 
 	public final List<Cell> getSubcells() {
@@ -179,8 +179,8 @@ public class Cell {
 	 *
 	 * @return the BEL this cell is placed at in the design
 	 */
-	public final Bel getAnchor() {
-		return anchor;
+	public final Bel getBel() {
+		return bel;
 	}
 
 	public final List<BelId> getPossibleAnchors() {
@@ -196,18 +196,18 @@ public class Cell {
 	 *
 	 * @return the site this cell resides
 	 */
-	public final Site getAnchorSite() {
-		return anchor == null ? null : anchor.getSite();
+	public final Site getSite() {
+		return bel == null ? null : bel.getSite();
 	}
 
 	void place(Bel anchor) {
 		assert anchor != null;
 
-		this.anchor = anchor;
+		this.bel = anchor;
 	}
 
 	void unplace() {
-		this.anchor = null;
+		this.bel = null;
 	}
 	
 	/**
@@ -462,7 +462,7 @@ public class Cell {
 	}
 	
 	public Map<SiteProperty, Object> getSharedSiteProperties() {
-		return getSharedSiteProperties(anchor.getId());
+		return getSharedSiteProperties(bel.getId());
 	}
 
 	public Map<SiteProperty, Object> getSharedSiteProperties(BelId belId) {
@@ -593,6 +593,6 @@ public class Cell {
 
 	@Override
 	public String toString() {
-		return "Cell{" + getName() + " " + (isPlaced() ? "@" + getAnchor().getFullName() : "") + "}";
+		return "Cell{" + getName() + " " + (isPlaced() ? "@" + getBel().getFullName() : "") + "}";
 	}
 }

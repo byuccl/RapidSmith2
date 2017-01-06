@@ -119,7 +119,7 @@ public class SimulatedAnnealingPlacer {
 				//populate the source information
 				VirtualNet vnet = new VirtualNet();
 				vnet.setName(net.getName());
-				Site sourceSite = net.getSourcePin().getCell().getAnchorSite();
+				Site sourceSite = net.getSourcePin().getCell().getSite();
 				SiteCluster scSource = siteToCluster.get(sourceSite);
 			
 				//populate the sink information
@@ -127,11 +127,11 @@ public class SimulatedAnnealingPlacer {
 				HashSet<Site> usedSinkSites = new HashSet<>();
 				int sinkCount = 0;
 				for (CellPin sinkpin : net.getSinkPins() ) {
-					Site sinkSite = sinkpin.getCell().getAnchorSite(); 
+					Site sinkSite = sinkpin.getCell().getSite();
 					
 					//ignore parts of nets that start in one site and end in the same site
 					if (!sourceSite.equals(sinkSite) && !usedSinkSites.contains(sinkSite) ) {
-						SiteCluster scSink = siteToCluster.get(sinkpin.getCell().getAnchorSite());
+						SiteCluster scSink = siteToCluster.get(sinkpin.getCell().getSite());
 						sinks.add(scSink);
 						sinkCount++;
 						scSink.addnet(vnet);
@@ -220,7 +220,7 @@ public class SimulatedAnnealingPlacer {
 			CellPin carryIn = dspGetNextCarryInCellPin(dsp);
 			
 			if (carryIn != null) { //this means that the current dsp is the start of a carry chain
-				Site site = dsp.getAnchorSite();
+				Site site = dsp.getSite();
 				System.out.println("Site " + site.getName() + " is the start of a dsp carry chain!");
 				DSPCarryCluster start = new DSPCarryCluster(site);
 				start.addCell(dsp);
@@ -233,7 +233,7 @@ public class SimulatedAnnealingPlacer {
 				while (carryIn != null) { //get the carry connections
 					height++; 
 					Cell nextDSP = carryIn.getCell();
-					Site nextSite = nextDSP.getAnchorSite();
+					Site nextSite = nextDSP.getSite();
 					SiteCluster tmp = new SiteCluster(nextSite);
 					tmp.addCell(nextDSP);
 					
@@ -278,7 +278,7 @@ public class SimulatedAnnealingPlacer {
 					CellPin carryIn = getNextCarryInCellPin(carryOutNet);
 					while (carryIn != null) {
 						height++;
-						Site nextSite = carryIn.getCell().getAnchorSite(); 
+						Site nextSite = carryIn.getCell().getSite();
 						SiteCluster carryTmp = createSiteCluster(nextSite);
 						start.addDependentSite(carryTmp);
 						
@@ -344,13 +344,13 @@ public class SimulatedAnnealingPlacer {
 	}
 	
 	private boolean isBufgNet(CellNet net) {
-		if (net.getSourcePin().getCell().getAnchorSite().getType().equals(Artix7.SiteTypes.BUFG)) {
+		if (net.getSourcePin().getCell().getSite().getType().equals(Artix7.SiteTypes.BUFG)) {
 			System.out.println("BUFG Net: " + net.getName());
 			return true;
 		}
 		else {
 			for (CellPin cp : net.getSinkPins()) {
-				if(cp.getCell().getAnchorSite().getType().equals(Artix7.SiteTypes.BUFG)) {// || cp.getBelPin().getName().equals("CE")) {
+				if(cp.getCell().getSite().getType().equals(Artix7.SiteTypes.BUFG)) {// || cp.getBelPin().getName().equals("CE")) {
 					System.out.println("BUFG Net: " + net.getName());
 					return true;
 				}
@@ -358,7 +358,7 @@ public class SimulatedAnnealingPlacer {
 		}
 		
 		return false;
-		//return net.getSourcePin().getCell().getAnchorSite().getType().equals(SiteType.BUFG);
+		//return net.getSourcePin().getCell().getSite().getType().equals(SiteType.BUFG);
 	}
 	private boolean netIsGlobalLogic(CellNet net) {
 		return net.getType().equals(NetType.VCC) || net.getType().equals(NetType.GND);
