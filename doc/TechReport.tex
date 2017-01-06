@@ -77,12 +77,12 @@
 \newfloat{Program}{thp}{loa}[section]
 
 \date{}
-\title{\bf \Huge \sc{RAPIDSMITH 2}\\[0.4in]
-\hline\\[0.1in]
+\title{{\bf \Huge \sc{RAPIDSMITH 2}}\\[0.1in]
+%\hline\\[0.1in]
 A Library for Low-level Manipulation 
 of Vivado Designs at the Cell/BEL Level\\[0.3in]
+%\hline\\[0.4in]
 Technical Report and Documentation\\[0.1in]
-\hline\\[0.3in]
 }
 \author{\Large Travis Haroldsen, Thomas Townsend, Brent Nelson\\[0.2in]
 \large NSF Center for High Performance Reconfigurable Computing (CHREC)
@@ -90,11 +90,16 @@ Technical Report and Documentation\\[0.1in]
  Science Foundation, grant number 1265957.}\\
 \large Department of Electrical and Computer Engineering  \\
 \large  Brigham Young University \\
-\large  Provo, UT, 84602 \\[1in]
-\large Last Modified: \today \\[0.5in]
+\large  Provo, UT, 84602 \\[0.7in]
+\large Last Modified: \today \\[0.05in]
 }
 
+
 \maketitle
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\columnwidth]{logo}
+\end{figure}
 \newpage
 \tableofcontents
 %\listoffigures
@@ -116,16 +121,17 @@ addition to RapidSmith.  Using RS2 you can write custom CAD tools which will:
   \item make modifications to those designs
   \item import those designs back into Vivado for further processing or bitstream generation
 \end{itemize}
-In addition, you need not start with a Vivado design – you can create a new
-design from scratch in RS2 (hereafter abbreviated as {\em RS2} and then
+In addition, you need not start with a Vivado design --- 
+you can create a new
+design from scratch in RS2 and then
 import it into Vivado.
 
 So, clearly a major addition with RS2 is the ability to work with Vivado. 
 However, the other major new capability which RS2 adds over RapidSmith is that
-it changes RapidSmith’s design representation from the Instances and Sites of
-ISE’s XDL language to the Cells and BELs of Vivado.   This is a significant
-change as it exposes the actual design and device in a way that RapidSmith never
-did, opening up a world of new CAD research opportunities which were difficult
+it changes RapidSmith's design representation from the Instances and Sites of
+ISE's XDL representation to the Cells and BELs of Vivado.   This is a
+significant change as it exposes the actual design and device in a way that RapidSmith never
+did, opening up new CAD research opportunities which were difficult
 to perform using Rapidsmith.
        
 \subsection{Who Should Use RS2?}
@@ -143,16 +149,15 @@ bitstreams for a design, for example).
 The Xilinx-provided TCL interface into Vivado, in theory, provides all that is
 needed to create any kind of CAD tool desired to augment the capabilities
 provided by Vivado.  In practice there are a number of problems with that.
-First, TCL is slow, far too slow to execute a router for example.  Also the
-Xilinx TCL interface does not manage memory well.  In our experience, long
-running scripts eventually cause the system to run out of memory (this has been
-unofficially confirmed by reading between the lines of the responses we have
-received to bug reports we have filed).  Brad White’s MS work also determined
+First, TCL is slow --- far too slow to execute a router for example.  Also the
+Xilinx TCL interface does not manage memory well.  In our experience,
+long-running scripts eventually cause the system to run out of memory. 
+Brad White's MS work also determined
 that not 100\% of the device information required to do arbitrary CAD
 manipulations is available through TCL.  As a result, additional tools (and
 some small amount of manual work) are required to provide the user (and CAD
-tools they might like to write) with all the physical details on Xilinx parts
-(simply put, some information is not available through the TCL interface). 
+tools they might like to write) with all the physical details on Xilinx parts.
+Simply put, some information is not available through the TCL interface. 
 Finally, the ability to export and import designs to/from Vivado and operate
 on them outside Vivado using a modern high-level language such as Java is a
 hugely useful capability.
@@ -169,28 +174,28 @@ matters most: their research of new ideas and algorithms.
 \subsection{Which Xilinx Parts does RS2 Support?}
 As of the writing of this document, Artix 7 has been tested the most and is
 currently supported in all forms and applications.  In addition, an Ultrascale
-device file was created and demonstrated as a part of Brad White’s MS work to
-show that it is possible.  At some point, Ultrascale should be fully supported
+device file was created and demonstrated as a part of Brad White's MS work to
+show that it is possible.  At some point, Ultrascale should be fully supported.
 \footnote{An XDL-based import/export capability has also been created and used
-with Virtex 6 devices as a part of Travis Haroldsen’s PhD work but that path is
-not being released, documented, or supported.}.
+with Virtex 6 devices as a part of Travis Haroldsen's PhD work but that path is
+not being released, documented, or supported.}
 
 As will be seen later, to generate additional device files for additional parts
 within a supported family is relatively straightforward and can be done by any
-user.  As will also be seen later, new families can also be supported but this
-requires a bit more work.  As time goes on the process will become simpler –
+user.  New families can also be supported but this
+requires a bit more work.  As time goes on the process will become simpler ---
 that is one of the goals for RS2 moving forward.
 
 \subsection{How is RS2 Different than VPR and VTR?}
 VPR (Versatile Place and Route) has been an FPGA research tool for several years
-and has led to hundreds of publications on new FPGA CAD research.  It has been a
+and has led to many publications on new FPGA CAD research.  It has been a
 significant contribution to the FPGA research community and has grown to be a
 complete FPGA CAD flow for research-based FPGAs.
 
-The main difference between RapidSmith/RS2 and VPR is that the RapidSmith tools
+The main difference between RapidSmith/RS2 and VPR is that the RapidSmith tools
 aim to provide the ability to target commercial Xilinx FPGAs, providing the
-ability to exit and re-enter the standard Xilinx flow at any point. All features
-of commercial FPGAs which are accessible via XDL and Vivado’s TCL are available
+ability to exit and re-enter the standard Xilinx flow at any point.  All
+features of commercial FPGAs which are accessible via XDL and Vivado's TCL are available
 in RapidSmith and RS2.  VPR currently is limited to FPGA features which can be
 described using VPR's architectural description facilities.
 
@@ -214,8 +219,8 @@ human-readable file format equivalent to the Xilinx proprietary Netlist Circuit
 Description (NCD) of ISE.  With RapidSmith, researchers were able to import
 XDL/NCD, manipulate, place, route and export designs among a variety of design
 transformations.  The RapidSmith project made an excellent test bed to try out
-new ideas and algorithms for FPGA CAD research as code could quickly be written
-to take advantage of the APIs available.
+new ideas and algorithms for FPGA CAD research because code could quickly be
+written to take advantage of the APIs available.
 
 RapidSmith also contained packages which could parse/export bitstreams (at the
 packet level) and represent the frames and configuration blocks in the provided
@@ -230,12 +235,13 @@ on it.
 \subsubsection{What is RS2?}
 With the announced end of ISE (with the Virtex7 family of parts being the last
 family to be supported by ISE), there was no path forward to newer parts using
-RapidSmith.  This is because XDL is not available with Vivado. However, with
-Vivado Xilinx has provided an extensive TCL scripting capability which it
+RapidSmith.  This is because XDL is not available with Vivado. With
+Vivado, however, Xilinx has provided an extensive TCL scripting capability which 
 initially looked as if it could provide a similar capability to that provided by
-XDL in terms of accessing both Vivado’s design and device data and in terms of
-creating and modifying Vivado designs.  The development of RS2 consisted of
-three parts.
+XDL in terms of accessing both Vivado's design and device data and in terms of
+creating and modifying Vivado designs.  However, as described above, Vivado's
+Tcl is limited by speed and memory challenges.
+The development of RS2 consisted of three parts.
 
 \subsubsection{Tincr: Integrating Custom CAD Tool Frameworks with the Xilinx 
 Vivado Design Suite} 
@@ -247,13 +253,13 @@ project, led by Brad White as a part of his MS work at BYU, with Thomas Townsend
 making additions as a part of his research.
 
 Tincr is a TCL-based library of routines which (a) provide a variety of
-functions to simply make working with Vivado via TCL simpler, (b) provide a way
+functions to simply make working with Vivado via TCL easier, (b) provide a way
 to export all the data associated with a Vivado design into what is called a
 Tincr Checkpoint (TCP), (c) provide a way to reimport Tincr Checkpoints back
 into Vivado, and (d) access device data from Vivado and output that data in the
 form of XDLRC files (these are the files which XDL used to describe devices and
-are necessary for RapidSmith to understand the structure of and the resources 
-available for use in a given Xilinx part).  Tincr is available at Github.com as
+are necessary for RapidSmith and RS2 to understand the structure of and the
+resources available for use in a given Xilinx part).  Tincr is available at Github.com as
 the project byuccl/Tincr.  Tincr is described in two publications:
 
 \begin{quotation}B. White and B. Nelson, "Tincr — A custom CAD tool framework
@@ -281,9 +287,9 @@ February 2015, Monterey CA, pp. 66-69, DOI: 10.1145/2684746.2689085.
 \subsubsection{Vivado and RS2 Integration}
 The third part of the development of RS2 was to create the ability to export
 designs from Vivado and into RS2 and, correspondingly, to import RS2 data back
-into Vivado.  This was completed during 2016, largely by Thomas Townsend who was
-an MS student at Brigham Young University during that time.  The initial public
-release of RS2 was made in late 2016 once that piece was in place.
+into Vivado.  This was completed during 2016, largely by Thomas Townsend
+as an MS student at Brigham Young University.  The initial
+public release of RS2 was made in January 2017 once that piece was in place.
 
 \subsubsection{What is All This About XDL and XDLRC and How Does RS2 Fit Into
 That?} 
@@ -302,9 +308,9 @@ RapidSmith used:
   routing connections).
 \end{itemize}
 In Vivado, however, designs are described as a collection of \cls{Cells} where a Cell
-corresponds to things like LUTs, flip flops, etc.  Cells are placed onto \cls{BEL}
-objects such as an ALUT or a BFF.  RS2 contains a new layer of hierarchy in its
-design and device descriptions where Cells and BELs are first-class objects and
+corresponds to things like LUTs, flip flops, etc.  A Cell may be placed
+onto a \cls{BEL} object such as an ALUT or a BFF.  RS2 contains a new layer of
+hierarchy in its design and device descriptions where Cells and BELs are first-class objects and
 design manipulation is all done at the Cell/BEL level.
 
 Also, Vivado Nets are described using directed routing strings rather than lists
@@ -324,7 +330,7 @@ Thus, a complete solution involves Vivado, Tincr, and RS2.
 
 \begin{figure}[htb]
 \centering
-\includegraphics[width=0.8\columnwidth]{UsageModels}
+\includegraphics[width=\columnwidth]{UsageModels}
 \caption{Vivado and RS2 Usage Model}
 \label{fig:UsageModels}
 \end{figure} 
@@ -333,53 +339,55 @@ Thus, a complete solution involves Vivado, Tincr, and RS2.
 
 \subsection{Installation}
 
-RS2 is available on Github at: \url{https://github.com/byuccl/RapidSmith2}.  The
-repository contains all the files you need (including supporting JAR files). 
+RS2 is available on Github at: \url{https://github.com/byuccl/RapidSmith2}.  
 You can either build RS2 into .class and .jar files for use in any Java
 environment, or you can easily build RS2 for use in Eclipse (recommended).
 
 \subsubsection{Requirements for Installation}
 \begin{itemize}
-  \item Windows, Linux or Mac OS X all will work (see notes below for Mac OS X)
+  \item Windows, Linux or Mac OS X all will work (see additional notes below for
+  Mac OS X)
   \item Vivado
   \item JDK 1.8 or later NOTE: If you plan on using the Qt Jambi framework in a
   Windows environment, you will need the 32-bit JRE (Qt Jambi 4.6.3 had yet to
   be compiled in 64-bit Windows as of the writing of this document).
-  \item In addition, the distribution provides copies of a number of JAR files
-  required for use by RS2.
- \end{itemize}
+\end{itemize}
  
 \subsubsection{Steps for Installation For Command Line Usage}
-The first task is to acquire RS2.  This will require a git client.  You can
-acquire the RS2 distribution by executing the following: 
+The first task is to acquire RS2 using git.
+You can acquire the RS2 distribution by executing the following: 
 \vspace{-0.15in}  \begin{code}
-git clone https://github.com/xrtc/RapidSmith2
+git clone https://github.com/byuccl/RapidSmith2
 \end{code} 
 The second task is to create an environment variable called
 \env{RAPIDSMITH\_PATH} and point it at the RS2 directory thus created.  This is
 needed so RS2 can find the required device files and other items as it runs.
 
 The third task is to build RS2.  At this point you have two choices: setting up
-RS2 for use with Eclipse or building RS2 manually to generate
+RS2 for use with Eclipse or building RS2 manually to generate
 .class and .jar files which you can then use with any Java installation.
 	
 \paragraph{Building for Eclipse}  
 RS2 requires Eclipse Neon or later so install that. 
-Then, create an eclipse project by executing one of the following (depending on your system):
+Then, create an eclipse project by executing one of the following:
 
 \vspace{-0.15in}  \begin{code}
 # Will build antlr-generated files and create Eclipse project
 gradlew antlr eclipse       
 (or gradlew.bat antlr eclipse depending on OS)
 \end{code} 
-Executing these will create a \fil{.project} file.  Once you have done this you
-can import the project into Eclipse by opening Eclipse and selecting: 
+Executing these will create an Eclipse \fil{.project} file.  Once you have done
+this you can import the project into Eclipse by opening Eclipse and selecting: 
 \vspace{-0.15in}  \begin{code}
     File->Open Projects From File System 
 \end{code}
 and pointing it to the RapidSmith2 directory created when you cloned RS2 from
 github above. 
 All of the Java source files will be found in Eclipse under \dir{src/main/java}.
+
+IMPORTANT: Eclipse does not seem to like (and instructions on the web
+discourage) having a git repository being inside its workspace.  Put your git
+repository elsewhere on disk (like \dir{MyDocuments/git}).
 
 \paragraph{Building Manually} 
 Execute one of the following to build RS2: 
@@ -401,11 +409,13 @@ This will produce a variety of things, any of which can be added to your
   qtjambi for windows so use the 32-bit one).
 \end{itemize}
 At this point you should be able to write tools that use RS2.
-An obvious thing to try is to mix and match – developing in Eclipse but then
-running the resulting apps from the command line.  Just be aware that Eclipse
+
+CAUTION: An obvious thing to try is to mix and match developing in Eclipse but
+then running the resulting apps from the command line.  Just be aware that Eclipse
 puts its compiled .class files in very different places than where the manual
-build process puts its .class files.  Make sure you understand that before you
-try that.
+build process puts its .class and .jar files.  Make sure you understand that
+before you try to combine these two build/execute methods (or better yet, don't
+combine them).
 
 \subsubsection{Additional Notes for Mac OS X Installation}
 \begin{itemize}
@@ -427,7 +437,7 @@ Some points to keep in mind:
 \begin{itemize}
   \item The RS2 code base contains a number of assertions which may be helpful  
   as you are developing code.  These are not enabled by default in Java.  To
-  enable them, add \opt{-ea} as a VM argument.
+  enable them, add \opt{-ea} as a VM argument.  This is highly recommended.
   \item If you are running on a Mac, when running RS2 programs that use Qt  (any
   of the built-in programs like \pgm{DeviceBrowser}) that are GUI-based, you
   will need to supply an extra JVM switch, \opt{-XstartOnFirstThread}.
@@ -438,7 +448,10 @@ Some points to keep in mind:
 
 \subsubsection{Testing Your Installation}
 
-At this point you can test your installation by executing the java
+{\em The DeviceBrowser program is not yet ready for use.   Stay tuned for a day
+or two.}
+
+\noindent At this point you can test your installation by executing the java
 \pgm{DeviceBrowser} program: 
 \vspace{-0.15in}  \begin{code}
 java edu.byu.ece.rapidSmith.device.browser.DeviceBrowser
@@ -453,10 +466,12 @@ java edu.byu.ece.rapidSmith.device.browser.DeviceBrowser
 
 This can be done either from within Eclipse or from the command line, depending
 on how you are running RS2 (if running under OS X be sure to provide the
-\opt{–XstartOnFirstThread JVM argument}.
+\opt{-XstartOnFirstThread JVM argument}.
 
 If all goes well you should see a graphical representation showing the details
-of a physical FPGA device as shown in \autoref{fig:deviceBrowser}.
+of a physical FPGA device as shown in \autoref{fig:deviceBrowser}.  You may
+initially be zoomed far in and might want to zoom out to see the entire chip
+layout.
 
 \subsection{Device Files For Use With RS2}
 Device files for one part (the {\em xc7a100tcsg324}) are included in the
@@ -558,7 +573,7 @@ and consist of 3 designs:
 \end{itemize} 
 The RS2 checkpoints are contained in
 the following directories: \dir{add.tcp}, \dir{cordic.tcp}, and
-\dir{count16}.
+\dir{count16.tcp}.
 Vivado checkpoints are also included and are the \fil{add.dcp},
 \fil{cordic.dcp}, and \fil{count16.dcp} files.  
 
@@ -598,14 +613,14 @@ order:
 \item A Cell always contains a reference to an object of type \cls{LibraryCell},
 which serves as a template for its construction.
 \item Cells may be physically  placed onto BELs in the device.  This is done by
-setting the Cell’s anchor value to point to the BEL it resides on.  If you know
+setting the Cell's anchor value to point to the BEL it resides on.  If you know
 where you want a Cell placed you can just place it there.  On the other hand,
 RS2 provides a way to identify the Site/BEL combinations where a Cell could be
 placed.  See the program \pgm{CreateDesignExample} in the \dir{examples}
 directory for an illustration of how to do it both ways.
 \item Cell objects have pins on their periphery where CellNets connect to.
 \item The top-level ports of a design are tied to \cls{IPORT}, \cls{OPORT}, or
-\cls{IOPORT} Cell objects.  These are pseudo-cells (you won’t find them in
+\cls{IOPORT} Cell objects.  These are pseudo-cells (you won't find them in
 Vivado) and represent the terminal points for signals leaving or entering the top-level.  
 \end{itemize}
 
@@ -613,12 +628,12 @@ Vivado) and represent the terminal points for signals leaving or entering the to
 Cells as represented in EDIF files coming from Vivado may contain properties. 
 For example, a D flip flop cell (FDRE) has a \env{CONFIG.INIT} property,
 indicating what its power-up state should be.  These properties can be set to modify the
-Cell’s behavior.  The DesignAnalyzer test program described above pretty-prints
-an RS2 logical design and, as a part of its operation, it lists the properties
+Cell's behavior.  The \pgm{DesignAnalyzer} test program described above
+pretty-prints an RS2 logical design and, as a part of its operation, it lists the properties
 set on each Cell in the design.  Here are some additional things about
 properties you should know:
 \begin{itemize}
-  \item	It might be of interest, however, to learn what properties could be set
+  \item	It might be of interest to learn what properties could be set
   for a given cell.  This set of properties can be found in the
   \fil{cellLibrary.xml} files generated for a given family (see the
   \dir{\$RAPIDSMITH\_PATH/devices} directory and its sub-directories to find
@@ -631,7 +646,7 @@ properties you should know:
   when set by a user program.   For now, user code can set properties and those
   will be exported into EDIF when going from RS2 back into Vivado.  However, no
   error checking will be done by RS2 as this is done.
-  \item In a GUI view of devices in Vivado you will see polarity inverter in
+  \item In a GUI view of devices in Vivado you will see polarity inverters in
   many sites allowing for programmable selection of a signal or its inverse. 
   This is shown in the GUI in the form of a 2:1 MUX.  The CLK signal
   and its inverse entering a SLICE is an example of this.  However, this is not
@@ -651,7 +666,8 @@ properties you should know:
   \env{CONFIG.IS\_C\_INVERTED} control set value).  If you violate this, Vivado
   will throw an error.  Similar restrictions exist for all cells in a site driven by
   shared programmable inverters.  For example, flip flops in a slice (FDRE
-  LibraryCells) share programmable inverters on their clock, D, and R inputs.
+  LibraryCells) may share programmable inverters on their clock, clock enable,
+  and R inputs.
 \end{itemize}
 
 \subsection{The CellNet Class}
@@ -678,19 +694,18 @@ properties you should know:
   the net.
   \item Normal wires (CellNets of type WIRE) have only one RouteTree, reflecting
   the fact that they have a single source and multiple sinks.  Note that a wire
-  cannot be physical routed to the pin of a cell which has not yet been routed.
-  \item Physically, GND and VCC nets have some unique characteristics compared
-  to other wires.  Most importantly, when a circuit has been routed by Vivado
-  the result will be multiple physical VCC routes and multiple physical GND
+  cannot be physical routed to the pin of a cell which has not yet been placed.
+  \item Physically, GND and VCC nets are unique.  When a
+  circuit has been routed by Vivado the result will be multiple physical VCC routes and multiple physical GND
   routes in the circuit.  Each route is represented by its own RouteTree object.
   The source for each of these RouteTree objects will be a wire which is
   connected to a TIEOFF.  These TIEOFFs are not physically placed but their
   locations can be inferred by the source wire for each of the RouteTrees making
   up the VCC or GND route.
-  \item Once a CellNet’s physical routing has been created as a RouteTree, that
+  \item Once a CellNet's physical routing has been created as a RouteTree, that
   is converted to a directed routing string when RS2 designs are exported from
-  RS2 back into Vivado.  The DesignAnalyzer program in the examples directory
-  gives an example of tracing out the RouteTrees which represent a physically
+  RS2 back into Vivado.  The \pgm{DesignAnalyzer} program in the examples
+  directory gives an example of tracing out the RouteTrees which represent a physically
   routed wire.                       
 \end{itemize}
 The program \pgm{DesignAnalyzer} in the \pkg{edu.byu.ece.rapidSmith.examples}
@@ -714,29 +729,19 @@ RS2 has significantly extended the original RapidSmith \cls{Device} class for
 its use as well as how device files are generated.
 
 A Device object consists of a collection of \cls{Tiles}, each of which contains
-one or more \cls{Sites}.  A Site contains one or more Bels.  Sites have
+one or more \cls{Sites}.  A Site contains one or more \cls{Bels}.  Sites have
 \cls{SitePins} around their periphery and Bel objects have \cls{BelPINs} around
 theirs.
 
 The physical wires in the device are represented by objects of type \cls{Wire},
 \cls{TileWire}, and \cls{SiteWire}.  However, the goal of RS2 is to largely hide
 the differences between these three wire object types and let the user simply deal
-with Wire objects.
+with \cls{Wire} objects.
 
 The previously-mentioned \pgm{DeviceBrowser} and \pgm{DeviceAnalyzer} programs
 illustrate how to load and browse a device down to the Tile and Wire levels.
 
 \section{Routing in RS2}
-Because understanding the routing graph in RS2’s device representation is
-crucial to being able to manipulate routing, this chapter provides a more
-detailed discussion to help users and developers.
-
-\subsection{Wire Resources in RapidSmith}
-RS2 has a unique way of representing wires and connections for Xilinx devices. 
-This approach was developed mainly to minimize disk and memory usage while also
-maintaining some level of efficiency and speed.
-
-\subsubsection{Wire Representation}
 The device files generated by RS2 each contain a list of all uniquely
 XDLRC-named wires that exist in a given Xilinx FPGA family.  Wires can span
 multiple tiles in the FPGA, however, the wire has a separate name for each tile
@@ -744,6 +749,14 @@ in which it crosses.  An example of this concept is illustrated in the DOUBLE
 lines found in several family architectures.  A DOUBLE line is a wire that
 connects switch boxes either one or two hops away in a given direction.  An
 example of this layout is given in \autoref{fig:wireFigure}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\columnwidth]{wireFigure}
+\caption{A Wire in an FPGA Illustrating How Each Part of the Wire Has a
+Different Name Depending on the Tile it is Located In}
+\label{fig:wireFigure}
+\end{figure}
 
 In this example, we see a wire that can be driven by one point, E2BEG4, and can
 drive either E2MID4 in tile INT\_X2Y1 and/or E2END4 in tile INT\_X3Y1.  However,
@@ -760,7 +773,9 @@ would have two wire connections, one to a wire named E2MID4 and one to a wire
 named E2END4.  These would be non-programmable (hard-wired) connections,
 reflecting the fact that it is all one wire, it just has different names in
 various locations.  In contrast, there are also programmable connections between
-wires (called PIPs).
+wires (called PIPs).  As you traverse wires in the device representation you
+will see these two types of connections between named sections
+(non-programmable and programmable) as well as a few others.
 
 \section{Importing/Exporting Designs Between Vivado and RS2}
 
@@ -780,11 +795,11 @@ controller circuitry).  While this has proven valuable to many researchers, it
 does not provide the ability to create your own bitstream from scratch because
 it does not provide the specific meaning of each bit in a bitstream.
 
-If you desire to use RapidSmith’s bitstream manipulation features, you should
+If you desire to use RapidSmith's bitstream manipulation features, you should
 download and work with RapidSmith instead of RS2 (the RapidSmith bitstream
-packages have been removed from RS2).  If you do so, note that RapidSmith’s
+packages have been removed from RS2).  If you do so, note that RapidSmith's
 bitstream packages have not been tested beyond Virtex 6.  The authors would be
-interested in upgrading RapidSmith’s bitstream functionality to device families
+interested in upgrading RapidSmith's bitstream functionality to device families
 beyond Virtex 6 if users create it and are willing to contribute it to us for
 inclusion.
 
@@ -809,7 +824,7 @@ RS2 is released under GPL version 3.
    
    A copy of the GNU General Public License is included with the BYU
    RapidSmith Tools. It can be found at doc/gpl2.txt. You may also get
-   a copy of the license at <http://www.gnu.org/licenses/>.
+   a copy of the license at \url{http://www.gnu.org/licenses/}.
 \end{quotation}
 
 \section{Included Dependency Projects}
