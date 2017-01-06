@@ -489,11 +489,17 @@ public class FamilyBuilders {
 	}
 
 	public static void main(String[] args) throws IOException {
+		if (args.length != 1) {
+			System.err.println("Example Usage: FamilyBuilders xc7a100tcsg324");
+			System.err.println("Terminating...");
+			System.exit(1);
+		}
 		FamilyBuilders fb = new FamilyBuilders();
 		RSEnvironment env = RSEnvironment.defaultEnv();
 		Map<FamilyType, List<String>> partsForFamily = new HashMap<>();
 		for (String part : args) {
 			FamilyType family = env.getFamilyTypeFromPart(part);
+			System.out.println("Processing Family: " + family + " based on part name: " + part);
 			partsForFamily.computeIfAbsent(family, k -> new ArrayList<>()).add(part);
 		}
 		for (Map.Entry<FamilyType, List<String>> e : partsForFamily.entrySet()) {

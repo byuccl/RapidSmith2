@@ -1,23 +1,3 @@
-/*
- * Copyright (c) 2016 Brigham Young University
- *
- * This file is part of the BYU RapidSmith Tools.
- *
- * BYU RapidSmith Tools is free software: you may redistribute it
- * and/or modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * BYU RapidSmith Tools is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * A copy of the GNU General Public License is included with the BYU
- * RapidSmith Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
- * also get a copy of the license at <http://www.gnu.org/licenses/>.
- */
-
 package edu.byu.ece.rapidSmith.device.families;
 
 import edu.byu.ece.rapidSmith.device.FamilyType;
@@ -652,5 +632,45 @@ public final class Artix7 implements FamilyInfo {
     /* ------ AUTO-GENERATED --- DO NOT EDIT ABOVE ------ */
     static {
     /* ------ CLASSIFICATIONS GO HERE ------ */
+        _CLB_TILES.add(TileTypes.CLBLL_L);
+        _CLB_TILES.add(TileTypes.CLBLL_R);
+        _CLB_TILES.add(TileTypes.CLBLM_L);
+        _CLB_TILES.add(TileTypes.CLBLM_R);
+
+        _SWITCHBOX_TILES.add(TileTypes.INT_L);
+        _SWITCHBOX_TILES.add(TileTypes.INT_R);
+
+        _BRAM_TILES.add(TileTypes.BRAM_L);
+        _BRAM_TILES.add(TileTypes.BRAM_R);
+	
+        _DSP_TILES.add(TileTypes.DSP_L);
+        _DSP_TILES.add(TileTypes.DSP_R);
+	
+        _IO_TILES.add(TileTypes.LIOI3_TBYTESRC);
+        _IO_TILES.add(TileTypes.LIOB33_SING);
+        _IO_TILES.add(TileTypes.LIOI3_SING);
+        _IO_TILES.add(TileTypes.LIOI3_TBYTETERM);
+        _IO_TILES.add(TileTypes.LIOI3);
+        _IO_TILES.add(TileTypes.LIOB33);
+        _IO_TILES.add(TileTypes.RIOI3);
+        _IO_TILES.add(TileTypes.RIOB33);
+        _IO_TILES.add(TileTypes.RIOI3_SING);
+        _IO_TILES.add(TileTypes.RIOI3_TBYTETERM);
+
+        _SLICE_SITES.add(SiteTypes.SLICEL);
+        _SLICE_SITES.add(SiteTypes.SLICEM);
+
+        _BRAM_SITES.add(SiteTypes.RAMB18E1);
+        _BRAM_SITES.add(SiteTypes.RAMB36E1);
+        _BRAM_SITES.add(SiteTypes.RAMBFIFO36E1);
+
+        _DSP_SITES.add(SiteTypes.DSP48E1);
+
+        _IO_SITES.add(SiteTypes.IOB33);
+        _IO_SITES.add(SiteTypes.IOB33S);
+        _IO_SITES.add(SiteTypes.IOB33M);
+        _IO_SITES.add(SiteTypes.IPAD);
+        _IO_SITES.add(SiteTypes.OPAD);
     }
 }
+
