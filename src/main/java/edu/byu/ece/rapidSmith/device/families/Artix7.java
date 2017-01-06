@@ -646,16 +646,9 @@ public final class Artix7 implements FamilyInfo {
         _DSP_TILES.add(TileTypes.DSP_L);
         _DSP_TILES.add(TileTypes.DSP_R);
 	
-        _IO_TILES.add(TileTypes.LIOI3_TBYTESRC);
         _IO_TILES.add(TileTypes.LIOB33_SING);
-        _IO_TILES.add(TileTypes.LIOI3_SING);
-        _IO_TILES.add(TileTypes.LIOI3_TBYTETERM);
-        _IO_TILES.add(TileTypes.LIOI3);
         _IO_TILES.add(TileTypes.LIOB33);
-        _IO_TILES.add(TileTypes.RIOI3);
         _IO_TILES.add(TileTypes.RIOB33);
-        _IO_TILES.add(TileTypes.RIOI3_SING);
-        _IO_TILES.add(TileTypes.RIOI3_TBYTETERM);
 
         _SLICE_SITES.add(SiteTypes.SLICEL);
         _SLICE_SITES.add(SiteTypes.SLICEM);
