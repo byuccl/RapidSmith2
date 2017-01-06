@@ -372,3 +372,87 @@ Problems encountered:
 - The LUTs in the SLICEL and SLICEM primitives were all tagged as
   routing muxes in what sitesandbels outputs.  These tags need to be
   commented out.
+
+========================================================================
+Running FamilyBuilders
+
+Once the above is complete, you must run
+edu.byu.ece.rapidSmith.util.FamilyBuilders and supply any partname
+from a family to it.  From this, the FamilyBuilders program will
+generate a file in edu.byu.ece.rapidSmith.device.families for the
+technology associated with that part.  For example for xc7a100tcsg324
+it will generate Artix7.java.  This file contains a mapping from XXXXX
+to YYYYYYY and must then be hand-edited to complete the task.  The
+reason for this family is to avoid much of the family-specific code
+that RapidSmith required and that was spread throughout the RapidSmith
+code base.
+
+The portion to edit is right at the bottom after the comment:
+
+        /* ------ CLASSIFICATIONS GO HERE ------ */
+
+Here is a sample from the Artix7.java file:
+
+    /* ------ CLASSIFICATIONS GO HERE ------ */
+        _CLB_TILES.add(TileTypes.CLBLL_L);
+        _CLB_TILES.add(TileTypes.CLBLL_R);
+        _CLB_TILES.add(TileTypes.CLBLM_L);
+        _CLB_TILES.add(TileTypes.CLBLM_R);
+
+        _SWITCHBOX_TILES.add(TileTypes.INT_L);
+        _SWITCHBOX_TILES.add(TileTypes.INT_R);
+
+        _BRAM_TILES.add(TileTypes.BRAM_L);
+        _BRAM_TILES.add(TileTypes.BRAM_R);
+	
+        _DSP_TILES.add(TileTypes.DSP_L);
+        _DSP_TILES.add(TileTypes.DSP_R);
+	
+        _IO_TILES.add(TileTypes.LIOI3_TBYTESRC);
+        _IO_TILES.add(TileTypes.LIOB33_SING);
+        _IO_TILES.add(TileTypes.LIOI3_SING);
+        _IO_TILES.add(TileTypes.LIOI3_TBYTETERM);
+        _IO_TILES.add(TileTypes.LIOI3);
+        _IO_TILES.add(TileTypes.LIOB33);
+        _IO_TILES.add(TileTypes.RIOI3);
+        _IO_TILES.add(TileTypes.RIOB33);
+        _IO_TILES.add(TileTypes.RIOI3_SING);
+        _IO_TILES.add(TileTypes.RIOI3_TBYTETERM);
+
+        _SLICE_SITES.add(SiteTypes.SLICEL);
+        _SLICE_SITES.add(SiteTypes.SLICEM);
+	
+        _BRAM_SITES.add(SiteTypes.RAMB18E1);
+        _BRAM_SITES.add(SiteTypes.RAMB36E1);
+        _BRAM_SITES.add(SiteTypes.RAMBFIFO36E1);
+
+        _DSP_SITES.add(SiteTypes.DSP48E1);
+
+        _IO_SITES.add(SiteTypes.IOB33);
+        _IO_SITES.add(SiteTypes.IOB33S);
+        _IO_SITES.add(SiteTypes.IOB33M);
+        _IO_SITES.add(SiteTypes.IPAD);
+        _IO_SITES.add(SiteTypes.OPAD);
+
+What this is doing is mapping tile types to tile categories and site
+types to site categories.  In the example above, the tile and site
+categories include:
+
+        _CLB_TILES
+        _SWITCHBOX_TILES
+        _BRAM_TILES
+        _DSP_TILES
+        _IO_TILES
+
+        _SLICE_SITES
+        _BRAM_SITES
+        _DSP_SITES
+        _IO_SITES
+
+The procedure to follow is to determine, from the list of TileTypes in
+the auto-generated code section, which of those go into each of these
+categories.  This should be fairly straightforward using the
+Artix7.java file as a pattern.  ??? Can we provide a precise algorithm
+for determining this ???
+
+
