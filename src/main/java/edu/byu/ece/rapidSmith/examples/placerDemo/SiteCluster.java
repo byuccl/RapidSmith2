@@ -138,7 +138,7 @@ public class SiteCluster {
 	
 	public void addCell(Cell c) {
 		this.cells.add(c);
-		this.bels.add(c.getAnchor().getName());
+		this.bels.add(c.getBel().getName());
 	}
 	
 	

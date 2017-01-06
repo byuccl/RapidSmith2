@@ -513,9 +513,9 @@ public abstract class ImportTest {
 	private void testCellPlacement(Cell cell, String actualBelPlacement) {
 		
 		if (cell.isPlaced()) {
-			assertTrue(cell.getAnchor().getFullName().equals(actualBelPlacement) , 
+			assertTrue(cell.getBel().getFullName().equals(actualBelPlacement) ,
 					String.format("Cell Placement for cell %s is incorrect!\n"
-					+ "Expected: %s Actual: %s\n", cell.getName(), cell.getAnchor().getFullName(), actualBelPlacement));
+					+ "Expected: %s Actual: %s\n", cell.getName(), cell.getBel().getFullName(), actualBelPlacement));
 		} 
 		else {
 			assertTrue(actualBelPlacement.isEmpty(), 
@@ -533,7 +533,7 @@ public abstract class ImportTest {
 	 */
 	private void testCellPinMapping(Cell cell, List<String> pinMapList) {
 		
-		Bel parentBel = cell.getAnchor();
+		Bel parentBel = cell.getBel();
 		
 		for (int i = 1; i < pinMapList.size(); i++) {
 			String[] pinMapToks = pinMapList.get(i).split(" ");

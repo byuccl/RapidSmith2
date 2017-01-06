@@ -223,7 +223,7 @@ public class DotFilePrinter {
 	}
 	
 	private boolean isCellPinInSite(CellPin pin, Site site) { 
-		return pin != null && pin.getCell().getAnchorSite().equals(site);
+		return pin != null && pin.getCell().getSite().equals(site);
 	}
 	
 	/*
@@ -256,7 +256,7 @@ public class DotFilePrinter {
 		
 		// add cell info .. TODO: update this to print all properties of a cell
 		String lutString = (c.getLibCell().isLut() ? "\\n" + c.getProperty("INIT").getValue() : "");
-		builder.append(String.format(" { <%d>%s%s\\n%s\\n(%s) } ", cellId, getAbbreviatedCellName(c), lutString, c.getAnchor().getName(), c.getLibCell().getName()));
+		builder.append(String.format(" { <%d>%s%s\\n%s\\n(%s) } ", cellId, getAbbreviatedCellName(c), lutString, c.getBel().getName(), c.getLibCell().getName()));
 		
 		// add output pin info
 		if (c.getOutputPins().size() > 0) {
@@ -362,7 +362,7 @@ public class DotFilePrinter {
 				formatCell(cell, lutBuilder, "      ");
 				lutCell = cell;
 			}
-			else if (cell.getAnchor().getName().contains("FF")) {
+			else if (cell.getBel().getName().contains("FF")) {
 				formatCell(cell, ffBuilder, "      ");
 				ffCell = cell;
 			}

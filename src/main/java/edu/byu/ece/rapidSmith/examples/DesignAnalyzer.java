@@ -101,7 +101,7 @@ public class DesignAnalyzer {
 					c.getLibCell().getName());
 			if (c.isPlaced())
 				// Print out its placement
-				System.out.println("  <<<Placed on: " + c.getAnchor() + ">>>");
+				System.out.println("  <<<Placed on: " + c.getBel() + ">>>");
 			else System.out.println("  <<<Unplaced>>>");
 			// Print out the pins
 			for (CellPin cp : c.getPins()) {
@@ -240,7 +240,7 @@ public class DesignAnalyzer {
 		System.out.println("Design Summary:");
 		int numplaced = 0;
 		for (Cell c : design.getCells())
-			if (c.getAnchor() != null)
+			if (c.getBel() != null)
 				numplaced++;
 		
 		System.out.println("The design has: " + design.getCells().size() + " cells, " + numplaced + " of them are placed.");
