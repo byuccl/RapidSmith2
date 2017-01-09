@@ -63,7 +63,6 @@ public class ImportExportExample {
 		CellDesign design = tcp.getDesign();
 		Device device= tcp.getDevice();
 		CellLibrary libCells = tcp.getLibCells();
-		String partName = tcp.getPartName();
 		
 		// Do some manipulations, in this case just print out the design
 		System.out.println("\nPrinting out the design...");

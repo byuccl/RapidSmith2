@@ -47,9 +47,15 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		this.library = new HashMap<>();
 	}
 
-	public CellLibrary(Path filePath) throws IOException, JDOMException {
+	public CellLibrary(Path filePath) throws IOException {
 		this.library = new HashMap<>();
-		loadFromFile(filePath);
+		
+		try {
+			loadFromFile(filePath);
+		} catch (JDOMException e) {
+			// wrap the JDOMException in a generic parse exception
+			throw new Exceptions.ParseException(e);
+		}
 	}
 
 	private void loadFromFile(Path filePath) throws IOException, JDOMException {

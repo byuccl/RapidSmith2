@@ -37,7 +37,6 @@ import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.util.Exceptions;
-import org.jdom2.JDOMException;
 
 /**
  * This class is used to interface Vivado and RapidSmith. <br>
@@ -51,7 +50,7 @@ public final class VivadoInterface {
 
 	private static final String CELL_LIBRARY_NAME = "cellLibrary.xml";
 
-	public static TincrCheckpoint loadTCP(String tcp) throws IOException, JDOMException {
+	public static TincrCheckpoint loadTCP(String tcp) throws IOException {
 		return loadTCP(tcp, false);
 	}
 	
@@ -62,7 +61,7 @@ public final class VivadoInterface {
 	 * @throws InvalidEdifNameException 
 	 * @throws EdifNameConflictException 
 	 */
-	public static TincrCheckpoint loadTCP (String tcp, boolean storeAdditionalInfo) throws IOException, JDOMException {
+	public static TincrCheckpoint loadTCP (String tcp, boolean storeAdditionalInfo) throws IOException {
 	
 		if (tcp.endsWith("/") || tcp.endsWith("\\")) {
 			tcp = tcp.substring(0, tcp.length()-1);

@@ -23,38 +23,69 @@ package edu.byu.ece.rapidSmith.design.subsite;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Wire;
+import static edu.byu.ece.rapidSmith.util.Exceptions.DesignAssemblyException;
+
+import java.util.Objects;
 
 /**
- * Represents a BelRoutethrough
+ * Represents a LUT Routethrough. A LUT is used  
  *  
  * TODO: Update this to include the sink cell pin that it leads to? 
  *  
  * @author Thomas Townsend
  */
 public class BelRoutethrough {
-
-	private final Bel bel;
-	private final BelPin inputPin;
-	private final BelPin outputPin;
-	//private final CellPin sinkCellPin;
 	
-	public BelRoutethrough(Bel bel, BelPin inputPin, BelPin outputPin) {
-		this.bel = bel;
+	/**Input pin of the BelRoutethrough (A1, A2, ... , A6) */
+	private final BelPin inputPin;
+	/**Input pin of the BelRoutethrough (O5, O6) */
+	private final BelPin outputPin;
+	
+	/**
+	 * Create a new BelRoutethrough object. 
+	 * 
+	 * @param inputPin Input {@link BelPin} object (A1 - A6 pins on a LUT typically)
+	 * @param outputPin Output {@link BelPin} object (O5 or O6 pin on a LUT typically)
+	 */
+	public BelRoutethrough(BelPin inputPin, BelPin outputPin) {
+		
+		// Reject null objects
+		Objects.requireNonNull(inputPin);
+		Objects.requireNonNull(outputPin);
+		
+		// Can we assume that getBel never returns null?
+		if (inputPin.getBel().equals(outputPin.getBel())) {
+			throw new DesignAssemblyException("BelPins are not on the same Bel object!");
+		}
+		
 		this.inputPin = inputPin;
 		this.outputPin = outputPin;
 	}
 	
+	/**
+	 * Returns the {@link Bel} object of this routethrough 
+	 */
 	public Bel getBel() {
-		return this.bel;
+		return this.inputPin.getBel();
 	}
 	
+	/**
+	 * Returns the input {@link BelPin} of this routethrough
+	 */
 	public BelPin getInputPin() {
 		return this.inputPin;
 	}
 	
+	/**
+	 * Returns the output {@link BelPin} of this routethrough
+	 */
 	public BelPin getOutputPin() {
 		return this.outputPin;
 	}
+	
+	/**
+	 * Returns the {@link Wire} object connected to the output {@link BelPin} of this routethrough
+	 */
 	public Wire getOutputWire() {
 		return outputPin.getWire();
 	}

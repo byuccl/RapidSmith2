@@ -426,7 +426,7 @@ public class XdcRoutingInterface {
 			BelPin inputPin = tryGetBelPin(bel, routethroughToks[2]);
 			BelPin outputPin = tryGetBelPin(bel, routethroughToks[3]);
 		
-			belRoutethroughMap.put(bel, new BelRoutethrough(bel, inputPin, outputPin));
+			belRoutethroughMap.put(bel, new BelRoutethrough(inputPin, outputPin));
 		}
 	}
 	

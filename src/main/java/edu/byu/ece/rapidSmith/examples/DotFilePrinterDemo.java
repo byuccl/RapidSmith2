@@ -23,7 +23,6 @@ import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.util.DotFilePrinter;
-import org.jdom2.JDOMException;
 
 import java.io.IOException;
 
@@ -59,7 +58,7 @@ public class DotFilePrinterDemo {
 		TincrCheckpoint tcp = null;
 		try {
 			tcp = VivadoInterface.loadTCP(checkpoint);
-		} catch (JDOMException|IOException e) {
+		} catch (IOException e) {
 			System.err.println("Failed loading TCP");
 			e.printStackTrace();
 		}
