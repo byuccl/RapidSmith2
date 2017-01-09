@@ -28,7 +28,8 @@ import static edu.byu.ece.rapidSmith.util.Exceptions.DesignAssemblyException;
 import java.util.Objects;
 
 /**
- * Represents a LUT Routethrough. A LUT is used  
+ * Represents a LUT Routethrough. A LUT is used as a routethrough when one of
+ * its input pins is routed directly to an output pin (i.e. O6=A4).  
  *  
  * TODO: Update this to include the sink cell pin that it leads to? 
  *  
