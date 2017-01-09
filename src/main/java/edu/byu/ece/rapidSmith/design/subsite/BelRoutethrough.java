@@ -55,7 +55,7 @@ public class BelRoutethrough {
 		Objects.requireNonNull(outputPin);
 		
 		// Can we assume that getBel never returns null?
-		if (inputPin.getBel().equals(outputPin.getBel())) {
+		if (!inputPin.getBel().equals(outputPin.getBel())) {
 			throw new DesignAssemblyException("BelPins are not on the same Bel object!");
 		}
 		
