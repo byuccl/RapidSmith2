@@ -1,3 +1,23 @@
+/*
+ * Copyright (c) 2016 Brigham Young University
+ *
+ * This file is part of the BYU RapidSmith Tools.
+ *
+ * BYU RapidSmith Tools is free software: you may redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * BYU RapidSmith Tools is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * A copy of the GNU General Public License is included with the BYU
+ * RapidSmith Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
+ * also get a copy of the license at <http://www.gnu.org/licenses/>.
+ */
+
 package edu.byu.ece.rapidSmith.device.families;
 
 import edu.byu.ece.rapidSmith.device.FamilyType;
@@ -646,16 +666,10 @@ public final class Artix7 implements FamilyInfo {
         _DSP_TILES.add(TileTypes.DSP_L);
         _DSP_TILES.add(TileTypes.DSP_R);
 	
-        _IO_TILES.add(TileTypes.LIOI3_TBYTESRC);
         _IO_TILES.add(TileTypes.LIOB33_SING);
-        _IO_TILES.add(TileTypes.LIOI3_SING);
-        _IO_TILES.add(TileTypes.LIOI3_TBYTETERM);
-        _IO_TILES.add(TileTypes.LIOI3);
         _IO_TILES.add(TileTypes.LIOB33);
-        _IO_TILES.add(TileTypes.RIOI3);
         _IO_TILES.add(TileTypes.RIOB33);
-        _IO_TILES.add(TileTypes.RIOI3_SING);
-        _IO_TILES.add(TileTypes.RIOI3_TBYTETERM);
+        _IO_TILES.add(TileTypes.RIOB33_SING);
 
         _SLICE_SITES.add(SiteTypes.SLICEL);
         _SLICE_SITES.add(SiteTypes.SLICEM);
