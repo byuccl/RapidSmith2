@@ -141,6 +141,13 @@ public class RSEnvironment {
 	}
 
 	/**
+	 * @return the path to resource files used in RapidSmith (such as the image  folder
+	 */
+	public Path getResourcePath() {
+		return rsPath.resolve("src").resolve("main").resolve("resources");
+	}
+	
+	/**
 	 * Returns the loaded device with the specified part name.  Once loaded, devices are
 	 * cached for quick access.
 	 *
