@@ -1,4 +1,4 @@
-RapidSmith2, the Vivado successor to RapidSmith (rapidsmith.sourceforge.net) is a research-based, open source FPGA CAD tool written in Java for modern Xilinx FPGAs. Its objective is to serve as a rapid prototyping platform for research ideas and algorithms relating to low level FPGA CAD tools.  Specifically, it allows users to manipulate Xilinx designs outside the standard Xilinx-provided CAD tool flow.
+RapidSmith2, the Vivado successor to RapidSmith (http://rapidsmith.sourceforge.net) is a research-based, open source FPGA CAD tool written in Java for modern Xilinx FPGAs. Its objective is to serve as a rapid prototyping platform for research ideas and algorithms relating to low level FPGA CAD tools.  Specifically, it allows users to manipulate Xilinx designs outside the standard Xilinx-provided CAD tool flow.
 
 Unlike RapidSmith, which was based on XDL, RapidSmith2 exports/imports design data from/to Vivado using Vivado's built-in Tcl interface.  To do so, it relies on functionality found in the Tincr project (https://github.com/byuccl/tincr).
 
