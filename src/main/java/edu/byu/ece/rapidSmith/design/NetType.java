@@ -27,6 +27,5 @@ package edu.byu.ece.rapidSmith.design;
 public enum NetType{
 	WIRE,
 	GND,
-	VCC,
-	UNKNOWN,
+	VCC
 }
