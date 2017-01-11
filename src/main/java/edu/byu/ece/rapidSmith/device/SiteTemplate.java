@@ -20,7 +20,6 @@
 
 package edu.byu.ece.rapidSmith.device;
 
-import edu.byu.ece.rapidSmith.design.PIP;
 import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
 
 import java.io.Serializable;

@@ -17,10 +17,7 @@
  * RapidSmith Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
  * also get a copy of the license at <http://www.gnu.org/licenses/>.
  */
-package edu.byu.ece.rapidSmith.design;
-
-import edu.byu.ece.rapidSmith.device.Tile;
-import edu.byu.ece.rapidSmith.device.Wire;
+package edu.byu.ece.rapidSmith.device;
 
 import java.io.Serializable;
 import java.util.Objects;
