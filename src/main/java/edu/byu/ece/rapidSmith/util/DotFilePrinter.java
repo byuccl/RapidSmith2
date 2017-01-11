@@ -255,7 +255,7 @@ public class DotFilePrinter {
 		}
 		
 		// add cell info .. TODO: update this to print all properties of a cell
-		String lutString = (c.getLibCell().isLut() ? "\\n" + c.getProperty("INIT").getValue() : "");
+		String lutString = (c.getLibCell().isLut() ? "\\n" + c.getProperties().getValue("INIT") : "");
 		builder.append(String.format(" { <%d>%s%s\\n%s\\n(%s) } ", cellId, getAbbreviatedCellName(c), lutString, c.getBel().getName(), c.getLibCell().getName()));
 		
 		// add output pin info

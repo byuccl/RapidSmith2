@@ -48,7 +48,7 @@ public class Cell {
 	/** BEL in the device this site is placed on */
 	private Bel bel;
 	/** Properties of the cell */		
-	private Map<Object, Property> properties;
+	private final PropertyList properties;
 	/** Mapping of pin names to CellPin objects of this cell */
 	private final Map<String, CellPin> pinMap;
 	/**	Set of pseudo pins attached to the cell */
@@ -70,8 +70,8 @@ public class Cell {
 
 		this.design = null;
 		this.bel = null;
-		this.properties = null;
-		
+
+		this.properties = new PropertyList();
 		this.pinMap = new HashMap<>();
 		for (LibraryPin pin : libCell.getLibraryPins()) {
 			this.pinMap.put(pin.getName(), new BackedCellPin(this, pin));
@@ -338,129 +338,16 @@ public class Cell {
 	}
 
 	/**
-	 * Returns true if this cell contains a property with the specified name.
+	 * Returns the properties of this cell in a {@link PropertyList}.  The
+	 * properties describe the configuration of this cell and can be used
+	 * to store user attributes for this cell.
 	 *
-	 * @param propertyKey the name of the property to check for
-	 * @return true if this cell contains a property with the specified name
+	 * @return a {@code PropertyList} containing the properties of this cell
 	 */
-	public final boolean hasProperty(Object propertyKey) {
-		Objects.requireNonNull(propertyKey);
-
-		return getProperty(propertyKey) != null;
+	public final PropertyList getProperties() {
+		return properties;
 	}
 
-	/**
-	 * Returns the property from this cell with the specified name.
-	 *
-	 * @param propertyKey name of the property to get
-	 * @return the property with name <i>propertyKey</i> or null if the property
-	 * is not in the cell
-	 */
-	public Property getProperty(Object propertyKey) {
-		Objects.requireNonNull(propertyKey);
-
-		if (properties == null)
-			return null;
-		return properties.get(propertyKey);
-	}
-
-	/**
-	 * Returns the properties of this cell.  The returned collection should not be
-	 * modified by the user.
-	 *
-	 * @return the properties of this cell
-	 */
-	public Collection<Property> getProperties() {
-		if (properties == null)
-			return Collections.emptyList();
-		return properties.values();
-	}
-	
-	public Set<Object> getPropertyNames() {
-		return properties.keySet();
-	}
-
-	/**
-	 * Updates or adds the properties in the provided collection to the properties
-	 * of this cell.
-	 *
-	 * @param properties the properties to add or update
-	 */
-	public void updateProperties(Collection<Property> properties) {
-		Objects.requireNonNull(properties);
-
-		properties.forEach(this::updateProperty);
-	}
-
-	/**
-	 * Updates or adds the property to this cell.
-	 *
-	 * @param property the property to add or update
-	 */
-	public void updateProperty(Property property) {
-		Objects.requireNonNull(property);
-
-		if (this.properties == null)
-			this.properties = new HashMap<>();
-		this.properties.put(property.getKey(), property);
-	}
-
-	/**
-	 * Updates the value of the property <i>propertyKey</i> in this cell or creates and
-	 * adds the property if it is not already present.
-	 *
-	 * @param propertyKey the name of the property
-	 * @param type the new type of the property
-	 * @param value the value to set the property to
-	 */
-	public void updateProperty(Object propertyKey, PropertyType type, Object value) {
-		Objects.requireNonNull(propertyKey);
-		Objects.requireNonNull(type);
-		Objects.requireNonNull(value);
-
-		updateProperty(new Property(propertyKey, type, value));
-	}
-
-	/**
-	 * Removes the property <i>propertyKey</i>.  Returns the removed property.
-	 *
-	 * @param propertyKey hte name of the property to remove
-	 * @return the removed property
-	 */
-	public Property removeProperty(Object propertyKey) {
-		Objects.requireNonNull(propertyKey);
-
-		if (properties == null)
-			return null;
-		return properties.remove(propertyKey);
-	}
-
-	/**
-	 * Tests if the property with the specified name has the specified value.
-	 *
-	 * @param propertyKey the name of the property to test
-	 * @param value the value to compare the property's to test
-	 * @return true if the value matches the property's value
-	 */
-	public boolean testPropertyValue(Object propertyKey, Object value) {
-		Objects.requireNonNull(propertyKey);
-
-		return Objects.equals(getPropertyValue(propertyKey), value);
-	}
-
-	/**
-	 * Returns the value of the property with the associated name.
-	 *
-	 * @param propertyKey the name of the property
-	 * @return the value of the specified property
-	 */
-	public Object getPropertyValue(Object propertyKey) {
-		Objects.requireNonNull(propertyKey);
-
-		Property property = getProperty(propertyKey);
-		return property == null ? null : property.getValue();
-	}
-	
 	public Map<SiteProperty, Object> getSharedSiteProperties() {
 		return getSharedSiteProperties(bel.getId());
 	}
@@ -471,8 +358,8 @@ public class Cell {
 		Map<String, SiteProperty> referenceMap =
 				getLibCell().getSharedSiteProperties(belId);
 		for (Map.Entry<String, SiteProperty> e : referenceMap.entrySet()) {
-			if (hasProperty(e.getKey()) && getProperty(e.getKey()).getType() == PropertyType.DESIGN) {
-				returnMap.put(e.getValue(), getPropertyValue(e.getKey()));
+			if (properties.has(e.getKey()) && properties.get(e.getKey()).getType() == PropertyType.DESIGN) {
+				returnMap.put(e.getValue(), properties.getValue(e.getKey()));
 			}
 		}
 		return returnMap;
@@ -573,7 +460,7 @@ public class Cell {
 		Cell cellCopy = cellFactory.apply(name, libCell);
 		cellCopy.setBonded(getBonded());
 		getProperties().forEach(p ->
-				cellCopy.updateProperty(copyAttribute(getLibCell(), libCell, p))
+				cellCopy.properties.update(copyAttribute(getLibCell(), libCell, p))
 		);
 		return cellCopy;
 	}

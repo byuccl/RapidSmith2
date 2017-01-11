@@ -20,10 +20,7 @@
 
 package edu.byu.ece.rapidSmith.design.subsite;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * This class represents an objects that can have properties. Any class that needs <br> 
@@ -31,21 +28,28 @@ import java.util.Objects;
  * 
  * @author Thomas Townsend
  */
-public class PropertyList {
-	
+public final class PropertyList implements Iterable<Property> {
 	/** Properties of the cell */
 	private Map<Object, Property> properties = null;
-		
+
+	private void initPropertiesMap() {
+		properties = new HashMap<>(4);
+	}
+
+	public int size() {
+		return properties == null ? 0 : properties.size();
+	}
+
 	/**
 	 * Returns true if this cell contains a property with the specified name.
 	 *
 	 * @param propertyKey the name of the property to check for
 	 * @return true if this cell contains a property with the specified name
 	 */
-	public final boolean hasProperty(Object propertyKey) {
+	public final boolean has(Object propertyKey) {
 		Objects.requireNonNull(propertyKey);
 
-		return getProperty(propertyKey) != null;
+		return get(propertyKey) != null;
 	}
 
 	/**
@@ -55,7 +59,7 @@ public class PropertyList {
 	 * @return the property with name <i>propertyKey</i> or null if the property
 	 * is not in the cell
 	 */
-	public Property getProperty(Object propertyKey) {
+	public Property get(Object propertyKey) {
 		Objects.requireNonNull(propertyKey);
 
 		if (properties == null)
@@ -64,28 +68,15 @@ public class PropertyList {
 	}
 
 	/**
-	 * Returns the properties of this cell.  The returned collection should not be
-	 * modified by the user.
-	 *
-	 * @return the properties of this cell
-	 */
-	public Collection<Property> getProperties() {
-		if (properties == null) {
-			properties = new HashMap<>();
-		}
-		return properties.values();
-	}
-
-	/**
 	 * Updates or adds the properties in the provided collection to the properties
 	 * of this cell.
 	 *
 	 * @param properties the properties to add or update
 	 */
-	public void updateProperties(Collection<Property> properties) {
+	public void updateAll(Collection<Property> properties) {
 		Objects.requireNonNull(properties);
 
-		properties.forEach(this::updateProperty);
+		properties.forEach(this::update);
 	}
 
 	/**
@@ -93,11 +84,11 @@ public class PropertyList {
 	 *
 	 * @param property the property to add or update
 	 */
-	public void updateProperty(Property property) {
+	public void update(Property property) {
 		Objects.requireNonNull(property);
 
 		if (this.properties == null)
-			this.properties = new HashMap<>();
+			initPropertiesMap();
 		this.properties.put(property.getKey(), property);
 	}
 
@@ -109,12 +100,12 @@ public class PropertyList {
 	 * @param type the new type of the property
 	 * @param value the value to set the property to
 	 */
-	public void updateProperty(Object propertyKey, PropertyType type, Object value) {
+	public void update(Object propertyKey, PropertyType type, Object value) {
 		Objects.requireNonNull(propertyKey);
 		Objects.requireNonNull(type);
 		Objects.requireNonNull(value);
 
-		updateProperty(new Property(propertyKey, type, value));
+		update(new Property(propertyKey, type, value));
 	}
 
 	/**
@@ -123,7 +114,7 @@ public class PropertyList {
 	 * @param propertyKey the name of the property to remove
 	 * @return the removed property. null if the property doesn't exist
 	 */
-	public Property removeProperty(Object propertyKey) {
+	public Property remove(Object propertyKey) {
 		Objects.requireNonNull(propertyKey);
 
 		if (properties == null)
@@ -138,10 +129,10 @@ public class PropertyList {
 	 * @param value the value to compare the property's to test
 	 * @return true if the value matches the property's value
 	 */
-	public boolean testPropertyValue(Object propertyKey, Object value) {
+	public boolean testValue(Object propertyKey, Object value) {
 		Objects.requireNonNull(propertyKey);
 
-		return Objects.equals(getPropertyValue(propertyKey), value);
+		return Objects.equals(getValue(propertyKey), value);
 	}
 
 	/**
@@ -150,22 +141,24 @@ public class PropertyList {
 	 * @param propertyKey the name of the property
 	 * @return the value of the specified property
 	 */
-	public Object getPropertyValue(Object propertyKey) {
+	public Object getValue(Object propertyKey) {
 		Objects.requireNonNull(propertyKey);
 
-		Property property = getProperty(propertyKey);
+		Property property = get(propertyKey);
 		return property == null ? null : property.getValue();
 	}
-	
+
+
+
 	/**
 	 * Return the given specified property as an integer. Only use this function <br>
 	 * if you are sure the property value can be safely cast to an int.
 	 * @param propertyKey the name of the property 
 	 * @return int
 	 */
-	public int getIntegerPropertyValue(Object propertyKey) {
+	public int getIntegerValue(Object propertyKey) {
 		
-		Property property = getProperty(propertyKey);
+		Property property = get(propertyKey);
 		return property == null ? null : (int) property.getValue();
 	}
 	
@@ -175,9 +168,9 @@ public class PropertyList {
 	 * @param propertyKey the name of the property 
 	 * @return string
 	 */
-	public String getStringPropertyValue(Object propertyKey) {
+	public String getStringValue(Object propertyKey) {
 			
-		Property property = getProperty(propertyKey);
+		Property property = get(propertyKey);
 		return property == null ? null : (String) property.getValue();
 	}
 	
@@ -187,9 +180,9 @@ public class PropertyList {
 	 * @param propertyKey the name of the property 
 	 * @return boolean
 	 */
-	public boolean getBooleanPropertyValue(Object propertyKey) {
+	public boolean getBooleanValue(Object propertyKey) {
 		
-		Property property = getProperty(propertyKey);
+		Property property = get(propertyKey);
 		return property == null ? null : (boolean) property.getValue();
 	}
 	
@@ -199,9 +192,14 @@ public class PropertyList {
 	 * @param propertyKey the name of the property 
 	 * @return double 
 	 */
-	public double getDoublePropertyValue(Object propertyKey) {
+	public double getDoubleValue(Object propertyKey) {
 		
-		Property property = getProperty(propertyKey);
+		Property property = get(propertyKey);
 		return property == null ? null : (double) property.getValue();
+	}
+
+	@Override
+	public Iterator<Property> iterator() {
+		return properties.values().iterator();
 	}
 }

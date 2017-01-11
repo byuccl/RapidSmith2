@@ -46,25 +46,25 @@ public enum PortDirection {
 	public static PortDirection getPortDirection(Cell portCell) {
 		
 		checkIsValidPort(portCell);
-		return (PortDirection)portCell.getProperty("Dir").getValue();
+		return (PortDirection)portCell.getProperties().get("Dir").getValue();
 	}
 	
 	public static boolean isInputPort(Cell portCell) {
 		
 		checkIsValidPort(portCell);
-		return portCell.getProperty("Dir").getValue() == PortDirection.IN;
+		return portCell.getProperties().get("Dir").getValue() == PortDirection.IN;
 	}
 	
 	public static boolean isOutputPort(Cell portCell) {
 
 		checkIsValidPort(portCell);
-		return portCell.getProperty("Dir").getValue() == PortDirection.OUT;
+		return portCell.getProperties().get("Dir").getValue() == PortDirection.OUT;
 	}
 	
 	public static boolean isInoutPort(Cell portCell) {
 
 		checkIsValidPort(portCell);
-		return portCell.getProperty("Dir").getValue() == PortDirection.INOUT;
+		return portCell.getProperties().get("Dir").getValue() == PortDirection.INOUT;
 	}
 	
 	private static void checkIsValidPort(Cell portCell) {

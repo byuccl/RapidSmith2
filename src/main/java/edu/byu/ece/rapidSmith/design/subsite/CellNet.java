@@ -57,8 +57,8 @@ public class CellNet implements Serializable {
 	private Set<CellPin> pins;
 	/** Source pin of the net*/
 	private CellPin sourcePin;
-	/** Property map for the Net*/
-	private Map<Object, Property> propertyMap;
+	/** Properties for the Net*/
+	private final PropertyList properties;
 	/** Set of CellPins that have been marked as routed in the design*/
 	private Set<CellPin> routedSinks; 
 	/** Set to true if this net is contained within a single site's boundaries*/
@@ -89,6 +89,7 @@ public class CellNet implements Serializable {
 		this.name = name;
 		this.type = type;
 		this.isIntrasite = false;
+		this.properties = new PropertyList();
 		init();
 	}
 
@@ -134,99 +135,15 @@ public class CellNet implements Serializable {
 	void setDesign(CellDesign design) {
 		this.design = design;
 	}
-	
-	/**
-	 * Returns true if this cell contains a property with the specified name.
-	 *
-	 * @param propertyKey the name of the property to check for
-	 * @return true if this cell contains a property with the specified name
-	 */
-	public boolean hasProperty(Object propertyKey) {
-		Objects.requireNonNull(propertyKey);
-
-		return getProperty(propertyKey) != null;
-	}
 
 	/**
-	 * Returns the property from this cell with the specified name.
-	 *
-	 * @param propertyKey name of the property to get
-	 * @return the property with the specified name
+	 * Returns the properties of this net in a {@link PropertyList}.
+	 * @return a {@code PropertyList} containing the properties of this net
 	 */
-	public Property getProperty(Object propertyKey) {
-		Objects.requireNonNull(propertyKey);
-
-		if (propertyMap == null)
-			return null;
-		return propertyMap.get(propertyKey);
+	public final PropertyList getProperties() {
+		return properties;
 	}
 
-	/**
-	 * Returns the properties of this cell.  The returned collection should not be
-	 * modified by the user.
-	 *
-	 * @return the properties of this cell
-	 */
-	public Collection<Property> getProperties() {
-		if (propertyMap == null)
-			return Collections.emptyList();
-		return propertyMap.values();
-	}
-
-	/**
-	 * Updates or adds the property to this cell.
-	 *
-	 * @param property the property to add or update
-	 */
-	public void updateProperty(Property property) {
-		Objects.requireNonNull(property);
-
-		if (this.propertyMap == null)
-			this.propertyMap = new HashMap<>();
-		this.propertyMap.put(property.getKey(), property);
-	}
-
-	/**
-	 * Updates the value of the property in this cell with the specified name or
-	 * creates and adds it if it is not already present.
-	 *
-	 * @param propertyKey the name of the property
-	 * @param value the value to set the property to
-	 */
-	public void updateProperty(Object propertyKey, PropertyType type, Object value) {
-		Objects.requireNonNull(propertyKey);
-		Objects.requireNonNull(type);
-		Objects.requireNonNull(value);
-
-		updateProperty(new Property(propertyKey, type, value));
-	}
-	
-	/**
-	 * Updates or adds the properties in the provided collection to the properties
-	 * of this cell.
-	 *
-	 * @param properties the properties to add or update
-	 */
-	public void updateProperties(Collection<Property> properties) {
-		Objects.requireNonNull(properties);
-
-		properties.forEach(this::updateProperty);
-	}
-
-	/**
-	 * Removes the property with the specified name.  Returns the removed property.
-	 *
-	 * @param propertyKey hte name of the property to remove
-	 * @return the removed property
-	 */
-	public Property removeProperty(Object propertyKey) {
-		Objects.requireNonNull(propertyKey);
-
-		if (propertyMap == null)
-			return null;
-		return propertyMap.remove(propertyKey);
-	}
-	
 	/**
 	 * Returns the pins (source and sinks) of this net.  This structure should not
 	 * be modified by the user.

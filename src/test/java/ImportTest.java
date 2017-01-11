@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.families.FamilyInfo;
 import edu.byu.ece.rapidSmith.device.families.FamilyInfos;
 import org.jdom2.JDOMException;
@@ -47,12 +48,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
-import edu.byu.ece.rapidSmith.design.subsite.BelRoutethrough;
-import edu.byu.ece.rapidSmith.design.subsite.Cell;
-import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.design.subsite.CellNet;
-import edu.byu.ece.rapidSmith.design.subsite.CellPin;
-import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Device;
@@ -648,8 +643,8 @@ public abstract class ImportTest {
 			// For cells with non-default properties, make sure the value in RapidSmith, matches the value in Vivado
 			// TODO: filter out non-EDIF properties?
 			String propertyList = "";
-			for (Object propertyName : cell.getPropertyNames()) {
-				propertyList += propertyName + " ";
+			for (Property property : cell.getProperties()) {
+				propertyList += property.getStringKey() + " ";
 			}
 			
 			String command = String.format("tincr::report_property_values %s {%s}", cell.getName(), propertyList);
@@ -659,7 +654,7 @@ public abstract class ImportTest {
 			
 			for (String tclProperty : result) {
 				String[] tclPropertyToks = tclProperty.split("!");
-				String rsPropertyValue = cell.getProperty(tclPropertyToks[0]).getValue().toString();
+				String rsPropertyValue = cell.getProperties().getValue(tclPropertyToks[0]).toString();
 				String tclPropertyValue = tclPropertyToks[1];
 				
 				boolean propertiesMatch = true;

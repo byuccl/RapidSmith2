@@ -49,8 +49,8 @@ public class CellDesign extends AbstractDesign {
 	private Map<Site, Map<Bel, Cell>> placementMap;
 	/** This is a list of all the nets in the design */
 	private Map<String, CellNet> netMap;
-	/** Map of properties of this design. */
-	private Map<Object, Property> propertyMap;
+	/** The properties of this design. */
+	private final PropertyList properties;
 	/** Map from a site to the used SitePip wires in the site*/
 	private HashMap<Site, Set<Integer>> usedSitePipsMap;
 	/** The VCC RapidSmith net */
@@ -67,6 +67,7 @@ public class CellDesign extends AbstractDesign {
 	public CellDesign() {
 		super();
 		init();
+		properties = new PropertyList();
 	}
 
 	/**
@@ -79,6 +80,7 @@ public class CellDesign extends AbstractDesign {
 	public CellDesign(String designName, String partName) {
 		super(designName, partName);
 		init();
+		properties = new PropertyList();
 	}
 
 	private void init() {
@@ -89,97 +91,14 @@ public class CellDesign extends AbstractDesign {
 	}
 
 	/**
-	 * Returns true if this cell contains a property with the specified name.
-	 *
-	 * @param propertyKey the name of the property to check for
-	 * @return true if this cell contains a property with the specified name
+	 * Returns the properties of this design in a {@link PropertyList}.  Properties
+	 * may contain metadata about a design including user-defined metadata.
+	 * @return a {@code PropertyList} containing the properties of this design
 	 */
-	public boolean hasProperty(Object propertyKey) {
-		Objects.requireNonNull(propertyKey);
-
-		return getProperty(propertyKey) != null;
+	public PropertyList getProperties() {
+		return properties;
 	}
 
-	/**
-	 * Returns the property from this cell with the specified name.
-	 *
-	 * @param propertyKey name of the property to get
-	 * @return the property with the specified name
-	 */
-	public Property getProperty(Object propertyKey) {
-		Objects.requireNonNull(propertyKey);
-
-		if (propertyMap == null)
-			return null;
-		return propertyMap.get(propertyKey);
-	}
-
-	/**
-	 * Returns the properties of this cell.  The returned collection should not be
-	 * modified by the user.
-	 *
-	 * @return the properties of this cell
-	 */
-	public Collection<Property> getProperties() {
-		if (propertyMap == null)
-			return Collections.emptyList();
-		return propertyMap.values();
-	}
-
-	/**
-	 * Updates or adds the property to this cell.
-	 *
-	 * @param property the property to add or update
-	 */
-	public void updateProperty(Property property) {
-		Objects.requireNonNull(property);
-
-		if (this.propertyMap == null)
-			this.propertyMap = new HashMap<>();
-		this.propertyMap.put(property.getKey(), property);
-	}
-	
-	/**
-	 * Updates or adds the properties in the provided collection to the properties
-	 * of this cell.
-	 *
-	 * @param properties the properties to add or update
-	 */
-	public void updateProperties(Collection<Property> properties) {
-		Objects.requireNonNull(properties);
-
-		properties.forEach(this::updateProperty);
-	}
-
-	/**
-	 * Updates the value of the property in this cell with the specified name or
-	 * creates and adds it if it is not already present.
-	 *
-	 * @param propertyKey the name of the property
-	 * @param value the value to set the property to
-	 */
-	public void updateProperty(Object propertyKey, PropertyType type, Object value) {
-		Objects.requireNonNull(propertyKey);
-		Objects.requireNonNull(type);
-		Objects.requireNonNull(value);
-
-		updateProperty(new Property(propertyKey, type, value));
-	}
-
-	/**
-	 * Removes the property with the specified name.  Returns the removed property.
-	 *
-	 * @param propertyKey the key of the property to remove
-	 * @return the removed property
-	 */
-	public Property removeProperty(Object propertyKey) {
-		Objects.requireNonNull(propertyKey);
-
-		if (propertyMap == null)
-			return null;
-		return propertyMap.remove(propertyKey);
-	}
-	
 	public boolean hasCell(String fullName) {
 		Objects.requireNonNull(fullName);
 
