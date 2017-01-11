@@ -9,12 +9,6 @@ import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.Connection;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Tile;
-
-import edu.byu.ece.rapidSmith.device.TileWire;
-
-
-import java.util.HashSet;
-
 import edu.byu.ece.rapidSmith.device.Wire;
 
 public class DeviceAnalyzer {
