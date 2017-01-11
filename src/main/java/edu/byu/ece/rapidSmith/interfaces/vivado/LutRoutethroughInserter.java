@@ -181,7 +181,7 @@ public class LutRoutethroughInserter {
 		// TODO: replace this code with a function
 		//create a new lut1 cell with the appropriate init string
 		Cell buffer = new Cell(ROUTETHROUGH_NAME + routethroughID, libCells.get("LUT1") );
-		buffer.updateProperty(new Property("INIT", PropertyType.EDIF, ROUTETHROUGH_INIT_STRING));
+		buffer.getProperties().update(new Property("INIT", PropertyType.EDIF, ROUTETHROUGH_INIT_STRING));
 		design.addCell(buffer);
 		
 		// break the netlist 

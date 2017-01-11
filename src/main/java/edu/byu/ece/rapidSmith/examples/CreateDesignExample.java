@@ -64,12 +64,12 @@ public class CreateDesignExample {
 		// Create a new cell and add it to the current design.  It is a LUT1 cell.
 		Cell invcell = design.addCell(new Cell("lutcell", libCells.get("LUT1")));
 		// Set the INIT property for the LUT cell (program the LUT) 
-		invcell.updateProperty("INIT", PropertyType.DESIGN, "2'h1");
+		invcell.getProperties().update("INIT", PropertyType.DESIGN, "2'h1");
 
 		// Create a flip flop cell and set its properties 
 		Cell ffcell = design.addCell(new Cell("ffcell", libCells.get("FDRE")));   
-		ffcell.updateProperty("INIT", PropertyType.DESIGN, "INIT0");
-		ffcell.updateProperty("SR", PropertyType.DESIGN, "SRLOW");
+		ffcell.getProperties().update("INIT", PropertyType.DESIGN, "INIT0");
+		ffcell.getProperties().update("SR", PropertyType.DESIGN, "SRLOW");
 		
 		// Create IOB's for the circuit's q output and for its clk input
 		Cell qbufcell = design.addCell(new Cell("qbuf", libCells.get("OBUF")));

@@ -102,7 +102,7 @@ public final class EdifInterface {
 		// create RS2 cell design
 		String partName = ((StringTypedValue)top.getTopDesign().getProperty("part").getValue()).getStringValue();
 		CellDesign design= new CellDesign(top.getTopDesign().getName(), partName);	
-		design.updateProperties(createCellProperties(topLevelCell.getPropertyList()));
+		design.getProperties().updateAll(createCellProperties(topLevelCell.getPropertyList()));
 		
 		// add all the cells and nets to the design
 		processTopLevelEdifPorts(design, topLevelCell.getInterface(), libCells);
@@ -146,7 +146,7 @@ public final class EdifInterface {
 									String.format("%s[%d]", portSuffix, reverseBusIndex(port.getWidth(), busMember.bitPosition())) :
 									portSuffix;
 				Cell portCell = new Cell(portName, libCell);
-				portCell.updateProperty(new Property("Dir", PropertyType.USER, PortDirection.getPortDirectionForImport(portCell)));
+				portCell.getProperties().update(new Property("Dir", PropertyType.USER, PortDirection.getPortDirectionForImport(portCell)));
 				design.addCell(portCell);
 			}
 		}
@@ -173,7 +173,7 @@ public final class EdifInterface {
 			
 			// Add properties to the cell 
 			// TODO: when macros are added, we will need to update this
-			newcell.updateProperties(createCellProperties(eci.getPropertyList()));
+			newcell.getProperties().updateAll(createCellProperties(eci.getPropertyList()));
 		}
 	}
 	
@@ -217,7 +217,7 @@ public final class EdifInterface {
 				design.addNet(cn);
 			}
 			
-			cn.updateProperties(createCellProperties(net.getPropertyList()));
+			cn.getProperties().updateAll(createCellProperties(net.getPropertyList()));
 		}
 	}
 	
@@ -595,7 +595,7 @@ public final class EdifInterface {
 	/*
 	 * Converts a collection of RapidSmith properties to an EDIF property list
 	 */
-	private static PropertyList createEdifPropertyList (Collection<Property> properties) {
+	private static PropertyList createEdifPropertyList (edu.byu.ece.rapidSmith.design.subsite.PropertyList properties) {
 		PropertyList edifProperties = new PropertyList();
 		
 		for (Property prop : properties) {
