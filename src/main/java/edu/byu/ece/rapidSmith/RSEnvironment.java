@@ -139,7 +139,7 @@ public class RSEnvironment {
 	public Path getJavaPath() {
 		return rsPath.resolve("src").resolve("main").resolve("java");
 	}
-
+	
 	/**
 	 * Returns the loaded device with the specified part name.  Once loaded, devices are
 	 * cached for quick access.
