@@ -15,7 +15,6 @@ import com.trolltech.qt.core.Qt.ContextMenuPolicy;
 import com.trolltech.qt.core.Qt.SortOrder;
 import com.trolltech.qt.gui.QAbstractItemView.SelectionMode;
 import com.trolltech.qt.gui.QBrush;
-import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QContextMenuEvent;
 import com.trolltech.qt.gui.QCursor;
 import com.trolltech.qt.gui.QIcon;
@@ -43,7 +42,7 @@ public class ElementTab extends QWidget {
 	/**Holds all of the site pips of the currently selected primitive site*/
 	private QTreeWidget pips;
 	/**Initial brush to make the color of all pins red (indicating they are unconnected)*/
-	private QBrush text_brush = new QBrush(QColor.red);
+	private QBrush text_brush = new QBrush(VsrtColor.red);
 	/**Mapping Site Pins to their corresponding elements so that connections can be generated*/
 	private HashMap <QTreePin, Element> pin2ElementMap = new HashMap<QTreePin, Element>();
 //	/**Set of inverting pip names */
@@ -79,7 +78,7 @@ public class ElementTab extends QWidget {
 		
 		QTreeWidgetItem pinHeader = new QTreeWidgetItem();
 		pinHeader.setText(0, "  Site Pins");
-		pinHeader.setIcon(0, new QIcon(VSRTool.getImagePath().resolve("add.gif").toString()));
+		pinHeader.setIcon(0, new QIcon(VSRTool.getImagePath("add.gif")));
 		pins.setHeaderItem(pinHeader);
 		pins.header().setClickable(true);
 		pins.header().sectionClicked.connect(this, "checkIconClick()");
@@ -158,7 +157,7 @@ public class ElementTab extends QWidget {
 				if (saveFileExists) {
 					if( xml.sitePinUnconnected(element.getName() ) ){
 						element.getPins().get(0).setConnected(false);
-						tmp.setForeground(0, new QBrush(QColor.gray ) ); 
+						tmp.setForeground(0, new QBrush(VsrtColor.gray ) ); 
 					}
 				}
 				
@@ -369,17 +368,17 @@ public class ElementTab extends QWidget {
 	
 		for (int i = 0; i < this.bels.topLevelItemCount(); i++ )
 			for (int j = 0; j< this.bels.topLevelItem(i).childCount(); j++ )
-				if ( this.bels.topLevelItem(i).child(j).foreground(0).color().value() == QColor.red.value())
+				if ( this.bels.topLevelItem(i).child(j).foreground(0).color().value() == VsrtColor.red.value())
 					return false;
 			
 		for (int i = 0; i < this.bels.topLevelItemCount(); i++ )
-			if ( this.bels.topLevelItem(i).foreground(0).color().value() == QColor.red.value())
+			if ( this.bels.topLevelItem(i).foreground(0).color().value() == VsrtColor.red.value())
 				return false;
 		
 		
 		for (int i = 0; i < this.pips.topLevelItemCount(); i++ )
 			for (int j = 0; j < this.pips.topLevelItem(i).childCount(); j++ )
-				if ( this.pips.topLevelItem(i).child(j).foreground(0).color().value() == QColor.red.value())
+				if ( this.pips.topLevelItem(i).child(j).foreground(0).color().value() == VsrtColor.red.value())
 					return false;
 					
 		return true;
@@ -500,8 +499,8 @@ public class ElementTab extends QWidget {
 				&& event.pos().y() > pins.pos().y() + pins.header().height() && event.pos().y() < pins.pos().y() + pins.height()) {
 
 			QMenu popupMenu = new QMenu();
-			popupMenu.addAction(new QIcon(VSRTool.getImagePath().resolve("trash.png").toString()), "Delete Selected Pins", this, "deleteSitePins()");
-			popupMenu.addAction(new QIcon(VSRTool.getImagePath().resolve("unconnected.png").toString()), "Mark As Unconnected", this, "markSitePinsUnconnected()");
+			popupMenu.addAction(new QIcon(VSRTool.getImagePath("trash.png")), "Delete Selected Pins", this, "deleteSitePins()");
+			popupMenu.addAction(new QIcon(VSRTool.getImagePath("unconnected.png")), "Mark As Unconnected", this, "markSitePinsUnconnected()");
 			popupMenu.popup(event.globalPos());
 		}
 		

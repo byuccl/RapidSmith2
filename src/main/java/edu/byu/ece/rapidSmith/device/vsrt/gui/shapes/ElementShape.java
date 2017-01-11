@@ -223,9 +223,9 @@ public abstract class ElementShape extends QGraphicsItem{
 		//If the button released was the right button, then display the pop-up menu
 		else if (event.button() == MouseButton.RightButton) {
 			QMenu popup_menu = new QMenu();
-			popup_menu.addAction(new QIcon(VSRTool.getImagePath().resolve("trash.png").toString()), "Remove", this, "sendRemoveElementCommand()"); //delete bel option
+			popup_menu.addAction(new QIcon(VSRTool.getImagePath("trash.png")), "Remove", this, "sendRemoveElementCommand()"); //delete bel option
 			if (this instanceof Bel)
-				popup_menu.addAction(new QIcon(VSRTool.getImagePath().resolve("bel.png").toString()), "Bel Config Options", this,  "showConfig()"); 
+				popup_menu.addAction(new QIcon(VSRTool.getImagePath("bel.png")), "Bel Config Options", this,  "showConfig()"); 
 			popup_menu.popup(event.screenPos());
 		}
 	}

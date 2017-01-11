@@ -57,12 +57,12 @@ public class MenuBar extends QMenuBar{
 	private void createFileMenu(){
 		// File Menu --add to this as necessary
 		//---------------------------------------
-		QAction quit = new QAction(new QIcon(VSRTool.getImagePath().resolve("quit.png").toString()), "&Exit", this);
+		QAction quit = new QAction(new QIcon(VSRTool.getImagePath("quit.png")), "&Exit", this);
 		quit.triggered.connect(QApplication.instance(), "exit()");
 		quit.setShortcut("Ctrl+q");
 		 
 		//save button
-		save = new QAction(new QIcon(VSRTool.getImagePath().resolve("filesave.png").toString()), "Save", this); 
+		save = new QAction(new QIcon(VSRTool.getImagePath("filesave.png")), "Save", this); 
 		save.triggered.connect(parent, "savePrimitiveSite()");
 		save.setShortcut("Ctrl+s");
 		save.setEnabled(false);
@@ -73,21 +73,21 @@ public class MenuBar extends QMenuBar{
 //		Import.setShortcut("Ctrl+i");
 		 
 		//view site configurations options button
-		viewSiteConfig = new QAction(new QIcon(VSRTool.getImagePath().resolve("gear.png").toString()), "Site Config Options", this);
+		viewSiteConfig = new QAction(new QIcon(VSRTool.getImagePath("gear.png")), "Site Config Options", this);
 		viewSiteConfig.triggered.connect(this.parent, "showSiteConfigDialog()");
 		viewSiteConfig.setEnabled(false);
 		 
 		//view bel configurations options button
-		viewBelConfig = new QAction(new QIcon(VSRTool.getImagePath().resolve("bel.png").toString()), "Bel Config Options", this);
+		viewBelConfig = new QAction(new QIcon(VSRTool.getImagePath("bel.png")), "Bel Config Options", this);
 		viewBelConfig.triggered.connect(this, "belConfigSelected()");
 		viewBelConfig.setEnabled(false);
 		
 		//Close current site button
-		closeSite = new QAction( new QIcon(VSRTool.getImagePath().resolve("closePrimitiveSite.png").toString()), "Close Site", this );
+		closeSite = new QAction( new QIcon(VSRTool.getImagePath("closePrimitiveSite.png")), "Close Site", this );
 		closeSite.triggered.connect(this, "closeSite()");
 		closeSite.setVisible(false);
 		
-		generateOneBel = new QAction( new QIcon(VSRTool.getImagePath().resolve("connect2.png").toString()), "Generate One Bel Connections", this );
+		generateOneBel = new QAction( new QIcon(VSRTool.getImagePath("connect2.png")), "Generate One Bel Connections", this );
 		generateOneBel.triggered.connect(this.parent, "generateAllOneBelConnections()");
 		
 		//Adding everything to the file menu
@@ -98,7 +98,7 @@ public class MenuBar extends QMenuBar{
 	    file.addAction(closeSite);
 	    file.addAction(generateOneBel);
 	    view = file.addMenu("&View");
-	    view.setIcon(new QIcon(VSRTool.getImagePath().resolve("view.png").toString()));
+	    view.setIcon(new QIcon(VSRTool.getImagePath("view.png")));
 	    view.addAction(viewSiteConfig);
 	    view.addAction(viewBelConfig);
 	    file.addSeparator();
@@ -111,13 +111,13 @@ public class MenuBar extends QMenuBar{
 		//Edit Menu -- only contains redo and undo
 	    //------------------------------------------
 	    //undo action
-	    undo = new QAction(new QIcon(VSRTool.getImagePath().resolve("editundo.png").toString()), "&Undo", this); 
+	    undo = new QAction(new QIcon(VSRTool.getImagePath("editundo.png")), "&Undo", this); 
 	    undo.setEnabled(false);
 		undo.triggered.connect( undoStack, "undo()" );
 		undo.setShortcut("Ctrl+z");
 	    	    
 		//redo action
-		redo = new QAction(new QIcon(VSRTool.getImagePath().resolve("editredo.png").toString()), "&Redo", this);
+		redo = new QAction(new QIcon(VSRTool.getImagePath("editredo.png")), "&Redo", this);
 		redo.setEnabled(false);
 		redo.triggered.connect( undoStack, "redo()" );
 		ArrayList<QKeySequence> redoShortcuts = new ArrayList<QKeySequence>();
@@ -140,7 +140,7 @@ public class MenuBar extends QMenuBar{
 	private void createHelpMenu(){
 		//Help Menu --add to this as necessary
 	    help = this.addMenu("&Help");
-	    QAction about = new QAction(new QIcon(VSRTool.getImagePath().resolve("about.png").toString()), "&About", this);
+	    QAction about = new QAction(new QIcon(VSRTool.getImagePath("about.png")), "&About", this);
 	    about.triggered.connect(this, "displayAbout()");
 	    about.setShortcut("Ctrl+a");
 	   
@@ -153,13 +153,14 @@ public class MenuBar extends QMenuBar{
 	 */
 	@SuppressWarnings("unused")
 	private void displayAbout(){
-		// TODO: Change this link to point to online documentation
+		// TODO: Change this link to point to online documentation rather than github master branch
 		QMessageBox.about(this, "Vivado Subsite Routing Tool", tr("This tool is designed to generate connections "
 								+ "between bels on the primitive site level in a quick and easy manner. "
 								+ "Once the TCL script 'GetAllPrimitiveDefs' has been run, "
 								+ "simply import the generated directory, choose an architecture, "
-								+ "a primitive site, and draw the connections! "
-								+ "<a href=\"https://google.com\"> Click here to learn more</a>"));
+								+ "a primitive site, and draw the connections! Read the "
+								+ "<a href=\"https://github.com/byuccl/RapidSmith2/tree/master/doc\"> VSRT User Guide</a> "
+								+ "to learn more."));
 	}
 	
 	/**

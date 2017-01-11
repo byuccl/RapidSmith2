@@ -55,8 +55,8 @@ public class PrimitiveSiteView extends QGraphicsView{
 		this.setInteractive(true);
 		this.setDragMode(DragMode.RubberBandDrag);	
 		
-		zoomSelectionImage = new QPixmap( VSRTool.getImagePath().resolve("zoomcursor.png").toString() );
-		deleteImage = new QPixmap( VSRTool.getImagePath().resolve("deleteCursor.png").toString() );
+		zoomSelectionImage = new QPixmap( VSRTool.getImagePath("zoomcursor.png"));
+		deleteImage = new QPixmap( VSRTool.getImagePath("deleteCursor.png"));
 		
 		//include anti-aliasing to the view so that lines and text look decent when zooming in and out
 		this.setRenderHints(QPainter.RenderHint.TextAntialiasing, QPainter.RenderHint.Antialiasing);

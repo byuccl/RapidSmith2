@@ -25,8 +25,6 @@ import com.trolltech.qt.gui.QTableWidget;
 import com.trolltech.qt.gui.QTableWidgetItem;
 import com.trolltech.qt.gui.QWidget;
 
-import edu.byu.ece.rapidSmith.RSEnvironment;
-
 /**
  * This class implements the QTableWidget that displays all of the 
  * available primitive sites for a given architecture/family. 
@@ -61,8 +59,8 @@ public class PrimitiveSiteTable extends QTableWidget {
 		this.parent = (SiteSelectTab) parent; 
 	
 		// initialize icons
-		checked =  new QIcon(RSEnvironment.defaultEnv().getResourcePath().resolve("images").resolve("vsrt").resolve("check.gif").toString());
-		unchecked =  new QIcon(RSEnvironment.defaultEnv().getResourcePath().resolve("images").resolve("vsrt").resolve("uncheck.gif").toString());
+		checked =  new QIcon(VSRTool.getImagePath("check.gif"));
+		unchecked =  new QIcon(VSRTool.getImagePath("uncheck.gif"));
 		
 		//Table Settings
 		this.setColumnCount(1);

@@ -21,7 +21,6 @@ import com.trolltech.qt.core.Qt.AspectRatioMode;
 import com.trolltech.qt.core.Qt.CursorShape;
 import com.trolltech.qt.core.Qt.MouseButton;
 import com.trolltech.qt.gui.QBrush;
-import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
 import com.trolltech.qt.gui.QGraphicsLineItem;
 import com.trolltech.qt.gui.QGraphicsScene;
@@ -238,8 +237,8 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 	 */
 	public void updateTreeView (QTreePin start_pin, QTreePin end_pin){
 		//Change the color of the pins in the element tab GREEN, signifying that it is connected to something
-		start_pin.setForeground(0, new QBrush(QColor.darkGreen));
-		end_pin.setForeground(0, new QBrush(QColor.darkGreen));
+		start_pin.setForeground(0, new QBrush(VsrtColor.darkGreen));
+		end_pin.setForeground(0, new QBrush(VsrtColor.darkGreen));
 		
 		//Check the parent element of each pin...if all pins are connected, then turn it green in the tree view
 		this.checkConnectionsComplete( start_pin.parent() );
@@ -275,14 +274,14 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 	 */
 	private void checkConnectionsComplete(QTreeWidgetItem parent){
 
-		if (parent != null && parent.foreground(0).color().value() != QColor.darkGreen.value() ) {
+		if (parent != null && parent.foreground(0).color().value() != VsrtColor.darkGreen.value() ) {
 			boolean changeColor = true;
 			for (int i = 0; i < parent.childCount(); i++) {
 				if( parent.child(i).childCount() == 0 ) {
 					changeColor = false; break;
 				}
 			}
-			if (changeColor) { parent.setForeground(0, new QBrush(QColor.darkGreen) );   }
+			if (changeColor) { parent.setForeground(0, new QBrush(VsrtColor.darkGreen) );   }
 		}
 	}
 	
@@ -382,7 +381,7 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 	 */
 	protected void drawBackground(QPainter painter, QRectF rect)
 	{
-		QPen pen = new QPen(QColor.lightGray);
+		QPen pen = new QPen(VsrtColor.lightGray);
 		pen.setWidth(1);
 		
 		painter.setPen(pen);

@@ -23,12 +23,12 @@ package edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands;
 import java.util.ArrayList;
 
 import com.trolltech.qt.gui.QBrush;
-import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QTreeWidgetItem;
 import com.trolltech.qt.gui.QUndoCommand;
 
 import edu.byu.ece.rapidSmith.device.vsrt.gui.PrimitiveSiteScene;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreePin;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.VsrtColor;
 
 /**
  * This class allows users to mark site pins as unconnected, and undo the action if necessary
@@ -78,7 +78,7 @@ public class MarkPinUnconnectedCommand extends QUndoCommand{
 			boolean connected = ((QTreePin) item).getPin().isConnected();
 			((QTreePin) item).getPin().setConnected(!connected);
 			//Show unconnected pins as gray in the tree view and graphics view
-			item.setForeground(0, new QBrush((connected) ? QColor.gray : QColor.red));
+			item.setForeground(0, new QBrush((connected) ? VsrtColor.gray : VsrtColor.red));
 			item.setSelected(false);
 		}
 		scene.update();

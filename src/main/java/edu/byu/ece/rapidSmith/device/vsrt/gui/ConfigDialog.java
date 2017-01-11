@@ -41,7 +41,6 @@ import com.trolltech.qt.gui.QDialogButtonBox.ButtonRole;
 import com.trolltech.qt.gui.QLabel;
 import com.trolltech.qt.gui.QMessageBox;
 import com.trolltech.qt.gui.QPalette.ColorRole;
-import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QHBoxLayout;
 import com.trolltech.qt.gui.QHeaderView;
 import com.trolltech.qt.gui.QIcon;
@@ -114,7 +113,7 @@ public class ConfigDialog extends QDialog{
 		this.newConfigToolBar.setOrientation(Orientation.Horizontal);
 		this.newConfigToolBar.addWidget(new QLabel("New Config Option: "));
 		this.newConfigToolBar.addWidget(newConfigOption);	
-		QAction add = new QAction(new QIcon(VSRTool.getImagePath().resolve("add.gif").toString()), "", this);
+		QAction add = new QAction(new QIcon(VSRTool.getImagePath("add.gif")), "", this);
 		add.triggered.connect(this, "addNewCfgOption()");
 		add.setToolTip("Add configuration option");
 		
@@ -122,7 +121,7 @@ public class ConfigDialog extends QDialog{
 		this.newConfigToolBar.setStyleSheet("QToolBar {border: 0px; icon-size: 16px}");
 		
 		//Buttons to close the dialog	
-		done = new QPushButton(new QIcon(VSRTool.getImagePath().resolve("apply.png").toString()), "Done");
+		done = new QPushButton(new QIcon(VSRTool.getImagePath("apply.png")), "Done");
 		done.clicked.connect(this, "closeDialog()");
 		applyBox = new QDialogButtonBox(this);
 		applyBox.addButton(done, ButtonRole.NoRole);		
@@ -134,7 +133,7 @@ public class ConfigDialog extends QDialog{
 	 */
 	private void initializeNewConfigElementTextBox(){
 		//Initializing line edit where user enters config options
-		pallete.setColor(ColorRole.Text, QColor.gray);
+		pallete.setColor(ColorRole.Text, VsrtColor.gray);
 		newConfigOption.setPalette(pallete);
 		newConfigOption.installEventFilter(this);
 		newConfigOption.setFocusPolicy(FocusPolicy.ClickFocus);
@@ -172,24 +171,24 @@ public class ConfigDialog extends QDialog{
 		this.editMenuToolBar.setSizePolicy(Policy.Minimum, Policy.Minimum);
 		
 		//Button that adds the new config option to all bels of that type
-		promoteToSite = new QAction(new QIcon(VSRTool.getImagePath().resolve("promoteToSite.png").toString()), "", this);
+		promoteToSite = new QAction(new QIcon(VSRTool.getImagePath("promoteToSite.png")), "", this);
 		promoteToSite.setToolTip("Promote this configuration options to the site level\n"
 								+ "\nNOTE: Selecting this will remove the configuration\noptions from all "
 								+ "other bels");
 		promoteToSite.triggered.connect(this,"promoteToSite()");
 		
 		//Button that deletes selected options 
-		QAction deleteSelected = new QAction(new QIcon(VSRTool.getImagePath().resolve("trash.png").toString()), "", this);
+		QAction deleteSelected = new QAction(new QIcon(VSRTool.getImagePath("trash.png")), "", this);
 		deleteSelected.triggered.connect(this, "deleteSelected()");
 		deleteSelected.setToolTip("Delete Selected");
 		
 		//Button that selects all config options
-		QAction selectAll = new QAction(new QIcon(VSRTool.getImagePath().resolve("editselectall.png").toString()), "", this);
+		QAction selectAll = new QAction(new QIcon(VSRTool.getImagePath("editselectall.png")), "", this);
 		selectAll.triggered.connect(this, "selectAll()");
 		selectAll.setToolTip("Select All");
 		
 		//Button that de-selects all config options 
-		QAction deselectAll = new QAction(new QIcon(VSRTool.getImagePath().resolve("editunselectall.png").toString()), "", this);
+		QAction deselectAll = new QAction(new QIcon(VSRTool.getImagePath("editunselectall.png")), "", this);
 		deselectAll.triggered.connect(this, "deselectAll()");
 		deselectAll.setToolTip("Deselect All");	
 		
@@ -284,7 +283,7 @@ public class ConfigDialog extends QDialog{
 	private void editBoxFocusChanged(QEvent event){
 		
 		if( event.type() == QEvent.Type.FocusIn ) { 	
-			this.pallete.setColor(ColorRole.Text, QColor.black);
+			this.pallete.setColor(ColorRole.Text, VsrtColor.black);
 			newConfigOption.setPalette(pallete);
 			if( this.newConfigOption.text().equals("Name: Option1 Option2 Option3...") ) {
 				newConfigOption.clear();
@@ -293,7 +292,7 @@ public class ConfigDialog extends QDialog{
 		else if ( event.type() == QEvent.Type.FocusOut ) {
 			if( this.newConfigOption.text().equals("") ) {
 				newConfigOption.setText("Name: Option1 Option2 Option3...");
-			    pallete.setColor(ColorRole.Text, QColor.gray);
+			    pallete.setColor(ColorRole.Text, VsrtColor.gray);
 			    newConfigOption.setPalette(pallete);
 			}
 		}

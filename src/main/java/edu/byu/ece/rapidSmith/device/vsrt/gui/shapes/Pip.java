@@ -3,17 +3,16 @@ package edu.byu.ece.rapidSmith.device.vsrt.gui.shapes;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.PrimitiveSiteScene;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreeElement;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreePin;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.VsrtColor;
 
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.Qt.AlignmentFlag;
 import com.trolltech.qt.core.Qt.LayoutDirection;
-import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QPolygonF;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
-
 
 /**
  * This class is used to add and draw site pips on the device view
@@ -100,14 +99,14 @@ public class Pip extends ElementShape {
 	public void paint(QPainter painter, QStyleOptionGraphicsItem item, QWidget widget) {
 		// TODO Auto-generated method stub
 		if ( this.isSelected() ) {
-			painter.setBrush(QColor.blue);
+			painter.setBrush(VsrtColor.blue);
 			painter.drawPolygon(shape);	
 			painter.drawText(0, (int)this.height, (int)this.width, (int)pin_width/2, AlignmentFlag.AlignTop.value(), element.getElement().getName());
-			painter.setPen(QColor.white);
+			painter.setPen(VsrtColor.white);
 		}
 		else {
-			painter.setBrush(QColor.green);
-			painter.setPen(QColor.black);
+			painter.setBrush(VsrtColor.green);
+			painter.setPen(VsrtColor.black);
 			painter.drawPolygon(shape);	
 			painter.drawText(0, (int)this.height, (int)this.width, (int)pin_width/2, AlignmentFlag.AlignTop.value(), element.getElement().getName());
 		}

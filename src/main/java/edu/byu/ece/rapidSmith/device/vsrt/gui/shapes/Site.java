@@ -67,7 +67,7 @@ public class Site extends QGraphicsItem {
 		this.pin_width = scene.getSquare_size();
 		this.addPins(pins);
 		popupMenu  = new QMenu();
-		popupMenu.addAction(new QIcon(VSRTool.getImagePath().resolve("gear.png").toString()), "Site Config Options", this,  "showSiteConfig()"); 
+		popupMenu.addAction(new QIcon(VSRTool.getImagePath("gear.png")), "Site Config Options", this,  "showSiteConfig()"); 
 		
 		if(pinsSaved){//restore the site to the settings before it was saved
 			height = xml.getGraphicsSiteHeight();

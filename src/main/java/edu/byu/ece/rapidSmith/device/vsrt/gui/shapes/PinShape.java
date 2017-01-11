@@ -5,6 +5,7 @@ package edu.byu.ece.rapidSmith.device.vsrt.gui.shapes;
 
 import edu.byu.ece.rapidSmith.device.vsrt.gui.PrimitiveSiteScene;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreePin;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.VsrtColor;
 import edu.byu.ece.rapidSmith.device.vsrt.primitiveDefs.PrimitiveDefPinDirection;
 
 import com.trolltech.qt.core.QPointF;
@@ -12,7 +13,6 @@ import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.Qt.AlignmentFlag;
 import com.trolltech.qt.core.Qt.LayoutDirection;
 import com.trolltech.qt.core.Qt.MouseButton;
-import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QFontMetrics;
 import com.trolltech.qt.gui.QGraphicsItem;
@@ -125,10 +125,10 @@ public class PinShape extends QGraphicsItem{
 	public void paint(QPainter painter, QStyleOptionGraphicsItem arg1, QWidget arg2) {
 		// TODO Auto-generated method stub
 		if ( this.isSelected() ) 
-			painter.setPen(QColor.blue);
+			painter.setPen(VsrtColor.blue);
 		else if ( !this.pin.getPin().isConnected() )
-			painter.setPen(QColor.darkGray); 
-		else {	painter.setPen(QColor.black);	}
+			painter.setPen(VsrtColor.darkGray); 
+		else {	painter.setPen(VsrtColor.black);	}
 		painter.setFont(font);
 		
 		//Input Pins

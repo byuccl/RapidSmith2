@@ -3,7 +3,6 @@ package edu.byu.ece.rapidSmith.device.vsrt.gui;
 import java.util.ArrayList;
 
 import com.trolltech.qt.gui.QBrush;
-import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QTreeWidget;
 import com.trolltech.qt.gui.QTreeWidgetItem;
 
@@ -42,7 +41,7 @@ public class QTreeElement extends QTreeWidgetItem{
 			QTreePin pin_tmp = new QTreePin(this, bel_pin, false);
 			pin_tmp.setText(0, bel_pin.getInternalName());
 			//pins are initially unconnected, and so their color is red to represent this
-			pin_tmp.setForeground(0, new QBrush(QColor.red));
+			pin_tmp.setForeground(0, new QBrush(VsrtColor.red));
 						
 			if ( bel_pin.getDirection() == PrimitiveDefPinDirection.OUTPUT ){
 				this.out_pins.add(pin_tmp);

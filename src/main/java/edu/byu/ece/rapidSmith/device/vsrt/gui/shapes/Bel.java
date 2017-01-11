@@ -1,16 +1,15 @@
 package edu.byu.ece.rapidSmith.device.vsrt.gui.shapes;
 
-
 import edu.byu.ece.rapidSmith.device.vsrt.gui.PrimitiveSiteScene;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreeElement;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreePin;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.VsrtColor;
 import edu.byu.ece.rapidSmith.device.vsrt.primitiveDefs.PrimitiveDefPinDirection;
 
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.Qt.AlignmentFlag;
 import com.trolltech.qt.core.Qt.LayoutDirection;
-import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QStyleOptionGraphicsItem;
 import com.trolltech.qt.gui.QWidget;
@@ -73,14 +72,14 @@ public class Bel extends ElementShape{
 		//painter.rotate(90);
 		// TODO Auto-generated method stub
 		if ( this.isSelected() ) {
-			painter.setBrush(QColor.blue);
+			painter.setBrush(VsrtColor.blue);
 			painter.drawRect(shape);
 			painter.drawText(0, (int)this.height, (int)this.width, (int)pin_width/2, AlignmentFlag.AlignTop.value(), element.getElement().getName());
-			painter.setPen(QColor.white);
+			painter.setPen(VsrtColor.white);
 		}
 		else {
-			painter.setBrush(QColor.yellow);
-			painter.setPen(QColor.black);
+			painter.setBrush(VsrtColor.yellow);
+			painter.setPen(VsrtColor.black);
 			painter.drawRect(shape);
 			painter.drawText(0, (int)this.height, (int)this.width, (int)pin_width/2, AlignmentFlag.AlignTop.value(), element.getElement().getName());
 		}
@@ -99,7 +98,7 @@ public class Bel extends ElementShape{
 			for (QTreePin pin : (this.rotationAngle==180) ? element.getOut_pins() :element.getIn_pins()) { 
 				//helps user see which pins are of type inout.
 				if (pin.getPin().getDirection() == PrimitiveDefPinDirection.INOUT)
-					painter.setPen(QColor.darkGray);
+					painter.setPen(VsrtColor.darkGray);
 
 				painter.drawText(new QRectF(3,(int)( i*(pin_width/2) ), width/2, pin_width), AlignmentFlag.AlignVCenter.value(), pin.get_pinName() );
 				i += 2;

@@ -78,60 +78,60 @@ public class ToolBar extends QToolBar{
 	}
 	
 	private void initializeButtons(QGraphicsView view, QUndoStack undoStack){
-		toggleView = new QAction(new QIcon(VSRTool.getImagePath().resolve("hide.png").toString()), "", this);
+		toggleView = new QAction(new QIcon(VSRTool.getImagePath("hide.png")), "", this);
 		toggleView.triggered.connect(this, "changeDockWidgetVisibility()");
 		toggleView.setToolTip("Hide Navigator View");
 		
-	    save_site = new QAction(new QIcon(VSRTool.getImagePath().resolve("filesave.png").toString()), "Save Primitive Site", this );
+	    save_site = new QAction(new QIcon(VSRTool.getImagePath("filesave.png")), "Save Primitive Site", this );
 	    save_site.triggered.connect(parent, "savePrimitiveSite()");
 	 
-	    draw_wire = new QAction(new QIcon(VSRTool.getImagePath().resolve("draw_wire.png").toString()), "Draw Wire (W)", this );
+	    draw_wire = new QAction(new QIcon(VSRTool.getImagePath("draw_wire.png")), "Draw Wire (W)", this );
 	    draw_wire.setCheckable(true);
 	    draw_wire.toggled.connect(this, "draw_wire_toggled()");
 	    draw_wire.setShortcut("w");
 		    
-	    delete = new QAction(new QIcon(VSRTool.getImagePath().resolve("editcut.png").toString()), "Remove", this );
+	    delete = new QAction(new QIcon(VSRTool.getImagePath("editcut.png")), "Remove", this );
 	    delete.setCheckable(true);
 	    delete.toggled.connect(this, "delete_toggled()" );
 	    delete.setShortcut("d");
 	    
-	    drag_mode = new QAction(new QIcon(VSRTool.getImagePath().resolve("drag.gif").toString()), "Drag View", this);
+	    drag_mode = new QAction(new QIcon(VSRTool.getImagePath("drag.gif")), "Drag View", this);
 	    drag_mode.setCheckable(true);
 	    drag_mode.toggled.connect(this, "drag_toggled()");
 	    drag_mode.setShortcut("Ctrl+d");
 	    
-	    zoom_in = new QAction(new QIcon(VSRTool.getImagePath().resolve("zoomin.png").toString()), "Zoom In", this);
+	    zoom_in = new QAction(new QIcon(VSRTool.getImagePath("zoomin.png")), "Zoom In", this);
 	    zoom_in.triggered.connect(view, "zoom_in()");
 	    zoom_in.setShortcut("Ctrl++");
 	    
-	    zoom_out = new QAction(new QIcon(VSRTool.getImagePath().resolve("zoomout.png").toString()), "Zoom Out", this);
+	    zoom_out = new QAction(new QIcon(VSRTool.getImagePath("zoomout.png")), "Zoom Out", this);
 	    zoom_out.triggered.connect(view, "zoom_out()");
 	    zoom_out.setShortcut("Ctrl+-");
 	    
-	    zoomToView = new QAction(new QIcon(VSRTool.getImagePath().resolve("zoomselection.png").toString()), "Zoom To Selected", this);
+	    zoomToView = new QAction(new QIcon(VSRTool.getImagePath("zoomselection.png")), "Zoom To Selected", this);
 	    zoomToView.toggled.connect(this, "zoomToViewToggled()");
 	    zoomToView.setCheckable(true);
 	    
-	    zoomBestFit = new QAction(new QIcon(VSRTool.getImagePath().resolve("zoombestfit2.png").toString()), "Zoom Best Fit", this);
+	    zoomBestFit = new QAction(new QIcon(VSRTool.getImagePath("zoombestfit2.png")), "Zoom Best Fit", this);
 	    zoomBestFit.triggered.connect(view, "zoomToBestFit()");
 	    
-	    generateRemaining = new QAction(new QIcon(VSRTool.getImagePath().resolve("generateConnections.gif").toString()), tr("Generate Remaining Connections and save Primitive Def"), this);
+	    generateRemaining = new QAction(new QIcon(VSRTool.getImagePath("generateConnections.gif")), tr("Generate Remaining Connections and save Primitive Def"), this);
 	    generateRemaining.triggered.connect(parent, "generateRemainingConnections()");
 	    generateRemaining.setEnabled(false);
 	    
-	    viewSiteConfigOptions = new QAction(new QIcon(VSRTool.getImagePath().resolve("site.gif").toString()), tr("View site configuration options"), this);
+	    viewSiteConfigOptions = new QAction(new QIcon(VSRTool.getImagePath("site.gif")), tr("View site configuration options"), this);
 	    viewSiteConfigOptions.triggered.connect(parent, "showSiteConfigDialog()");
 	    viewSiteConfigOptions.setEnabled(false);
 	    
-	    viewBelConfigOptions = new QAction(new QIcon(VSRTool.getImagePath().resolve("bel.png").toString()), tr("View selected bel configuration options"), this);
+	    viewBelConfigOptions = new QAction(new QIcon(VSRTool.getImagePath("bel.png")), tr("View selected bel configuration options"), this);
 	    viewBelConfigOptions.triggered.connect(this, "showBelConfig()");
 	    viewBelConfigOptions.setEnabled(false);
 	    
-	    rotateClockwise = new QAction (new QIcon(VSRTool.getImagePath().resolve("rotateClockwise.png").toString()), tr("Rotate the selected items clockwise by 90 degrees (Ctrl+R)"), this);
+	    rotateClockwise = new QAction (new QIcon(VSRTool.getImagePath("rotateClockwise.png")), tr("Rotate the selected items clockwise by 90 degrees (Ctrl+R)"), this);
 	    rotateClockwise.triggered.connect(scene, "rotateItemsClockwise()");
 	    rotateClockwise.setShortcut("Ctrl+r");
 	    
-	    rotateCounter = new QAction (new QIcon(VSRTool.getImagePath().resolve("rotateCounterclockwise.png").toString()), tr("Rotate the selected items Counterclockwise by 90 degrees (Ctrl+Shift+R)"), this);
+	    rotateCounter = new QAction (new QIcon(VSRTool.getImagePath("rotateCounterclockwise.png")), tr("Rotate the selected items Counterclockwise by 90 degrees (Ctrl+Shift+R)"), this);
 	    rotateCounter.triggered.connect(scene, "rotateItemsCounterclockwise()");
 	    rotateCounter.setShortcut("Ctrl+Shift+r");
 	     	 
@@ -145,7 +145,7 @@ public class ToolBar extends QToolBar{
 	    menu.addAction(action);
 
 	    undoMenu = new QToolButton();
-	    undoMenu.setIcon(new QIcon(VSRTool.getImagePath().resolve("editundo.png").toString()));
+	    undoMenu.setIcon(new QIcon(VSRTool.getImagePath("editundo.png")));
 	    undoMenu.setMenu(menu);
 	    undoMenu.setPopupMode(QToolButton.ToolButtonPopupMode.MenuButtonPopup);
 	    undoMenu.clicked.connect(undoStack, "undo()");
@@ -293,12 +293,12 @@ public class ToolBar extends QToolBar{
 	@SuppressWarnings("unused")
 	private void changeDockWidgetVisibility(){
 		if ( parent.getNavigator().isHidden() ) {
-			toggleView.setIcon(new QIcon(VSRTool.getImagePath().resolve("hide.png").toString()));	
+			toggleView.setIcon(new QIcon(VSRTool.getImagePath("hide.png")));	
 			toggleView.setToolTip("Hide Navigator View");
 			parent.getNavigator().setHidden(false);
 		
 		} else {
-			toggleView.setIcon(new QIcon(VSRTool.getImagePath().resolve("expand.gif").toString()));
+			toggleView.setIcon(new QIcon(VSRTool.getImagePath("expand.gif")));
 			toggleView.setToolTip("Expand Navigator View");
 			parent.getNavigator().setHidden(true);
 		}

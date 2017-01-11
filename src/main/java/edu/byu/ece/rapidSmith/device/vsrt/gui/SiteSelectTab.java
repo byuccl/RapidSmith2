@@ -9,7 +9,6 @@ import com.trolltech.qt.core.QObject;
 import com.trolltech.qt.core.Qt;
 import com.trolltech.qt.core.Qt.FocusPolicy;
 import com.trolltech.qt.gui.QAbstractItemView.ScrollHint;
-import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QKeyEvent;
 import com.trolltech.qt.gui.QLabel;
 import com.trolltech.qt.gui.QLineEdit;
@@ -96,7 +95,7 @@ public class SiteSelectTab extends QWidget{
 	private void initializeSearchbox(){
 	     searchbox.textChanged.connect(this, "search_table()");
 	     searchbox.setText("Search...");
-	     pallete.setColor(ColorRole.Text, QColor.gray);
+	     pallete.setColor(ColorRole.Text, VsrtColor.gray);
 	     searchbox.setPalette(pallete);
 	     searchbox.setFocusPolicy(FocusPolicy.ClickFocus);
 	     searchbox.installEventFilter(this);
@@ -191,7 +190,7 @@ public class SiteSelectTab extends QWidget{
 		//and clear the searchbox if the default text "Search..." is in the searchbox
 		if( event.type() == QEvent.Type.FocusIn ) { 
 			
-			this.pallete.setColor(ColorRole.Text, QColor.black);
+			this.pallete.setColor(ColorRole.Text, VsrtColor.black);
 			searchbox.setPalette(pallete);
 			if( this.searchbox.text().equals("Search...") ) {
 				searchbox.clear();
@@ -202,7 +201,7 @@ public class SiteSelectTab extends QWidget{
 		else if ( event.type() == QEvent.Type.FocusOut ) {
 			if( this.searchbox.text().equals("") ) {
 				searchbox.setText("Search...");
-			    pallete.setColor(ColorRole.Text, QColor.gray);
+			    pallete.setColor(ColorRole.Text, VsrtColor.gray);
 			    searchbox.setPalette(pallete);
 			}
 			notfound.hide();

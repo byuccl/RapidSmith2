@@ -7,7 +7,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
@@ -42,7 +41,6 @@ import com.trolltech.qt.gui.QDockWidget.DockWidgetFeature;
 import com.trolltech.qt.gui.QLayout.SizeConstraint;
 import com.trolltech.qt.gui.QWidget;
 
-import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.*;
 import edu.byu.ece.rapidSmith.device.vsrt.primitiveDefs.*;
 
@@ -76,7 +74,7 @@ public class VSRTool extends QMainWindow {
 	private ArrayList<String> siteCfgElements = new ArrayList<String>(); 
 	private QUndoStack undoStack = new QUndoStack();  
 	private XMLCommands xml = new XMLCommands();
-	private static Path rapidSmithImagePath;
+	private static String vsrtImagePath;
 	
 	private HashMap<String, HashSet<String>> sites2arch = new HashMap<String, HashSet<String>>();
 	
@@ -91,8 +89,9 @@ public class VSRTool extends QMainWindow {
 	public VSRTool(String dir) throws NullPointerException { 
 		super.setWindowTitle("Vivado Subsite Routing Tool");
 		//super.setWindowIcon(new QIcon("images/byuLogo.gif"));
-
-		rapidSmithImagePath = RSEnvironment.defaultEnv().getResourcePath().resolve("images").resolve("vsrt"); 
+		
+		vsrtImagePath = "classpath:images" + File.separator + "vsrt";
+		//rapidSmithImagePath = RSEnvironment.defaultEnv().getResourcePath().resolve("images").resolve("vsrt"); 
 	
 		QApplication.setStyle(QStyleFactory.create("Cleanlooks"));
 		
@@ -104,7 +103,7 @@ public class VSRTool extends QMainWindow {
 	 * Initializes the size and position of the GUI based on the screen size of the device <br>
 	 * and the number of screens
 	 */
-	private void initSize(){
+	private void initSize() {
 		//Finding the number of screens on the device and placing the GUI in the middle of the 1st screen
 		int num_screens = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length;
 		QDesktopWidget qdw = new QDesktopWidget();
@@ -601,8 +600,8 @@ public class VSRTool extends QMainWindow {
 	/********************************************
 	 **		 		Getters/Setters 	       **
 	 ********************************************/
-	public static Path getImagePath(){
-		return rapidSmithImagePath;
+	public static String getImagePath(String image){
+		return vsrtImagePath + File.separator + image;
 	}
 	
 	/**

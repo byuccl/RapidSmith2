@@ -2,12 +2,12 @@ package edu.byu.ece.rapidSmith.device.vsrt.gui.shapes;
 
 import edu.byu.ece.rapidSmith.device.vsrt.gui.PrimitiveSiteScene;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreePin;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.VsrtColor;
 
 import java.util.ArrayList;
 
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.gui.QBrush;
-import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QLineF;
 import com.trolltech.qt.gui.QTreeWidgetItem;
 
@@ -78,7 +78,7 @@ public class Wire {
 
 		//remove the start of the wire
 		if (startParent.childCount() == 1) { //if this was the only connection of the pin, change the pins color back to red
-			startParent.setForeground(0, new QBrush(QColor.red));
+			startParent.setForeground(0, new QBrush(VsrtColor.red));
 			this.updateElementColor(startParent.parent());
 		}
 	
@@ -87,7 +87,7 @@ public class Wire {
 
 		//now remove the other end of the wire
 		if (endParent.childCount() == 1) {
-			endParent.setForeground(0, new QBrush(QColor.red));
+			endParent.setForeground(0, new QBrush(VsrtColor.red));
 			this.updateElementColor(endParent.parent());
 		}
 		
@@ -126,7 +126,7 @@ public class Wire {
 	 */
 	private void updateElementColor(QTreeWidgetItem parent){
 		if (parent != null)
-			parent.setForeground(0, new QBrush(QColor.red) );
+			parent.setForeground(0, new QBrush(VsrtColor.red) );
 	}
 	
 	/**
@@ -136,13 +136,13 @@ public class Wire {
 	public void undoRemoveWire(){
 		//need to un-comment this is I ever get to implementing wires drawing on the grid.
 		//if (startParent.indexOfChild(start) == -1) {
-			this.startParent.setForeground(0, new QBrush(QColor.darkGreen));
+			this.startParent.setForeground(0, new QBrush(VsrtColor.darkGreen));
 			this.startParent.addChild(start);
 			this.startParent.add_wire(this);
 			
 			this.endParent.addChild(end);
 			this.endParent.add_wire(this);
-			this.endParent.setForeground(0, new QBrush(QColor.darkGreen));
+			this.endParent.setForeground(0, new QBrush(VsrtColor.darkGreen));
 		//}
 	}
 }//end class
