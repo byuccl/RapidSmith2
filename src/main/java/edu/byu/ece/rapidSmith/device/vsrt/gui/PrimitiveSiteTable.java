@@ -230,7 +230,7 @@ public class PrimitiveSiteTable extends QTableWidget {
 	protected void contextMenuEvent(QContextMenuEvent event){
 		QMenu tmp = new QMenu();
 		if ( this.selectedItems().get(0).icon().cacheKey() == unchecked.cacheKey() )
-			tmp.addAction(null, "Mark Site As Complete", this, "siteCompleted()");
+			tmp.addAction(new QIcon(VSRTool.getImagePath("check.gif")), "Mark Site As Complete", this, "siteCompleted()");
 	// NOTE: May update this later with users being able to make a site incomplete, but right now this is unnecessary
 	//	else {
 	//		tmp.addAction(null, "Mark Site As Incomplete", this, "siteCompleted()");

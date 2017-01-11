@@ -81,6 +81,11 @@ public class VSRTool extends QMainWindow {
 	/********************************************
 	 **		 	Initialization Methods 	       **
 	 ********************************************/
+	// static initializer
+	static
+	{
+		vsrtImagePath = "classpath:images" + File.separator + "vsrt";
+	}
 	
 	/**
 	 * Constructor
@@ -88,11 +93,8 @@ public class VSRTool extends QMainWindow {
 	 */
 	public VSRTool(String dir) throws NullPointerException { 
 		super.setWindowTitle("Vivado Subsite Routing Tool");
-		//super.setWindowIcon(new QIcon("images/byuLogo.gif"));
-		
-		vsrtImagePath = "classpath:images" + File.separator + "vsrt";
-		//rapidSmithImagePath = RSEnvironment.defaultEnv().getResourcePath().resolve("images").resolve("vsrt"); 
-	
+		//super.setWindowIcon(new QIcon(VSRTool.getImagePath(byuLogo.gif")));
+			
 		QApplication.setStyle(QStyleFactory.create("Cleanlooks"));
 		
 		this.initSize();
