@@ -23,10 +23,7 @@ package edu.byu.ece.rapidSmith.design.subsite;
 import java.util.*;
 
 /**
- * This class represents an objects that can have properties. Any class that needs <br> 
- * to have properties, should inherit from this class. 
- * 
- * @author Thomas Townsend
+ * This class represents an objects that can have properties.
  */
 public final class PropertyList implements Iterable<Property> {
 	/** Properties of the cell */
@@ -53,10 +50,12 @@ public final class PropertyList implements Iterable<Property> {
 	}
 
 	/**
-	 * Returns the property from this cell with the specified name.
+	 * Returns the property from this cell with the specified name.  If this collection
+	 * has no property with the key {@code propertyKey}, then this method returns
+	 * {@code null}.
 	 *
 	 * @param propertyKey name of the property to get
-	 * @return the property with name <i>propertyKey</i> or null if the property
+	 * @return the property with name <i>propertyKey</i> or {@code null} if the property
 	 * is not in the cell
 	 */
 	public Property get(Object propertyKey) {
@@ -136,10 +135,12 @@ public final class PropertyList implements Iterable<Property> {
 	}
 
 	/**
-	 * Returns the value of the property with the associated name.
+	 * Returns the value of the property with the associated name.  If this collection
+	 * has no property with the key {@code propertyKey}, then this method returns
+	 * {@code null}.
 	 *
 	 * @param propertyKey the name of the property
-	 * @return the value of the specified property
+	 * @return the value of the specified property or {@code null} if it does not exist
 	 */
 	public Object getValue(Object propertyKey) {
 		Objects.requireNonNull(propertyKey);
@@ -151,22 +152,26 @@ public final class PropertyList implements Iterable<Property> {
 
 
 	/**
-	 * Return the given specified property as an integer. Only use this function <br>
-	 * if you are sure the property value can be safely cast to an int.
+	 * Return the given specified property as an integer. Only use this function
+	 * if you are sure the property value can be safely cast to an int.  If this
+	 * collection has no property with the key {@code propertyKey}, then this method
+	 * returns {@code null}.
 	 * @param propertyKey the name of the property 
-	 * @return int
+	 * @return the value as an Integer or {@code null} if it does not exist
 	 */
-	public int getIntegerValue(Object propertyKey) {
+	public Integer getIntegerValue(Object propertyKey) {
 		
 		Property property = get(propertyKey);
 		return property == null ? null : (int) property.getValue();
 	}
 	
 	/**
-	 * Return the given specified property as a string. Only use this function <br>
-	 * if you are sure the property value can be safely cast to a string.
+	 * Return the given specified property as a string. Only use this function if
+	 * you are sure the property value can be safely cast to a string.  If this
+	 * collection has no property with the key {@code propertyKey}, then this method
+	 * returns {@code null}.
 	 * @param propertyKey the name of the property 
-	 * @return string
+	 * @return the value as a String or {@code null} if it does not exist
 	 */
 	public String getStringValue(Object propertyKey) {
 			
@@ -175,22 +180,26 @@ public final class PropertyList implements Iterable<Property> {
 	}
 	
 	/**
-	 * Return the given specified property as a boolean. Only use this function <br>
-	 * if you are sure the property value can be safely cast to a boolean.
+	 * Return the given specified property as a boolean. Only use this function if
+	 * you are sure the property value can be safely cast to a boolean.  If this
+	 * collection has no property with the key {@code propertyKey}, then this method
+	 * returns {@code null}.
 	 * @param propertyKey the name of the property 
-	 * @return boolean
+	 * @return the value as a Boolean or {@code null} if it does not exist
 	 */
-	public boolean getBooleanValue(Object propertyKey) {
+	public Boolean getBooleanValue(Object propertyKey) {
 		
 		Property property = get(propertyKey);
 		return property == null ? null : (boolean) property.getValue();
 	}
 	
 	/**
-	 * Return the given specified property as a double. Only use this function <br>
-	 * if you are sure the property value can be safely cast to a double.
+	 * Return the given specified property as a double. Only use this function if
+	 * you are sure the property value can be safely cast to a double.  If this
+	 * collection has no property with the key {@code propertyKey}, then this method
+	 * returns {@code null}.
 	 * @param propertyKey the name of the property 
-	 * @return double 
+	 * @return the value as a Double or {@code null} if it does not exist
 	 */
 	public double getDoubleValue(Object propertyKey) {
 		
