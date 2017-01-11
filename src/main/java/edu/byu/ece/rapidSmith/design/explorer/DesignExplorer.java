@@ -107,7 +107,7 @@ public class DesignExplorer extends QMainWindow{
 
 		designExplorer.show();
 
-		QApplication.execStatic();
+		QApplication.exec();
 	}
 	
 	/**
