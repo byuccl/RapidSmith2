@@ -19,8 +19,8 @@
  */
 package edu.byu.ece.rapidSmith.util;
 
-import edu.byu.ece.rapidSmith.design.*;
 import edu.byu.ece.rapidSmith.design.xdl.*;
+import edu.byu.ece.rapidSmith.device.PIP;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;

@@ -20,8 +20,6 @@
 package edu.byu.ece.rapidSmith.device;
 
 
-import edu.byu.ece.rapidSmith.design.PIP;
-
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;

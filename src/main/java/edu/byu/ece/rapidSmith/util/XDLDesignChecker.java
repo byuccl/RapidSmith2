@@ -29,7 +29,7 @@ import java.util.HashMap;
 import edu.byu.ece.rapidSmith.design.xdl.XdlDesign;
 import edu.byu.ece.rapidSmith.design.xdl.XdlInstance;
 import edu.byu.ece.rapidSmith.design.xdl.XdlNet;
-import edu.byu.ece.rapidSmith.design.PIP;
+import edu.byu.ece.rapidSmith.device.PIP;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.interfaces.ise.XDLReader;
 import edu.byu.ece.rapidSmith.device.Wire;

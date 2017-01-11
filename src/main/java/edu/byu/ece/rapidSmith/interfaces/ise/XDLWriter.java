@@ -22,6 +22,7 @@ package edu.byu.ece.rapidSmith.interfaces.ise;
 
 import edu.byu.ece.rapidSmith.design.*;
 import edu.byu.ece.rapidSmith.design.xdl.*;
+import edu.byu.ece.rapidSmith.device.PIP;
 import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.util.FileTools;
 
