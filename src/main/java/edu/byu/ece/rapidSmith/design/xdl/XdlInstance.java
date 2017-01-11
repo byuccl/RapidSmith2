@@ -19,12 +19,12 @@
  */
 package edu.byu.ece.rapidSmith.design.xdl;
 
-import java.io.Serializable;
-import java.util.*;
-
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.device.Tile;
+
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * This class represents the inst object in XDL design files.  It can determine
@@ -570,37 +570,5 @@ public class XdlInstance implements Serializable{
 		sb.append(" \"").append(nl).append("  ;").append(nl);
 		
 		return sb.toString();
-	}
-	
-	/**
-	 * Checks the instance type to see if it is a slice.
-	 * @return true if this instance is a slice
-	 */
-	public boolean isSLICE(){
-		return XdlDesign.sliceTypes.contains(getType());
-	}
-	
-	/**
-	 * Checks the instance type to see if it is a DSP.
-	 * @return true if this instance is a DSP
-	 */
-	public boolean isDSP(){
-		return XdlDesign.dspTypes.contains(getType());
-	}
-	
-	/**
-	 * Checks the instance type to see if it is a BRAM.
-	 * @return true if this instance is a BRAM
-	 */
-	public boolean isBRAM(){
-		return XdlDesign.bramTypes.contains(getType());
-	}
-	
-	/**
-	 * Checks the instance type to see if it is a IOB.
-	 * @return true if this instance is a IOB
-	 */
-	public boolean isIOB(){
-		return XdlDesign.iobTypes.contains(getType());
 	}
 }

@@ -23,6 +23,8 @@ package edu.byu.ece.rapidSmith.interfaces.ise;
 import edu.byu.ece.rapidSmith.design.*;
 import edu.byu.ece.rapidSmith.design.xdl.*;
 import edu.byu.ece.rapidSmith.device.SiteType;
+import edu.byu.ece.rapidSmith.device.families.FamilyInfo;
+import edu.byu.ece.rapidSmith.device.families.FamilyInfos;
 import edu.byu.ece.rapidSmith.util.FileTools;
 
 import java.io.IOException;
@@ -271,13 +273,15 @@ public class XDLWriter {
 			int sliceCount = 0;
 			int bramCount = 0;
 			int dspCount = 0;
+
+			FamilyInfo finfo = FamilyInfos.get(design.getFamily());
 			for (XdlInstance instance : design.getInstances()) {
 				SiteType type = instance.getType();
-				if (XdlDesign.sliceTypes.contains(type)) {
+				if (finfo.sliceSites().contains(type)) {
 					sliceCount++;
-				} else if (XdlDesign.dspTypes.contains(type)) {
+				} else if (finfo.dspSites().contains(type)) {
 					dspCount++;
-				} else if (XdlDesign.bramTypes.contains(type)) {
+				} else if (finfo.bramSites().contains(type)) {
 					bramCount++;
 				}
 			}

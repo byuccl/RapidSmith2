@@ -22,25 +22,15 @@ package edu.byu.ece.rapidSmith.design;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.device.FamilyType;
 
 import java.io.Serializable;
-import java.util.*;
 
 /**
  *
  */
 public abstract class AbstractDesign implements Serializable {
 	private static final long serialVersionUID = 6284690406230426968L;
-	/**  Keeps track of all slice primitive types, initialized statically */
-	public static Set<SiteType> sliceTypes;
-	/**  Keeps track of all DSP48 primitive types, initialized statically */
-	public static Set<SiteType> dspTypes;
-	/**  Keeps track of all BRAM primitive types, initialized statically */
-	public static Set<SiteType> bramTypes;
-	/**  Keeps track of all IOB primitive types, initialized statically */
-	public static Set<SiteType> iobTypes;
 	/**  Name of the design */
 	protected String name;
 	// use partName instead of device here to allow speed grade to be specified
