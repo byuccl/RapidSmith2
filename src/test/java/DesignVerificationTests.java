@@ -27,11 +27,11 @@ import org.junit.platform.runner.JUnitPlatform;
  * 
  * @author Thomas Townsend
  */
-public class ImportTests {
+public class DesignVerificationTests {
 	
 	@RunWith(JUnitPlatform.class)
 	@Tag("slow")
-	public static class SuperCounterTest extends ImportTest {
+	public static class SuperCounterTest extends DesignVerificationTest {
 		@Override
 		public String getCheckpointName() {
 			return "superCounter";
@@ -40,7 +40,7 @@ public class ImportTests {
 	
 	@RunWith(JUnitPlatform.class)
 	@Tag("slow")
-	public static class count16Test extends ImportTest {
+	public static class count16Test extends DesignVerificationTest {
 		@Override
 		public String getCheckpointName() {
 			return "count16";
@@ -49,7 +49,7 @@ public class ImportTests {
 	
 	@RunWith(JUnitPlatform.class)
 	@Tag("slow")
-	public static class cordicTest extends ImportTest {
+	public static class cordicTest extends DesignVerificationTest {
 		@Override
 		public String getCheckpointName() {
 			return "cordic";
