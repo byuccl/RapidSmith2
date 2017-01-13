@@ -724,7 +724,7 @@ public class VSRTool extends QMainWindow {
 			QApplication.initialize(args);
 			VSRTool test = new VSRTool(args[0]);
 			test.show();
-			QApplication.execStatic(); 
+			QApplication.exec(); 
 			}
 			catch(NullPointerException e){
 				System.out.println("ERROR: No Primitive Definitions found in the specified directory!\n" + 
