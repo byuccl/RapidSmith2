@@ -37,6 +37,20 @@ public final class XdcConstraint {
 	}
 	
 	/**
+	 * @return The name of the XDC constraint command
+	 */
+	public String getCommandName() {
+		return command;
+	}
+	
+	/**
+	 * @return The parameters of the command (separated by whitespace)
+	 */
+	public String getOptions() {
+		return options;
+	}
+	
+	/**
 	 * Formats the XDC constraint and returns it as a string.
 	 */
 	@Override
