@@ -33,11 +33,6 @@ import java.io.IOException;
  * A simple class to illustrate importing and exporting Tincr checkpoints.
  * @author Brent Nelson
  */
-
-/**
- * @author nelson
- *
- */
 public class ImportExportExample {
 	
 	/**

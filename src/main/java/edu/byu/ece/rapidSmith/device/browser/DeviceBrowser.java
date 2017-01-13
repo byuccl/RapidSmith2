@@ -86,7 +86,7 @@ public class DeviceBrowser extends QMainWindow{
 		QApplication.initialize(args);
 		DeviceBrowser testPTB = new DeviceBrowser(null);
 		testPTB.show();
-		QApplication.execStatic();
+		QApplication.exec();
 	}
 
 	/**

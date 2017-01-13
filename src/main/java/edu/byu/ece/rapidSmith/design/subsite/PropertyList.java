@@ -209,6 +209,6 @@ public final class PropertyList implements Iterable<Property> {
 
 	@Override
 	public Iterator<Property> iterator() {
-		return properties.values().iterator();
+		return (properties == null) ? Collections.emptyIterator() : properties.values().iterator();
 	}
 }
