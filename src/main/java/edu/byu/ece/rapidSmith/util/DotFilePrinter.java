@@ -25,7 +25,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -34,6 +36,7 @@ import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
+import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.families.FamilyInfo;
 import edu.byu.ece.rapidSmith.device.families.FamilyInfos;
@@ -220,6 +223,55 @@ public class DotFilePrinter {
 		dotBuilder.append("}");
 		
 		return dotBuilder.toString();
+	}
+	
+	/**
+	 * Creates a DOT string of the intersite route of the specified {@link CellNet}.
+	 * This function assumes that a RouteTree has been assigned to the net.
+	 * 
+	 * @param net {@link CellNet}
+	 */
+	public static String getRouteTreeDotString(CellNet net) {
+		
+		// initialize function
+		Queue<RouteTree> rtQueue = new LinkedList<RouteTree>();
+		Map<RouteTree, Integer> nodeIds = new HashMap<>(); 
+		StringBuilder builder = new StringBuilder();
+		RouteTree route = net.getIntersiteRouteTree();
+		
+		if(route == null) {
+			throw new Exceptions.DesignAssemblyException("Net needs to have a RouteTree to generate dot string");
+		}
+		
+		// append the header
+		builder.append("digraph \"" + net.getName() + "\"{\n");
+				
+		// create the unique ID list for RouteTrees
+		route.iterator().forEachRemaining(rt -> nodeIds.put(rt, nodeIds.size()));
+		
+		// print the node and edge information for the RouteTree
+		rtQueue.add(route);
+
+		while (!rtQueue.isEmpty()) {
+			RouteTree tmp = rtQueue.poll();
+			
+			builder.append(String.format(" %d [label=\"%s\"]\n", nodeIds.get(tmp), tmp.getWire().getFullWireName()));
+			
+			// only print edges if the route tree has any
+			if (!tmp.isLeaf()) {
+				for (RouteTree sink : tmp.getSinkTrees()) {
+					String edgeColor = sink.getConnection().isPip() ? "red" : "black";
+					builder.append(String.format(" %d->%d [color=\"%s\"]\n", nodeIds.get(tmp), nodeIds.get(sink), edgeColor));
+					rtQueue.add(sink);
+				}
+			} 
+			else {
+				// TODO: add a node for site pins?
+			}
+		}
+		
+		builder.append("}");
+		return builder.toString();
 	}
 	
 	private boolean isCellPinInSite(CellPin pin, Site site) { 

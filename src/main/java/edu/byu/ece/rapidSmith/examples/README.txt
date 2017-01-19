@@ -61,9 +61,14 @@ minute for the Vivado gui to initially load.
 Batch mode usage: java edu.byu.ece.rapidSmith.examples2.placerDemo.PlacerDemo tincrCheckPointName
 Interactive mode usage: java edu.byu.ece.rapidSmith.examples2.placerDemo.PlacerDemo -I tincrCheckPointName
 
+HandRouterExample.java:
+-----------------------
+Command line hand router. This example is useful for exploring the wires of a device. It helps
+users gain a better understanding of wires and wire connections. It also demonstrates
+how to build a RouteTree data structure to represent a physical route in a design. 
 
-
-
-
-
-
+AStarRouterExample.java:
+-----------------------
+Implements an A* router, capable of automatically routing a single CellNet in Vivado. 
+This example demonstrates how to use the RouteTree data structure to
+route a net in a design. 
