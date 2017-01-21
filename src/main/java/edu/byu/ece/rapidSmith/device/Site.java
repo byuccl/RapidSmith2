@@ -433,7 +433,8 @@ public final class Site implements Serializable{
 	public List<SitePin> getSourcePins(SiteType type) {
 		return getSourcePins(getTemplate(type));
 	}
-
+	
+	// TODO: this should be private
 	public List<SitePin> getSourcePins(SiteTemplate template) {
 		Map<String, SitePinTemplate> sourceTemplates = template.getSources();
 		List<SitePin> pins = new ArrayList<>(sourceTemplates.size());
