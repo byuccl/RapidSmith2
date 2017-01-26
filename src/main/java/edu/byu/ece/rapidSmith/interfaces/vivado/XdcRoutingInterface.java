@@ -224,6 +224,7 @@ public class XdcRoutingInterface {
 				createIntrasiteRoute(sourceBelPin, false, false, design.getUsedSitePipsAtSite(site));
 			}
 		}
+		net.computeRouteStatus();
 	}
 	
 	/**
