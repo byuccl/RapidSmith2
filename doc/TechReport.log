@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9) (preloaded format=pdflatex 2015.12.10)  27 JAN 2017 23:23
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9) (preloaded format=pdflatex 2015.12.10)  30 JAN 2017 09:40
 entering extended mode
 **TechReport.tex
 (C:\Users\ecestudent\Documents\Git\RapidSmith2\doc\TechReport.tex
@@ -452,7 +452,7 @@ LaTeX Font Info:    Try loading font information for U+lasy on input line 162.
  ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\ulasy.fd"
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 )
-<./TechReportAndDocumentation_files/logo.pdf, id=179, 614.295pt x 408.65886pt>
+<./TechReportAndDocumentation_files/logo.pdf, id=183, 614.295pt x 408.65886pt>
 File: ./TechReportAndDocumentation_files/logo.pdf Graphic file (type pdf)
 
 <use ./TechReportAndDocumentation_files/logo.pdf>
@@ -469,9 +469,9 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.4> not available
 (C:\Users\ecestudent\Documents\Git\RapidSmith2\doc\TechReport.toc
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1.
-)
+ [2])
 \tf@toc=\write5
- [2] [3]
+ [3]
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 175.
 LaTeX Font Info:    Try loading font information for OMS+ptm on input line 182.
@@ -518,7 +518,7 @@ LaTeX Font Info:    Try loading font information for OT1+pcr on input line 365.
  ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\psnfss\ot1pcr.fd"
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
-<./TechReportAndDocumentation_files/UsageModels.pdf, id=281, 614.27289pt x 246.
+<./TechReportAndDocumentation_files/UsageModels.pdf, id=286, 614.27289pt x 246.
 96687pt>
 File: ./TechReportAndDocumentation_files/UsageModels.pdf Graphic file (type pdf
 )
@@ -585,7 +585,7 @@ Missing character: There is no ‚ in font pcrr7t!
 Missing character: There is no Â in font pcrr7t!
 Missing character: There is no   in font pcrr7t!
  [8]
-<./TechReportAndDocumentation_files/deviceBrowser.jpg, id=337, 528.47438pt x 42
+<./TechReportAndDocumentation_files/deviceBrowser.jpg, id=342, 528.47438pt x 42
 5.33907pt>
 File: ./TechReportAndDocumentation_files/deviceBrowser.jpg Graphic file (type j
 pg)
@@ -595,7 +595,7 @@ sed on input line 510.
 (pdftex.def)             Requested size: 375.80542pt x 302.46661pt.
  [9 <C:/Users/ecestudent/Documents/Git/RapidSmith2/doc/TechReportAndDocumentati
 on_files/deviceBrowser.jpg>] [10]
-<./TechReportAndDocumentation_files/tiles.pdf, id=353, 409.48785pt x 272.49pt>
+<./TechReportAndDocumentation_files/tiles.pdf, id=358, 409.48785pt x 272.49pt>
 File: ./TechReportAndDocumentation_files/tiles.pdf Graphic file (type pdf)
 
 <use ./TechReportAndDocumentation_files/tiles.pdf>
@@ -603,7 +603,7 @@ Package pdftex.def Info: ./TechReportAndDocumentation_files/tiles.pdf used on i
 nput line 583.
 (pdftex.def)             Requested size: 328.82706pt x 218.82385pt.
 
-<./TechReportAndDocumentation_files/site.pdf, id=354, 482.50264pt x 317.65376pt
+<./TechReportAndDocumentation_files/site.pdf, id=359, 482.50264pt x 317.65376pt
 >
 File: ./TechReportAndDocumentation_files/site.pdf Graphic file (type pdf)
  <use ./TechReportAndDocumentation_files/site.pdf>
@@ -613,7 +613,7 @@ put line 602.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <9> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 603.
 
-<./TechReportAndDocumentation_files/subsite.pdf, id=355, 482.50264pt x 317.6537
+<./TechReportAndDocumentation_files/subsite.pdf, id=360, 482.50264pt x 317.6537
 6pt>
 File: ./TechReportAndDocumentation_files/subsite.pdf Graphic file (type pdf)
  <use ./TechReportAndDocumentation_files/subsite.pdf>
@@ -627,7 +627,7 @@ files/tiles.pdf>]
 [12 <C:/Users/ecestudent/Documents/Git/RapidSmith2/doc/TechReportAndDocumentati
 on_files/site.pdf> <C:/Users/ecestudent/Documents/Git/RapidSmith2/doc/TechRepor
 tAndDocumentation_files/subsite.pdf>]
-<./TechReportAndDocumentation_files/pipExample.pdf, id=383, 305.96309pt x 406.6
+<./TechReportAndDocumentation_files/pipExample.pdf, id=388, 305.96309pt x 406.6
 663pt>
 File: ./TechReportAndDocumentation_files/pipExample.pdf Graphic file (type pdf)
 
@@ -649,7 +649,7 @@ DS.eps>
 (epstopdf)             \includegraphics on input line 676.
 Package epstopdf Info: Output file is already uptodate.
 
-<./TechReportAndDocumentation_files/deviceDS-eps-converted-to.pdf, id=385, 823.
+<./TechReportAndDocumentation_files/deviceDS-eps-converted-to.pdf, id=390, 823.
 075pt x 413.545pt>
 File: ./TechReportAndDocumentation_files/deviceDS-eps-converted-to.pdf Graphic 
 file (type pdf)
@@ -661,7 +661,7 @@ ted-to.pdf used on input line 676.
  [13 <C:/Users/ecestudent/Documents/Git/RapidSmith2/doc/TechReportAndDocumentat
 ion_files/pipExample.pdf>] [14 <C:/Users/ecestudent/Documents/Git/RapidSmith2/d
 oc/TechReportAndDocumentation_files/deviceDS-eps-converted-to.pdf>]
-<./TechReportAndDocumentation_files/xdlrcTile.pdf, id=416, 92.85078pt x 11.6655
+<./TechReportAndDocumentation_files/xdlrcTile.pdf, id=421, 92.85078pt x 11.6655
 9pt>
 File: ./TechReportAndDocumentation_files/xdlrcTile.pdf Graphic file (type pdf)
  <use ./TechReportAndDocumentation_files/xdlrcTile.pdf>
@@ -669,7 +669,7 @@ Package pdftex.def Info: ./TechReportAndDocumentation_files/xdlrcTile.pdf used
 on input line 771.
 (pdftex.def)             Requested size: 469.75499pt x 59.02316pt.
 
-<./TechReportAndDocumentation_files/xdlrcSite.pdf, id=418, 558.64508pt x 115.19
+<./TechReportAndDocumentation_files/xdlrcSite.pdf, id=423, 558.64508pt x 115.19
 235pt>
 File: ./TechReportAndDocumentation_files/xdlrcSite.pdf Graphic file (type pdf)
  <use ./TechReportAndDocumentation_files/xdlrcSite.pdf>
@@ -678,7 +678,7 @@ on input line 794.
 (pdftex.def)             Requested size: 469.75499pt x 96.86635pt.
  [15 <C:/Users/ecestudent/Documents/Git/RapidSmith2/doc/TechReportAndDocumentat
 ion_files/xdlrcTile.pdf>]
-<./TechReportAndDocumentation_files/xdlrcWire.pdf, id=433, 557.13945pt x 113.68
+<./TechReportAndDocumentation_files/xdlrcWire.pdf, id=438, 557.13945pt x 113.68
 674pt>
 File: ./TechReportAndDocumentation_files/xdlrcWire.pdf Graphic file (type pdf)
  <use ./TechReportAndDocumentation_files/xdlrcWire.pdf>
@@ -686,7 +686,7 @@ Package pdftex.def Info: ./TechReportAndDocumentation_files/xdlrcWire.pdf used
 on input line 815.
 (pdftex.def)             Requested size: 469.75499pt x 95.85701pt.
 
-<./TechReportAndDocumentation_files/xdlrcPip.pdf, id=436, 557.13945pt x 31.6214
+<./TechReportAndDocumentation_files/xdlrcPip.pdf, id=441, 557.13945pt x 31.6214
 4pt>
 File: ./TechReportAndDocumentation_files/xdlrcPip.pdf Graphic file (type pdf)
  <use ./TechReportAndDocumentation_files/xdlrcPip.pdf>
@@ -703,7 +703,7 @@ Missing character: There is no  in font ptmr7t!
 ion_files/xdlrcSite.pdf> <C:/Users/ecestudent/Documents/Git/RapidSmith2/doc/Tec
 hReportAndDocumentation_files/xdlrcWire.pdf> <C:/Users/ecestudent/Documents/Git
 /RapidSmith2/doc/TechReportAndDocumentation_files/xdlrcPip.pdf>]
-<./TechReportAndDocumentation_files/xdlrcDef.pdf, id=464, 762.67834pt x 328.260
+<./TechReportAndDocumentation_files/xdlrcDef.pdf, id=469, 762.67834pt x 328.260
 38pt>
 File: ./TechReportAndDocumentation_files/xdlrcDef.pdf Graphic file (type pdf)
  <use ./TechReportAndDocumentation_files/xdlrcDef.pdf>
@@ -712,7 +712,7 @@ n input line 873.
 (pdftex.def)             Requested size: 469.75499pt x 202.18697pt.
  [17 <C:/Users/ecestudent/Documents/Git/RapidSmith2/doc/TechReportAndDocumentat
 ion_files/xdlrcDef.pdf>]
-<./TechReportAndDocumentation_files/schematic.png, id=480, 802.6788pt x 301.606
+<./TechReportAndDocumentation_files/schematic.png, id=485, 802.6788pt x 301.606
 8pt>
 File: ./TechReportAndDocumentation_files/schematic.png Graphic file (type png)
  <use ./TechReportAndDocumentation_files/schematic.png>
@@ -735,7 +735,7 @@ DS.eps>
 (epstopdf)             \includegraphics on input line 963.
 Package epstopdf Info: Output file is already uptodate.
 
-<./TechReportAndDocumentation_files/designDS-eps-converted-to.pdf, id=492, 427.
+<./TechReportAndDocumentation_files/designDS-eps-converted-to.pdf, id=497, 427.
 5975pt x 337.26pt>
 File: ./TechReportAndDocumentation_files/designDS-eps-converted-to.pdf Graphic 
 file (type pdf)
@@ -748,7 +748,7 @@ LaTeX Font Info:    Font shape `OT1/pcr/bx/n' in size <10> not available
 (Font)              Font shape `OT1/pcr/b/n' tried instead on input line 992.
  [19 <C:/Users/ecestudent/Documents/Git/RapidSmith2/doc/TechReportAndDocumentat
 ion_files/designDS-eps-converted-to.pdf>]
-<./TechReportAndDocumentation_files/pseudoPin.png, id=514, 330.5148pt x 235.600
+<./TechReportAndDocumentation_files/pseudoPin.png, id=519, 330.5148pt x 235.600
 2pt>
 File: ./TechReportAndDocumentation_files/pseudoPin.png Graphic file (type png)
  <use ./TechReportAndDocumentation_files/pseudoPin.png>
@@ -757,7 +757,7 @@ on input line 1062.
 (pdftex.def)             Requested size: 234.87749pt x 167.43188pt.
  [20 <C:/Users/ecestudent/Documents/Git/RapidSmith2/doc/TechReportAndDocumentat
 ion_files/pseudoPin.png>] [21]
-<./TechReportAndDocumentation_files/staticNetSources.png, id=532, 415.7934pt x 
+<./TechReportAndDocumentation_files/staticNetSources.png, id=537, 415.7934pt x 
 477.4638pt>
 File: ./TechReportAndDocumentation_files/staticNetSources.png Graphic file (typ
 e png)
@@ -766,7 +766,7 @@ Package pdftex.def Info: ./TechReportAndDocumentation_files/staticNetSources.pn
 g used on input line 1166.
 (pdftex.def)             Requested size: 234.87749pt x 269.71655pt.
 
-<./TechReportAndDocumentation_files/iobNet.png, id=535, 465.99094pt x 418.56375
+<./TechReportAndDocumentation_files/iobNet.png, id=540, 465.99094pt x 418.56375
 pt>
 File: ./TechReportAndDocumentation_files/iobNet.png Graphic file (type png)
  <use ./TechReportAndDocumentation_files/iobNet.png>
@@ -775,7 +775,7 @@ input line 1191.
 (pdftex.def)             Requested size: 234.87749pt x 210.97385pt.
  [22 <C:/Users/ecestudent/Documents/Git/RapidSmith2/doc/TechReportAndDocumentat
 ion_files/staticNetSources.png>]
-<./TechReportAndDocumentation_files/interVsIntra.png, id=544, 597.9138pt x 244.
+<./TechReportAndDocumentation_files/interVsIntra.png, id=549, 597.9138pt x 244.
 7544pt>
 File: ./TechReportAndDocumentation_files/interVsIntra.png Graphic file (type pn
 g)
@@ -786,7 +786,7 @@ ed on input line 1207.
  [23 <C:/Users/ecestudent/Documents/Git/RapidSmith2/doc/TechReportAndDocumentat
 ion_files/iobNet.png> <C:/Users/ecestudent/Documents/Git/RapidSmith2/doc/TechRe
 portAndDocumentation_files/interVsIntra.png>] [24]
-<./TechReportAndDocumentation_files/cellLibHandEdit.png, id=561, 375.65344pt x 
+<./TechReportAndDocumentation_files/cellLibHandEdit.png, id=566, 375.65344pt x 
 93.34875pt>
 File: ./TechReportAndDocumentation_files/cellLibHandEdit.png Graphic file (type
  png)
@@ -800,7 +800,7 @@ on_files/cellLibHandEdit.png>]
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
 nput line 1368.
 
-<./TechReportAndDocumentation_files/lutPins.png, id=578, 784.3704pt x 286.671pt
+<./TechReportAndDocumentation_files/lutPins.png, id=583, 784.3704pt x 286.671pt
 >
 File: ./TechReportAndDocumentation_files/lutPins.png Graphic file (type png)
  <use ./TechReportAndDocumentation_files/lutPins.png>
@@ -821,7 +821,7 @@ File: lstlang1.sty 2015/06/04 1.6 listings language file
 File: lstlang2.sty 2015/06/04 1.6 listings language file
 ) [27 <C:/Users/ecestudent/Documents/Git/RapidSmith2/doc/TechReportAndDocumenta
 tion_files/lutPins.png>]
-<./TechReportAndDocumentation_files/wireFigure.pdf, id=629, 403.6379pt x 117.50
+<./TechReportAndDocumentation_files/wireFigure.pdf, id=634, 403.6379pt x 117.50
 52pt>
 File: ./TechReportAndDocumentation_files/wireFigure.pdf Graphic file (type pdf)
 
@@ -831,7 +831,7 @@ Package pdftex.def Info: ./TechReportAndDocumentation_files/wireFigure.pdf used
 (pdftex.def)             Requested size: 375.80542pt x 109.4042pt.
  [28 <C:/Users/ecestudent/Documents/Git/RapidSmith2/doc/TechReportAndDocumentat
 ion_files/wireFigure.pdf>] [29]
-<./TechReportAndDocumentation_files/routeTree.pdf, id=692, 833.1125pt x 1215.54
+<./TechReportAndDocumentation_files/routeTree.pdf, id=697, 833.1125pt x 1215.54
 124pt>
 File: ./TechReportAndDocumentation_files/routeTree.pdf Graphic file (type pdf)
  <use ./TechReportAndDocumentation_files/routeTree.pdf>
@@ -840,22 +840,22 @@ on input line 1668.
 (pdftex.def)             Requested size: 305.33788pt x 445.49582pt.
  [30] [31 <C:/Users/ecestudent/Documents/Git/RapidSmith2/doc/TechReportAndDocum
 entation_files/routeTree.pdf>] [32] [33] [34]
-<./TechReportAndDocumentation_files/routethroughs.pdf, id=830, 598.43576pt x 18
+<./TechReportAndDocumentation_files/routethroughs.pdf, id=835, 598.43576pt x 18
 8.39684pt>
 File: ./TechReportAndDocumentation_files/routethroughs.pdf Graphic file (type p
 df)
  <use ./TechReportAndDocumentation_files/routethroughs.pdf>
 Package pdftex.def Info: ./TechReportAndDocumentation_files/routethroughs.pdf u
-sed on input line 1887.
+sed on input line 1890.
 (pdftex.def)             Requested size: 469.75499pt x 147.89183pt.
 
-<./TechReportAndDocumentation_files/staticSourceLut.png, id=833, 311.7246pt x 2
+<./TechReportAndDocumentation_files/staticSourceLut.png, id=838, 311.7246pt x 2
 47.6452pt>
 File: ./TechReportAndDocumentation_files/staticSourceLut.png Graphic file (type
  png)
  <use ./TechReportAndDocumentation_files/staticSourceLut.png>
 Package pdftex.def Info: ./TechReportAndDocumentation_files/staticSourceLut.png
- used on input line 1927.
+ used on input line 1930.
 (pdftex.def)             Requested size: 234.87749pt x 186.59499pt.
 
 
@@ -864,69 +864,69 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 [35 <C:/Users/ecestudent/Documents/Git/RapidSmith2/doc/TechReportAndDocumentati
 on_files/routethroughs.pdf>] [36 <C:/Users/ecestudent/Documents/Git/RapidSmith2
 /doc/TechReportAndDocumentation_files/staticSourceLut.png>]
-<./TechReportAndDocumentation_files/deviceBrowser2.jpg, id=875, 530.73282pt x 4
+<./TechReportAndDocumentation_files/deviceBrowser2.jpg, id=880, 530.73282pt x 4
 19.31656pt>
 File: ./TechReportAndDocumentation_files/deviceBrowser2.jpg Graphic file (type 
 jpg)
  <use ./TechReportAndDocumentation_files/deviceBrowser2.jpg>
 Package pdftex.def Info: ./TechReportAndDocumentation_files/deviceBrowser2.jpg 
-used on input line 2041.
+used on input line 2044.
 (pdftex.def)             Requested size: 375.80542pt x 296.91705pt.
 
 [37]
 LaTeX Font Info:    Font shape `OT1/ptm/bx/sl' in size <10> not available
-(Font)              Font shape `OT1/ptm/b/sl' tried instead on input line 2089.
+(Font)              Font shape `OT1/ptm/b/sl' tried instead on input line 2092.
 
  [38 <C:/Users/ecestudent/Documents/Git/RapidSmith2/doc/TechReportAndDocumentat
 ion_files/deviceBrowser2.jpg>] [39] [40] [41]
 
 LaTeX Warning: Hyper reference `http://www.apache.org/licenses/LICENSE-2.0' on 
-page 42 undefined on input line 2159.
+page 42 undefined on input line 2162.
 
 
 LaTeX Warning: Hyper reference `http://hessian.caucho.com' on page 42 undefined
- on input line 2165.
+ on input line 2168.
 
 
 LaTeX Warning: Hyper reference `http://www.gnu.org/licenses/licenses.html' on p
-age 42 undefined on input line 2174.
+age 42 undefined on input line 2177.
 
 
 LaTeX Warning: Hyper reference `http://qtjambi.org/downloads' on page 42 undefi
-ned on input line 2180.
+ned on input line 2183.
 
 
 LaTeX Warning: Hyper reference `https://sourceforge.net/projects/qtjambi/files/
-' on page 42 undefined on input line 2183.
+' on page 42 undefined on input line 2186.
 
 
 LaTeX Warning: Hyper reference `http://www.opensource.org/licenses/mit-license.
-php' on page 42 undefined on input line 2191.
+php' on page 42 undefined on input line 2194.
 
 
 LaTeX Warning: Hyper reference `http://jopt-simple.sourceforge.net/download.htm
-l' on page 42 undefined on input line 2197.
+l' on page 42 undefined on input line 2200.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2215.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2218.
 [42]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 2215.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 2218.
  (C:\Users\ecestudent\Documents\Git\RapidSmith2\doc\TechReport.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2215.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2215.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2218.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2218.
 
 Package rerunfilecheck Info: File `TechReport.out' has not changed.
-(rerunfilecheck)             Checksum: 8993BB115CEDA6B9477036ACC0A44496;2941.
+(rerunfilecheck)             Checksum: FAEF21CD2593AA11888EB7F5D9572E59;3010.
 
 
 LaTeX Warning: There were undefined references.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2215.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2218.
  ) 
 Here is how much of TeX's memory you used:
- 10305 strings out of 493921
- 156573 string characters out of 3144860
+ 10307 strings out of 493921
+ 156603 string characters out of 3144860
  291255 words of memory out of 3000000
- 13086 multiletter control sequences out of 15000+200000
+ 13087 multiletter control sequences out of 15000+200000
  39249 words of font info for 79 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
  42i,13n,43p,4806b,1738s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -942,9 +942,9 @@ type1/urw/times/utmb8a.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/urw/t
 imes/utmb8a.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/urw/times/utmr8a
 .pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Pr
 ogram Files (x86)/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
-Output written on TechReport.pdf (42 pages, 1831884 bytes).
+Output written on TechReport.pdf (42 pages, 1832517 bytes).
 PDF statistics:
- 1015 PDF objects out of 1200 (max. 8388607)
- 345 named destinations out of 1000 (max. 500000)
- 483 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1020 PDF objects out of 1200 (max. 8388607)
+ 346 named destinations out of 1000 (max. 500000)
+ 491 words of extra memory for PDF output out of 10000 (max. 10000000)
 

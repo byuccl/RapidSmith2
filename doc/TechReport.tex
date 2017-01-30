@@ -1656,8 +1656,8 @@ a \cls{RouteTree} include:
 \noindent
 When a design is imported from Vivado, the routing information is representated
 using \cls{Route\-Tree}s. On design export, the \cls{RouteTree} for each
-\cls{CellNet} is parsed and converted into a Vivado ROUTE string. A user can use
-custom data structures to route a design, but it needs to be
+\cls{CellNet} is traversed and converted into a Vivado ROUTE string. A user can
+use custom data structures to route a design, but it needs to be
 converted to an equivalent RouteTree data structure before exporting the
 design to Vivado. The \pgm{DesignAnalyzer} example demonstrates how to
 iterate through a \cls{RouteTree}. The \pgm{AStarRouter} and \pgm{HandRouter}
@@ -1672,6 +1672,9 @@ black edges represent non-PIP wire connections. This specific RouteTree was crea
 example.}
 \label{fig:routeTree}
 \end{figure}
+
+\subsection{Three Part Routing}
+
 
 \pagebreak
 \section{Importing/Exporting Designs Between Vivado and RS2} \label{sec:import}

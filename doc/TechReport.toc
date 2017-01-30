@@ -54,6 +54,7 @@
 \contentsline {subsection}{\numberline {7.2}Traversing Wire Objects}{28}{subsection.7.2}
 \contentsline {subsection}{\numberline {7.3}Other Types of Connections}{28}{subsection.7.3}
 \contentsline {subsection}{\numberline {7.4}RouteTrees}{30}{subsection.7.4}
+\contentsline {subsection}{\numberline {7.5}Three Part Routing}{31}{subsection.7.5}
 \contentsline {section}{\numberline {8}Importing/Exporting Designs Between Vivado and RS2}{32}{section.8}
 \contentsline {subsection}{\numberline {8.1}RapidSmith Checkpoints}{32}{subsection.8.1}
 \contentsline {subsubsection}{\numberline {8.1.1}design.info}{32}{subsubsection.8.1.1}

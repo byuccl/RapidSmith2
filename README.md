@@ -16,3 +16,5 @@ RapidSmith2 and Tincr together also provide support for creating device files fo
 RapidSmith2 (and previously RapidSmith) have been used in a variety of settings where control over the logical and/or physical characteristics of an FPGA design implementation are desired.  One example is Post-PAR logic and layout modifications to address reliability issues resulting from how the Xilinx tool flow implements designs.  Another is the creation of a physical template on the FPGA into which circuit modules may be inserted using partial reconfiguration.
 
 For the full documentation, see the [TechReport](doc/TechReport.pdf).
+
+**NOTE**: The current release of RS2 is an alpha release. Significant changes to the code are still being made, and so expect frequent code updates. RS2 and its functionality is still being tested, so please report any bugs you find. 
