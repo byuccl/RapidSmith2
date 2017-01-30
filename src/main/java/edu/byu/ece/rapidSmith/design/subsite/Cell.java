@@ -146,6 +146,13 @@ public class Cell {
 	}
 	
 	/**
+	 * Returns true if the cell is a LUT cell with 1-6 inputs
+	 */
+	public boolean isLut() {
+		return libCell.isLut();
+	}
+	
+	/**
 	 * Returns the bondedness of this cell.  IO are either BONDED or UNBONDED,
 	 * all others INTERNAL.
 	 */

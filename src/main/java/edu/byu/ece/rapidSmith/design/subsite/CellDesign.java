@@ -27,6 +27,8 @@ import edu.byu.ece.rapidSmith.util.Exceptions;
 import edu.byu.ece.rapidSmith.interfaces.vivado.XdcConstraint;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *  This class represents a logical netlist consisting of cells interconnected by
@@ -140,7 +142,30 @@ public class CellDesign extends AbstractDesign {
 	public Collection<Cell> getCells() {
 		return cellMap.values();
 	}
+	
+	/**
+	 * Returns a stream of {@link Cell} objects of the specified type. 
+	 * TODO: Should there be a link to a {@link CellLibrary} in this class?
+	 * 
+	 * @param libCellType Name of the {@link LibraryCell} to filter by
+	 */
+	public Stream<Cell> getCellsOfType(String libCellType, CellLibrary library) {
+		LibraryCell libraryCell = library.get(libCellType);
+		
+		if (libraryCell == null) {
+			Stream.empty();
+		}
+		
+		return cellMap.values().stream().filter(c -> c.getLibCell() == libraryCell);
+	}
 
+	/**
+	 * Returns a stream of {@link Cell} objects that are top-level ports of the design.
+	 */
+	public Stream<Cell> getPorts(){
+		return cellMap.values().stream().filter(c -> c.isPort());
+	}
+	
 	/**
 	 * Adds a cell to this design.  The name of this added cell should be unique
 	 * to this design.  The cell should not be part of another design and should

@@ -1,23 +1,29 @@
-\documentclass[12pt]{article}
+\documentclass[10pt]{article}
 \usepackage{times}
 \usepackage{amsmath}
 \usepackage{enumerate}
 
 \usepackage{hyperref}
-\usepackage{subcaption}
+\usepackage[labelfont=bf]{subcaption}
 \usepackage{graphicx,latexsym,float}
 \usepackage{fancyhdr}
 \usepackage{alltt}
-\usepackage{listing}
+\usepackage{listings}
+\usepackage{epstopdf}
+\usepackage{color}
+\usepackage[labelfont=bf]{caption}
+\usepackage{tabu}
+\usepackage{xspace}
 %%%%%\usepackage{draftwatermark}
 %%%%%%\SetWatermarkFontSize{2.6cm}
 %%%%%%\SetWatermarkText{DRAFT Evaluation Copy}
  
 %set dimensions
+\tabulinesep=1.2mm 
 \setlength{\textheight}{9.0in}
 \setlength{\oddsidemargin}{0in}
 \setlength{\evensidemargin}{0in}
-\setlength{\topmargin}{0in}
+\setlength{\topmargin}{-0.25in}
 \setlength{\textwidth}{6.5in}
 
 \pagestyle{fancy}
@@ -40,6 +46,43 @@
 
 \graphicspath{{./TechReportAndDocumentation_files/}}
 
+% remake the texttt command so that line breaks will occur for certain
+% characters
+\renewcommand{\texttt}[1]{%
+  \begingroup
+  \ttfamily
+  \begingroup\lccode`~=`/\lowercase{\endgroup\def~}{/\discretionary{}{}{}}%
+  \begingroup\lccode`~=`[\lowercase{\endgroup\def~}{[\discretionary{}{}{}}%
+  \begingroup\lccode`~=`.\lowercase{\endgroup\def~}{.\discretionary{}{}{}}%
+  %\begingroup\lccode`~=`:\lowercase{\endgroup\def~}{:\discretionary{}{}{}}%
+  \catcode`/=\active\catcode`[=\active\catcode`.=\active
+  \scantokens{#1\noexpand}%
+  \endgroup
+}
+
+\renewcommand{\lstlistingname}{Code Sample}
+
+% For making java code look good
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
 
 \newcommand{\env}[1]{{\texttt{#1}}}
 \newcommand{\fil}[1]{{\em #1}}
@@ -50,12 +93,32 @@
 \newcommand{\pgm}[1]{{\textbf{#1}}}
 \newcommand{\dir}[1]{{\em #1}}
 \newcommand{\sbr}[1]{{\em #1}}
+\newcommand{\MYhref}[3][blue]{\href{#2}{\color{#1}{#3}}}%
 
 \newcommand{\state}[1]{{\bf #1}}
 \newcommand{\AND}{\bullet}
 \newcommand{\nnp}{\newpage}
 \newcommand{\nni}{\noindent}
 \newcommand{\nnpi}{\newpage \noindent}
+% Command for quotes inside texttt and code blocks
+\newcommand{\textQuote}[1]{\textquotedblright{#1}\textquotedblright}
+\newcommand{\bel}{\cls{Bel}\xspace}
+\newcommand{\bels}{\cls{Bel}s\xspace}
+\newcommand{\cell}{\cls{Cell}\xspace}
+\newcommand{\cells}{\cls{Cell}s\xspace}
+\newcommand{\cellpin}{\cls{CellPin}\xspace}
+\newcommand{\cellspins}{\cls{CellPin}s\xspace}
+\newcommand{\belpin}{\cls{BelPin}\xspace}
+\newcommand{\belpins}{\cls{BelPin}s\xspace}
+\newcommand{\tile}{\cls{Tile}\xspace}
+\newcommand{\tiles}{\cls{Tile}s\xspace}
+\newcommand{\cellnet}{\cls{CellNet}\xspace}
+\newcommand{\cellnets}{\cls{CellNet}s\xspace}
+\newcommand{\net}{\cls{Net}\xspace}
+\newcommand{\nets}{\cls{Net}s\xspace}
+\newcommand{\port}{\cls{Port}\xspace}
+\newcommand{\ports}{\cls{Port}s\xspace}
+\newcommand{\celldesign}{\cls{CellDesign}\xspace}
 
 \newenvironment{codei}{\vspace{-0.1in} \begin{center} \begin{minipage}{6in} \noindent \begin{alltt}}{\end{alltt} \end{minipage} \end{center}}
 
@@ -110,7 +173,7 @@ Technical Report and Documentation\\[0.1in]
 \newpage
 \section{Introduction}
 \subsection{What is RapidSmith 2?}
-The original BYU RapidSmith project began in 2010 with the goal to develop
+The original BYU RapidSmith project began in 2010. Its goal was to develop
 a set of tools and APIs written in Java which would provide academics with an
 easy-to-use platform to try out experimental CAD ideas and algorithms on modern
 Xilinx FPGAs.  RapidSmith 2 (abbreviated RS2 hereafter) represents a major
@@ -122,9 +185,7 @@ addition to RapidSmith.  Using RS2 you can write custom CAD tools which will:
   \item import those designs back into Vivado for further processing or bitstream generation
 \end{itemize}
 In addition, you need not start with a Vivado design --- 
-you can create a new
-design from scratch in RS2 and then
-import it into Vivado.
+you can create a new design from scratch in RS2 and then import it into Vivado.
 
 So, clearly a major addition with RS2 is the ability to work with Vivado. 
 However, the other major new capability which RS2 adds over RapidSmith is that
@@ -137,7 +198,7 @@ to perform using Rapidsmith.
 \subsection{Who Should Use RS2?}
 RS2 is aimed at anyone desiring to do FPGA CAD research on real Xilinx devices. 
 It is written in Java. It also depends on some understanding of Xilinx FPGAs,
-Vivado, and TCL.  However, the goal is that this documentation provides
+Vivado, and Tcl.  However, the goal is that this documentation provides
 sufficient background and detail to help bring developers up to speed on the
 needed topics.    
 
@@ -146,21 +207,21 @@ valid and current license to a Xilinx tools installation (RS2 cannot generate
 bitstreams for a design, for example).     
 
 \subsection{Why RS2?}
-The Xilinx-provided TCL interface into Vivado, in theory, provides all that is
+The Xilinx-provided Tcl interface into Vivado, in theory, provides all that is
 needed to create any kind of CAD tool desired to augment the capabilities
 provided by Vivado.  In practice there are a number of problems with that.
-First, TCL is slow --- far too slow to execute a router for example.  Also the
-Xilinx TCL interface does not manage memory well.  In our experience,
+First, Tcl is slow --- far too slow to execute a router for example.  Also the
+Xilinx Tcl interface does not manage memory well.  In our experience,
 long-running scripts eventually cause the system to run out of memory. 
 Brad White's MS work also determined
 that not 100\% of the device information required to do arbitrary CAD
-manipulations is available through TCL.  As a result, additional tools (and
+manipulations is accessible through Tcl.  As a result, additional tools (and
 some small amount of manual work) are required to provide the user (and CAD
 tools they might like to write) with all the physical details on Xilinx parts.
-Simply put, some information is not available through the TCL interface. 
+Simply put, some information is not available through the Tcl interface. 
 Finally, the ability to export and import designs to/from Vivado and operate
 on them outside Vivado using a modern high-level language such as Java is a
-hugely useful capability.
+very useful capability.
 
 RS2 (in conjunction with Tincr which is described in a later section of this
 document) takes care of all of the generation of the FPGA part information that
@@ -188,16 +249,15 @@ that is one of the goals for RS2 moving forward.
 
 \subsection{How is RS2 Different than VPR and VTR?}
 VPR (Versatile Place and Route) has been an FPGA research tool for several years
-and has led to many publications on new FPGA CAD research.  It has been a
+and has led to many publications on new FPGA CAD research. It has been a
 significant contribution to the FPGA research community and has grown to be a
-complete FPGA CAD flow for research-based FPGAs.
-
-The main difference between RapidSmith/RS2 and VPR is that the RapidSmith tools
-aim to provide the ability to target commercial Xilinx FPGAs, providing the
-ability to exit and re-enter the standard Xilinx flow at any point.  All
-features of commercial FPGAs which are accessible via XDL and Vivado's TCL are available
-in RapidSmith and RS2. Â VPR currently is limited to FPGA features which can be
-described using VPR's architectural description facilities.
+complete FPGA CAD flow for research-based FPGAs. The main difference between
+RapidSmith/RS2 and VPR is that the RapidSmith tools aim to provide the ability
+to target commercial Xilinx FPGAs, providing the ability to exit and re-enter
+the standard Xilinx flow at any point.  All features of commercial FPGAs which
+are accessible via XDL and Vivado's Tcl interface are available in RapidSmith
+and RS2. VPR currently is limited to FPGA features which can be described using
+VPR's architectural description facilities.
 
 \subsection{Why Java?}
 We have found Java to be an excellent rapid prototyping platform for FPGA CAD
@@ -206,7 +266,7 @@ applications and Java eliminates the need to clean up objects in memory.  This
 eliminates the time needed to debug such things, leaving more time for the
 researcher to focus on the real research at hand.  Our experience over the past
 decade is that for student research projects, the lack of memory management
-problems (dangling pointers, memory leaks, â€¦) and the associated errors has
+problems (dangling pointers, memory leaks, etc.) and the associated errors has
 greatly improved our student productivity and led to far more stable CAD tools.
 
 \pagebreak
@@ -236,7 +296,7 @@ on it.
 With the announced end of ISE (with the Virtex7 family of parts being the last
 family to be supported by ISE), there was no path forward to newer parts using
 RapidSmith.  This is because XDL is not available with Vivado. With
-Vivado, however, Xilinx has provided an extensive TCL scripting capability which 
+Vivado, however, Xilinx has provided an extensive Tcl scripting capability which 
 initially looked as if it could provide a similar capability to that provided by
 XDL in terms of accessing both Vivado's design and device data and in terms of
 creating and modifying Vivado designs.  However, as described above, Vivado's
@@ -246,21 +306,22 @@ The development of RS2 consisted of three parts.
 \subsubsection{Tincr: Integrating Custom CAD Tool Frameworks with the Xilinx 
 Vivado Design Suite} 
 
-In the first part, the Vivado TCL capability was investigated to ensure that,
+In the first part, the Vivado Tcl capability was investigated to ensure that,
 indeed, it did provide the needed ability to access design and device data and
 export that to external tools such as RapidSmith.  This resulted in the Tincr
 project, led by Brad White as a part of his MS work at BYU, with Thomas
 Townsend making additions as a part of his research.
 
-Tincr is a TCL-based library of routines which (a) provide a variety of
-functions to simply make working with Vivado via TCL easier, (b) provide a way
+Tincr is a Tcl-based library of routines which (a) provide a variety of
+functions to simply make working with Vivado via Tcl easier, (b) provide a way
 to export all the data associated with a Vivado design into what is called a
 Tincr Checkpoint (TCP), (c) provide a way to reimport Tincr Checkpoints back
 into Vivado, and (d) access device data from Vivado and output that data in the
 form of XDLRC files (these are the files which XDL used to describe devices and
 are necessary for RapidSmith and RS2 to understand the structure of and the
-resources available for use in a given Xilinx part).  Tincr is available at Github.com as
-the project byuccl/Tincr.  Tincr is described in two publications:
+resources available for use in a given Xilinx part).  Tincr is available at 
+\href{https://github.com/byuccl/tincr}{\color{blue}https://github.com/byuccl/tincr}.
+Tincr is described in two publications:
 
 \begin{quotation}B. White and B. Nelson, "Tincr â€” A custom CAD tool framework
 for Vivado," 2014 International Conference on ReConFigurable Computing and FPGAs (ReConFig14),
@@ -342,7 +403,7 @@ Thus, a complete solution involves Vivado, Tincr, and RS2.
 
 RS2 is available on Github at: \url{https://github.com/byuccl/RapidSmith2}.  
 You can either build RS2 into .class and .jar files for use in any Java
-environment, or you can easily build RS2 for use in Eclipse (recommended).
+environment, or build RS2 for use in Eclipse (recommended).
 
 \subsubsection{Requirements for Installation and Use}
 \begin{itemize}
@@ -385,9 +446,8 @@ RS2 requires Eclipse Neon or later so install that.Â 
 Then, create an eclipse project by executing one of the following:
 
 \vspace{-0.15in}  \begin{code}
-# Will build antlr-generated files and create Eclipse project
-gradlew antlr eclipse       
-(or gradlew.bat antlr eclipse depending on OS)
+gradlew antlr eclipse (unix)       
+gradlew.bat antlr eclipse (windows)
 \end{code} 
 Executing these will create an Eclipse \fil{.project} file. Â Once you have done
 this you can import the project into Eclipse by opening Eclipse and selecting: 
@@ -405,8 +465,8 @@ repository elsewhere on disk (like \dir{MyDocuments/git}).
 \paragraph{Building Manually} 
 Execute one of the following to build RS2: 
 \vspace{-0.15in}  \begin{code}
-Â  Â  Â gradlew build Â  Â  # Will build everything needed
-Â  Â  Â gradlew.bat build 
+Â  Â  Â gradlew build (unix) Â  Â 
+Â  Â  Â gradlew.bat build (windows)
 \end{code}
 This will produce a variety of things, any of which can be added to your
 \env{CLASSPATH} as needed:
@@ -445,6 +505,13 @@ combine them).
   likely have to edit some \fil{.plist} files.
 \end{itemize}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.8\columnwidth]{deviceBrowser}
+\caption{\pgm{DeviceBrowser} Sample Display}
+\label{fig:deviceBrowser}
+\end{figure}
+
 \subsubsection{Running RS2 Programs}
 Some points to keep in mind:
 \begin{itemize}
@@ -466,286 +533,24 @@ Some points to keep in mind:
 java edu.byu.ece.rapidSmith.device.browser.DeviceBrowser
 \end{code}    
 
-\begin{figure}[htb]
-\centering
-\includegraphics[width=0.8\columnwidth]{deviceBrowser}
-\caption{\pgm{DeviceBrowser} Sample Display}
-\label{fig:deviceBrowser}
-\end{figure}
-
 \noindent This can be done either from within Eclipse or from the command line,
 depending on how you are running RS2 (if running under OS X be sure to provide the
-\opt{-XstartOnFirstThread JVM argument}.
-
-If all goes well you should see a graphical representation showing the details
-of a physical FPGA device as shown in \autoref{fig:deviceBrowser}.  You may
-initially be zoomed far in and might want to zoom out to see the entire chip
-layout.
+\opt{-XstartOnFirstThread JVM argument}. If all goes well you should see a
+graphical representation showing the details of a physical FPGA device as shown
+in \autoref{fig:deviceBrowser}.  You may initially be zoomed far in and might
+want to zoom out to see the entire chip layout.
 
 \subsection{Device Files For Use With RS2}
 Device files for one part (the {\em xc7a100tcsg324}) are included in the
 distribution so you can immediately start working with RS2 using this part (initially, it
 will be the only device available when you run the \pgm{DeviceBrowser} program
 above).  The device files for this part can be found in the
-\dir{\${RAPIDSMITH\_PATH}/devices/artix7} directory.               
+\dir{\${RAPIDSMITH\_PATH}/devices/artix7} directory. If you desire to work with
+additional parts, follow the instructions found in the file
+\fil{\$RAPIDSMITH\_PATH/\-doc/Installing\-NewDevices.txt}.
 
-If you desire to work with additional parts, follow the instructions found in the
-file \fil{\$RAPIDSMITH\_PATH/doc/InstallingNewDevices.txt}.
-
-\pagebreak
-
-\section{Example RS2 Programs and Sample Vivado Designs} \label{examples}
-
-A variety of example programs can be found in the
-\pkg{edu.byu.edu.rapidSmith.examples} package in the RS2 installation.
-They have been heavily commented and so provide a means to learn the RS2 API by
-example as we believe this is much better than reading a lot of text trying to
-teach you what you need to know.
-
-There is a \fil{README.txt} file in that directory to provide an overview and
-suggested order for learning from the examples.
-In addition, the subsections below describe one or more built-in RS2 programs
-which you might find useful.
-
-\subsection{\pgm{DeviceBrowser}}
-Note: this is a program from the original RapidSmith, but which is discussed
-here because it is still very useful in RS2. 
-
-This GUI program is located in \pkg{edu.byu.ece.rapidSmith.device.browser}
-package.  It will let you browse parts at the tile level. Â On the left, the user
-may choose the desired part by navigating the tree menu and double-clicking on
-the desired part name. Â This will load the part in the viewer pane on the right
-(the first available part is loaded at startup). Â The status bar in the bottom
-left displays which part is currently loaded. Â Also displayed is the name of the
-current tile which the mouse is over, highlighted by a yellow outline in the
-viewer pane. The user may navigate inside the viewer pane by using the mouse.
-Â By right-clicking and dragging the cursor, the user may pan. Â By using the
-scroll-wheel on the mouse, the user may zoom. Â If a scroll-wheel is unavailable,
-the user may zoom by clicking inside the viewer pane and pressing the minus(-)
-key to zoom out or the equals(=) key to zoom in.
-
-All that is required for this to operate is a valid device file (no design
-required). A screenshot of the \pgm{DeviceBrowser} program is shown in
-\autoref{fig:deviceBrowser}.
-
-\begin{figure}[htb]
-\centering
-\includegraphics[width=0.8\columnwidth]{deviceBrowser2}
-\caption{\pgm{DeviceBrowser} Screen Shot Showing Wire Connections}
-\label{fig:deviceBrowser2}
-\end{figure}
-
-The device browser also allows the user to follow the various connections found
-in the FPGA.  By double clicking a wire in the wire list, the application will
-draw the connection on the tile array (as shown in the screenshot below).  By
-hovering the mouse pointer over the connection, the wire becomes red and a
-tooltip will appear describing the connection made by declaring the source tile
-and wire followed by an arrow and the destination tile and wire.  By
-clicking on the wire, the application will redraw all the connections that can
-be made from the currently selected wire.  By repeating this action, the user
-can follow connections and discover how the FPGA interconnect is laid out.  This
-is shown in \autoref{fig:deviceBrowser2}.  Thanks to Chris Lavin for originally
-creating this app.
-
-\subsection{The \pgm{DesignAnalyzer} Test Program}
-This program, along with a number of other example programs, is located in the\\
-\pkg{edu.byu.ece.rapidSmith.examples} package.  After loading a design from a
-checkpoint, it simply walks the design data structure, printing out what it
-finds as it goes.  As such, it provides a nice example of a number of things
-which would be useful for getting started with RS2:
-\begin{itemize}
-  \item How to enumerate the Cells in a design, determine and print their 
-  placement information as well as their properties.
-  \item How to enumerate the logical nets in a design and print out their source
-  and sink pins. 
-  \item How to traverse and print out the physical route for a logical net (if
-  it is routed)  
-\end{itemize}
-
-\subsection{The \pgm{DeviceAnalyzer} Test Program}
-This program is also located in the \pkg{edu.byu.ece.rapidSmith.examples}
-package.  It is designed as a simple getting started program and demonstrates
-how to query and print tiles in a device, wires in a tile, etc.
-
-\subsection{Other Test Programs}
-See the README.txt file in the \pkg{edu.byu.ece.rapidSmith.examples} package
-directory.  It outlines the other test programs there which may be useful in
-coming up to speed on RS2. 
-
-\subsection{Sample Vivado Designs}
-To enable new users of RS2 to be able to quickly start running the above test
-programs, a small set of pre-compiled Vivado designs have been included in the
-RS2 distribution.  They are located in the \dir{exampleVivadoDesigns} directory
-and consist of 3 designs: 
-\begin{itemize}
-\item \sbr{add}: synthesized only
-\item \sbr{cordic}: synthesized and placed
-\item \sbr{count16}: synthesized, placed and routed
-\end{itemize} 
-The RS2 checkpoints are contained in
-the following directories: \dir{add.tcp}, \dir{cordic.tcp}, and
-\dir{count16.tcp}.
-Vivado checkpoints are also included and are the \fil{add.dcp},
-\fil{cordic.dcp}, and \fil{count16.dcp} files.  
-
-To re-build one of the example designs in Vivado a compile script called
-\pgm{compile.tcl} has been included in the \dir{exampleVivadoDesigns}
-directory.  To re-build one of the sample designs, you would start up the Vivado
-Tcl shell from your Vivado distribution and then execute the following in the Tcl shell:                
-\vspace{-0.15in}  \begin{code}
-	\% cd <path to exampleVivadoDesigns directory>
-	\% compile_hdl_to_checkpoint_files add
-	\% close_project
-\end{code}
-This will re-synthesize, place, and route the add design and, from that compiled
-design, generate the \dir{.tcp} directory and the \fil{.dcp} file.
-
-\pagebreak
-
-\section{Designs in RS2}
-
-Designs in RS2 are similar to the designs found in Vivado (which are
-exported as EDIF files). They are essentially logical netlists. They are
-represented and stored in the data structures found in the \pkg{design.subsite}
-package. The data structure hierarchy of the \pkg{design.subsite} package can be
-seen in figure \ref{fig:designDS}.
-
-\begin{figure}[H]
- \centering
- \includegraphics[width=.6\columnwidth]{designDS}
- \caption{RapidSmith 2 \cls{Design} data structure tree. Green arrows represent
- inheritance, and black arrows represent association. Blue boxes represent
- physical implementation components of the netlist (i.e. what physical \cls{Bel}
- a \cls{Cell} is placed on, or what physical \cls{Wire}s are used in a
- \cls{CellNet} )}
- \label{fig:designDS}
-\end{figure}
-
-\noindent
-A \cls{CellDesign} consists of a collection of \cls{Cell} objects,
-interconnected by \cls{CellNets}. CellNets connect to the \cls{CellPins} on
-Cells. CellNets typically have one source pin and one or more sink pins.  Cell
-objects have a name, properties, pins, a link to the library cell they are an
-instantiation of, etc. Cells may be placed onto \cls{BELs} and the corresponding
-CellPins mapped onto \cls{BelPins}.  CellNets, when physically routed, map onto
-one or more \cls{RouteTrees}.
-
-\subsection{The Cell Class}
-The example programs mentioned above provide examples of manipulating Cell
-objects.  Here are a few things you should know about cells, in no particular
-order: 
-\begin{itemize}
-\item A Cell always contains a reference to an object of type \cls{LibraryCell},
-which serves as a template for its construction.
-\item Cells may be physically  placed onto BELs in the device.  This is done by
-setting the Cell's anchor value to point to the BEL it resides on.  If you know
-where you want a Cell placed you can just place it there.  On the other hand,
-RS2 provides a way to identify the Site/BEL combinations where a Cell could be
-placed.  See the program \pgm{CreateDesignExample} in the \dir{examples}
-directory for an illustration of how to do it both ways.
-\item Cell objects have pins on their periphery where CellNets connect to.
-\item The top-level ports of a design are tied to \cls{IPORT}, \cls{OPORT}, or
-\cls{IOPORT} Cell objects.  These are pseudo-cells (you won't find them in
-Vivado) and represent the terminal points for signals leaving or entering the top-level.  
-\end{itemize}
-
-\subsubsection{Cell Properties}
-Cells as represented in EDIF files coming from Vivado may contain properties. 
-For example, a D flip flop cell (FDRE) has a \env{CONFIG.INIT} property,
-indicating what its power-up state should be.  These properties can be set to modify the
-Cell's behavior.  The \pgm{DesignAnalyzer} test program described above
-pretty-prints an RS2 logical design and, as a part of its operation, it lists the properties
-set on each Cell in the design.  Here are some additional things about
-properties you should know:
-\begin{itemize}
-  \item	It might be of interest to learn what properties could be set
-  for a given cell.  This set of properties can be found in the
-  \fil{cellLibrary.xml} files generated for a given family (see the
-  \dir{\$RAPIDSMITH\_PATH/devices} directory and its sub-directories to find
-  these XML files for any devices installed). 
-  The files are quite readable and from them you can learn much about the
-  available LibraryCell types for a given FPGA family (look for the
-  \cls{libcellproperty} tags in the file).  At some point in the future this
-  information will be incorporated into the RS2 data structures so that user
-  programs can query them and so RS2 can check whether they are legal values
-  when set by a user program.   For now, user code can set properties and those
-  will be exported into EDIF when going from RS2 back into Vivado.  However, no
-  error checking will be done by RS2 as this is done.
-  \item In a GUI view of devices in Vivado you will see polarity inverters in
-  many sites allowing for programmable selection of a signal or its inverse. 
-  This is shown in the GUI in the form of a 2:1 MUX.  The CLK signal
-  and its inverse entering a SLICE is an example of this.  However, this is not
-  explicitly represented in the device representation.  Rather, properties on
-  the Cells driven by the mux output signals muxes indicate whether the signal
-  is inverted or not.  For example, generate a 4-bit counter using rising-edge
-  triggered flip flops in Vivado and generate an EDIF file for it.  You will see
-  that the counter is constructed, in part from FDRE cells.  Now, modify the HDL
-  for your counter to make it a falling-edge triggered counter and compare the
-  resulting EDIF file.  The difference you will see is that the property on each
-  of the FDRE cells called \env{CONFIG.IS\_C\_INVERTED} has been set, indicating
-  it is a falling-edge triggered flip flop.  When \pgm{bitgen} is actually run
-  by Vivado, the corresponding clock inverter will be programmed accordingly.
-  \item It should go without saying that since there is only one such clock
-  inverter in a SLICE, all the flip flops in a slice must be either rising-edge
-  triggered or falling-edge triggered (they must have the same
-  \env{CONFIG.IS\_C\_INVERTED} control set value).  If you violate this, Vivado
-  will throw an error.  Similar restrictions exist for all cells in a site driven by
-  shared programmable inverters.  For example, flip flops in a slice (FDRE
-  LibraryCells) may share programmable inverters on their clock, clock enable,
-  and R inputs.
-\end{itemize}
-
-\subsection{The CellNet Class}
-\begin{itemize}
-  \item	A CellNet has a type.  Legal values are WIRE, GND, VCC, and UNKNOWN. 
-  The WIRE type is the one used for normal signals.  CellNets have one source
-  pin and one or more sink pins (these are of type CellPin).  The CellNet class
-  has methods for traversing these.
-  \item	GND and VCC nets have some special characteristics. There is a single
-  logical VCC net.  It is driven by a single RapidSmithGlobalVcc cell.  The
-  output pin of that cell is the source of all VCC in the design. However,
-  unlike other cells which get routed to, this cell is never physically placed. 
-  The situation with GND is similar.
-\end{itemize}
-
-\subsubsection{Physical Routing of CellNets in RS2}
-\begin{itemize}
-  \item A CellNet is physically routed by determining the metal segments and
-  intervening PIPs that are to be used to make up the route.  A physical net is
-  called a \cls{Wire} and contains some number of RouteTree objects.  A given
-  RouteTree object has the source of the route as its root and then branches
-  represent the branching of the route between source and sink. The physical
-  routing of a net is represented by attaching one or more RouteTree objects to
-  the net.
-  \item Normal wires (CellNets of type WIRE) have only one RouteTree, reflecting
-  the fact that they have a single source and multiple sinks.  Note that a wire
-  cannot be physical routed to the pin of a cell which has not yet been placed.
-  \item Physically, GND and VCC nets are unique.  When a
-  circuit has been routed by Vivado the result will be multiple physical VCC routes and multiple physical GND
-  routes in the circuit.  Each route is represented by its own RouteTree object.
-  The source for each of these RouteTree objects will be a wire which is
-  connected to a TIEOFF.  These TIEOFFs are not physically placed but their
-  locations can be inferred by the source wire for each of the RouteTrees making
-  up the VCC or GND route.
-  \item Once a CellNet's physical routing has been created as a RouteTree, that
-  is converted to a directed routing string when RS2 designs are exported from
-  RS2 back into Vivado.  The \pgm{DesignAnalyzer} program in the examples
-  directory gives an example of tracing out the RouteTrees which represent a physically
-  routed wire.                       
-\end{itemize}
-The program \pgm{DesignAnalyzer} in the \pkg{edu.byu.ece.rapidSmith.examples}
-package provides an illustration of how to traverse a physically routed CellNet.  This
-is done in its \sbr{createRoutingString()} method.  This method starts by
-getting the RouteTree object associated with the source pin for the given CellNet.  It then
-recursively follows the linked set of RouteTree objects to follow the wire. 
-Liberal comments in the \pgm{DesignAnalyzer} program illustrate how this is
-done.
-Consult it for details.
-
-\pagebreak
-
+\clearpage
 \section{Devices in RS2}
-
 
 \subsection{Xilinx FPGA Architecture Overview} \label{fpgaArch}
 This section is intended to give a brief introduction to Xilinx FPGA
@@ -753,7 +558,7 @@ architecture and terminology. The terminology introduced here is consistent
 with the terminolgy used in the Vivado Design Suite. If you are already familiar
 with Xilinx FPGA devices, then you can skip to section \ref{devicesRS2}. As you
 read through this section, it may be helpful to open a sample device in Vivado's
-Device Browser. To do this, open a new command prompt and run Vivado in TCL mode
+Device Browser. To do this, open a new command prompt and run Vivado in Tcl mode
 (``vivado -mode tcl''). Then, run the following commands in the Vivado prompt:
 
 \begin{verbatim}
@@ -843,7 +648,7 @@ FPGA components are connected together using metal \cls{Wire}s (called
 (\cls{PIP}s). Individual \cls{PIP}s can be enabled or disabled as a design is
 being routed, and a string of enabled \cls{PIP}s uniquely identify the
 used \cls{Wire}s of a physical route. \cls{PIP}s are most commonly
-found in Switchbox \cls{Tile}s, and enable a single wire to routed to many
+found in Switchbox \cls{Tile}s, and enable a single wire to be routed to many
 different locations in the FPGA. Figure \ref{fig:switchboxPIP} shows an
 example of a switchbox.
 
@@ -868,7 +673,7 @@ edu.byu.ece.rapidSmith.device} package.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=1\columnwidth]{deviceDS}
+	\includegraphics[width=1\columnwidth]{deviceDS.eps}
 	\caption{RapidSmith2 \cls{Device} data structure tree. Green arrows represent
 	inheritance, and black arrows represent association. Classes and Interfaces
 	bolded in blue are new to RapidSmith 2.}
@@ -878,7 +683,7 @@ edu.byu.ece.rapidSmith.device} package.
 \noindent
 The classes and interfaces within {\em edu.byu.ece.rapidSmith.device} are named
 to reflect the terminology used by Xilinx. Many classes that exist in Vivado's
-TCL interface have a direct map to a class in RapidSmith (such as a \cls{Tile}).
+Tcl interface have a direct map to a class in RapidSmith (such as a \cls{Tile}).
 Because of this, most RapidSmith data structures represent a straightforward
 part of a Xilinx FPGA, The reader is referred to the documentation in the
 source code to learn more about each data structure. Also, The
@@ -891,7 +696,7 @@ As figure \ref{fig:deviceDataStructures} shows, there are several template
 classes in RapidSmith. Template classes are used to specify the configuration of
 certain structures only once, and then reuse the configuration across
 identical objects. The usefulness of templates is best shown with an example. In
-an Artix7 {\em xc7a100tcsg324} part, there are 11,100 \cls{Site}s of type
+an Artix-7 {\em xc7a100tcsg324} part, there are 11,100 \cls{Site}s of type
 SLICEL. Each of these SLICELs have 215 \cls{BEL}s, \cls{Site} \cls{Pin}s, and
 \cls{Site} \cls{PIP}s combined. In order to save memory, RapidSmith
 lazily creates these objects only when a SLICEL \cls{Site} is being used. The
@@ -901,9 +706,9 @@ algorithms using RapidSmith's API, use the non-template version of classes.
 
 \subsubsection{WireEnumerator} \label{wireEnum}
 Wires with the same name can occur several times throughout a Xilinx FPGA
-device. For example, the wire ``CLBLL\_L\_C2'' exists in every \cls{Tile} of
+device. For example, the wire ``CLBLL\-\_L\_C2'' exists in every \cls{Tile} of
 type ``CLBLL\_L''. In order to make the device files small, each uniquely named \cls{Wire}
-is assigned an integer as enumeration. This avoids moving strings around in
+is assigned an integer enumeration. This avoids moving strings around in
 memory which would be costly in terms of both space and comparison times.
 RapidSmith manages all uniquely named wires in an FPGA family with a
 \cls{WireEnumerator}. The \cls{WireEnumerator} class has methods that convert to
@@ -953,7 +758,7 @@ who are interested, and for those who want to modify the XDLRC parser
 in some way. If these don't apply to you, then go ahead and skip this section.
 XDLRC files are textual descriptions of Xilinx FPGA devices and can be very
 verbose (which is why they get so large). This section highlights the main parts
-of an XDLRC file with accompaning images. As you will see, much of the
+of an XDLRC file with accompanying images. As you will see, much of the
 terminology is the same as section \ref {fpgaArch}.
 
 \bigbreak \noindent
@@ -969,7 +774,7 @@ terminology is the same as section \ref {fpgaArch}.
 \end{figure}
 
 \noindent
-A tile in an XDLRC file corresponds to the same thing as the \cls{Tile}s
+A tile in an XDLRC file corresponds to the same thing as the \cls{Tile}
 described in section \ref{fpgaArch}. Each tile is declared with a ``(tile''
 directive as shown above followed by the unique row and column index of where
 the tile fits into the grid of tiles found on the FPGA. The tile declaration
@@ -1000,7 +805,7 @@ differentiate the multiple primitive sites that may be present in the same
 tile. In this case, BX of SLICE\_X9Y127 has the external name BX\_PINWIRE3. In
 RapidSmith, only the first pin name (i.e. BX above) is used.
 
-\pagebreak \noindent
+\bigbreak \noindent
 \begin{large}
 \pgm{Wire}
 \end{large}
@@ -1078,9 +883,609 @@ This section describes the necessary steps to create new device files.
 
 \pgm{TODO section}.
 
-\pagebreak
 
-\section{Routing in RS2}
+\pagebreak
+\section{Designs in RS2}
+
+\subsection{Xilinx Netlists} \label{sec:xilinxNetlist}
+During the synthesis stage of implementation, a digital circuit expressed using
+RTL (VHDL or Verilog) is translated to a lower level Xilinx netlist. This
+netlist describes a digital circuit in terms of primitive elements that can
+directly target hardware on a Xilinx FPGA. In terms of granularity, a Xilinx
+netlist is more abstract than gates and transistors, but more detailed than RTL. A list of valid
+primitives (also called \cls{Cell}s) that can be used within a Xilinx netlist
+can be found
+\href{http://www.xilinx.com/support/documentation/sw_manuals/xilinx2016_2/ug953-vivado-7series-libraries.pdf}{\color{blue}{here}}
+for 7 Series devices and
+\href{http://www.xilinx.com/support/documentation/sw_manuals/xilinx2014_1/ug974-vivado-ultrascale-libraries.pdf}{\color{blue}{here}}
+for Ultrascale devices. It is suggested that users of RapidSmith become
+familiar with the primitives found in these documents, and how they are used.
+The primitives of a Xilinx netlist are wired together to create a digital
+circuit (such as an 32-bit adder) capable of being implemented on an FPGA.
+\autoref{fig:schematic} shows an example netlist of a 3-bit counter that has
+been synthesized in Vivado. 
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=1\columnwidth]{schematic.png}
+ \caption{Schematic of a 3-bit counter in Vivado using LUT and FDRE cells.
+ The yellow boxes are \cls{Cell}s, the green lines are \cls{Net}s, and and the
+ white figures on the edge of the diagram are \cls{Port}s. An example of each
+ of these netlist components have been highlighted.}
+ \label{fig:schematic}
+\end{figure}
+
+As the figure shows, Vivado netlists are composed of three primary components:
+\cls{Cell}s, \cls{Net}s, and \cls{Port}s. \cls{Cell}s are \pgm{instances} of
+Xilinx primitives. They are the basic building blocks of a Xilinx netlist and
+implement the actual logic of a digital design. The most commonly used
+\cls{Cell}s include:
+
+\begin{itemize}
+  \item \pgm{Look Up Tables} (LUTs): Implement logic equations such as
+  $O6 = (A1 + A2) \oplus A3$.
+  \item \pgm{Flip Flops} (FDxx): Single-bit storage elements.
+  \autoref{fig:schematic} uses an FDRE cell which specifies a rising-edge
+  Flip Flop with a reset port, but ties the clock enable port high. Other
+  types of FDxx cells can be used to include a clock enable signal (replace xx
+  with the corresponding letters).
+  \item \pgm{Block Ram} (BRAMs): On-chip FPGA memory cell.
+  \item \pgm{Digital Signal Processing Units} (DSPs): Perform complex arithmetic
+  functions efficiently.
+  \item \pgm{Buffers} (BUF): IO, clock, and other types of signal buffers. 
+\end{itemize}
+
+\noindent
+There exists several other types of \cls{Cell}s, but the ones in the list above
+are the most prevalent. \cls{Net}s are used to connect \cls{Cell}s together. In
+other words, the output of one \cls{Cell} is wired to the input of another
+\cls{Cell} using a \cls{Net}. \cls{Port}s are simply design
+Input/Output (IO). In terms of an FPGA design, \cls{Port}s are connected to
+specific peripheral pins of the FPGA for chip IO. It is important to note that
+a Xilinx netlist is purely logical, there is no physical information within the
+netlist (i.e. there is not information about where the \cls{Cell}s have been
+placed, or how the \cls{Net}s have been routed). When exporting a design from
+Vivado, the Xilinx netlist representation is converted to EDIF. In order to
+recreate the design in RapidSmith, the EDIF file is parsed and converted to a
+custom netlist structure described in the next section.
+
+\subsection {RS2 Netlist Data Structures} \label{sec:designDS}
+
+RapidSmith netlists are modeled closely after Xilinx netlists. In fact,
+much of the terminology between the two are identical or very similar. For those
+that are familiar with Vivado designs, this should make the transition to
+RapidSmith straightforward. The data structures that constitute a RapidSmith
+netlist can be found in the package \pkg{byu.edu.ece.rapidSmith.design.subsite}.
+The package hierarchy can be seen in \autoref{fig:designDS}.
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=.6\columnwidth]{designDS.eps}
+ \caption{RapidSmith 2 design data structure tree. Black arrows represent
+ composition (i.e. a \cls{CellDesign} contains an array of \cls{CellNet}s and
+ an array of \cls{Cell}s). Green arrows represent inheritance (i.e. a
+ \cls{CellPin} can be either a \cls{BackedCellPin} or a
+ \cls{PseudoCellPin}). Blue boxes represent physical implementation components
+ of the netlist (i.e. what physical \cls{Bel} a \cls{Cell} is placed on, or what
+ physical \cls{Wire}s are used in a \cls{CellNet}).}
+ \label{fig:designDS}
+\end{figure}
+
+\noindent
+A \cls{CellDesign} is the top level design object in RapidSmith. It consists of
+a collection of \cls{Cell} objects, interconnected by \cls{CellNet}s. RapidSmith
+\cls{Cell}s are equivalent to Xilinx \cls{Cell}s and RapidSmith \cls{CellNet}s
+are equivalent to Xilinx \cls{Net}s. \cls{Cell} objects have a template
+\cls{LibraryCell}, which represents a Xilinx primitive. They also have a
+collection of \cls{CellPin}s, which can be thought of as \cls{Cell} IO. 
+During the placement phase of implementation, \cls{Cell}s may be mapped onto
+\cls{BEL}s and the corresponding \cls{CellPin}s mapped onto \cls{BelPin}s.
+Placement is described in more detail in \autoref{sec:placement}. \cls{CellNet}
+objects connect \cls{Cell}s together via their \cls{CellPin}s.
+During the routing phase of implementation, a \cls{CellNet} maps onto one or
+more \cls{RouteTree}s. Routing is described in more detail in
+\autoref{sec:routing}. The best way to learn how to use these classes is to read
+through the \href{https://github.com/byuccl/RapidSmith2}{\color{blue}{Javadocs}}, but
+important aspects of each class is included in the following subsections.
+
+
+\subsubsection{\cls{CellDesign}}
+As previously mentioned, the \cls{CellDesign} class is the top level netlist
+structure. A Vivado design is converted from a Tincr checkpoint to a
+\cls{CellDesign} on import, and converted from a \cls{CellDesign} to a Tincr
+checkpoint on design export. It contains the following:
+
+\begin{itemize}
+  \item A list of uniquely named \cls{Cell}s in the design.
+  \item A list of uniquely named \cls{CellNet}s in the design
+  \item Global GND and VCC \cls{CellNet}s
+  \item \cls{Cell} placement information (where each cell is placed)
+  \item Internal routing configuration for each \pgm{used} \cls {Site} (in the
+  form of \cls{Site} \cls{PIP}s)
+  \item A list of XDC constraints imported from Vivado. See \autoref{sec:import}
+  for more information about XDC constraints and how they are represented in
+  RapidSmith.
+\end{itemize}
+
+\noindent
+The \cls{CellDesign} class has a variety of methods to retrieve and manipulate
+the \cls{Cell}s and \cls{CellNet}s of a design, place \cls{Cell}s onto
+physical \cls{BEL}s, configure sub-site routing, and perform several other
+tasks. See the
+\href{https://github.com/byuccl/RapidSmith2}{\color{blue}{Javadocs}} for the
+exact API.
+ 
+\subsubsection{\cls{Cell}}
+This section contains a few things you should know about \cls{Cell}s in, no
+particular order.
+
+\begin {itemize}
+  \item A \cls{Cell} always contains a reference to a backing \cls{LibraryCell}.
+  A \cls{LibraryCell} is equivalent to a Xilinx primitive cell (described in
+  \autoref{sec:xilinxNetlist}), and serves as a template for instantiated
+  \cls{Cell} objects. The template is used to save memory when creating several
+  \cls{Cell}s of the same type. Whenever a new \cls{Cell} object is created, a
+  corresponding \cls{LibraryCell} must be specified in the constructor. The
+  method call \texttt{CellDesign.getCellsOfType(String,CellLibrary)} can be used
+  to get all \cls{Cell}s in the current design with a specific \cls{LibraryCell}
+  type.
+  \item A \cls{Cell} has a list of \cls{CellPin}s that can connect to
+  \cls{CellNet}s. The methods \texttt{Cell.getPins()},
+  \texttt{Cell.getInputPins()}, and \texttt{Cell.getOutputPins()} can be used to
+  get a handle to the pins of a \cls{Cell}. If more pins are
+  needed on a \cls{Cell}, \cls{PseudoCellPin} objects can be attached (see
+  \autoref{sec:cellPin}). \item \cls{Cell}s can be placed onto \cls{BEL}s of the
+  current \cls{Device}. See \autoref{sec:placement} for more information about
+  cell placement.
+  \item Top-level \cls{Port}s in Vivado (design input/output) are represented as
+  Port \cls{Cell}s in RapidSmith. Specifically, there are three types of port cells: IPORT, 
+  OPORT, and IOPORT. The method \texttt{CellDesign.getPorts()} can
+  be used to iterate through the port \cls{Cell}s in a design, and the method
+  \texttt{Cell.isPort()} can be used to determine if a given \cls{Cell} is
+  actually a port.
+\end{itemize}
+
+\subsubsection{\cls{CellPin}} \label{sec:cellPin}
+
+There are two types of \cls{CellPin} objects in RapidSmith:
+(1) \cls{BackedCellPin}s and (2) \cls{PseudoCellPin}s. \cls{BackedCellPin}s are
+straightforward. They represent a \cls{LibraryCellPin}, which is a pin attached
+to the corresponding \cls{LibraryCell} of a \cls{Cell}. These pins are used as
+signal input and signal output. On the other hand, \cls{PseudoCellPin}s are
+``fake" \cls{CellPin} objects which are added to a \cls{Cell} after
+the \cls{Cell} has been created. They don't affect the functionality of the
+\cls{Cell}, but are needed for physical implementation. An example of where a
+\cls{PseudoCellPin} is needed can be seen in \autoref{fig:pseudoPin}.
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=.5\columnwidth]{pseudoPin.png}
+ \caption{An example where a \cls{PseudoCellPin} in RapidSmith may be needed.
+ Both a \cls{PseudoCellPin} and \cls{BackedCellPin} are pointed out. The red net
+ in the image (going into the A6 pin) is the power net (VCC).}
+ \label{fig:pseudoPin}
+\end{figure}
+
+\noindent
+In the figure, a cell of type LUT2 has been placed onto a D6LUT \cls{BEL} of a
+SLICEL. The two \cls{CellPin}s of the LUT2 have been mapped to the A1 and A4
+pins of the \cls{BEL} (which have been highlighted in blue), connected to
+\cls{Net}s, and routed. This is expected behavior based on the netlist.
+Also, the global VCC net has been routed to the A6 \cls{BelPin}. This is
+necessary due to the hardware implementation of LUTs. However, in the
+netlist view of the circuit, the fact that VCC needs to be routed to the A6 pin
+is not at all represented (a \cls{CellNet} can only be connected to
+\cls{CellPin}s). This is where \cls{PseudoCellPin}s are helpful.
+In RapidSmith, a \cls{PseudoCellPin} can be added to the LUT2 cell (called
+``VCCPin''), mapped to the A6 \cls{BelPin}, and attached to the global VCC
+\cls{CellNet}. This gives a more complete view of how the netlist needs to be
+physically implemented. \cls{PseudoCellPin}s are created and added
+automatically to \cls{Cell}s when importing a Tincr checkpoint. If you are
+creating \cls{Cell}s from scratch, a \cls{PseudoCellPin} can be added with the
+method call \texttt{Cell.attachPseudoPin(string,PinDirection)}. To determine if
+a \cls{CellPin} is a \cls{PseudoCellPin}, the method call
+\texttt{CellPin.isPseudoPin()} can be used. That
+being said, in general \pgm{users do not need to worry about the different
+between pseudo and backed \cls{CellPin}s} when creating a CAD algorithm. They
+function identically, so you can use the higher level handles to the
+\cls{CellPin} interface instead.
+
+Each \cls{CellPin} object also has a \cls{CellPinType} and \cls{PinDirection}
+enumeration. \autoref{tab:pinEnums} displays the possible values for both of
+these enumerations. The \cls{CellPinType} field can be used to find all RESET
+\cls{CellPin}s in a design, determine if a \cls{CellNet} is a clock net (it
+connects to pins of type CLOCK), and other useful functions. The
+\cls{PinDirection} field is typically used to filter a list of \cls{CellPin}s by
+their direction. It it especially useful in determining if a pin on a \cls{Cell}
+is of type INOUT. 
+
+\begin{table} [h!]
+\begin{center}
+\begin{tabu}{ |c|l| }
+%\begin{tabular}{ |p{2cm}|p{3cm}| }
+\hline
+\pgm{Enum} & \multicolumn{1}{|c|}{\textbf{Values}}\\
+%\pgm{Enum} & \textbf{Values} & \textbf{Description} \\
+\hline
+\hline
+ & CLEAR \\ 
+ & CLOCK  \\
+ & ENABLE \\      
+ & PRESET \\ 
+ & RESET \\
+\cls{CellPinType} & REUSED \\
+ & SET \\
+ & SETRESET \\
+ & WRITE\_ENABLE \\
+ & DATA \\
+ & PSEUDO \\
+\hline
+ & IN \\
+\cls{PinDirection} & OUT \\ 
+ & INOUT\\ 
+\hline
+\end{tabu}
+\caption{Enumerations for the \cls{CellPin} class}
+\label{tab:pinEnums}
+\end{center}
+\end{table}
+
+\subsubsection{\cls{CellNet}}
+\cls{CellNet}s are used to wire components of a logical netlist
+together. Specifically, a \cls{CellNet} connects an output
+\cls{CellPin} to several input \cls{CellPin}s with the purpose of transferring
+a signal from one \cls{Cell} to another. The remainder of this section details
+important aspects about \cls{CellNet}s in RapidSmith.
+
+\begin{itemize}
+  \item \cls{CellNet}s are routed using the \cls{RouteTree} data structure.
+  Routing in RapidSmith is described in more detail in \autoref{sec:routing}.
+  \item All \cls{CellNet}s have a \cls{NetType} enumeration. Possible values for
+  \cls{NetType} include VCC, GND, and WIRE. VCC is reserved for power nets, GND
+  is reserved for ground nets, and WIRE represents all other nets in the design.
+  Other \cls{NetType}s could be added to this list in the future (such
+  as CLOCK), but for now they are not differentiated.
+  \item VCC and GND nets (also called static nets) are treated specially in
+  RapidSmith in two ways. (1) Vivado designs can have multiple nets that
+  correspond to VCC or GND, but they all logically represent the same thing.
+  This representation can be challenging to work with when designing CAD tools.
+  RapidSmith takes a different approach. When a design is imported from Vivado,
+  all VCC nets are collapsed into a single VCC net that is sourced by a global
+  VCC cell (the same applies to GND nets). We have found this representation
+  much easier to work with. The function calls \texttt{CellDesign.getVccNet()}
+  and \texttt{CellDesign.getGndNet()} can be used to retrieve these special
+  nets from the design. If you add a VCC net to a design that already has a VCC
+  net, the old net will be overridden. (2) When a static net is routed, it
+  doesn't have a single source driving it. Rather, the net is partitioned
+  into sections with each section having a single source. In an FPGA, each of
+  these sources corresponds to a TIEOFF within a switchbox tile. This is shown
+  in \autoref{fig:staticNetSources}.
+  
+  \begin{figure}[H]
+   \centering
+   \includegraphics[width=.5\columnwidth]{staticNetSources.png}
+   \caption{Static net multiple sources example. The higlighted white wires are
+   a part of the same GND net, and the circled red areas are the source TIEOFFs
+   for the GND net. In this image, only two sources are shown.}
+   \label{fig:staticNetSources}
+  \end{figure}
+  
+  RapidSmith handles this oddity by allowing \cls{CellNet}s to have more than
+  one RouteTree object associated with it. In the case of
+  \autoref{fig:staticNetSources} the GND net would have two \cls{RouteTree}
+  objects associated with it, one for each source TIEOFF.
+   
+  \item Most \cls{CellNet}s have a single source pin and multiple sink pins
+  (referred to as the ``fanout'' of the net). When routing a net that fits
+  this description, only one RouteTree needs to be specified. However, there are
+  two noticable exceptions to the common case: (1) static nets (described
+  in the bullet point above) and (2) nets with multiple drivers (involving IO
+  pins). In a Xilinx FPGA, this is most often seen in IOB pads. An example is
+  shown in \autoref{fig:iobNet}. The highlighted net can be driven by both the OBUF output, and from an
+  external source. RapidSmith 2 supports nets with multiple drivers. The
+  function call \texttt{CellNet.getAllSources()} can be used to retrieve all
+  possible source \cls{CellPin}s of a net.
+  
+  \begin{figure}[H]
+   \centering
+   \includegraphics[width=.5\columnwidth]{iobNet.png}
+   \caption{An example of net (highlighted in white) that can be driven by more
+   than once source.}
+   \label{fig:iobNet}
+  \end{figure}
+  
+  \item After a design has been placed, \cls{CellNet}s fall into one of two
+  categories: INTRASITE or INTERSITE. \autoref{fig:interVsIntra} shows an
+  example of both types of nets. As can be seen, INTRASITE nets do not cross
+  \cls{Site} boundaries while INTERSITE nets stretch across multiple
+  \cls{Site}s. These types of nets are handled differently during routing. To
+  determine if a \cls{CellNet} is an INTRASITE net, the method call
+  \texttt{CellNet.isIntrasite()} can be used.
+  
+  \begin{figure}[H]
+   \centering
+   \includegraphics[width=.9\columnwidth]{interVsIntra.png}
+   \caption{Example of an INTRASITE net (left) and an INTERSITE net (right).}
+   \label{fig:interVsIntra}
+  \end{figure}
+  
+\end{itemize}
+
+\subsubsection {\cls{PropertyList}}
+
+In Vivado the top-level design, cells, and nets all have properties associated
+with them. The Tcl command \texttt{[report\_\-property \$object]} can be used to
+view the properties of a Vivado Tcl object. When a design is exported from
+Vivado, these properties (\pgm{if they are not the default value}) are stored
+in the EDIF netlist file. When RapidSmith parses the EDIF file, the properties
+are stored in a data structure called a \cls{PropertyList}. Each
+\cls{CellDesign}, \cls{Cell}, and \cls{CellNet} in RapidSmith has an associated
+\cls{PropertyList} object, which can be retrieved using the method
+\texttt{getProperties()}. \cls{PropertyList} implements the \cls{Iterable}
+interface, so properties of an object can be iterated through easily using a
+for-loop. Also, properties can be retrieved by their string name. Because EDIF
+properties only support String, Integer, and Boolean types, any properties
+imported from Vivado will have one of these types.
+	
+\cls{Cell}s are the most interesting objects
+in terms of properties. This is because the function of a \cls{Cell} is
+determined by how it is configured. For example, the memory width of a BRAM cell
+in Vivado is configured by setting the ``READ\_WIDTH'' and ``WRITE\_WIDTH''
+properties. Possible values include 1, 2, 4, 9, 18, 36 and 72. Another example
+is a D flip flop cell (FDRE) and its ``CONFIG.INIT'' property. This property
+indicates what the flip flops power-up state should be. Some additional things
+about cell properties that may be helpful include:
+
+\begin{itemize}
+  \item To learn what configuration properties a \cls{Cell} has, open up a
+  Vivado design and type the following into the console,
+  
+  \begin{code}
+  Vivado\% link_design -part xc7a100tcsg324-3 -quiet
+  Vivado\% set lib_cell [get\_lib\_cells RAMB36E1]
+  Vivado\% report_property \$lib_cell 
+  \end{code}
+  
+  replacing ``xc7a100tcsg324-3'' with the part you are using and ``RAMB36E1'' with your
+  cell of interest. All properties that start with ``CONFIG'' represent
+  configuration properties that a user can set.
+  \item To learn what configuration properties \pgm{affect the pin mappings of
+  a cell}, open the \fil{cellLibrary.xml} file you have, and search for the
+  tag ``libcellproperty.'' Pin mappings are described in more detail in
+  \autoref{sec:placement}.
+  \item Only properties of type EDIF will be exported from RapidSmith. If you
+  create cells in your design and add properties to them, make sure that you
+  mark the properties as EDIF properties by setting their type. All other
+  properties will be ignored.
+  \item Some properties not only affect how a \cls{Cell} is configured, but they
+  can also affect how a \cls{Site} is configured. For example, on SLICEL
+  sites there exists a clock routing mux that chooses between a regular clock
+  signal and an inverted signal. This inverter is connected to the flip flops of
+  the SLICEL, and so decides whether the flip flops are rising-edge or falling-edge
+  triggered. The clock that is selected is decided by the property
+  ``CONFIG.IS\_C\_INVERTED'' of the flip flops cells \pgm{that have been placed
+  on the SLICEL}. The clock inverter is programmed automatically based on the
+  cell properties. There are other such properties, but they will not be
+  listed here. When creating designs in RapidSmith, it is important to not
+  place \cls{Cell}s together that may have conflicting properties. RapidSmith
+  does not perform any error checking, and so an error in Vivado will be thrown
+  if you violate property restrictions.
+\end{itemize}
+
+\subsection{The Cell Library}
+
+The \cls{CellLibrary} in RapidSmith stores important information about each of
+the \cls{LibraryCell}s compatible with a specific Xilinx FPGA part.
+This includes: 
+
+\begin {itemize}
+  \item The name of the library cell
+  \item The name, direction, and type of each library cell pin
+  \item Valid placement locations for instances of the library cell
+  \item Possible logical-to-physical pin mappings for every library pin
+  \item Configuration properties of the library cell (TODO)
+\end{itemize}
+
+\noindent
+When doing any type of netlist modification, the \cls{CellLibrary} is needed.
+Currently, each \cls{CellLibrary} corresponds to a specific Xilinx
+part.
+This means that for each part you use in RapidSmith, a new \cls{CellLibrary}
+needs to be generated \footnote{This may change to be family-specific in the
+future. Usually, parts in the same family can use the same
+\cls{CellLibrary}. The part-specific mention is very conservative, but is one
+that we know is right}.
+The rest of this section demonstrates how to get access to a cell library in
+RapidSMith, and how to create a new cell library XML file from Tincr.
+
+\subsubsection{Getting a handle to the Cell Library}
+When a Tincr checkpoint is imported into RapidSmith, a \cls{CellLibrary} is
+automatically loaded. To get a handle to the \cls{CellLibrary}, you can use
+the method call \texttt{TincrCheckpoint.getLibCells()} on the Tincr checkpoint
+object that was loaded. If you only have a handle to a \cls{Device} object, then
+the code below can be used to load a cell library from disk:
+
+\begin{code}
+CellLibrary libCells = new CellLibrary(RSEnvironment.defaultEnv()
+                       .getPartFolderPath(device.getPartName())
+                       .resolve(CELL_LIBRARY_NAME));
+\end{code}
+
+\subsubsection{Generating a new Cell Library}
+During runtime, a \cls{CellLibrary} data structure is created by parsing a
+\textit{cellLibrary.xml} file into memory. So, to create a new \cls{CellLibrary}
+all you have to do is generate a new \textit{cellLibrary.xml} file for the
+Xilinx part you are interested in. This can be done in a few easy steps.
+
+\begin{enumerate}
+  \item Open Vivado in Tcl mode, and type the following into the console:
+  \begin{code}
+::tincr::create_xml_cell_library xc7a100tcsg324-3 mycellLibrary.xml
+  \end{code}
+  Replace ``xc7a100tcsg324-3'' with the part you want to generate and
+  ``mycellLibrary.xml'' with the location where you want to store the generated
+  cell library XML. This will generate most of what you need in the cell library
+  XML automatically.
+  \item Open the generated XML file in a text editor and search for the
+  ``CARRY'' cell (could be the CARRY4 or CARRY8).
+  \item Scroll down to the ``bels'' XML element within the CARRY cell,
+  and add the following lines to each pin that is named ``CI'':
+  
+  \begin{figure}[H]
+   \centering
+   \includegraphics[width=.9\columnwidth]{cellLibHandEdit.png}
+   %\caption{Example of an INTRASITE net (left) and an INTERSITE net (right).}
+   %\label{fig:interVsIntra}
+  \end{figure}
+  
+  If the cell is a CARRY4, you should have to insert this line in two places
+  only.
+  \item Save your changes and exit the text editor
+  \item Copy the XML file to \textit{\$RapidSmith\_Path/device/family}
+  directory where ``family'' is replaced by the family of your part (such as
+  Artix7), and ``\$RapidSmith\_Path'' is your RapidSmith repository location.
+  Once this is done the new \cls{CellLibrary} should be ready to use. 
+\end{enumerate}
+
+\pgm{NOTE}: Usually, parts in the same family can use the same
+\cls{CellLibrary}.
+
+
+\pagebreak
+\section{Placement in RS2} \label{sec:placement}
+
+In the original RapidSmith, placement occurred at the \cls{Site} level. A
+collection of \cls{Cell}s were grouped together in what was called an
+\cls{Instance}, and the \cls{Instance} was assigned to a compatible site type.
+Where the individual \cls{Cell}s were actually placed within the \cls{Site}
+was a blackbox. Because RapidSmith 2 breaks up a \cls{Site} into its
+individual components, \cls{Cell}s can now be placed directly onto
+physical \cls{BEL}s within a \cls{Site}. This gives Xilinx FPGA CAD developers
+finer grain control during the placement of a design, and allows sub-site
+algorithms (such as packing algorithms) to be explored. \autoref{code:place}
+demonstrates the basic steps to placing a \cls{Cell} in RapidSmith.
+
+\begin{lstlisting} [caption=Steps for placing a Cell in RapidSmith,label=code:place]
+// Load the device and design
+TincrCheckpoint tcp = VivadoInterface.loadTcp("myCheckpoint.tcp"); 
+Device device = tcp.getDevice();
+CellDesign design = tcp.getDesign();
+
+// Get a handle to a Cell and Bel. The cell is of type LUT2 
+Cell cell = design.getCell("MyCell"); 
+Bel bel = device.getSite("SLICE_X40Y137").getBel("D6LUT");
+
+// Place the cell onto the bel
+design.placeCell(cell,bel);
+
+// Two ways to map bel pins
+CellPin pin1 = cell.getPin("I0");
+CellPin pin2 = cell.getPin("I1");
+CellPin pin3 = cell.getPin("O")
+
+// First way
+pin1.mapToBelPin(bel.getPin("A1"));
+pin2.mapToBelPin(bel.getPin("A2"));
+
+// Second way
+List<BelPin> possible = pin3.getPossibleBelPins(bel);
+pin3.mapToBelPin( possible.get(0) );
+\end{lstlisting}
+
+\noindent
+As the code listing shows, there are two steps to placing a RapidSmith
+\cell. The first is straightforward: get a handle to a \bel object,
+and use the method call \texttt{CellDesign.placeCell(Cell, Bel)} (line 11). This
+will map a logical \cell onto a physical \bel. Once a \bel has been
+used, no other \cells can be mapped to it. No error checking is performed to
+ensure that a \cell is compatible with the \bel it is being placed on, that is
+up to the user. The second step is more complicated: each logical \cellpin of
+the \cell needs to be mapped to a physical \belpin. This can be done by
+either (a) specifying the \belpin name (lines 19-20), or (b) using
+the function call \texttt{CellPin.getPossibleBelPins(Bel)} (line 23) to
+get a list of valid \belpin mappings. For most \cells each \cellpin only
+maps to a single \belpin, and so option (b) is preferable. However, there are two
+noticable exceptions to this rule.
+
+\begin {enumerate}
+  \item LUT input pins are permutable. This means that an input \cellpin 
+  attached to a LUT \cell can be mapped to any input pin of a LUT \bel.
+  \autoref{fig:lutPins} shows an example of this functionality in Vivado. Once
+  the input pins have been mapped, a configuration equation is created for and
+  applied to the LUT \bel using the appropriate \belpin inputs.
+  In order for a LUT \cell to be physically implemented, these pins need to be
+  mapped. The function call \texttt{CellPin.getPossibleBelPins(Bel)} in this
+  case will return all of the input \belpins of the LUT and the user can decide
+  which ones to use.
+  
+  \begin{figure}[t]
+	\centering
+	\includegraphics[width=1\columnwidth]{lutPins.png}
+	\caption{An example of LUT pin permutations. The left figure shows the
+	schematic of a LUT2 cell. The middle figure shows the two input pins of the LUT
+	cell being mapped to the A1 and A2 pins of a LUT6 bel. The right figure shows
+	the same input pins being mapped to the A6 and A5 pins instead.}
+	\label{fig:lutPins}
+  \end{figure}
+  
+  \item Logical-to-physical pin mappings can change \pgm{based on how a cell is
+  configured}. For example, on a RAMB36E1 \cell, the least-significant data
+  input pins map to different physical \belpins when the width of the BRAM is
+  set to 72. This is an important concept when performing netlist modifications
+  in RapidSmith. The function call \texttt{CellPin.getPossibleBelPins(Bel)} only
+  returns the pin mappings for the \pgm{default} \cell configuration. The
+  correct pin mappings are always used when a Tincr checkpoint is imported into
+  RapidSmith, but if new logic is being added to a design it is up to the
+  user to determine the proper pin mappings. Adding support for
+  automatically determining a \cells pin mappings based on a its
+  configuration is currently being worked on, but is not yet ready. For now,
+  users can configure a cell in Vivado, place it, and use the TCL function shown
+  in \autoref{code:tclPinMap} to determine the correct pin mappings for a \cell.
+
+\end{enumerate}
+
+\begin{lstlisting}[language=tcl, caption=TCL script to print all
+logical-to-physical pin mappings of a cell,label=code:tclPinMap]
+
+proc print_pin_mappings{cell} {
+
+	foreach cell_pin [get_pins -of $cell] {
+		puts "$cell_pin -> [get_bel_pins -of $cell_pin]" 
+	}
+}
+
+\end{lstlisting}
+ 
+\vspace{.2cm}
+\noindent
+Some additional points about placement to be aware of include: 
+
+\begin {itemize}
+  \item VCC and GND \cells are not placed when implementing a design in Vivado.
+  This distinction is applied to RapidSmith 2 as well. Rather than placing VCC
+  or GND explictly, \cls{RouteTree}s that are sourced by switchbox TIEOFFs are
+  used to express their placement implicitly (VCC/GND is ``placed'' on the
+  TIEOFF).
+  \item A list of valid placement options for a \cell can be obtained with the
+  function call \texttt{Cell.getPossible\-Anchors()}. The sample program
+  \pgm{CreateDesignExample} (described in \autoref{sec:createDesignExample})
+  gives a good example of how to use this function. The reader is referred to
+  the source code and Javadocs for more details.
+  \item If you plan on writing a placer in RapidSmith, there are several
+  placement rules for a given device. A few examples include (a) CARRY4 \cells
+  that are connected through the carry chain need to placed vertically to one
+  another so they can use the dedicated carry wires, and (b) A RAMB36E1 cell
+  cannot be placed in the same tile as a RAMB18E1 cell. If either of these
+  rules are violated, an error will be thrown in Vivado. It is the
+  responsibility of the user to determine all relevant placement rules
+  because error checking is not performed on design export. The source code for
+  a sample simulated annealing placer for the Artix-7 part {\em
+  xc7a100tcsg324} can be found in the package
+  \pkg{edu.byu.ece.rapidSmith.examples.placerDemo}.
+\end{itemize}
+
+\pagebreak
+\section{Routing in RS2} \label{sec:routing}
 
 \subsection{Wires and WireConnections} \label{wireConnSection}
 Routing in RapidSmith is done using \cls{Wire} objects, which are described in
@@ -1134,9 +1539,10 @@ In general, these are the only three functions that are needed to
 search through the wires of a FPGA device. It is important to note however that
 the first wire in the route has to be either (a) created using a \cls{TileWire}
 constructor, or (b) retrieved from a function call of another object (such as
-\texttt{SitePin::getExternalWire()}). To gain a better understanding of how to
-use \cls{Wire}s and \cls{WireConnection}s, see the \pgm{HandRouter} example in
-the RapidSmith repository.
+\texttt{SitePin::getExternalWire()}). \autoref{code:connections} demonstrates
+how to iterate through \cls{WireConnection} objects. To gain a better
+understanding of how to use \cls{Wire}s and \cls{WireConnection}s, see the
+\pgm{HandRouter} example in the RapidSmith repository.
 
 \subsection{Other Types of Connections} \label{otherConns}
 Along with PIP and non-PIP wire connections, there are several other types of
@@ -1172,7 +1578,61 @@ below:
 \noindent
 When traversing through the device data structure, a generic \cls{Connection}
 object is usually used. This connection can refer to any of the connections
-described so far in this documentation.
+described so far in this documentation. \autoref{code:connections} demonstrates
+how to iterate through different \cls{Connection} types in RapidSmith.
+
+\begin{lstlisting}[caption=How to iterate over Connections in RapidSmith,
+label=code:connections] 
+// Get a handle to a wire
+Wire wire = sitePin.getExternalWire();
+
+// Iterate over all WireConnections
+for (Connection conn : wire.getWireConnections()) {
+	Wire sinkWire = conn.getSinkWire();
+
+	if (conn.isPip()) {
+		// Do something with a PIP
+	} 
+	else if (conn.isRoutethrough()) {
+		// Do something with a routethrough
+	} 
+	else {	
+		// Do something with a regular wire connection				
+	}
+}
+
+// Iterate over all Pin Connections
+for (Connection conn : wire.getPinConnections() ) {
+	SitePin pin = conn.getSitePin();
+	// Do something with the SitePin
+}
+
+// Iterate over all Terminal Connections
+for (Connection conn : wire.getTerminals()) {
+	BelPin bp = conn.getBelPin();
+	// Do something with the BelPin
+}
+
+// Iterate over all connections at the same time
+Iterator<Connection> connIt = wire.getAllConnections().iterator();
+
+while (connIt.hasNext()) {
+	Connection conn = connIt.next();
+	
+	if (conn.isPinConnection()) {
+		//do something with the site pin
+	}
+	else if (conn.isTerminal()) {
+		//do something with the bel pin 
+	}
+	else if (conn.isPip()) {
+		//do something with the pip wire connection
+	}
+	else {
+		//do something with regular wire connection.
+	}
+}
+\end{lstlisting}
 
 \subsection{RouteTrees}
 
@@ -1196,8 +1656,8 @@ a \cls{RouteTree} include:
 \noindent
 When a design is imported from Vivado, the routing information is representated
 using \cls{Route\-Tree}s. On design export, the \cls{RouteTree} for each
-\cls{CellNet} is parsed and converted into a Vivado ROUTE string. A user can use
-custom data structures to route a design, but it needs to be
+\cls{CellNet} is traversed and converted into a Vivado ROUTE string. A user can
+use custom data structures to route a design, but it needs to be
 converted to an equivalent RouteTree data structure before exporting the
 design to Vivado. The \pgm{DesignAnalyzer} example demonstrates how to
 iterate through a \cls{RouteTree}. The \pgm{AStarRouter} and \pgm{HandRouter}
@@ -1213,12 +1673,438 @@ example.}
 \label{fig:routeTree}
 \end{figure}
 
-\pagebreak
-\section{Importing/Exporting Designs Between Vivado and RS2}
+\subsection{Three Part Routing}
 
-Importing and export designs between Vivado and RS2 is straightforward.  See the
-program edu.byu.ece.rapidSmith.examples.ImportExportExample for an illustration
-of how to do this.
+
+\pagebreak
+\section{Importing/Exporting Designs Between Vivado and RS2} \label{sec:import}
+Importing and exporting designs between Vivado and RS2 is fairly
+straightforward. It is done using Tincr Checkpoint (TCP) files, which contain a
+variety of information about a digital design. This section describes in detail
+the following: 
+
+\begin{itemize}
+  \item The contents of TCP files
+  \item The small differences between TCP files for design import and export
+  \item How to load a TCP into RS2, and how to export a RS2 design to a TCP
+  \item Some additional information that is imported with a TCP 
+\end{itemize}
+
+\subsection{RapidSmith Checkpoints}
+RapidSmith checkpoints (RSCP) are Tincr checkpoints generated in Vivado from the
+command \texttt{::tincr::write\-\_rscp}. These checkpoints are capable of
+representing a Vivado design at any stage of implementation (post-synthesis,
+post-place, and post-route), and can be parsed and imported into RapidSmith. As
+we will see in \autoref{sec:tcp} below, the format of these checkpoints differ
+slightly than those of regular TCPs. This is because a great deal of additional
+information needs to be added to RapidSmith checkpoints in order to import a
+complete representation of a Vivado design. The remainder of this subsection
+describes each of the file types within a RapidSmith checkpoint, and what they
+represent.
+
+\subsubsection{design.info}
+The \textit{design.info} file within a RSCP is used to include any useful
+information about a design. Currently, it only stores the part name that the
+design is implemented on. This file is reserved to add more additional
+information in the future.
+
+\subsubsection{netlist.edf}
+The \textit{netlist.edf} file within a RSCP is an EDIF netlist representing the
+logical portion of a design. It details all of the \cells, \nets,
+and \ports within a design, and is generated from Vivado using the Tcl
+command \texttt{write\_edif}. A RapidSmith \celldesign is created by parsing the
+EDIF file, and converting it into the appropriate RS2 data structures described
+in \autoref{sec:designDS}. Below is an example of a RSCP EDIF file.
+
+\begin{lstlisting}[numbers=none, keywordstyle=, stringstyle=]
+  (Library work
+    (edifLevel 0)
+    (technology (numberDefinition ))
+   (cell add (celltype GENERIC)
+     (view add (viewtype NETLIST)
+       (interface 
+        (port a (direction INPUT))
+        (port b (direction INPUT))
+        (port cin (direction INPUT))
+        (port cout (direction OUTPUT))
+        (port s (direction OUTPUT))
+       )
+       (contents
+         (instance GND (viewref netlist (cellref GND (libraryref hdi_primitives))))
+         (instance VCC (viewref netlist (cellref VCC (libraryref hdi_primitives))))
+         (instance a_IBUF_inst (viewref netlist (cellref IBUF (libraryref hdi_primitives))))
+         (instance b_IBUF_inst (viewref netlist (cellref IBUF (libraryref hdi_primitives))))
+         (instance cin_IBUF_inst (viewref netlist (cellref IBUF (libraryref hdi_primitives))))
+         (instance cout_OBUF_inst (viewref netlist (cellref OBUF (libraryref hdi_primitives))))
+         (instance cout_OBUF_inst_i_1 (viewref netlist (cellref LUT3 (libraryref hdi_primitives)))
+           (property INIT (string "8'hE8"))
+         )
+\end{lstlisting}
+
+\subsubsection{placement.rsc}
+The \textit{placement.rsc} file within a RSCP stores all of the placement
+information of a Vivado design. This includes which package pin every \port is
+mapped to, which \bel each \cell is placed on, and the logical-to-physical pin
+mappings for each \cellpin. If a design has not yet been placed, this file
+will be empty. Below is an example of a RSCP placement file.
+
+\begin{lstlisting}[numbers=none]
+LOC a_IBUF_inst R10 IOB33 INBUF_EN LIOB33_SING_X0Y50
+PINMAP a_IBUF_inst O:OUT I:PAD 
+LOC b_IBUF_inst T10 IOB33 INBUF_EN LIOB33_X0Y51
+PINMAP b_IBUF_inst O:OUT I:PAD 
+LOC cin_IBUF_inst T9 IOB33 INBUF_EN LIOB33_X0Y51
+PINMAP cin_IBUF_inst O:OUT I:PAD 
+LOC cout_OBUF_inst U13 IOB33 OUTBUF LIOB33_X0Y53
+PINMAP cout_OBUF_inst O:OUT I:IN 
+LOC cout_OBUF_inst_i_1 SLICE_X0Y51 SLICEL A6LUT CLBLL_L_X2Y51
+PINMAP cout_OBUF_inst_i_1 O:O6 I0:A4 I1:A5 I2:A6 
+LOC s_OBUF_inst T13 IOB33 OUTBUF LIOB33_X0Y53
+PINMAP s_OBUF_inst O:OUT I:IN T:TRI 
+PACKAGE_PIN R10 a
+PACKAGE_PIN T10 b
+PACKAGE_PIN T9 cin
+PACKAGE_PIN U13 cout
+PACKAGE_PIN T13 s
+\end{lstlisting}
+
+\subsubsection{routing.rsc}
+The \textit{routing.rsc} file within a RSCP stores all of the routing
+information of a Vivado design. This includes: 
+
+\begin{itemize}
+  \item The used \cls{Site} \cls{PIPs} within each \cls{Site} (which
+  specifies the internal routing)
+  \item A list of LUT \bels that are acting as static sources (see
+  \autoref{sec:additionalInfo} for more details)
+  \item A list of LUT \bels that are being used as routethroughs (see
+  \autoref{sec:additionalInfo} for more details) 
+  \item The name of each INTRASITE net
+  \item The name, connecting \cls{SitePin}s, and used \cls{TileWire}s
+  of each INTERSITE net.
+  \item Special routing information for the VCC and GND nets.
+\end{itemize}
+
+\noindent
+If Vivado has not yet been routed, this file will be mostly empty. Below is
+an example of the contents within a RSCP routing file.
+
+\begin{lstlisting}[numbers=none]
+SITE_PIPS SLICE_X9Y80 SRUSEDMUX:0 CEUSEDMUX:IN COUTUSED:0 CLKINV:CLK DCY0:DX ...
+SITE_PIPS SLICE_X13Y80 PRECYINIT:AX SRUSEDMUX:0 CEUSEDMUX:IN COUTUSED:0 ...
+SITE_PIPS SLICE_X15Y80 SRUSEDMUX:0 CEUSEDMUX:IN COUTUSED:0 CLKINV:CLK DCY0:DX ...
+SITE_PIPS M17 OUSED:0 
+
+... 
+
+STATIC_SOURCES SLICE_X2Y106/D6LUT/O6 SLICE_X2Y106/C6LUT/O6 SLICE_X4Y106/D6LUT/O6 ...
+LUT_RTS SLICE_X5Y101/B6LUT/A6/O6 SLICE_X2Y100/A5LUT/A4/O5 SLICE_X5Y100/C6LUT/A6/O6 ...
+
+...
+
+INTRASITE AddSub[10]
+INTERSITE AngStep1[0] SLICE_X2Y82/AX SLICE_X2Y87/AQ SLICE_X2Y84/A1
+ROUTE AngStep1[0] CLBLM_R_X3Y87/CLBLM_M_AQ CLBLM_R_X3Y87/CLBLM_LOGIC_OUTS4 ...
+
+...
+
+VCC INT_L_X2Y107/VCC_WIRE INT_L_X2Y107/VCC_WIRE INT_L_X2Y107/VCC_WIRE ...
+START_WIRES INT_L_X2Y107/VCC_WIRE INT_L_X2Y106/VCC_WIRE INT_R_X3Y106/VCC_WIRE ...
+GND INT_R_X3Y106/GND_WIRE INT_R_X3Y106/GND_WIRE INT_R_X3Y106/GFAN1 ...
+START_WIRES INT_R_X3Y106/GND_WIRE INT_L_X4Y106/GND_WIRE INT_R_X3Y105/GND_WIRE ...
+\end{lstlisting}
+
+\subsubsection{contraints.rsc}
+The \textit{contraints.rsc} file within a RSCP stores all XDC constraints on a
+Vivado design. XDC constraints are similar to UCF files for ISE designs. They
+can be used to set the clock frequency, constrain a top-level port to a specific
+package pin on the device, and set other physical implementation details. An
+example of a RSCP constraints file can be seen below.
+
+\begin{lstlisting}[numbers=none]
+create_clock -period 5.000 -name sysClk -waveform {0.000 2.500}
+set_property IOSTANDARD LVCMOS18 [get_ports clk]
+set_property IOSTANDARD LVCMOS18 [get_ports ena]
+set_property PACKAGE_PIN E15 [get_ports {Yin[12]}]
+set_property PACKAGE_PIN H17 [get_ports {Xin[14]}]
+set_property PACKAGE_PIN D18 [get_ports {Xin[7]}]
+\end{lstlisting}
+
+\noindent
+As can be seen, a Vivado constraints file is essentially a list of Tcl commands
+to execute before generating a bitstream. When importing a RSCP into RapidSmith,
+each constraint is parsed into a \cls{XdcConstraint} object and stored in the
+top-level \celldesign. Each \cls{XdcConstraint} has two fields, a String
+command and a String representing all command arguments. \autoref{code:xdc}
+demonstrates how to manipulate XDC constraints in RapidSmith. Future RS2 plans
+include creating a more intelligent way of handling XDC constraints. 
+
+\begin{lstlisting} [caption=How to manipulate XDC constraints in RS2,
+label=code:xdc] 
+// Getting a list of all constraints in the current design
+List<XdcConstraint> xdcConstraints = design.getVivadoConstraints();
+
+// Look for all of the "create_clock" constraints in the design
+List<XdcConstraint> crtClks = xdcConstraints.stream()
+                              .filter(xdc -> xdc.getCommandName().equals("create_clock")) 
+                              .collect(Collectors.toList());
+
+// Add a new XDC constraint to the design
+XdcConstraint xdc = new XdcConstraint("set_property", "IOSTANDARD LVCMOS18 [get_ports clk]") 
+design.addVivadoConstraint(xdc);
+\end{lstlisting}
+
+\subsection{Tincr Checkpoints} \label{sec:tcp}
+Tincr checkpoints are very similar to RapidSmith checkpoints, but they can be
+used to import designs back into Vivado after they have been modified in
+RapidSmith. The main different between TCPs and RSCPs, is that the
+\textit{placement.rsc}, \textit{routing.rsc}, and \textit{constraints.rsc} files
+turn into \textit{placement.xdc}, \textit{routing.xdc}, and \textit{constraints.xdc}
+respectively. Vivado is able to parse the XDC files and apply physical
+information to the design. On design export, RapidSmith produces
+a TCP that is compatible with Vivado. The file formats of the three XDC files
+will not be included in this documentation. If you are interested in their
+format, the best way to learn is to consult the Vivado user guide and generate a
+TCP from RapidSmith and view the individual files.
+
+\subsection{Additional Information} \label{sec:additionalInfo}
+The reason RSCP and TCP checkpoints are distinguished, is that there are
+several design implementation aspects in Vivado that aren't explictly
+represented. In order to accurately represent a design in RapidSmith, they
+must be included somehow. This section describes the parts of the design that
+aren't explicitly represented in Vivado, and how RapidSmith handles them.
+\autoref{sec:importExportTcp} describes how to get a handle to the additional
+information after a checkpoint has been imported.
+
+\subsubsection{LUT Routethroughs}
+Besides their use in implementing logic equations, LUT BELs can also act as
+signal routethroughs. In Vivado, a LUT is marked as a  routethrough when its
+configuration equation (CONFIG.EQN) maps the value of a single input pin
+directly to the output pin. These LUTs are not explicitly represented in the
+logical netlist because there is no cell placed on the corresponding BEL. Figure
+\ref{fig:routethroughs} shows two examples of LUTs in Vivado that are configured
+as routethroughs.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=1\columnwidth]{routethroughs}
+  \caption{Two examples of LUTs being used as
+  routethroughs in the Vivado GUI. The RT on the left uses the A6 input pin,
+  while the RT on the right uses the A4 input pin. The net highlighted in red
+  represents VCC.}
+  \label{fig:routethroughs}
+\end{figure}
+
+\noindent
+When a design is exported from Vivado, all LUTs that are acting as routethroughs
+are included in the \textit{routing.rsc} file of a RSCP. When the file is
+parsed, each routethrough is stored in a \cls{BelRoutethrough} object which
+contains the physical \bel, the input \belpin, and the output \belpin that
+uniquely describes the routethrough. It is important to note that if a \bel is
+being used as a routethrough, no \cell can be placed there. When creating CAD
+tools, \cls{BelRoutethrough}s give the user a more complete picture of what
+\bels are actually available. 
+	
+As described in \autoref{otherConns}, there is a \cls{Connection} object in
+RapidSmith from every input LUT pin to the LUTs output pin. These \bel
+routethrough connections, are actually just \cls{WireConnection}s with the
+\texttt{isRoute\-through()} method returning true. In order to use a LUT as a
+routethrough in RapidSmith, you simply have to include the corresponding
+\cls{WireConnection} within an INTRASITE \cls{RouteTree}. When a design is
+exported from RapidSmith, the routethrough \cls{WireConnection}s are
+automatically detected and converted to a passthrough LUT \cell. The netlist
+is rewired appropriately.
+
+\subsubsection{Static Source LUTs}
+LUTs can also act as a static power or ground source. This occurs when the
+configuration equation is set to 1 or 0. An example of a LUT that exhibits
+this behavior is shown in \autoref{fig:staticSourceLut}. When a design
+is exported from Vivado, all LUTs that are acting as static sources are
+included in the \textit{routing.rsc} file of a RSCP. As the file is being
+parsed, a list of static sources \bels are recorded and stored in a list data
+structure. Just like routethroughs, if a \bel is being used as a static source
+no \cell should be placed on it.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=.5\columnwidth]{staticSourceLut.png}
+  \caption{A LUT \bel that has been configured as a GND source. Notice that
+  there are no input pins being driven.}
+  \label{fig:staticSourceLut}
+\end{figure}
+
+\subsubsection{Pseudo CellPins}
+\cls{PseudoCellPin}s are described in great detail in \autoref{sec:cellPin}.
+When a RSCP is loaded, \cls{PseudoCellPin}s are automatically detected,
+created, and attached to their corresponding \cells.
+
+\subsection{Importing and Exporting TCPs} \label{sec:importExportTcp}
+After a Vivado design has been converted to a TCP using the
+\texttt{::tincr::write\_rscp} command, it can be loaded into RapidSmith.
+\autoref{code:import} demonstrates the basix syntax of design
+import and export.
+
+\begin{lstlisting}[caption=How to import and export TCP files to and from RS2,
+label=code:import]
+// Loading a Tincr Checkpoint
+TincrCheckpoint tcp = VivadoInterface.loadTcp("pathToCheckpoint.tcp");
+CellDesign design = tcp.getDesign();
+Device device = tcp.getDevice();
+CellLibrary libCells = tcp.getLibCells();
+
+// Insert CAD Tool Here
+
+// Exporting the modified design to a Tincr Checkpoint
+VivadoInterface.writeTCP("pathToStore.tcp", design, device, libCells);
+
+\end{lstlisting}
+
+\noindent
+While a design is being imported into RapidSmith, several useful data structures
+are built up. If you want to gain access to those data structures, you can pass
+an additional argument into the \texttt{VivadoInterface.loadTCP} method. This
+is shown in \autoref{code:import2}.
+
+\begin{lstlisting}[caption=Importing a TCP with additional information,
+label=code:import2]
+// Loading a Tincr Checkpoint with additional info
+TincrCheckpoint tcp = VivadoInterface.loadTcp("PathToCheckpoint.tcp", true);
+Collection<BelRoutethrough> belRts = tcp.getRoutethroughObjects();
+Collection<Bel> staticSources = tcp.getStaticSourceBels();
+Map<BelPin, CellPin> belPinToCellPinMap = tcp.getBelPinToCellPinMap()
+\end{lstlisting}
+
+\pagebreak
+\section{Example Programs} \label{examples}
+
+A variety of example programs can be found in the
+\pkg{edu.byu.edu.rapidSmith.examples} package of the RS2 installation.
+They have been heavily commented to provide a means to learn the RS2 API by
+example. We believe this approach is better than reading through a block of
+text while trying to understand the data structures and what they do.
+There is a \fil{README.txt} file in that directory to provide an overview of
+each example. The order that they appear in the \fil{README.txt} is also the
+suggested learning order for beginners. In addition, the subsections below
+describe one or more built-in RS2 programs which you might find useful.
+
+\subsection{Sample Vivado Designs}
+To enable new users of RS2 to quickly start running the example
+programs, a small set of pre-compiled Vivado designs have been included in the
+distribution. They are located in the \dir{exampleVivadoDesigns} directory of
+the repository, and consist of 3 designs: 
+\begin{itemize}
+\item \textbf{add.tcp}: synthesized only
+\item \textbf{cordic.tcp}: synthesized and placed
+\item \textbf{count16.tcp}: synthesized, placed and routed
+\end{itemize} 
+There is a sample design to demonstrate each possible tool flow between Vivado
+and RS2. Equivalent Vivado checkpoints files (.dcp) are also included in
+the same directory as \fil{add.dcp}, \fil{cordic.dcp}, and \fil{count16.dcp}
+files. To open these checkpoints in Vivado, you can either (a) double click on
+the .dcp file in a file explorer, or (b) use the command
+\texttt{open\_checkpoint} when a Vivado terminal is open. It is suggested that
+you have the equivalent Vivado designs open when going through the example
+programs listed below.
+
+If you want to recompile the designs from scratch, the source code for each
+design has also been included in the same directory. The Tcl script called
+\pgm{compile.tcl} can be used for this purpose. Simply open Vivado in Tcl
+mode, and type the following commands to re-build one of the example designs. 
+                
+\vspace{-0.15in}  \begin{code}
+	Vivado\% cd <path to exampleVivadoDesigns directory>
+	Vivado\% compile_hdl_to_checkpoint_files add
+	Vivado\% close_project
+\end{code}
+This will synthesize, place, and route a design and, from that compiled
+design, generate the \dir{.tcp} directory and the \fil{.dcp} file. For example
+programs that only explore the architecture, opening the device browser in
+Vivado can also be helpful.
+
+\subsection{\pgm{DeviceBrowser}}
+The DeviceBrowser is a GUI program located in the 
+\pkg{edu.byu.ece.rapidSmith.device.browser} package. It lets you browse
+parts at the tile level, and is useful for becoming more familiar with FPGA
+architecture. As long as a valid device file exists, then the DeviceBrowser can
+operate (no design required). A screenshot from the DeviceBrowser can be seen in
+\autoref{fig:deviceBrowser}. On the left, the user may choose the desired part
+by navigating the tree menu and double-clicking on the desired part name.
+This will load the part in the viewer pane on the right (the first available
+part is loaded at startup). The status bar in the bottom left displays which
+part is currently loaded. Also displayed is the name of the current tile
+which the mouse is over, highlighted by a yellow outline in the viewer pane.
+The user may navigate inside the viewer pane by using the mouse. By
+right-clicking and dragging the cursor, the user may pan. By using the
+scroll-wheel on the mouse, the user may zoom. If a scroll-wheel is
+unavailable, the user may zoom by clicking inside the viewer pane and pressing
+the minus(-) key to zoom out or the equals(=) key to zoom in.
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.8\columnwidth]{deviceBrowser2}
+\caption{\pgm{DeviceBrowser} Screen Shot Showing Wire Connections}
+\label{fig:deviceBrowser2}
+\end{figure}
+
+The device browser also allows the user to follow the various connections found
+in the FPGA.  By double clicking a wire in the wire list, the application will
+draw the connection on the tile array (as shown in
+\autoref{fig:deviceBrowser2}). By hovering the mouse pointer over the
+connection, the wire becomes red and a tooltip will appear describing the
+connection made by declaring the source tile and wire followed by an arrow and
+the destination tile and wire.  By clicking on the wire, the application will
+redraw all the connections that can be made from the currently selected wire. 
+By repeating this action, the user can follow connections and discover how the
+FPGA interconnect is laid out. Thanks to Chris Lavin for originally creating
+this application.
+
+\subsection{\pgm{DeviceAnalyzer}}
+The DeviceAnalyzer is designed as a simple getting started program and
+demonstrates how to use some of the Device data structures in RS2. This
+includes how to query for and print tiles in a device, how to use wires and
+wire connections, and other useful device functions.
+
+\subsection{\pgm{ImportExportExample}} \label{sec:importExportExample}
+The ImportExportExample demonstrates how to load a Tincr checkpoint into
+RapidSmith, and how to export a RapidSmith netlist back into a Tincr
+checkpoint. This is a very important step in passing digital designs back
+and forth between Vivado and RapidSmith.
+
+\subsection{\pgm{DesignAnalyzer}}
+The DesignAnalyzer loads a Tincr checkpoint into RapidSmith, walks
+the design data structures, and prints what it finds as it goes in a
+readable format. As such, it provides a nice example of a number of things which would
+be useful for getting started with RS2 including:
+\begin{itemize}
+  \item How to enumerate the Cells in a design, determine and print their 
+  placement information, and determine and print their properties.
+  \item How to enumerate the logical nets in a design and print out their source
+  and sink pins. 
+  \item How to traverse and print out the physical route for a logical net (if
+  it is routed)  
+\end{itemize}
+
+\subsection{CreateDesignExample} \label{sec:createDesignExample}
+The CreateDesignExample program builds a RapidSmith netlist from scratch (using
+\cells and \cellnets) and then places the design. While this is certainly not
+recommended for substantial designs, it does demonstrate how to do the
+following useful tasks in RapidSmith:
+
+\begin{itemize}
+  \item Create new \cells and add them to an existing netlist
+  \item Create new \cellnets, and connect them to \cls{CellPin}s
+  \item Modify the properties on \cells
+  \item Place \cells onto a \bels
+  \item Find compatible \bel placement for a given \cell
+\end{itemize}
+
+\subsection{Other Test Programs}
+The programs introduced in this section are designed for beginners of RS2. Once
+you start becoming more comfortable with RapidSmith and its data structures,
+there are several other more advanced examples. These examples include the
+\pgm{HandRouter}, \pgm{AStarRouter}, and \pgm{SimulatedAnnealingPlacer}
+programs. See the README.txt file for more information about each of these
+examples.
 
 \pagebreak
 \section{Bitstreams in RS2}
@@ -1243,9 +2129,8 @@ inclusion.
 
 \pagebreak
 \section{Legal and Dependencies}
-RS2 is released under GPL version 3.
+RS2 is released under GPL version 3 with the following license: 
 
-\subsection{RapidSmith Legal Text}
 \begin{verbatim}
 BYU RapidSmith Tools
 
@@ -1263,7 +2148,7 @@ General Public License for more details.
    
 A copy of the GNU General Public License is included with the BYU
 RapidSmith Tools. It can be found at doc/gpl2.txt. You may also get
-a copy of the license at \url{http://www.gnu.org/licenses/}.
+a copy of the license at http://www.gnu.org/licenses/.
 \end{verbatim}
 
 \pagebreak
@@ -1274,13 +2159,13 @@ directory in the file APACHE2-LICENSE.txt. This license is also available for
 download at:
 
 \noindent
-\url{http://www.apache.org/licenses/LICENSE-2.0}. 
+\hyperref[http://www.apache.org/licenses/LICENSE-2.0]{\color{blue}http://www.apache.org/licenses/LICENSE-2.0}
 
 \bigbreak \noindent
 The source for the Caucho Technology Hessian implementation is available at:
 
 \noindent
-\url{http://hessian.caucho.com}.
+\hyperref[http://hessian.caucho.com]{\color{blue}http://hessian.caucho.com}
 
 \bigbreak \noindent
 RS2 also includes the Qt Jambi project jars for Windows, Linux and Mac OS X.  Qt
@@ -1289,16 +2174,16 @@ exception are also available in the /doc directory in files LICENSE.GPL3.TXT and
 LICENSE.LGPL.TXT respectively. These licenses can also be downloaded at:
 
 \noindent
-\url{http://www.gnu.org/licenses/licenses.html}.
-  
+\hyperref[http://www.gnu.org/licenses/licenses.html]{\color{blue}http://www.gnu.org/licenses/licenses.html}
+
 \bigbreak \noindent
 Source for the Qt Jambi project is available at:
 
 \noindent
-\url{http://qtjambi.org/downloads}, and
+\hyperref[http://qtjambi.org/downloads]{\color{blue}http://qtjambi.org/downloads}, and
 
 \noindent
-\url {https://sourceforge.net/projects/qtjambi/files/}
+\hyperref[https://sourceforge.net/projects/qtjambi/files/]{\color{blue}https://sourceforge.net/projects/qtjambi/files/}
 
 \bigbreak \noindent
 RS2 also includes the JOpt Simple option parser which is released under
@@ -1306,13 +2191,13 @@ the open source MIT License which can be found in this directory in the file
 MIT\_LICENSE.TXT.  A copy of this license can also be found at:
 
 \noindent
-\url{http://www.opensource.org/licenses/mit-license.php}.
+\hyperref[http://www.opensource.org/licenses/mit-license.php]{\color{blue}http://www.opensource.org/licenses/mit-license.php}
 
 \bigbreak \noindent   
 A copy of the source for JOpt Simple can also be downloaded at:
 
 \noindent
-\url{http://jopt-simple.sourceforge.net/download.html}.
+\hyperref[http://jopt-simple.sourceforge.net/download.html]{\color{blue}http://jopt-simple.sourceforge.net/download.html}
 
 \bigbreak \noindent
 RS2 also includes the JDOM jars.  JDOM is available under an Apache-style open

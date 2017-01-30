@@ -62,7 +62,7 @@ public class DotFilePrinter {
 	private BufferedWriter outputStream; 
 	private final Map<String,String> dotProperties; 
 	private final CellDesign design;
-	private static final int MAX_FANOUT = 10;
+	private final int MAX_FANOUT = 3;
 	
 	/**
 	 * Creates a new DotFilePrinter for the specified CellDesign
@@ -114,7 +114,7 @@ public class DotFilePrinter {
 		dotBuilder = new StringBuilder();
 			
 		// add the dot file header
-		dotBuilder.append("digraph " + design.getName() + "{\n");
+		dotBuilder.append("digraph \"" + design.getName() + "\"{\n");
 		formatGraphProperties();
 		
 		// add cells to the dot file
@@ -127,7 +127,7 @@ public class DotFilePrinter {
 			
 			// only print small fanout nets for now to produce cleaner results
 			// TODO: add option for this?
-			if (net.getFanOut() == 0 || net.getFanOut() > 10) {
+			if (net.getFanOut() == 0 || net.getFanOut() > MAX_FANOUT) {
 				continue;
 			}
 			
@@ -166,7 +166,7 @@ public class DotFilePrinter {
 		dotBuilder = new StringBuilder();
 			
 		// add the dot file header
-		dotBuilder.append("digraph " + design.getName() + "{\n");
+		dotBuilder.append("digraph \"" + design.getName() + "\"{\n");
 		formatGraphProperties();
 		
 		for (Site site : design.getUsedSites()) {
@@ -178,7 +178,7 @@ public class DotFilePrinter {
 			
 			// only print small fanout nets for now to produce cleaner results
 			// TODO: add option for this?
-			if (net.getFanOut() == 0 || net.getFanOut() > 10) {
+			if (net.getFanOut() == 0 || net.getFanOut() > MAX_FANOUT) {
 				continue;
 			}
 			
@@ -213,7 +213,7 @@ public class DotFilePrinter {
 		dotBuilder = new StringBuilder();
 				
 		// add the dot file header
-		dotBuilder.append("digraph " + design.getName() + "{\n");
+		dotBuilder.append("digraph \"" + design.getName() + "\"{\n");
 		
 		formatGraphProperties();
 		formatBlankNodes(site);
@@ -308,7 +308,7 @@ public class DotFilePrinter {
 		
 		// add cell info .. TODO: update this to print all properties of a cell
 		String lutString = (c.getLibCell().isLut() ? "\\n" + c.getProperties().getValue("INIT") : "");
-		builder.append(String.format(" { <%d>%s%s\\n%s\\n(%s) } ", cellId, getAbbreviatedCellName(c), lutString, c.getBel().getName(), c.getLibCell().getName()));
+		builder.append(String.format(" { <%d>%s%s\\n%s\\n(%s) } ", cellId, getAbbreviatedCellName(c), lutString, c.isPlaced() ? c.getBel().getName() : "UNPLACED", c.getLibCell().getName()));
 		
 		// add output pin info
 		if (c.getOutputPins().size() > 0) {

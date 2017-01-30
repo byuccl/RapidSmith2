@@ -1203,6 +1203,7 @@
             </pin>
             <pin>
               <name>CI</name>
+			  <possible>CIN</possible>
               <possible>CYINIT</possible>
             </pin>
             <pin>
