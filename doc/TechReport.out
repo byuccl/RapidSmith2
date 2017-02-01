@@ -26,20 +26,23 @@
 \BOOKMARK [2][-]{subsection.7.3}{Other Types of Connections}{section.7}% 26
 \BOOKMARK [2][-]{subsection.7.4}{RouteTrees}{section.7}% 27
 \BOOKMARK [2][-]{subsection.7.5}{Three Part Routing}{section.7}% 28
-\BOOKMARK [1][-]{section.8}{Importing/Exporting Designs Between Vivado and RS2}{}% 29
-\BOOKMARK [2][-]{subsection.8.1}{RapidSmith Checkpoints}{section.8}% 30
-\BOOKMARK [2][-]{subsection.8.2}{Tincr Checkpoints}{section.8}% 31
-\BOOKMARK [2][-]{subsection.8.3}{Additional Information}{section.8}% 32
-\BOOKMARK [2][-]{subsection.8.4}{Importing and Exporting TCPs}{section.8}% 33
-\BOOKMARK [1][-]{section.9}{Example Programs}{}% 34
-\BOOKMARK [2][-]{subsection.9.1}{Sample Vivado Designs}{section.9}% 35
-\BOOKMARK [2][-]{subsection.9.2}{DeviceBrowser}{section.9}% 36
-\BOOKMARK [2][-]{subsection.9.3}{DeviceAnalyzer}{section.9}% 37
-\BOOKMARK [2][-]{subsection.9.4}{ImportExportExample}{section.9}% 38
-\BOOKMARK [2][-]{subsection.9.5}{DesignAnalyzer}{section.9}% 39
-\BOOKMARK [2][-]{subsection.9.6}{CreateDesignExample}{section.9}% 40
-\BOOKMARK [2][-]{subsection.9.7}{Other Test Programs}{section.9}% 41
-\BOOKMARK [1][-]{section.10}{Bitstreams in RS2}{}% 42
-\BOOKMARK [1][-]{section.11}{Legal and Dependencies}{}% 43
-\BOOKMARK [1][-]{section.12}{Included Dependency Projects}{}% 44
-\BOOKMARK [1][-]{section.13}{Appendix}{}% 45
+\BOOKMARK [2][-]{subsection.7.6}{Routing in Vivado}{section.7}% 29
+\BOOKMARK [2][-]{subsection.7.7}{IntrasiteRouting}{section.7}% 30
+\BOOKMARK [1][-]{section.8}{Importing/Exporting Designs Between Vivado and RS2}{}% 31
+\BOOKMARK [2][-]{subsection.8.1}{RapidSmith Checkpoints}{section.8}% 32
+\BOOKMARK [2][-]{subsection.8.2}{Tincr Checkpoints}{section.8}% 33
+\BOOKMARK [2][-]{subsection.8.3}{Additional Information}{section.8}% 34
+\BOOKMARK [2][-]{subsection.8.4}{Importing and Exporting TCPs}{section.8}% 35
+\BOOKMARK [1][-]{section.9}{Example Programs}{}% 36
+\BOOKMARK [2][-]{subsection.9.1}{Sample Vivado Designs}{section.9}% 37
+\BOOKMARK [2][-]{subsection.9.2}{DeviceBrowser}{section.9}% 38
+\BOOKMARK [2][-]{subsection.9.3}{DeviceAnalyzer}{section.9}% 39
+\BOOKMARK [2][-]{subsection.9.4}{ImportExportExample}{section.9}% 40
+\BOOKMARK [2][-]{subsection.9.5}{DesignAnalyzer}{section.9}% 41
+\BOOKMARK [2][-]{subsection.9.6}{CreateDesignExample}{section.9}% 42
+\BOOKMARK [2][-]{subsection.9.7}{Other Test Programs}{section.9}% 43
+\BOOKMARK [1][-]{section.10}{Bitstreams in RS2}{}% 44
+\BOOKMARK [1][-]{section.11}{Installing New Device Files}{}% 45
+\BOOKMARK [1][-]{section.12}{Legal and Dependencies}{}% 46
+\BOOKMARK [1][-]{section.13}{Included Dependency Projects}{}% 47
+\BOOKMARK [1][-]{section.14}{Appendix}{}% 48
