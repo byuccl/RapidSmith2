@@ -104,10 +104,12 @@
 \newcommand{\textQuote}[1]{\textquotedblright{#1}\textquotedblright}
 \newcommand{\bel}{\cls{Bel}\xspace}
 \newcommand{\bels}{\cls{Bel}s\xspace}
+\newcommand{\site}{\cls{Site}\xspace}
+\newcommand{\sites}{\cls{Site}s\xspace}
 \newcommand{\cell}{\cls{Cell}\xspace}
 \newcommand{\cells}{\cls{Cell}s\xspace}
 \newcommand{\cellpin}{\cls{CellPin}\xspace}
-\newcommand{\cellspins}{\cls{CellPin}s\xspace}
+\newcommand{\cellpins}{\cls{CellPin}s\xspace}
 \newcommand{\belpin}{\cls{BelPin}\xspace}
 \newcommand{\belpins}{\cls{BelPin}s\xspace}
 \newcommand{\tile}{\cls{Tile}\xspace}
@@ -119,6 +121,12 @@
 \newcommand{\port}{\cls{Port}\xspace}
 \newcommand{\ports}{\cls{Port}s\xspace}
 \newcommand{\celldesign}{\cls{CellDesign}\xspace}
+\newcommand{\sitepin}{\cls{SitePin}\xspace}
+\newcommand{\sitepins}{\cls{SitePin}s\xspace}
+\newcommand{\routeTree}{\cls{RouteTree}\xspace}
+\newcommand{\routeTrees}{\cls{RouteTree}s\xspace}
+\newcommand{\pip}{\cls{PIP}\xspace}
+\newcommand{\pips}{\cls{PIP}s\xspace}
 
 \newenvironment{codei}{\vspace{-0.1in} \begin{center} \begin{minipage}{6in} \noindent \begin{alltt}}{\end{alltt} \end{minipage} \end{center}}
 
@@ -174,69 +182,84 @@ Technical Report and Documentation\\[0.1in]
 \section{Introduction}
 \subsection{What is RapidSmith 2?}
 The original BYU RapidSmith project began in 2010. Its goal was to develop
-a set of tools and APIs written in Java which would provide academics with an
-easy-to-use platform to try out experimental CAD ideas and algorithms on modern
-Xilinx FPGAs.  RapidSmith 2 (abbreviated RS2 hereafter) represents a major
-addition to RapidSmith.  Using RS2 you can write custom CAD tools which will:
+a set of tools and APIs which would provide academics with an
+easy-to-use platform to implement experimental CAD ideas and algorithms on
+modern Xilinx FPGAs. It integrated with Xilinx's old design suite, ISE.
+RapidSmith 2 (abbreviated RS2 hereafter) represents a major addition to
+RapidSmith. Specifically, Vivado designs are now supported. Using RS2 you can
+write custom CAD tools which will:
 \begin{itemize}
-  \item export designs from Vivado
-  \item perform analyses on those designs
-  \item make modifications to those designs
-  \item import those designs back into Vivado for further processing or bitstream generation
+  \item Export designs from Vivado
+  \item Perform analyses on those designs
+  \item Make modifications to those designs
+  \item Import those designs back into Vivado for further processing or
+  bitstream generation
 \end{itemize}
-In addition, you need not start with a Vivado design --- 
-you can create a new design from scratch in RS2 and then import it into Vivado.
+Futhermore, you need not start with a Vivado design --- 
+you can create a new design from scratch in RS2 and then import it into Vivado
+if desired.
 
-So, clearly a major addition with RS2 is the ability to work with Vivado. 
-However, the other major new capability which RS2 adds over RapidSmith is that
-it changes RapidSmith's design representation from the Instances and Sites of
-ISE's XDL representation to the Cells and BELs of Vivado.   This is a
-significant change as it exposes the actual design and device in a way that RapidSmith never
-did, opening up new CAD research opportunities which were difficult
-to perform using Rapidsmith.
+The other new major capability of RS2 is that it changes RapidSmith's design
+representation. Instead of using XDL's view of a design with Instances and
+Sites, RS2 uses Vivado's representation of design with Cells and BELs. This
+is a significant change as it exposes the actual design and device in a way
+that RapidSmith never did, opening up new CAD research opportunities which were
+difficult to perform using Rapidsmith.
        
 \subsection{Who Should Use RS2?}
-RS2 is aimed at anyone desiring to do FPGA CAD research on real Xilinx devices. 
-It is written in Java. It also depends on some understanding of Xilinx FPGAs,
-Vivado, and Tcl.  However, the goal is that this documentation provides
-sufficient background and detail to help bring developers up to speed on the
-needed topics.    
-
-RS2 by no means is a Xilinx Vivado replacement and cannot be used without a
-valid and current license to a Xilinx tools installation (RS2 cannot generate
-bitstreams for a design, for example).     
+RS2 is aimed at anyone desiring to do FPGA CAD research on real Xilinx devices
+available in Vivado. As such, users of RS2 should have some understanding of
+Xilinx FPGA architecture, the Vivado design suite, and the Tcl programming
+language. However, one goal of this documentation is to provide sufficient
+background and detail to help bring developers up to speed on the needed
+topics. RS2 is by no means a Xilinx Vivado replacement. It cannot be used
+without a valid and current license to a Vivado installation (RS2
+cannot generate bitstreams for example).
 
 \subsection{Why RS2?}
-The Xilinx-provided Tcl interface into Vivado, in theory, provides all that is
-needed to create any kind of CAD tool desired to augment the capabilities
-provided by Vivado.  In practice there are a number of problems with that.
-First, Tcl is slow --- far too slow to execute a router for example.  Also the
-Xilinx Tcl interface does not manage memory well.  In our experience,
-long-running scripts eventually cause the system to run out of memory. 
-Brad White's MS work also determined
-that not 100\% of the device information required to do arbitrary CAD
-manipulations is accessible through Tcl.  As a result, additional tools (and
-some small amount of manual work) are required to provide the user (and CAD
-tools they might like to write) with all the physical details on Xilinx parts.
-Simply put, some information is not available through the Tcl interface. 
-Finally, the ability to export and import designs to/from Vivado and operate
-on them outside Vivado using a modern high-level language such as Java is a
-very useful capability.
+The Xilinx-provided Tcl interface into Vivado is a great addition to the tool
+suite. It can be used to do a variety of useful things including scripting
+design flows, querying device and design data structures, and  modifying placed
+and routed designs. In theory, the Tcl interface provides all of the
+functionality needed in order to create any type of CAD tool as a plugin to the
+normal Vivado tool flow. However, there are a few issues in TCL that motivate
+the use of external CAD tool frameworks such as RS2. These include:
+\begin{itemize}
+  \item Tcl, being an interpreted language, is slow. It is far too slow to
+  implement complex algorithms such as PathFinder. Compiled and
+  managed runtime languages are a better option in terms of performance.
+  \item Tcl is hard to program in. TCL is not an object oriented language, and
+  so writing complex algorithms are difficult since Object-Oriented language
+  constructs do not exist. That being said, TCL is great for writing automation
+  scripts.
+  \item There are some memory issues in Vivado's Tcl interface. In our
+  experience, long-running scripts eventually cause the system to run out of
+  memory even if they are not doing anything interesting.
+  \item Vivado's TCL interface does not offer a complete device representation
+  (determined by Brad White's MS work). Most notably, a user cannot gain
+  access to sub-site wire objects through the Tcl interface. This limits the CAD
+  tools that can be created in Tcl, but this additional information can be added
+  to external tools with some manual work.
+\end{itemize}
 
-RS2 (in conjunction with Tincr which is described in a later section of this
-document) takes care of all of the generation of the FPGA part information that
-is required by CAD tools. It also takes care of exporting/importing designs from
-and to Vivado along with a myriad number of fairly arcane details associated
-with that process.  In addition, RS2 creates special device files from the XDLRC
-files produced by Tincr and provides a nice API into those physical device
-details.  All of this enables researchers to have more time to focus on what
-matters most: their research of new ideas and algorithms.
+\noindent
+In short, the ability to export designs out of Vivado, manipulate them with more
+powerful languages such as Java, and then import the design back into Vivado
+is a very useful capability.
+
+RS2 (in conjunction with Tincr which is described in \autoref{sec:tincr})
+abstracts this process into a few easy-to-use function calls. Generating FPGA
+part information, importing and exporting \pgm{all aspects} of a design, and
+dealing with other fairly arcane details is made mostly transparent to the
+user. RS2 and Tincr provide a nice API into equivalent Vivado device and design
+data structures. All of this enables researchers to have more time to focus on what matters
+most: the research of new ideas and algorithms.
 
 \subsection{Which Xilinx Parts does RS2 Support?}
 As of the writing of this document, Artix 7 has been tested the most and is
 currently supported in all forms and applications.  In addition, an Ultrascale
 device file was created and demonstrated as a part of Brad White's MS work to
-show that it is possible.  At some point, Ultrascale should be fully supported.
+show that it is possible. At some point, Ultrascale should be fully supported.
 \footnote{An XDL-based import/export capability has also been created and used
 with Virtex 6 devices as a part of Travis Haroldsen's PhD work but that path is
 not being released, documented, or supported.}
@@ -252,22 +275,21 @@ VPR (Versatile Place and Route) has been an FPGA research tool for several years
 and has led to many publications on new FPGA CAD research. It has been a
 significant contribution to the FPGA research community and has grown to be a
 complete FPGA CAD flow for research-based FPGAs. The main difference between
-RapidSmith/RS2 and VPR is that the RapidSmith tools aim to provide the ability
-to target commercial Xilinx FPGAs, providing the ability to exit and re-enter
-the standard Xilinx flow at any point.  All features of commercial FPGAs which
-are accessible via XDL and Vivado's Tcl interface are available in RapidSmith
-and RS2. VPR currently is limited to FPGA features which can be described using
-VPR's architectural description facilities.
+RapidSmith and VPR is that the RapidSmith tools can target commercial Xilinx
+FPGAs, providing the ability to exit and re-enter the standard Xilinx flow at
+any point.  All features of commercial FPGAs which are accessible via XDL and
+Vivado's Tcl interface are available in RapidSmith and RS2. VPR is currently
+limited to FPGA features which can be described using VPR's architectural
+description facilities.
 
 \subsection{Why Java?}
-We have found Java to be an excellent rapid prototyping platform for FPGA CAD
-tools.  The Java libraries are rich with data structures useful for such
-applications and Java eliminates the need to clean up objects in memory.  This
-eliminates the time needed to debug such things, leaving more time for the
-researcher to focus on the real research at hand.  Our experience over the past
-decade is that for student research projects, the lack of memory management
-problems (dangling pointers, memory leaks, etc.) and the associated errors has
-greatly improved our student productivity and led to far more stable CAD tools.
+RS2 is written in Java. We have found Java to be an excellent rapid prototyping
+platform for FPGA CAD tools.  Java libraries are rich with useful data
+structures, and garbage collection eliminates the need to clean up objects in
+memory. This helps reduce the time spent debugging, leaving more
+time for researchers to focus on the real research at hand.  Our experience over
+the past decade is that for student research projects, Java has greatly improved
+student productivity and led to far more stable CAD tools.
 
 \pagebreak
 \section{Vivado, RS2, and Tincr}
@@ -304,7 +326,7 @@ Tcl is limited by speed and memory challenges.
 The development of RS2 consisted of three parts.
 
 \subsubsection{Tincr: Integrating Custom CAD Tool Frameworks with the Xilinx 
-Vivado Design Suite} 
+Vivado Design Suite} \label{sec:tincr}
 
 In the first part, the Vivado Tcl capability was investigated to ensure that,
 indeed, it did provide the needed ability to access design and device data and
@@ -401,109 +423,111 @@ Thus, a complete solution involves Vivado, Tincr, and RS2.
 
 \subsection{Installation}
 
-RS2 is available on Github at: \url{https://github.com/byuccl/RapidSmith2}.  
+RS2 is available on Github at:
+{\color{blue}{\url{https://github.com/byuccl/RapidSmith2}}}.
 You can either build RS2 into .class and .jar files for use in any Java
-environment, or build RS2 for use in Eclipse (recommended).
+environment, or configure RS2 to work in an IDE (recommended).
 
 \subsubsection{Requirements for Installation and Use}
 \begin{itemize}
   \item Windows, Linux or Mac OS X all will work (see additional notes below for
   Mac OS X)
-  \item Vivado
+  \item Vivado 2016.2. Later versions of Vivado may work, have not been tested
+  yet. Earlier versions will not work.
   \item JDK 1.8 or later
   \item Tincr 
 \end{itemize}
 
-Tincr is a companion project (\url{https://github.com/byuccl/tincr}) which 
-is used for importing/exporting designs between Vivado
-and RS2.  For getting started (running the example programs on the
-provided sample designs) you will not need it installed.
+Tincr is a companion project
+({\color{blue}{\url{https://github.com/byuccl/tincr}}}) which is used for
+importing/exporting designs between Vivado and RS2.  For getting started (running the example programs on the provided sample designs) you will not need it installed.
 Later, as you  actually start processing your own Vivado designs you will need
-to obtain and install it.  
-
-There are additional dependencies beyond these required for installation but
-they are either provided in the distribution itself or are
-automatically retrieved for you as a part of the installation process. 
-Examples of these additional dependencies include QT Jambi, the BYU Edif Tools,
-etc.
+to obtain and install it. There are additional dependencies beyond these
+required for installation, but they are either provided in the distribution
+itself or are automatically retrieved for you as a part of the installation process. 
+Examples of these additional dependencies include QT Jambi and the BYU Edif
+Tools.
  
-\subsubsection{Steps for Installation For Command Line Usage}
-The first task is to acquire RS2 using git.
-You can acquire the RS2 distribution by executing the following: 
-\vspace{-0.15in}  \begin{code}
-git clone https://github.com/byuccl/RapidSmith2
-\end{code} 
-The second task is to create an environment variable called
-\env{RAPIDSMITH\_PATH} and point it at the RS2 directory thus created. Â This is
-needed so RS2 can find the required device files and other items as it runs.
+\subsubsection{Steps for Installation}
 
-The third task is to build RS2. Â At this point you have two choices: setting up
-RS2 for use with Eclipse or building RS2 manually to generate
-.class and .jar files which you can then use with any Java installation.
-	
-\paragraph{Building for Eclipse}  
-RS2 requires Eclipse Neon or later so install that.Â 
-Then, create an eclipse project by executing one of the following:
-
-\vspace{-0.15in}  \begin{code}
-gradlew antlr eclipse (unix)       
-gradlew.bat antlr eclipse (windows)
-\end{code} 
-Executing these will create an Eclipse \fil{.project} file. Â Once you have done
-this you can import the project into Eclipse by opening Eclipse and selecting: 
-\vspace{-0.15in}  \begin{code}
-Â  Â  File->Open Projects From File System 
-\end{code}
-and pointing it to the RapidSmith2 directory created when you cloned RS2 from
-github above. 
-All of the Java source files will be found in Eclipse under \dir{src/main/java}.
-
-IMPORTANT: Eclipse does not seem to like (and instructions on the web
-discourage) having a git repository being inside its workspace.  Put your git
-repository elsewhere on disk (like \dir{MyDocuments/git}).
-
-\paragraph{Building Manually} 
-Execute one of the following to build RS2: 
-\vspace{-0.15in}  \begin{code}
-Â  Â  Â gradlew build (unix) Â  Â 
-Â  Â  Â gradlew.bat build (windows)
-\end{code}
-This will produce a variety of things, any of which can be added to your
-\env{CLASSPATH} as needed:
-\begin{itemize}
-  \item The resulting RS2 class file directory tree will be found in
-  \dir{build/classes/main}.
-  \item	A jar file of the above RS2 class files can be
-  found in \dir{build/libs}.
-  \item Both tar and zip files can be found in \dir{build/distributions}. They
-  contain a full jar of the RS2 build along with copies of other needed jar
-  files. You should add them all to your \env{CLASSPATH} except the qtjambi ones
-  - just add the qtjambi one for your particular system (note there is no 64-bit
-  qtjambi for windows so use the 32-bit one).
-\end{itemize}
-At this point you should be able to write tools that use RS2.
-
-CAUTION: An obvious thing to try is to mix and match developing in Eclipse but
-then running the resulting apps from the command line.  Just be aware that Eclipse
-puts its compiled .class files in very different places than where the manual
-build process puts its .class and .jar files.  Make sure you understand that
-before you try to combine these two build/execute methods (or better yet, don't
-combine them).
+\begin{enumerate}
+  \item Clone the RS2 repository at
+  {\color{blue}{\url{https://github.com/byuccl/RapidSmith2}}}. If you are not
+  familiar with GitHub, you will need to install Git on your computer, and run the
+  following command in an open terminal: 
+  \begin{code}
+  git clone https://github.com/byuccl/RapidSmith2
+  \end{code} 
+  \noindent This will copy the RS2 repository into a local directory.
+  \item Create a new environment variable called RAPIDSMITH\_PATH, and point it
+  to your local repository of RS2 that you setup in step (1). This is needed so
+  RS2 can find required device files and other items at runtime.
+  \item Build the  RS2 project. RS2 is managed using a gradle build system.
+  To build the project, navigate to your local repository of RS2 and execute one
+  of the following scripts in a terminal:
+  \begin{code}
+	gradlew build (unix)
+	gradlew.bat build (windows)
+  \end{code}
+  The build process could take a few minutes.
+  \item At this point, you have two choices: set up RS2 for use in an IDE, or
+  run RS2 from the command line. Both choices are detailed below.
+  \paragraph{Running from an IDE} The gradle scripts in RS2 currently support
+  setup for both Eclipse and IDEA Java IDEs. This section will detail how to
+  setup the Eclipse environment, but similar steps can be taken for IDEA. If
+  using Eclipse, it is best to use version Eclipse Neon or later. To create a
+  new eclipse project, execute one of the following in a terminal:
+  \begin{code}
+	gradlew antlr eclipse (unix)       
+	gradlew.bat antlr eclipse (windows)
+  \end{code}
+  Executing these will create an Eclipse \fil{.project} file. After the project
+  file has been created, you can import the project into Eclipse by opening
+  Eclipse and selecting:
+  \begin{code}
+	File->Open Projects From File System 
+  \end{code}
+  and pointing it to your RapidSmith2 local repository. All Java source files
+  will be found under \dir{src/main/java}. \pgm{NOTE:} Your RS2 git repository
+  should not be put inside your eclipse workspace. It is better to put it
+  elsewhere, and then import it into your workspace.
+  \paragraph{Building on the Command Line} After step (3) in the installation
+  process, gradlew produces everything that you will need to run RS2 from the
+  command line. The following directories are created: 
+  \begin{itemize}
+    \item \fil{build/classes/main}: This folder contains the RS2 class file
+    directory tree.
+    \item \fil{build/libs}: This folder contains a Jar file of the RS2 class
+    files.
+    \item \fil{build/distributions}: This folder has both .zip and .tar files
+    with contains all Jars needed to run RS2 from the command line. This
+    includes a full jar of the RS2 build alond with copies of dependency Jars
+    (such as QT-Jambi).
+  \end{itemize} 
+  After adding the appropriate .class files or Jars to your \texttt{CLASSPATH},
+  you should be able to run RS2 tools from the command line. If you make any
+  changes to the RS2 code, you will have to rebuild before running the program
+  again (Step 3). \pgm{CAUTION:} An obvious thing to try is to mix and match
+  developing in Eclipse but then running the resulting apps from the command
+  line. Just be aware that Eclipse puts its compiled .class files in very
+  different places than where the gradle build process puts its .class and
+  .jar files. Make sure you understand that before you try to combine these two
+  build/execution methods. Our suggested approach is to choose one or the
+  other, but not both.
+\end{enumerate}
 
 \subsubsection{Additional Notes for Mac OS X Installation}
-\begin{itemize}
-  \item The instructions above require you to set the \env{RAPIDSMITH\_PATH}
-  environment variable.  If running from the command line, the environment
-  variables can be added to your \fil{.bash\_profile} file as in any other
-  UNIX-like system.  However, if using an IDE such as Eclipse, you either need to define
-  the environment variable for every Run Configuration you create you create in
-  Eclipse or you need to add the \env{RAPIDSMITH\_PATH} definition system-wide
-  in OS X.
-  This can be done, but how to do so differs based on what OS X version you are
-  running (and seems to have changed a number of times over the years).  Search
-  the web for instructions for how to do so if you desire.   Hint: you will
-  likely have to edit some \fil{.plist} files.
-\end{itemize}
+
+The instructions above require you to set the \env{RAPIDSMITH\_PATH}
+environment variable.  If running from the command line, the environment
+variables can be added to your \fil{.bash\_profile} file as in any other
+UNIX-like system.  However, if using an IDE such as Eclipse you either need to
+define the environment variable for every Run Configuration you create, or you
+need to add the \env{RAPIDSMITH\_PATH} definition system-wide in OS X. This can
+be done, but how to do so differs based on what OS X version you are running
+(and seems to have changed a number of times over the years). Search the web for
+instructions for how to do so if you desire. \pgm{Hint}: you will likely have
+to edit some \fil{.plist} files.
 
 \begin{figure}[t]
 \centering
@@ -513,7 +537,7 @@ combine them).
 \end{figure}
 
 \subsubsection{Running RS2 Programs}
-Some points to keep in mind:
+Some points to keep in mind while configuring and running RS2 programs:
 \begin{itemize}
   \item The RS2 code base contains a number of assertions which may be helpful  
   as you are developing code.  These are not enabled by default in Java.  To
@@ -522,8 +546,13 @@ Some points to keep in mind:
   of the built-in programs like \pgm{DeviceBrowser}) that are GUI-based, you
   will need to supply an extra JVM switch, \opt{-XstartOnFirstThread}.
   \item A common error when running RS2 programs is failing to have your
-  \env{RAPIDSMITH\_PATH} defined.  If this is the case you will typically get
-  file open failure messages as RS2 tries to load device files and the like.
+  \env{RAPIDSMITH\_PATH} defined.  If this is the case when you try to execute a
+  program, an \texttt{EnvironmentException} will be thrown telling you that you
+  forgot to set the variable.
+  \item If you are running on Windows, only a 32-bit QT Jar file is included in
+  the RS2 repository. This means that you will need to set your JRE to a 32-bit
+  version when running the GUI programs. We are working on updating QT to the
+  latest version, so this will no longer be an issue.
 \end{itemize}
 
 \subsubsection{Testing Your Installation}
@@ -542,7 +571,7 @@ want to zoom out to see the entire chip layout.
 
 \subsection{Device Files For Use With RS2}
 Device files for one part (the {\em xc7a100tcsg324}) are included in the
-distribution so you can immediately start working with RS2 using this part (initially, it
+distribution so you can immediately start working with RS2 (initially, it
 will be the only device available when you run the \pgm{DeviceBrowser} program
 above).  The device files for this part can be found in the
 \dir{\${RAPIDSMITH\_PATH}/devices/artix7} directory. If you desire to work with
@@ -556,8 +585,8 @@ additional parts, follow the instructions found in the file
 This section is intended to give a brief introduction to Xilinx FPGA
 architecture and terminology. The terminology introduced here is consistent
 with the terminolgy used in the Vivado Design Suite. If you are already familiar
-with Xilinx FPGA devices, then you can skip to section \ref{devicesRS2}. As you
-read through this section, it may be helpful to open a sample device in Vivado's
+with Xilinx FPGA devices, then you can skip to \autoref{devicesRS2}. 
+As you read through this section, it may be helpful to open a sample device in Vivado's
 Device Browser. To do this, open a new command prompt and run Vivado in Tcl mode
 (``vivado -mode tcl''). Then, run the following commands in the Vivado prompt:
 
@@ -575,8 +604,9 @@ needed.
 Conceptually, a Xilinx FPGA can be thought of as a two dimensional
 array of \cls{Tile}s. A \cls{Tile} is a template section within a FPGA that
 performs a specific function (say, implementing logic equations). Templates are
-then duplicated across the device (all copies are identical) and different \cls{Tile} types are wired together. As an example, figure
-\ref{fig:tileExample} displays three types of template \cls{Tile}s in an Artix7 part.
+then duplicated across the device (all copies are identical) and different
+\cls{Tile} types are wired together. As an example, \autoref{fig:tileExample}
+displays three types of template \cls{Tile}s in an Artix7 part.
 
 \begin{figure}[H]
  \centering
@@ -617,11 +647,11 @@ Xilinx FPGA.}
 \end{figure}
 
 Each \cls{Tile} can contain one or more \cls{Primitive Site}s (often shortened
-to \cls{Site}). As figure \ref{fig:tileExample} shows, CLBLL \cls{Tile}s have
-two \cls{Site}s, INT\_L \cls{Tile}s have one \cls{Site}, and VBRK \cls{Tile}s
+to \cls{Site}). As \autoref{fig:tileExample} shows, CLBLL \cls{Tile}s
+have two \cls{Site}s, INT\_L \cls{Tile}s have one \cls{Site}, and VBRK \cls{Tile}s
 have none. A \cls{Site} is the part within a \cls{Tile} that actually performs
 its ``useful'' function. The remainder of the \cls{Tile} is used to wire signals
-to/from its \cls{Site}s. Figure \ref{fig:site} shows a SLICEL, one of the
+to/from its \cls{Site}s. \autoref{fig:site} shows a SLICEL, one of the
 \cls{Site}s within a CLBLL \cls{Tile}. As the figure shows, there are three main
 components to \cls{Site}s in Xilinx FPGAs:
 
@@ -649,7 +679,7 @@ FPGA components are connected together using metal \cls{Wire}s (called
 being routed, and a string of enabled \cls{PIP}s uniquely identify the
 used \cls{Wire}s of a physical route. \cls{PIP}s are most commonly
 found in Switchbox \cls{Tile}s, and enable a single wire to be routed to many
-different locations in the FPGA. Figure \ref{fig:switchboxPIP} shows an
+different locations in the FPGA. \autoref{fig:switchboxPIP} shows an
 example of a switchbox.
 
 \begin{figure}[H]
@@ -667,8 +697,8 @@ In the original RapidSmith, the \cls{Device} architecture stopped at the
 \cls{Site} level. A \cls{Site} was considered a black box who could be
 configured using string attributes, but the actual components were unknown.
 RapidSmith 2 extends the \cls{Device} architecture to include all components
-\pgm{within} a \cls{Site} as well. Figure \ref{fig:deviceDataStructures} shows
-the new data structure hierarchy, which can be found in the {\em
+\pgm{within} a \cls{Site} as well. \autoref{fig:deviceDataStructures}
+shows the new data structure hierarchy, which can be found in the {\em
 edu.byu.ece.rapidSmith.device} package.
 
 \begin{figure}[H]
@@ -687,12 +717,12 @@ Tcl interface have a direct map to a class in RapidSmith (such as a \cls{Tile}).
 Because of this, most RapidSmith data structures represent a straightforward
 part of a Xilinx FPGA, The reader is referred to the documentation in the
 source code to learn more about each data structure. Also, The
-\pgm{DeviceBrowser} and \pgm{DeviceAnalyzer} programs described in section
-\ref{examples} illustrate how to load and browse a device down to the
+\pgm{DeviceBrowser} and \pgm{DeviceAnalyzer} programs described in 
+\autoref{examples} illustrate how to load and browse a device down to the
 \cls{Tile} and \cls{Site} levels.
 
 \subsubsection{Templates}
-As figure \ref{fig:deviceDataStructures} shows, there are several template
+As \autoref{fig:deviceDataStructures} shows, there are several template
 classes in RapidSmith. Template classes are used to specify the configuration of
 certain structures only once, and then reuse the configuration across
 identical objects. The usefulness of templates is best shown with an example. In
@@ -732,13 +762,14 @@ return a \cls{TileWire} or \cls{SiteWire} (wrapped in a generic \cls{Wire}
 object) to the user instead of an integer wire enumeration.
 
 \subsubsection{Wire and Connection Interfaces}
-As figure \ref{fig:deviceDataStructures} shows, there are two classes that
-inherit the \cls{Wire} interface (described in section \ref{wires}) and three
-classes that inherit the \cls{Connection} interface (described in section
-\ref{otherConns}). In general, most methods in RapidSmith return the generic
-interface instead of the subclasses. When creating CAD tools in RapidSmith, it
-is suggested that the user use these interfaces. Several of the examples
-referenced in section \ref{examples} demonstrate the use of these interfaces.
+As \autoref{fig:deviceDataStructures} shows, there are two classes that
+inherit the \cls{Wire} interface (described in \autoref{wires}) and
+three classes that inherit the \cls{Connection} interface (described in 
+\autoref{otherConns}). In general, most methods in RapidSmith return the
+generic interface instead of the subclasses. When creating CAD tools in
+RapidSmith, it is suggested that the user use these interfaces. Several of the
+examples referenced in \autoref{examples} demonstrate the use of these
+interfaces.
 
 \subsection{Device Files}
 The \cls{Device} data structures in RapidSmith are created from XDLRC files.
@@ -759,7 +790,7 @@ in some way. If these don't apply to you, then go ahead and skip this section.
 XDLRC files are textual descriptions of Xilinx FPGA devices and can be very
 verbose (which is why they get so large). This section highlights the main parts
 of an XDLRC file with accompanying images. As you will see, much of the
-terminology is the same as section \ref {fpgaArch}.
+terminology is the same as \autoref{fpgaArch}.
 
 \bigbreak \noindent
 \begin{large}
@@ -775,7 +806,7 @@ terminology is the same as section \ref {fpgaArch}.
 
 \noindent
 A tile in an XDLRC file corresponds to the same thing as the \cls{Tile}
-described in section \ref{fpgaArch}. Each tile is declared with a ``(tile''
+described in \autoref{fpgaArch}. Each tile is declared with a ``(tile''
 directive as shown above followed by the unique row and column index of where
 the tile fits into the grid of tiles found on the FPGA. The tile declaration
 also contains a name followed by a type with the final number being the number
@@ -826,9 +857,9 @@ to denote connectivity. The connections are not programmable, but hard wired
 into the FPGA. Wire portions of the XDLRC file are included in the definition of
 every tile (even if the same tile type has already been printed), which has a
 big impact on the final size of XDLRC files. How RapidSmith handles wire
-duplication is described in section \ref{wireEnum}. The \cls{WireConnection}
-objects that are created from this part of the XDLRC are described in section
-\ref{wireConnSection}.
+duplication is described in \autoref{wireEnum}. The \cls{WireConnection}
+objects that are created from this part of the XDLRC are described in
+\autoref{wireConnSection}.
 
 \bigbreak \noindent
 \begin{large}
@@ -849,8 +880,8 @@ and repeats the tile name for reference. It specifies two wires by name that
 both exist in that same tile (``BEST\_LOGIC\_OUTS0'' and ``BYP\_INT\_B5'') and
 declares that the wire ``BEST\_LOGIC\_OUTS0'' can drive the wire
 ``BYP\-\_INT\_B5''. A collection of these PIPs in a net define how a net is
-routed and is consistent with saying that those PIPs are “turned on.” Section
-\ref{wireConnSection} describes in detail how PIPs are represented in
+routed and is consistent with saying that those PIPs are “turned on.”
+\autoref{wireConnSection} describes in detail how PIPs are represented in
 RapidSmith.
 
 \bigbreak \noindent
@@ -864,8 +895,8 @@ components found within a \cls{Primitive} \cls{Site} type (a SLICEL for example)
 and how they are connected. \cls{BEL}s, \cls{Site} \cls{Pins}, \cls{Site}
 \cls{PIP}s, configuration options, and route-throughs are the elements that are
 most commonly found within these parts of the file. An example of a complete
-primitive definition file of type BUFHCE can be seen in figure
-\ref{fig:xdlrcDef}. The sub-site data structures in RapidSmith (\cls{Bels},
+primitive definition file of type BUFHCE can be seen in
+\autoref{fig:xdlrcDef}. The sub-site data structures in RapidSmith (\cls{Bels},
 \cls{SiteWire}s, etc.) are built by parsing this section of the XDLRC file.
 
 \begin{figure}[H]
@@ -874,15 +905,6 @@ primitive definition file of type BUFHCE can be seen in figure
 	\caption{Primitive Def sections of XDLRC files}
 	\label{fig:xdlrcDef}
 \end{figure}
-
-\subsubsection{Installing New Device Files}
-By default, RapidSmith includes an Artix7 {\em xc7a100tcsg324} part.
-This part has been well tested, and is a good place to start if you are
-learning how to use RapidSmith. However, different devices can also be created.
-This section describes the necessary steps to create new device files.
-
-\pgm{TODO section}.
-
 
 \pagebreak
 \section{Designs in RS2}
@@ -1486,29 +1508,37 @@ Some additional points about placement to be aware of include:
 
 \pagebreak
 \section{Routing in RS2} \label{sec:routing}
+After placement, all \cells of a design have been mapped to \bels, and their
+corresponding \cellpins mapped to \belpins. The next (and final) step of the
+FPGA implementation flow is to physically wire together the used \belpins. This
+is known as routing. Routing involves taking each logical \net of a design,
+determining the \belpins they are connected to (based on the \cellpins), and
+finding a list of physical wires that electrically connect the pins together.
+This section details how routing is done in RS2.
 
 \subsection{Wires and WireConnections} \label{wireConnSection}
 Routing in RapidSmith is done using \cls{Wire} objects, which are described in
-section \ref{wireSection}. \cls{Wire}s are uniquely identified by their
+\autoref{wireSection}. \cls{Wire}s are uniquely identified by their
 corresponding tile and wire name (i.e. tile1/wire1), and are connected through
 \cls{WireConnection} objects. There are two types of wire connections:
 
 \begin {enumerate}
   \item \pgm{PIP Connections}: Connect two different wires through a
   Programmable Interconnect Point. Most PIP connections are found in
-  switchbox tiles of an FPGA part (as shown in Figure \ref{fig:switchboxPIP}).
+  switchbox tiles of an FPGA part (as shown in \autoref{fig:switchboxPIP}).
   These types of connections are important to FPGA routing, because they
   dynamically configure the routing network for a given design.
    
   \item \pgm{Non-PIP Connections}: Connect the same physical wire across two
   different tiles. In general, wires stretch across multiple tiles in a device, having
-  a different name in each tile. This is demonstrated in figure
-  \ref{fig:wireFigure}. The example wire shown in the figure spans 5
+  a different name in each tile. This is demonstrated in
+  \autoref{fig:wireFigure}. The example wire shown in the figure spans 5
   different tiles, but has a different name in each. To save space, only the
   source and sink wire segments are kept in RapidSmith data structures
   (\texttt{INT\_X1Y1/E2BEG4}, \texttt{INT\_X2Y1/E2MID4}, and
   \texttt{INT\_X3Y1/E2END4}). The source segment is connected to each sink
-  segment through a non-PIP wire connection.
+  segment through a non-PIP wire connection. It is also possible to have non-PIP
+  connections within a \tile, but this is rare.
 \end{enumerate} 
 
 \begin{figure}[H]
@@ -1637,44 +1667,227 @@ while (connIt.hasNext()) {
 \subsection{RouteTrees}
 
 \cls{Wire}s and \cls{WireConnection}s are the fundamental objects used to
-specify and explore routing in RapidSmith, but they need to be encapsulated in
+specify and explore routing in RapidSmith, but they need to be organized in
 a higher-level data structure to give meaning to the route of a \cls{CellNet}.
 In the original RapidSmith, creating this data structure was up to the user.
-RapidSmith 2 introduces the \cls{RouteTree} data structure, which handles
-\cls{Wire}s, \cls{WireConnection}s, and branching while routing a
-\cls{CellNet}. As figure \ref{fig:routeTree} shows, it is a simple tree
-structure that organizes wires and wire connections. The fields in
-a \cls{RouteTree} include:
-
-\begin{itemize}
-  \item A link to the the parent \cls{RouteTree}
-  \item The \cls{Connection} from the parent tree to the current tree
-  \item A list of sink \cls{RouteTree} children
-  \item A cost field for routers 
-\end{itemize}
-
-\noindent
-When a design is imported from Vivado, the routing information is representated
-using \cls{Route\-Tree}s. On design export, the \cls{RouteTree} for each
-\cls{CellNet} is traversed and converted into a Vivado ROUTE string. A user can
-use custom data structures to route a design, but it needs to be
-converted to an equivalent RouteTree data structure before exporting the
-design to Vivado. The \pgm{DesignAnalyzer} example demonstrates how to
-iterate through a \cls{RouteTree}. The \pgm{AStarRouter} and \pgm{HandRouter}
-examples demonstrate how to build a \cls{RouteTree}.
+RapidSmith 2 introduces the \cls{RouteTree}, which can be see in
+\autoref{fig:routeTreeDS}.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.65\columnwidth]{routeTree}
-\caption{A DOT file representation of the RapidSmith2 RouteTree data structure.
-Nodes represent \cls{Wire}s, red edges represent \cls{PIP} wire connections, and
-black edges represent non-PIP wire connections. This specific RouteTree was created from the \pgm{AStarRouter}
-example.}
+\includegraphics[width=0.8\columnwidth]{routeTreeDS.eps}
+\caption{Visual representation of the \cls{RouteTree} data structure.}
+\label{fig:routeTreeDS}
+\end{figure}
+
+\noindent
+As the figure shows, a \cls{RouteTree} is a simple tree data structure. Each
+node in the tree represents a physical wire, and is connected to other nodes
+(wires). Edges in the tree represent wire connections (i.e. how one wire
+connects to another). A \cls{RouteTree} can also be conceptually thought of as
+a graph, with a single ``starting'' node and several ``sink'' nodes. A
+\cls{RouteTree} node contains the following members:
+
+\begin{itemize}
+  \item \pgm{Wire}: The physical \cls{Wire} object that the \cls{RouteTree} node
+  represents. This can be either a \cls{TileWire} or \cls{SiteWire}.
+  \item \pgm{Source}: A link to the the parent \cls{RouteTree} node 
+  \item \pgm{Connection}: The \cls{Connection} taken from the \pgm{parent}
+  RouteTree node to reach the \pgm{current} RouteTree node. In other words, it
+  is the \cls{WireConnection} object that was taken from the parent wire to reach the current wire.
+  \item \pgm{Sinks}: A list of child nodes. There is no limit
+  to how many children a \cls{RouteTree} node can have.
+  \item \pgm{Cost} (not shown): An optional cost field for routers 
+\end{itemize}
+
+\noindent
+A complete \cls{RouteTree} specifies how the source of a
+\cellnet is physically connected to all of its sinks. \autoref{fig:routeTree}
+shows an example of a complete \cls{RouteTree} in RapidSmith. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.65\columnwidth]{routeTree.eps}
+\caption{A visual representation of a RapidSmith2 RouteTree. Nodes represent
+\cls{Wire}s, red edges represent \cls{PIP} wire connections, and black edges
+represent non-PIP wire connections. This specific RouteTree was created from
+the \pgm{AStarRouter} example.}
 \label{fig:routeTree}
 \end{figure}
 
-\subsection{Three Part Routing}
+\noindent
+In this case, the \cellnet that is being routed has once source pin, and two
+sink pins. The source pin is connected to wire ``CLBLM\_L\_X8Y97/CLBLM\_L\_DQ'',
+and the sink pins are connected to the wires ``CLBLM\_R\_X1Y97/CLBLM\-\_M\_A6''
+and ``CLBLM\-\_R\_X11Y97/CLBLM\_M\_AX''. Starting from the source, wires are
+traversed downward (via wire connections) until the target wires are reached.
+\autoref{code:routeTree} demonstrates the basic usage of \cls{RouteTree}s in
+RapidSmith. The \pgm{DesignAnalyzer}, \pgm{AStarRouter}, and \pgm{HandRouter}
+examples described in \autoref{examples} also demonstrate how to traverse and
+build a \cls{RouteTree}.
 
+\begin{lstlisting}[caption=Building a RouteTree,
+label=code:routeTree] 
+// Find a Wire to start the RouteTree at
+Site site = device.getSite("SLICE_X5Y84");
+SitePin pin = site.getSitePin("DQ");
+Wire startWire = sink.getExternalWire();
+
+// Create the first node in the RouteTree 
+Queue<RouteTree> rtQueue = new LinkedList<RouteTree>();
+RouteTree start = new RouteTree(startWire);
+rtQueue.add(start);
+
+// Build up the RouteTree somehow 
+while (!amDone()) {
+	RouteTree current = rtQueue.poll();
+	Wire wire = route.getWire();
+
+	for (Connection conn : wire.getWireConnections()) {
+		// add qualified connections to the RouteTree
+		if (isQualified(wire)) {
+			RouteTree tmp = current.addConnection(conn);
+			rtQueue.add(tmp);
+		}
+	}
+}
+
+\end{lstlisting}
+
+When a design is imported from Vivado, the routing information is parsed and
+loaded into \cls{Route\-Tree}s for each \cellnet. On design export, the
+\cls{RouteTree} for each \cls{CellNet} is traversed and converted into a Vivado
+ROUTE string. A user can use custom data structures to route a design, but it
+needs to be \pgm{converted to an equivalent RouteTree data structure} before
+exporting the design to Vivado.  
+
+\subsection{Three Part Routing}
+In RapidSmith 2, there are three sections to a routed  \cellnet. 
+
+\begin{enumerate}
+  \item The portion of the net that starts at the source \belpin, and is routed
+  to an output \sitepin. This part of the route exists completely inside of
+  \site boundaries.
+  \item The portion of the net that starts at the output \sitepin of part (1),
+  and is routed to several sink \sitepins. This part of the route is
+  called the ``INTERSITE'' route because it connects \sites together. A typical
+  router is responsible for routing this section of the net\footnote{VCC and
+  GND nets don't follow this pattern. The only difference for VCC and GND is
+  that they can have multiple intersite nets.}.
+  \item The portion of the net that start at an input \sitepin from part (2),
+  and is routed to a sink \belpin. Since there can be several sink pins in a
+  \cellnet, this section of the net can have more than one component. This part
+  of the route also exists completely inside of \site boundaries. 
+\end{enumerate}
+
+\noindent \autoref{fig:threePartRouting} shows an example of the three parts of
+a routed \cellnet.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\columnwidth]{threePartRouting.png}
+\caption{The three sections of a RapidSmith route.}
+\label{fig:threePartRouting}
+\end{figure}
+
+\noindent 
+There is a \routeTree object associated with each section of the
+three-part routing. A source \routeTree represents the orange wires in the
+figure above (part 1). An intersite \routeTree represents the green wires in the
+figure above (part 2). A list of sink \routeTrees represents the purple
+wires in the figure above (part 3, with a different \routeTree object for each
+\site). It is important to note that INTRASITE nets only have a source
+\routeTree because they are completely contained within a \site.
+\autoref{code:threePartRouting} demonstrates how to utilize three part routing
+in RapidSmith. When a design is imported into RapidSmith, the routing sections
+of each \cellnet are created automatically.
+
+\begin{lstlisting}[caption=Three-part routing in RapidSmith,
+label=code:threePartRouting]
+// Get a handle to a routed net in the design 
+CellNet net = design.getNet("myNet");
+
+// Handling the source RouteTree
+RouteTree source = net.getSourceRouteTree();
+net.setSourceRouteTree(createSourceRoute());
+
+// Handling the intersite RouteTree
+RouteTree intersite = net.getIntersiteRouteTree();
+net.addIntersiteRouteTree(createIntersiteRoute());
+
+// Iterate over a list of sink RouteTrees
+for (RouteTree rt : net.getSinkSitePinRouteTrees()) {
+	// do something with the RouteTree
+}
+
+// Or, get a RouteTree based on a SitePin
+for(SitePin sitePin : net.getSitePins()) {
+	if (sitePin.isInput()) {
+		RouteTree sinkTree = net.getSinkTree(sitePin);
+		// do something with the RouteTree
+	}
+}
+
+// Add a new sink RouteTree that starts at a SitePin
+
+net.addSinkRouteTree(sitePin, createSinkRouteTree(sp));
+\end{lstlisting}
+
+\subsection{Routing in Vivado}
+The reason a three-part routing distinction is necessary in RapidSmith, is due
+to how routing is represented in Vivado. Inside \site boundaries, a route is
+represented using \site \pips. A string of enabled \pips determines what pins
+are connected together within the \site. Between \site boundaries, a route is
+instead represented using wires. The wires are formatted into a Vivado ROUTE
+string, which uniquely specifies the intersite route for a net. The three-part
+routing representation makes this distinction explicit to the users of
+RapidSmith (it also makes import/export easier). When a design is exported from
+Vivado, the intrasite portions of a net are exported as \site \pips, and the
+intersite portion of the net is exported as wires.
+
+\begin{lstlisting}[numbers=none, keywordstyle=, stringstyle=]
+% An example of a string of used site pips in Vivado
+{IUSED:0 IBUFDISABLE_SEL:GND INTERMDISABLE_SEL:GND}
+
+% An example of a Vivado ROUTE string
+ { CLBLL_LL_AQ CLBLL_LOGIC_OUTS4  { NW6BEG0 NE2BEG0 WR1BEG1 IMUX_L34
+IOI_OLOGIC0_D1 LIOI_OLOGIC0_OQ LIOI_O0 }  IMUX_L1 CLBLL_LL_A3 }  
+\end{lstlisting}
+
+\subsection{IntrasiteRouting}
+On design import, the \site \pip information extracted from Vivado is stored
+into RapidSmith data structures, and used to resconstruct the three-part
+routing view. This gives the user two options when dealing with intrasite
+routing in RapidSmith: (1) use the three-part routing data structures, or (2)
+use the set of enabled \site \pips that exist in each \site. It is up to user
+preference for which representation to use when writing a CAD tool, but in
+order to export a design back into Vivado the three-part routing data
+structures need to be converted to \site \pips and assigned to their
+corresponding \site. \autoref{code:sitePips} demonstrates how this is
+currently done. This step needs to be taken \pgm{only when you have modified the
+intrasite routing} for a \site. We are working on improving the API for \site
+\pips, and creating a way to automate conversion from three-part routing to
+\site \pip information.
+
+\begin{lstlisting}[caption=Configuring Site Pips,
+label=code:sitePips]
+// Get a handle to a Design and a Site
+CellDesign design = tcp.getDesign();
+Device device = tcp.getDevice();
+Site site = device.getSite("SLICE_X5Y84");
+
+// Get a list of used site wires somehow (this is up to you)
+Set<Wire> usedSiteWires = getUsedWires(site);
+
+// Convert the list of wires to their integer enumeration
+Set<Integer> usedPipWires = usedSiteWires.stream()
+										 .map(w -> w.getWireEnum())
+										 .collect(Collectors.toSet());
+
+// Set the used site pips with the design class
+design.setUsedSitePipsAtSite(site, usedPipWires);
+
+\end{lstlisting}
 
 \pagebreak
 \section{Importing/Exporting Designs Between Vivado and RS2} \label{sec:import}
@@ -1881,9 +2094,9 @@ Besides their use in implementing logic equations, LUT BELs can also act as
 signal routethroughs. In Vivado, a LUT is marked as a  routethrough when its
 configuration equation (CONFIG.EQN) maps the value of a single input pin
 directly to the output pin. These LUTs are not explicitly represented in the
-logical netlist because there is no cell placed on the corresponding BEL. Figure
-\ref{fig:routethroughs} shows two examples of LUTs in Vivado that are configured
-as routethroughs.
+logical netlist because there is no cell placed on the corresponding BEL. 
+\autoref{fig:routethroughs} shows two examples of LUTs in Vivado that are
+configured as routethroughs.
 
 \begin{figure}[h]
   \centering
@@ -2126,6 +2339,15 @@ bitstream packages have not been tested beyond Virtex 6.  The authors would be
 interested in upgrading RapidSmith's bitstream functionality to device families
 beyond Virtex 6 if users create it and are willing to contribute it to us for
 inclusion.
+
+\pagebreak
+\section{Installing New Device Files}
+By default, RapidSmith includes an Artix7 {\em xc7a100tcsg324} part.
+This part has been well tested, and is a good place to start if you are
+learning how to use RapidSmith. However, different devices can also be created.
+This section describes the necessary steps to create new device files.
+
+\pgm{TODO section}.
 
 \pagebreak
 \section{Legal and Dependencies}

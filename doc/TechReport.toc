@@ -2,7 +2,7 @@
 \contentsline {subsection}{\numberline {1.1}What is RapidSmith 2?}{4}{subsection.1.1}
 \contentsline {subsection}{\numberline {1.2}Who Should Use RS2?}{4}{subsection.1.2}
 \contentsline {subsection}{\numberline {1.3}Why RS2?}{4}{subsection.1.3}
-\contentsline {subsection}{\numberline {1.4}Which Xilinx Parts does RS2 Support?}{4}{subsection.1.4}
+\contentsline {subsection}{\numberline {1.4}Which Xilinx Parts does RS2 Support?}{5}{subsection.1.4}
 \contentsline {subsection}{\numberline {1.5}How is RS2 Different than VPR and VTR?}{5}{subsection.1.5}
 \contentsline {subsection}{\numberline {1.6}Why Java?}{5}{subsection.1.6}
 \contentsline {section}{\numberline {2}Vivado, RS2, and Tincr}{6}{section.2}
@@ -17,9 +17,9 @@
 \contentsline {section}{\numberline {3}Getting Started}{8}{section.3}
 \contentsline {subsection}{\numberline {3.1}Installation}{8}{subsection.3.1}
 \contentsline {subsubsection}{\numberline {3.1.1}Requirements for Installation and Use}{8}{subsubsection.3.1.1}
-\contentsline {subsubsection}{\numberline {3.1.2}Steps for Installation For Command Line Usage}{8}{subsubsection.3.1.2}
-\contentsline {paragraph}{Building for Eclipse}{8}{section*.4}
-\contentsline {paragraph}{Building Manually}{8}{section*.5}
+\contentsline {subsubsection}{\numberline {3.1.2}Steps for Installation}{8}{subsubsection.3.1.2}
+\contentsline {paragraph}{Running from an IDE}{8}{section*.4}
+\contentsline {paragraph}{Building on the Command Line}{9}{section*.5}
 \contentsline {subsubsection}{\numberline {3.1.3}Additional Notes for Mac OS X Installation}{9}{subsubsection.3.1.3}
 \contentsline {subsubsection}{\numberline {3.1.4}Running RS2 Programs}{9}{subsubsection.3.1.4}
 \contentsline {subsubsection}{\numberline {3.1.5}Testing Your Installation}{10}{subsubsection.3.1.5}
@@ -36,7 +36,6 @@
 \contentsline {subsubsection}{\numberline {4.2.4}Wire and Connection Interfaces}{15}{subsubsection.4.2.4}
 \contentsline {subsection}{\numberline {4.3}Device Files}{15}{subsection.4.3}
 \contentsline {subsubsection}{\numberline {4.3.1}Basic Syntax of XDLRC files}{15}{subsubsection.4.3.1}
-\contentsline {subsubsection}{\numberline {4.3.2}Installing New Device Files}{17}{subsubsection.4.3.2}
 \contentsline {section}{\numberline {5}Designs in RS2}{18}{section.5}
 \contentsline {subsection}{\numberline {5.1}Xilinx Netlists}{18}{subsection.5.1}
 \contentsline {subsection}{\numberline {5.2}RS2 Netlist Data Structures}{19}{subsection.5.2}
@@ -52,31 +51,34 @@
 \contentsline {section}{\numberline {7}Routing in RS2}{28}{section.7}
 \contentsline {subsection}{\numberline {7.1}Wires and WireConnections}{28}{subsection.7.1}
 \contentsline {subsection}{\numberline {7.2}Traversing Wire Objects}{28}{subsection.7.2}
-\contentsline {subsection}{\numberline {7.3}Other Types of Connections}{28}{subsection.7.3}
+\contentsline {subsection}{\numberline {7.3}Other Types of Connections}{29}{subsection.7.3}
 \contentsline {subsection}{\numberline {7.4}RouteTrees}{30}{subsection.7.4}
-\contentsline {subsection}{\numberline {7.5}Three Part Routing}{31}{subsection.7.5}
-\contentsline {section}{\numberline {8}Importing/Exporting Designs Between Vivado and RS2}{32}{section.8}
-\contentsline {subsection}{\numberline {8.1}RapidSmith Checkpoints}{32}{subsection.8.1}
-\contentsline {subsubsection}{\numberline {8.1.1}design.info}{32}{subsubsection.8.1.1}
-\contentsline {subsubsection}{\numberline {8.1.2}netlist.edf}{32}{subsubsection.8.1.2}
-\contentsline {subsubsection}{\numberline {8.1.3}placement.rsc}{33}{subsubsection.8.1.3}
-\contentsline {subsubsection}{\numberline {8.1.4}routing.rsc}{33}{subsubsection.8.1.4}
-\contentsline {subsubsection}{\numberline {8.1.5}contraints.rsc}{34}{subsubsection.8.1.5}
-\contentsline {subsection}{\numberline {8.2}Tincr Checkpoints}{34}{subsection.8.2}
-\contentsline {subsection}{\numberline {8.3}Additional Information}{35}{subsection.8.3}
-\contentsline {subsubsection}{\numberline {8.3.1}LUT Routethroughs}{35}{subsubsection.8.3.1}
-\contentsline {subsubsection}{\numberline {8.3.2}Static Source LUTs}{35}{subsubsection.8.3.2}
-\contentsline {subsubsection}{\numberline {8.3.3}Pseudo CellPins}{36}{subsubsection.8.3.3}
-\contentsline {subsection}{\numberline {8.4}Importing and Exporting TCPs}{36}{subsection.8.4}
-\contentsline {section}{\numberline {9}Example Programs}{37}{section.9}
-\contentsline {subsection}{\numberline {9.1}Sample Vivado Designs}{37}{subsection.9.1}
-\contentsline {subsection}{\numberline {9.2}{\textbf {DeviceBrowser}}}{37}{subsection.9.2}
-\contentsline {subsection}{\numberline {9.3}{\textbf {DeviceAnalyzer}}}{38}{subsection.9.3}
-\contentsline {subsection}{\numberline {9.4}{\textbf {ImportExportExample}}}{38}{subsection.9.4}
-\contentsline {subsection}{\numberline {9.5}{\textbf {DesignAnalyzer}}}{38}{subsection.9.5}
-\contentsline {subsection}{\numberline {9.6}CreateDesignExample}{39}{subsection.9.6}
-\contentsline {subsection}{\numberline {9.7}Other Test Programs}{39}{subsection.9.7}
-\contentsline {section}{\numberline {10}Bitstreams in RS2}{40}{section.10}
-\contentsline {section}{\numberline {11}Legal and Dependencies}{41}{section.11}
-\contentsline {section}{\numberline {12}Included Dependency Projects}{42}{section.12}
-\contentsline {section}{\numberline {13}Appendix}{42}{section.13}
+\contentsline {subsection}{\numberline {7.5}Three Part Routing}{32}{subsection.7.5}
+\contentsline {subsection}{\numberline {7.6}Routing in Vivado}{34}{subsection.7.6}
+\contentsline {subsection}{\numberline {7.7}IntrasiteRouting}{34}{subsection.7.7}
+\contentsline {section}{\numberline {8}Importing/Exporting Designs Between Vivado and RS2}{35}{section.8}
+\contentsline {subsection}{\numberline {8.1}RapidSmith Checkpoints}{35}{subsection.8.1}
+\contentsline {subsubsection}{\numberline {8.1.1}design.info}{35}{subsubsection.8.1.1}
+\contentsline {subsubsection}{\numberline {8.1.2}netlist.edf}{35}{subsubsection.8.1.2}
+\contentsline {subsubsection}{\numberline {8.1.3}placement.rsc}{36}{subsubsection.8.1.3}
+\contentsline {subsubsection}{\numberline {8.1.4}routing.rsc}{36}{subsubsection.8.1.4}
+\contentsline {subsubsection}{\numberline {8.1.5}contraints.rsc}{37}{subsubsection.8.1.5}
+\contentsline {subsection}{\numberline {8.2}Tincr Checkpoints}{37}{subsection.8.2}
+\contentsline {subsection}{\numberline {8.3}Additional Information}{38}{subsection.8.3}
+\contentsline {subsubsection}{\numberline {8.3.1}LUT Routethroughs}{38}{subsubsection.8.3.1}
+\contentsline {subsubsection}{\numberline {8.3.2}Static Source LUTs}{38}{subsubsection.8.3.2}
+\contentsline {subsubsection}{\numberline {8.3.3}Pseudo CellPins}{39}{subsubsection.8.3.3}
+\contentsline {subsection}{\numberline {8.4}Importing and Exporting TCPs}{39}{subsection.8.4}
+\contentsline {section}{\numberline {9}Example Programs}{40}{section.9}
+\contentsline {subsection}{\numberline {9.1}Sample Vivado Designs}{40}{subsection.9.1}
+\contentsline {subsection}{\numberline {9.2}{\textbf {DeviceBrowser}}}{40}{subsection.9.2}
+\contentsline {subsection}{\numberline {9.3}{\textbf {DeviceAnalyzer}}}{41}{subsection.9.3}
+\contentsline {subsection}{\numberline {9.4}{\textbf {ImportExportExample}}}{41}{subsection.9.4}
+\contentsline {subsection}{\numberline {9.5}{\textbf {DesignAnalyzer}}}{41}{subsection.9.5}
+\contentsline {subsection}{\numberline {9.6}CreateDesignExample}{42}{subsection.9.6}
+\contentsline {subsection}{\numberline {9.7}Other Test Programs}{42}{subsection.9.7}
+\contentsline {section}{\numberline {10}Bitstreams in RS2}{43}{section.10}
+\contentsline {section}{\numberline {11}Installing New Device Files}{44}{section.11}
+\contentsline {section}{\numberline {12}Legal and Dependencies}{45}{section.12}
+\contentsline {section}{\numberline {13}Included Dependency Projects}{46}{section.13}
+\contentsline {section}{\numberline {14}Appendix}{46}{section.14}

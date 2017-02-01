@@ -531,7 +531,7 @@ public class CellDesign extends AbstractDesign {
 		}
 	}
 
-	public void setUsedSitePipsAtSite(Site ps, HashSet<Integer> usedWires) {
+	public void setUsedSitePipsAtSite(Site ps, Set<Integer> usedWires) {
 		this.usedSitePipsMap.put(ps, usedWires);
 	}
 
