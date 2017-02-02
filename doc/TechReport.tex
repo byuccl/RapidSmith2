@@ -529,13 +529,6 @@ be done, but how to do so differs based on what OS X version you are running
 instructions for how to do so if you desire. \pgm{Hint}: you will likely have
 to edit some \fil{.plist} files.
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.8\columnwidth]{deviceBrowser}
-\caption{\pgm{DeviceBrowser} Sample Display}
-\label{fig:deviceBrowser}
-\end{figure}
-
 \subsubsection{Running RS2 Programs}
 Some points to keep in mind while configuring and running RS2 programs:
 \begin{itemize}
@@ -553,6 +546,13 @@ Some points to keep in mind while configuring and running RS2 programs:
   the RS2 repository. This means that you will need to set your JRE to a 32-bit
   version when running the GUI programs. We are working on updating QT to the
   latest version, so this will no longer be an issue.
+  \item For Linux command line usage, the \env{CLASSPATH} environment variable
+  must point to both the full (uncompressed) RS2 jar in the \dir{build/distributions}
+  folder as well as all the jar files in the \dir{/lib} subdirectory. An example
+  \env{CLASSPATH} could look like this:
+  \vspace{-0.15in}  \begin{code}
+  Â  Â  Â RAPIDSMITH2-SNAPSHOT/*:RAPIDSMITH2-SNAPSHOT/lib/*
+  \end{code}
 \end{itemize}
 
 \subsubsection{Testing Your Installation}
@@ -568,6 +568,13 @@ depending on how you are running RS2 (if running under OS X be sure to provide t
 graphical representation showing the details of a physical FPGA device as shown
 in \autoref{fig:deviceBrowser}.  You may initially be zoomed far in and might
 want to zoom out to see the entire chip layout.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\columnwidth]{deviceBrowser}
+\caption{\pgm{DeviceBrowser} Sample Display}
+\label{fig:deviceBrowser}
+\end{figure}
 
 \subsection{Device Files For Use With RS2}
 Device files for one part (the {\em xc7a100tcsg324}) are included in the
