@@ -77,7 +77,7 @@ public class PseudoCellPin extends CellPin {
 	@Override
 	public String getFullName() {
 		Cell cell = getCell();
-		return (cell == null) ? name : cell.getName() + "." + name ;
+		return (cell == null) ? name : cell.getName() + "/" + name ;
 	}
 
 	@Override
@@ -118,6 +118,11 @@ public class PseudoCellPin extends CellPin {
 	@Override
 	public CellPinType getType() {
 		return pinType;
+	}
+
+	@Override
+	public CellPin getExternalPin() {
+		return null;
 	}
 
 }

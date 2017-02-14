@@ -27,7 +27,6 @@ import edu.byu.ece.rapidSmith.util.Exceptions;
 import edu.byu.ece.rapidSmith.interfaces.vivado.XdcConstraint;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -47,6 +46,8 @@ public class CellDesign extends AbstractDesign {
 	private static final long serialVersionUID = -807318199842395826L;
 	/** This is a list of all the cells in the design */
 	private Map<String, Cell> cellMap;
+	/** This is a list of all internal cell in the design*/
+	private Map<String, Cell> internalCellMap;
 	/** A map used to keep track of all used primitive sites used by the design */
 	private Map<Site, Map<Bel, Cell>> placementMap;
 	/** This is a list of all the nets in the design */
@@ -87,6 +88,7 @@ public class CellDesign extends AbstractDesign {
 
 	private void init() {
 		cellMap = new HashMap<>();
+		internalCellMap = new HashMap<>();
 		placementMap = new HashMap<>();
 		netMap = new HashMap<>();
 		usedSitePipsMap = new HashMap<>();
@@ -101,10 +103,17 @@ public class CellDesign extends AbstractDesign {
 		return properties;
 	}
 
+	/**
+	 * Returns {@code true} if the a {@link Cell} with the specified name
+	 * is in the design, {@code false} otherwise. The cell can be a leaf 
+	 * cell, macro cell, or internal cell. 
+	 * 
+	 * @param fullName Name of a cell
+	 */
 	public boolean hasCell(String fullName) {
 		Objects.requireNonNull(fullName);
 
-		return cellMap.containsKey(fullName);
+		return cellMap.containsKey(fullName) || internalCellMap.containsKey(fullName);
 	}
 
 	public String getUniqueCellName(String proposedName) {
@@ -121,8 +130,7 @@ public class CellDesign extends AbstractDesign {
 	}
 
 	/**
-	 * Returns the cell in this design with the specified name.  In the case of
-	 * molecules, cells are stored using their full hierarchical names.
+	 * Returns the cell in this design with the specified name.  
 	 *
 	 * @param fullName name of the cell to return
 	 * @return the cell, or null if it does not exist
@@ -130,12 +138,16 @@ public class CellDesign extends AbstractDesign {
 	public Cell getCell(String fullName) {
 		Objects.requireNonNull(fullName);
 
-		return cellMap.get(fullName);
+		// first look in the regular cell map
+		Cell firstAttempt = cellMap.get(fullName); 
+		
+		// If it isn't found there, look in the internalCellMap
+		return firstAttempt == null ? internalCellMap.get(fullName) : firstAttempt;
 	}
 
 	/**
 	 * Returns all of the cells in this design.  The returned collection should not
-	 * be modified.
+	 * be modified. It returns the leaf cells and macro cells of the design.
 	 *
 	 * @return the cells in this design
 	 */
@@ -144,19 +156,46 @@ public class CellDesign extends AbstractDesign {
 	}
 	
 	/**
+	 * Returns a flattened view of the cells in the netlist. Macro
+	 * cells are not returned in this list, only leaf and internal cells
+	 * are returned.
+	 */
+	public Stream<Cell> getLeafCells() {
+		return cellMap.values().stream().flatMap(c -> flatten(c));
+	}
+	
+	/**
+	 * Returns a list of only the internal cells of the specified cell. If the input
+	 * cell is not a macro, then a singleton list is returned. The lists are converted to
+	 * streams before returning.
+	 * 
+	 * @param cell {@link Cell} object to flatten
+	 * @return A {@link Stream} of internal cells
+	 */
+	private Stream<Cell> flatten(Cell cell) {
+		return cell.isMacro() ? cell.getInternalCells().stream() : Collections.singletonList(cell).stream();
+	}
+	
+	/**
+	 * Returns a {@link Stream} of all cells in the design that are macro cells.
+	 */
+	public Stream<Cell> getMacros() {
+		return cellMap.values().stream().filter(Cell::isMacro);
+	}
+	
+	/**
 	 * Returns a stream of {@link Cell} objects of the specified type. 
 	 * TODO: Should there be a link to a {@link CellLibrary} in this class?
 	 * 
 	 * @param libCellType Name of the {@link LibraryCell} to filter by
 	 */
-	public Stream<Cell> getCellsOfType(String libCellType, CellLibrary library) {
-		LibraryCell libraryCell = library.get(libCellType);
+	public Stream<Cell> getCellsOfType(LibraryCell libraryCell) {
 		
 		if (libraryCell == null) {
-			Stream.empty();
+			return Stream.empty();
 		}
 		
-		return cellMap.values().stream().filter(c -> c.getLibCell() == libraryCell);
+		return cellMap.values().stream().filter(c -> (c.getLibCell() == libraryCell));
 	}
 
 	/**
@@ -178,7 +217,9 @@ public class CellDesign extends AbstractDesign {
 		Objects.requireNonNull(cell);
 		if (cell.isInDesign())
 			throw new Exceptions.DesignAssemblyException("Cell already in a design.");
-
+		if (cell.isInternal())
+			throw new Exceptions.DesignAssemblyException("Cannot add internal cell to design. Must add parent macro instead.");
+		
 		return registerCell(cell);
 	}
 
@@ -188,13 +229,24 @@ public class CellDesign extends AbstractDesign {
 
 		cell.setDesign(this);
 		cellMap.put(cell.getName(), cell);
+		
+		// add all internal nets when a macro is added to the design
+		if (cell.isMacro()) {
+			for (Cell internal : cell.getInternalCells()) {
+				internalCellMap.put(internal.getName(), internal);
+				internal.setDesign(this);
+			}
+			cell.getInternalNets().forEach(this::addNet);
+		}
+		
 		return cell;
 	}
 
 	/**
-	 * Disconnects and removes the specified cell from this design.
-	 *
-	 * The cell should not be a part of a molecule.
+	 * Disconnects and removes the specified cell from this design. For macro cells,
+	 * all internal nets and cells are also removed from the design. Internal cells
+	 * cannot be removed from the design, an exception will be thrown. Instead,
+	 * remove the parent macro cell. 
 	 *
 	 * @param cell the cell in this design to remove
 	 */
@@ -202,21 +254,37 @@ public class CellDesign extends AbstractDesign {
 		Objects.requireNonNull(cell);
 		if (cell.getDesign() != this)
 			throw new Exceptions.DesignAssemblyException("Cannot remove cell not in the design.");
-
+		if (cell.isInternal()) 
+			throw new Exceptions.DesignAssemblyException("Cannot remove internal cell from the design. Remove the macro parent cell.");
+		
 		removeCell_impl(cell);
 	}
 
 	private void removeCell_impl(Cell cell) {
-		disconnectCell_impl(cell);
+		
 		cellMap.remove(cell.getName());
 		cell.clearDesign();
+		
+		// remove all of the internal cells and nets if a macro cell is removed
+		if (cell.isMacro()) {
+			for (Cell iCell: cell.getInternalCells()) {
+				iCell.clearDesign();
+				unplaceCell_impl(iCell);
+				internalCellMap.remove(iCell.getName());
+			}
+			cell.getPins().stream().filter(CellPin::isConnectedToNet).forEach(p -> p.getNet().disconnectFromPin(p));
+			cell.getInternalNets().forEach(this::removeNet_impl);
+		}
+		else {
+			disconnectCell_impl(cell);
+		}
 	}
 
 	/**
 	 * Disconnects without removing the specified cell from this design.  This is
-	 * accomplished by unplacing the cell and disconnecting all of its pins.
-	 *
-	 * The cell should not be a part of a molecule.
+	 * accomplished by unplacing the cell and disconnecting all of its pins. For macro
+	 * cells, all internal cells are unplaced. Internal cells cannot be disconnected, an
+	 * exception will be thrown. Instead, disconnect the parent macro cell.
 	 *
 	 * @param cell the cell to disconnect from this design
 	 */
@@ -224,13 +292,22 @@ public class CellDesign extends AbstractDesign {
 		Objects.requireNonNull(cell);
 		if (cell.getDesign() != this)
 			throw new Exceptions.DesignAssemblyException("Cannot disconnect cell not in the design.");
-
-		disconnectCell_impl(cell);
+		if (cell.isInternal())
+			throw new Exceptions.DesignAssemblyException("Cannot disconnect internal cell. Disconnet macro cell instead");
+		
+		// for macros, disconnect the sub-cells
+		if (cell.isMacro()) {
+			cell.getInternalCells().forEach(this::unplaceCell_impl);
+			cell.getPins().stream().filter(CellPin::isConnectedToNet).forEach(p -> p.getNet().disconnectFromPin(p));
+		}
+		else { // leaf cell
+			disconnectCell_impl(cell);
+		}
 	}
 
 	private void disconnectCell_impl(Cell cell) {
-		if (cell.isPlaced())
-			unplaceCell_impl(cell);
+
+		unplaceCell_impl(cell);
 
 		// disconnect the cell's pins from their nets
 		for (CellPin pin : cell.getPins()) {
@@ -240,6 +317,12 @@ public class CellDesign extends AbstractDesign {
 		}
 	}
 
+	/**
+	 * Returns {@code true} if the {@link CellNet} with the specified name
+	 * is currently in the design. Internal nets to macros will be returned from this function
+	 * 
+	 * @param netName String name of net to find in the design
+	 */
 	public boolean hasNet(String netName) {
 		Objects.requireNonNull(netName);
 
@@ -259,7 +342,6 @@ public class CellDesign extends AbstractDesign {
 		return newName;
 	}
 
-
 	/**
 	 * Returns the net in this design with the specified name.  Nets of molecules
 	 * are stored using their full hierarchical name.
@@ -273,6 +355,10 @@ public class CellDesign extends AbstractDesign {
 		return netMap.get(netName);
 	}
 
+	/**
+	 * Returns a collection of {@link CellNet}s currently in the design.
+	 * Internal macro nets are included in the list.
+	 */
 	public Collection<CellNet> getNets() {
 		return netMap.values();
 	}
@@ -307,7 +393,7 @@ public class CellDesign extends AbstractDesign {
 			gndNet = net;
 		} 
 		
-		// TODO: should VCC and GND nets be added to the net data structure
+		// TODO: should VCC and GND nets be added to the net data structure?
 		netMap.put(net.getName(), net);
 		net.setDesign(this);
 		
@@ -323,8 +409,10 @@ public class CellDesign extends AbstractDesign {
 		Objects.requireNonNull(net);
 		if (net.getDesign() != this)
 			return;
+		if (net.isInternal())
+			throw new Exceptions.DesignAssemblyException("Cannot remove internal net " + net.getName());
 		if (!net.getPins().isEmpty())
-			throw new Exceptions.DesignAssemblyException("Cannot remove connected net.");
+			throw new Exceptions.DesignAssemblyException("Cannot remove connected net." + net.getName());
 
 		removeNet_impl(net);
 	}
@@ -346,14 +434,18 @@ public class CellDesign extends AbstractDesign {
 	/**
 	 * Disconnects the specified net from this design without removing it.  This
 	 * method unroutes the net and removes it from the netlist of the pins it is on.
-	 *
+	 * Internal nets should not be specified in this function. Internal macro nets
+	 * cannot be disconnected.
+	 * 
 	 * @param net the net to disconnect
 	 */
 	public void disconnectNet(CellNet net) {
 		Objects.requireNonNull(net);
 		if (net.getDesign() != this)
 			throw new Exceptions.DesignAssemblyException("Cannot disconnect net not in the design.");
-
+		if (net.isInternal()) 
+			throw new Exceptions.DesignAssemblyException("Cannot disconnect internal net.");
+		
 		disconnectNet_impl(net);
 	}
 
@@ -382,7 +474,9 @@ public class CellDesign extends AbstractDesign {
 	}
 
 	/**
-	 * Returns the cell at the specified BEL in this design.
+	 * Returns the cell at the specified BEL in this design. Only internal and
+	 * leaf cells will be returned from this function. Macro cells will not be 
+	 * returned since they cannot be placed.
 	 *
 	 * @param bel the BEL of the desired cell
 	 * @return the cell at specified BEL, or null if the BEL is unoccupied
@@ -397,7 +491,9 @@ public class CellDesign extends AbstractDesign {
 	}
 
 	/**
-	 * Returns a collection of cells at the specified site in this design.
+	 * Returns a collection of cells at the specified site in this design. Only internal and
+	 * leaf cells will be returned from this function. Macro cells will not be 
+	 * returned since they cannot be placed.
 	 *
 	 * @param site the site of the desired cells
 	 * @return the instance at site, or null if the primitive site is unoccupied
@@ -437,11 +533,22 @@ public class CellDesign extends AbstractDesign {
 		Map<Bel, Cell> sitePlacementMap = placementMap.get(site);
 		return sitePlacementMap != null && !sitePlacementMap.isEmpty();
 	}
-
+	
+	/**
+	 * Returns a collections of {@link Site}s that currently have
+	 * one or more {@Cell} objects placed there. 
+	 */
 	public Collection<Site> getUsedSites() {
 		return placementMap.keySet();
 	}
 
+	/**
+	 * Returns {@code true} if the specified {@link Cell} can be placed onto
+	 * the specified {@link Bel}.
+	 * 
+	 * @param cell {@link Cell} to place
+	 * @param anchor {@link Bel} to place the cell on
+	 */
 	public boolean canPlaceCellAt(Cell cell, Bel anchor) {
 		List<Bel> requiredBels = cell.getLibCell().getRequiredBels(anchor);
 		return canPlaceCellAt_impl(requiredBels);
@@ -458,6 +565,9 @@ public class CellDesign extends AbstractDesign {
 	/**
 	 * Places the cell at the specified BEL in this design.
 	 * No cells should exist at the specified BEL in this design.
+	 * CellPins are not mapped to BelPins in this function. 
+	 * In general, best placement practices are to wait until the BEL placement
+	 * is finalized, and then apply the pin mappings.
 	 *
 	 * @param cell the cell to place
 	 * @param anchor the BEL where the cell is to be placed
@@ -468,8 +578,10 @@ public class CellDesign extends AbstractDesign {
 		if (cell.getDesign() != this)
 			throw new Exceptions.DesignAssemblyException("Cannot place cell not in the design.");
 		if (cell.isPlaced())
-			throw new Exceptions.DesignAssemblyException("Cannot re-place cell.");
-
+			throw new Exceptions.DesignAssemblyException("Cell is already placed. Cannot re-place cell.");
+		if (cell.isMacro()) 
+			throw new Exceptions.DesignAssemblyException("Cannot place macro cell. Can only place internal cells to the macro.");
+		
 		List<Bel> requiredBels = cell.getLibCell().getRequiredBels(anchor);
 		if (!canPlaceCellAt_impl(requiredBels))
 			throw new Exceptions.DesignAssemblyException("Cell already placed at location.");
@@ -494,8 +606,9 @@ public class CellDesign extends AbstractDesign {
 	}
 
 	/**
-	 * Unplaces the cell in this design.  The cell must be placed in this design
-	 * and not be a part of a relatively-placed molecule.
+	 * Unplaces the specified cell in this design. The input cell can either be a leaf cell,
+	 * or a macro cell. If the specified cell is a macro cell, all sub-cells will be unplaced.
+	 * This function also undoes any pin mappings of the cell. 
 	 *
 	 * @param cell the cell to unplace.
 	 */
@@ -504,37 +617,78 @@ public class CellDesign extends AbstractDesign {
 		if (cell.getDesign() != this)
 			throw new Exceptions.DesignAssemblyException("Cannot unplace cell not in the design.");
 
-		unplaceCell_impl(cell);
+		// for macros, unplace all internal cells
+		if (cell.isMacro()) {
+			cell.getInternalCells().forEach(this::unplaceCell_impl);
+		}
+		else {
+			unplaceCell_impl(cell);
+		}
 	}
 
 	private void unplaceCell_impl(Cell cell) {
-		assert cell.getDesign() == this;
-		assert cell.isPlaced();
-
+		
+		// if the cell is not placed, return
+		if (!cell.isPlaced()) {
+			return;
+		}
+		
 		Site site = cell.getSite();
 		Map<Bel, Cell> sitePlacementMap = placementMap.get(site);
 		sitePlacementMap.remove(cell.getBel());
 		if (sitePlacementMap.size() == 0)
 			placementMap.remove(site);
+		
 		cell.unplace();
+		
+		// undo all cell pin mappings
+		cell.getPins().forEach(CellPin::clearPinMappings);
 	}
 
 	/**
-	 * Unroutes the current design by removing all PIPs.
+	 * Unroutes the INTERSITE portions of all nets currently in the design.
+	 * This function is currently not recommended for use. Further testing is needed.
 	 */
+	@Deprecated
 	public void unrouteDesign() {
-		// Just remove all the PIPs
 		getNets().forEach(CellNet::unroute);
+	}
+	
+	/**
+	 * Unplaces the design. The design is first unrouted. All CellPin to BelPin 
+	 * mappings are undone as well. This function is currently not recommended for use.
+	 * Further testing is needed.   
+	 */
+	@Deprecated
+	public void unplaceDesign() {
+		unrouteDesign();
 
 		for (Cell cell : getCells()) {
-			cell.getPins().forEach(CellPin::clearPinMappings);
+			if (cell.isMacro()) {
+				cell.getInternalCells().forEach(this::unplaceCell_impl);
+			}
+			else {
+				this.unplaceCell_impl(cell);
+			}
 		}
 	}
-
+	
+	/**
+	 * Set the INTRASITE routing of a {@link Site}. If you are modifying the logic within 
+	 * a {@link Site}, this function needs to be called before exporting a design. 
+	 * 
+	 * @param ps {@link Site} to route
+	 * @param usedWires Set of wire enumerations that are used within a site.
+	 */
 	public void setUsedSitePipsAtSite(Site ps, Set<Integer> usedWires) {
 		this.usedSitePipsMap.put(ps, usedWires);
 	}
 
+	/**
+	 * Returns the used wires (as enumerations), of the specified {@link Site}
+	 * 
+	 * @param ps {@link Site} object
+	 */
 	public  Set<Integer> getUsedSitePipsAtSite(Site ps) {
 		return this.usedSitePipsMap.getOrDefault(ps, Collections.emptySet());
 	}
@@ -559,14 +713,8 @@ public class CellDesign extends AbstractDesign {
 	}
 	
 	/**
-	 * Unplaces the design.  The design is first unrouted.
+	 * Creates and returns a deep copy of the current CellDesign.
 	 */
-	public void unplaceDesign() {
-		unrouteDesign();
-
-		getCells().forEach(this::unplaceCell_impl);
-	}
-
 	public CellDesign deepCopy() {
 		CellDesign designCopy = new CellDesign();
 		designCopy.setName(getName());

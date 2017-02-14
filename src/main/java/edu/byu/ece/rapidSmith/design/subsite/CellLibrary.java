@@ -33,6 +33,7 @@ import org.jdom2.input.SAXBuilder;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *  Contains a set of cells for a design.
@@ -43,10 +44,20 @@ public class CellLibrary implements Iterable<LibraryCell> {
 	private LibraryCell gndSource;
 	private FamilyType familyType; 
 
+	/**
+	 * Creates a new Cell Library object
+	 */
 	public CellLibrary() {
 		this.library = new HashMap<>();
 	}
 
+	/**
+	 * Creates a new cell library object, and populates it with the
+	 * XML cell library found at the specified path.
+	 * 
+	 * @param filePath Path to the cell library XML file.
+	 * @throws IOException
+	 */
 	public CellLibrary(Path filePath) throws IOException {
 		this.library = new HashMap<>();
 		
@@ -55,6 +66,35 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		} catch (JDOMException e) {
 			// wrap the JDOMException in a generic parse exception
 			throw new Exceptions.ParseException(e);
+		}
+	}
+	
+	/**
+	 * Parses an XML file which represents MACRO cell objects, creates corresponding
+	 * {@link LibraryMacro} library cells in RapidSmith, and adds them the current
+	 * cell library. This function can be used to augment the default {@link CellLibrary}
+	 * with additional cells.
+	 * 
+	 * @param macroXmlPath {@link Path} to the XML file
+	 */
+	public void loadMacroXML(Path macroXmlPath) throws IOException {
+		SAXBuilder builder = new SAXBuilder();
+		Document doc;
+		try {
+			doc = builder.build(macroXmlPath.toFile());
+		} catch (JDOMException e) {
+			throw new Exceptions.ParseException(e);
+		}
+		
+		// Load all macro library cells into the cell library 
+		Element macrosEl = doc.getRootElement().getChild("macros");
+		
+		List<Element> childrenMacros = macrosEl.getChildren("macro"); 
+		
+		if (childrenMacros != null) {
+			for (Element macroEl : childrenMacros) {
+				loadMacroFromXml(macroEl);
+			}
 		}
 	}
 
@@ -68,8 +108,18 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		
 		Element cellsEl = doc.getRootElement().getChild("cells");
 		Map<SiteType, Map<String, SiteProperty>> sitePropertiesMap = new HashMap<>();
+		// first load the leaf cells
 		for (Element cellEl : cellsEl.getChildren("cell")) {
 			loadCellFromXml(cellEl, sitePropertiesMap);
+		}
+		// then load the macro cells if any exist
+		Element macrosEl = doc.getRootElement().getChild("macros");
+		List<Element> childrenMacros = macrosEl.getChildren("macro"); 
+		
+		if (childrenMacros != null) {
+			for (Element macroEl : childrenMacros) {
+				loadMacroFromXml(macroEl);
+			}
 		}
 	}
 	
@@ -115,7 +165,18 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		add(libCell);
 	}
 
-	private void loadPinsFromXml(Element cellEl, SimpleLibraryCell libCell) {
+	private void loadMacroFromXml(Element macroEl) {
+		
+		String type = macroEl.getChildText("type");
+		LibraryMacro macroCell = new LibraryMacro(type);
+
+		loadInternalCellsFromXml(macroEl, macroCell);
+		loadPinsFromXml(macroEl, macroCell);
+		loadInternalNetsFromXml(macroEl, macroCell);
+		add(macroCell);
+	}
+	
+	private void loadPinsFromXml(Element cellEl, LibraryCell libCell) {
 		List<LibraryPin> pins = new ArrayList<>();
 		Element pinsEl = cellEl.getChild("pins");
 		for (Element pinEl : pinsEl.getChildren("pin")) {
@@ -127,14 +188,58 @@ public class CellLibrary implements Iterable<LibraryCell> {
 				case "input": pin.setDirection(PinDirection.IN); break;
 				case "output": pin.setDirection(PinDirection.OUT); break;
 				case "inout": pin.setDirection(PinDirection.INOUT); break;
-				default: assert false : "unrecognized pin direction";
+				default: throw new Exceptions.ParseException("Unrecognized pin direction while parsing the CellLibrary.xml file: " + pinDirection);
 			}
 			String pinType = pinEl.getChildText("type");
 			pin.setPinType(pinType == null ? CellPinType.DATA : CellPinType.valueOf(pinType));
-			
 			pins.add(pin);
+			
+			// for macro cells, add the internal connection information
+			if (libCell.isMacro()) {
+				List<String> internalPinNames = pinEl.getChild("internalConnections")
+													.getChildren("pinname")
+													.stream().map(el -> el.getText())
+													.collect(Collectors.toList());
+				((LibraryMacro)libCell).addInternalPinConnections(pin, internalPinNames);
+			}
 		}
 		libCell.setLibraryPins(pins);
+	}
+	
+	private void loadInternalCellsFromXml(Element macroEl, LibraryMacro macroCell) {
+		
+		Element cellsEl = macroEl.getChild("cells");
+		
+		for (Element internalEl : cellsEl.getChildren("internal")) {
+			LibraryCell libCell = library.get(internalEl.getChildText("type"));
+			
+			if (libCell == null) {
+				throw new Exceptions.ParseException("Unable to find leaf library cell \"" + internalEl.getChildText("type") + 
+												 "\" in macro cell: \"" + macroEl.getChildText("type") + "\"");
+			}
+			else if (libCell.isMacro()) {
+				throw new Exceptions.ParseException("Nested hierarchy is not supported. Cell: \"" + macroEl.getChildText("type") + "\"");
+			}
+			
+			macroCell.addInternalCell(internalEl.getChildText("name"), (SimpleLibraryCell)libCell);
+		}
+	}
+	
+	private void loadInternalNetsFromXml(Element macroEl, LibraryMacro macroCell) {
+		Element internalNetsEl = macroEl.getChild("internalNets");
+		
+		// only add internal nets to the macro if they exist
+		if (internalNetsEl != null) {
+			
+			for (Element internalNetEl : internalNetsEl.getChildren("internalNet")) {
+				String name = internalNetEl.getChildText("name");
+				List<String> pinNames = internalNetEl.getChild("pins")
+													.getChildren("pinname")
+													.stream().map(el -> el.getText())
+													.collect(Collectors.toList());
+				macroCell.addInternalNet(name, pinNames);
+			}
+		}
 	}
 
 	private void loadPossibleBelsFromXml(
@@ -223,44 +328,100 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		}
 	}
 
+	/**
+	 * Returns the library cell in the cell library that is a VCC source.
+	 * Only one such cell should exist.
+	 */
 	public LibraryCell getVccSource() {
 		return vccSource;
 	}
 
+	/**
+	 * Returns the library cell in the cell library that is a GND source.
+	 * Only one such cell should exist.
+	 */
 	public LibraryCell getGndSource() {
 		return gndSource;
 	}
 
+	/**
+	 * Returns {@code true} if the cell library contains a library cell
+	 * with the specified name. Otherwise, {@code false} is returned.
+	 * 
+	 * @param cellName String name of a library cell (i.e. LUT6)
+	 */
 	public boolean contains(String cellName) {
 		return library.containsKey(cellName);
 	}
 
+	/**
+	 * Returns the {@link LibraryCell} in the cell library with the given
+	 * name.
+	 * 
+	 * @param cellName String name of a library cell (i.e. LUT6)
+	 */
 	public LibraryCell get(String cellName) {
 		return library.get(cellName);
 	}
 
+	/**
+	 * Adds a new @link{LibraryCell} to the cell library.
+	 * 
+	 * @param libraryCell Library Cell to add (can be a macro cell or leaf cell)
+	 * @return The previous library cell of the same name, or {@code null}
+	 * 		if there is no previous library cell of the same name.
+	 */
 	public LibraryCell add(LibraryCell libraryCell) {
 		return library.put(libraryCell.getName(), libraryCell);
 	}
 
+	/**
+	 * Adds a collection of {@link LibraryCell}s to the cell library
+	 * 
+	 * @param libraryCells Collection of {@link LibraryCell}s
+	 */
 	public void addAll(Collection<LibraryCell> libraryCells) {
 		for (LibraryCell cell : libraryCells) {
 			library.put(cell.getName(), cell);
 		}
 	}
-
+	
+	/**
+	 * Removes the {@link LibraryCell} with the specified name
+	 * from the cell library.
+	 * 
+	 * @param cellName String name of a library cell.
+	 */
 	public void remove(String cellName) {
 		library.remove(cellName);
 	}
 
+	/**
+	 * Returns the number of {@link LibraryCell}s currently in the cell library.
+	 */
 	public int size() {
 		return library.size();
 	}
 
+	/**
+	 * Returns all {@link LibraryCell}s in the cell library as
+	 * a generic collection.
+	 */
 	public Collection<LibraryCell> getAll() {
 		return library.values();
 	}
 
+	/**
+	 * Returns the Xilinx device family type that this cell library
+	 * is valid for (i.e. Artix7, Ultrascale, etc.).
+	 */
+	public FamilyType getFamilyType() {
+		return this.familyType;
+	}
+	
+	/**
+	 * Creates and returns an iterator for the cell library.
+	 */
 	@Override
 	public Iterator<LibraryCell> iterator() {
 		return library.values().iterator();

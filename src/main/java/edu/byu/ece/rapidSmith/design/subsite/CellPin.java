@@ -31,6 +31,7 @@ import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelId;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.PinDirection;
+import edu.byu.ece.rapidSmith.util.Exceptions;
 
 /**
  *  A pin on a Cell. CellPins connect cells to nets and map to BelPins.
@@ -96,6 +97,13 @@ public abstract class CellPin implements Serializable {
 	}
 
 	/**
+	 * 
+	 */
+	public boolean isInternal() {
+		return cell.isInternal(); 
+	}
+	
+	/**
 	 * @return the net attached to this pin
 	 */
 	public CellNet getNet() {
@@ -119,6 +127,18 @@ public abstract class CellPin implements Serializable {
 	 */
 	void clearNet() {
 		this.net = null;
+	}
+	
+	/**
+	 * Disconnects this pin and the external pin (if it exists) from
+	 * the previously attached net. This is package private and should
+	 * not be called by regular users.
+	 */
+	void clearNetAndExternalPin() {
+		this.net = null;
+		if (this.isInternal()) {
+			getExternalPin().clearNet();
+		}
 	}
 	
 	/**
@@ -150,12 +170,18 @@ public abstract class CellPin implements Serializable {
 	}
 	
 	/**
-	 * Maps the CellPin to the specified BelPin
+	 * Maps the CellPin to the specified BelPin. Only leaf cell pins and
+	 * external cell pins can be mapped to BEL pins. If a macro cell pin
+	 * is specified, an exception will be thrown.
 	 * 
 	 * @param pin BelPin to map this CellPin to 
-	 * @return <code>true</code> if the CellPin is not already mapped to the BelPin 
+	 * @return <code>true</code> if the CellPin is not already mapped to a BelPin 
 	 */
 	public boolean mapToBelPin(BelPin pin) {
+		
+		if (cell.isMacro()) {
+			throw new Exceptions.DesignAssemblyException("Cannot map external macro pins to bel pins. Only leaf pins can be mapped to bel pins"); 
+		}
 		
 		if (belPinMappingSet == null) {
 			belPinMappingSet = new HashSet<>();
@@ -343,4 +369,10 @@ public abstract class CellPin implements Serializable {
 	 * @return The {@link CellPinType} of this pin. 
 	 */
 	public abstract CellPinType getType();
+	
+	/**
+	 * If the 
+	 * @return 
+	 */
+	public abstract CellPin getExternalPin();
 }

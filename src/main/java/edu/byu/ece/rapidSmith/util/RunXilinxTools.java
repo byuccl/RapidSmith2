@@ -208,7 +208,7 @@ public class RunXilinxTools {
 	 */
 	public static ArrayList<String> getPartNames(String[] familyNames, boolean includeSpeedGrades){
 		String executableName = "partgen -arch ";
-		String pathToPartgen = "";
+		
 		if(familyNames == null) return null;
 		String line;
 		String lastPartName;

@@ -44,11 +44,11 @@
 \@writefile{toc}{\contentsline {paragraph}{Building on the Command Line}{9}{section*.5}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.3}Additional Notes for Mac OS X Installation}{9}{subsubsection.3.1.3}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.4}Running RS2 Programs}{9}{subsubsection.3.1.4}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.5}Testing Your Installation}{10}{subsubsection.3.1.5}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces {\textbf  {DeviceBrowser}} Sample Display\relax }}{10}{figure.caption.6}}
 \newlabel{fig:deviceBrowser}{{2}{10}{\pgm {DeviceBrowser} Sample Display\relax }{figure.caption.6}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.5}Testing Your Installation}{10}{subsubsection.3.1.5}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Device Files For Use With RS2}{10}{subsection.3.2}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Devices in RS2}{11}{section.4}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Devices}{11}{section.4}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Xilinx FPGA Architecture Overview}{11}{subsection.4.1}}
 \newlabel{fpgaArch}{{4.1}{11}{Xilinx FPGA Architecture Overview}{subsection.4.1}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.1}Tiles}{11}{subsubsection.4.1.1}}
@@ -87,7 +87,7 @@
 \newlabel{fig:xdlrcPip}{{10}{16}{PIP syntax in XDLRC files\relax }{figure.caption.14}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Primitive Def sections of XDLRC files\relax }}{17}{figure.caption.15}}
 \newlabel{fig:xdlrcDef}{{11}{17}{Primitive Def sections of XDLRC files\relax }{figure.caption.15}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Designs in RS2}{18}{section.5}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Designs}{18}{section.5}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Xilinx Netlists}{18}{subsection.5.1}}
 \newlabel{sec:xilinxNetlist}{{5.1}{18}{Xilinx Netlists}{subsection.5.1}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Schematic of a 3-bit counter in Vivado using LUT and FDRE cells. The yellow boxes are {\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active Cell\endgroup }s, the green lines are {\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active Net\endgroup }s, and and the white figures on the edge of the diagram are {\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active Port\endgroup }s. An example of each of these netlist components have been highlighted.\relax }}{18}{figure.caption.16}}
@@ -98,100 +98,115 @@
 \newlabel{fig:designDS}{{13}{19}{RapidSmith 2 design data structure tree. Black arrows represent composition (i.e. a \cls {CellDesign} contains an array of \cls {CellNet}s and an array of \cls {Cell}s). Green arrows represent inheritance (i.e. a \cls {CellPin} can be either a \cls {BackedCellPin} or a \cls {PseudoCellPin}). Blue boxes represent physical implementation components of the netlist (i.e. what physical \cls {Bel} a \cls {Cell} is placed on, or what physical \cls {Wire}s are used in a \cls {CellNet}).\relax }{figure.caption.17}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.1}{\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active CellDesign\endgroup }}{19}{subsubsection.5.2.1}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.2}{\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active Cell\endgroup }}{20}{subsubsection.5.2.2}}
+\newlabel{code:cells}{{1}{20}{How to create new cells in RapidSmith}{lstlisting.1}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {1}How to create new cells in RapidSmith}{20}{lstlisting.1}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.3}{\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active CellPin\endgroup }}{20}{subsubsection.5.2.3}}
 \newlabel{sec:cellPin}{{5.2.3}{20}{\cls {CellPin}}{subsubsection.5.2.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces An example where a {\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active PseudoCellPin\endgroup } in RapidSmith may be needed. Both a {\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active PseudoCellPin\endgroup } and {\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active BackedCellPin\endgroup } are pointed out. The red net in the image (going into the A6 pin) is the power net (VCC).\relax }}{20}{figure.caption.18}}
-\newlabel{fig:pseudoPin}{{14}{20}{An example where a \cls {PseudoCellPin} in RapidSmith may be needed. Both a \cls {PseudoCellPin} and \cls {BackedCellPin} are pointed out. The red net in the image (going into the A6 pin) is the power net (VCC).\relax }{figure.caption.18}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Enumerations for the {\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active CellPin\endgroup } class\relax }}{21}{table.caption.19}}
-\newlabel{tab:pinEnums}{{1}{21}{Enumerations for the \cls {CellPin} class\relax }{table.caption.19}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces An example where a {\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active PseudoCellPin\endgroup } in RapidSmith may be needed. Both a {\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active PseudoCellPin\endgroup } and {\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active BackedCellPin\endgroup } are pointed out. The red net in the image (going into the A6 pin) is the power net (VCC).\relax }}{21}{figure.caption.18}}
+\newlabel{fig:pseudoPin}{{14}{21}{An example where a \cls {PseudoCellPin} in RapidSmith may be needed. Both a \cls {PseudoCellPin} and \cls {BackedCellPin} are pointed out. The red net in the image (going into the A6 pin) is the power net (VCC).\relax }{figure.caption.18}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.4}{\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active CellNet\endgroup }}{21}{subsubsection.5.2.4}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Enumerations for the {\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active CellPin\endgroup } class\relax }}{22}{table.caption.19}}
+\newlabel{tab:pinEnums}{{1}{22}{Enumerations for the \cls {CellPin} class\relax }{table.caption.19}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces Static net multiple sources example. The higlighted white wires are a part of the same GND net, and the circled red areas are the source TIEOFFs for the GND net. In this image, only two sources are shown.\relax }}{22}{figure.caption.20}}
 \newlabel{fig:staticNetSources}{{15}{22}{Static net multiple sources example. The higlighted white wires are a part of the same GND net, and the circled red areas are the source TIEOFFs for the GND net. In this image, only two sources are shown.\relax }{figure.caption.20}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces An example of net (highlighted in white) that can be driven by more than once source.\relax }}{23}{figure.caption.21}}
 \newlabel{fig:iobNet}{{16}{23}{An example of net (highlighted in white) that can be driven by more than once source.\relax }{figure.caption.21}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {17}{\ignorespaces Example of an INTRASITE net (left) and an INTERSITE net (right).\relax }}{23}{figure.caption.22}}
 \newlabel{fig:interVsIntra}{{17}{23}{Example of an INTRASITE net (left) and an INTERSITE net (right).\relax }{figure.caption.22}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.5}{\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active PropertyList\endgroup }}{23}{subsubsection.5.2.5}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}The Cell Library}{24}{subsection.5.3}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.1}Getting a handle to the Cell Library}{25}{subsubsection.5.3.1}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.2}Generating a new Cell Library}{25}{subsubsection.5.3.2}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Placement in RS2}{26}{section.6}}
-\newlabel{sec:placement}{{6}{26}{Placement in RS2}{section.6}{}}
-\newlabel{code:place}{{1}{26}{Steps for placing a Cell in RapidSmith}{lstlisting.1}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {1}Steps for placing a Cell in RapidSmith}{26}{lstlisting.1}}
-\@writefile{lof}{\contentsline {figure}{\numberline {18}{\ignorespaces An example of LUT pin permutations. The left figure shows the schematic of a LUT2 cell. The middle figure shows the two input pins of the LUT cell being mapped to the A1 and A2 pins of a LUT6 bel. The right figure shows the same input pins being mapped to the A6 and A5 pins instead.\relax }}{27}{figure.caption.24}}
-\newlabel{fig:lutPins}{{18}{27}{An example of LUT pin permutations. The left figure shows the schematic of a LUT2 cell. The middle figure shows the two input pins of the LUT cell being mapped to the A1 and A2 pins of a LUT6 bel. The right figure shows the same input pins being mapped to the A6 and A5 pins instead.\relax }{figure.caption.24}{}}
-\newlabel{code:tclPinMap}{{2}{27}{TCL script to print all logical-to-physical pin mappings of a cell}{lstlisting.2}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {2}TCL script to print all logical-to-physical pin mappings of a cell}{27}{lstlisting.2}}
-\@writefile{toc}{\contentsline {section}{\numberline {7}Routing in RS2}{28}{section.7}}
-\newlabel{sec:routing}{{7}{28}{Routing in RS2}{section.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Wires and WireConnections}{28}{subsection.7.1}}
-\newlabel{wireConnSection}{{7.1}{28}{Wires and WireConnections}{subsection.7.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {19}{\ignorespaces A wire in an FPGA illustrating how each part of the wire has a different name depending on the tile it is located in\relax }}{28}{figure.caption.25}}
-\newlabel{fig:wireFigure}{{19}{28}{A wire in an FPGA illustrating how each part of the wire has a different name depending on the tile it is located in\relax }{figure.caption.25}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Traversing Wire Objects}{28}{subsection.7.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Other Types of Connections}{29}{subsection.7.3}}
-\newlabel{otherConns}{{7.3}{29}{Other Types of Connections}{subsection.7.3}{}}
-\newlabel{code:connections}{{3}{29}{How to iterate over Connections in RapidSmith}{lstlisting.3}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {3}How to iterate over Connections in RapidSmith}{29}{lstlisting.3}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}RouteTrees}{30}{subsection.7.4}}
-\@writefile{lof}{\contentsline {figure}{\numberline {20}{\ignorespaces Visual representation of the {\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active RouteTree\endgroup } data structure.\relax }}{30}{figure.caption.26}}
-\newlabel{fig:routeTreeDS}{{20}{30}{Visual representation of the \cls {RouteTree} data structure.\relax }{figure.caption.26}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {21}{\ignorespaces A visual representation of a RapidSmith2 RouteTree. Nodes represent {\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active Wire\endgroup }s, red edges represent {\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active PIP\endgroup } wire connections, and black edges represent non-PIP wire connections. This specific RouteTree was created from the {\textbf  {AStarRouter}} example.\relax }}{31}{figure.caption.27}}
-\newlabel{fig:routeTree}{{21}{31}{A visual representation of a RapidSmith2 RouteTree. Nodes represent \cls {Wire}s, red edges represent \cls {PIP} wire connections, and black edges represent non-PIP wire connections. This specific RouteTree was created from the \pgm {AStarRouter} example.\relax }{figure.caption.27}{}}
-\newlabel{code:routeTree}{{4}{32}{Building a RouteTree}{lstlisting.4}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {4}Building a RouteTree}{32}{lstlisting.4}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.5}Three Part Routing}{32}{subsection.7.5}}
-\@writefile{lof}{\contentsline {figure}{\numberline {22}{\ignorespaces The three sections of a RapidSmith route.\relax }}{33}{figure.caption.28}}
-\newlabel{fig:threePartRouting}{{22}{33}{The three sections of a RapidSmith route.\relax }{figure.caption.28}{}}
-\newlabel{code:threePartRouting}{{5}{33}{Three-part routing in RapidSmith}{lstlisting.5}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {5}Three-part routing in RapidSmith}{33}{lstlisting.5}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.6}Routing in Vivado}{34}{subsection.7.6}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.7}IntrasiteRouting}{34}{subsection.7.7}}
-\newlabel{code:sitePips}{{6}{34}{Configuring Site Pips}{lstlisting.6}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {6}Configuring Site Pips}{34}{lstlisting.6}}
-\@writefile{toc}{\contentsline {section}{\numberline {8}Importing/Exporting Designs Between Vivado and RS2}{35}{section.8}}
-\newlabel{sec:import}{{8}{35}{Importing/Exporting Designs Between Vivado and RS2}{section.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}RapidSmith Checkpoints}{35}{subsection.8.1}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.1}design.info}{35}{subsubsection.8.1.1}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.2}netlist.edf}{35}{subsubsection.8.1.2}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.3}placement.rsc}{36}{subsubsection.8.1.3}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.4}routing.rsc}{36}{subsubsection.8.1.4}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.5}contraints.rsc}{37}{subsubsection.8.1.5}}
-\newlabel{code:xdc}{{7}{37}{How to manipulate XDC constraints in RS2}{lstlisting.7}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {7}How to manipulate XDC constraints in RS2}{37}{lstlisting.7}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Tincr Checkpoints}{37}{subsection.8.2}}
-\newlabel{sec:tcp}{{8.2}{37}{Tincr Checkpoints}{subsection.8.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Additional Information}{38}{subsection.8.3}}
-\newlabel{sec:additionalInfo}{{8.3}{38}{Additional Information}{subsection.8.3}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.3.1}LUT Routethroughs}{38}{subsubsection.8.3.1}}
-\@writefile{lof}{\contentsline {figure}{\numberline {23}{\ignorespaces Two examples of LUTs being used as routethroughs in the Vivado GUI. The RT on the left uses the A6 input pin, while the RT on the right uses the A4 input pin. The net highlighted in red represents VCC.\relax }}{38}{figure.caption.29}}
-\newlabel{fig:routethroughs}{{23}{38}{Two examples of LUTs being used as routethroughs in the Vivado GUI. The RT on the left uses the A6 input pin, while the RT on the right uses the A4 input pin. The net highlighted in red represents VCC.\relax }{figure.caption.29}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.3.2}Static Source LUTs}{38}{subsubsection.8.3.2}}
-\@writefile{lof}{\contentsline {figure}{\numberline {24}{\ignorespaces A LUT {\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active Bel\endgroup }\xspace  that has been configured as a GND source. Notice that there are no input pins being driven.\relax }}{39}{figure.caption.30}}
-\newlabel{fig:staticSourceLut}{{24}{39}{A LUT \bel that has been configured as a GND source. Notice that there are no input pins being driven.\relax }{figure.caption.30}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.3.3}Pseudo CellPins}{39}{subsubsection.8.3.3}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.4}Importing and Exporting TCPs}{39}{subsection.8.4}}
-\newlabel{sec:importExportTcp}{{8.4}{39}{Importing and Exporting TCPs}{subsection.8.4}{}}
-\newlabel{code:import}{{8}{39}{How to import and export TCP files to and from RS2}{lstlisting.8}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {8}How to import and export TCP files to and from RS2}{39}{lstlisting.8}}
-\newlabel{code:import2}{{9}{39}{Importing a TCP with additional information}{lstlisting.9}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {9}Importing a TCP with additional information}{39}{lstlisting.9}}
-\@writefile{toc}{\contentsline {section}{\numberline {9}Example Programs}{40}{section.9}}
-\newlabel{examples}{{9}{40}{Example Programs}{section.9}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.1}Sample Vivado Designs}{40}{subsection.9.1}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.2}{\textbf  {DeviceBrowser}}}{40}{subsection.9.2}}
-\@writefile{lof}{\contentsline {figure}{\numberline {25}{\ignorespaces {\textbf  {DeviceBrowser}} Screen Shot Showing Wire Connections\relax }}{41}{figure.caption.31}}
-\newlabel{fig:deviceBrowser2}{{25}{41}{\pgm {DeviceBrowser} Screen Shot Showing Wire Connections\relax }{figure.caption.31}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.3}{\textbf  {DeviceAnalyzer}}}{41}{subsection.9.3}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.4}{\textbf  {ImportExportExample}}}{41}{subsection.9.4}}
-\newlabel{sec:importExportExample}{{9.4}{41}{\pgm {ImportExportExample}}{subsection.9.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.5}{\textbf  {DesignAnalyzer}}}{41}{subsection.9.5}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.6}CreateDesignExample}{42}{subsection.9.6}}
-\newlabel{sec:createDesignExample}{{9.6}{42}{CreateDesignExample}{subsection.9.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.7}Other Test Programs}{42}{subsection.9.7}}
-\@writefile{toc}{\contentsline {section}{\numberline {10}Bitstreams in RS2}{43}{section.10}}
-\@writefile{toc}{\contentsline {section}{\numberline {11}Installing New Device Files}{44}{section.11}}
-\@writefile{toc}{\contentsline {section}{\numberline {12}Legal and Dependencies}{45}{section.12}}
-\@writefile{toc}{\contentsline {section}{\numberline {13}Included Dependency Projects}{46}{section.13}}
-\@writefile{toc}{\contentsline {section}{\numberline {14}Appendix}{46}{section.14}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.5}Macro Cells}{24}{subsubsection.5.2.5}}
+\newlabel{sec:macros}{{5.2.5}{24}{Macro Cells}{subsubsection.5.2.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {18}{\ignorespaces An IOBUF macro in Vivado.\relax }}{24}{figure.caption.23}}
+\newlabel{fig:macros}{{18}{24}{An IOBUF macro in Vivado.\relax }{figure.caption.23}{}}
+\newlabel{code:macros}{{2}{24}{How to use macros in RapidSmith}{lstlisting.2}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {2}How to use macros in RapidSmith}{24}{lstlisting.2}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.6}{\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active PropertyList\endgroup }}{25}{subsubsection.5.2.6}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}The Cell Library}{26}{subsection.5.3}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.1}Loading a Cell Library}{26}{subsubsection.5.3.1}}
+\newlabel{code:cellLibrary}{{3}{26}{How to load a CellLibrary}{lstlisting.3}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {3}How to load a CellLibrary}{26}{lstlisting.3}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.2}Adding Custom Macros to a Cell Library}{27}{subsubsection.5.3.2}}
+\newlabel{sec:customMacros}{{5.3.2}{27}{Adding Custom Macros to a Cell Library}{subsubsection.5.3.2}{}}
+\newlabel{code:macroImport}{{4}{28}{Adding new macros to the Cell Library}{lstlisting.4}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4}Adding new macros to the Cell Library}{28}{lstlisting.4}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.3}Creating a New Cell Library}{28}{subsubsection.5.3.3}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Placement}{30}{section.6}}
+\newlabel{sec:placement}{{6}{30}{Placement}{section.6}{}}
+\newlabel{code:place}{{5}{30}{Steps for placing a Cell in RapidSmith}{lstlisting.5}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5}Steps for placing a Cell in RapidSmith}{30}{lstlisting.5}}
+\@writefile{lof}{\contentsline {figure}{\numberline {19}{\ignorespaces An example of LUT pin permutations. The left figure shows the schematic of a LUT2 cell. The middle figure shows the two input pins of the LUT cell being mapped to the A1 and A2 pins of a LUT6 bel. The right figure shows the same input pins being mapped to the A6 and A5 pins instead.\relax }}{31}{figure.caption.25}}
+\newlabel{fig:lutPins}{{19}{31}{An example of LUT pin permutations. The left figure shows the schematic of a LUT2 cell. The middle figure shows the two input pins of the LUT cell being mapped to the A1 and A2 pins of a LUT6 bel. The right figure shows the same input pins being mapped to the A6 and A5 pins instead.\relax }{figure.caption.25}{}}
+\newlabel{code:tclPinMap}{{6}{31}{TCL script to print all logical-to-physical pin mappings of a cell}{lstlisting.6}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {6}TCL script to print all logical-to-physical pin mappings of a cell}{31}{lstlisting.6}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Routing}{32}{section.7}}
+\newlabel{sec:routing}{{7}{32}{Routing}{section.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Wires and WireConnections}{32}{subsection.7.1}}
+\newlabel{wireConnSection}{{7.1}{32}{Wires and WireConnections}{subsection.7.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {20}{\ignorespaces A wire in an FPGA illustrating how each part of the wire has a different name depending on the tile it is located in\relax }}{32}{figure.caption.26}}
+\newlabel{fig:wireFigure}{{20}{32}{A wire in an FPGA illustrating how each part of the wire has a different name depending on the tile it is located in\relax }{figure.caption.26}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Traversing Wire Objects}{32}{subsection.7.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Other Types of Connections}{33}{subsection.7.3}}
+\newlabel{otherConns}{{7.3}{33}{Other Types of Connections}{subsection.7.3}{}}
+\newlabel{code:connections}{{7}{33}{How to iterate over Connections in RapidSmith}{lstlisting.7}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {7}How to iterate over Connections in RapidSmith}{33}{lstlisting.7}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}RouteTrees}{34}{subsection.7.4}}
+\@writefile{lof}{\contentsline {figure}{\numberline {21}{\ignorespaces Visual representation of the {\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active RouteTree\endgroup } data structure.\relax }}{34}{figure.caption.27}}
+\newlabel{fig:routeTreeDS}{{21}{34}{Visual representation of the \cls {RouteTree} data structure.\relax }{figure.caption.27}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {22}{\ignorespaces A visual representation of a RapidSmith2 RouteTree. Nodes represent {\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active Wire\endgroup }s, red edges represent {\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active PIP\endgroup } wire connections, and black edges represent non-PIP wire connections. This specific RouteTree was created from the {\textbf  {AStarRouter}} example.\relax }}{35}{figure.caption.28}}
+\newlabel{fig:routeTree}{{22}{35}{A visual representation of a RapidSmith2 RouteTree. Nodes represent \cls {Wire}s, red edges represent \cls {PIP} wire connections, and black edges represent non-PIP wire connections. This specific RouteTree was created from the \pgm {AStarRouter} example.\relax }{figure.caption.28}{}}
+\newlabel{code:routeTree}{{8}{36}{Building a RouteTree}{lstlisting.8}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {8}Building a RouteTree}{36}{lstlisting.8}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.5}Three Part Routing}{36}{subsection.7.5}}
+\@writefile{lof}{\contentsline {figure}{\numberline {23}{\ignorespaces The three sections of a RapidSmith route.\relax }}{37}{figure.caption.29}}
+\newlabel{fig:threePartRouting}{{23}{37}{The three sections of a RapidSmith route.\relax }{figure.caption.29}{}}
+\newlabel{code:threePartRouting}{{9}{37}{Three-part routing in RapidSmith}{lstlisting.9}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {9}Three-part routing in RapidSmith}{37}{lstlisting.9}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.6}Routing in Vivado}{38}{subsection.7.6}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.7}IntrasiteRouting}{38}{subsection.7.7}}
+\newlabel{code:sitePips}{{10}{38}{Configuring Site Pips}{lstlisting.10}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {10}Configuring Site Pips}{38}{lstlisting.10}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Design Import/Export}{39}{section.8}}
+\newlabel{sec:import}{{8}{39}{Design Import/Export}{section.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}RapidSmith Checkpoints}{39}{subsection.8.1}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.1}design.info}{39}{subsubsection.8.1.1}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.2}netlist.edf}{39}{subsubsection.8.1.2}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.3}placement.rsc}{40}{subsubsection.8.1.3}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.4}routing.rsc}{40}{subsubsection.8.1.4}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.5}contraints.rsc}{41}{subsubsection.8.1.5}}
+\newlabel{code:xdc}{{11}{41}{How to manipulate XDC constraints in RS2}{lstlisting.11}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {11}How to manipulate XDC constraints in RS2}{41}{lstlisting.11}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.6}macros.xml}{41}{subsubsection.8.1.6}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Tincr Checkpoints}{42}{subsection.8.2}}
+\newlabel{sec:tcp}{{8.2}{42}{Tincr Checkpoints}{subsection.8.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Additional Information}{42}{subsection.8.3}}
+\newlabel{sec:additionalInfo}{{8.3}{42}{Additional Information}{subsection.8.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.3.1}LUT Routethroughs}{42}{subsubsection.8.3.1}}
+\@writefile{lof}{\contentsline {figure}{\numberline {24}{\ignorespaces Two examples of LUTs being used as routethroughs in the Vivado GUI. The RT on the left uses the A6 input pin, while the RT on the right uses the A4 input pin. The net highlighted in red represents VCC.\relax }}{43}{figure.caption.30}}
+\newlabel{fig:routethroughs}{{24}{43}{Two examples of LUTs being used as routethroughs in the Vivado GUI. The RT on the left uses the A6 input pin, while the RT on the right uses the A4 input pin. The net highlighted in red represents VCC.\relax }{figure.caption.30}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.3.2}Static Source LUTs}{43}{subsubsection.8.3.2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {25}{\ignorespaces A LUT {\begingroup \ttfamily  \begingroup \lccode `\nobreakspace  {}=`/\lowercase {\endgroup \def \nobreakspace  {}}{/\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`[\lowercase {\endgroup \def \nobreakspace  {}}{[\discretionary {}{}{}}\begingroup \lccode `\nobreakspace  {}=`.\lowercase {\endgroup \def \nobreakspace  {}}{.\discretionary {}{}{}}\catcode `/=\active \catcode `[=\active \catcode `.=\active Bel\endgroup }\xspace  that has been configured as a GND source. Notice that there are no input pins being driven.\relax }}{43}{figure.caption.31}}
+\newlabel{fig:staticSourceLut}{{25}{43}{A LUT \bel that has been configured as a GND source. Notice that there are no input pins being driven.\relax }{figure.caption.31}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.3.3}Pseudo CellPins}{44}{subsubsection.8.3.3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.4}Importing and Exporting TCPs}{44}{subsection.8.4}}
+\newlabel{sec:importExportTcp}{{8.4}{44}{Importing and Exporting TCPs}{subsection.8.4}{}}
+\newlabel{code:import}{{12}{44}{How to import and export TCP files to and from RS2}{lstlisting.12}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {12}How to import and export TCP files to and from RS2}{44}{lstlisting.12}}
+\newlabel{code:import2}{{13}{44}{Importing a TCP with additional information}{lstlisting.13}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {13}Importing a TCP with additional information}{44}{lstlisting.13}}
+\@writefile{toc}{\contentsline {section}{\numberline {9}Example Programs}{45}{section.9}}
+\newlabel{examples}{{9}{45}{Example Programs}{section.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.1}Sample Vivado Designs}{45}{subsection.9.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.2}{\textbf  {DeviceBrowser}}}{45}{subsection.9.2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {26}{\ignorespaces {\textbf  {DeviceBrowser}} Screen Shot Showing Wire Connections\relax }}{46}{figure.caption.32}}
+\newlabel{fig:deviceBrowser2}{{26}{46}{\pgm {DeviceBrowser} Screen Shot Showing Wire Connections\relax }{figure.caption.32}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.3}{\textbf  {DeviceAnalyzer}}}{46}{subsection.9.3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.4}{\textbf  {ImportExportExample}}}{46}{subsection.9.4}}
+\newlabel{sec:importExportExample}{{9.4}{46}{\pgm {ImportExportExample}}{subsection.9.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.5}{\textbf  {DesignAnalyzer}}}{46}{subsection.9.5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.6}CreateDesignExample}{47}{subsection.9.6}}
+\newlabel{sec:createDesignExample}{{9.6}{47}{CreateDesignExample}{subsection.9.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.7}Other Test Programs}{47}{subsection.9.7}}
+\@writefile{toc}{\contentsline {section}{\numberline {10}Bitstreams in RS2}{48}{section.10}}
+\@writefile{toc}{\contentsline {section}{\numberline {11}Installing New Device Files}{49}{section.11}}
+\@writefile{toc}{\contentsline {section}{\numberline {12}Legal and Dependencies}{50}{section.12}}
+\@writefile{toc}{\contentsline {section}{\numberline {13}Included Dependency Projects}{51}{section.13}}
+\@writefile{toc}{\contentsline {section}{\numberline {14}Appendix}{51}{section.14}}

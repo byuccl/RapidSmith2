@@ -18,8 +18,6 @@
  * also get a copy of the license at <http://www.gnu.org/licenses/>.
  */
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;

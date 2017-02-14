@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -194,16 +195,33 @@ public final class EdifInterface {
 			CellNet cn = new CellNet(net.getOldName(), NetType.WIRE); 
 			
 			// Add all the source and sink connections to the net
-			Collection<EdifPortRef> sources = net.getSourcePortRefs(false, true);
+			//Collection<EdifPortRef> sources = net.getSourcePortRefs(false, true);
 			
-			if (sources.size() == 0) {
+			// process all net connections
+			processNetConnections(net.getPortRefList(), design, cn);
+			
+			//report a warning if no sources on a net are found
+			if (cn.getAllSourcePins().size() == 0) {
 				System.err.println("[Warning] No source for net " + net.getOldName());
+			}
+			
+			/*
+			if (sources.size() == 0) {
+				System.out.println("[Warning] No source for net " + net.getOldName());
 				design.addNet(cn);
+				
+				for (EdifPortRef enet : net.getPortRefList()) {
+					System.out.println(enet.getPort().getName() + " " + enet.isTopLevelPortRef() + " " + enet.getPort().getDirection());
+				}
+				
 				continue;
 			}
 			
+			assert (sources.size() + net.getSinkPortRefs(false,true).size() == net.getPortRefList().size());
+			
 			processNetConnections(sources, design, cn);
 			processNetConnections(net.getSinkPortRefs(false, true), design, cn);
+			*/
 			
 			// Add the net to the design if is is NOT a static net.
 			// Otherwise, store it for later use (will collapse later)
@@ -431,7 +449,12 @@ public final class EdifInterface {
 		
 		HashSet<LibraryCell> uniqueLibraryCells = new HashSet<>();
 		
-		for (Cell c : design.getCells()) {			
+		Iterator<Cell> cellIt = design.getLeafCells().iterator();
+		
+		// for (Cell c : design.getCells()) {
+		while (cellIt.hasNext()) {
+			Cell c = cellIt.next();
+			
 			if (!c.isPort())
 				uniqueLibraryCells.add(c.getLibCell());
 		}
@@ -451,12 +474,15 @@ public final class EdifInterface {
 		topLevelCell.setInterface(cellInterface);
 		
 		// create the cell instances
-		for (Cell cell : design.getCells()) {
+		Iterator<Cell> cellIt = design.getLeafCells().iterator();
+		//for (Cell cell : design.getCells) {
+		while (cellIt.hasNext()) {
+			Cell cell = cellIt.next();
 			
 			if (cell.isPort())
 				continue;
 			
-			EdifCell edifLibCell = cellMap.get(cell.getLibCell());	
+			EdifCell edifLibCell = cellMap.get(cell.getLibCell());
 			topLevelCell.addSubCell( createEdifCellInstance(cell, topLevelCell, edifLibCell) );
 		}
 		
@@ -526,14 +552,14 @@ public final class EdifInterface {
 	 */
 	private static EdifNet createEdifNet(CellNet cellNet, EdifCell edifParentCell) {
 		EdifNet edifNet = new EdifNet(createEdifNameable(cellNet.getName()), edifParentCell);
-		
+				
 		// create the port references for the edif net
 		for (CellPin cellPin : cellNet.getPins()) {
 			
 			if (cellPin.isPseudoPin()) {
 				continue;
 			}
-			
+						
 			Cell parentCell = cellPin.getCell();
 			
 			EdifPortRef portRef = parentCell.isPort() ?
