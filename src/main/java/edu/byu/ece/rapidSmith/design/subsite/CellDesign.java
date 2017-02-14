@@ -641,7 +641,7 @@ public class CellDesign extends AbstractDesign {
 		
 		cell.unplace();
 		
-		// undo all cell pin mappings
+		// undo all cell pin mappings (if they exists)
 		cell.getPins().forEach(CellPin::clearPinMappings);
 	}
 

@@ -267,9 +267,7 @@ public abstract class CellPin implements Serializable {
 	 * pin will no longer map to any BelPins). 
 	 */
 	public void clearPinMappings() {
-		if (getPossibleBelPins().size() > 1) {
-			this.belPinMappingSet = null;
-		}
+		this.belPinMappingSet = null;
 	}
 	
 	/**
