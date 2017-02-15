@@ -15,3 +15,12 @@
 /testdesigns/*.log
 /testdesigns/*.dmp
 **/~$*.docx
+/doc/*.aux
+/doc/*.idx
+/doc/*.ilg
+/doc/*.ind
+/doc/TechReport.log
+/doc/TechReport.out
+/doc/*.toc
+/doc/texput.log
+/doc/*.synctex.gz
