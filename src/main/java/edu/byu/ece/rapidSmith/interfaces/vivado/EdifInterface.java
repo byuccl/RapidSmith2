@@ -147,7 +147,7 @@ public final class EdifInterface {
 									String.format("%s[%d]", portSuffix, reverseBusIndex(port.getWidth(), busMember.bitPosition())) :
 									portSuffix;
 				Cell portCell = new Cell(portName, libCell);
-				portCell.getProperties().update(new Property("Dir", PropertyType.USER, PortDirection.getPortDirectionForImport(portCell)));
+				//portCell.getProperties().update(new Property("Dir", PropertyType.USER, PortDirection.getPortDirectionForImport(portCell)));
 				design.addCell(portCell);
 			}
 		}

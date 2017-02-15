@@ -24,6 +24,7 @@ import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelId;
 import edu.byu.ece.rapidSmith.device.BondedType;
 import edu.byu.ece.rapidSmith.device.PinDirection;
+import edu.byu.ece.rapidSmith.device.PortDirection;
 import edu.byu.ece.rapidSmith.device.Site;
 
 import java.util.*;
@@ -86,6 +87,11 @@ public class Cell {
 			this.pinMap.put(pin.getName(), new BackedCellPin(this, pin));
 		}
 
+		// for port cells, set the direction property
+		if(libCell.isPort()) {
+			this.properties.update(new Property("Dir", PropertyType.USER, PortDirection.getPortDirectionForImport(this)));
+		}
+		
 		// additional initialization for macro cells
 		if (libCell.isMacro()) {
 			LibraryMacro macroCell = (LibraryMacro) libCell;
