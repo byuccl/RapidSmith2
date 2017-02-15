@@ -516,7 +516,7 @@ public final class EdifInterface {
 				portWidthMap.put(portName, count + 1);
 				
 				if (count == 0) {
-					portDirectionMap.put(portName, PortDirection.isInputPort(cell) ? EdifPort.IN : EdifPort.OUT);
+					portDirectionMap.put(portName, getEdifPinDirection(cell));
 				}
 			}
 		}
@@ -715,5 +715,17 @@ public final class EdifInterface {
 			default: // if we reach here, then thrown a new exception
 				throw new AssertionError("Invalid Pin Direction!");
 		}
+	}
+	
+	/*
+	 * Returns the corresponding EDIF port direction of a RapidSmith
+	 * port cell.
+	 */
+	private static int getEdifPinDirection(Cell portCell) {		
+		if (PortDirection.isInoutPort(portCell)) {
+			return EdifPort.INOUT;
+		}
+		
+		return PortDirection.isInputPort(portCell) ? EdifPort.IN : EdifPort.OUT; 
 	}
 }
