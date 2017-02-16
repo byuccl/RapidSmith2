@@ -404,9 +404,9 @@ public class CellDesign extends AbstractDesign {
 		if (net.getDesign() != this)
 			return;
 		if (net.isInternal())
-			throw new Exceptions.DesignAssemblyException("Cannot remove internal net " + net.getName());
+			throw new IllegalArgumentException("Cannot remove internal net " + net.getName());
 		if (!net.getPins().isEmpty())
-			throw new IllegalArgumentException("Cannot remove connected net." + net.getName());
+			throw new Exceptions.DesignAssemblyException("Cannot remove connected net." + net.getName());
 
 		removeNet_impl(net);
 	}
