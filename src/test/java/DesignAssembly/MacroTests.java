@@ -213,14 +213,14 @@ public class MacroTests {
 			assertTrue(iCell.getDesign() == design, String.format("Internal cell \"%s\" not added to design", iCell.getName()));
 			
 			//check that an exception is thrown when you try to remove the internal cell
-			assertThrows(Exceptions.DesignAssemblyException.class, () -> design.removeCell(iCell));
+			assertThrows(IllegalArgumentException.class, () -> design.removeCell(iCell));
 		}
 		for (CellNet iNet : testMacro.getInternalNets()) {
 			// check that the internal net is the design
 			assertTrue(iNet.getDesign() == design, String.format("Internal net \"%s\" not added to design", iNet.getName()));
 			
 			//check that an exception is thrown when you try to remove the internal net
-			assertThrows(Exceptions.DesignAssemblyException.class, () -> design.removeNet(iNet));
+			assertThrows(IllegalArgumentException.class, () -> design.removeNet(iNet));
 		}
 				
 		// Now, remove the cell from the design

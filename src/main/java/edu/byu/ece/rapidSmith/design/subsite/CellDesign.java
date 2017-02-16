@@ -251,7 +251,7 @@ public class CellDesign extends AbstractDesign {
 		if (cell.getDesign() != this)
 			throw new Exceptions.DesignAssemblyException("Cannot remove cell not in the design.");
 		if (cell.isInternal()) 
-			throw new Exceptions.DesignAssemblyException("Cannot remove internal cell from the design. Remove the macro parent cell.");
+			throw new IllegalArgumentException("Cannot remove internal cell from the design. Remove the macro parent cell.");
 		
 		removeCell_impl(cell);
 	}
