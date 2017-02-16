@@ -31,7 +31,6 @@ import java.time.LocalDateTime;
 
 import edu.byu.ece.edif.core.EdifNameConflictException;
 import edu.byu.ece.edif.core.InvalidEdifNameException;
-import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
@@ -42,24 +41,38 @@ import edu.byu.ece.rapidSmith.util.Exceptions;
  * This class is used to interface Vivado and RapidSmith. <br>
  * It parses TINCR checkpoints and creates equivalent RapidSmith designs. <br>
  * It can also create TINCR checkpoints from existing RapidSmith designs.
- * 
- * @author Thomas Townsend
  *
  */
 public final class VivadoInterface {
 
 	private static final String CELL_LIBRARY_NAME = "cellLibrary.xml";
 
+	/**
+	 * Parses a Tincr Checkpoint, and creates an equivalent RapidSmith 2 design. 
+	 * 
+	 * @param tcp Path to the Tincr checkpoint to import
+	 * @throws IOException Thrown if the specified TCP is not found
+	 * 
+	 * @return A {@link TincrCheckpoint} object that contains all the necessary information about the design.
+	 */
 	public static TincrCheckpoint loadTCP(String tcp) throws IOException {
 		return loadTCP(tcp, false);
 	}
 	
 	/**
-	 * Parses a TINCR checkpoint, and creates an equivalent RapidSmith 2 design.
+	 * Parses a Tincr checkpoint, and creates an equivalent RapidSmith 2 design.
+	 * Stores the following additional information: <br>
+	 * <p>
+	 * <ul>
+	 * 	<li>A list of {@link BelRoutethrough} objects</li>
+	 * 	<li>A list of {@link Bel}s that are being used as static sources</li>
+	 *  <li>A Map of {@link BelPin} to the corresponding {@link CellPin} placed on it.</li> 
+	 * </ul>
+	 * @param tcp Path to the Tincr checkpoint to import
+	 * @param storeAdditionalInfo set to {@code true} to store additional information
+	 * @throws IOException Thrown if the specified TCP is not found
 	 * 
-	 * @param tcp Path to the TINCR checkpoint to import
-	 * @throws InvalidEdifNameException 
-	 * @throws EdifNameConflictException 
+	 * @return A {@link TincrCheckpoint} object that contains all the necessary information about the design.
 	 */
 	public static TincrCheckpoint loadTCP (String tcp, boolean storeAdditionalInfo) throws IOException {
 	
@@ -86,14 +99,9 @@ public final class VivadoInterface {
 				.getPartFolderPath(partName)
 				.resolve(CELL_LIBRARY_NAME));
 				
-		// create the RS2 netlist
+		// create the RS2 flattened netlist 
 		String edifFile = Paths.get(tcp, "netlist.edf").toString();
-		CellDesign design;
-		try {
-			design = EdifInterface.parseEdif(edifFile, libCells);
-		} catch (edu.byu.ece.edif.util.parse.ParseException e) {
-			throw new ParseException(e);
-		}
+		CellDesign design = EdifInterface.parseEdif(edifFile, libCells, true);
 		
 		// parse the constraints into RapidSmith
 		parseConstraintsXDC(design, Paths.get(tcp, "constraints.rsc").toString());

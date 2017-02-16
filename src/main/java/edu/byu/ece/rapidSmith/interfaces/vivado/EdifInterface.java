@@ -72,8 +72,6 @@ import edu.byu.ece.rapidSmith.util.Exceptions;
  * This includes both parsing an EDIF file into a RapidSmith CellDesign, and creating an EDIF <br>
  * file from a RapidSmith CellDesign. Currently, it only supports edif created from <br>
  * fully flattened Vivado designs. <br>
- * 
- * @author Thomas Townsend
  *
  */
 public final class EdifInterface {
@@ -143,7 +141,7 @@ public final class EdifInterface {
 			top = EdifParser.translate(edifFile);
 			
 			// If the flattenNetlist option is set to true, flatten the netlist
-			if (flattenNetlist) {
+			if (flattenNetlist && !top.getTopCell().isFlat()) {
 				FlattenedEdifCell flattenedEdifCell = new FlattenedEdifCell(top.getTopCell());
 				top.setTopCell(flattenedEdifCell);
 				EdifLibraryManager topLibMan = top.getLibraryManager();
