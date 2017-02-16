@@ -475,7 +475,7 @@ public class Cell {
 	 * If this function is used on a leaf cell, then null will be returned.
 	 */
 	public Collection<Cell> getInternalCells() {
-		return this.internalCells.values();
+		return isMacro() ? this.internalCells.values() : null;
 	}
 	
 	/**
@@ -495,13 +495,14 @@ public class Cell {
 	 * If this function is used on a leaf cell, then null will be returned.
 	 */	
 	public Collection<CellNet> getInternalNets() {
-		return this.internalNets.values();
+		return isMacro() ? this.internalNets.values() : null;
 	}
 	
 	/**
-	 * 
-	 * @param internalPin
-	 * @return
+	 * Returns the external macro pin of an internal {@link CellPin}. This
+	 * is package private and so should not be used by users.
+	 *  
+	 * @param internalPin Internal {@link CellPin}
 	 */
 	CellPin getExternalPin(CellPin internalPin) {
 		

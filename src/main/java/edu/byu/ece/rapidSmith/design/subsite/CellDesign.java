@@ -104,7 +104,7 @@ public class CellDesign extends AbstractDesign {
 	}
 
 	/**
-	 * Returns {@code true} if the a {@link Cell} with the specified name
+	 * Returns {@code true} if a {@link Cell} with the specified name
 	 * is in the design, {@code false} otherwise. The cell can be a leaf 
 	 * cell, macro cell, or internal cell. 
 	 * 
@@ -185,17 +185,13 @@ public class CellDesign extends AbstractDesign {
 	
 	/**
 	 * Returns a stream of {@link Cell} objects of the specified type. 
-	 * TODO: Should there be a link to a {@link CellLibrary} in this class?
 	 * 
 	 * @param libCellType Name of the {@link LibraryCell} to filter by
 	 */
 	public Stream<Cell> getCellsOfType(LibraryCell libraryCell) {
-		
-		if (libraryCell == null) {
-			return Stream.empty();
-		}
-		
-		return cellMap.values().stream().filter(c -> (c.getLibCell() == libraryCell));
+		Objects.requireNonNull(libraryCell, "LibraryCell parameter cannot be null");
+				
+		return cellMap.values().stream().filter(c -> c.getLibCell() == libraryCell);
 	}
 
 	/**
@@ -281,10 +277,9 @@ public class CellDesign extends AbstractDesign {
 	}
 
 	/**
-	 * Disconnects without removing the specified cell from this design.  This is
-	 * accomplished by unplacing the cell and disconnecting all of its pins. For macro
-	 * cells, all internal cells are unplaced. Internal cells cannot be disconnected, an
-	 * exception will be thrown. Instead, disconnect the parent macro cell.
+	 * Disconnects without removing the specified cell from this design.  
+	 * Internal cells cannot be disconnected and if attempted, this method will
+	 * throw a DesignAssemblyException.
 	 *
 	 * @param cell the cell to disconnect from this design
 	 */
@@ -293,7 +288,7 @@ public class CellDesign extends AbstractDesign {
 		if (cell.getDesign() != this)
 			throw new Exceptions.DesignAssemblyException("Cannot disconnect cell not in the design.");
 		if (cell.isInternal())
-			throw new Exceptions.DesignAssemblyException("Cannot disconnect internal cell. Disconnet macro cell instead");
+			throw new IllegalArgumentException("Cannot disconnect internal cell. Disconnet macro cell instead");
 		
 		// for macros, disconnect the sub-cells
 		if (cell.isMacro()) {
@@ -393,7 +388,6 @@ public class CellDesign extends AbstractDesign {
 			gndNet = net;
 		} 
 		
-		// TODO: should VCC and GND nets be added to the net data structure?
 		netMap.put(net.getName(), net);
 		net.setDesign(this);
 		
@@ -412,7 +406,7 @@ public class CellDesign extends AbstractDesign {
 		if (net.isInternal())
 			throw new Exceptions.DesignAssemblyException("Cannot remove internal net " + net.getName());
 		if (!net.getPins().isEmpty())
-			throw new Exceptions.DesignAssemblyException("Cannot remove connected net." + net.getName());
+			throw new IllegalArgumentException("Cannot remove connected net." + net.getName());
 
 		removeNet_impl(net);
 	}
@@ -607,10 +601,10 @@ public class CellDesign extends AbstractDesign {
 
 	/**
 	 * Unplaces the specified cell in this design. The input cell can either be a leaf cell,
-	 * or a macro cell. If the specified cell is a macro cell, all sub-cells will be unplaced.
+	 * or a macro cell. If the specified cell is a macro cell, all internal cells will be unplaced.
 	 * This function also undoes any pin mappings of the cell. 
 	 *
-	 * @param cell the cell to unplace.
+	 * @param cell the {@link Cell} to unplace.
 	 */
 	public void unplaceCell(Cell cell) {
 		Objects.requireNonNull(cell);
@@ -627,6 +621,8 @@ public class CellDesign extends AbstractDesign {
 	}
 
 	private void unplaceCell_impl(Cell cell) {
+		
+		assert(!cell.isMacro());
 		
 		// if the cell is not placed, return
 		if (!cell.isPlaced()) {

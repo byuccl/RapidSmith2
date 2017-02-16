@@ -204,25 +204,7 @@ public final class EdifInterface {
 			if (cn.getAllSourcePins().size() == 0) {
 				System.err.println("[Warning] No source for net " + net.getOldName());
 			}
-			
-			/*
-			if (sources.size() == 0) {
-				System.out.println("[Warning] No source for net " + net.getOldName());
-				design.addNet(cn);
-				
-				for (EdifPortRef enet : net.getPortRefList()) {
-					System.out.println(enet.getPort().getName() + " " + enet.isTopLevelPortRef() + " " + enet.getPort().getDirection());
-				}
-				
-				continue;
-			}
-			
-			assert (sources.size() + net.getSinkPortRefs(false,true).size() == net.getPortRefList().size());
-			
-			processNetConnections(sources, design, cn);
-			processNetConnections(net.getSinkPortRefs(false, true), design, cn);
-			*/
-			
+						
 			// Add the net to the design if is is NOT a static net.
 			// Otherwise, store it for later use (will collapse later)
 			if (cn.isVCCNet()) {
