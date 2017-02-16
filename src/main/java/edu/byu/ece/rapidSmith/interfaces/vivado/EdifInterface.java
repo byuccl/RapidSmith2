@@ -50,6 +50,7 @@ import edu.byu.ece.edif.core.InvalidEdifNameException;
 import edu.byu.ece.edif.core.PropertyList;
 import edu.byu.ece.edif.core.RenamedObject;
 import edu.byu.ece.edif.core.StringTypedValue;
+import edu.byu.ece.edif.tools.flatten.FlattenedEdifCell;
 import edu.byu.ece.edif.util.parse.EdifParser;
 import edu.byu.ece.edif.util.parse.ParseException;
 import edu.byu.ece.rapidSmith.design.NetType;
@@ -80,25 +81,41 @@ public final class EdifInterface {
 	/* ********************
 	 * 	 Import Section
 	 *********************/
-		
 	/**
-	 * Parses the Edif netlist into a RapidSmith2 CellDesign data structure
+	 * Parses an EDIF netlist into an equivalent RapidSmith {@link CellDesign} data structure.
+	 * The netlist will NOT be flattened with this function call.
 	 * 
 	 * @param edifFile Input EDIF file
-	 * @param libCells A Cell library for a specific Xilinx part
-	 * @return
+	 * @param libCells A {@link CellLibrary} for a specific Xilinx part
+	 * 
+	 * @return A {@link CellDesign} representation of the EDIF netlist
+	 * 
 	 * @throws FileNotFoundException
-	 * @throws ParseException
 	 */
-	public static CellDesign parseEdif(String edifFile, CellLibrary libCells) throws FileNotFoundException, ParseException {
+	public static CellDesign parseEdif(String edifFile, CellLibrary libCells) throws FileNotFoundException {
+		return parseEdif(edifFile, libCells, false);
+	}
+	
+	/**
+	 * Parses an EDIF netlist into an equivalent RapidSmith2 {@link CellDesign} data structure.
+	 * The EDIF netlist can optionally be flattened before it is converted to a CellDesign.
+	 * 
+	 * @param edifFile Input EDIF file
+	 * @param libCells A {@link CellLibrary} for a specific Xilinx part
+	 * @param flattenNetlist If this parameter is {@code true}, the EDIF netlist will be flattened before parsing.
+	 * @throws FileNotFoundException
+	 * 
+	 * @return A {@link CellDesign} representation of the EDIF netlist
+	 */
+	public static CellDesign parseEdif(String edifFile, CellLibrary libCells, boolean flattenNetlist) throws FileNotFoundException {
 		
 		List<CellNet> vccNets = new ArrayList<>();
 		List<CellNet> gndNets = new ArrayList<>();
 		
 		// parse edif into the BYU edif tools data structures
-		EdifEnvironment top = EdifParser.translate(edifFile);
+		EdifEnvironment top = createEdifEnvironment(edifFile, flattenNetlist); 		
 		EdifCell topLevelCell = top.getTopCell();
-		
+
 		// create RS2 cell design
 		String partName = ((StringTypedValue)top.getTopDesign().getProperty("part").getValue()).getStringValue();
 		CellDesign design= new CellDesign(top.getTopDesign().getName(), partName);	
@@ -112,6 +129,32 @@ public final class EdifInterface {
 		collapseStaticNets(design, libCells, vccNets, gndNets);
 				
 		return design;
+	}
+	
+	/*
+	 * Loads the EDIF netlist into an EdifEnvironment object. If the flattenNetlist option
+	 * is true, then the netlist is fully flattened. 
+	 */
+	private static EdifEnvironment createEdifEnvironment(String edifFile, boolean flattenNetlist) throws FileNotFoundException {
+		EdifEnvironment top = null ;
+		
+		try {
+			// Parse the EDIF as is
+			top = EdifParser.translate(edifFile);
+			
+			// If the flattenNetlist option is set to true, flatten the netlist
+			if (flattenNetlist) {
+				FlattenedEdifCell flattenedEdifCell = new FlattenedEdifCell(top.getTopCell());
+				top.setTopCell(flattenedEdifCell);
+				EdifLibraryManager topLibMan = top.getLibraryManager();
+				topLibMan.pruneNonReferencedCells();
+			}
+		} // wrap all Exceptions in a ParseException 
+		catch (EdifNameConflictException | InvalidEdifNameException | ParseException e) {
+			throw new Exceptions.ParseException(e);
+		}
+		
+		return top;
 	}
 	
 	/*
