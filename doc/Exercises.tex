@@ -98,13 +98,13 @@ to do the following:
   \item Find a tile of type ``CLBLL\_L'' in the device (this can be done by tile
   name, or getting all tiles in the device of type CLBLL\_L and choosing the
   first one).
-\begin{lstlisting}[numbers=none] 
-// Load the Artix7 device
-Device device = RSEnvironment.defaultEnv().getDevice("xc7a100tcsg324-3");
+  \begin{lstlisting}[numbers=none] 
+  // Load the Artix7 device
+  Device device = RSEnvironment.defaultEnv().getDevice("xc7a100tcsg324-3");
 
-// Get a handle to a Tile object
-Tile t = device.getTile("CLBLL_L_X2Y69");
-\end{lstlisting}
+  // Get a handle to a Tile object
+  Tile t = device.getTile("CLBLL_L_X2Y69");
+  \end{lstlisting}
   \item Print the following information (in any format you want)
   \begin{itemize}
     \item The name of all Wires in the Tile
@@ -117,16 +117,16 @@ Tile t = device.getTile("CLBLL_L_X2Y69");
   into the numHops parameter then all the wires directly connected to the
   source wire (through a PIP) should be returned. Only traversing a PIP wire
   connection counts as taking a hop.
-\end{itemize}
-\begin{lstlisting}[numbers=none] 
-public Set<Wire> getWiresHops(Wire sourceWire, int numHops) {
+  \begin{lstlisting}[numbers=none] 
+  public Set<Wire> getWiresHops(Wire sourceWire, int numHops) {
 	Set<Wire> sinkWires = new HashSet<Wire>();
 	
 	// Your code here
 	
 	return sinkWires;
-}
-\end{lstlisting}
+  }
+  \end{lstlisting}
+\end{itemize}
 
 \section{Design Printer}
 
@@ -138,7 +138,7 @@ repository. It gives a good overview of the netlist data structures and how to
 use them. Create a Java program to do the following:
 
 \begin{itemize}
-  \item Load the \textit{cordic.tcp} Tincr checkpoint is into RapidSmith (this
+  \item Load the \textit{cordic.tcp} Tincr checkpoint into RapidSmith (this
   design has been placed in Vivado, but not routed). This checkpoint is located
   in the \textit{exampleVivadoDesigns} directory of the repository.
   \item Print the following about the loaded design (in any format you want):
@@ -218,8 +218,8 @@ command in a terminal:
 dot -Tpng fullAdder.dot -o fullAdder.png
 \end{verbatim}
 
-\noindent Visually verify that you assembled the full adder correctly, and that
-the LUTs are correctly initialized.
+\noindent Open the generated fullAdder.png image file, and visually verify that
+you assembled the full adder correctly, and that the LUTs are correctly initialized.
 
 \begin{figure}[H]
 \centering
