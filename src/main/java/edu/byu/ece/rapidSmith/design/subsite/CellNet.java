@@ -32,16 +32,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- *  Represents a net in a cell design.  Cell nets connect the pins on cells.
+ *  Represents a net in a cell design.  Cell nets connect to pins on cells.
  *  Cell nets contain a set of pins they connect to and a set of PIPs which
  *  define the routing of the net.
  *
- *  Cell nets can contain multiple source pins, however, in this case only one of
- *  the pins can be designated as an output pin and all other sources must be an
- *  inout pin.  When an output pin exists, it is designated as the source; when
+ *  Cell nets may contain multiple source pins, but only one of
+ *  the pins can be designated as an OUTPUT pin. All other possible sources must be of type
+ *  INOUT.  When an output pin exists, it is designated as the source; when
  *  absent, the source is one of the inout pins.
- *
- *  Cell nets may be members of a molecule.
+ *  
  */
 public class CellNet implements Serializable {
 	
@@ -63,6 +62,8 @@ public class CellNet implements Serializable {
 	private Set<CellPin> routedSinks; 
 	/** Set to true if this net is contained within a single site's boundaries*/
 	private boolean isIntrasite;
+	/** Set to true if the net is an internal macro net*/
+	private boolean isInternal;
 	/** Route status of the net*/
 	private RouteStatus routeStatus;
 	
@@ -95,6 +96,7 @@ public class CellNet implements Serializable {
 
 	private void init() {
 		this.pins = new HashSet<>();
+		this.isInternal = false;
 	}
 
 	/**
@@ -106,12 +108,38 @@ public class CellNet implements Serializable {
 		return name;
 	}
 
+	/**
+	 * Return the {@link NetType} of the net. 
+	 */
 	public NetType getType() {
 		return type;
 	}
 
+	/**
+	 * Sets the {@link NetType} of the net. 
+	 */
 	public void setType(NetType type) {
 		this.type = type;
+	}
+	
+	/**
+	 * Sets the internal status of the net. An internal net
+	 * is a net that connects two internal cell pins together.
+	 * Cell pins are internal if they are attached to internal cells
+	 * of a macro.
+	 * @param isInternal
+	 */
+	public void setIsInternal(boolean isInternal) {
+		this.isInternal = isInternal;
+	}
+	
+	/**
+	 * Returns {@code true} if the net is an internal net. A net is marked as
+	 * internal if all pins connected to the net are attached to internal
+	 * cells pins (cell pins attached to internal cells of a macro).
+	 */
+	public boolean isInternal() {
+		return this.isInternal;
 	}
 
 	/**
@@ -212,23 +240,35 @@ public class CellNet implements Serializable {
 	 */
 	public void connectToPins(Collection<CellPin> pinsToAdd) {
 		Objects.requireNonNull(pinsToAdd);
-
 		pinsToAdd.forEach(this::connectToPin);
 	}
 		
 	/**
-	 * Adds a pin to this net.  It is an error to add multiple output pins
+	 * Adds a pin to this net. It is an error to add multiple output pins
 	 * (excluding inout pins).
 	 *
-	 * @param pin the new pin to add
+	 * @param pin the new {@link CellPin} to add
 	 */
 	public void connectToPin(CellPin pin) {
+		
+		// If the cellpin is part of a macro cell, add all of the internal pins
+		// to the net instead of the external macro pins
+		if (pin.getCell().isMacro()) {
+			pin.getCell().mapToInternalPins(pin).forEach(this::connectToLeafPin);
+			pin.setNet(this);
+		}
+		else {
+			connectToLeafPin(pin);
+		}
+	}
+	
+	private void connectToLeafPin(CellPin pin) {
 		Objects.requireNonNull(pin);
 		if (pins.contains(pin))
 			throw new Exceptions.DesignAssemblyException("Pin already exists in net.");
 		if (pin.getNet() != null)
 			throw new Exceptions.DesignAssemblyException("Pin already connected to net.");
-
+		
 		pins.add(pin);
 		pin.setNet(this);
 
@@ -259,22 +299,13 @@ public class CellNet implements Serializable {
 	}
 
 	/**
-	 * Removes a collection of pins from the net. 
-	 * 
-	 * @param pins Collection of pins to remove
-	 */
-	public void disconnectFromPins(Collection<CellPin> pins) {
-		pins.forEach(this::disconnectFromPin);
-	}
-
-	/**
 	 * Tests if the specified pin is attached to the net
 	 * 
 	 * @param pin CellPin to test
 	 * @return <code>true</code> if the pin is attached to the net, <code>false</code> otherwise
 	 */
 	public boolean isConnectedToPin(CellPin pin) {
-		return pins.contains(pin);
+		return (pin.isInternal() ? pins.contains(pin) : (pin.getNet() == this));
 	}
 	
 	/**
@@ -292,11 +323,38 @@ public class CellNet implements Serializable {
 	}
 	
 	/**
-	 * Removes a pin from this net.
+	 * Removes a collection of pins from the net. 
+	 * 
+	 * @param pins Collection of pins to remove
+	 */
+	public void disconnectFromPins(Collection<CellPin> pins) {
+		pins.forEach(this::disconnectFromPin);
+	}
+	
+	/**
+	 * Removes a pin from this net. Only external macro pins and leaf cell pins
+	 * are valid parameters. If an internal macro pin is specified, an exception
+	 * will be thrown.
 	 *
 	 * @param pin the pin to remove
 	 */
 	public void disconnectFromPin(CellPin pin) {
+		
+		if (pin.isInternal()) {
+			throw new Exceptions.DesignAssemblyException("Cannot remove internal pin from net! Remove the external macro pin instead");
+		}
+		
+		// If the cellpin is part of a macro cell, remove all of the internal pins
+		if (pin.getCell().isMacro()) {
+			pin.getCell().mapToInternalPins(pin).forEach(this::disconnectFromLeafPin);
+			pin.clearNet();
+		}
+		else {
+			disconnectFromLeafPin(pin);
+		}
+	}
+	
+	private void disconnectFromLeafPin(CellPin pin) {
 		Objects.requireNonNull(pin);
 
 		boolean used = pins.remove(pin);
@@ -332,9 +390,10 @@ public class CellNet implements Serializable {
 
 	/**
 	 * Checks if a net is a clk net and should use the clock routing resources.
-	 * More specifically, checks if the pins connected to this net are of {@link CellPinType#CLOCK}.
+	 * More specifically, checks if the pins connected to this net are of type 
+	 * {@link CellPinType#CLOCK}.
 	 *
-	 * @return true if this net is a clock net
+	 * @return {@code true} if this net is a clock net
 	 */
 	public boolean isClkNet() {
 		
@@ -525,7 +584,7 @@ public class CellNet implements Serializable {
 					+ "Cannot be added to the routed sinks of the net!");
 		}
 		
-		if (cellPin.isOutpin()) {
+		if (cellPin.getDirection().equals(PinDirection.OUT)) {
 			throw new IllegalArgumentException(String.format("CellPin %s is an output pin. Cannout be added as a routed sink!", cellPin.getName()));
 		}
 		

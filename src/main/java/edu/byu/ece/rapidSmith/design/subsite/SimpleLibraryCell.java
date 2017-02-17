@@ -29,14 +29,14 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- *
+ * Represents a Vivado leaf primitive library cell. Examples of leaf cells
+ * include LUTs (LUT1, LUT2, ..., LUT6), Flip Flops (FDRE), BRAMs (RAMB36E1), etc. 
  */
 public class SimpleLibraryCell extends LibraryCell {
 	private static final long serialVersionUID = 6378678352365270213L;
 	/** List of types of BELs cells of this type can be placed on */
 	private List<BelId> compatibleBels;
-	/** List of LibraryPins of this LibraryCell */
-	private List<LibraryPin> libraryPins;
+	/** Stores the properties of a cell that are part of a control set*/
 	private Map<BelId, Map<String, SiteProperty>> sharedSiteProperties;
 
 	private boolean isVccSource;
@@ -44,6 +44,10 @@ public class SimpleLibraryCell extends LibraryCell {
 	private Integer numLutInputs = null;
 	private boolean isPort;
 
+	/**
+	 * Creates a new simple library cell with the specified name.
+	 * @param name Name of the library cell (i.e. LUT6)
+	 */
 	public SimpleLibraryCell(String name) {
 		super(name);
 	}
@@ -62,7 +66,12 @@ public class SimpleLibraryCell extends LibraryCell {
 	public boolean isVccSource() {
 		return isVccSource;
 	}
-
+	
+	/**
+	 * Marks this library cell as a VCC source.
+	 * 
+	 * @param isVccSource {@code true} to mark cell as a VCC source, {@code false} otherwise
+	 */
 	public void setVccSource(boolean isVccSource) {
 		this.isVccSource = isVccSource;
 	}
@@ -72,14 +81,29 @@ public class SimpleLibraryCell extends LibraryCell {
 		return isGndSource;
 	}
 
+	/**
+	 * Marks this library cell as a top-level design port.
+	 * 
+	 * @param isPort {@code true} to mark cell as top-level port, {@code false} otherwise
+	 */
 	public void setIsPort(boolean isPort) {
 		this.isPort = isPort;
 	}
 	
+	/**
+	 * Marks this library cell as a GND source.
+	 * 
+	 * @param isGndSource {@code true} to mark cell as a GND source, {@code false} otherwise
+	 */
 	public void setGndSource(boolean isGndSource) {
 		this.isGndSource = isGndSource;
 	}
 
+	/**
+	 * Set the number of LUT inputs on the cell
+	 * 
+	 * @param numInputs Integer number of LUT inputs
+	 */
 	public void setNumLutInputs(Integer numInputs) {
 		this.numLutInputs = numInputs;
 	}
@@ -92,21 +116,6 @@ public class SimpleLibraryCell extends LibraryCell {
 	@Override
 	public Integer getNumLutInputs() {
 		return numLutInputs;
-	}
-
-	/**
-	 * @return the templates of the pins that reside on cells of this type
-	 */
-	@Override
-	public List<LibraryPin> getLibraryPins() {
-		return libraryPins;
-	}
-
-	/**
-	 * List containing the templates of all this pins on this site
-	 */
-	public void setLibraryPins(List<LibraryPin> libraryPins) {
-		this.libraryPins = libraryPins;
 	}
 
 	/**
@@ -135,7 +144,11 @@ public class SimpleLibraryCell extends LibraryCell {
 	public Map<String, SiteProperty> getSharedSiteProperties(BelId anchor) {
 		return sharedSiteProperties.get(anchor);
 	}
-
+	
+	/**
+	 * Sets the shared site properties for the cell
+	 * @param sharedSiteProperties
+	 */
 	public void setSharedSiteProperties(
 			Map<BelId, Map<String, SiteProperty>> sharedSiteProperties
 	) {
@@ -143,7 +156,7 @@ public class SimpleLibraryCell extends LibraryCell {
 	}
 
 	/**
-	 * Library cells with the same name are considered equals.
+	 * Library cells with the same name are considered equal.
 	 */
 	@Override
 	public boolean equals(Object o) {
