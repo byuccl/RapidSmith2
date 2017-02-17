@@ -586,7 +586,7 @@ additional parts, follow the instructions found in the file
 \fil{\$RAPIDSMITH\_PATH/\-doc/Installing\-NewDevices.txt}.
 
 \clearpage
-\section{Devices in RS2}
+\section{Devices}
 
 \subsection{Xilinx FPGA Architecture Overview} \label{fpgaArch}
 This section is intended to give a brief introduction to Xilinx FPGA
@@ -914,7 +914,7 @@ primitive definition file of type BUFHCE can be seen in
 \end{figure}
 
 \pagebreak
-\section{Designs in RS2}
+\section{Designs}
 
 \subsection{Xilinx Netlists} \label{sec:xilinxNetlist}
 During the synthesis stage of implementation, a digital circuit expressed using
@@ -1054,10 +1054,30 @@ particular order.
   \autoref{sec:xilinxNetlist}), and serves as a template for instantiated
   \cls{Cell} objects. The template is used to save memory when creating several
   \cls{Cell}s of the same type. Whenever a new \cls{Cell} object is created, a
-  corresponding \cls{LibraryCell} must be specified in the constructor. The
-  method call \texttt{CellDesign.getCellsOfType(String,CellLibrary)} can be used
-  to get all \cls{Cell}s in the current design with a specific \cls{LibraryCell}
-  type.
+  corresponding \cls{LibraryCell} must be specified in the constructor.
+  \autoref{code:cells} demonstrates how to create a new cell in RapidSmith and
+  filter cells based on their type.
+  
+\begin{lstlisting}[caption=How to create new cells in RapidSmith,
+label=code:cells] 
+// You need to have a cell library to create a cell
+CellLibrary libCells = new CellLibrary(RSEnvironment.defaultEnv()
+				.getPartFolderPath("xc7a100t-csg324")
+				.resolve("cell_library.xml"));
+
+// How to create a new cell. The first argument is the name of the cell, the
+// second argument is the library cell
+Cell cell = new Cell("myCell", libCells.get("LUT6"));
+
+// Get all cells in a design of a certain type
+CellDesign design = getCellDesign();
+Stream<Cell> cells = design.getCellsOfType(libCells.get("FDRE"));
+\end{lstlisting}
+
+  The method call \texttt{CellDesign.getCellsOfType(String,CellLibrary)} can be
+  used to get all \cls{Cell}s in the current design with a specific
+  \cls{LibraryCell} type.
+  
   \item A \cls{Cell} has a list of \cls{CellPin}s that can connect to
   \cls{CellNet}s. The methods \texttt{Cell.getPins()},
   \texttt{Cell.getInputPins()}, and \texttt{Cell.getOutputPins()} can be used to
@@ -1072,6 +1092,9 @@ particular order.
   be used to iterate through the port \cls{Cell}s in a design, and the method
   \texttt{Cell.isPort()} can be used to determine if a given \cls{Cell} is
   actually a port.
+  \item Cells can be MACRO cells or LEAF cells. Leaf cells are the types of
+  cells described in \autoref{sec:xilinxNetlist}. Macro cells are described in
+  more detail in \autoref{sec:macros}.
 \end{itemize}
 
 \subsubsection{\cls{CellPin}} \label{sec:cellPin}
@@ -1192,7 +1215,7 @@ important aspects about \cls{CellNet}s in RapidSmith.
   
   \begin{figure}[H]
    \centering
-   \includegraphics[width=.5\columnwidth]{staticNetSources.png}
+   \includegraphics[width=.49\columnwidth]{staticNetSources.png}
    \caption{Static net multiple sources example. The higlighted white wires are
    a part of the same GND net, and the circled red areas are the source TIEOFFs
    for the GND net. In this image, only two sources are shown.}
@@ -1238,6 +1261,83 @@ important aspects about \cls{CellNet}s in RapidSmith.
    \label{fig:interVsIntra}
   \end{figure}
   
+\end{itemize}
+
+\subsubsection{Macro Cells} \label{sec:macros}
+Most cells in RapidSmith or Vivado designs are leaf cells (LUTs, Flip Flops,
+etc.). However, macro cells can also exist. A macro cell can conceptually be
+thought of as a wrapper for related leaf cells. \autoref{fig:macros} shows an
+example of an ``IOBUF'' macro cell in Vivado, which is a bidirectional buffer.
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=.9\columnwidth]{macro.png}
+ \caption{An IOBUF macro in Vivado.}
+ \label{fig:macros}
+\end{figure}
+
+\noindent 
+As the figure shows, the macro consists of two internal cells: one of type
+``OBUFT'' and another of type ``IBUF''. The two internal cells are encapsulated
+into an external macro cell with the name ``MemDB\_IOBUF[0]\_inst'', and wired
+together accordingly. External cell pins of the macro connect to one or more
+internal cell pins. Also, internal nets can exist in macros that connect two
+internal cells together. RapidSmith now supports importing macro cells from
+Vivado and adding them to a \cls{CellDesign}. \autoref{code:macros} gives a
+brief introduction to using macro in RapidSmith.
+
+\begin{lstlisting}[caption=How to use macros in RapidSmith,
+label=code:macros] 
+// Get a handle to a design and cell library
+CellDesign design = getCellDesign();
+CellLibrary libCells = getCellLibrary();
+
+// Create a new macro cell and add it to a design
+Cell macro = new Cell("myMacro", libCells.get("IOBUF"));
+design.addCell(macro);
+
+// Connect the macro cell to a net 
+CellPin pin = macro.getPin("IO");
+design.getNet("TmpNet").connectToPin(pin);
+
+// Iterate through a list of all cells (macro and leaf cells) of a design
+for (Cell cell : design.getCells) {
+	if ( cell.isMacro() ) {
+		List<Cell> internalCells = cell.getInternalCells();
+		List<CellNet> internalNets = cell.getInternalNets();
+		List<CellPin> externalPins = cell.getPins();
+		// do something with the macro info
+	}
+	else {
+		// do something with a regular leaf cell 
+	}
+}
+
+\end{lstlisting}
+
+\noindent
+As the code example above shows, macro cells are generally used
+exactly like regular leaf cells. However, there are a few distinctions
+between macro cells and leaf cells.
+
+\begin{itemize}
+  \item When a macro cell is added to a \cls{CellDesign}, all of the internal
+  cells and internal nets are automatically added to the design as well. You do
+  not have to worry about adding these yourself. When a macro cell is removed
+  from a \cls{CellDesign}, the internal cells and nets are also removed.
+  \item When a macro cell pin is connected to a \cellnet, RapidSmith
+  automatically connects the net to the corresponding internal pins. When a
+  macro cell pin is disconnected from a \cellnet, the internal cell pins are
+  disconnected. Nets in RapidSmith only connect to leaf cells (i.e. it is
+  essentially a flattened netlist).
+  \item Internal cells and nets within a macro cannot be individually added or
+  removed from a \cls{CellDesign}. An exception will be thrown if you try to do
+  this. Instead, the entire macro cell must be added or removed.
+  \item Macros cannot be placed. Rather, the internal cells of a macro should be
+  placed instead.
+  \item When a \cls{CellDesign} is exported from RapidSmith, macro cells are not
+  exported. Only the internal cells and nets are exported and the macro is not
+  rebuilt in Vivado.
 \end{itemize}
 
 \subsubsection {\cls{PropertyList}}
@@ -1312,6 +1412,7 @@ This includes:
   \item The name, direction, and type of each library cell pin
   \item Valid placement locations for instances of the library cell
   \item Possible logical-to-physical pin mappings for every library pin
+  \item The type of library cell (macro or simple)
   \item Configuration properties of the library cell (TODO)
 \end{itemize}
 
@@ -1327,20 +1428,125 @@ that we know is right}.
 The rest of this section demonstrates how to get access to a cell library in
 RapidSMith, and how to create a new cell library XML file from Tincr.
 
-\subsubsection{Getting a handle to the Cell Library}
+\subsubsection{Loading a Cell Library}
 When a Tincr checkpoint is imported into RapidSmith, a \cls{CellLibrary} is
 automatically loaded. To get a handle to the \cls{CellLibrary}, you can use
-the method call \texttt{TincrCheckpoint.getLibCells()} on the Tincr checkpoint
-object that was loaded. If you only have a handle to a \cls{Device} object, then
-the code below can be used to load a cell library from disk:
+the method call \texttt{TincrCheckpoint.getLibCells()} on the loaded checkpoint
+object. If you don't have a handle to a Tincr Checkpoint, then the cell
+library XML can be loaded directly from disk. \autoref{code:cellLibrary}
+demonstrates both methods of loading a \cls{CellLibrary}.
 
-\begin{code}
-CellLibrary libCells = new CellLibrary(RSEnvironment.defaultEnv()
-                       .getPartFolderPath(device.getPartName())
-                       .resolve(CELL_LIBRARY_NAME));
-\end{code}
+\begin{lstlisting}[caption=How to load a CellLibrary,
+label=code:cellLibrary] 
+// First way, load a Tincr Checkpoint
+TincrCheckpoint tcp = VivadoInterface.loadTcp("checkpoint.tcp");
+CellLibrary libCells1 = tcp.getLibCells();
 
-\subsubsection{Generating a new Cell Library}
+// Second way, directly load the cell library from disk
+CellLibrary libCells2 = new CellLibrary(RSEnvironment.defaultEnv()
+                       .getPartFolderPath("xc7a100t-csg324-3")
+                       .resolve("cellLibrary.xml");
+
+\end{lstlisting}
+
+\subsubsection{Adding Custom Macros to a Cell Library} \label{sec:customMacros}
+Customized macros can now be added to a \cls{CellLibrary} if desired. This can
+be accomplished in two easy steps. 
+
+\begin {enumerate}
+  \item Create an XML specification
+  of your macro that follows the format laid out below: 
+
+\begin{lstlisting}[language=XML, numbers=none, keywordstyle=, stringstyle=]
+<?xml version="1.0" encoding="UTF-8"?>
+<root>	
+  <macros>    
+		<macro>
+        <type>RAM128X1D</type>
+        <!-- List of internal cells with name and leaf type of each -->
+        <cells>
+            <internal>
+                <name>DP.HIGH</name>
+                <type>RAMD64E</type>
+            </internal>
+            <internal>
+                <name>DP.LOW</name>
+                <type>RAMD64E</type>
+            </internal>
+            <internal>
+                <name>F7.DP</name>
+                <type>MUXF7</type>
+            </internal>
+			...
+        </cells>
+        <!-- List of macro pins with name, direction, pin type, and internal connections --> 
+        <pins>
+            <pin>
+                <name>DPO</name>
+                <direction>output</direction>
+                <type>MACRO</type>
+                <internalConnections>
+                    <pinname>F7.DP/O</pinname>
+                </internalConnections>
+            </pin>
+            <pin>
+                <name>SPO</name>
+                <direction>output</direction>
+                <type>MACRO</type>
+                <internalConnections>
+                    <pinname>F7.SP/O</pinname>
+                </internalConnections>
+            </pin>
+            <pin>
+                <name>A[6]</name>
+                <direction>input</direction>
+                <type>MACRO</type>
+                <internalConnections>
+                    <pinname>F7.SP/S</pinname>
+                    <pinname>DP.HIGH/WADR6</pinname>
+                    <pinname>DP.LOW/WADR6</pinname>
+                    <pinname>SP.HIGH/WADR6</pinname>
+                    <pinname>SP.LOW/WADR6</pinname>
+                </internalConnections>
+            </pin>
+            ...
+        </pins>
+        <!-- List of internal nets, and the internal cell pins they connect to --> 
+        <internalNets>
+            <internalNet>
+                <name>DPO0</name>
+                <pins>
+                    <pinname>F7.DP/I0</pinname>
+                    <pinname>DP.LOW/O</pinname>
+                </pins>
+            </internalNet>
+            ...
+        </internalNets>
+    </macro>
+	...
+  </macros>
+</root>
+\end{lstlisting}
+
+  \item Import the macro into the \cls{CellLibrary} using the API call shown in
+  \autoref{code:macroImport}.
+
+\begin{lstlisting}[caption=Adding new macros to the Cell Library,
+label=code:macroImport] 
+// Get a handle to a CellLibrary
+CellLibrary libCells = getCellLibrary();
+
+// Add the macros in an XML file.
+libCells.loadMacroXML(Paths.get("myMacro.xml"); 
+\end{lstlisting}
+
+\end{enumerate}
+
+\noindent
+Once this is complete, you can use your custom macro in a \cls{CellDesign} like
+a normal cell.
+
+\subsubsection{Creating a New Cell Library}
 During runtime, a \cls{CellLibrary} data structure is created by parsing a
 \textit{cellLibrary.xml} file into memory. So, to create a new \cls{CellLibrary}
 all you have to do is generate a new \textit{cellLibrary.xml} file for the
@@ -1381,7 +1587,7 @@ Xilinx part you are interested in. This can be done in a few easy steps.
 
 
 \pagebreak
-\section{Placement in RS2} \label{sec:placement}
+\section{Placement} \label{sec:placement}
 
 In the original RapidSmith, placement occurred at the \cls{Site} level. A
 collection of \cls{Cell}s were grouped together in what was called an
@@ -1511,10 +1717,12 @@ Some additional points about placement to be aware of include:
   a sample simulated annealing placer for the Artix-7 part {\em
   xc7a100tcsg324} can be found in the package
   \pkg{edu.byu.ece.rapidSmith.examples.placerDemo}.
+  \item Macro cells in RapidSmith cannot be placed. The internal cells of a
+  macro should be placed instead.
 \end{itemize}
 
 \pagebreak
-\section{Routing in RS2} \label{sec:routing}
+\section{Routing} \label{sec:routing}
 After placement, all \cells of a design have been mapped to \bels, and their
 corresponding \cellpins mapped to \belpins. The next (and final) step of the
 FPGA implementation flow is to physically wire together the used \belpins. This
@@ -1897,7 +2105,7 @@ design.setUsedSitePipsAtSite(site, usedPipWires);
 \end{lstlisting}
 
 \pagebreak
-\section{Importing/Exporting Designs Between Vivado and RS2} \label{sec:import}
+\section{Design Import/Export} \label{sec:import}
 Importing and exporting designs between Vivado and RS2 is fairly
 straightforward. It is done using Tincr Checkpoint (TCP) files, which contain a
 variety of information about a digital design. This section describes in detail
@@ -2074,6 +2282,49 @@ XdcConstraint xdc = new XdcConstraint("set_property", "IOSTANDARD LVCMOS18 [get_
 design.addVivadoConstraint(xdc);
 \end{lstlisting}
 
+\subsubsection{macros.xml}
+
+The \textit{macros.xml} file within a RSCP contains template information about
+macro cells in a Vivado design that (a) were not fully flattened, and (b) do not
+exist in the default Vivado cell library. Using the information in the XML file,
+a \cls{LibraryCell} can be created and added to the \cls{CellLibrary} so that
+the design can import correctly. More information about macro cells in
+RapidSmith can be found in \autoref{sec:macros}.
+
+\begin{lstlisting}[numbers=none]
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <macros>
+    <macro>
+        <type>IOBUF</type>
+        <cells>
+            <internal>
+                <name>IBUF</name>
+                <type>IBUF</type>
+            </internal>
+            <internal>
+                <name>OBUFT</name>
+                <type>OBUFT</type>
+            </internal>
+        </cells>
+        <pins>
+            <pin>
+                <name>IO</name>
+                <direction>inout</direction>
+                <type>MACRO</type>
+                <internalConnections>
+                    <pinname>IBUF/I</pinname>
+                    <pinname>OBUFT/O</pinname>
+                </internalConnections>
+            </pin>
+            ...
+        </pins>
+    </macro>
+  </macros>
+</root>  
+\end{lstlisting}
+
+
 \subsection{Tincr Checkpoints} \label{sec:tcp}
 Tincr checkpoints are very similar to RapidSmith checkpoints, but they can be
 used to import designs back into Vivado after they have been modified in
@@ -2193,6 +2444,15 @@ Collection<BelRoutethrough> belRts = tcp.getRoutethroughObjects();
 Collection<Bel> staticSources = tcp.getStaticSourceBels();
 Map<BelPin, CellPin> belPinToCellPinMap = tcp.getBelPinToCellPinMap()
 \end{lstlisting}
+
+\noindent
+After a design is exported from RapidSmith, a Tincr Checkpoint (TCP) is
+produced. To import the TCP back into Vivado, simply open up Vivado in Tcl mode
+and use the following command:
+
+\begin{code}
+Vivado% tincr::read_tcp myCheckpoint.tcp
+\end{code}
 
 \pagebreak
 \section{Example Programs} \label{examples}

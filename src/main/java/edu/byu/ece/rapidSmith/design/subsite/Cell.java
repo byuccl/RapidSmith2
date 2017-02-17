@@ -24,6 +24,7 @@ import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelId;
 import edu.byu.ece.rapidSmith.device.BondedType;
 import edu.byu.ece.rapidSmith.device.PinDirection;
+import edu.byu.ece.rapidSmith.device.PortDirection;
 import edu.byu.ece.rapidSmith.device.Site;
 
 import java.util.*;
@@ -53,7 +54,16 @@ public class Cell {
 	private final Map<String, CellPin> pinMap;
 	/**	Set of pseudo pins attached to the cell */
 	private Set<CellPin> pseudoPins;
-
+	
+	// Macro specific cell categories.
+	
+	/** Parent of this cell (for internal cells only)*/
+	private Cell parent;
+	/** Mapping of cell name to internal cell*/
+	private Map<String, Cell> internalCells;
+	/** Mapping of net name to internal net*/
+	private Map<String, CellNet> internalNets;
+	
 	/**
 	 * Creates a new cell with specified name and type.
 	 *
@@ -77,7 +87,17 @@ public class Cell {
 			this.pinMap.put(pin.getName(), new BackedCellPin(this, pin));
 		}
 
-		// TODO subcells for hierarchical macros
+		// for port cells, set the direction property
+		if(libCell.isPort()) {
+			this.properties.update(new Property("Dir", PropertyType.USER, PortDirection.getPortDirectionForImport(this)));
+		}
+		
+		// additional initialization for macro cells
+		if (libCell.isMacro()) {
+			LibraryMacro macroCell = (LibraryMacro) libCell;
+			this.internalCells = macroCell.constructInternalCells(this);
+			this.internalNets = macroCell.constructInternalNets(this.name, this.internalCells);
+		}
 	}
 
 	/**
@@ -92,7 +112,26 @@ public class Cell {
 
 		this.name = name;
 	}
-
+	
+	void setParent(Cell parent) {
+		this.parent = parent;
+	}
+	
+	/**
+	 * Returns the parent {@link Cell} of the cell if it is an internal cell (inside of a macro).
+	 * If the cell is not inside of a macro, null will be returned. 
+	 */
+	public Cell getParent() {
+		return this.parent;
+	}
+	
+	/**
+	 * Returns {@code true} if the cell is an internal cell of a macro.
+	 */
+	public final boolean isInternal() {
+		return this.parent != null;
+	}
+	
 	/**
 	 * Returns true if this cell is part of a design.
 	 */
@@ -123,6 +162,13 @@ public class Cell {
 	public final LibraryCell getLibCell() {
 		return libCell;
 	}
+	
+	/**
+	 * Returns the type of cell this is (i.e LUT6)
+	 */
+	public final String getType() {
+		return libCell.getName();
+	}
 
 	/**
 	 * Returns true if this cell acts as a VCC source.
@@ -143,6 +189,13 @@ public class Cell {
 	 */
 	public boolean isPort() {
 		return getLibCell().isPort();
+	}
+	
+	/**
+	 * Returns {@code true} if the current cell is a macro cell, {@code false} otherwise.
+	 */
+	public boolean isMacro() {
+		return libCell.isMacro();
 	}
 	
 	/**
@@ -417,6 +470,45 @@ public class Cell {
 				.collect(Collectors.toList());
 	}
 
+	/**
+	 * Returns a collections of the internal cells within a macro cell.
+	 * If this function is used on a leaf cell, then null will be returned.
+	 */
+	public Collection<Cell> getInternalCells() {
+		return isMacro() ? this.internalCells.values() : null;
+	}
+	
+	/**
+	 * Returns a list of internal cell pins that are connected to the
+	 * specified external cell pin for the macro. This is package private,
+	 * and should not be used by users of RapidSmith. 
+	 * 
+	 * @param pin External macro pin
+	 */
+	List<CellPin> mapToInternalPins(CellPin pin) {
+		assert (libCell.isMacro()) : "Only macro cells can call this function!";
+		return ((LibraryMacro)libCell).getInternalPins(this.name, pin.getLibraryPin(), this.internalCells); 
+	}
+	
+	/**
+	 * Returns a collections of the internal nets within a macro cell.
+	 * If this function is used on a leaf cell, then null will be returned.
+	 */	
+	public Collection<CellNet> getInternalNets() {
+		return isMacro() ? this.internalNets.values() : null;
+	}
+	
+	/**
+	 * Returns the external macro pin of an internal {@link CellPin}. This
+	 * is package private and so should not be used by users.
+	 *  
+	 * @param internalPin Internal {@link CellPin}
+	 */
+	CellPin getExternalPin(CellPin internalPin) {
+		
+		return ((LibraryMacro)libCell).getExternalPin(this, internalPin);
+	}
+	
 	/**
 	 * Returns a deep copy of this cell.  The deep copy does not have any design
 	 * or cluster information.

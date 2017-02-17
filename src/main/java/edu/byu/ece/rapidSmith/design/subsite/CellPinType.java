@@ -42,5 +42,6 @@ public enum CellPinType {
 	SETRESET,
 	WRITE_ENABLE,
 	DATA, 
-	PSEUDO
+	PSEUDO,
+	MACRO
 }

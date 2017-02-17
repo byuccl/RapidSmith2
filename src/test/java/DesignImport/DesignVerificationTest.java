@@ -1,3 +1,4 @@
+package DesignImport;
 /*
  * Copyright (c) 2016 Brigham Young University
  *
@@ -17,8 +18,6 @@
  * RapidSmith Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
  * also get a copy of the license at <http://www.gnu.org/licenses/>.
  */
-
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.IOException;

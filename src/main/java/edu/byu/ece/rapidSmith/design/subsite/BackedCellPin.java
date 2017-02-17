@@ -68,7 +68,7 @@ public class BackedCellPin extends CellPin {
 
 	@Override
 	public String getFullName() {
-		return getCell().getName() + "." + getName();
+		return getCell().getName() + "/" + getName();
 	}
 
 	@Override
@@ -117,5 +117,10 @@ public class BackedCellPin extends CellPin {
 	@Override
 	public CellPinType getType() {
 		return libraryPin.getPinType();
+	}
+
+	@Override
+	public CellPin getExternalPin() {		
+		return isInternal() ? getCell().getParent().getExternalPin(this) : null;
 	}
 }
