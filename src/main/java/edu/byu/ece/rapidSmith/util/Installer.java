@@ -19,7 +19,6 @@
  */
 package edu.byu.ece.rapidSmith.util;
 
-import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.creation.*;
 import net.sourceforge.argparse4j.ArgumentParsers;
@@ -31,7 +30,6 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 
 /**
  * This class will create the device and wire enumerator files 
@@ -60,7 +58,6 @@ public class Installer {
 			System.exit(-1);
 		}
 
-		RSEnvironment env = RSEnvironment.defaultEnv();
 		long timeStart = System.currentTimeMillis();
 
 		System.out.println("DISCLAIMER:");
@@ -83,7 +80,6 @@ public class Installer {
 		System.out.println("START: " + FileTools.getTimeString());
 
 		// Check if user supplied file with parameters
-		ArrayList<String> partNames = new ArrayList<>();
 		for(Object opart : options.getList("device")) {
 			String part = (String) opart;
 

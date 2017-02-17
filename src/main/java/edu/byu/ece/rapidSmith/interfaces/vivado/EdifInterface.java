@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -187,7 +188,7 @@ public final class EdifInterface {
 									String.format("%s[%d]", portSuffix, reverseBusIndex(port.getWidth(), busMember.bitPosition())) :
 									portSuffix;
 				Cell portCell = new Cell(portName, libCell);
-				portCell.getProperties().update(new Property("Dir", PropertyType.USER, PortDirection.getPortDirectionForImport(portCell)));
+				//portCell.getProperties().update(new Property("Dir", PropertyType.USER, PortDirection.getPortDirectionForImport(portCell)));
 				design.addCell(portCell);
 			}
 		}
@@ -235,17 +236,16 @@ public final class EdifInterface {
 			CellNet cn = new CellNet(net.getOldName(), NetType.WIRE); 
 			
 			// Add all the source and sink connections to the net
-			Collection<EdifPortRef> sources = net.getSourcePortRefs(false, true);
+			//Collection<EdifPortRef> sources = net.getSourcePortRefs(false, true);
 			
-			if (sources.size() == 0) {
+			// process all net connections
+			processNetConnections(net.getPortRefList(), design, cn);
+			
+			//report a warning if no sources on a net are found
+			if (cn.getAllSourcePins().size() == 0) {
 				System.err.println("[Warning] No source for net " + net.getOldName());
-				design.addNet(cn);
-				continue;
 			}
-			
-			processNetConnections(sources, design, cn);
-			processNetConnections(net.getSinkPortRefs(false, true), design, cn);
-			
+						
 			// Add the net to the design if is is NOT a static net.
 			// Otherwise, store it for later use (will collapse later)
 			if (cn.isVCCNet()) {
@@ -472,7 +472,12 @@ public final class EdifInterface {
 		
 		HashSet<LibraryCell> uniqueLibraryCells = new HashSet<>();
 		
-		for (Cell c : design.getCells()) {			
+		Iterator<Cell> cellIt = design.getLeafCells().iterator();
+		
+		// for (Cell c : design.getCells()) {
+		while (cellIt.hasNext()) {
+			Cell c = cellIt.next();
+			
 			if (!c.isPort())
 				uniqueLibraryCells.add(c.getLibCell());
 		}
@@ -492,12 +497,15 @@ public final class EdifInterface {
 		topLevelCell.setInterface(cellInterface);
 		
 		// create the cell instances
-		for (Cell cell : design.getCells()) {
+		Iterator<Cell> cellIt = design.getLeafCells().iterator();
+		//for (Cell cell : design.getCells) {
+		while (cellIt.hasNext()) {
+			Cell cell = cellIt.next();
 			
 			if (cell.isPort())
 				continue;
 			
-			EdifCell edifLibCell = cellMap.get(cell.getLibCell());	
+			EdifCell edifLibCell = cellMap.get(cell.getLibCell());
 			topLevelCell.addSubCell( createEdifCellInstance(cell, topLevelCell, edifLibCell) );
 		}
 		
@@ -531,7 +539,7 @@ public final class EdifInterface {
 				portWidthMap.put(portName, count + 1);
 				
 				if (count == 0) {
-					portDirectionMap.put(portName, PortDirection.isInputPort(cell) ? EdifPort.IN : EdifPort.OUT);
+					portDirectionMap.put(portName, getEdifPinDirection(cell));
 				}
 			}
 		}
@@ -567,14 +575,14 @@ public final class EdifInterface {
 	 */
 	private static EdifNet createEdifNet(CellNet cellNet, EdifCell edifParentCell) {
 		EdifNet edifNet = new EdifNet(createEdifNameable(cellNet.getName()), edifParentCell);
-		
+				
 		// create the port references for the edif net
 		for (CellPin cellPin : cellNet.getPins()) {
 			
 			if (cellPin.isPseudoPin()) {
 				continue;
 			}
-			
+						
 			Cell parentCell = cellPin.getCell();
 			
 			EdifPortRef portRef = parentCell.isPort() ?
@@ -730,5 +738,17 @@ public final class EdifInterface {
 			default: // if we reach here, then thrown a new exception
 				throw new AssertionError("Invalid Pin Direction!");
 		}
+	}
+	
+	/*
+	 * Returns the corresponding EDIF port direction of a RapidSmith
+	 * port cell.
+	 */
+	private static int getEdifPinDirection(Cell portCell) {		
+		if (PortDirection.isInoutPort(portCell)) {
+			return EdifPort.INOUT;
+		}
+		
+		return PortDirection.isInputPort(portCell) ? EdifPort.IN : EdifPort.OUT; 
 	}
 }

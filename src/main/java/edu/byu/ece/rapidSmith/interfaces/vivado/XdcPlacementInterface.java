@@ -27,9 +27,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
@@ -279,7 +281,10 @@ public class XdcPlacementInterface {
 		BufferedWriter fileout = new BufferedWriter (new FileWriter(xdcOut));
 		
 		//TODO: Assuming that the logical design has not been modified...can no longer assume this with insertion/deletion
-		for (Cell cell : sortCellsForXdcExport(design)) {
+		Iterator<Cell> cellIt = sortCellsForXdcExport(design).iterator();
+		//for (Cell cell : sortCellsForXdcExport(design)) {
+		while (cellIt.hasNext()) {
+			Cell cell = cellIt.next();
 						
 			Site ps = cell.getSite();
 			Bel b = cell.getBel();
@@ -291,14 +296,17 @@ public class XdcPlacementInterface {
 				continue;
 			}
 			
-			fileout.write(String.format("set_property BEL %s.%s [get_cells {%s}]\n", ps.getType().toString(), b.getName(), cellname));
+			fileout.write(String.format("set_property BEL %s.%s [get_cells {%s}]\n", ps.getType().name(), b.getName(), cellname));
 			fileout.write(String.format("set_property LOC %s [get_cells {%s}]\n", ps.getName(), cellname));
 								
 			//TODO: Update this function when more cells with LOCK_PINS are discovered
 			if(cell.getLibCell().isLut()) { 
 				fileout.write("set_property LOCK_PINS { ");
-				for(CellPin cp: cell.getInputPins()) 
-					fileout.write(String.format("%s:%s ", cp.getName(), cp.getMappedBelPin().getName()));
+				for(CellPin cp: cell.getInputPins()) {
+					if (!cp.isPseudoPin()) {
+						fileout.write(String.format("%s:%s ", cp.getName(), cp.getMappedBelPin().getName()));
+					}
+				}
 				
 				fileout.write("} [get_cells {" + cellname + "}]\n");
 			}
@@ -313,17 +321,21 @@ public class XdcPlacementInterface {
 	 * 
 	 * TODO: Add <is_lut>, <is_carry>, and <is_ff> tags to cell library
 	 */
-	private Collection<Cell> sortCellsForXdcExport(CellDesign design) {
+	private Stream<Cell> sortCellsForXdcExport(CellDesign design) {
 		
 		// cell bins
 		ArrayList<Cell> sorted = new ArrayList<>(design.getCells().size());
-		ArrayList<Cell> lutCells = new ArrayList<>();
+		ArrayList<Cell> lutCellsD = new ArrayList<>();
+		ArrayList<Cell> lutCellsABC = new ArrayList<>();
 		ArrayList<Cell> carryCells = new ArrayList<>();
 		ArrayList<Cell> ffCells = new ArrayList<>();
 		ArrayList<Cell> ff5Cells = new ArrayList<>();
 		
 		// traverse the cells and drop them in the correct bin
-		for (Cell cell : design.getCells()) {
+		Iterator<Cell> cellIt = design.getLeafCells().iterator();
+		//for (Cell cell : design.getCells) {
+		while (cellIt.hasNext()) {
+			Cell cell = cellIt.next();
 			
 			// only add cells that are placed to the list
 			if( !cell.isPlaced() ) {
@@ -334,7 +346,13 @@ public class XdcPlacementInterface {
 			String belName = cell.getBel().getName();
 			
 			if (belName.endsWith("LUT")) {
-				lutCells.add(cell); 
+				if (belName.contains("D")) {
+					//System.out.println(cell.getName());
+					lutCellsD.add(cell);
+				}
+				else {
+					lutCellsABC.add(cell);
+				}
 			}
 			else if (libCellName.startsWith("CARRY")) {
 				carryCells.add(cell);
@@ -351,11 +369,22 @@ public class XdcPlacementInterface {
 		}
 				
 		// append all other cells in the correct order
+		
+		return Stream.of(sorted.stream(), 
+				lutCellsD.stream(), 
+				lutCellsABC.stream(), 
+				ffCells.stream(), 
+				carryCells.stream(), 
+				ff5Cells.stream())
+				.flatMap(Function.identity());
+		
+		/*
 		sorted.addAll(lutCells);
 		sorted.addAll(ffCells);
 		sorted.addAll(carryCells);		
 		sorted.addAll(ff5Cells);
+		*/
 	
-		return sorted;
+		//return sorted;
 	}
 }

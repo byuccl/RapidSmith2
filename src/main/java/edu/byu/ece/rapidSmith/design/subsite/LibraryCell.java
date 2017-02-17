@@ -33,28 +33,41 @@ import java.util.Objects;
  */
 public abstract class LibraryCell implements Serializable {
 	private static final long serialVersionUID = -7850247997306342388L;
+	/** Name of the Library cell*/
 	private final String name;
+	/** List of LibraryPins of this LibraryCell */
+	private List<LibraryPin> libraryPins;
 
+	/**
+	 * Library Cell constructor
+	 * @param name String name of the library cell (i.e. LUT6)
+	 */
 	public LibraryCell(String name) {
 		Objects.nonNull(name);
 		this.name = name;
 	}
 
+	/**
+	 * Returns the name of the Library Cell (i.e. LUT6)
+	 */
 	public final String getName() {
 		return name;
 	}
 
-	abstract public boolean isMacro();
-	abstract public boolean isVccSource();
-	abstract public boolean isGndSource();
-	abstract public boolean isLut();
-	abstract public boolean isPort();
-	abstract public Integer getNumLutInputs();
-	abstract public List<LibraryPin> getLibraryPins();
-	abstract public List<BelId> getPossibleAnchors();
-	abstract public List<Bel> getRequiredBels(Bel anchor);
-	abstract public Map<String, SiteProperty> getSharedSiteProperties(BelId anchor);
+	/**
+	 * @return the templates of the pins that reside on cells of this type
+	 */
+	public List<LibraryPin> getLibraryPins() {
+		return libraryPins;
+	}
 
+	/**
+	 * List containing the templates of all this pins on this site
+	 */
+	public void setLibraryPins(List<LibraryPin> libraryPins) {
+		this.libraryPins = libraryPins;
+	}
+	
 	/**
 	 * Returns the {@link LibraryPin} on this LibraryCell with the given name.<p>
 	 * Operates in O{# of pins} time.
@@ -66,4 +79,58 @@ public abstract class LibraryCell implements Serializable {
 		}
 		return null;
 	}
+	
+	// Abstract functions
+	/**
+	 * Returns {@code true} if the cell is a library cell is a library macro, 
+	 * {@code false} otherwise.
+	 */
+	abstract public boolean isMacro();
+	/**
+	 * Returns {@code true} if the cell is a VCC source, {@code false} otherwise.
+	 */
+	abstract public boolean isVccSource();
+	/**
+	 * Returns {@code true} if the cell is a GND source, {@code false} otherwise.
+	 */
+	abstract public boolean isGndSource();
+	/**
+	 * Returns {@code true} if the cell is a LUT cell (LUT1, LUT2, etc.), {@code false} otherwise.
+	 */
+	abstract public boolean isLut();
+	/**
+	 * Returns {@code true} if the cell represents a top-level port cell.
+	 */
+	abstract public boolean isPort();
+	/**
+	 * If the cell is a LUT cell, this returns the number of LUT inputs
+	 * on the cell.
+	 */
+	abstract public Integer getNumLutInputs();
+	
+	/**
+	 * Returns a List of {@link BelId} objects that represent where the
+	 * current cell can be placed. Since macro cells cannot be placed
+	 * directly in RapidSmith, null is returned if this function is used 
+	 * for a library macro
+	 */
+	abstract public List<BelId> getPossibleAnchors();
+	/**
+	 * For macro cells, returns a list of required bel object that are
+	 * needed to place the macro. This functionality is currently unimplemented
+	 * and should not be used.
+	 * @param anchor Anchor {@link Bel} for the macro
+	 */
+	abstract public List<Bel> getRequiredBels(Bel anchor);
+	
+	/**
+	 * Returns a list of site properties that are shared across a {@link Bel} Type.
+	 * For example, all Flip Flop Bels in a Site, must all be either rising edge or
+	 * falling edge. This property would be returned in this list. For Macro cells,
+	 * {@code null} is returned.
+	 *  
+	 * @param anchor {@link Bel}
+	 */
+	abstract public Map<String, SiteProperty> getSharedSiteProperties(BelId anchor);
+		
 }

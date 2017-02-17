@@ -98,7 +98,10 @@ public final class VivadoInterface {
 		CellLibrary libCells = new CellLibrary(RSEnvironment.defaultEnv()
 				.getPartFolderPath(partName)
 				.resolve(CELL_LIBRARY_NAME));
-				
+		
+		// add additional macro cell specifications to the cell library before parsing the EDIF netlist
+		libCells.loadMacroXML(Paths.get(tcp, "macros.xml"));
+		
 		// create the RS2 flattened netlist 
 		String edifFile = Paths.get(tcp, "netlist.edf").toString();
 		CellDesign design = EdifInterface.parseEdif(edifFile, libCells, true);
