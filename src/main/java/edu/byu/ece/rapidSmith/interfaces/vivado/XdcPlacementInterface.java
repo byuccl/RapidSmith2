@@ -324,7 +324,7 @@ public class XdcPlacementInterface {
 	private Stream<Cell> sortCellsForXdcExport(CellDesign design) {
 		
 		// cell bins
-		ArrayList<Cell> sorted = new ArrayList<>(design.getCells().size());
+		ArrayList<Cell> sorted = new ArrayList<>(design.getCells().size());		
 		ArrayList<Cell> lutCellsD = new ArrayList<>();
 		ArrayList<Cell> lutCellsABC = new ArrayList<>();
 		ArrayList<Cell> carryCells = new ArrayList<>();
@@ -333,7 +333,7 @@ public class XdcPlacementInterface {
 		
 		// traverse the cells and drop them in the correct bin
 		Iterator<Cell> cellIt = design.getLeafCells().iterator();
-		//for (Cell cell : design.getCells) {
+		
 		while (cellIt.hasNext()) {
 			Cell cell = cellIt.next();
 			
@@ -347,7 +347,6 @@ public class XdcPlacementInterface {
 			
 			if (belName.endsWith("LUT")) {
 				if (belName.contains("D")) {
-					//System.out.println(cell.getName());
 					lutCellsD.add(cell);
 				}
 				else {
@@ -369,7 +368,6 @@ public class XdcPlacementInterface {
 		}
 				
 		// append all other cells in the correct order
-		
 		return Stream.of(sorted.stream(), 
 				lutCellsD.stream(), 
 				lutCellsABC.stream(), 
@@ -377,14 +375,5 @@ public class XdcPlacementInterface {
 				carryCells.stream(), 
 				ff5Cells.stream())
 				.flatMap(Function.identity());
-		
-		/*
-		sorted.addAll(lutCells);
-		sorted.addAll(ffCells);
-		sorted.addAll(carryCells);		
-		sorted.addAll(ff5Cells);
-		*/
-	
-		//return sorted;
 	}
 }

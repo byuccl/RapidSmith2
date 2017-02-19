@@ -1,4 +1,4 @@
-package DesignAssembly;
+package design.assembly;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -23,7 +23,6 @@ import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
 import edu.byu.ece.rapidSmith.design.subsite.CellPinType;
-import edu.byu.ece.rapidSmith.util.Exceptions;
 
 /**
  *	Tests macro cell functionality in RapidSmith
