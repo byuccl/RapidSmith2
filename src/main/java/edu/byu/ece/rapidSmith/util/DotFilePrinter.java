@@ -225,6 +225,18 @@ public class DotFilePrinter {
 		return dotBuilder.toString();
 	}
 	
+
+	/**
+	 * Creates a DOT string of the specified {@link RouteTree} object.
+	 * The resulting DOT graph is given a default name of "RouteTree"
+	 * 
+	 * @param tree {@link RouteTree} to print
+	 * @return A DOT string
+	 */
+	public static String getRouteTreeDotString(RouteTree route) {
+		return getRouteTreeDotString(route, "RouteTree");
+	}
+	
 	/**
 	 * Creates a DOT string of the intersite route of the specified {@link CellNet}.
 	 * This function assumes that a RouteTree has been assigned to the net.
@@ -232,19 +244,28 @@ public class DotFilePrinter {
 	 * @param net {@link CellNet}
 	 */
 	public static String getRouteTreeDotString(CellNet net) {
-		
+		return getRouteTreeDotString(net.getIntersiteRouteTree(), net.getName());
+	}
+	
+	/**
+	 * Creates a DOT string of the specified {@link RouteTree} object.
+	 * 
+	 * @param tree {@link RouteTree} to print
+	 * @param name Name of the generated DOT graph.
+	 * @return A DOT string
+	 */
+	public static String getRouteTreeDotString(RouteTree route, String name) {
 		// initialize function
 		Queue<RouteTree> rtQueue = new LinkedList<RouteTree>();
 		Map<RouteTree, Integer> nodeIds = new HashMap<>(); 
 		StringBuilder builder = new StringBuilder();
-		RouteTree route = net.getIntersiteRouteTree();
 		
 		if(route == null) {
 			throw new Exceptions.DesignAssemblyException("Net needs to have a RouteTree to generate dot string");
 		}
 		
 		// append the header
-		builder.append("digraph \"" + net.getName() + "\"{\n");
+		builder.append("digraph \"" + name + "\"{\n");
 				
 		// create the unique ID list for RouteTrees
 		route.iterator().forEachRemaining(rt -> nodeIds.put(rt, nodeIds.size()));
@@ -273,7 +294,7 @@ public class DotFilePrinter {
 		builder.append("}");
 		return builder.toString();
 	}
-	
+		
 	private boolean isCellPinInSite(CellPin pin, Site site) { 
 		return pin != null && pin.getCell().getSite().equals(site);
 	}

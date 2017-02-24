@@ -45,9 +45,6 @@ import edu.byu.ece.rapidSmith.device.BelPin;
  * needs to be inserted on the bel to achieve the same functionality. 
  *  
  * TODO: add option to create a deep copy of the 
- * 
- * @author Thomas Townsend
- *
  */
 public class LutRoutethroughInserter {
 	
@@ -126,6 +123,7 @@ public class LutRoutethroughInserter {
 				BelPin rtSource = tryFindRoutethroughSourcePin(routeTree, sinks);
 						
 				if (rtSource != null) { // we found a routethrough
+					assert(!sinks.isEmpty());
 					insertRouteThroughBel(net, rtSource, sinks);
 				}
 			}
@@ -161,7 +159,11 @@ public class LutRoutethroughInserter {
 			}
 			else if (current.isLeaf()) {
 				BelPin bp = current.getConnectingBelPin();
-				sinks.add(belPinToCellPinMap.get(bp));
+				
+				// add all sinks that are not connected to LUTs
+				if (!bp.getBel().getName().endsWith("LUT")) {
+					sinks.add(belPinToCellPinMap.get(bp));
+				}
 			}
 		}
 		

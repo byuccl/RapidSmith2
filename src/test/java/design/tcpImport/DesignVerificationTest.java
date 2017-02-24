@@ -1,4 +1,4 @@
-package DesignImport;
+package design.tcpImport;
 /*
  * Copyright (c) 2016 Brigham Young University
  *
