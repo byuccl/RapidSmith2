@@ -33,7 +33,6 @@ public class Property {
 		this.key = key;
 		this.type = type;
 		this.value = value;
-
 	}
 
 	public Object getKey() {

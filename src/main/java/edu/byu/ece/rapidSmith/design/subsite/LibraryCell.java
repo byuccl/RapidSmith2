@@ -24,9 +24,11 @@ import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelId;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  *  Provides a template of possible cells for a design.
@@ -37,6 +39,10 @@ public abstract class LibraryCell implements Serializable {
 	private final String name;
 	/** List of LibraryPins of this LibraryCell */
 	private List<LibraryPin> libraryPins;
+	/** Map holding the default properties for a Cell instance*/
+	private Map<Object, Property> defaultProperties;
+	/** Cell configuration properties */
+	private final Map<String, LibraryCellProperty> configurableProperties;
 
 	/**
 	 * Library Cell constructor
@@ -45,6 +51,7 @@ public abstract class LibraryCell implements Serializable {
 	public LibraryCell(String name) {
 		Objects.nonNull(name);
 		this.name = name;
+		configurableProperties = new HashMap<>();
 	}
 
 	/**
@@ -78,6 +85,106 @@ public abstract class LibraryCell implements Serializable {
 				return pin;
 		}
 		return null;
+	}
+
+	// Cell property configuration methods 
+	/**
+	 * Adds a new configurable property to the library cell. This is package
+	 * private and should not be used by normal users.
+	 * 
+	 * @param libCellProperty {@link LibraryCellProperty} object
+	 */
+	void addConfigurableProperty(LibraryCellProperty libCellProperty) {
+		this.configurableProperties.put(libCellProperty.getName(), libCellProperty);
+	}
+	
+	/**
+	 * Adds a new default cell {@link Property} to the LibraryCell. This is
+	 * package private and should not be called by normal users. 
+	 */
+	void addDefaultProperty(Property property) {
+		
+		if (defaultProperties == null) {
+			defaultProperties = new HashMap<>();
+		}
+		
+		defaultProperties.put(property.getStringKey(), property);		
+	}
+	
+	Map<Object, Property> getDefaultPropertyMap() {
+		return defaultProperties;
+	}
+	
+	/**
+	 * Returns a set of property names that are configurable
+	 * on {@link Cell} instances of the library cell.
+	 */
+	public Set<String> getConfigurableProperties() {
+		return configurableProperties.keySet();
+	}
+	
+	/**
+	 * Returns the default value for the specified property of the library cell.
+	 * If the property does not exist on the library cell or there is no
+	 * default, {@code null} is returned.
+	 * 
+	 * @param propertyName Name of the property
+	 */
+	public Object getDefaultValue(String propertyName) {
+		
+		if (defaultProperties == null) {
+			return null;
+		}
+		
+		Property prop = defaultProperties.get(propertyName);
+		return prop == null ? null : prop.getValue();
+	}
+	
+	/**
+	 * Returns the default value for the specified property of the library cell.
+	 * If the property does not exist on the library cell, {@code null} is returned.
+	 * 
+	 * @param property {@link Property} object that has been added to a {@Cell}
+	 */
+	public Object getDefaultValue(Property property) {
+		return getDefaultValue(property.getStringKey());
+	}
+		
+	/**
+	 * Returns the possible values for the specified property (if they exist) of
+	 * the library cell. If the property does not exist, {@code null} is returned
+	 * 
+	 * @param propertyName Name of the property
+	 */
+	public Object[] getPossibleValues(String propertyName) {
+		LibraryCellProperty prop = configurableProperties.get(propertyName);
+		return prop == null ? null : prop.getPossibleValues(); 
+	}
+	
+	/**
+	 * Returns the possible values for the specified property (if they exist) of
+	 * the library cell. If the property does not exist, {@code null} is returned
+	 * 
+	 * @param property {@link Property} object that has been added to a {@Cell}
+	 */
+	public Object[] getPossibleValues(Property property) {
+		LibraryCellProperty prop = configurableProperties.get(property.getStringKey());
+		return prop == null ? null : prop.getPossibleValues(); 
+	}
+	
+	/**
+	 * Returns {@code true} if the configuration property of the given name
+	 * is read-only. If the configuration property is not read-only or the 
+	 * property does not exist on the library cell, {@code false} will be
+	 * returned.
+	 * 
+	 * TODO: move read-only attribute to the actual {@link Property} class?
+	 * 
+	 * @param propertyName Name of the property
+	 */
+	public boolean isReadonlyProperty(String propertyName) {
+		LibraryCellProperty prop = configurableProperties.get(propertyName);
+		return prop == null ? false : prop.isReadonly(); 
 	}
 	
 	// Abstract functions

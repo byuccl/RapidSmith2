@@ -21,18 +21,30 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * This class represents an objects that can have properties.
  */
 public final class PropertyList implements Iterable<Property> {
-	/** Properties of the cell */
-	private Map<Object, Property> properties = null;
+	/** Properties in the property list */
+	private Map<Object, Property> properties;
+	/** Map of default properties */
+	private final Map<Object, Property> defaultProperties;
 
+	PropertyList() {
+		properties = null;
+		defaultProperties = null; 
+	}
+	
+	PropertyList(Map<Object, Property> defaultProperties) {
+		this.defaultProperties = defaultProperties;
+	}
+	
 	private void initPropertiesMap() {
 		properties = new HashMap<>(4);
 	}
-
+	
 	public int size() {
 		return properties == null ? 0 : properties.size();
 	}
@@ -61,9 +73,17 @@ public final class PropertyList implements Iterable<Property> {
 	public Property get(Object propertyKey) {
 		Objects.requireNonNull(propertyKey);
 
-		if (properties == null)
+		if (properties == null) {
 			return null;
-		return properties.get(propertyKey);
+		} 
+		
+		// first check in the normal property map
+		Property prop = properties.get(propertyKey);
+		
+		// if its not found, check in the default property map.
+		return prop != null ? prop :
+			defaultProperties != null ? 
+			defaultProperties.get(propertyKey) : null;	
 	}
 
 	/**
@@ -149,8 +169,6 @@ public final class PropertyList implements Iterable<Property> {
 		return property == null ? null : property.getValue();
 	}
 
-
-
 	/**
 	 * Return the given specified property as an integer. Only use this function
 	 * if you are sure the property value can be safely cast to an int.  If this
@@ -206,9 +224,25 @@ public final class PropertyList implements Iterable<Property> {
 		Property property = get(propertyKey);
 		return property == null ? null : (double) property.getValue();
 	}
-
+		
 	@Override
 	public Iterator<Property> iterator() {
-		return (properties == null) ? Collections.emptyIterator() : properties.values().iterator();
+		
+		// If no properties have been set by the user, return the default property list
+		if (properties == null) {
+			return defaultProperties == null ? Collections.emptyIterator() : defaultProperties.values().iterator(); 
+		}
+		
+		// If the default properties are null, then just return the user property list
+		if (defaultProperties == null) {
+			return properties.values().iterator();
+		}
+		
+		// otherwise, create an iterator that includes the user property list
+		// concatenated with default properties that are NOT defined in the user list
+		Stream<Property> propStream = properties.values().stream();
+		Stream<Property> defaultStream = defaultProperties.values().stream().filter(p -> !properties.containsKey(p.getKey()));
+		
+		return Stream.concat(propStream, defaultStream).iterator();
 	}
 }

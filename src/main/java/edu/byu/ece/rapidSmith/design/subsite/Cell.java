@@ -81,7 +81,8 @@ public class Cell {
 		this.design = null;
 		this.bel = null;
 
-		this.properties = new PropertyList();
+		this.properties = new PropertyList(libCell.getDefaultPropertyMap());
+		
 		this.pinMap = new HashMap<>();
 		for (LibraryPin pin : libCell.getLibraryPins()) {
 			this.pinMap.put(pin.getName(), new BackedCellPin(this, pin));
@@ -396,7 +397,7 @@ public class Cell {
 	public int getPseudoPinCount() {
 		return pseudoPins == null ? 0 : pseudoPins.size();
 	}
-
+		
 	/**
 	 * Returns the properties of this cell in a {@link PropertyList}.  The
 	 * properties describe the configuration of this cell and can be used
