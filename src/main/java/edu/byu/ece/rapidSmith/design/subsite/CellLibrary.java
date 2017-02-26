@@ -185,6 +185,14 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		
 		if (properties != null) {
 			for (Element propertyEl : properties.getChildren("libcellproperty")) {
+
+				boolean isReadonly = propertyEl.getChild("readonly") != null;
+				// for now, skip read only properties
+				// TODO: revisit this
+				if (isReadonly) {
+					continue;
+				}
+				
 				String name = propertyEl.getChildText("name");
 				String deflt = propertyEl.getChildText("default");
 				// TODO: integrate the min and max properties
@@ -192,8 +200,7 @@ public class CellLibrary implements Iterable<LibraryCell> {
 				// String min = propertyEl.getChildText("min");
 				String type = propertyEl.getChildText("type");
 				String valueString = propertyEl.getChildText("values");
-				boolean isReadonly = propertyEl.getChild("readonly") != null;
-				String[] values =  valueString.split(", ");
+				String[] values = valueString.isEmpty() ? new String[0] : valueString.split(", ");
 				
 				// add the configuration to the library cell
 				libCell.addDefaultProperty(new Property(name, PropertyType.EDIF, deflt));						

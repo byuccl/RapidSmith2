@@ -40,7 +40,7 @@ public abstract class LibraryCell implements Serializable {
 	/** List of LibraryPins of this LibraryCell */
 	private List<LibraryPin> libraryPins;
 	/** Map holding the default properties for a Cell instance*/
-	private Map<Object, Property> defaultProperties;
+	private Map<String, Property> defaultProperties;
 	/** Cell configuration properties */
 	private final Map<String, LibraryCellProperty> configurableProperties;
 
@@ -108,10 +108,15 @@ public abstract class LibraryCell implements Serializable {
 			defaultProperties = new HashMap<>();
 		}
 		
-		defaultProperties.put(property.getStringKey(), property);		
+		defaultProperties.put(property.getKey(), property);		
 	}
 	
-	Map<Object, Property> getDefaultPropertyMap() {
+	/**
+	 * Returns the default property map of the library cell.
+	 * This is package private and should not be used by regular
+	 * users.
+	 */
+	Map<String, Property> getDefaultPropertyMap() {
 		return defaultProperties;
 	}
 	
@@ -124,51 +129,53 @@ public abstract class LibraryCell implements Serializable {
 	}
 	
 	/**
-	 * Returns the default value for the specified property of the library cell.
-	 * If the property does not exist on the library cell or there is no
-	 * default, {@code null} is returned.
+	 * Returns the default value for the specified configurable property 
+	 * of the library cell. If the property does not exist on the library 
+	 * cell or there is no default, {@code null} is returned.
 	 * 
 	 * @param propertyName Name of the property
 	 */
-	public Object getDefaultValue(String propertyName) {
+	public String getDefaultValue(String propertyName) {
 		
 		if (defaultProperties == null) {
 			return null;
 		}
 		
 		Property prop = defaultProperties.get(propertyName);
-		return prop == null ? null : prop.getValue();
+		return prop == null ? null : prop.getStringValue();
 	}
 	
 	/**
-	 * Returns the default value for the specified property of the library cell.
+	 * Returns the default value for the specified configurable property of the library cell.
 	 * If the property does not exist on the library cell, {@code null} is returned.
 	 * 
 	 * @param property {@link Property} object that has been added to a {@Cell}
 	 */
-	public Object getDefaultValue(Property property) {
-		return getDefaultValue(property.getStringKey());
+	public String getDefaultValue(Property property) {
+		return getDefaultValue(property.getKey());
 	}
 		
 	/**
-	 * Returns the possible values for the specified property (if they exist) of
-	 * the library cell. If the property does not exist, {@code null} is returned
+	 * Returns the possible values for the specified configurable property of
+	 * the library cell (if they exist). If the property does not exist, 
+	 * {@code null} is returned
 	 * 
 	 * @param propertyName Name of the property
 	 */
-	public Object[] getPossibleValues(String propertyName) {
+	public String[] getPossibleValues(String propertyName) {
 		LibraryCellProperty prop = configurableProperties.get(propertyName);
 		return prop == null ? null : prop.getPossibleValues(); 
 	}
 	
 	/**
-	 * Returns the possible values for the specified property (if they exist) of
-	 * the library cell. If the property does not exist, {@code null} is returned
+	 * Returns the possible values for the specified configurable property of
+	 * the library cell (if they exist) . If the property does not exist, 
+	 * {@code null} is returned
 	 * 
 	 * @param property {@link Property} object that has been added to a {@Cell}
 	 */
-	public Object[] getPossibleValues(Property property) {
-		LibraryCellProperty prop = configurableProperties.get(property.getStringKey());
+	public String[] getPossibleValues(Property property) {
+		LibraryCellProperty prop = configurableProperties.get(property.getKey());
 		return prop == null ? null : prop.getPossibleValues(); 
 	}
 	

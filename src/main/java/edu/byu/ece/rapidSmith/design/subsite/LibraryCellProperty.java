@@ -20,35 +20,58 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 /**
+ * Class that encapsulates all of the important information of a
+ * library cell property. It is package private, and should not
+ * be used by regular users. 
  * 
- * If the property is readonly, then the default value will hold the actual value?
+ * TODO: How to handle read-only properties?
  */
-class LibraryCellProperty {
+final class LibraryCellProperty {
 
 	private final String name;
 	private final String type;
-	private final Object[] possibleValues;
+	private final String[] possibleValues;
 	private final boolean isReadonly;
 	
-	LibraryCellProperty(String name, String type, Object[] possibleValues, boolean isReadonly) {
+	/**
+	 * Constructor
+	 * 
+	 * @param name Name of the property
+	 * @param type Type of the property
+	 * @param possibleValues A list of possible property values
+	 * @param isReadonly {@code true} if the property is a read-only property
+	 */
+	LibraryCellProperty(String name, String type, String[] possibleValues, boolean isReadonly) {
 		this.name = name;
 		this.type = type;
 		this.possibleValues = possibleValues;
 		this.isReadonly = isReadonly;
 	}
 	
+	/**
+	 * Returns the name of the property
+	 */
 	String getName() {
 		return name;
 	}
 	
+	/**
+	 * Returns the type of the property
+	 */
 	String getType() {
 		return type;
 	}
-		
-	Object[] getPossibleValues() {
+	
+	/**
+	 * Returns the possible values of the property
+	 */
+	String[] getPossibleValues() {
 		return possibleValues;
 	}
 	
+	/**
+	 * Returns {@code true} if the property is read-only, {@code false} otherwise.
+	 */
 	boolean isReadonly() {
 		return isReadonly;
 	}

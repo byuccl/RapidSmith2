@@ -643,7 +643,7 @@ public abstract class DesignVerificationTest {
 			// TODO: filter out non-EDIF properties?
 			String propertyList = "";
 			for (Property property : cell.getProperties()) {
-				propertyList += property.getStringKey() + " ";
+				propertyList += property.getKey() + " ";
 			}
 			
 			String command = String.format("tincr::report_property_values %s {%s}", cell.getName(), propertyList);

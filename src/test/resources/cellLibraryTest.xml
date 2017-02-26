@@ -24248,7 +24248,7 @@ Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
 		<cell>
 			<type>LUT1</type>
 			<is_lut>
-				<num_inputs>2</num_inputs>
+				<num_inputs>1</num_inputs>
 			</is_lut>
 			<level>LEAF</level>
 			<libcellproperties>
@@ -24476,7 +24476,7 @@ Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
 		<cell>
 			<type>LUT2</type>
 			<is_lut>
-				<num_inputs>3</num_inputs>
+				<num_inputs>2</num_inputs>
 			</is_lut>
 			<level>LEAF</level>
 			<libcellproperties>
@@ -24757,7 +24757,7 @@ Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
 		<cell>
 			<type>LUT3</type>
 			<is_lut>
-				<num_inputs>4</num_inputs>
+				<num_inputs>3</num_inputs>
 			</is_lut>
 			<level>LEAF</level>
 			<libcellproperties>
@@ -25091,7 +25091,7 @@ Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
 		<cell>
 			<type>LUT4</type>
 			<is_lut>
-				<num_inputs>5</num_inputs>
+				<num_inputs>4</num_inputs>
 			</is_lut>
 			<level>LEAF</level>
 			<libcellproperties>
@@ -25478,7 +25478,7 @@ Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
 		<cell>
 			<type>LUT5</type>
 			<is_lut>
-				<num_inputs>6</num_inputs>
+				<num_inputs>5</num_inputs>
 			</is_lut>
 			<level>LEAF</level>
 			<libcellproperties>
@@ -25918,7 +25918,7 @@ Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
 		<cell>
 			<type>LUT6</type>
 			<is_lut>
-				<num_inputs>7</num_inputs>
+				<num_inputs>6</num_inputs>
 			</is_lut>
 			<level>LEAF</level>
 			<libcellproperties>

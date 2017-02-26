@@ -1342,28 +1342,81 @@ between macro cells and leaf cells.
 
 \subsubsection {\cls{PropertyList}}
 
-In Vivado the top-level design, cells, and nets all have properties associated
-with them. The Tcl command \texttt{[report\_\-property \$object]} can be used to
-view the properties of a Vivado Tcl object. When a design is exported from
-Vivado, these properties (\pgm{if they are not the default value}) are stored
-in the EDIF netlist file. When RapidSmith parses the EDIF file, the properties
-are stored in a data structure called a \cls{PropertyList}. Each
-\cls{CellDesign}, \cls{Cell}, and \cls{CellNet} in RapidSmith has an associated
-\cls{PropertyList} object, which can be retrieved using the method
-\texttt{getProperties()}. \cls{PropertyList} implements the \cls{Iterable}
-interface, so properties of an object can be iterated through easily using a
-for-loop. Also, properties can be retrieved by their string name. Because EDIF
-properties only support String, Integer, and Boolean types, any properties
-imported from Vivado will have one of these types.
-	
-\cls{Cell}s are the most interesting objects
+Most objects in Vivado's Tcl interface have attached properties. These
+properties can be used to describe attributes of the object (such as name,
+type, etc.), but they can also be used for configuring the object.
+\autoref{fig:properties} shows a list of properties for a FDCE flip flop
+cell in Vivado.
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=.6\columnwidth]{vivadoProperties.png}
+ \caption{Properties of an FDCE cell in Vivado.}
+ \label{fig:properties}
+\end{figure}
+
+\noindent If you are interested in exploring object properties in
+Vivado, the following Tcl command can be used where ``object'' is a cell, bel, or
+other Tcl object.
+
+\vspace{-.25cm}
+\begin {code}
+vivado% report\_\-property \$object
+\end{code}
+
+\noindent Cells are the most interesting objects
 in terms of properties. This is because the function of a \cls{Cell} is
 determined by how it is configured. For example, the memory width of a BRAM cell
 in Vivado is configured by setting the ``READ\_WIDTH'' and ``WRITE\_WIDTH''
-properties. Possible values include 1, 2, 4, 9, 18, 36 and 72. Another example
-is a D flip flop cell (FDRE) and its ``CONFIG.INIT'' property. This property
-indicates what the flip flops power-up state should be. Some additional things
-about cell properties that may be helpful include:
+properties of the cell. Possible values include 1, 2, 4, 9, 18, 36 and 72. The
+operation of the BRAM is different depending on how this property is set. Another example is
+a D flip flop cell (FDRE) and its ``IS\_C\_INVERTED'' property. This property
+indicates if the flip flop will be rising-edge or falling-edge triggered. On
+design export, the properties of cells, nets, and the top-level design are
+included in the output EDIF netlist of a Tincr Checkpoint (\pgm{if they are not
+the default value}).
+
+When RapidSmith parses the EDIF file in a Tincr Checkpoint, the properties
+within are stored in a data structure called a \cls{PropertyList}. Each
+\cls{CellDesign}, \cls{Cell}, and \cls{CellNet} in RapidSmith has an associated
+\cls{PropertyList} object. The \cls{PropertyList} for each \cell in the design
+also has a list of default configuration properties. Configuration properties
+for \cells are always included in the \cls{PropertyList} even if they are not
+explicitly set by the user. As previously stated, this is because the
+functionality of the cell is dependent on the values of its configuration
+properties. \autoref{code:properties} shows some basic property usage.
+
+\begin{lstlisting}[caption=Using PropertyLists in RapidSmith,
+label=code:properties] 
+// Create a new FF cell with default properties
+CellLibrary libCells = getCellLibrary();
+LibraryCell libCell = libCells.get("FDRE");
+Cell cell = new Cell("myCell", libCell);
+
+// Get a handle to the cells properties
+PropertyList properties = cell.getProperties();
+
+// Print the configurable properties of the cell 
+for(String propName : libCell.getConfigurableProperties()) {
+	Property prop = properties.get(propName);
+	System.out.println(propName + ":");
+	System.out.println("\tDefault -> " + prop.getStringValue());
+	System.out.println("\tPossible -> " + libCell.getPossibleValues(propName)); 
+}
+
+// Iterating over a PropertyList
+for (Property prop : properties) {
+	System.out.println(prop.getKey() " -> " + prop.getStringValue());
+}
+
+// Change the FF to a falling edge flop...this will override the default property 
+properties.update("IS_C_INVERTED", PropertyType.EDIF, "1'b1");
+
+
+\end{lstlisting}
+
+\noindent Here are some additional notes about  cell properties that may be
+helpful:
 
 \begin{itemize}
   \item To learn what configuration properties a \cls{Cell} has, open up a
@@ -1378,27 +1431,45 @@ about cell properties that may be helpful include:
   replacing ``xc7a100tcsg324-3'' with the part you are using and ``RAMB36E1'' with your
   cell of interest. All properties that start with ``CONFIG'' represent
   configuration properties that a user can set.
+  \item Because EDIF properties only support String, Integer, and Boolean types,
+  any properties imported from the EDIF file will be one of these types.
+  However, from our testing, Vivado always exports its properties as strings.
+  \pgm{RapidSmith makes no attempt to parse the Vivado properties into their
+  corresponding data structures. All Vivado properties are represented using
+  Strings, and it is currently up to the user to parse the properties if they
+  need to}.
   \item To learn what configuration properties \pgm{affect the pin mappings of
   a cell}, open the \fil{cellLibrary.xml} file you have, and search for the
   tag ``libcellproperty.'' Pin mappings are described in more detail in
   \autoref{sec:placement}.
-  \item Only properties of type EDIF will be exported from RapidSmith. If you
-  create cells in your design and add properties to them, make sure that you
-  mark the properties as EDIF properties by setting their type. All other
-  properties will be ignored.
+  \item Only properties of type \cls{PropertyType.EDIF} will be exported from
+  RapidSmith.
+  If you create cells in your design and add properties to them, make sure that you
+  mark the properties as EDIF properties if you want them to be exported
+  All other properties will be ignored during design export.
   \item Some properties not only affect how a \cls{Cell} is configured, but they
   can also affect how a \cls{Site} is configured. For example, on SLICEL
   sites there exists a clock routing mux that chooses between a regular clock
-  signal and an inverted signal. This inverter is connected to the flip flops of
-  the SLICEL, and so decides whether the flip flops are rising-edge or falling-edge
-  triggered. The clock that is selected is decided by the property
-  ``CONFIG.IS\_C\_INVERTED'' of the flip flops cells \pgm{that have been placed
-  on the SLICEL}. The clock inverter is programmed automatically based on the
-  cell properties. There are other such properties, but they will not be
-  listed here. When creating designs in RapidSmith, it is important to not
-  place \cls{Cell}s together that may have conflicting properties. RapidSmith
-  does not perform any error checking, and so an error in Vivado will be thrown
-  if you violate property restrictions.
+  signal and an inverted signal (\autoref{fig:clkinv}). The output of this
+  inverter is connected to all flip flops of the SLICEL, and so decides whether the flip flops are
+  all rising-edge or all falling-edge triggered. The clock that is selected is
+  decided by the property ``IS\_C\_INVERTED'' of the flip flops cells \pgm{that
+  have been placed onto the SLICEL}. The clock inverter is programmed
+  automatically based on the cell properties. There are other such properties,
+  but they will not be listed here. When creating designs in RapidSmith, it is
+  important to not place \cls{Cell}s together that may have conflicting
+  properties. RapidSmith does not perform any error checking, and so an error
+  in Vivado will be thrown if you violate property restrictions.
+  
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=.8\columnwidth]{clkinv.png}
+ \caption{A SLICEL clock inverter mux. The highlighted white portion of the
+ figure shows the connection of the clock inverter.}
+ \label{fig:clkinv}
+\end{figure}
+  
+  
 \end{itemize}
 
 \subsection{The Cell Library}
