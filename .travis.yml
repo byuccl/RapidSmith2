@@ -21,7 +21,7 @@ install:
 script: ./gradlew build --continue
 after_success:
   - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-    docker build -t mcrossen/rapidsmith2:latest .;
+    docker build -t byuccl/rapidsmith2:latest .;
     docker login -u="$DOCKER_USER" -p="$DOCKER_PASSWORD";
-    docker push mcrossen/rapidsmith2;
+    docker push byuccl/rapidsmith2;
     fi
