@@ -21,6 +21,8 @@
 package Overview;
 import java.io.IOException;
 import java.lang.Integer;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -87,10 +89,9 @@ public class DesignTest {
         assertEquals(new Integer(3), lutlibcell.getNumLutInputs(), "Incorrect input count for LUT LibraryCell");
 
         // create a LUT to use for the sum logic
-        Cell addcell = design.addCell(new Cell("addcell", lutlibcell));
-        assertEquals("addcell", addcell.getName(), "LUT cell name doesn't match constructor");
+        Cell addcell = testAddCell(design, "addcell", lutlibcell);
         // Program the LUT
-        addcell.getProperties().update("INIT", PropertyType.DESIGN, "8'b01101001");
+        addcell.getProperties().update("INIT", PropertyType.EDIF, "8'b01101001");
         /* truth table for sum logic
           a b c | o
           0 0 0 | 0
@@ -105,10 +106,9 @@ public class DesignTest {
         testLUT3(addcell);
 
         // create a LUT cell for the carry logic
-        Cell carrycell = design.addCell(new Cell("carrycell", lutlibcell));
-        assertEquals("carrycell", carrycell.getName(), "LUT cell name doesn't match constructor");
+        Cell carrycell = testAddCell(design, "carrycell", lutlibcell);
         // Program the LUT
-        carrycell.getProperties().update("INIT", PropertyType.DESIGN, "8'b00010111");
+        carrycell.getProperties().update("INIT", PropertyType.EDIF, "8'b00010111");
         /* truth table for carry logic
           a b c | o
           0 0 0 | 0
@@ -124,110 +124,53 @@ public class DesignTest {
 
         // find a flip flop to use fo this design
         LibraryCell fflibcell = libCells.get("FDRE");
+        assertEquals("FDRE", fflibcell.getName(), "Flip Flop LibraryCell name doesn't match");
 
         // Create a flip flop cell to register the sum output
-        Cell sumreg = design.addCell(new Cell("sumreg", fflibcell));
-        assertEquals("sumreg", sumreg.getName(), "Flip Flop cell name doesn't match constructor");
-        sumreg.getProperties().update("INIT", PropertyType.DESIGN, "INIT0");
-        sumreg.getProperties().update("SR", PropertyType.DESIGN, "SRLOW");
+        Cell sumreg = testAddCell(design, "sumreg", fflibcell);
+        // program the flip flop
+        sumreg.getProperties().update("INIT", PropertyType.EDIF, "INIT0");
+        sumreg.getProperties().update("SR", PropertyType.EDIF, "SRLOW");
         testFF(sumreg);
 
         // Create a flip flop cell to register the carry output
-        Cell coutreg = design.addCell(new Cell("coutreg", fflibcell));
-        assertEquals("coutreg", coutreg.getName(), "Flip Flop cell name doesn't match constructor");
-        coutreg.getProperties().update("INIT", PropertyType.DESIGN, "INIT0");
-        coutreg.getProperties().update("SR", PropertyType.DESIGN, "SRLOW");
+        Cell coutreg = testAddCell(design, "coutreg", fflibcell);
+        // program the flip flop
+        coutreg.getProperties().update("INIT", PropertyType.EDIF, "INIT0");
+        coutreg.getProperties().update("SR", PropertyType.EDIF, "SRLOW");
         testFF(coutreg);
 
         // create and test the input ports
-        Cell aport = design.addCell(new Cell("aport", libCells.get("IPORT")));
-        assertEquals("aport", aport.getName(), "IPORT cell name doesn't match constructor");
+        Cell aport = testAddCell(design, "aport", libCells.get("IPORT"));
         testIPORT(aport);
-        Cell bport = design.addCell(new Cell("bport", libCells.get("IPORT")));
-        assertEquals("bport", bport.getName(), "IPORT cell name doesn't match constructor");
+        Cell bport = testAddCell(design, "bport", libCells.get("IPORT"));
         testIPORT(bport);
-        Cell cinport = design.addCell(new Cell("cinport", libCells.get("IPORT")));
-        assertEquals("cinport", cinport.getName(), "IPORT cell name doesn't match constructor");
+        Cell cinport = testAddCell(design, "cinport", libCells.get("IPORT"));
         testIPORT(cinport);
 
         // create and test the output ports
-        Cell sumport = design.addCell(new Cell("sumport", libCells.get("OPORT")));
-        assertEquals("sumport", sumport.getName(), "OPORT cell name doesn't match constructor");
+        Cell sumport = testAddCell(design, "sumport", libCells.get("OPORT"));
         testOPORT(sumport);
-        Cell coutport = design.addCell(new Cell("coutport", libCells.get("OPORT")));
-        assertEquals("coutport", coutport.getName(), "OPORT cell name doesn't match constructor");
+        Cell coutport = testAddCell(design, "coutport", libCells.get("OPORT"));
         testOPORT(coutport);
 
         // create and test the wires
-        CellNet anet = design.addNet(new CellNet("anet", NetType.WIRE));
-        assertEquals("anet", anet.getName(), "CellNet name doesn't match constructor");
-        CellNet bnet = design.addNet(new CellNet("bnet", NetType.WIRE));
-        assertEquals("bnet", bnet.getName(), "CellNet name doesn't match constructor");
-        CellNet cnet = design.addNet(new CellNet("cnet", NetType.WIRE));
-        assertEquals("cnet", cnet.getName(), "CellNet name doesn't match constructor");
-        CellNet sumnet = design.addNet(new CellNet("sumnet", NetType.WIRE));
-        assertEquals("sumnet", sumnet.getName(), "CellNet name doesn't match constructor");
-        CellNet coutnet = design.addNet(new CellNet("coutnet", NetType.WIRE));
-        assertEquals("coutnet", coutnet.getName(), "CellNet name doesn't match constructor");
-        CellNet sumregnet = design.addNet(new CellNet("sumregnet", NetType.WIRE));
-        assertEquals("sumregnet", sumregnet.getName(), "CellNet name doesn't match constructor");
-        CellNet coutregnet = design.addNet(new CellNet("coutregnet", NetType.WIRE));
-        assertEquals("coutregnet", coutregnet.getName(), "CellNet name doesn't match constructor");
+        CellNet anet = testAddNet(design, "anet");
+        CellNet bnet = testAddNet(design, "bnet");
+        CellNet cnet = testAddNet(design, "cnet");
+        CellNet sumnet = testAddNet(design, "sumnet");
+        CellNet coutnet = testAddNet(design, "coutnet");
+        CellNet sumregnet = testAddNet(design, "sumregnet");
+        CellNet coutregnet = testAddNet(design, "coutregnet");
 
-        // connect and test the A input wire
-        anet.connectToPin(aport.getPin("PAD"));
-        anet.connectToPin(addcell.getPin("I0"));
-        anet.connectToPin(carrycell.getPin("I0"));
-        assertEquals(2, anet.getSinkPins().size(), "CellNet has incorrect sink pin count");
-        assertEquals(aport.getPin("PAD"), anet.getSourcePin(), "CellNet has incorrect source pin");
-        assertTrue(anet.getSinkPins().contains(addcell.getPin("I0")), "CellNet doesn't contain a required sink pin");
-        assertTrue(anet.getSinkPins().contains(carrycell.getPin("I0")), "CellNet doesn't contain a required sink pin");
-
-        // connect and test the B input wire
-        bnet.connectToPin(bport.getPin("PAD"));
-        bnet.connectToPin(addcell.getPin("I1"));
-        bnet.connectToPin(carrycell.getPin("I1"));
-        assertEquals(2, bnet.getSinkPins().size(), "CellNet has incorrect sink pin count");
-        assertEquals(bport.getPin("PAD"), bnet.getSourcePin(), "CellNet has incorrect source pin");
-        assertTrue(bnet.getSinkPins().contains(addcell.getPin("I1")), "CellNet doesn't contain a required sink pin");
-        assertTrue(bnet.getSinkPins().contains(carrycell.getPin("I1")), "CellNet doesn't contain a required sink pin");
-
-        // connect and test the carry input wire
-        cnet.connectToPin(cinport.getPin("PAD"));
-        cnet.connectToPin(addcell.getPin("I2"));
-        cnet.connectToPin(carrycell.getPin("I2"));
-        assertEquals(2, cnet.getSinkPins().size(), "CellNet has incorrect sink pin count");
-        assertEquals(cinport.getPin("PAD"), cnet.getSourcePin(), "CellNet has incorrect source pin");
-        assertTrue(cnet.getSinkPins().contains(addcell.getPin("I2")), "CellNet doesn't contain a required sink pin");
-        assertTrue(cnet.getSinkPins().contains(carrycell.getPin("I2")), "CellNet doesn't contain a required sink pin");
-
-        // connect and test the sum output wire
-        sumnet.connectToPin(addcell.getPin("O"));
-        sumnet.connectToPin(sumreg.getPin("D"));
-        assertEquals(1, sumnet.getSinkPins().size(), "CellNet has incorrect sink pin count");
-        assertEquals(addcell.getPin("O"), sumnet.getSourcePin(), "CellNet has incorrect source pin");
-        assertTrue(sumnet.getSinkPins().contains(sumreg.getPin("D")), "CellNet doesn't contain a required sink pin");
-
-        // connect and test the carry output wire
-        coutnet.connectToPin(carrycell.getPin("O"));
-        coutnet.connectToPin(coutreg.getPin("D"));
-        assertEquals(1, coutnet.getSinkPins().size(), "CellNet has incorrect sink pin count");
-        assertEquals(carrycell.getPin("O"), coutnet.getSourcePin(), "CellNet has incorrect source pin");
-        assertTrue(coutnet.getSinkPins().contains(coutreg.getPin("D")), "CellNet doesn't contain a required sink pin");
-
-        // connect and test the sum register output wire
-        sumregnet.connectToPin(sumreg.getPin("Q"));
-        sumregnet.connectToPin(sumport.getPin("PAD"));
-        assertEquals(1, sumregnet.getSinkPins().size(), "CellNet has incorrect sink pin count");
-        assertEquals(sumreg.getPin("Q"), sumregnet.getSourcePin(), "CellNet has incorrect source pin");
-        assertTrue(sumregnet.getSinkPins().contains(sumport.getPin("PAD")), "CellNet doesn't contain a required sink pin");
-
-        // connect and test the carry register output wire
-        coutregnet.connectToPin(coutreg.getPin("Q"));
-        coutregnet.connectToPin(coutport.getPin("PAD"));
-        assertEquals(1, coutregnet.getSinkPins().size(), "CellNet has incorrect sink pin count");
-        assertEquals(coutreg.getPin("Q"), coutregnet.getSourcePin(), "CellNet has incorrect source pin");
-        assertTrue(coutregnet.getSinkPins().contains(coutport.getPin("PAD")), "CellNet doesn't contain a required sink pin");
+        // connect the pins and test the result
+        testAddNetPins(anet, aport.getPin("PAD"), Arrays.asList(addcell.getPin("I0"), carrycell.getPin("I0")));
+        testAddNetPins(bnet, bport.getPin("PAD"), Arrays.asList(addcell.getPin("I1"), carrycell.getPin("I1")));
+        testAddNetPins(cnet, cinport.getPin("PAD"), Arrays.asList(addcell.getPin("I2"), carrycell.getPin("I2")));
+        testAddNetPins(sumnet, addcell.getPin("O"), Arrays.asList(sumreg.getPin("D")));
+        testAddNetPins(coutnet, carrycell.getPin("O"), Arrays.asList(coutreg.getPin("D")));
+        testAddNetPins(sumregnet, sumreg.getPin("Q"), Arrays.asList(sumport.getPin("PAD")));
+        testAddNetPins(coutregnet, coutreg.getPin("Q"), Arrays.asList(coutport.getPin("PAD")));
 
         // test the dot file
         DotFilePrinter dotFilePrinter = new DotFilePrinter(design);
@@ -240,7 +183,7 @@ public class DesignTest {
      * test a LUT3 cell's input and output pins
      * @param cell the (LUT3) cell to test
      */
-    public void testLUT3(Cell cell) {
+    protected void testLUT3(Cell cell) {
         // assert that the cell really is a LUT3
         assertEquals("LUT3", cell.getLibCell().getName(), "LUT3 cell has wrong library cell attached");
         // a LUT3 cell should have 3 inputs, and 1 output
@@ -263,7 +206,7 @@ public class DesignTest {
      * test an IPORT cell's input and output pins
      * @param cell the (IPORT) cell to test
      */
-    public void testIPORT(Cell cell) {
+    protected void testIPORT(Cell cell) {
         // assert that the cell really is an IPORT
         assertEquals("IPORT", cell.getLibCell().getName(), "IPORT cell has wrong library cell attached");
         // an IPORT cell should have no inputs and one output
@@ -279,7 +222,7 @@ public class DesignTest {
      * test an OPORT cell's input and output pins
      * @param cell the (OPORT) cell to test
      */
-    public void testOPORT(Cell cell) {
+    protected void testOPORT(Cell cell) {
         // assert that the cell really is an OPORT
         assertEquals("OPORT", cell.getLibCell().getName(), "OPORT cell has wrong library cell attached");
         // an OPORT cell should have one input and no outputs
@@ -295,11 +238,74 @@ public class DesignTest {
      * test a Flip Flop cell's properties
      * @param cell the (Flip Flop) cell to test
      */
-    public void testFF(Cell cell) {
+    protected void testFF(Cell cell) {
         assertEquals("FDRE", cell.getLibCell().getName(), "Flip Flop cell has incorrect library cell attached");
         assertNotNull(cell.getProperties().get("INIT"), "Cannot find INIT property for Flip Flop cell");
         assertNotNull(cell.getProperties().get("SR"), "Cannot find SR property for Flip Flop cell");
         assertEquals("INIT0", cell.getProperties().get("INIT").getStringValue(), "Flip Flop cell has incorrect INIT property");
         assertEquals("SRLOW", cell.getProperties().get("SR").getStringValue(), "Flip Flop cell has incorrect SR property");
     }
+
+    /**
+     * add a cell to the design and test that it was added correctly
+     * @param design the CellDesign to add the cell to
+     * @param cell_name the name of the cell to add
+     * @param lib_cell the library cell to use while creating the cell
+     */
+     protected Cell testAddCell(CellDesign design, String cell_name, LibraryCell lib_cell) {
+       // create a new cell and add it to the design
+       design.addCell(new Cell(cell_name, lib_cell));
+       // test that the cell is in the design
+       assertTrue(design.hasCell(cell_name), "Cell " + cell_name + " not found in design after adding.");
+       // test that the cell can be retreived from the design
+       Cell cell = design.getCell(cell_name);
+       assertNotNull(cell, "Cell " + cell_name + " unable to be retrieved from design.");
+       // test that the cell was created correctly
+       assertEquals(cell_name, cell.getName(), lib_cell.getName() + " cell name doesn't match constructor.");
+       assertEquals(cell.getLibCell(), lib_cell, "Library cell incorrect.");
+       // return the cell to be used later by the test
+       return cell;
+     }
+
+     /**
+      * add a Net to the design and test that it was added correctly
+      * @param design the CellDesign to add the cell to
+      * @param net_name the name of the net to add
+      */
+     protected CellNet testAddNet(CellDesign design, String net_name) {
+       // create a new net and add it to the design
+       design.addNet(new CellNet(net_name, NetType.WIRE));
+       // test that the net is in the design
+       assertTrue(design.hasNet(net_name), "Net " + net_name + " not found in design after adding.");
+       // test that the net can be retrieved from the design
+       CellNet net = design.getNet(net_name);
+       assertNotNull(net, "Net " + net_name + " unable to be retrieved from design.");
+       // test that the net was created correctly
+       assertEquals(net_name, net.getName(), "net name from design (" + net_name + ") doesn't match constructor.");
+       // return the net so it can be connected to pins
+       return net;
+     }
+
+     /**
+      * connect a net to its pins and test the result
+      * @param net the Net to connect up
+      * @param source_pin the pin to be used by the net as its source
+      * @param sink_pins the list of pins to be used by the net as its sinks
+      */
+     protected void testAddNetPins(CellNet net, CellPin source_pin, List<CellPin> sink_pins) {
+       // connect the source pins
+       net.connectToPin(source_pin);
+       // ensure the source pin isn't included in the sink pins
+       assertFalse(net.getSinkPins().contains(source_pin), "Net (" + net.getName() + ") mistook the source pin (" + source_pin.getName() + ") as a sink pin.");
+       // test that the source pin exists
+       assertNotNull(net.getSourcePin(), "Net (" + net.getName() + ") doesn't have source pin (" + source_pin.getName() + ") after adding.");
+       // test that the source pin matches the parameter
+       assertEquals(source_pin, net.getSourcePin(), "Net has incorrect source pin");
+       // connect and test the sink pins
+       for (CellPin sink_pin : sink_pins) {
+         net.connectToPin(sink_pin);
+         assertTrue(net.getSinkPins().contains(sink_pin), "Net (" + net.getName() + ") doesn't include sink pin (" + sink_pin.getName() + ") after adding.");
+       }
+       assertEquals(sink_pins.size(), net.getSinkPins().size(), "CellNet has incorrect sink pin count");
+     }
 }
