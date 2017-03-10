@@ -284,6 +284,7 @@ public class CellNet implements Serializable {
 	
 	/**
 	 * Returns the number of pseudo pins connected to the net.
+	 * This operation has a complexity of O(n).
 	 */
 	public int getPseudoPinCount() {
 		
