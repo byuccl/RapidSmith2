@@ -25,27 +25,18 @@ package edu.byu.ece.rapidSmith.design.subsite;
  * to indicate the source and use of the property.
  */
 public class Property {
-	private final Object key;
+	private final String key;
 	private PropertyType type;
 	private Object value;
 
-	public Property(Object key, PropertyType type, Object value) {
+	public Property(String key, PropertyType type, Object value) {
 		this.key = key;
 		this.type = type;
 		this.value = value;
-
 	}
 
-	public Object getKey() {
+	public String getKey() {
 		return key;
-	}
-
-	/**
-	 * Convenience method to get the key casted as a String.
-	 * @throws ClassCastException if the key is not a String
-	 */
-	public String getStringKey() {
-		return (String) key;
 	}
 
 	/**
@@ -77,7 +68,31 @@ public class Property {
 	public String getStringValue() {
 		return (String) value;
 	}
+	
+	/**
+	 * Convenience method to get the value of the property casted as a int.
+	 */	
+	public int getIntValue() {
+		return (int) value;
+	}
 
+	/**
+	 * Convenience method to get the value of the property casted as a boolean.
+	 */
+	public boolean getBooleanValue() {
+		return (boolean) value;
+	}
+
+	/**
+	 * Convenience method to get the value of the property casted as a double.
+	 */
+	public double getDoubleValue() {
+		return (double) value;
+	}
+
+	/**
+	 * Sets the value of the property
+	 */
 	public void setValue(Object value) {
 		this.value = value;
 	}

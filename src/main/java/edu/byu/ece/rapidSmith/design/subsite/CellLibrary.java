@@ -159,12 +159,56 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		if (libCell.isGndSource())
 			gndSource = libCell;
 
+		loadConfigurationPropertiesFromXml(cellEl, libCell);
 		loadPinsFromXml(cellEl, libCell);
-
 		loadPossibleBelsFromXml(libCell, cellEl, sitePropertiesMap);
 		add(libCell);
 	}
 
+	/*
+	 * Loads the configuration properties found in the cell library XML and 
+	 * applies them to the library cell. The properties look like the following: 
+	 * 
+	 * <libcellproperties>
+	 *   <libcellproperty>
+	 *	   <name>INIT</name>
+	 *	   <default>0x8'h00</default>
+	 *	   <max>0x8'hFF</max>
+	 *	   <min>0x8'h00</min>
+	 *	   <type>hex</type>
+	 *	   <values>min=Ox8'h00, max=Ox8'hFF</values>
+	 *   </libcellproperty>
+	 * <libcellproperties>
+	 */
+	private void loadConfigurationPropertiesFromXml(Element cellEl, LibraryCell libCell) { 
+		Element properties = cellEl.getChild("libcellproperties");
+		
+		if (properties != null) {
+			for (Element propertyEl : properties.getChildren("libcellproperty")) {
+
+				boolean isReadonly = propertyEl.getChild("readonly") != null;
+				// for now, skip read only properties
+				// TODO: revisit this
+				if (isReadonly) {
+					continue;
+				}
+				
+				String name = propertyEl.getChildText("name");
+				String deflt = propertyEl.getChildText("default");
+				// TODO: integrate the min and max properties
+				// String max = propertyEl.getChildText("max");
+				// String min = propertyEl.getChildText("min");
+				String type = propertyEl.getChildText("type");
+				String valueString = propertyEl.getChildText("values");
+				String[] values = valueString.isEmpty() ? new String[0] : valueString.split(", ");
+				
+				// add the configuration to the library cell
+				libCell.addDefaultProperty(new Property(name, PropertyType.EDIF, deflt));						
+				libCell.addConfigurableProperty(new LibraryCellProperty(name, type, values, isReadonly));
+			}
+		}
+	}
+	
 	private void loadMacroFromXml(Element macroEl) {
 		
 		String type = macroEl.getChildText("type");

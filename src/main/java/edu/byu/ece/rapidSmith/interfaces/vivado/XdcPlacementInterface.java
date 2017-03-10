@@ -36,6 +36,8 @@ import java.util.stream.Stream;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
+import edu.byu.ece.rapidSmith.design.subsite.Property;
+import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Device;
@@ -89,6 +91,8 @@ public class XdcPlacementInterface {
 				case "PINMAP" : applyCellPinMappings(toks);
 					break;
 				case "PACKAGE_PIN" : applyPortPlacement(toks) ;
+					break;
+				case "IPROP" : applyInternalCellProperty(toks) ; 
 					break;
 				default :
 					throw new ParseException(String.format("Unrecognized Token: %s \nOn %d of %s", toks[0], currentLineNumber, currentFile));
@@ -147,6 +151,23 @@ public class XdcPlacementInterface {
 		
 		cellPin.mapToBelPin(belPin);
 		belPinToCellPinMap.put(belPin, cellPin);
+	}
+	
+	/*
+	 * Applies a property to an internal cell based on the tokens read from the placement.rsc file
+	 * Expected format of toks : "IPROP cellName propertyName propertyValue"
+	 */
+	private void applyInternalCellProperty(String[] toks) {
+		
+		// throw an exception if the number of tokens on the line is not correct
+		if (toks.length != 4) {
+			throw new ParseException("Expected 3 parameters after token IPROP, found " + toks.length + " instead\n" 
+					+ "On line " + this.currentLineNumber + " of " + currentFile);
+		}
+		
+		// add the property to the cell
+		Cell cell = tryGetCell(toks[1]);
+		cell.getProperties().update(new Property(toks[2], PropertyType.EDIF, toks[3]));
 	}
 
 	/**

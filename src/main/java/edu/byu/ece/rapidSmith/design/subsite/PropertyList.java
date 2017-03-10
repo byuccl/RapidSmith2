@@ -21,20 +21,44 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * This class represents an objects that can have properties.
  */
 public final class PropertyList implements Iterable<Property> {
-	/** Properties of the cell */
-	private Map<Object, Property> properties = null;
+	/** Properties in the property list */
+	private Map<String, Property> properties;
+	/** Map of default properties */
+	private final Map<String, Property> defaultProperties;
 
+	PropertyList() {
+		properties = null;
+		defaultProperties = null; 
+	}
+	
+	PropertyList(Map<String, Property> defaultProperties) {
+		this.defaultProperties = defaultProperties;
+	}
+	
 	private void initPropertiesMap() {
 		properties = new HashMap<>(4);
 	}
-
+	
 	public int size() {
-		return properties == null ? 0 : properties.size();
+		
+		if (properties == null) {
+			return (defaultProperties==null) ? 0 : defaultProperties.size();
+		}
+		
+		if (defaultProperties == null) {
+			return properties.size();
+		}
+		
+		int propCount = properties.size(); 
+		propCount += defaultProperties.keySet().stream().filter(key -> !properties.containsKey(key)).count();
+		
+		return propCount;
 	}
 
 	/**
@@ -43,7 +67,7 @@ public final class PropertyList implements Iterable<Property> {
 	 * @param propertyKey the name of the property to check for
 	 * @return true if this cell contains a property with the specified name
 	 */
-	public final boolean has(Object propertyKey) {
+	public final boolean has(String propertyKey) {
 		Objects.requireNonNull(propertyKey);
 
 		return get(propertyKey) != null;
@@ -58,12 +82,18 @@ public final class PropertyList implements Iterable<Property> {
 	 * @return the property with name <i>propertyKey</i> or {@code null} if the property
 	 * is not in the cell
 	 */
-	public Property get(Object propertyKey) {
+	public Property get(String propertyKey) {
 		Objects.requireNonNull(propertyKey);
-
-		if (properties == null)
-			return null;
-		return properties.get(propertyKey);
+		Property userProp = getUserProperty(propertyKey);
+		return userProp != null ? userProp : getDefaultProperty(propertyKey);	
+	}
+	
+	private Property getUserProperty(String propertyKey) {
+		return (properties == null) ? null : properties.get(propertyKey) ;
+	}
+	
+	private Property getDefaultProperty(String propertyKey) {
+		return (defaultProperties == null) ? null : defaultProperties.get(propertyKey) ;
 	}
 
 	/**
@@ -99,7 +129,7 @@ public final class PropertyList implements Iterable<Property> {
 	 * @param type the new type of the property
 	 * @param value the value to set the property to
 	 */
-	public void update(Object propertyKey, PropertyType type, Object value) {
+	public void update(String propertyKey, PropertyType type, Object value) {
 		Objects.requireNonNull(propertyKey);
 		Objects.requireNonNull(type);
 		Objects.requireNonNull(value);
@@ -113,7 +143,7 @@ public final class PropertyList implements Iterable<Property> {
 	 * @param propertyKey the name of the property to remove
 	 * @return the removed property. null if the property doesn't exist
 	 */
-	public Property remove(Object propertyKey) {
+	public Property remove(String propertyKey) {
 		Objects.requireNonNull(propertyKey);
 
 		if (properties == null)
@@ -128,7 +158,7 @@ public final class PropertyList implements Iterable<Property> {
 	 * @param value the value to compare the property's to test
 	 * @return true if the value matches the property's value
 	 */
-	public boolean testValue(Object propertyKey, Object value) {
+	public boolean testValue(String propertyKey, Object value) {
 		Objects.requireNonNull(propertyKey);
 
 		return Objects.equals(getValue(propertyKey), value);
@@ -142,14 +172,12 @@ public final class PropertyList implements Iterable<Property> {
 	 * @param propertyKey the name of the property
 	 * @return the value of the specified property or {@code null} if it does not exist
 	 */
-	public Object getValue(Object propertyKey) {
+	public Object getValue(String propertyKey) {
 		Objects.requireNonNull(propertyKey);
 
 		Property property = get(propertyKey);
 		return property == null ? null : property.getValue();
 	}
-
-
 
 	/**
 	 * Return the given specified property as an integer. Only use this function
@@ -159,7 +187,7 @@ public final class PropertyList implements Iterable<Property> {
 	 * @param propertyKey the name of the property 
 	 * @return the value as an Integer or {@code null} if it does not exist
 	 */
-	public Integer getIntegerValue(Object propertyKey) {
+	public Integer getIntegerValue(String propertyKey) {
 		
 		Property property = get(propertyKey);
 		return property == null ? null : (int) property.getValue();
@@ -173,7 +201,7 @@ public final class PropertyList implements Iterable<Property> {
 	 * @param propertyKey the name of the property 
 	 * @return the value as a String or {@code null} if it does not exist
 	 */
-	public String getStringValue(Object propertyKey) {
+	public String getStringValue(String propertyKey) {
 			
 		Property property = get(propertyKey);
 		return property == null ? null : (String) property.getValue();
@@ -187,7 +215,7 @@ public final class PropertyList implements Iterable<Property> {
 	 * @param propertyKey the name of the property 
 	 * @return the value as a Boolean or {@code null} if it does not exist
 	 */
-	public Boolean getBooleanValue(Object propertyKey) {
+	public Boolean getBooleanValue(String propertyKey) {
 		
 		Property property = get(propertyKey);
 		return property == null ? null : (boolean) property.getValue();
@@ -201,14 +229,30 @@ public final class PropertyList implements Iterable<Property> {
 	 * @param propertyKey the name of the property 
 	 * @return the value as a Double or {@code null} if it does not exist
 	 */
-	public double getDoubleValue(Object propertyKey) {
+	public double getDoubleValue(String propertyKey) {
 		
 		Property property = get(propertyKey);
 		return property == null ? null : (double) property.getValue();
 	}
-
+		
 	@Override
 	public Iterator<Property> iterator() {
-		return (properties == null) ? Collections.emptyIterator() : properties.values().iterator();
+		
+		// If no properties have been set by the user, return the default property list
+		if (properties == null) {
+			return defaultProperties == null ? Collections.emptyIterator() : defaultProperties.values().iterator(); 
+		}
+		
+		// If the default properties are null, then just return the user property list
+		if (defaultProperties == null) {
+			return properties.values().iterator();
+		}
+		
+		// otherwise, create an iterator that includes the user property list
+		// concatenated with default properties that are NOT defined in the user list
+		Stream<Property> propStream = properties.values().stream();
+		Stream<Property> defaultStream = defaultProperties.values().stream().filter(p -> !properties.containsKey(p.getKey()));
+		
+		return Stream.concat(propStream, defaultStream).iterator();
 	}
 }
