@@ -20,6 +20,9 @@
 
  package design.assembly;
  import java.io.IOException;
+ import java.util.Arrays;
+ import java.util.List;
+ import java.util.stream.Collectors;
  import org.junit.jupiter.api.BeforeAll;
  import org.junit.jupiter.api.DisplayName;
  import org.junit.jupiter.api.Test;
@@ -32,6 +35,8 @@
  import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
  import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
  import edu.byu.ece.rapidSmith.design.subsite.Cell;
+ import edu.byu.ece.rapidSmith.design.subsite.CellPin;
+
  /**
   * jUnit test for the Cell class in RapidSmith2
   * @author Mark Crossen
@@ -60,10 +65,10 @@
              fail("Cannot find cell library XML in test directory. Setup is incorrect.");
          }
          // Create a few Cells to test.
-         lutcell = new Cell("lutcell", libCells.get("LUT3"));
-         portcell = new Cell("portcell", libCells.get("IPORT"));
-         gndcell = new Cell("gndcell", libCells.get("GND"));
-         vcccell = new Cell("vcccell", libCells.get("VCC"));
+         lutcell = new Cell("LUT3", libCells.get("LUT3"));
+         portcell = new Cell("IPORT", libCells.get("IPORT"));
+         gndcell = new Cell("GND", libCells.get("GND"));
+         vcccell = new Cell("VCC", libCells.get("VCC"));
      }
 
      @Test
@@ -100,5 +105,53 @@
         assertFalse(portcell.isLut(), "IPORT Cell isn't a LUT.");
         assertFalse(gndcell.isLut(), "GND Cell isn't a LUT.");
         assertFalse(vcccell.isLut(), "VCC Cell isn't a LUT.");
+    }
+
+    @Test
+    @DisplayName("test Cell method 'getOutputPins'")
+    public void testGetOutputPins() {
+        verifyOutputPins(lutcell, Arrays.asList("O"));
+        verifyOutputPins(portcell, Arrays.asList("PAD"));
+        verifyOutputPins(gndcell, Arrays.asList("G"));
+        verifyOutputPins(vcccell, Arrays.asList("P"));
+    }
+
+    @Test
+    @DisplayName("test Cell method 'getInputPins'")
+    public void testGetInputPins() {
+        verifyInputPins(lutcell, Arrays.asList("I0", "I1", "I2"));
+        verifyInputPins(portcell, Arrays.asList());
+        verifyInputPins(gndcell, Arrays.asList());
+        verifyInputPins(vcccell, Arrays.asList());
+    }
+
+    /**
+     * helper function to test a Cell to make sure it has the given output pins
+     * cell the Cell to test
+     * expected the list of output pin names the cell should have
+     */
+    private void verifyOutputPins(Cell cell, List<String> expected) {
+      List<String> actual = cell.getOutputPins().stream()
+          .map(CellPin::getName)
+          .collect(Collectors.toList());
+      assertEquals(expected.size(), actual.size(), "Expected output pin count for " + cell.getName() + " Cell doesn't match calculated.");
+      for (String pin : expected) {
+          assertTrue(actual.contains(pin), cell.getName() + " Cell doesn't have " + pin + " output pin.");
+      }
+    }
+
+    /**
+     * helper function to test a Cell to make sure it has the given input pins
+     * cell the Cell to test
+     * pins the list of input pin names the cell should have
+     */
+    private void verifyInputPins(Cell cell, List<String> expected) {
+      List<String> actual = cell.getInputPins().stream()
+          .map(CellPin::getName)
+          .collect(Collectors.toList());
+      assertEquals(expected.size(), actual.size(), "Expected input pin count for " + cell.getName() + " Cell doesn't match calcualted.");
+      for (String pin : expected) {
+          assertTrue(actual.contains(pin), cell.getName() + " Cell doesn't have " + pin + " input pin.");
+      }
     }
 }
