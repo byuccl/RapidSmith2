@@ -31,6 +31,7 @@
  import static org.junit.jupiter.api.Assertions.*;
  import edu.byu.ece.rapidSmith.RSEnvironment;
  import edu.byu.ece.rapidSmith.device.Device;
+ import edu.byu.ece.rapidSmith.device.PortDirection;
  import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
  import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
  import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
@@ -46,7 +47,9 @@
 
      private static CellLibrary libCells;
      private static Cell lutcell;
-     private static Cell portcell;
+     private static Cell iportcell;
+     private static Cell oportcell;
+     private static Cell ioportcell;
      private static Cell gndcell;
      private static Cell vcccell;
 
@@ -66,7 +69,9 @@
          }
          // Create a few Cells to test.
          lutcell = new Cell("LUT3", libCells.get("LUT3"));
-         portcell = new Cell("IPORT", libCells.get("IPORT"));
+         iportcell = new Cell("IPORT", libCells.get("IPORT"));
+         oportcell = new Cell("OPORT", libCells.get("OPORT"));
+         ioportcell = new Cell("IOPORT", libCells.get("IOPORT"));
          gndcell = new Cell("GND", libCells.get("GND"));
          vcccell = new Cell("VCC", libCells.get("VCC"));
      }
@@ -75,7 +80,9 @@
      @DisplayName("test Cell method 'isVccSource'")
      public void testIsVccSource() {
         assertFalse(lutcell.isVccSource(), "LUT3 Cell isn't a vcc source.");
-        assertFalse(portcell.isVccSource(), "IPORT Cell isn't a vcc source.");
+        assertFalse(iportcell.isVccSource(), "IPORT Cell isn't a vcc source.");
+        assertFalse(oportcell.isVccSource(), "OPORT Cell isn't a vcc source.");
+        assertFalse(ioportcell.isVccSource(), "IOPORT Cell isn't a vcc source.");
         assertFalse(gndcell.isVccSource(), "GND Cell isn't a vcc source.");
         assertTrue(vcccell.isVccSource(), "VCC Cell should be a vcc source.");
      }
@@ -84,7 +91,9 @@
      @DisplayName("test Cell method 'isGndSource'")
      public void testIsGndSource() {
         assertFalse(lutcell.isGndSource(), "LUT3 Cell isn't a gnd source.");
-        assertFalse(portcell.isGndSource(), "IPORT Cell isn't a gnd source.");
+        assertFalse(iportcell.isGndSource(), "IPORT Cell isn't a gnd source.");
+        assertFalse(oportcell.isGndSource(), "OPORT Cell isn't a gnd source.");
+        assertFalse(ioportcell.isGndSource(), "IOPORT Cell isn't a gnd source.");
         assertTrue(gndcell.isGndSource(), "GND Cell should be a gnd source.");
         assertFalse(vcccell.isGndSource(), "VCC Cell isn't a gnd source.");
      }
@@ -93,7 +102,9 @@
      @DisplayName("test Cell method 'isPort'")
      public void testIsPort() {
         assertFalse(lutcell.isPort(), "LUT3 Cell isn't a port.");
-        assertTrue(portcell.isPort(), "IPORT Cell should be a port.");
+        assertTrue(iportcell.isPort(), "IPORT Cell should be a port.");
+        assertTrue(oportcell.isPort(), "OPORT Cell should be a port.");
+        assertTrue(ioportcell.isPort(), "IOPORT Cell should be a port.");
         assertFalse(gndcell.isPort(), "GND Cell isn't a port.");
         assertFalse(vcccell.isPort(), "VCC Cell isn't a port.");
      }
@@ -102,7 +113,9 @@
     @DisplayName("test Cell method 'isLut'")
     public void testIsLut() {
         assertTrue(lutcell.isLut(), "LUT3 Cell should be a LUT.");
-        assertFalse(portcell.isLut(), "IPORT Cell isn't a LUT.");
+        assertFalse(iportcell.isLut(), "IPORT Cell isn't a LUT.");
+        assertFalse(oportcell.isLut(), "OPORT Cell isn't a LUT.");
+        assertFalse(ioportcell.isLut(), "IOPORT Cell isn't a LUT.");
         assertFalse(gndcell.isLut(), "GND Cell isn't a LUT.");
         assertFalse(vcccell.isLut(), "VCC Cell isn't a LUT.");
     }
@@ -111,7 +124,9 @@
     @DisplayName("test Cell method 'getOutputPins'")
     public void testGetOutputPins() {
         verifyOutputPins(lutcell, Arrays.asList("O"));
-        verifyOutputPins(portcell, Arrays.asList("PAD"));
+        verifyOutputPins(iportcell, Arrays.asList("PAD"));
+        verifyOutputPins(oportcell, Arrays.asList());
+        verifyOutputPins(ioportcell, Arrays.asList("PAD"));
         verifyOutputPins(gndcell, Arrays.asList("G"));
         verifyOutputPins(vcccell, Arrays.asList("P"));
     }
@@ -120,7 +135,9 @@
     @DisplayName("test Cell method 'getInputPins'")
     public void testGetInputPins() {
         verifyInputPins(lutcell, Arrays.asList("I0", "I1", "I2"));
-        verifyInputPins(portcell, Arrays.asList());
+        verifyInputPins(iportcell, Arrays.asList());
+        verifyInputPins(oportcell, Arrays.asList("PAD"));
+        verifyInputPins(ioportcell, Arrays.asList("PAD"));
         verifyInputPins(gndcell, Arrays.asList());
         verifyInputPins(vcccell, Arrays.asList());
     }
@@ -131,13 +148,13 @@
      * expected the list of output pin names the cell should have
      */
     private void verifyOutputPins(Cell cell, List<String> expected) {
-      List<String> actual = cell.getOutputPins().stream()
-          .map(CellPin::getName)
-          .collect(Collectors.toList());
-      assertEquals(expected.size(), actual.size(), "Expected output pin count for " + cell.getName() + " Cell doesn't match calculated.");
-      for (String pin : expected) {
-          assertTrue(actual.contains(pin), cell.getName() + " Cell doesn't have " + pin + " output pin.");
-      }
+        List<String> actual = cell.getOutputPins().stream()
+            .map(CellPin::getName)
+            .collect(Collectors.toList());
+        assertEquals(expected.size(), actual.size(), "Expected output pin count for " + cell.getName() + " Cell doesn't match calculated.");
+        for (String pin : expected) {
+            assertTrue(actual.contains(pin), cell.getName() + " Cell doesn't have " + pin + " output pin.");
+        }
     }
 
     /**
@@ -146,12 +163,30 @@
      * pins the list of input pin names the cell should have
      */
     private void verifyInputPins(Cell cell, List<String> expected) {
-      List<String> actual = cell.getInputPins().stream()
-          .map(CellPin::getName)
-          .collect(Collectors.toList());
-      assertEquals(expected.size(), actual.size(), "Expected input pin count for " + cell.getName() + " Cell doesn't match calcualted.");
-      for (String pin : expected) {
-          assertTrue(actual.contains(pin), cell.getName() + " Cell doesn't have " + pin + " input pin.");
-      }
+        List<String> actual = cell.getInputPins().stream()
+            .map(CellPin::getName)
+            .collect(Collectors.toList());
+        assertEquals(expected.size(), actual.size(), "Expected input pin count for " + cell.getName() + " Cell doesn't match calcualted.");
+        for (String pin : expected) {
+            assertTrue(actual.contains(pin), cell.getName() + " Cell doesn't have " + pin + " input pin.");
+        }
     }
+
+    @Test
+    @DisplayName("test 'Dir' property of PORT Cells.")
+    public void testDirProperty() {
+        verifyDirProperty(iportcell, PortDirection.IN);
+        verifyDirProperty(oportcell, PortDirection.OUT);
+        verifyDirProperty(ioportcell, PortDirection.INOUT);
+    }
+
+    /**
+     * helper functino to test a Cell for a certain value of the Dir Property
+     * cell the Cell to test
+     * property the Property to check for
+     */
+     private void verifyDirProperty(Cell cell, PortDirection property) {
+        assertTrue(cell.getProperties().has("Dir"), cell.getName() + " Cell doesn't have 'Dir' property.");
+        assertEquals(property, cell.getProperties().get("Dir").getValue(), cell.getName() + " Cell has improper 'Dir' property value.");
+     }
 }
