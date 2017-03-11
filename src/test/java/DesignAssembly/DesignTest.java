@@ -18,7 +18,7 @@
  * also get a copy of the license at <http://www.gnu.org/licenses/>.
  */
 
-package Overview;
+package DesignAssembly;
 import java.io.IOException;
 import java.lang.Integer;
 import java.util.Arrays;
@@ -183,7 +183,7 @@ public class DesignTest {
      * test a LUT3 cell's input and output pins
      * @param cell the (LUT3) cell to test
      */
-    protected void testLUT3(Cell cell) {
+    private void testLUT3(Cell cell) {
         // assert that the cell really is a LUT3
         assertEquals("LUT3", cell.getLibCell().getName(), "LUT3 cell has wrong library cell attached");
         // a LUT3 cell should have 3 inputs, and 1 output
@@ -206,7 +206,7 @@ public class DesignTest {
      * test an IPORT cell's input and output pins
      * @param cell the (IPORT) cell to test
      */
-    protected void testIPORT(Cell cell) {
+    private void testIPORT(Cell cell) {
         // assert that the cell really is an IPORT
         assertEquals("IPORT", cell.getLibCell().getName(), "IPORT cell has wrong library cell attached");
         // an IPORT cell should have no inputs and one output
@@ -222,7 +222,7 @@ public class DesignTest {
      * test an OPORT cell's input and output pins
      * @param cell the (OPORT) cell to test
      */
-    protected void testOPORT(Cell cell) {
+    private void testOPORT(Cell cell) {
         // assert that the cell really is an OPORT
         assertEquals("OPORT", cell.getLibCell().getName(), "OPORT cell has wrong library cell attached");
         // an OPORT cell should have one input and no outputs
@@ -238,7 +238,7 @@ public class DesignTest {
      * test a Flip Flop cell's properties
      * @param cell the (Flip Flop) cell to test
      */
-    protected void testFF(Cell cell) {
+    private void testFF(Cell cell) {
         assertEquals("FDRE", cell.getLibCell().getName(), "Flip Flop cell has incorrect library cell attached");
         assertNotNull(cell.getProperties().get("INIT"), "Cannot find INIT property for Flip Flop cell");
         assertNotNull(cell.getProperties().get("SR"), "Cannot find SR property for Flip Flop cell");
@@ -252,7 +252,7 @@ public class DesignTest {
      * @param cell_name the name of the cell to add
      * @param lib_cell the library cell to use while creating the cell
      */
-     protected Cell testAddCell(CellDesign design, String cell_name, LibraryCell lib_cell) {
+     private Cell testAddCell(CellDesign design, String cell_name, LibraryCell lib_cell) {
        // create a new cell and add it to the design
        design.addCell(new Cell(cell_name, lib_cell));
        // test that the cell is in the design
@@ -272,7 +272,7 @@ public class DesignTest {
       * @param design the CellDesign to add the cell to
       * @param net_name the name of the net to add
       */
-     protected CellNet testAddNet(CellDesign design, String net_name) {
+     private CellNet testAddNet(CellDesign design, String net_name) {
        // create a new net and add it to the design
        design.addNet(new CellNet(net_name, NetType.WIRE));
        // test that the net is in the design
@@ -292,7 +292,7 @@ public class DesignTest {
       * @param source_pin the pin to be used by the net as its source
       * @param sink_pins the list of pins to be used by the net as its sinks
       */
-     protected void testAddNetPins(CellNet net, CellPin source_pin, List<CellPin> sink_pins) {
+     private void testAddNetPins(CellNet net, CellPin source_pin, List<CellPin> sink_pins) {
        // connect the source pins
        net.connectToPin(source_pin);
        // ensure the source pin isn't included in the sink pins
