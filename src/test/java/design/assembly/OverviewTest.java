@@ -18,7 +18,7 @@
  * also get a copy of the license at <http://www.gnu.org/licenses/>.
  */
 
-package DesignAssembly;
+package design.assembly;
 import java.io.IOException;
 import java.lang.Integer;
 import java.util.Arrays;
@@ -46,7 +46,7 @@ import edu.byu.ece.rapidSmith.design.NetType;
  * @author Mark Crossen
  */
 @RunWith(JUnitPlatform.class)
-public class DesignTest {
+public class OverviewTest {
 
     private static CellLibrary libCells;
     private static Device device;
