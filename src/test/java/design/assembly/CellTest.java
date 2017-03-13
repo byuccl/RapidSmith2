@@ -33,6 +33,8 @@
  import edu.byu.ece.rapidSmith.device.Device;
  import edu.byu.ece.rapidSmith.device.PortDirection;
  import edu.byu.ece.rapidSmith.device.BelId;
+ import edu.byu.ece.rapidSmith.device.Site;
+ import edu.byu.ece.rapidSmith.device.Bel;
  import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
  import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
  import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
@@ -46,6 +48,7 @@
  @RunWith(JUnitPlatform.class)
  public class CellTest {
 
+     private static Device device;
      private static CellLibrary libCells;
      private static Cell lutcell;
      private static Cell iportcell;
@@ -61,7 +64,7 @@
      public static void initializeTest() {
          // Get a CellLibrary to use
          try {
-             Device device = RSEnvironment.defaultEnv().getDevice("xc7a100tcsg324");
+             device = RSEnvironment.defaultEnv().getDevice("xc7a100tcsg324");
              libCells = new CellLibrary(RSEnvironment.defaultEnv()
                      .getPartFolderPath("xc7a100tcsg324")
                      .resolve("cellLibrary.xml"));
@@ -207,13 +210,53 @@
       * cell the Cell to test
       * expected the list of possible anchors to check for
       */
-      private void verifyAnchors(Cell cell, List<String> expected) {
-          List<String> actual = cell.getPossibleAnchors().stream()
+     private void verifyAnchors(Cell cell, List<String> expected) {
+        List<String> actual = cell.getPossibleAnchors().stream()
             .map(belid -> (belid.getSiteType()+"-"+belid.getName()).replace("ARTIX7.", "").replace("LUT", ""))
             .collect(Collectors.toList());
-          assertEquals(expected.size(), actual.size(), "Expected anchor count for " + cell.getName() + " doesn't match calculated.");
-          for (String bel : expected) {
+        assertEquals(expected.size(), actual.size(), "Expected anchor count for " + cell.getName() + " doesn't match calculated.");
+        for (String bel : expected) {
             assertTrue(actual.contains(bel), cell.getName() + " Cell doesn't have " + bel + " anchor.");
+        }
+     }
+
+      @Test
+      @DisplayName("test Cell placement")
+      public void testCellPlacement() {
+          cellPlacer(lutcell);
+          cellPlacer(iportcell);
+          cellPlacer(oportcell);
+          cellPlacer(ioportcell);
+          cellPlacer(gndcell);
+          cellPlacer(vcccell);
+      }
+
+      /**
+       * helper function to find a suitable Bel for a Cell and place it
+       * cell the Cell to place and unplace
+       */
+      private void cellPlacer(Cell cell) {
+          // Attempt to place and remove the cell on each type of anchor
+      		for (BelId anchortype : cell.getPossibleAnchors()) {
+              // Create a new empty CellDesign for the designated FPGA part
+        		  CellDesign design = new CellDesign("CellPlacementTest", "xc7a100tcsg324");
+              // Add the cell to the design
+              design.addCell(cell);
+          		// Get the first site from the device that matches the site type
+          		Site site = device.getAllSitesOfType(anchortype.getSiteType()).get(0);
+              // Get the Bel in the site that matches the particular sitetype we're testing.
+              Bel bel = site.getBel(anchortype.getName());
+          		// Place the cell on the bel
+          		design.placeCell(cell, bel);
+              // verify that getSite returns the correct value
+              assertEquals(cell.getSite(), site, "Site mismatch after placing " + cell.getName() + " Cell on site " + anchortype.getSiteType());
+              // verify that getBel return the correct value
+              assertEquals(cell.getBel(), bel, "Bel mismatch after placing " + cell.getName() + " Cell on bel " + anchortype.getName());
+              // remove the cell from the design so that it can be reused
+              design.removeCell(cell);
+              // verify that the cell is no longer attached to a site or Bel
+              assertNull(cell.getSite(), cell.getName() + " Cell still attached to Site " + site.getName() + " after being removed from design.");
+              assertNull(cell.getBel(), cell.getName() + " Cell still attached to " + bel.getName() + " after being removed from design.");
           }
       }
 }
