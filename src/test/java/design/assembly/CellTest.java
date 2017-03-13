@@ -20,8 +20,10 @@
 
  package design.assembly;
  import java.io.IOException;
+ import java.util.Collection;
  import java.util.Arrays;
  import java.util.List;
+ import java.util.ArrayList;
  import java.util.stream.Collectors;
  import org.junit.jupiter.api.BeforeAll;
  import org.junit.jupiter.api.DisplayName;
@@ -40,6 +42,8 @@
  import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
  import edu.byu.ece.rapidSmith.design.subsite.Cell;
  import edu.byu.ece.rapidSmith.design.subsite.CellPin;
+ import edu.byu.ece.rapidSmith.design.subsite.CellNet;
+ import edu.byu.ece.rapidSmith.design.NetType;
 
  /**
   * jUnit test for the Cell class in RapidSmith2
@@ -56,6 +60,7 @@
      private static Cell ioportcell;
      private static Cell gndcell;
      private static Cell vcccell;
+     private static List<Cell> testcells;
 
      /**
       * Initializes the Cell test.
@@ -78,6 +83,7 @@
          ioportcell = new Cell("IOPORT", libCells.get("IOPORT"));
          gndcell = new Cell("GND", libCells.get("GND"));
          vcccell = new Cell("VCC", libCells.get("VCC"));
+         testcells = Arrays.asList(lutcell, iportcell, oportcell, ioportcell, gndcell, vcccell);
      }
 
      @Test
@@ -223,40 +229,75 @@
       @Test
       @DisplayName("test Cell placement")
       public void testCellPlacement() {
-          cellPlacer(lutcell);
-          cellPlacer(iportcell);
-          cellPlacer(oportcell);
-          cellPlacer(ioportcell);
-          cellPlacer(gndcell);
-          cellPlacer(vcccell);
+          // test each of the sample test cells
+          for (Cell cell : testcells) {
+              // Attempt to place and remove the cell on each type of anchor
+          		for (BelId anchortype : cell.getPossibleAnchors()) {
+                  // Create a new empty CellDesign for the designated FPGA part
+            		  CellDesign design = new CellDesign("CellPlacementTest", "xc7a100tcsg324");
+                  // Add the cell to the design
+                  design.addCell(cell);
+              		// Get the first site from the device that matches the site type
+              		Site site = device.getAllSitesOfType(anchortype.getSiteType()).get(0);
+                  // Get the Bel in the site that matches the particular sitetype we're testing.
+                  Bel bel = site.getBel(anchortype.getName());
+              		// Place the cell on the bel
+              		design.placeCell(cell, bel);
+                  // verify that getSite returns the correct value
+                  assertEquals(cell.getSite(), site, "Site mismatch after placing " + cell.getName() + " Cell on site " + anchortype.getSiteType());
+                  // verify that getBel return the correct value
+                  assertEquals(cell.getBel(), bel, "Bel mismatch after placing " + cell.getName() + " Cell on bel " + anchortype.getName());
+                  // remove the cell from the design so that it can be reused
+                  design.removeCell(cell);
+                  // verify that the cell is no longer attached to a site or Bel
+                  assertNull(cell.getSite(), cell.getName() + " Cell still attached to Site " + site.getName() + " after being removed from design.");
+                  assertNull(cell.getBel(), cell.getName() + " Cell still attached to " + bel.getName() + " after being removed from design.");
+              }
+          }
+      }
+
+      @Test
+      @DisplayName("test Cell method 'getNetList'")
+      public void testGetNetList() {
+          // test each of the sample test cells
+          for (Cell cell : testcells) {
+              // keep track of which nets have been added
+              List<CellNet> addednets = new ArrayList<CellNet>();
+              // keep track of all the cell pins
+              List<CellPin> cellpins = new ArrayList(cell.getPins());
+              // connect each cell pin to a net one at a time
+              for (int index = 0; index < cellpins.size(); index++) {
+                  // create a new net for the pin
+                  CellNet newnet = new CellNet("input_net_" + Integer.toString(index), NetType.WIRE);
+                  // keep track of the new net
+                  addednets.add(newnet);
+                  // connect the new net to the pin
+                  newnet.connectToPin(cellpins.get(index));
+                  // verify the netlist
+                  verifyNetList(cell, addednets);
+              }
+              // remove the nets one at a time
+              for (int index = 0; index < cellpins.size(); index++) {
+                  // disconnect the pin from the net
+                  addednets.get(0).disconnectFromPin(cellpins.get(index));
+                  // remove the net from the expected netlist
+                  addednets.remove(0);
+                  // verify the netlist
+                  verifyNetList(cell, addednets);
+              }
+          }
       }
 
       /**
-       * helper function to find a suitable Bel for a Cell and place it
-       * cell the Cell to place and unplace
+       * helper function to verify a Cell's netlist
+       * cell the Cell to test
+       * expected the expected netlist
        */
-      private void cellPlacer(Cell cell) {
-          // Attempt to place and remove the cell on each type of anchor
-      		for (BelId anchortype : cell.getPossibleAnchors()) {
-              // Create a new empty CellDesign for the designated FPGA part
-        		  CellDesign design = new CellDesign("CellPlacementTest", "xc7a100tcsg324");
-              // Add the cell to the design
-              design.addCell(cell);
-          		// Get the first site from the device that matches the site type
-          		Site site = device.getAllSitesOfType(anchortype.getSiteType()).get(0);
-              // Get the Bel in the site that matches the particular sitetype we're testing.
-              Bel bel = site.getBel(anchortype.getName());
-          		// Place the cell on the bel
-          		design.placeCell(cell, bel);
-              // verify that getSite returns the correct value
-              assertEquals(cell.getSite(), site, "Site mismatch after placing " + cell.getName() + " Cell on site " + anchortype.getSiteType());
-              // verify that getBel return the correct value
-              assertEquals(cell.getBel(), bel, "Bel mismatch after placing " + cell.getName() + " Cell on bel " + anchortype.getName());
-              // remove the cell from the design so that it can be reused
-              design.removeCell(cell);
-              // verify that the cell is no longer attached to a site or Bel
-              assertNull(cell.getSite(), cell.getName() + " Cell still attached to Site " + site.getName() + " after being removed from design.");
-              assertNull(cell.getBel(), cell.getName() + " Cell still attached to " + bel.getName() + " after being removed from design.");
+      private void verifyNetList(Cell cell, Collection<CellNet> expected) {
+          Collection<CellNet> actual = cell.getNetList();
+          assertEquals(expected.size(), actual.size(), "netlist size mismatch after adding new net to " + cell.getName());
+          for (CellNet net : expected) {
+              assertTrue(actual.contains(net), cell.getName() + " Cell doesn't contain expected net while connecting pins.");
           }
       }
 }
