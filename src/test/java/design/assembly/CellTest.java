@@ -32,6 +32,7 @@
  import edu.byu.ece.rapidSmith.RSEnvironment;
  import edu.byu.ece.rapidSmith.device.Device;
  import edu.byu.ece.rapidSmith.device.PortDirection;
+ import edu.byu.ece.rapidSmith.device.BelId;
  import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
  import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
  import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
@@ -181,7 +182,7 @@
     }
 
     /**
-     * helper functino to test a Cell for a certain value of the Dir Property
+     * helper function to test a Cell for a certain value of the Dir Property
      * cell the Cell to test
      * property the Property to check for
      */
@@ -189,4 +190,30 @@
         assertTrue(cell.getProperties().has("Dir"), cell.getName() + " Cell doesn't have 'Dir' property.");
         assertEquals(property, cell.getProperties().get("Dir").getValue(), cell.getName() + " Cell has improper 'Dir' property value.");
      }
+
+     @Test
+     @DisplayName("test Cell method 'getPossibleAnchors'")
+     public void testGetPossibleAnchors() {
+         verifyAnchors(lutcell, Arrays.asList("SLICEL-D6", "SLICEL-D5", "SLICEL-C6", "SLICEL-C5", "SLICEL-B6", "SLICEL-B5", "SLICEL-A5", "SLICEL-A6", "SLICEM-D6", "SLICEM-D5", "SLICEM-C6", "SLICEM-C5", "SLICEM-B6", "SLICEM-B5", "SLICEM-A5", "SLICEM-A6"));
+         verifyAnchors(iportcell, Arrays.asList("IOB33-PAD", "IOB33S-PAD", "IOB33M-PAD", "IPAD-PAD"));
+         verifyAnchors(oportcell, Arrays.asList("IOB33-PAD", "IOB33S-PAD", "IOB33M-PAD", "OPAD-PAD"));
+         verifyAnchors(ioportcell, Arrays.asList("IOB33-PAD", "IOB33S-PAD", "IOB33M-PAD"));
+         verifyAnchors(gndcell, Arrays.asList());
+         verifyAnchors(vcccell, Arrays.asList());
+     }
+
+     /**
+      * helper function to test a Cell's possible anchors
+      * cell the Cell to test
+      * expected the list of possible anchors to check for
+      */
+      private void verifyAnchors(Cell cell, List<String> expected) {
+          List<String> actual = cell.getPossibleAnchors().stream()
+            .map(belid -> (belid.getSiteType()+"-"+belid.getName()).replace("ARTIX7.", "").replace("LUT", ""))
+            .collect(Collectors.toList());
+          assertEquals(expected.size(), actual.size(), "Expected anchor count for " + cell.getName() + " doesn't match calculated.");
+          for (String bel : expected) {
+            assertTrue(actual.contains(bel), cell.getName() + " Cell doesn't have " + bel + " anchor.");
+          }
+      }
 }
