@@ -26,7 +26,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import edu.byu.ece.rapidSmith.design.NetType
 
+// The cell library is needed to create different types of pins. These pins are found by creating various Cells.
 private val cell_library = CellLibrary(RSEnvironment.defaultEnv().getPartFolderPath("xc7a100tcsg324").resolve("cellLibrary.xml"))
+
 /**
  * unit test for the CellNet class in RapidSmith2
  * @author Mark Crossen
@@ -46,6 +48,44 @@ class CellNetTests {
             net.disconnectFromPin(pin)
             assertFalse(net.isConnectedToPin(pin), "CellNet still connected to pin after being removed.")
             assertEquals(cell.getPins().size-index-1, net.getPins().size, "CellNet has improper pin count after removing a pin.")
+        }
+    }
+
+    @Test
+    @DisplayName("test CellNet source pins")
+    fun testSourcePins() {
+        val lut3_cell = Cell("test_lut", cell_library.get("LUT3"))
+        val ioport_cell = Cell("test_inout", cell_library.get("IOPORT"))
+        var net = CellNet("test_net", NetType.WIRE)
+        net.connectToPins(lut3_cell.getPins())
+        net.connectToPins(ioport_cell.getPins())
+        assertNotNull(net.sourcePin, "Net has no source pin.")
+        assertEquals(lut3_cell.getPin("O"), net.sourcePin, "Net has improper source pin.")
+        assertEquals(lut3_cell.outputPins.size + ioport_cell.pins.size, net.allSourcePins.size, "Net has improper source pin count")
+        verify_collection(lut3_cell.outputPins, net.allSourcePins, element_name = "source pin", ignore_different_size = true)
+        verify_collection(ioport_cell.pins, net.allSourcePins, element_name = "source pin", ignore_different_size = true)
+        assertEquals(lut3_cell.inputPins.size + ioport_cell.pins.size, net.sinkPins.size, "Net has improper sink pin count")
+        verify_collection(lut3_cell.inputPins, net.sinkPins, element_name = "sink pin", ignore_different_size = true)
+        verify_collection(ioport_cell.pins, net.sinkPins, element_name = "sink pin", ignore_different_size = true)
+        net.disconnectFromPin(lut3_cell.getPin("O"))
+        assertEquals(ioport_cell.getPin("PAD"), net.sourcePin, "Net has improper source pin after removing original source pin")
+        verify_collection(ioport_cell.pins, net.allSourcePins, element_name = "source pin")
+    }
+
+    /**
+     * helper function to assert that two Collections are equal to each other
+     * expected the Collection to check against
+     * actual the Coollection to test
+     * collection_name optional collection name to be used in debug message
+     * element_name optional element name to be used in debug message
+     * ignore_different_size optionally set this to true if the expected Collection contains more elements than the actual Collection.
+     */
+    private fun <type>verify_collection(expected : Collection<type>, actual : Collection<type>, collection_name : String = "CellNet", element_name : String = "element", ignore_different_size : Boolean = false) {
+        if (!ignore_different_size) {
+            assertEquals(expected.size, actual.size, collection_name + " " + element_name + " size mismatch")
+        }
+        expected.forEach { element ->
+            assertTrue(actual.contains(element), collection_name + " is missing a " + element_name)
         }
     }
 }
