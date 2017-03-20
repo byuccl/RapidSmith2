@@ -43,7 +43,7 @@ public enum PortDirection {
 		}
 	}
 	
-	public static PortDirection getPortDirection(Cell portCell) {
+	public static PortDirection get(Cell portCell) {
 		
 		checkIsValidPort(portCell);
 		return (PortDirection)portCell.getProperties().get("Dir").getValue();
