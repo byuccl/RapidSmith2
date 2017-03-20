@@ -197,7 +197,7 @@
       */
      private void verifyDirProperty(Cell cell, PortDirection property) {
          assertTrue(cell.getProperties().has("Dir"), cell.getName() + " Cell doesn't have 'Dir' property.");
-         assertEquals(property, cell.getProperties().get("Dir").getValue(), cell.getName() + " Cell has improper 'Dir' property value.");
+         assertEquals(property, PortDirection.get(cell), cell.getName() + " Cell has improper PortDirection property.");
      }
 
      @Test
@@ -307,12 +307,18 @@
          for (Cell cell : testcells) {
              // create and attach a pseudo pin to the cell
              CellPin pseudopin = cell.attachPseudoPin("test_pin", PinDirection.INOUT);
+             // ensure the pin exists
+             assertNotNull(cell.getPin("test_pin"), cell.getName() + " Cell doesn't contain recently added pseudo pin.");
+             // verify the pin is a pseudo pin.
+             assertTrue(cell.getPin("test_pin").isPseudoPin(), cell.getName() + " Cell returns non-pseudo pin when it should be pseudo.");
              // make sure the cell has the pseudo pin
              assertEquals(1, cell.getPseudoPinCount(), cell.getName() + " Cell doesn't contain a psuedo pin after attaching one.");
              // verify its the right pseudo pin
              assertEquals(pseudopin, cell.getPseudoPins().iterator().next(), cell.getName() + " Cell doesn't contain the right pseudo pin.");
+             // verify the cell returns the right pin based on name
+             assertEquals(pseudopin, cell.getPin("test_pin"), cell.getName() + " Cell doesn't return proper (pseudo) pin.");
              // detach the pseudo pin, and make sure it returns True for successful
-             assertTrue(cell.removePseudoPin(pseudopin), cell.getName() + "Cell didn't detach pseudo pin properly.");
+             assertTrue(cell.removePseudoPin(pseudopin), cell.getName() + " Cell didn't detach pseudo pin properly.");
              // verify the cell no longer has any pseudo pins attached.
              assertEquals(0, cell.getPseudoPinCount(), cell.getName() + " Cell still contains a psuedo pin after removing it.");
          }
