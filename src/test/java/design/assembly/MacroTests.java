@@ -327,4 +327,32 @@ public class MacroTests {
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 * @throws IOException
+	 */
+	@Test
+	@DisplayName("Internal Net Type Test")
+	public void internalNetTypeTest() throws IOException {
+		libCells.loadMacroXML(resourceDir.resolve("seanMacroTest.xml"));
+		
+		CellDesign design = new CellDesign();
+		Cell testCell = design.addCell(new Cell("test", libCells.get("counter")));
+		
+		// Test GND internal nets
+		assertTrue(design.hasNet("test/<const0>"), "Internal net missing from design: test/<const0>");
+		CellNet gndNet = design.getNet("test/<const0>");
+		assertEquals(NetType.GND, gndNet.getType(), "Internal type for GND net test/<const0> is not correct!");
+		
+		// Test VCC internal nets
+		assertTrue(design.hasNet("test/<const1>"), "Internal net missing from design: test/<const1>");
+		CellNet vccNet = design.getNet("test/<const1>");
+		assertEquals(NetType.VCC, vccNet.getType(), "Internal type for VCC net test/<const1> is not correct!");
+		
+		// Test WIRE nets
+		testCell.getInternalNets().stream()
+			.filter(net -> !net.getName().equals("test/<const1>") && !net.getName().equals("test/<const0>"))
+			.forEach(net -> assertEquals(NetType.WIRE, net.getType(), "Internal type for net " + net.getName() + " is not correct!"));
+	}
 }
