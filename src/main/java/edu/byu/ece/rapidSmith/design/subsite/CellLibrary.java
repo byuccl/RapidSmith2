@@ -281,7 +281,12 @@ public class CellLibrary implements Iterable<LibraryCell> {
 													.getChildren("pinname")
 													.stream().map(el -> el.getText())
 													.collect(Collectors.toList());
-				macroCell.addInternalNet(name, pinNames);
+				String type = internalNetEl.getChildText("type");
+				if (type == null) {
+					type = "WIRE";
+				}
+				
+				macroCell.addInternalNet(name, type, pinNames);
 			}
 		}
 	}

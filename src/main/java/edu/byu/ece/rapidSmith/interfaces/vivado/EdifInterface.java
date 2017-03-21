@@ -107,7 +107,7 @@ public final class EdifInterface {
 		
 		// add all the cells and nets to the design
 		processTopLevelEdifPorts(design, topLevelCell.getInterface(), libCells);
-		processEdifCells(design, topLevelCell.getCellInstanceList(), libCells);
+		processEdifCells(design, topLevelCell.getCellInstanceList(), libCells, vccNets, gndNets);
 		processEdifNets(design, topLevelCell.getNetList(), vccNets, gndNets);
 				
 		collapseStaticNets(design, libCells, vccNets, gndNets);
@@ -156,7 +156,7 @@ public final class EdifInterface {
 	/*
 	 * Converts EDIF cell instances to equivalent RapidSmith cells and adds them to the design
 	 */
-	private static void processEdifCells(CellDesign design, Collection<EdifCellInstance> edifCellInstances, CellLibrary libCells) {
+	private static void processEdifCells(CellDesign design, Collection<EdifCellInstance> edifCellInstances, CellLibrary libCells, List<CellNet> vccNets, List<CellNet> gndNets) {
 		// TODO: think about throwing an error or warning here
 		if (edifCellInstances == null || edifCellInstances.size() == 0) {
 			System.err.println("[Warning] No cells found in the edif netlist");
@@ -173,8 +173,19 @@ public final class EdifInterface {
 			Cell newcell = design.addCell(new Cell(eci.getOldName(), lcType));
 			
 			// Add properties to the cell 
-			// TODO: when macros are added, we will need to update this
 			newcell.getProperties().updateAll(createCellProperties(eci.getPropertyList()));
+			
+			// look for internal macro nets
+			if (newcell.isMacro()) {
+				for (CellNet net : newcell.getInternalNets()) {
+					if (net.isVCCNet()) {
+						vccNets.add(net);
+					}
+					else if (net.isGNDNet()) {
+						gndNets.add(net);
+					}
+				}
+			}
 		}
 	}
 	

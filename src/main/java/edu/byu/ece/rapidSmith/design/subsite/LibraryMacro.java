@@ -140,14 +140,14 @@ public class LibraryMacro extends LibraryCell {
 	 * @param name Relative name of the internal net
 	 * @param fullPinNames A List of pin names that are attached to the internal net
 	 */
-	void addInternalNet(String name, List<String> fullPinNames) {
+	void addInternalNet(String name, String type, List<String> fullPinNames) {
 		
 		// lazily initialize the internal net list (only some macros have this list)
 		if (this.internalNets == null) {
 			this.internalNets = new ArrayList<>();
 		}
 		
-		this.internalNets.add(new InternalNet(name, fullPinNames));
+		this.internalNets.add(new InternalNet(name, type, fullPinNames));
 	}
 	
 	/**
@@ -212,7 +212,7 @@ public class LibraryMacro extends LibraryCell {
 		
 		for (InternalNet net: internalNets) {
 			String netName = parentName + "/" + net.getName();
-			CellNet cellNet = new CellNet(netName, NetType.WIRE);
+			CellNet cellNet = new CellNet(netName, net.getType());
 			cellNet.setIsInternal(true);
 			
 			for (InternalPin pin : net.getInternalPins()) {
@@ -278,13 +278,16 @@ public class LibraryMacro extends LibraryCell {
 	 */
 	private class InternalNet {
 		private final String name;
+		private final NetType type;
 		private final List<InternalPin> internalPins;
 		
-		public InternalNet(String name, List<String> fullPinNames) {
+		public InternalNet(String name, String type, List<String> fullPinNames) {
 			this.name = name;
 			assert (fullPinNames.size() > 1) : "Need at least two pins for a complete net.";
 			
 			this.internalPins = new ArrayList<>();
+			
+			this.type = NetType.valueOf(type); 
 			
 			for (String fullPinName : fullPinNames) {
 				String[] nameToks = fullPinName.split("/");
@@ -295,6 +298,10 @@ public class LibraryMacro extends LibraryCell {
 		
 		public String getName() {
 			return name;
+		}
+		
+		public NetType getType() {
+			return type;
 		}
 		
 		public List<InternalPin> getInternalPins() {

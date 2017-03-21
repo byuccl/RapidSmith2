@@ -300,6 +300,7 @@ public class XdcRoutingInterface {
 		Set<String> wiresInNet = new HashSet<>();
 
 		// First 2 tokens are ROUTE <netName>
+		// Build up the Set containing all the wires in the net
 		String startWire = toks[2];
 		for (int i = 2; i < toks.length; i++ ) {			
 			wiresInNet.add(toks[i]);
