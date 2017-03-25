@@ -111,6 +111,18 @@ class CellNetTests {
     }
 
     @Test
+    @DisplayName("test CellNet 'getPseudoPinCount' method")
+    void testGetPseudoPinCount() {
+        CellNet net = new CellNet("test_net", NetType.WIRE);
+        Cell cell = new Cell("test_cell", cell_library.get("LUT5"));
+        CellPin pin = cell.attachPseudoPin("test_pin", PinDirection.INOUT);
+        net.connectToPin(pin);
+        assertEquals(1, net.getPseudoPinCount(), "Net returns wrong pseudo pin count after connecting a pseudo pin");
+        net.disconnectFromPin(pin);
+        assertEquals(0, net.getPseudoPinCount(), "Net returns wrong pseudo pin count after disconnecting a pseudo pin");
+    }
+
+    @Test
     @DisplayName("test CellNet 'detachNet' method")
     void testDetachNet() {
         CellNet net = new CellNet("test_net", NetType.WIRE);
