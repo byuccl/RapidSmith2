@@ -110,6 +110,23 @@ class CellNetTests {
         verify_collection(ioport_cell.getPins(), net.getAllSourcePins(), "CellNet", "source pin", false);
     }
 
+    /**
+     * helper function to assert that two Collections are equal to each other
+     * expected the Collection to check against
+     * actual the Coollection to test
+     * collection_name collection name to be used in debug message
+     * element_name element name to be used in debug message
+     * ignore_different_size set this to true if the expected Collection contains more elements than the actual Collection.
+     */
+    private <type> void verify_collection(Collection<type> expected, Collection<type> actual, String collection_name, String element_name, Boolean ignore_different_size) {
+        if (!ignore_different_size) {
+            assertEquals(expected.size(), actual.size(), collection_name + " " + element_name + " size mismatch");
+        }
+        for (type element : expected) {
+            assertTrue(actual.contains(element), collection_name + " is missing a " + element_name);
+        }
+    }
+
     @Test
     @DisplayName("test CellNet 'getPseudoPinCount' method")
     void testGetPseudoPinCount() {
@@ -133,20 +150,18 @@ class CellNetTests {
         assertEquals(0, net.getPins().size(), "Net didn't detach from pins correctly");
     }
 
-    /**
-     * helper function to assert that two Collections are equal to each other
-     * expected the Collection to check against
-     * actual the Coollection to test
-     * collection_name collection name to be used in debug message
-     * element_name element name to be used in debug message
-     * ignore_different_size set this to true if the expected Collection contains more elements than the actual Collection.
-     */
-    private <type> void verify_collection(Collection<type> expected, Collection<type> actual, String collection_name, String element_name, Boolean ignore_different_size) {
-        if (!ignore_different_size) {
-            assertEquals(expected.size(), actual.size(), collection_name + " " + element_name + " size mismatch");
+    @Test
+    @DisplayName("test CellNet 'getFanOut' method")
+    void testGetFanOut() {
+        CellNet net = new CellNet("test_net", NetType.WIRE);
+        List<CellPin> sink_pins = new ArrayList<CellPin>(new Cell("test_cell", cell_library.get("LUT3")).getInputPins());
+        for (int index = 0; index < sink_pins.size(); index++) {
+            net.connectToPin(sink_pins.get(index));
+            assertEquals(index+1, net.getFanOut(), "CellNet has improper fan out after adding a new sink pin.");
         }
-        for (type element : expected) {
-            assertTrue(actual.contains(element), collection_name + " is missing a " + element_name);
+        for (int index = 0; index < sink_pins.size(); index++) {
+            net.disconnectFromPin(sink_pins.get(index));
+            assertEquals(sink_pins.size()-index-1, net.getFanOut(), "CellNet has improper fan out after removing a sink pin.");
         }
     }
 }
