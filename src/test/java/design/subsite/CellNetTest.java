@@ -61,6 +61,9 @@ class CellNetTests {
         }
     }
 
+    /**
+     * Test if a Net carries a clock signal by connecting and siconnecting a clock pin.
+     */
     @Test
     @DisplayName("test cellNet 'isClkNet' method")
     void testIsClkNet() {
@@ -108,6 +111,9 @@ class CellNetTests {
         assertFalse(mix_net.isClkNet(), "Net shouldn't be a ClkNet after removing all pins.");
     }
 
+    /**
+     * Iteratively test if a Net is connected to a set of pins.
+     */
     @Test
     @DisplayName("test CellNet 'isConnectedToPin' method")
     void testIsConnectedToPin() {
@@ -130,6 +136,12 @@ class CellNetTests {
         }
     }
 
+    /**
+     * Test a Net's source pin(s).
+     * When multiple source pins are connected, the Net should return the OUT pin instead of the INOUT pin.
+     * When a single source pin is connected of type OUT or INOUT, the Net should return that pin.
+     * In either case, the Net should return all output pins when getOutputPins is called.
+     */
     @Test
     @DisplayName("test CellNet source pins")
     void testSourcePins() {
@@ -173,6 +185,10 @@ class CellNetTests {
         }
     }
 
+    /**
+     * Test a Net for the pseudo pins attached to it.
+     * This can be tested by asserting the proper pseudo pin count after connecting and disconnecting a pseudo pin.
+     */
     @Test
     @DisplayName("test CellNet 'getPseudoPinCount' method")
     void testGetPseudoPinCount() {
@@ -186,6 +202,10 @@ class CellNetTests {
         assertEquals(0, net.getPseudoPinCount(), "Net returns wrong pseudo pin count after disconnecting a pseudo pin");
     }
 
+    /**
+     * Detach a Net and test the results.
+     * After detaching, the net should have no pins connected to it.
+     */
     @Test
     @DisplayName("test CellNet 'detachNet' method")
     void testDetachNet() {
@@ -199,6 +219,11 @@ class CellNetTests {
         assertEquals(0, net.getPins().size(), "Net didn't detach from pins correctly");
     }
 
+    /**
+     * Test a Net's fan-out
+     * The fan-out is basically just a count of all the Net's sink pins.
+     * To test the fan-out, iteratively connect and check some sink pins to the Net.
+     */
     @Test
     @DisplayName("test CellNet 'getFanOut' method")
     void testGetFanOut() {
