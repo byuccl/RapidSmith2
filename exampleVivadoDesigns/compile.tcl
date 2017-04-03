@@ -13,7 +13,15 @@ proc dcp2tcp {top} {
 # Compile the specified directory of HDL files and create a Tincr
 # checkpoint from that.  They do not remove the files or close the
 # design in case you want to do further work with them.
+# IMPORTANTLY: it assumes that the top level module has the same
+# name as the directory where all the source files are located.
 proc compile_hdl_to_checkpoint_files {top} {
+    puts "Closing any designs that are currently open..."
+    puts ""
+
+    close_design -quiet
+
+    puts "Continuing..."
     link_design -part xc7a100t-csg324-3
     
     if {[glob -nocomplain $top/*.sv] != ""} {
@@ -47,7 +55,7 @@ proc compile_hdl_to_checkpoint_files {top} {
     puts "Writing rscp"
     tincr::write_rscp $top
     puts "All done..."
-    close_project
+    close_design
 
     }
 
