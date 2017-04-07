@@ -29,6 +29,9 @@ import com.trolltech.qt.gui.QUndoCommand;
 
 import edu.byu.ece.rapidSmith.device.vsrt.gui.PrimitiveSiteScene;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreePin;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.Bel;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.ElementShape;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.Pip;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.Wire;
 import edu.byu.ece.rapidSmith.device.vsrt.primitiveDefs.PrimitiveDefPinDirection;
 
@@ -55,6 +58,15 @@ public class AddWireCommand extends QUndoCommand {
 	 */
 	public AddWireCommand (PrimitiveSiteScene scene, QTreePin start_pin, QTreePin end_pin, QPointF start, QPointF end){
 		this.scene = scene; 
+		
+		if (start.x() < end.x()) {
+			System.out.println(((ElementShape)scene.itemAt(start.x() - 1, start.y())).getName());
+			System.out.println(((ElementShape)scene.itemAt(end.x() + 1, end.y())).getName());
+		}
+		else{
+			System.out.println(((ElementShape)scene.itemAt(start.x() + 1, start.y())).getName());
+			System.out.println(((ElementShape)scene.itemAt(end.x() - 1, end.y())).getName());
+		}
 		
 		//two connections need to be generated for pins that are both of type inout
 		if (start_pin.getPin().getDirection() == PrimitiveDefPinDirection.INOUT 

@@ -119,7 +119,7 @@ public class RoutethroughInserterTest {
 	 * Creates a small design that can be used to test the RoutethroughInserter 
 	 */
 	private CellDesign createTestDesign() {
-		CellDesign design = new CellDesign("TestDesign", device.getPartName());
+		CellDesign design = new CellDesign("TestDesign", device.getPartName(), libCells);
 
 		// create partial netlist
 		Cell lut1 = design.addCell(new Cell("lut1", libCells.get("LUT1")));

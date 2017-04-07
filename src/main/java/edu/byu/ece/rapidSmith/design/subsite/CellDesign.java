@@ -62,6 +62,8 @@ public class CellDesign extends AbstractDesign {
 	private CellNet gndNet;
 	/** List of Vivado constraints on the design **/
 	private List<XdcConstraint> vivadoConstraints;
+	/** Cell Library that the current design is implemented with*/
+	private CellLibrary cellLibrary;
 	
 	/**
 	 * Constructor which initializes all member data structures. Sets name and
@@ -72,18 +74,20 @@ public class CellDesign extends AbstractDesign {
 		init();
 		properties = new PropertyList();
 	}
-
+	
 	/**
 	 * Creates a new design and populates it with the given design name and
 	 * part name.
 	 *
 	 * @param designName The name of the newly created design.
 	 * @param partName   The target part name of the newly created design.
+	 * @param cellLibrary The {@link CellLibrary} object containing available library cells for the design 
 	 */
-	public CellDesign(String designName, String partName) {
+	public CellDesign(String designName, String partName, CellLibrary cellLibrary) {
 		super(designName, partName);
 		init();
 		properties = new PropertyList();
+		this.cellLibrary = cellLibrary;
 	}
 
 	private void init() {
@@ -275,6 +279,17 @@ public class CellDesign extends AbstractDesign {
 			disconnectCell_impl(cell);
 		}
 	}
+	
+	/**
+	 * Removes an internal macro cell. The cell will first be unplaced and then removed from the design
+	 * 
+	 * @param iCell Internal macro {@link Cell}
+	 */
+	void removeInternalCell(Cell iCell) {
+		unplaceCell_impl(iCell);
+		internalCellMap.remove(iCell.getName());
+		iCell.clearDesign();
+	}
 
 	/**
 	 * Disconnects without removing the specified cell from this design.  
@@ -395,6 +410,20 @@ public class CellDesign extends AbstractDesign {
 	}
 
 	/**
+	 * Forcibly removes an internal net from the design (this is usually an error). This is package private and so should
+	 * not be called by regular users
+	 * 
+	 * @param net The internal {@link CellNet} to remove
+	 */
+	void forceRemoveInternalNet(CellNet net) {
+		assert (net.isInternal()) : "Input argument should be an internal net!";
+		if (!net.getPins().isEmpty())
+			throw new Exceptions.DesignAssemblyException("Cannot remove connected net." + net.getName());
+		
+		removeNet_impl(net);
+	}
+	
+	/**
 	 * Disconnects and removes a net from this design.
 	 *
 	 * @param net the net to remove from this design
@@ -448,7 +477,7 @@ public class CellDesign extends AbstractDesign {
 		pins.forEach(net::disconnectFromPin);
 		net.unroute();
 	}
-
+	
 	/**
 	 * Returns the power(VCC) net of the design
 	 * 
@@ -706,6 +735,22 @@ public class CellDesign extends AbstractDesign {
 			vivadoConstraints = new ArrayList<>();
 		}
 		vivadoConstraints.add(constraint);
+	}
+	
+	/**
+	 * Sets the Cell Library for the design
+	 * @param cellLibrary {@link CellLibrary} object
+	 */
+	public void setCellLibrary(CellLibrary cellLibrary) {
+		this.cellLibrary = cellLibrary;
+	}
+	
+	/**
+	 * Returns the {@link CellLibrary} of the design. If the cell library
+	 * has not been set, {@code null} will be returned.
+	 */
+	public CellLibrary getCellLibrary() {
+		return this.cellLibrary;
 	}
 	
 	/**

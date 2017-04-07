@@ -6,6 +6,9 @@ import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreePin;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.VsrtColor;
 import edu.byu.ece.rapidSmith.device.vsrt.primitiveDefs.PrimitiveDefPinDirection;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.Qt.AlignmentFlag;
@@ -25,7 +28,7 @@ public class Bel extends ElementShape{
 	
 	/**Bounding shape where the item can be selected */	
 	QRectF shape;
-	
+		
 	/**
 	 * Initializes the Bel object
 	 * @param element  QTreeElement that this drawn bel represents
@@ -95,7 +98,7 @@ public class Bel extends ElementShape{
 			//draw the input pin names in white in their corresponding position (left justified)
 			int i = 1;
 			
-			for (QTreePin pin : (this.rotationAngle==180) ? element.getOut_pins() :element.getIn_pins()) { 
+			for (QTreePin pin : (this.rotationAngle==180) ? element.getOut_pins() : element.getIn_pins()) { 
 				//helps user see which pins are of type inout.
 				if (pin.getPin().getDirection() == PrimitiveDefPinDirection.INOUT)
 					painter.setPen(VsrtColor.darkGray);
@@ -108,6 +111,10 @@ public class Bel extends ElementShape{
 			painter.setLayoutDirection(LayoutDirection.RightToLeft);
 			for (QTreePin pin : (this.rotationAngle==180) ? element.getIn_pins() :element.getOut_pins()) {
 					double xPos = this.width/2; 
+					
+					if (pin.getPin().getDirection() == PrimitiveDefPinDirection.INOUT)
+						painter.setPen(VsrtColor.darkGray);
+					
 					painter.drawText(new QRectF(xPos,(int)( i*(pin_width/2) ), width-xPos, pin_width)
 								, AlignmentFlag.AlignVCenter.value(), pin.get_pinName() );
 				i += 2;

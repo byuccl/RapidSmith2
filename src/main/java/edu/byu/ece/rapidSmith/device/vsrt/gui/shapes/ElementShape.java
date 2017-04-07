@@ -1,6 +1,8 @@
 package edu.byu.ece.rapidSmith.device.vsrt.gui.shapes;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import edu.byu.ece.rapidSmith.device.vsrt.gui.PrimitiveSiteScene;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreeElement;
@@ -50,6 +52,8 @@ public abstract class ElementShape extends QGraphicsItem{
 	protected QPainterPath path = new QPainterPath();
 	/**Rotation of the object (valid values are 0, 90, 180, and 270)*/
 	protected double rotationAngle =  0;
+	/** Wire objects that are connected to the Bel */
+	protected Set<Wire> connectedWires = new HashSet<Wire>();
 	
 	public QTreeElement getTreeElement(){
 		return this.element;  
@@ -375,5 +379,19 @@ public abstract class ElementShape extends QGraphicsItem{
 	}
 	public void setRotationAngle(double angle){
 		this.rotationAngle = angle; 
+	}
+	
+	public String getName() {
+		return element.getElement().getName();
+	}
+	
+	public void connectToWire(Wire w) {
+		assert(!this.connectedWires.contains(w));
+		this.connectedWires.add(w);
+	}
+	
+	public void disconnectWire(Wire w) {
+		assert(this.connectedWires.contains(w));
+		this.connectedWires.remove(w);
 	}
 }
