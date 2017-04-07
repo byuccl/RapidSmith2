@@ -8,6 +8,9 @@ import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreePin;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.VsrtColor;
 import edu.byu.ece.rapidSmith.device.vsrt.primitiveDefs.PrimitiveDefPinDirection;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.Qt.AlignmentFlag;
@@ -42,7 +45,7 @@ public class PinShape extends QGraphicsItem{
 	private QFont font = new QFont();
 	/**Selectable area of the object*/
 	private QPainterPath path = new QPainterPath();
-
+	
 	/**
 	 * Constructor
 	 * @param pin
@@ -123,12 +126,15 @@ public class PinShape extends QGraphicsItem{
 	 **/
 	@Override
 	public void paint(QPainter painter, QStyleOptionGraphicsItem arg1, QWidget arg2) {
-		// TODO Auto-generated method stub
-		if ( this.isSelected() ) 
+		
+		if ( this.isSelected() ) // highlighed pins show blue  
 			painter.setPen(VsrtColor.blue);
-		else if ( !this.pin.getPin().isConnected() )
+		else if ( !this.pin.getPin().isConnected() ) // unconnected pins show gray
 			painter.setPen(VsrtColor.darkGray); 
-		else {	painter.setPen(VsrtColor.black);	}
+		else if (this.pin.getPin().getDirection() == PrimitiveDefPinDirection.INOUT) { // inout pins show red
+			painter.setPen(VsrtColor.red);
+		}
+		else {	painter.setPen(VsrtColor.black);	} // all other pins show black
 		painter.setFont(font);
 		
 		//Input Pins

@@ -145,4 +145,17 @@ public class Wire {
 			this.endParent.setForeground(0, new QBrush(VsrtColor.darkGreen));
 		//}
 	}
+	
+	public void hideWire() {
+		for(WirePart wire: lines) {
+			wire.hide(); 
+		}
+	}
+	
+	public void showWire() {
+		for (WirePart wire : lines) {
+			wire.show();
+		}
+	}
+	
 }//end class

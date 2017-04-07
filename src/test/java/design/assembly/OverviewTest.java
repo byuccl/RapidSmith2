@@ -80,7 +80,7 @@ public class OverviewTest {
     @DisplayName("Design Overview Test")
     public void testDesignOverview() {
         // create the top level design object
-        CellDesign design = new CellDesign("TestDesignOverview", device.getPartName());
+        CellDesign design = new CellDesign("TestDesignOverview", device.getPartName(), libCells);
         assertEquals("TestDesignOverview", design.getName(), "Design name doesn't match constructor");
 
         // find a LUT cell to use for this design

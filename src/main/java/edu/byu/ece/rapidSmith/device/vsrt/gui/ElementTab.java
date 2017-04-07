@@ -53,8 +53,7 @@ public class ElementTab extends QWidget {
 	private boolean underPip = false;
 	/**Undo stack to push commands onto*/
 	private QUndoStack undoStack;
-	
-	
+		
 	/*************************************************************************************
 	 *	Initialization -- methods used to initialize the element tab and its components  *
 	 *************************************************************************************/
@@ -392,11 +391,51 @@ public class ElementTab extends QWidget {
 	public void showDeleteElementPinMenu(){
 		this.underPip = pips.underMouse();
 		
-		if ((underPip ? pips : bels ).selectedItems().get(0).parent() instanceof QTreeElement ) {
+		QTreeWidgetItem item = (underPip ? pips : bels ).selectedItems().get(0);
+		int numSelected = (underPip ? pips : bels ).selectedItems().size();
+		
+		if (item.parent() instanceof QTreeElement ) {
 			QMenu popupMenu = new QMenu();
-			popupMenu.addAction(new QIcon("images/trash.png"), "Delete Element Pin", this, "deleteElementPin()");
-			popupMenu.popup(QCursor.pos());		
+			popupMenu.addAction(new QIcon(VSRTool.getImagePath("trash.png")), "Delete Element Pin", this, "deleteElementPin()");
+			if (numSelected == 1) {
+				popupMenu.addAction(new QIcon(""), "Mark Pin as IN", this, "changeBelPinIn()");
+				popupMenu.addAction(new QIcon(""), "Mark Pin as OUT", this, "changeBelPinOut()");
+				popupMenu.addAction(new QIcon(""), "Mark Pin as INOUT", this, "changeBelPinInOut()");
+			}
+			popupMenu.popup(QCursor.pos());	
 		}
+	}
+	
+	@SuppressWarnings("unused")
+	private void changeBelPinIn() {
+		QTreePin pin = (QTreePin) (underPip ? pips : bels ).selectedItems().get(0);
+		changePinDirection(pin, PrimitiveDefPinDirection.INPUT);
+	}
+	@SuppressWarnings("unused")
+	private void changeBelPinOut() {
+		QTreePin pin = (QTreePin) (underPip ? pips : bels ).selectedItems().get(0);
+		changePinDirection(pin, PrimitiveDefPinDirection.OUTPUT);
+	}
+	@SuppressWarnings("unused")
+	private void changeBelPinInOut() {
+		QTreePin pin = (QTreePin) (underPip ? pips : bels ).selectedItems().get(0);
+		changePinDirection(pin, PrimitiveDefPinDirection.INOUT);
+	}
+	
+	private void changePinDirection(QTreePin pin, PrimitiveDefPinDirection newDir) {
+			
+		if (pin.childCount() > 0) {
+			QMessageBox.critical(this, "Disconnect Pin", "Cannot change the pin direction of a connected pin.");
+			return;
+		}
+				
+		PrimitiveDefPin pdPin = pin.getPin();
+		if (pdPin.getDirection() == newDir) {
+			QMessageBox.information(this, "Nothing to do.", "Pin already has a direction of " + pdPin.getDirection());
+			return;
+		}
+		
+		pdPin.setDirection(newDir);
 	}
 	
 	/**
@@ -501,10 +540,48 @@ public class ElementTab extends QWidget {
 			QMenu popupMenu = new QMenu();
 			popupMenu.addAction(new QIcon(VSRTool.getImagePath("trash.png")), "Delete Selected Pins", this, "deleteSitePins()");
 			popupMenu.addAction(new QIcon(VSRTool.getImagePath("unconnected.png")), "Mark As Unconnected", this, "markSitePinsUnconnected()");
+			
+			/*
+			if (pins.selectedItems().size() == 1) {
+				popupMenu.addAction(new QIcon(""), "Mark Pin as IN", this, "changeSitePinIn()");
+				popupMenu.addAction(new QIcon(""), "Mark Pin as OUT", this, "changeSitePinOut()");
+				popupMenu.addAction(new QIcon(""), "Mark Pin as INOUT", this, "changeSitePinInOut()");
+			}
+			*/
+			
 			popupMenu.popup(event.globalPos());
 		}
 		
 	}
+
+	/*
+	private QTreePin getSelectedSingleQTreePin() {
+		ArrayList<QTreeWidgetItem> items = (ArrayList<QTreeWidgetItem>) pins.selectedItems();
+
+		if (items.size() != 1) {
+			QMessageBox.critical(this, "Multiple Pins selected", "Can only change the direction of one site pin at a time.");
+		}
+		
+		return (QTreePin) items.get(0);
+		
+	}
+	
+	@SuppressWarnings("unused")
+	private void changeSitePinIn() {
+		QTreePin pin = getSelectedSingleQTreePin();
+		changePinDirection(pin, PrimitiveDefPinDirection.INPUT);
+	}
+	@SuppressWarnings("unused")
+	private void changeSitePinOut() {
+		QTreePin pin = getSelectedSingleQTreePin();
+		changePinDirection(pin, PrimitiveDefPinDirection.OUTPUT);
+	}
+	@SuppressWarnings("unused")
+	private void changeSitePinInOut() {
+		QTreePin pin = getSelectedSingleQTreePin();
+		changePinDirection(pin, PrimitiveDefPinDirection.INOUT);
+	}
+	*/
 	
 	/**
 	 * Checks to see if the "add site pin" icon has been clicked. <br>

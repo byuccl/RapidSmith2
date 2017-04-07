@@ -5,6 +5,9 @@ import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreeElement;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreePin;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.VsrtColor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.Qt.AlignmentFlag;
@@ -19,7 +22,9 @@ import com.trolltech.qt.gui.QWidget;
  * @author Thomas Townsend
  * Created: Jun 10, 2014 3:36:10 PM
  */
-public class Pip extends ElementShape {
+public class Pip extends ElementShape {	
+	QPolygonF shape;
+		
 	/**
 	 * Initializes the PIP object
 	 * @param element QTreeElement that this drawn pip represents
@@ -27,8 +32,6 @@ public class Pip extends ElementShape {
 	 * 					the distance between adjacent pip pins
 	 * @param start The starting location of the PIP 
 	 */
-	
-	QPolygonF shape;
 	public Pip (QTreeElement element, double pin_width, QPointF start) {
 		super(element, pin_width, start, false);
 		

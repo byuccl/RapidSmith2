@@ -3,6 +3,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
@@ -70,7 +72,8 @@ public class AStarRouter {
 		while(sinksToRoute.hasNext()) {
 			
 			// initialize the target wire, and priority queue
-			SitePin sink = sinksToRoute.next(); 
+			SitePin sink = sinksToRoute.next();
+			System.out.println(sink);
 			Wire targetWire = getTargetSinkWire(sink);
 			targetTile = targetWire.getTile();
 			resortPriorityQueue(start);
@@ -78,6 +81,10 @@ public class AStarRouter {
 			boolean routeFound = false;
 			// This loop actually builds the routing data structure
 			while (!routeFound) {
+				
+				if (priorityQueue.isEmpty()) {
+					throw new AssertionError("Priority Queue should not be empty during the search for a route!");
+				}
 				
 				// Grab the lowest cost route from the queue
 				RouteTree current = priorityQueue.poll();
@@ -152,7 +159,13 @@ public class AStarRouter {
 	 * @param net {@link CellNet} to route
 	 */
 	private Stream<SitePin> getSinksToRoute(CellNet net) {
-		return net.getSitePins().stream().filter(SitePin::isInput);
+		List<SitePin> pinList = new LinkedList<SitePin>();
+		
+		for (SitePin pin : net.getSitePins()) {
+			pinList.add(0, pin);
+		}
+		return pinList.stream();
+		// return net.getSitePins().stream(). filter(SitePin::isInput);
 	}
 	
 	/**

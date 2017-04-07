@@ -26,13 +26,15 @@ public class AStarRouterExample {
 
 	public static void main(String[] args) throws IOException {
 		// load the device and design
-		String checkpoint = RSEnvironment.defaultEnv().getEnvironmentPath()
+		/*String checkpoint = RSEnvironment.defaultEnv().getEnvironmentPath()
 				.resolve("src")
 				.resolve("test")
 				.resolve("resources")
 				.resolve("ImportTests")
 				.resolve("TCP")
-				.resolve("cordic.tcp").toString();
+				.resolve("cordic.tcp").toString();*/
+		
+		String checkpoint = "C:/Users/ecestudent/Documents/Research/Tincr/TestTCP/count16.tcp";
 		
 		System.out.println("Loading Device and Design...");
 		TincrCheckpoint tcp = VivadoInterface.loadTCP(checkpoint);
@@ -45,7 +47,7 @@ public class AStarRouterExample {
 		// Routing net
 		System.out.println("Routing Net...");
 		AStarRouter router = new AStarRouter();
-		CellNet net = design.getNet("u2/gen_pipe[8].Pipe/Zo_reg_n_0_[9]");
+		CellNet net = design.getNet("q_OBUF[8]");
 		RouteTree test = router.routeNet(net);
 		net.addIntersiteRouteTree(test);
 		

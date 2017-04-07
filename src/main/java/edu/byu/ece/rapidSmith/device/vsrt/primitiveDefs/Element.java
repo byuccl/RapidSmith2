@@ -31,6 +31,7 @@ public class Element implements Serializable{
 
 	private String name;
 	private boolean bel;
+	private boolean isTest;
 	private boolean pin;
 	private ArrayList<PrimitiveDefPin> pins;
 	private ArrayList<String> cfgOptions;
@@ -44,6 +45,7 @@ public class Element implements Serializable{
 	public Element(){
 		name = null;
 		bel = false;
+		isTest = false;
 		pins = new ArrayList<PrimitiveDefPin>();
 		cfgOptions = null;
 		cfgElements = null;
@@ -84,6 +86,12 @@ public class Element implements Serializable{
 	}
 	public void setBel(boolean bel) {
 		this.bel = bel;
+	}
+	public boolean isTest() {
+		return isTest;
+	}
+	public void setIsTest(boolean isTest) {
+		this.isTest = isTest;
 	}
 	public boolean isPin() {
 		return pin;
@@ -165,7 +173,8 @@ public class Element implements Serializable{
 	public String toString(boolean printName){
 		StringBuilder s = new StringBuilder();
 		String nl = System.getProperty("line.separator");
-		s.append("(element " + name +" "+ pins.size() +(bel ? " # BEL" : "")+nl);
+		
+		s.append("(element " + name +" "+ pins.size() +(bel ? " # BEL" : "") + (isTest ? " TEST" : "") + nl);
 		for(PrimitiveDefPin p : pins){
 			s.append("\t\t\t"+p.toString(printName) + nl);
 		}

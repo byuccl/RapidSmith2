@@ -27,9 +27,12 @@ import edu.byu.ece.rapidSmith.device.PinDirection;
 import edu.byu.ece.rapidSmith.device.PortDirection;
 import edu.byu.ece.rapidSmith.device.Site;
 
+import java.awt.datatransfer.Transferable;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 
 /**
  *  Cells represent a primitive logical element in a cell design which can map
@@ -506,8 +509,61 @@ public class Cell {
 	 * @param internalPin Internal {@link CellPin}
 	 */
 	CellPin getExternalPin(CellPin internalPin) {
-		
 		return ((LibraryMacro)libCell).getExternalPin(this, internalPin);
+	}
+	
+	/**
+	 * Removes all internal VCC cells and nets of a macro cell, and attaches the pins
+	 * that were connected to the cells to the specified VCC net instead. 
+	 * An identical process occurs for internal GND cells. This function should NOT
+	 * be called on regular leaf cells, an exception will be thrown. Also, this
+	 * function assumes that macro cell has not yet been placed or routed.
+	 *  
+	 * @param vcc {@link CellNet} to attach the VCC pins to
+	 * @param gnd {@link CellNet} to attach the GND pins to
+	 */
+	public void collapseStaticNets(CellNet vcc, CellNet gnd) {
+		
+		if (!this.isMacro()) {
+			throw new IllegalArgumentException("Cannot collapse the static nets of leaf cells!");
+		}
+		
+		List<Cell> cellsToRemove = new ArrayList<Cell>();
+		for (Cell internal : internalCells.values()) {
+			if (internal.isVccSource()) {
+				cellsToRemove.add(internal);
+				transferPins(internal, vcc);
+			}
+			else if (internal.isGndSource()) {
+				cellsToRemove.add(internal);
+				transferPins(internal, gnd);			
+			}
+		}
+		
+		// remove all internal VCC and GND cells from the data structures after iterating.
+		cellsToRemove.forEach(c -> internalCells.remove(c.getName()));
+	}
+	
+	private void transferPins(Cell internal, CellNet newNet) {
+		
+		// remove the internal cell from the design its currently in		
+		if (internal.getDesign() != null) {
+			internal.getDesign().removeInternalCell(internal);
+		}
+		
+		// transfer the sink pins of the VCC/GND nets, and remove the internal nets
+		CellNet oldNet = internal.getOutputPins().iterator().next().getNet();
+		
+		assert (this.internalNets.containsKey(oldNet.getName())) : "Net attached to internal VCC/GND not internal to same macro" ;
+		
+		for (CellPin sinkPins : oldNet.getSinkPins()) {
+			assert(sinkPins.isInternal());
+			oldNet.forceDisconnectInternalPin(sinkPins);
+			newNet.connectToPin(sinkPins);
+		}
+		oldNet.detachNet();
+		oldNet.getDesign().forceRemoveInternalNet(oldNet);
+		internalNets.remove(oldNet.getName());
 	}
 	
 	/**
