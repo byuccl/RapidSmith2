@@ -29,7 +29,11 @@ public class Wire {
 	/**Actual start pin*/
 	QTreePin startParent;
 	/**Actual end pin*/
-	QTreePin endParent; 
+	QTreePin endParent;
+	
+	ElementShape startShape;
+	ElementShape endShape;
+	
 
 	/**
 	 * Constructor:
@@ -98,6 +102,7 @@ public class Wire {
 		for (WirePart item : lines) {
 			item.scene().removeItem(item);
 		}
+		this.disconnect();
 	}
 	
 	/**
@@ -143,7 +148,23 @@ public class Wire {
 			this.endParent.addChild(end);
 			this.endParent.add_wire(this);
 			this.endParent.setForeground(0, new QBrush(VsrtColor.darkGreen));
+			this.connect();
 		//}
+	}
+	
+	public void setShapeConnections(ElementShape start, ElementShape end) {
+		this.startShape = start;
+		this.endShape = end;
+	}
+	
+	public void connect() {
+		this.startShape.connectToWire(this);
+		this.endShape.connectToWire(this);
+	}
+	
+	public void disconnect() {
+		this.startShape.disconnectWire(this);
+		this.endShape.disconnectWire(this);
 	}
 	
 	public void hideWire() {
@@ -156,6 +177,18 @@ public class Wire {
 		for (WirePart wire : lines) {
 			wire.show();
 		}
+	}
+	
+	public boolean isVisible() {
+		return this.getFirstWirePart().isVisible();
+	}
+	
+	public ElementShape getStartShape() {
+		return this.startShape;
+	}
+	
+	public ElementShape getEndShape() {
+		return this.endShape;
 	}
 	
 }//end class

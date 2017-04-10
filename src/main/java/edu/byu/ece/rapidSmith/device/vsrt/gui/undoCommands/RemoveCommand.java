@@ -24,6 +24,8 @@
 package edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.trolltech.qt.core.Qt.MouseButton;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
@@ -59,7 +61,7 @@ public class RemoveCommand extends QUndoCommand {
 		int itemCount = 0;
 		String itemName = null;
 		//making sure all of the wires attached to bels are accounted for, so they can be re-added when necessary
-		ArrayList<QGraphicsItemInterface> unaccountedWires = new ArrayList<QGraphicsItemInterface>();
+		Set<QGraphicsItemInterface> unaccountedWires = new HashSet<QGraphicsItemInterface>();
 		for (QGraphicsItemInterface item : items) {
 			if ( item instanceof ElementShape ) {
 				for (QTreePin pin : ((ElementShape) item).getTreeElement().get_allPins()) {

@@ -162,6 +162,9 @@ public class XMLCommands {
 		//Save the two ends of the wire
 		element.appendChild(this.saveQPointF("StartPos", wire.getFirstWirePart().line().p1()));
 		element.appendChild(this.saveQPointF("EndPos", wire.getFirstWirePart().line().p2()));
+		//Save the graphic elements the wire is connected to. 
+		element.appendChild(this.saveString("StartShape", wire.getStartShape().getName()));
+		element.appendChild(this.saveString("EndShape", wire.getEndShape().getName()));
 	
 		return element;
 	}

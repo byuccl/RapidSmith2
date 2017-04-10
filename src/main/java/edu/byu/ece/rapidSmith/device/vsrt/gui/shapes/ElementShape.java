@@ -55,6 +55,8 @@ public abstract class ElementShape extends QGraphicsItem{
 	/** Wire objects that are connected to the Bel */
 	protected Set<Wire> connectedWires = new HashSet<Wire>();
 	
+	boolean wiresShowing; 
+	
 	public QTreeElement getTreeElement(){
 		return this.element;  
 	}
@@ -69,6 +71,7 @@ public abstract class ElementShape extends QGraphicsItem{
 		this.element = element;
 		this.pin_width = pin_width;
 		this.last_pos = startingPos;
+		this.wiresShowing = true; 
 	
 		//standard flags that needs to be set in order for the elements to behave as you want 
 		this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
@@ -228,12 +231,39 @@ public abstract class ElementShape extends QGraphicsItem{
 		else if (event.button() == MouseButton.RightButton) {
 			QMenu popup_menu = new QMenu();
 			popup_menu.addAction(new QIcon(VSRTool.getImagePath("trash.png")), "Remove", this, "sendRemoveElementCommand()"); //delete bel option
+			
+			if (isConnected()) {
+				if (wiresShowing()) {
+					popup_menu.addAction(new QIcon(VSRTool.getImagePath("hideWires.png")), "Hide Wires", this, "hideWires()");
+				} else {
+					popup_menu.addAction(new QIcon(VSRTool.getImagePath("showWires.png")), "Show Wires", this, "showWires()");
+				}
+			}
+			
+			
 			if (this instanceof Bel)
 				popup_menu.addAction(new QIcon(VSRTool.getImagePath("bel.png")), "Bel Config Options", this,  "showConfig()"); 
 			popup_menu.popup(event.screenPos());
 		}
 	}
+	
+	private boolean wiresShowing() {
+		return this.connectedWires.stream().anyMatch(w -> w.isVisible());
+	}
 
+	private void hideWires() {
+		connectedWires.forEach(w -> w.hideWire());
+		this.wiresShowing = false;
+	}
+	
+	private void showWires() {
+		connectedWires.forEach(w -> w.showWire());
+		this.wiresShowing = true;
+	}
+	
+	private boolean isConnected() {
+		return this.connectedWires.size() > 0;
+	}
 	
 	/**
 	 * Redraws the wires connected to each pin of the element as the element is being moved 
