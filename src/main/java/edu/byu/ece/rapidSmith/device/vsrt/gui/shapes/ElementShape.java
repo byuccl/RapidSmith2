@@ -13,6 +13,7 @@ import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.RemoveCommand;
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.Qt.MouseButton;
+import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QFontMetrics;
 import com.trolltech.qt.gui.QGraphicsItem;
@@ -55,8 +56,6 @@ public abstract class ElementShape extends QGraphicsItem{
 	/** Wire objects that are connected to the Bel */
 	protected Set<Wire> connectedWires = new HashSet<Wire>();
 	
-	boolean wiresShowing; 
-	
 	public QTreeElement getTreeElement(){
 		return this.element;  
 	}
@@ -71,7 +70,6 @@ public abstract class ElementShape extends QGraphicsItem{
 		this.element = element;
 		this.pin_width = pin_width;
 		this.last_pos = startingPos;
-		this.wiresShowing = true; 
 	
 		//standard flags that needs to be set in order for the elements to behave as you want 
 		this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
@@ -233,11 +231,8 @@ public abstract class ElementShape extends QGraphicsItem{
 			popup_menu.addAction(new QIcon(VSRTool.getImagePath("trash.png")), "Remove", this, "sendRemoveElementCommand()"); //delete bel option
 			
 			if (isConnected()) {
-				if (wiresShowing()) {
-					popup_menu.addAction(new QIcon(VSRTool.getImagePath("hideWires.png")), "Hide Wires", this, "hideWires()");
-				} else {
-					popup_menu.addAction(new QIcon(VSRTool.getImagePath("showWires.png")), "Show Wires", this, "showWires()");
-				}
+				popup_menu.addAction(new QIcon(VSRTool.getImagePath("hideWires.png")), "Hide Wires", this, "hideWires()");
+				popup_menu.addAction(new QIcon(VSRTool.getImagePath("showWires.png")), "Show Wires", this, "showWires()");
 			}
 			
 			
@@ -247,18 +242,12 @@ public abstract class ElementShape extends QGraphicsItem{
 		}
 	}
 	
-	private boolean wiresShowing() {
-		return this.connectedWires.stream().anyMatch(w -> w.isVisible());
-	}
-
-	private void hideWires() {
+	public void hideWires() {
 		connectedWires.forEach(w -> w.hideWire());
-		this.wiresShowing = false;
 	}
 	
-	private void showWires() {
+	public void showWires() {
 		connectedWires.forEach(w -> w.showWire());
-		this.wiresShowing = true;
 	}
 	
 	private boolean isConnected() {
@@ -423,5 +412,9 @@ public abstract class ElementShape extends QGraphicsItem{
 	public void disconnectWire(Wire w) {
 		assert(this.connectedWires.contains(w));
 		this.connectedWires.remove(w);
+	}
+	
+	protected QColor getBorderColor(){
+		return element.getBorderColor();
 	}
 }

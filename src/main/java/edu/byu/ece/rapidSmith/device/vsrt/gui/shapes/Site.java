@@ -11,6 +11,7 @@ import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.ResizeSiteCommand;
 import edu.byu.ece.rapidSmith.device.vsrt.primitiveDefs.PrimitiveDefPinDirection;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import com.trolltech.qt.core.QPointF;
@@ -386,5 +387,8 @@ public class Site extends QGraphicsItem {
 	}
 	public void pushSiteResizeCommand(ResizeSiteCommand cmd){
 		this.undo.push(cmd);
+	}
+	public Collection<PinShape> getGraphicsPins() {
+		return this.pin2graphics.values();
 	}
 }

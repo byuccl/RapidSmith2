@@ -57,6 +57,10 @@ public class ToolBar extends QToolBar{
 	private QToolButton undoMenu; 
 	/***/
 	private PrimitiveSiteScene scene;
+	/**Hides all the wires on the GUI scene*/
+	private QAction hideWires;
+	/**Shows all the wires on the GUI scene*/
+	private QAction showWires;
 	
 	/**
 	 * 
@@ -134,7 +138,13 @@ public class ToolBar extends QToolBar{
 	    rotateCounter = new QAction (new QIcon(VSRTool.getImagePath("rotateCounterclockwise.png")), tr("Rotate the selected items Counterclockwise by 90 degrees (Ctrl+Shift+R)"), this);
 	    rotateCounter.triggered.connect(scene, "rotateItemsCounterclockwise()");
 	    rotateCounter.setShortcut("Ctrl+Shift+r");
-	     	 
+	    
+	    hideWires = new QAction(new QIcon(VSRTool.getImagePath("hideWires.png")), tr("Hide all wires"), this);
+	    hideWires.triggered.connect(scene, "hideWires()");
+	    
+	    showWires = new QAction(new QIcon(VSRTool.getImagePath("showWires.png")), tr("Show all wires"), this);
+	    showWires.triggered.connect(scene, "showWires()");
+	    
 	    //Creating a QUndoView so the user can undo/redo multiple things at a time
 	    QMenu menu = new QMenu();
 	    QUndoView list = new QUndoView(undoStack);
@@ -175,6 +185,8 @@ public class ToolBar extends QToolBar{
 	    this.addSeparator();
 	    this.addAction(viewSiteConfigOptions);
 	    this.addAction(viewBelConfigOptions);
+	    this.addAction(showWires);
+	    this.addAction(hideWires);
 	    
 	    this.setOrientation(Orientation.Vertical);
 	    this.setFloatable(true);

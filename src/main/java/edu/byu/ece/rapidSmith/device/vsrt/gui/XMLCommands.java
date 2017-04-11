@@ -162,12 +162,10 @@ public class XMLCommands {
 		//Save the two ends of the wire
 		element.appendChild(this.saveQPointF("StartPos", wire.getFirstWirePart().line().p1()));
 		element.appendChild(this.saveQPointF("EndPos", wire.getFirstWirePart().line().p2()));
-		//Save the graphic elements the wire is connected to. 
-		element.appendChild(this.saveString("StartShape", wire.getStartShape().getName()));
-		element.appendChild(this.saveString("EndShape", wire.getEndShape().getName()));
 	
 		return element;
 	}
+	
 	/**
 	 * Creates an XML element that stores information for each object currently on the <br>
 	 * graphics scene.  
@@ -341,6 +339,20 @@ public class XMLCommands {
 				Wire graphicsWire = new Wire(startPoint, endPoint);
 				graphicsWire.setTree_start(startConn);
 				graphicsWire.setTree_end(endConn);
+				
+				// connect the wire to the element shapes
+				QGraphicsItemInterface startItem = scene.itemAt(startx-1, starty);
+				if (startItem instanceof Site) {
+					startItem = scene.itemAt(startx+1, starty);
+				}
+				
+				QGraphicsItemInterface endItem = scene.itemAt(endx-1, endy);
+				if (endItem instanceof Site) {
+					endItem = scene.itemAt(endx+1, endy);
+				}
+				
+				graphicsWire.setShapeConnections(startItem, endItem);
+				graphicsWire.connect();
 				
 				startPin.add_wire(graphicsWire);
 				endPin.add_wire(graphicsWire);

@@ -295,7 +295,7 @@ public class VSRTool extends QMainWindow {
 		current_site = parser.getPrimitiveDefs().get(0);
 		boolean saveFileExists = this.xml.parseSceneXML(this.directory + File.separator  + family + File.separator + site_name + ".xml");
 
-		//extracting the elements from the PrimitiveDef data structure and displaying its contents 
+		//extracting the elements from the PrimitiveDef data structure and displaying its contents
 		String singleElementName = this.element_view.generate_elements(current_site, this.xml, saveFileExists);
 		if (saveFileExists)
 			this.siteCfgElements = this.xml.loadSiteCfgElements();
@@ -328,6 +328,7 @@ public class VSRTool extends QMainWindow {
 		this.tool_bar.setEnabled(true);
 
 		siteShape = new Site(element_view.getSitePins(), scene, this.xml, siteSaved, this.undoStack);
+				
 		if (siteSaved)
 			this.xml.loadWires(scene);
 

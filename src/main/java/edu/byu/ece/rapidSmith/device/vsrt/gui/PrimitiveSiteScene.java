@@ -430,10 +430,10 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 	 * @param element
 	 * @param location
 	 */
-	public void addSavedElementToScene(QTreeWidgetItem element, QPointF location, double rotation){
+	public ElementShape addSavedElementToScene(QTreeWidgetItem element, QPointF location, double rotation){
 		try {
 			QTreeElement tmp = (QTreeElement) element;
-			ElementShape item;
+			ElementShape item = null;
 			
 			if (!tmp.isPlaced()) {
 				if (tmp.getElement().isBel() )
@@ -449,8 +449,11 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 				item.rotateTo(rotation);
 				//((ElementShape)item).updatePinPosition();
 			}
+			return item;
 		}
-		catch(ClassCastException e){}
+		catch(ClassCastException e){
+			return null;
+		}
 	}
 	/**
 	 * 
@@ -546,4 +549,19 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 			this.undoStack.push(rotate);
 		}
 	}
+	
+	public void hideWires() {	
+		this.items().stream()
+			.filter(item -> (item instanceof ElementShape))
+			.map(item -> (ElementShape) item)
+			.forEach(elShape -> elShape.hideWires());
+	}
+	
+	public void showWires() {
+		this.items().stream()
+			.filter(item -> (item instanceof ElementShape))
+			.map(item -> (ElementShape) item)
+			.forEach(elShape -> elShape.showWires());
+	}
+	
 }//end class

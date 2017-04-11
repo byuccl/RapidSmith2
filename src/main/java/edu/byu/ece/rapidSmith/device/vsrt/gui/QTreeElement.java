@@ -1,8 +1,10 @@
 package edu.byu.ece.rapidSmith.device.vsrt.gui;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import com.trolltech.qt.gui.QBrush;
+import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QTreeWidget;
 import com.trolltech.qt.gui.QTreeWidgetItem;
 
@@ -24,6 +26,9 @@ public class QTreeElement extends QTreeWidgetItem{
 	private ArrayList<QTreePin> out_pins = new ArrayList<QTreePin>();
 	/**Keeps track of whether this element has been added to the scene already*/
 	private boolean isPlaced = false;
+	
+	private HashSet<QTreePin> connectedPins = new HashSet<QTreePin>();
+
 	
 	/**
 	 * Constructor
@@ -137,5 +142,26 @@ public class QTreeElement extends QTreeWidgetItem{
 		}
 		else 
 		{	return this.in_pins.indexOf(pin);	}
+	}
+	
+	public void markPinAsConnected(QTreePin pin) {
+		this.connectedPins.add(pin);
+	}
+	
+	public void markPinAsUnconnected(QTreePin pin) {
+		this.connectedPins.remove(pin);
+	}
+	
+	public QColor getBorderColor() {
+		
+		QColor borderColor = VsrtColor.red;
+		int connectedCount = this.connectedPins.size();
+		int pinCount = in_pins.size() + out_pins.size();
+		
+		if (connectedCount > 0) {
+			borderColor = (connectedCount == pinCount) ? VsrtColor.darkGreen : VsrtColor.darkOrange; 
+		}
+		
+		return borderColor; 
 	}
 }

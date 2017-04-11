@@ -124,7 +124,7 @@ public class ElementTab extends QWidget {
 	 * for the currently selected primitive site
 	 * @param def Primitive Definition that contains all of the bel, pin, and pip info
 	 */
-	public String generate_elements(PrimitiveDef def, XMLCommands xml, boolean saveFileExists ) {
+	public String generate_elements(PrimitiveDef def, XMLCommands xml, boolean saveFileExists) {
 		
 		this.clear_all();
 		QTreeWidgetItem tmp;

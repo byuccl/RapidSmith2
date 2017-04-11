@@ -1,6 +1,7 @@
 package edu.byu.ece.rapidSmith.device.vsrt.gui.shapes;
 
 import edu.byu.ece.rapidSmith.device.vsrt.gui.PrimitiveSiteScene;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreeElement;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreePin;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.VsrtColor;
 
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.gui.QBrush;
+import com.trolltech.qt.gui.QGraphicsItemInterface;
 import com.trolltech.qt.gui.QLineF;
 import com.trolltech.qt.gui.QTreeWidgetItem;
 
@@ -84,6 +86,7 @@ public class Wire {
 		if (startParent.childCount() == 1) { //if this was the only connection of the pin, change the pins color back to red
 			startParent.setForeground(0, new QBrush(VsrtColor.red));
 			this.updateElementColor(startParent.parent());
+			((QTreeElement)startParent.parent()).markPinAsUnconnected(startParent);
 		}
 	
 		startParent.remove_wire(this);
@@ -93,6 +96,7 @@ public class Wire {
 		if (endParent.childCount() == 1) {
 			endParent.setForeground(0, new QBrush(VsrtColor.red));
 			this.updateElementColor(endParent.parent());
+			((QTreeElement)endParent.parent()).markPinAsUnconnected(endParent);
 		}
 		
 		endParent.remove_wire(this);
@@ -144,27 +148,60 @@ public class Wire {
 			this.startParent.setForeground(0, new QBrush(VsrtColor.darkGreen));
 			this.startParent.addChild(start);
 			this.startParent.add_wire(this);
+			//((QTreeElement)this.startParent.parent()).markPinAsConnected(startParent); 
 			
 			this.endParent.addChild(end);
 			this.endParent.add_wire(this);
 			this.endParent.setForeground(0, new QBrush(VsrtColor.darkGreen));
+			//((QTreeElement)this.endParent.parent()).markPinAsConnected(endParent); 
 			this.connect();
 		//}
 	}
 	
-	public void setShapeConnections(ElementShape start, ElementShape end) {
-		this.startShape = start;
-		this.endShape = end;
+	public void setShapeConnections(QGraphicsItemInterface startItem, QGraphicsItemInterface endItem ) {
+		
+		boolean startIsElement = false, endIsElement=false;
+		
+		if (startItem instanceof ElementShape) {
+			this.startShape = (ElementShape) startItem;
+			startIsElement = true;
+		} else if(!(startItem instanceof PinShape) ){
+			throw new AssertionError("Parameter startItem should be ElementShape of PinShape");
+		}
+		
+		if (endItem instanceof ElementShape) {
+			this.endShape = (ElementShape) endItem;
+			endIsElement = true;
+		} else if(!(endItem instanceof PinShape)) {
+			throw new AssertionError("Parameter endItem should be ElementShape of PinShape: " + endItem.getClass());
+		}
+		
+		// make sure this assertion holds (i.e. an input site pin will not connect directly to an output site pin
+		if (!startIsElement && !endIsElement) {
+			throw new AssertionError("Either the startItem or the endItem needs to be of type ElementShape");
+		}
 	}
-	
+		
 	public void connect() {
-		this.startShape.connectToWire(this);
-		this.endShape.connectToWire(this);
+		if (startShape!=null) {
+			this.startShape.connectToWire(this);
+			((QTreeElement)this.startParent.parent()).markPinAsConnected(startParent);
+		}
+		if (endShape!=null) {
+			this.endShape.connectToWire(this);
+			((QTreeElement)this.endParent.parent()).markPinAsConnected(endParent);
+		}	
 	}
 	
 	public void disconnect() {
-		this.startShape.disconnectWire(this);
-		this.endShape.disconnectWire(this);
+		if (startShape!=null) {
+			this.startShape.disconnectWire(this);
+			((QTreeElement)this.startParent.parent()).markPinAsUnconnected(startParent);
+		}
+		if (endShape!=null) {
+			this.endShape.disconnectWire(this);
+			((QTreeElement)this.endParent.parent()).markPinAsUnconnected(endParent);
+		}
 	}
 	
 	public void hideWire() {
@@ -190,5 +227,5 @@ public class Wire {
 	public ElementShape getEndShape() {
 		return this.endShape;
 	}
-	
+
 }//end class

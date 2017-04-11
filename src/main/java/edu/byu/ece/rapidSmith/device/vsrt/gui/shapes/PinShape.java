@@ -177,4 +177,8 @@ public class PinShape extends QGraphicsItem{
 				this.setPinPos(new QPointF(this.pos().x() - offsetX, this.pos().y() - offsetY));
 		} 
 	}
+	
+	public String getName() {
+		return pin.getPin().getInternalName();
+	}
 }

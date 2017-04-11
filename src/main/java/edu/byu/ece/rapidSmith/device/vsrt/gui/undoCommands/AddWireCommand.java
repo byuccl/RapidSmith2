@@ -23,20 +23,14 @@
  */
 package edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.trolltech.qt.core.QPointF;
-import com.trolltech.qt.gui.QGraphicsItem;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
 import com.trolltech.qt.gui.QTreeWidgetItem;
 import com.trolltech.qt.gui.QUndoCommand;
 
 import edu.byu.ece.rapidSmith.device.vsrt.gui.PrimitiveSiteScene;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreePin;
-import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.Bel;
-import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.ElementShape;
-import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.Pip;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.Site;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.Wire;
 import edu.byu.ece.rapidSmith.device.vsrt.primitiveDefs.PrimitiveDefPinDirection;
 
@@ -52,10 +46,6 @@ public class AddWireCommand extends QUndoCommand {
 	private Wire wire2 = null;
 	/**Graphics scene where the wires are added*/
 	private PrimitiveSiteScene scene;
-	/**List of Elements wire1 is connected to*/
-	private List<ElementShape> wire1ElementList = new ArrayList<ElementShape>();
-	/**List of Elements wire2 is connected to*/
-	private List<ElementShape> wire2ElementList = new ArrayList<ElementShape>();
 	
 	/**
 	 * Constructor: Creates the wires(s), and generates the connections for each wire 
@@ -68,39 +58,26 @@ public class AddWireCommand extends QUndoCommand {
 	public AddWireCommand (PrimitiveSiteScene scene, QTreePin start_pin, QTreePin end_pin, QPointF start, QPointF end){
 		this.scene = scene; 
 		
+		// Find the element shapes the wire is connected to
 		QGraphicsItemInterface startItem = scene.itemAt(start.x()-1, start.y());
-		if (!(startItem instanceof ElementShape)) {
+		if (startItem instanceof Site) {
 			startItem = scene.itemAt(start.x()+1, start.y());
-			assert (startItem instanceof ElementShape);
 		}
 		
 		QGraphicsItemInterface endItem = scene.itemAt(end.x()-1, end.y());
-		if (!(endItem instanceof ElementShape)) {
+		if (endItem instanceof Site) {
 			endItem = scene.itemAt(end.x()+1, end.y());
-			assert (startItem instanceof ElementShape);
-		}
+		}	
 				
 		//two connections need to be generated for pins that are both of type inout
 		if (start_pin.getPin().getDirection() == PrimitiveDefPinDirection.INOUT 
 				&& end_pin.getPin().getDirection()==PrimitiveDefPinDirection.INOUT) {
 			wire1 = new Wire(start, end);
 			wire2 = new Wire(start, end);
-		
-			/*
-			((ElementShape)startItem).connectToWire(wire1);
-			((ElementShape)startItem).connectToWire(wire2);
-			((ElementShape)endItem).connectToWire(wire1);
-			((ElementShape)endItem).connectToWire(wire2);
-			*/
-			
-			wire1.setShapeConnections((ElementShape)startItem, (ElementShape)endItem);
-			wire2.setShapeConnections((ElementShape)startItem, (ElementShape)endItem);
-			
-			//wire1ElementList.add((ElementShape)startItem);
-			//wire1ElementList.add((ElementShape)endItem);
-			//wire2ElementList.add((ElementShape)endItem);
-			//wire2ElementList.add((ElementShape)startItem);
-			
+					
+			wire1.setShapeConnections(startItem, endItem);
+			wire2.setShapeConnections(startItem, endItem);
+					
 			QTreeWidgetItem conn1 = new QTreeWidgetItem(start_pin);
 			QTreeWidgetItem conn2 = new QTreeWidgetItem(start_pin);
 							
@@ -122,16 +99,8 @@ public class AddWireCommand extends QUndoCommand {
 		}
 		else {//if ((start_pin.getPin().getDirection() != end_pin.getPin().getDirection())) {	
 			wire1 = new Wire(start, end);
-			
-			/*
-			((ElementShape)startItem).connectToWire(wire1);
-			((ElementShape)endItem).connectToWire(wire1);
-			*/
-			
-			wire1.setShapeConnections((ElementShape)startItem, (ElementShape)endItem);
-			
-			//wire1ElementList.add((ElementShape)startItem);
-			//wire1ElementList.add((ElementShape)endItem);
+						
+			wire1.setShapeConnections(startItem, endItem);
 			
 			//Create the connection on the start pin
 			QTreeWidgetItem tmp = new QTreeWidgetItem(start_pin); 
@@ -156,11 +125,9 @@ public class AddWireCommand extends QUndoCommand {
 		wire1.addWireToScene(scene);
 		wire1.undoRemoveWire();
 		wire1.connect();
-		// wire1ElementList.forEach(e -> e.connectToWire(wire1));
 		if (wire2 != null){
 			wire2.addWireToScene(scene);
 			wire2.undoRemoveWire();
-			// wire2ElementList.forEach(e -> e.connectToWire(wire2));
 			wire2.disconnect();
 		}
 	}
@@ -172,12 +139,10 @@ public class AddWireCommand extends QUndoCommand {
 	public void undo(){
 		wire1.removeWire();
 		wire1.disconnect();
-		//wire1ElementList.forEach(e -> e.disconnectWire(wire1));
 		
 		if(wire2 != null) {
 			wire2.removeWire();
 			wire2.disconnect();
-			//wire2ElementList.forEach(e -> e.disconnectWire(wire2));
 		}
 	}
 }
