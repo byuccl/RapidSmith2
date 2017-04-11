@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.AddBelCommand;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.AddSitePinGroupCommand;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.DeleteElementPinCommand;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.DeleteSitePinCommand;
@@ -86,8 +87,16 @@ public class ElementTab extends QWidget {
 		bels = new QTreeWidget();
 		bels.setColumnCount(1);
 		bels.setStyleSheet("selection-background-color: blue");
-		bels.setHeaderLabel("Bels");
+		//bels.setHeaderLabel("Bels");
 		bels.setAlternatingRowColors(true);
+		
+		QTreeWidgetItem belHeader = new QTreeWidgetItem();
+		belHeader.setText(0, "  Bels");
+		belHeader.setIcon(0, new QIcon(VSRTool.getImagePath("add.gif")));
+		bels.setHeaderItem(belHeader);
+		bels.header().setClickable(true);
+		bels.header().sectionClicked.connect(this, "checkBelHeaderClick()");
+		
 		bels.setContextMenuPolicy(ContextMenuPolicy.CustomContextMenu);
 		bels.customContextMenuRequested.connect(this, "showDeleteElementPinMenu()");
 	
@@ -456,6 +465,59 @@ public class ElementTab extends QWidget {
 		}
 		catch(Exception e) {
 		}	
+	}
+	
+	/**
+	 * Checks to see if the "add static bel" icon has been clicked.
+	 * If it has, then the add site pin dialog is displayed so the user can
+	 * create a new VCC or GND bel. 
+	 */
+	public void checkBelHeaderClick(){
+	
+		int iconSize = bels.header().height() - 5;
+		
+		int x = QCursor.pos().x() - bels.mapToGlobal(bels.header().pos() ).x();
+		int y = QCursor.pos().y() - bels.mapToGlobal(bels.header().pos() ).y();
+		
+		if((x < iconSize && y < iconSize) && this.bels.topLevelItemCount() > 0) {
+			StaticBelDialog test = new StaticBelDialog();
+			if ( test.exec() == 1 ) {
+				AddBelCommand addBelCommand = new AddBelCommand(test.getBelName(), test.isVcc(), this, parent.getCurrentSite());
+				this.undoStack.push(addBelCommand);
+			}
+		}	
+	}
+	
+	/**
+	 * Creates and returns a new {@link QTreeElement} for the specified {@link PrimitiveDef} element
+	 * @param e Primitive Def element (i.e. Bel or Site Pip)
+	 */
+	public QTreeElement createNewBel(Element e){
+		QTreeElement treeElement = new QTreeElement(bels, e);
+		treeElement.setText(0, e.getName());
+		treeElement.setForeground(0, text_brush);
+		return treeElement;
+	}
+
+	/**
+	 * Adds a new Bel to the "Bels" section of the tree view
+	 * 
+	 * @param treeElement {@link QTreeElement} to add
+	 */
+	public void addBelToTree(QTreeElement treeElement){
+		bels.addTopLevelItem(treeElement);
+		bels.sortItems(0, SortOrder.AscendingOrder); 
+	}
+	
+	/**
+	 * Removes a Bel from the "Bels" section of the tree view.
+	 * NOTE: This function assumes all wires of the bel have first been
+	 * disconnected.
+	 * 
+	 * @param treeElement {@link QTreeElement} to remove
+	 */
+	public void removeBelFromTree(QTreeElement treeElement){
+		bels.takeTopLevelItem( bels.indexOfTopLevelItem(treeElement) );
 	}
 	
 	/*************************************************************

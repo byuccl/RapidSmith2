@@ -30,7 +30,6 @@ import com.trolltech.qt.gui.QUndoCommand;
 
 import edu.byu.ece.rapidSmith.device.vsrt.gui.PrimitiveSiteScene;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreePin;
-import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.Site;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.Wire;
 import edu.byu.ece.rapidSmith.device.vsrt.primitiveDefs.PrimitiveDefPinDirection;
 
@@ -58,17 +57,9 @@ public class AddWireCommand extends QUndoCommand {
 	public AddWireCommand (PrimitiveSiteScene scene, QTreePin start_pin, QTreePin end_pin, QPointF start, QPointF end){
 		this.scene = scene; 
 		
-		// Find the element shapes the wire is connected to
-		QGraphicsItemInterface startItem = scene.itemAt(start.x()-1, start.y());
-		if (startItem instanceof Site) {
-			startItem = scene.itemAt(start.x()+1, start.y());
-		}
-		
-		QGraphicsItemInterface endItem = scene.itemAt(end.x()-1, end.y());
-		if (endItem instanceof Site) {
-			endItem = scene.itemAt(end.x()+1, end.y());
-		}	
-				
+		QGraphicsItemInterface startItem = scene.getElementAtPoint(start);
+		QGraphicsItemInterface endItem = scene.getElementAtPoint(end);
+
 		//two connections need to be generated for pins that are both of type inout
 		if (start_pin.getPin().getDirection() == PrimitiveDefPinDirection.INOUT 
 				&& end_pin.getPin().getDirection()==PrimitiveDefPinDirection.INOUT) {

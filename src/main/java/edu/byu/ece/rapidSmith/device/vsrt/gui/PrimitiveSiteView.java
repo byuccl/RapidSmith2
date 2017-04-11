@@ -101,8 +101,10 @@ public class PrimitiveSiteView extends QGraphicsView{
 	 * @return none
 	 */
 	public void zoom_in(){
-		if (this.transform().m11() < ZOOM_IN_MAX) 
+		if (this.transform().m11() < ZOOM_IN_MAX)  {
+			this.setTransformationAnchor(QGraphicsView.ViewportAnchor.AnchorUnderMouse);
 			scale(scaleFactor, scaleFactor);
+		}
 	}
 	/**
 	 * Zooms out the device view by the pre-specified scale factor

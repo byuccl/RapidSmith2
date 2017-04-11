@@ -98,6 +98,8 @@ public class Pip extends ElementShape {
 	@Override
 	public void paint(QPainter painter, QStyleOptionGraphicsItem item, QWidget widget) {
 		// TODO Auto-generated method stub
+		
+		painter.setPen(getBorderColor());
 		if ( this.isSelected() ) {
 			painter.setBrush(VsrtColor.blue);
 			painter.drawPolygon(shape);	
@@ -106,8 +108,8 @@ public class Pip extends ElementShape {
 		}
 		else {
 			painter.setBrush(VsrtColor.green);
-			painter.setPen(VsrtColor.black);
 			painter.drawPolygon(shape);	
+			painter.setPen(VsrtColor.black);
 			painter.drawText(0, (int)this.height, (int)this.width, (int)pin_width/2, AlignmentFlag.AlignTop.value(), element.getElement().getName());
 		}
 		

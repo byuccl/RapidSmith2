@@ -86,7 +86,10 @@ public class Wire {
 		if (startParent.childCount() == 1) { //if this was the only connection of the pin, change the pins color back to red
 			startParent.setForeground(0, new QBrush(VsrtColor.red));
 			this.updateElementColor(startParent.parent());
-			((QTreeElement)startParent.parent()).markPinAsUnconnected(startParent);
+			
+			if (startShape!=null) {
+				((QTreeElement)startParent.parent()).markPinAsUnconnected(startParent);
+			}
 		}
 	
 		startParent.remove_wire(this);
@@ -96,7 +99,9 @@ public class Wire {
 		if (endParent.childCount() == 1) {
 			endParent.setForeground(0, new QBrush(VsrtColor.red));
 			this.updateElementColor(endParent.parent());
-			((QTreeElement)endParent.parent()).markPinAsUnconnected(endParent);
+			if (endShape!=null) {
+				((QTreeElement)endParent.parent()).markPinAsUnconnected(endParent);
+			}
 		}
 		
 		endParent.remove_wire(this);
@@ -186,10 +191,12 @@ public class Wire {
 		if (startShape!=null) {
 			this.startShape.connectToWire(this);
 			((QTreeElement)this.startParent.parent()).markPinAsConnected(startParent);
+			startShape.update();
 		}
 		if (endShape!=null) {
 			this.endShape.connectToWire(this);
 			((QTreeElement)this.endParent.parent()).markPinAsConnected(endParent);
+			endShape.update();
 		}	
 	}
 	
@@ -197,10 +204,12 @@ public class Wire {
 		if (startShape!=null) {
 			this.startShape.disconnectWire(this);
 			((QTreeElement)this.startParent.parent()).markPinAsUnconnected(startParent);
+			startShape.update();
 		}
 		if (endShape!=null) {
 			this.endShape.disconnectWire(this);
 			((QTreeElement)this.endParent.parent()).markPinAsUnconnected(endParent);
+			endShape.update();
 		}
 	}
 	

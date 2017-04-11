@@ -41,7 +41,7 @@ import com.trolltech.qt.gui.QVBoxLayout;
  * @author Thomas Townsend
  * Created on: Jul 14, 2014
  */
-public class AddPinDialog extends QDialog{
+public class AddPinDialog extends QDialog {
 
 	/**text box used to enter the pin name */
 	private QLineEdit textBox;

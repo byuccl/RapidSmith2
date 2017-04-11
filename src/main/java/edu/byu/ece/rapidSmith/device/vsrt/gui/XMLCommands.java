@@ -340,16 +340,8 @@ public class XMLCommands {
 				graphicsWire.setTree_start(startConn);
 				graphicsWire.setTree_end(endConn);
 				
-				// connect the wire to the element shapes
-				QGraphicsItemInterface startItem = scene.itemAt(startx-1, starty);
-				if (startItem instanceof Site) {
-					startItem = scene.itemAt(startx+1, starty);
-				}
-				
-				QGraphicsItemInterface endItem = scene.itemAt(endx-1, endy);
-				if (endItem instanceof Site) {
-					endItem = scene.itemAt(endx+1, endy);
-				}
+				QGraphicsItemInterface startItem = scene.getElementAtPoint(startPoint);				
+				QGraphicsItemInterface endItem = scene.getElementAtPoint(endPoint);
 				
 				graphicsWire.setShapeConnections(startItem, endItem);
 				graphicsWire.connect();

@@ -42,7 +42,7 @@ import edu.byu.ece.rapidSmith.device.vsrt.primitiveDefs.PrimitiveDefPinDirection
  * @author Thomas Townsend 
  * Created on: Jul 30, 2014
  */
-public class AddSitePinGroupCommand extends QUndoCommand{
+public class AddSitePinGroupCommand extends QUndoCommand {
 	/**Primitive def pin to be added*/
 	private ArrayList<PrimitiveDefPin>  sitePins = new ArrayList<PrimitiveDefPin>() ;
 	/**Primitive def pin within the pin element*/

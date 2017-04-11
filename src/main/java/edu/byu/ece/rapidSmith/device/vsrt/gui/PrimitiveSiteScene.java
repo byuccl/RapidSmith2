@@ -550,6 +550,9 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 		}
 	}
 	
+	/**
+	 * Hides all wire objects on the current scene (makes them not visible)
+	 */
 	public void hideWires() {	
 		this.items().stream()
 			.filter(item -> (item instanceof ElementShape))
@@ -557,11 +560,29 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 			.forEach(elShape -> elShape.hideWires());
 	}
 	
+	/**
+	 * Shows all wire objects on the current scene (makes them visible)
+	 */
 	public void showWires() {
 		this.items().stream()
 			.filter(item -> (item instanceof ElementShape))
 			.map(item -> (ElementShape) item)
 			.forEach(elShape -> elShape.showWires());
+	}
+	
+	/**
+	 * Returns the {@link ElementShape} or {@link PinShape} object at the specified point
+	 * @param point {@link QPointF} to look
+	 */
+	public QGraphicsItemInterface getElementAtPoint(QPointF point) {
+			
+		for (QGraphicsItemInterface item : items(point.x(),point.y(),1,1) ) {
+			if ((item instanceof ElementShape) || (item instanceof PinShape)) {
+				return item;
+			}
+		}
+	
+		return null;
 	}
 	
 }//end class

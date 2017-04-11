@@ -153,11 +153,7 @@ public class XDLRCPrimitiveDefsParser {
 			int elementPinCount = Integer.parseInt(tokens[2].replace(")", ""));
 			e.setBel(tokens.length >= 5 && tokens[3].equals("#") && tokens[4].equals("BEL"));
 			e.setIsTest(e.isBel() && tokens.length >=6 && tokens[5].equals("TEST"));
-			
-			if (e.isBel()) {
-				System.out.println(e.getName());
-			}
-			
+						
 			//This can be optimized
 			for (PrimitiveDefPin pin : pins) {
 				if ( e.getName().equals(pin.getInternalName()) ) {
