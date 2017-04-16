@@ -41,6 +41,7 @@ public class RouteTreeTest {
 
     private Site dummy_site;
     private SiteWire dummy_wire;
+    // for these tests, a RouteTree with three levels is created. each of the levels is remembered as follows:
     private RouteTree root;
     private RouteTree branch;
     private RouteTree leaf;
@@ -79,6 +80,7 @@ public class RouteTreeTest {
     @Test
     @DisplayName("test RouteTree method 'getFirstSource'")
     public void testGetFirstSource() {
+        /* every RouteTree should return the root tree */
         assertEquals(root, root.getFirstSource());
         assertEquals(root, branch.getFirstSource());
         assertEquals(root, leaf.getFirstSource());
@@ -87,6 +89,7 @@ public class RouteTreeTest {
     @Test
     @DisplayName("test RouteTree method 'isLeaf'")
     public void testIsLeaf() {
+        /* only the leaf RouteTree should return true */
         assertFalse(root.isLeaf());
         assertFalse(branch.isLeaf());
         assertTrue(leaf.isLeaf());
@@ -109,14 +112,17 @@ public class RouteTreeTest {
     @Test
     @DisplayName("test RouteTree method 'removeConnection'")
     public void testRemoveConnection() {
+        /* remove the leaf connection and verify that the branch RouteTree is now a leaf */
         branch.removeConnection(leaf.getConnection());
         assertTrue(branch.isLeaf());
+        /* repair the RouteTree so it can be used for other tests */
         leaf = branch.addConnection(leaf.getConnection());
     }
 
     @Test
     @DisplayName("test RouteTree method 'getAllPips")
     public void testGetAllPips() {
+        /* only one of the same RouteTrees has a Pip connection (the leaf) */
         assertEquals(1, root.getAllPips().size());
         assertEquals(leaf.getConnection().getPip(), root.getAllPips().iterator().next());
     }
@@ -124,20 +130,25 @@ public class RouteTreeTest {
     @Test
     @DisplayName("test RouteTree method 'deepCopy'")
     public void testDeepCopy() {
+        /* copy the RouteTree */
         RouteTree copy = leaf.deepCopy();
+        /* begin to iterate over each child RouteTree in both copies */
         Iterator<RouteTree> main_index = leaf.iterator();
         Iterator<RouteTree> copy_index = copy.iterator();
         while (main_index.hasNext() && copy_index.hasNext()) {
             RouteTree main_next = main_index.next();
             RouteTree copy_next = copy_index.next();
+            /* verify that each sub-RouteTree matches the original */
             assertEquals(main_next.getConnection(), copy_next.getConnection(), "Connection doesn't match in copied RouteTree");
             assertEquals(main_next.getWire(), copy_next.getWire(), "Wire doesn't match in copied RouteTree");
+            /* verify that each copied RouteTree is a separate object from the original (not a shallow reference copy) */
             assertTrue(main_next != copy_next, "Copied RouteTree shouldn't have same reference");
             if (main_next.isSourced())
                 assertTrue(main_next.getSourceTree() != copy_next.getSourceTree(), "Copied RouteTree should have different source tree");
             else
                 assertNull(copy_next.getSourceTree(), "Copied RouteTree should have null source.");
         }
+        /* verify that the copies have the same number of sub-RouteTrees */
         assertFalse(main_index.hasNext(), "Copied RouteTree has less children.");
         assertFalse(copy_index.hasNext(), "Copied RouteTree has more children.");
     }
@@ -145,12 +156,13 @@ public class RouteTreeTest {
     @Test
     @DisplayName("test RouteTree method 'prune'")
     public void testPrune() {
+        /* after pruning the RouteTree, only the root and the branch (terminal) should be left */
         root.prune(branch);
-        System.out.println("ending test");
         assertNotNull(root.getSinkTrees(), "The root RouteTree should still have sink trees after pruning");
         assertNotNull(branch.getSinkTrees(), "The terminal RouteTree should still have a collection of children after pruning");
         assertEquals(1, root.getSinkTrees().size(), "The root RouteTree should still have a reference to the terminal RouteTree after pruning");
         assertEquals(0, branch.getSinkTrees().size(), "The terminal RouteTree shouldn't have any children after pruning");
+        /* repair the RouteTree for future tests */
         leaf = branch.addConnection(leaf.getConnection());
     }
 }
