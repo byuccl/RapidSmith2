@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import edu.byu.ece.rapidSmith.device.vsrt.gui.VSRTool;
+
 public class Element implements Serializable{
 
 	private static final long serialVersionUID = -4173250951419860912L;
@@ -138,6 +140,12 @@ public class Element implements Serializable{
 			this.connSet.add( connection.toString() );
 		}
 	}
+	/**
+	 * Removes all of the current connections for the Element
+	 */
+	public void clearConnections() {
+		this.connections.clear();
+	}
 	public void addCfgElement(String cfgElement){
 		if(cfgElements == null){
 			cfgElements = new ArrayList<String>();
@@ -165,7 +173,7 @@ public class Element implements Serializable{
 			}
 		}
 	}
-	
+		
 	//testing elements
 	
 	
@@ -185,11 +193,11 @@ public class Element implements Serializable{
 			}
 			s.append(")"+nl);
 		}
-		if (!printName) { //only print the connections if we are writing the final primitive def and not! the original 
+		//if (!printName || VSRTool.singleBelMode) { //only print the connections if we are writing the final primitive def and not! the original 
 			for(Connection c : connections){
 				s.append("\t\t\t"+c.toString() + nl);
 			}
-		}
+		//}
 		
 		if(cfgElements != null && cfgElements.size() > 0) {
 			s.append("\t\t)" + nl); 

@@ -23,11 +23,21 @@
  */
 package edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.trolltech.qt.core.QPointF;
+import com.trolltech.qt.gui.QBrush;
 import com.trolltech.qt.gui.QGraphicsItem;
+import com.trolltech.qt.gui.QTreeWidgetItem;
 import com.trolltech.qt.gui.QUndoCommand;
 
 import edu.byu.ece.rapidSmith.device.vsrt.gui.PrimitiveSiteScene;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreeElement;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreePin;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.VSRTool;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.VsrtColor;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.ElementShape;
 
 /**
@@ -43,6 +53,8 @@ public class AddElementCommand extends QUndoCommand {
 	/**Initial Position of the added item*/
 	private QPointF initialPos;
 	
+	private Map<QTreePin, List<QTreeWidgetItem>> existingItems;
+	
 	/***
 	 * Constructor
 	 * @param scene Graphics scene to which the item is added
@@ -54,6 +66,15 @@ public class AddElementCommand extends QUndoCommand {
 		this.item = item; 
 		this.initialPos = initPos;
 		this.setText("adding " + ((ElementShape)item).getTreeElement().getElement().getName());
+		
+		if (VSRTool.singleBelMode) {
+			existingItems = new HashMap<QTreePin, List<QTreeWidgetItem>>();
+			QTreeElement treeElement = ((ElementShape)item).getTreeElement();
+			for (int i = 0; i < treeElement.childCount(); i++) {
+				QTreePin treePin = (QTreePin)treeElement.child(i);
+				existingItems.put(treePin, treePin.takeChildren());
+			}
+		}
 	}
 
 	/**
@@ -67,6 +88,15 @@ public class AddElementCommand extends QUndoCommand {
 		
 		((ElementShape)item).getTreeElement().setIsPlaced(true);
 		
+		if (VSRTool.singleBelMode) {
+			QTreeElement treeElement = ((ElementShape)item).getTreeElement();
+			for (int i = 0; i < treeElement.childCount(); i++) {
+				treeElement.child(i).takeChildren();
+				treeElement.child(i).setForeground(0, new QBrush(VsrtColor.red));
+			}
+			
+			treeElement.updateElementColor();
+		}
 	}
 	
 	/**
@@ -77,5 +107,17 @@ public class AddElementCommand extends QUndoCommand {
 		this.scene.removeItem(item);
 		this.scene.update();
 		((ElementShape)item).getTreeElement().setIsPlaced(false);
+		
+		if (VSRTool.singleBelMode) {
+			QTreeElement treeElement = ((ElementShape)item).getTreeElement();
+			for (int i = 0; i < treeElement.childCount(); i++) {
+				QTreePin treePin = (QTreePin)treeElement.child(i); 
+				treePin.addChildren(existingItems.get(treePin));
+				if(treePin.childCount() > 0) {
+					treePin.setForeground(0, new QBrush(VsrtColor.darkGreen));
+				}
+			}
+			treeElement.updateElementColor();
+		}
 	}
 }

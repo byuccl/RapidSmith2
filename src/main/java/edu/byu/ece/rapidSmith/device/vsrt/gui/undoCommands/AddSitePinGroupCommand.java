@@ -112,7 +112,7 @@ public class AddSitePinGroupCommand extends QUndoCommand {
 			QTreePin treePin = elementTab.createNewSitePin(element);
 			this.treePins.add(treePin);
 			
-			this.pinShapes.add( new PinShape(treePin, pin_width) );
+			this.pinShapes.add( new PinShape(treePin, pin_width, true) );
 			
 			this.initialPos.add(new QPointF(startX, startY + (i+1)*pin_width));
 			}

@@ -121,6 +121,7 @@ public class AddWireCommand extends QUndoCommand {
 			wire2.undoRemoveWire();
 			wire2.disconnect();
 		}
+		this.scene.updateTreeView(wire1.getTreePinStart(), wire1.getTreePinEnd());
 	}
 	
 	/**

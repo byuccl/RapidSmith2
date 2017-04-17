@@ -30,4 +30,5 @@ public final class VsrtColor {
         public static final QColor lightGray = new QColor(Qt.GlobalColor.lightGray);
         public static final QColor transparent = new QColor(Qt.GlobalColor.transparent);
         public static final QColor darkOrange = new QColor(255,140,0);
+        public static final QColor darkViolet = new QColor(148,0,211); 	
 }

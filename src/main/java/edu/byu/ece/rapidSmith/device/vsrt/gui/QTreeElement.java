@@ -1,7 +1,9 @@
 package edu.byu.ece.rapidSmith.device.vsrt.gui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import com.trolltech.qt.gui.QBrush;
 import com.trolltech.qt.gui.QColor;
@@ -26,9 +28,10 @@ public class QTreeElement extends QTreeWidgetItem{
 	private ArrayList<QTreePin> out_pins = new ArrayList<QTreePin>();
 	/**Keeps track of whether this element has been added to the scene already*/
 	private boolean isPlaced = false;
-	
+	/**Holds all of the currently connected pins on the site**/
 	private HashSet<QTreePin> connectedPins = new HashSet<QTreePin>();
-
+	/** Map from name to QTreePin object for the element*/
+	private Map<String, QTreePin> treePinMap;
 	
 	/**
 	 * Constructor
@@ -39,6 +42,7 @@ public class QTreeElement extends QTreeWidgetItem{
 		super(view);
 		
 		this.element = element;
+		this.treePinMap = new HashMap<String, QTreePin>();
 
 		//Adding QTreePins to this element
 		for (PrimitiveDefPin bel_pin : element.getPins()) {
@@ -53,6 +57,7 @@ public class QTreeElement extends QTreeWidgetItem{
 			}
 			else
 			{	this.in_pins.add(pin_tmp);	}
+			treePinMap.put(bel_pin.getInternalName(), pin_tmp);
 		}
 	}
 
@@ -163,5 +168,29 @@ public class QTreeElement extends QTreeWidgetItem{
 		}
 		
 		return borderColor; 
+	}
+	
+	public void addExistingConnections () {
+		for (Connection conn : this.element.getConnections()) {	
+			String dirString = (conn.isForwardConnection()) ? "==>" : "<=="; 
+			QTreePin treePin = this.treePinMap.get(conn.getPin0());
+			QTreeWidgetItem treeConn = new QTreeWidgetItem(treePin);
+			treeConn.setText(0, dirString + " " + conn.getElement1() +  " " + conn.getPin1());
+			treePin.setForeground(0, new QBrush(VsrtColor.darkGreen));
+		}
+		updateElementColor();
+	}
+	
+	public void updateElementColor(){	
+		QColor color = VsrtColor.darkGreen;
+		
+		for (int i = 0; i < this.childCount(); i++) {
+			if( this.child(i).childCount() == 0 ) {
+				color = VsrtColor.red;
+				break;
+			}
+		}
+		
+		this.setForeground(0, new QBrush(color));
 	}
 }

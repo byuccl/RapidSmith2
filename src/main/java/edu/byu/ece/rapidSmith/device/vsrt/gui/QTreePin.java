@@ -27,6 +27,8 @@ public class QTreePin extends QTreeWidgetItem implements Comparable<QTreePin>{
 	private QPointF last_move_location = new QPointF(0,0);
 	/**Set to true if the QTreePin is a site pin, not a bel pin*/
 	private boolean isSitePin;
+	/** true if the pin shape has been placed **/
+	private boolean isPlaced;
 	
 	/**
 	 * Constructor 1:
@@ -39,6 +41,7 @@ public class QTreePin extends QTreeWidgetItem implements Comparable<QTreePin>{
 		this.parent = parent;
 		this.pin = pin;
 		this.isSitePin = isSitePin;
+		this.isPlaced = false;
 	}
 	/**
 	 * Constructor 2:
@@ -51,6 +54,7 @@ public class QTreePin extends QTreeWidgetItem implements Comparable<QTreePin>{
 
 		this.pin = pin;
 		this.isSitePin = isSitePin;
+		this.isPlaced = false;
 	}
 	
 	//getters and setters
@@ -124,6 +128,20 @@ public class QTreePin extends QTreeWidgetItem implements Comparable<QTreePin>{
 	 */
 	public ArrayList<Wire> get_wires(){
 		return wires;
+	}
+	
+	public void setIsPlaced(boolean isPlaced){
+		this.isPlaced = isPlaced;
+	}
+	
+	public boolean isPlaced() {
+		return this.isPlaced;
+	}
+	
+	public void updateParentColor() {
+		if (parent!=null) {
+			((QTreeElement)parent).updateElementColor();
+		}
 	}
 	
 	@Override

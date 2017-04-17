@@ -3,6 +3,7 @@ package edu.byu.ece.rapidSmith.device.vsrt.gui.shapes;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.PrimitiveSiteScene;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreeElement;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreePin;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.VSRTool;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.VsrtColor;
 
 import java.util.ArrayList;
@@ -54,6 +55,12 @@ public class Wire {
 	public void setTree_start(QTreeWidgetItem start) {
 		this.start = start;
 		this.startParent = (QTreePin) start.parent();
+	}
+	public QTreePin getTreePinStart() {
+		return startParent;
+	}
+	public QTreePin getTreePinEnd() {
+		return endParent;
 	}
 	public QTreeWidgetItem getTree_end() {
 		return end;
@@ -153,12 +160,13 @@ public class Wire {
 			this.startParent.setForeground(0, new QBrush(VsrtColor.darkGreen));
 			this.startParent.addChild(start);
 			this.startParent.add_wire(this);
-			//((QTreeElement)this.startParent.parent()).markPinAsConnected(startParent); 
+			this.startParent.updateParentColor();
 			
 			this.endParent.addChild(end);
 			this.endParent.add_wire(this);
 			this.endParent.setForeground(0, new QBrush(VsrtColor.darkGreen));
-			//((QTreeElement)this.endParent.parent()).markPinAsConnected(endParent); 
+			this.endParent.updateParentColor();
+			
 			this.connect();
 		//}
 	}
@@ -181,10 +189,18 @@ public class Wire {
 			throw new AssertionError("Parameter endItem should be ElementShape of PinShape: " + endItem.getClass());
 		}
 		
-		// make sure this assertion holds (i.e. an input site pin will not connect directly to an output site pin
-		if (!startIsElement && !endIsElement) {
-			throw new AssertionError("Either the startItem or the endItem needs to be of type ElementShape");
+		if (!VSRTool.singleBelMode) {
+			if (!startIsElement && !endIsElement) {
+				throw new AssertionError("Either the startItem or the endItem needs to be of type ElementShape");
+			}
+		} 
+		/*
+		else {
+			if (((PinShape)startItem).isSitePin() == ((PinShape)endItem).isSitePin()) {
+				throw new AssertionError("Cannot connect two site pins or bel pins together");
+			}
 		}
+		*/
 	}
 		
 	public void connect() {

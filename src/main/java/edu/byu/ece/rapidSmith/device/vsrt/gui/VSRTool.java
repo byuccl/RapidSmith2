@@ -75,7 +75,7 @@ public class VSRTool extends QMainWindow {
 	private QUndoStack undoStack = new QUndoStack();  
 	private XMLCommands xml = new XMLCommands();
 	private static String vsrtImagePath;
-	
+	public static boolean singleBelMode;
 	private HashMap<String, HashSet<String>> sites2arch = new HashMap<String, HashSet<String>>();
 	
 	/********************************************
@@ -85,6 +85,7 @@ public class VSRTool extends QMainWindow {
 	static
 	{
 		vsrtImagePath = "classpath:images" + File.separator + "vsrt";
+		singleBelMode = false;
 	}
 	
 	/**
@@ -296,18 +297,13 @@ public class VSRTool extends QMainWindow {
 		boolean saveFileExists = this.xml.parseSceneXML(this.directory + File.separator  + family + File.separator + site_name + ".xml");
 
 		//extracting the elements from the PrimitiveDef data structure and displaying its contents
-		String singleElementName = this.element_view.generate_elements(current_site, this.xml, saveFileExists);
-		if (saveFileExists)
+		singleBelMode = this.element_view.generate_elements(current_site, this.xml, saveFileExists);
+		if (saveFileExists) {
 			this.siteCfgElements = this.xml.loadSiteCfgElements();
+		}
 		
-		//The user has chosen to generate connections by hand (or they are required to)
-		if ( singleElementName == null ) {
-			this.openSite(family, site_name, saveFileExists);
-		}
-		else {
-			//The user has chosen to generate connections automatically 
-			this.writePrimitiveDef(true, false);
-		}
+		this.element_view.setSingleBelMode(singleBelMode , scene);
+		this.openSite(family, site_name, saveFileExists);
 	}
 	
 	/**
@@ -477,7 +473,9 @@ public class VSRTool extends QMainWindow {
 	 */
 	private void saveSiteProgress(String xmlLocation, String oldFileLocation){
 
-		this.xml.saveGraphicsScene(scene, xmlLocation, this.siteCfgElements  );
+		if (!VSRTool.singleBelMode) {
+			this.xml.saveGraphicsScene(scene, xmlLocation, this.siteCfgElements  );
+		}
 		try {
 			BufferedWriter writer = Files.newBufferedWriter(Paths.get(oldFileLocation), 
 					Charset.defaultCharset(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
@@ -496,9 +494,13 @@ public class VSRTool extends QMainWindow {
 	 * user can generate connections for another primitive site. 
 	 */
 	public void closeSite(boolean saveProgress){
-		if (saveProgress)
+		if (saveProgress) {
+			if (VSRTool.singleBelMode) {
+				this.element_view.generateConnections();
+			}
 			this.saveSiteProgress(this.directory + File.separator + this.site_select.getXMLLocation(), 
 								  this.directory + File.separator + this.site_select.getSiteLocation());
+		}
 		
 		this.scene.resetScene();
 		this.element_view.clear_all();
@@ -667,6 +669,9 @@ public class VSRTool extends QMainWindow {
 			StandardButton result = this.askUserToSave();
 			
 			if (result == StandardButton.Yes){
+				if (VSRTool.singleBelMode) {
+					this.element_view.generateConnections();
+				}
 				this.saveSiteProgress(this.directory + File.separator + this.site_select.getXMLLocation(), 
 						  			  this.directory + File.separator + this.site_select.getSiteLocation());
 			}else if (result == StandardButton.Cancel){

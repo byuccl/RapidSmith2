@@ -72,18 +72,15 @@ public class MoveCommand extends QUndoCommand {
 				movedItems.add(item); 
 				oldPositions.add(((ElementShape) item).getLastPos()); 
 				newPositions.add(item.pos());
-				if (i == 0)
-					if (this.itemsInSameLocation(item))
-						break;
 			}
 			else if( item instanceof PinShape) {
 				name = ((PinShape) item).getTreePin().get_pinName();
 				movedItems.add(item); 
 				oldPositions.add( ((PinShape)item).getLastLocation()); 
 				newPositions.add(item.pos());
-				if (i == 0 )
-					if (this.itemsInSameLocation(item))
-						break;
+			}
+			if (i == 0) {
+				checkItemsInSameLocation(item);
 			}
 			i++;
 		}
@@ -150,7 +147,7 @@ public class MoveCommand extends QUndoCommand {
 	 * @param item
 	 * @return
 	 */
-	private boolean itemsInSameLocation(QGraphicsItemInterface item){
+	private boolean checkItemsInSameLocation(QGraphicsItemInterface item){
 		double remX = item.pos().x() % pin_width;
 		double remY = item.pos().y() % pin_width;	
 		double offsetX = (remX < pin_width/2) ? remX : -(pin_width - remX) ;

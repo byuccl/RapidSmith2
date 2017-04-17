@@ -9,6 +9,7 @@ import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.PinShape;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.Pip;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.WirePart;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.AddElementCommand;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.AddPinToSceneCommand;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.AddWireCommand;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.MoveCommand;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.RemoveCommand;
@@ -130,7 +131,6 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 	 * @param pin The pin whose position has been updated. 
 	 */
 	public void add_pin (QPointF old_point, QPointF new_point,  QTreePin pin){
-		
 		if (old_point != null) { 
 			if(pin_locations.get(old_point) == pin)
 				pin_locations.remove(old_point);
@@ -220,9 +220,14 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 				}
 			}
 			else if ( this.itemsMoving ) { 
+				
 				MoveCommand move = new MoveCommand(this, (ArrayList<QGraphicsItemInterface>) this.selectedItems());
-				if (move.shouldPushMove())
+				if (move.shouldPushMove()) {
 					this.undoStack.push(move);
+				}
+				else {
+					move.undo();
+				}
 			}
 		}
 		mousePressed = false;
@@ -340,7 +345,7 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 				this.tmp_wire.setLine(new QLineF(start, event.scenePos()));
 			else if ( !should_delete && !zoomToView ) {//this.views().get(0).dragMode() == DragMode.RubberBandDrag ) {
 				for (QGraphicsItemInterface item : this.selectedItems()) {
-					if ( !item.isUnderMouse() && item instanceof ElementShape )
+					if ( !item.isUnderMouse() )
 						item.mouseMoveEvent(event);
 				}
 			}
@@ -460,22 +465,47 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 	 * @param element
 	 */
 	public void addElementToScene(QTreeWidgetItem element){
-		try {
-			QTreeElement tmp = (QTreeElement) element;
-			ElementShape item;
-			
-			if (!tmp.isPlaced()) {
-				if (tmp.getElement().isBel() )
-					item = new Bel(tmp, this.square_size, parent.getPlacementPosition()) ;
-				else{ 
-					item = new Pip(tmp, this.square_size, parent.getPlacementPosition() ) ;
+		
+		// In single bel mode, only allow pins and site pips to be added to the scene.
+		if (VSRTool.singleBelMode) {
+			if (element instanceof QTreePin) {
+				QTreePin tmp = (QTreePin) element;
+				
+				if (!tmp.isPlaced()) {
+					PinShape pinShape = new PinShape(tmp, square_size, tmp.isSitePin());
+					AddPinToSceneCommand addPinCommand = new AddPinToSceneCommand(this, pinShape);
+					this.undoStack.push(addPinCommand);
+					this.parent.getToolBar().untoggleAll();
 				}
-				AddElementCommand add = new AddElementCommand(this, item, item.pos());
-				this.undoStack.push(add);
-				this.parent.getToolBar().untoggleAll();
 			}
+			else  {
+				QTreeElement tmp = (QTreeElement) element;
+				if (!tmp.isPlaced() && !tmp.getElement().isBel()) {
+					ElementShape item = new Pip(tmp, this.square_size, parent.getPlacementPosition() ) ;
+					AddElementCommand add = new AddElementCommand(this, item, item.pos());
+					this.undoStack.push(add);
+					this.parent.getToolBar().untoggleAll();
+				}
+			}
+		} 
+		else { // regular mode only allow BELs and Site Pips to be added to scene
+			try {
+				QTreeElement tmp = (QTreeElement) element;
+				ElementShape item;
+				
+				if (!tmp.isPlaced()) {
+					if (tmp.getElement().isBel() )
+						item = new Bel(tmp, this.square_size, parent.getPlacementPosition()) ;
+					else{ 
+						item = new Pip(tmp, this.square_size, parent.getPlacementPosition() ) ;
+					}
+					AddElementCommand add = new AddElementCommand(this, item, item.pos());
+					this.undoStack.push(add);
+					this.parent.getToolBar().untoggleAll();
+				}
+			}
+			catch(ClassCastException e){}
 		}
-		catch(ClassCastException e){}
 	}
 	/**
 	 * Enable drawing wires on the device view  
