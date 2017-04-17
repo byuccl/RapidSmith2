@@ -234,7 +234,7 @@
              // Attempt to place and remove the cell on each type of anchor
              for (BelId anchortype : cell.getPossibleAnchors()) {
                  // Create a new empty CellDesign for the designated FPGA part
-                 CellDesign design = new CellDesign("CellPlacementTest", "xc7a100tcsg324", libCells);
+                 CellDesign design = new CellDesign("CellPlacementTest", "xc7a100tcsg324");
                  // Add the cell to the design
                  design.addCell(cell);
                  // Get the first site from the device that matches the site type

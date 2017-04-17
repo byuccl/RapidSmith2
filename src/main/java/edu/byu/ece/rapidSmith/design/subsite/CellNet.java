@@ -251,13 +251,9 @@ public class CellNet implements Serializable {
 	 */
 	public void connectToPin(CellPin pin) {
 		
-		if (pin.isInternal()) {
-			throw new Exceptions.DesignAssemblyException("Cannot connect net to internal pin of a macro. Connect the net to the external pin instead.");
-		}
-		
 		// If the cellpin is part of a macro cell, add all of the internal pins
 		// to the net instead of the external macro pins
-		if (pin.isMacroPin()) {
+		if (pin.getCell().isMacro()) {
 			pin.getCell().mapToInternalPins(pin).forEach(this::connectToLeafPin);
 			pin.setNet(this);
 		}
@@ -318,7 +314,7 @@ public class CellNet implements Serializable {
 	 */
 	public void detachNet() { 
 		
-		pins.forEach(this::clearNet);
+		pins.forEach(CellPin::clearNet);
 		
 		if (sourcePin != null) {
 			sourcePin = null;
@@ -327,15 +323,6 @@ public class CellNet implements Serializable {
 		pins.clear();
 	}
 	
-	private void clearNet(CellPin pin) {
-		pin.clearNet();
-		CellPin external = pin.getExternalPin(); 
-		if (external != null) {
-			external.clearNet();
-		}
-	}
-	
-	
 	/**
 	 * Removes a collection of pins from the net. 
 	 * 
@@ -343,22 +330,6 @@ public class CellNet implements Serializable {
 	 */
 	public void disconnectFromPins(Collection<CellPin> pins) {
 		pins.forEach(this::disconnectFromPin);
-	}
-	
-	/**
-	 * Force an internal pin to be disconnected from the net. No checks are made
-	 * before removing the pin. This method is package private and shouldn't
-	 * be called by regular users.
-	 * @param pin
-	 */
-	void forceDisconnectInternalPin(CellPin pin) {
-		assert (pin.isInternal()) : "This function should only be called with internal macro cell pins";
-		disconnectFromLeafPin(pin);
-	}
-	
-	void forceConnectInternalPin(CellPin pin) {
-		assert (pin.isInternal()) : "This function should only be called with internal macro cell pins";
-		connectToLeafPin(pin);
 	}
 	
 	/**

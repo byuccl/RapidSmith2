@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.device.Bel;
@@ -109,17 +108,14 @@ public class LibraryMacro extends LibraryCell {
 	 * @param libraryPin external macro library pin
 	 * @param pinNames List of internal pin names in the form "cellname/pinname" 
 	 */
-	public void addInternalPinConnections(LibraryPin libraryPin, List<String> pinNames) {
+	void addInternalPinConnections(LibraryPin libraryPin, List<String> pinNames) {
 		
-		Objects.requireNonNull(libraryPin);
-		assert (pinNames.size() > 0 ) : libraryPin.getName() + " is not connected internally";
+		assert (pinNames.size() > 0);
 		
 		List<InternalPin> internalPins = new ArrayList<>(pinNames.size());
 		
 		for(String pinName : pinNames) {
-			//String[] nameToks = pinName.split("/");
-			int i = pinName.lastIndexOf("/");
-			String[] nameToks =  {pinName.substring(0, i), pinName.substring(i+1)};
+			String[] nameToks = pinName.split("/");
 			assert(nameToks.length == 2);
 			internalPins.add(new InternalPin(nameToks[0], nameToks[1]));
 			this.internalToExternalPinMap.put(nameToks[0] + "/" + nameToks[1], libraryPin.getName());
@@ -134,7 +130,7 @@ public class LibraryMacro extends LibraryCell {
 	 * @param name Relative name of the internal cell  
 	 * @param libCell Internal cell type 
 	 */
-	public void addInternalCell(String name, SimpleLibraryCell libCell) {
+	void addInternalCell(String name, SimpleLibraryCell libCell) {
 		this.internalCells.add(new InternalCell(name, libCell));
 	}
 	
@@ -144,7 +140,7 @@ public class LibraryMacro extends LibraryCell {
 	 * @param name Relative name of the internal net
 	 * @param fullPinNames A List of pin names that are attached to the internal net
 	 */
-	public void addInternalNet(String name, String type, List<String> fullPinNames) {
+	void addInternalNet(String name, String type, List<String> fullPinNames) {
 		
 		// lazily initialize the internal net list (only some macros have this list)
 		if (this.internalNets == null) {
@@ -221,21 +217,11 @@ public class LibraryMacro extends LibraryCell {
 			
 			for (InternalPin pin : net.getInternalPins()) {
 				Cell cell = internalCellMap.get(parentName + "/" + pin.getCellName());
-				
-				// mark nets as VCC or GND as we create them.
-				if (cell.isVccSource()) {
-					cellNet.setType(NetType.VCC);
-				} 
-				else if (cell.isGndSource()) {
-					cellNet.setType(NetType.GND);
-				}
-				
 				CellPin cellPin = cell.getPin(pin.getPinName());
 				
 				assert (cellPin != null) : "Unable to find cell pin for macro cell: " +  cell.getName() + "/" + pin.getPinName();
 				
-				cellNet.forceConnectInternalPin(cellPin);
-				// cellNet.connectToPin(cellPin);
+				cellNet.connectToPin(cellPin);
 			}
 			internalNetMap.put(netName, cellNet);
 		}
@@ -304,9 +290,7 @@ public class LibraryMacro extends LibraryCell {
 			this.type = NetType.valueOf(type); 
 			
 			for (String fullPinName : fullPinNames) {
-				int i = fullPinName.lastIndexOf("/");
-				String[] nameToks =  {fullPinName.substring(0, i), fullPinName.substring(i+1)};
-				// String[] nameToks = fullPinName.split("/");
+				String[] nameToks = fullPinName.split("/");
 				assert (nameToks.length==2);
 				internalPins.add(new InternalPin(nameToks[0], nameToks[1]));
 			}

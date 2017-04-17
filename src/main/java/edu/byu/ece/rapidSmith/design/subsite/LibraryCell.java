@@ -94,7 +94,7 @@ public abstract class LibraryCell implements Serializable {
 	 * 
 	 * @param libCellProperty {@link LibraryCellProperty} object
 	 */
-	public void addConfigurableProperty(LibraryCellProperty libCellProperty) {
+	void addConfigurableProperty(LibraryCellProperty libCellProperty) {
 		this.configurableProperties.put(libCellProperty.getName(), libCellProperty);
 	}
 	
@@ -102,7 +102,7 @@ public abstract class LibraryCell implements Serializable {
 	 * Adds a new default cell {@link Property} to the LibraryCell. This is
 	 * package private and should not be called by normal users. 
 	 */
-	public void addDefaultProperty(Property property) {
+	void addDefaultProperty(Property property) {
 		
 		if (defaultProperties == null) {
 			defaultProperties = new HashMap<>();

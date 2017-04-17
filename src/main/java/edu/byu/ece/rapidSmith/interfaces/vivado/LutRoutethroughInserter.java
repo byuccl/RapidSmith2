@@ -142,7 +142,7 @@ public class LutRoutethroughInserter {
 	 * @param sinks List to add sink CellPins to
 	 * @return The source BelPin of the routethrough. If no routethrough is found, null is returned
 	 */
-	private BelPin tryFindRoutethroughSourcePin(RouteTree route, List<CellPin> sinks) {
+	private BelPin tryFindRoutethroughSourcePin(RouteTree route, List<CellPin> sinks ) {
 		
 		Iterator<RouteTree> rtIterator = route.getFirstSource().iterator();
 		BelPin rtSource = null;
