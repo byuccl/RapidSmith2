@@ -1,5 +1,6 @@
 package edu.byu.ece.rapidSmith.device.vsrt.gui;
 
+import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -29,6 +30,7 @@ import com.trolltech.qt.gui.QGraphicsSceneMouseEvent;
 import com.trolltech.qt.gui.QGraphicsItem.GraphicsItemFlag;
 import com.trolltech.qt.gui.QGraphicsView.DragMode;
 import com.trolltech.qt.gui.QLineF;
+import com.trolltech.qt.gui.QMessageBox;
 import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QPen;
 import com.trolltech.qt.gui.QTreeWidgetItem;
@@ -471,16 +473,39 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 			if (element instanceof QTreePin) {
 				QTreePin tmp = (QTreePin) element;
 				
+				// only add the pin if the parent element has not been placed on the scene
+				if (tmp.parent() instanceof QTreeElement) {
+					QTreeElement parentTreeElement = (QTreeElement)tmp.parent();
+					if (parentTreeElement.isPlaced())  {	
+						String message = String.format("Parent element %s already added to scene. If you want to add the "
+								+ "individual pin, you need to first remove the parent element", parentTreeElement.text(0));
+						QMessageBox.information(null, "Cannot add pin", message);
+						return;
+					}
+				}
+				
 				if (!tmp.isPlaced()) {
 					PinShape pinShape = new PinShape(tmp, square_size, tmp.isSitePin());
 					AddPinToSceneCommand addPinCommand = new AddPinToSceneCommand(this, pinShape);
 					this.undoStack.push(addPinCommand);
 					this.parent.getToolBar().untoggleAll();
+				} 
+				else {
+					QMessageBox.information(null, "Cannot add pin", "Pin Already Placed");
 				}
 			}
-			else  {
+			else  { // add a BEL / site pip 
 				QTreeElement tmp = (QTreeElement) element;
-				if (!tmp.isPlaced() && !tmp.getElement().isBel()) {
+				
+				// do not add the element if either (1) it has already been placed, or (2) any of its pins have already been placed
+				if (tmp.isPlaced()) {
+					QMessageBox.information(null, "Cannot add element", "Element Already Placed");
+				}
+				else if (tmp.pinsPlaced()) {
+					QMessageBox.information(null, "Cannot add element", "Pins of " + tmp.text(0) + " have already been added to the scene. To add the element"
+							+ " to the scene, first remove all of its pins.");
+				}
+				else {
 					ElementShape item = new Pip(tmp, this.square_size, parent.getPlacementPosition() ) ;
 					AddElementCommand add = new AddElementCommand(this, item, item.pos());
 					this.undoStack.push(add);

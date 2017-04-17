@@ -193,4 +193,12 @@ public class QTreeElement extends QTreeWidgetItem{
 		
 		this.setForeground(0, new QBrush(color));
 	}
+	
+	/**
+	 * Returns {@code true} if any pins of the element have already been placed on the graphics scene.
+	 * @return
+	 */
+	public boolean pinsPlaced() {
+		return treePinMap.values().stream().anyMatch(p -> p.isPlaced());
+	}
 }

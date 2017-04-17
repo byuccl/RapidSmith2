@@ -97,6 +97,13 @@ public class QTreePin extends QTreeWidgetItem implements Comparable<QTreePin>{
 	public String get_pinName(){
 		return pin.getInternalName();
 	}
+	public String getFullName() {
+		if (this.isSitePin) {
+			return this.getPin().getInternalName();
+		} 
+		
+		return ((QTreeElement) parent).text(0) + "/" + this.getPin().getInternalName();
+	}
 	
 	/**
 	 * When an element is removed from the graphics scene, 

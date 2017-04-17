@@ -134,7 +134,7 @@ public class ElementTab extends QWidget {
 	 * for the currently selected primitive site
 	 * @param def Primitive Definition that contains all of the bel, pin, and pip info
 	 */
-	public boolean generate_elements(PrimitiveDef def, XMLCommands xml, boolean saveFileExists) {
+	public void generate_elements(PrimitiveDef def, XMLCommands xml, boolean saveFileExists) {
 		
 		this.clear_all();
 		QTreeWidgetItem tmp;
@@ -192,30 +192,20 @@ public class ElementTab extends QWidget {
 		bels.sortItems(0, SortOrder.AscendingOrder);
 		pips.sortItems(0, SortOrder.AscendingOrder);
 		
-		//If the primitive site only has one bel and no site pips then we can assume that 
-		//site pin names and bel pin names will match, and so we can automatically generate
-		//the connections if the user chooses to. 
-		if ( bels.topLevelItemCount() == 1 ) { 
-			
-			QMessageBox singleBelMode = new QMessageBox();
-			singleBelMode.setWindowTitle("Open Single Bel Mode?");
-			singleBelMode.setText("The Primitive Site you selected has only one bel. "
-					+ "This means many of the connections have been inferred in Vivado for this site. "
-					+ "Do you want to open the site in single bel mode?");
-			
-			singleBelMode.setStandardButtons(QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No);
-			
-			if ( singleBelMode.exec() == QMessageBox.StandardButton.Yes.value() ) {
-				((QTreeElement)bels.topLevelItem(0)).addExistingConnections(); // add existing bel connections
-				for(int i = 0; i < pips.topLevelItemCount(); i++) { // add existing site pip connections
-					((QTreeElement)pips.topLevelItem(i)).addExistingConnections();
-				}
-				addExistingSitePinConnections(sitePinElementMap);
-				return true; 
+		// If the tool is being run in Single BEL Mode, then we add any connections
+		// in the primitive def to the tree view of the GUI
+		if (VSRTool.singleBelMode) {
+			// add bel pin connections
+			for(int i = 0; i < bels.topLevelItemCount(); i++) {
+				((QTreeElement)bels.topLevelItem(i)).addExistingConnections();
 			}
+			
+			// add site pip connections
+			for(int i = 0; i < pips.topLevelItemCount(); i++) { 
+				((QTreeElement)pips.topLevelItem(i)).addExistingConnections();
+			}
+			addExistingSitePinConnections(sitePinElementMap);
 		}
-		
-		return false;
 	}
 
 	private void addExistingSitePinConnections(Map<String,Element> sitePinElementMap) {

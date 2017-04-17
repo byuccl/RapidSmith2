@@ -93,6 +93,12 @@ public class XDLRCPrimitiveDefsParser {
 		def.setType(PrimitiveType.valueOf(name));
 		int pinCount = Integer.parseInt(tokens[2]);
 		int elementCount = Integer.parseInt(tokens[3]);
+		
+		// primitive defs with # SBS tags are marked as single bel sites
+		if (tokens.length > 4 ) {
+			def.setIsSingleBelSite(tokens[4].equals("#SBS"));
+		}
+		
 		ArrayList<PrimitiveDefPin> pins = new ArrayList<PrimitiveDefPin>(pinCount);
 		ArrayList<Element> elements = new ArrayList<Element>(elementCount);
 		

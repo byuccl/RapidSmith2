@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import edu.byu.ece.rapidSmith.device.vsrt.gui.VSRTool;
-
 public class Element implements Serializable{
 
 	private static final long serialVersionUID = -4173250951419860912L;

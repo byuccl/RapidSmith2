@@ -279,9 +279,9 @@ public class VSRTool extends QMainWindow {
 	}
 	
 	/**
-	 * This method creates a new PrimitiveDefParser and parses the .def file that was <br>
-	 * selected by the user into a PrimitiveDef data structure.  This data structure is <br>
-	 * then added to the elementTab to display the available bels, site pins, and site pips <br>
+	 * This method creates a new PrimitiveDefParser and parses the .def file that was 
+	 * selected by the user into a PrimitiveDef data structure.  This data structure is
+	 * then added to the elementTab to display the available bels, site pins, and site pips
 	 * to the user.  Also, the site and site pins are added to the device graphics view.      
 	 * @param family Family/Architecture name of the primitive site. 
 	 * @param site_name Name of the primitive site name. 
@@ -294,16 +294,50 @@ public class VSRTool extends QMainWindow {
 
 		//we know that there is only going to be one primitive site
 		current_site = parser.getPrimitiveDefs().get(0);
-		boolean saveFileExists = this.xml.parseSceneXML(this.directory + File.separator  + family + File.separator + site_name + ".xml");
+		
+		singleBelMode = openInSingleBelMode(current_site);
+		
+		boolean saveFileExists = false;
+		if (!singleBelMode) {
+			saveFileExists = this.xml.parseSceneXML(this.directory + File.separator  + family + File.separator + site_name + ".xml");
+		}
 
 		//extracting the elements from the PrimitiveDef data structure and displaying its contents
-		singleBelMode = this.element_view.generate_elements(current_site, this.xml, saveFileExists);
+		this.element_view.generate_elements(current_site, this.xml, saveFileExists);
 		if (saveFileExists) {
 			this.siteCfgElements = this.xml.loadSiteCfgElements();
 		}
 		
-		this.element_view.setSingleBelMode(singleBelMode , scene);
+		this.element_view.setSingleBelMode(singleBelMode, scene);
 		this.openSite(family, site_name, saveFileExists);
+	}
+	
+	/**
+	 * For sites that can be run in "Single BEL Mode", this function
+	 * asks the user if they want to run VSRT in single BEL mode or
+	 * in the regular mode.
+	 *   
+	 * @param def {@link PrimitiveDef} to open
+	 * @return {@code true} if the user wants to run the tool in Single BEL Mode, 
+	 * 			{@code false} otherwise
+	 */
+	private boolean openInSingleBelMode(PrimitiveDef def) {
+		
+		// is the primitive def does not represent a single BEL site, return false 
+		if (!def.isSingleBelSite()) {
+			return false;
+		}
+		
+		// Otherwise create a new dialog box and ask the user if they want to run the GUI in "Single Bel Mode"
+		QMessageBox singleBelMode = new QMessageBox();
+		singleBelMode.setWindowTitle("Open Single Bel Mode?");
+		singleBelMode.setText("The Primitive Site you selected has only one main bel. "
+				+ "This means many of the connections have been inferred in Vivado for this site. "
+				+ "Do you want to open the site in single bel mode?");
+		
+		singleBelMode.setStandardButtons(QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No);
+		
+		return singleBelMode.exec() == QMessageBox.StandardButton.Yes.value();	
 	}
 	
 	/**

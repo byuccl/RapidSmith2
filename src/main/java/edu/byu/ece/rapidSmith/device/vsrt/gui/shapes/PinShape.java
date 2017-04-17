@@ -45,6 +45,8 @@ public class PinShape extends QGraphicsItem{
 	/** true if the pin shape represents a Bel Pin**/
 	private boolean isSitePin;
 	
+	private String fullPinName;
+	
 	private QPointF lastMoveLocation;
 	
 	/**
@@ -57,6 +59,7 @@ public class PinShape extends QGraphicsItem{
 		this.font.setPointSizeF(pin_width/3);
 		this.height = pin_width;
 		this.isSitePin = isSitePin;
+		this.fullPinName = pin.getFullName();
 		
 		this.setFlag(GraphicsItemFlag.ItemIsMovable, true);
 		this.setFlag(GraphicsItemFlag.ItemIsSelectable, true);
@@ -67,9 +70,9 @@ public class PinShape extends QGraphicsItem{
 		QFontMetrics fm = new QFontMetrics(font);
 		//Input Pins
 		if (pin.getPin().getDirection() == PrimitiveDefPinDirection.OUTPUT) 
-			bounding = new QRectF( -(double)fm.width(pin.getPin().getInternalName()), 3*pin_width/4, (double) fm.width(pin.getPin().getInternalName())+ pin_width/2, pin_width/2 + 2);		
+			bounding = new QRectF( -(double)fm.width(fullPinName), 3*pin_width/4, (double) fm.width(fullPinName)+ pin_width/2, pin_width/2 + 2);		
 		else //Output Pins
-			bounding = new QRectF( -pin_width/2, 3*pin_width/4, (double) fm.width(pin.getPin().getInternalName())+ pin_width/2 + 2, pin_width/2 + 2);		
+			bounding = new QRectF( -pin_width/2, 3*pin_width/4, (double) fm.width(fullPinName)+ pin_width/2 + 2, pin_width/2 + 2);		
 		
 		path.addRect(this.bounding);
 		this.setToolTip(pin.get_pinName());
@@ -155,10 +158,10 @@ public class PinShape extends QGraphicsItem{
 		//Input Pins
 		if (this.pin.getPin().getDirection() == PrimitiveDefPinDirection.OUTPUT) {
 			painter.setLayoutDirection(LayoutDirection.RightToLeft);
-			painter.drawText((int)-this.bounding.width(),3*(int)height/4, (int)bounding.width(), (int)height/2, AlignmentFlag.AlignVCenter.value(), pin.get_pinName() );
+			painter.drawText((int)-this.bounding.width(),3*(int)height/4, (int)bounding.width(), (int)height/2, AlignmentFlag.AlignVCenter.value(), fullPinName );
 			painter.drawLine(0, (int)height, (int)height/2, (int)height);
 		}else { //Output Pins:
-			painter.drawText(3,3*(int)height/4, (int)bounding.width(), (int)height/2, AlignmentFlag.AlignVCenter.value(), pin.get_pinName() );
+			painter.drawText(3,3*(int)height/4, (int)bounding.width(), (int)height/2, AlignmentFlag.AlignVCenter.value(), fullPinName );
 			painter.drawLine(0, (int)height, -(int)height/2, (int)height);
 		}
 	}
