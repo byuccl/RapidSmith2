@@ -122,6 +122,9 @@ public class Element implements Serializable{
 			}
 		}
 	}
+	public int pinCount() {
+		return pins.size();
+	}
 	public ArrayList<String> getCfgOptions() {
 		return cfgOptions;
 	}

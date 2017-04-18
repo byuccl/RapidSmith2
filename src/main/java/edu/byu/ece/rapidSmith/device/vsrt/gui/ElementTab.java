@@ -146,7 +146,12 @@ public class ElementTab extends QWidget {
 			{
 				tmp = new QTreeElement(bels, element);
 				tmp.setText(0, element.getName());
-				tmp.setForeground(0, text_brush);
+				if (element.pinCount() == 0) {
+					tmp.setForeground(0, new QBrush(VsrtColor.darkGreen));
+				}
+				else {
+					tmp.setForeground(0, text_brush);
+				}
 				
 				if (saveFileExists) {
 					QPointF savedLocation = xml.getSavedElementLocation(element.getName());

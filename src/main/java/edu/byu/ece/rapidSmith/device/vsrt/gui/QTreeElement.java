@@ -163,7 +163,7 @@ public class QTreeElement extends QTreeWidgetItem{
 		int connectedCount = this.connectedPins.size();
 		int pinCount = in_pins.size() + out_pins.size();
 		
-		if (connectedCount > 0) {
+		if (connectedCount > 0 || pinCount == 0) {
 			borderColor = (connectedCount == pinCount) ? VsrtColor.darkGreen : VsrtColor.darkOrange; 
 		}
 		
@@ -200,5 +200,9 @@ public class QTreeElement extends QTreeWidgetItem{
 	 */
 	public boolean pinsPlaced() {
 		return treePinMap.values().stream().anyMatch(p -> p.isPlaced());
+	}
+	
+	public int getPinCount() {
+		return this.in_pins.size() + this.out_pins.size();
 	}
 }
