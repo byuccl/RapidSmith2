@@ -119,7 +119,7 @@ public class AddWireCommand extends QUndoCommand {
 		if (wire2 != null){
 			wire2.addWireToScene(scene);
 			wire2.undoRemoveWire();
-			wire2.disconnect();
+			wire2.connect();
 		}
 		this.scene.updateTreeView(wire1.getTreePinStart(), wire1.getTreePinEnd());
 	}

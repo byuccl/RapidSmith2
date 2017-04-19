@@ -535,6 +535,8 @@ public class VSRTool extends QMainWindow {
 								  this.directory + File.separator + this.site_select.getSiteLocation());
 		}
 		
+		singleBelMode = false;
+		this.element_view.setSingleBelMode(false, scene);
 		this.scene.resetScene();
 		this.element_view.clear_all();
 		this.left_tab.setCurrentIndex(0);

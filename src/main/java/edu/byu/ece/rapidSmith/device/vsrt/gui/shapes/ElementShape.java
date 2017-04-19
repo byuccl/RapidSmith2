@@ -205,18 +205,7 @@ public abstract class ElementShape extends QGraphicsItem{
 				double offsetX = (remX < pin_width/2) ? remX : -(pin_width - remX) ;
 				double offsetY = (remY < pin_width/2) ? remY : -(pin_width - remY) ;
 				
-				//making sure pins do not overlap
-				if (remX < pin_width / 2) {
-					this.setPos(this.pos().x() - pin_width/2, this.pos().y());
-					colliding = this.checkCollisions();
-					this.setPos(this.pos().x() + pin_width/2, this.pos().y());
-				}
-				else {
-					this.setPos(this.pos().x() + pin_width/2, this.pos().y());
-					colliding = this.checkCollisions();
-					this.setPos(this.pos().x() - pin_width/2, this.pos().y());
-				}
-				if ( colliding ) {
+				if (checkCollisionsX(remX) || checkCollisionsY(remY)) {
 					this.setPos(last_pos);
 				}
 				else { this.setPos(new QPointF(this.pos().x() - offsetX, this.pos().y() - offsetY)); }					
@@ -240,6 +229,52 @@ public abstract class ElementShape extends QGraphicsItem{
 				popup_menu.addAction(new QIcon(VSRTool.getImagePath("bel.png")), "Bel Config Options", this,  "showConfig()"); 
 			popup_menu.popup(event.screenPos());
 		}
+	}
+	
+	/**
+	 * Two Elements are not allowed to be placed directly next to each other (so that their pins are touching).
+	 * This function returns true if the left or right edges of an element are two close to one another.
+	 * 
+	 * @param remX 
+	 * @return {@code true} if this element is too close to another element in the X direction. {@code false} otherwise.
+	 */
+	private boolean checkCollisionsX(double remX) {
+		boolean colliding = false;
+		//making sure pins do not overlap
+		if (remX < pin_width / 2) {
+			this.setPos(this.pos().x() - pin_width/2, this.pos().y());
+			colliding = this.checkCollisions();
+			this.setPos(this.pos().x() + pin_width/2, this.pos().y());
+		}
+		else {
+			this.setPos(this.pos().x() + pin_width/2, this.pos().y());
+			colliding = this.checkCollisions();
+			this.setPos(this.pos().x() - pin_width/2, this.pos().y());
+		}
+		return colliding; 
+	}
+	
+	/**
+	 * Two Elements are not allowed to be placed directly next to each other (so that their pins are touching).
+	 * This function returns true if the top or bottom edges of an element are two close to one another.
+	 * 
+	 * @param remX 
+	 * @return {@code true} if this element is too close to another element in the Y direction. {@code false} otherwise.
+	 */
+	private boolean checkCollisionsY(double remY) {
+		boolean colliding = false;
+		//making sure pins do not overlap
+		if (remY < pin_width / 2) {
+			this.setPos(this.pos().x(), this.pos().y() - pin_width/2);
+			colliding = this.checkCollisions();
+			this.setPos(this.pos().x(), this.pos().y() + pin_width/2);
+		}
+		else {
+			this.setPos(this.pos().x(), this.pos().y() + pin_width/2);
+			colliding = this.checkCollisions();
+			this.setPos(this.pos().x(), this.pos().y() - pin_width/2);
+		}
+		return colliding; 
 	}
 	
 	public void hideWires() {

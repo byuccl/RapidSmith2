@@ -466,7 +466,7 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 	 * @param element
 	 */
 	public void addElementToScene(QTreeWidgetItem element){
-		
+		System.out.println("hello");
 		// In single bel mode, only allow pins and site pips to be added to the scene.
 		if (VSRTool.singleBelMode && (element instanceof QTreePin)) {
 			//if (element instanceof QTreePin) {
@@ -619,13 +619,23 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 	 * @param point {@link QPointF} to look
 	 */
 	public QGraphicsItemInterface getElementAtPoint(QPointF point) {
-			
+		
 		for (QGraphicsItemInterface item : items(point.x(),point.y(),1,1) ) {
+			System.out.println("\t" + item.getClass());
 			if ((item instanceof ElementShape) || (item instanceof PinShape)) {
 				return item;
 			}
 		}
-	
+		
+		// Hack for QT bug. For some reason, when a element has been rotated
+		// 270 degrees (so the input pins are facing down), the for loop above does not
+		// include the nearest bel or site_pip. This loop, however, does 
+		for (QGraphicsItemInterface item : items(point.x(),point.y()-1,1,1) ) {
+			if ((item instanceof ElementShape) || (item instanceof PinShape)) {
+				return item;
+			}
+		}
+		
 		return null;
 	}
 	
