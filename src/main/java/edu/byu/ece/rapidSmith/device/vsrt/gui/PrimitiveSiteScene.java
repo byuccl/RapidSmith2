@@ -494,7 +494,7 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 				this.parent.getToolBar().untoggleAll();
 			}
 		}
-		else  { // add a BEL / site pip 
+		else if (element instanceof QTreeElement) { // add a BEL / site pip 
 			QTreeElement tmp = (QTreeElement) element;
 			
 			// do not add the element if either (1) it has already been placed, or (2) any of its pins have already been placed

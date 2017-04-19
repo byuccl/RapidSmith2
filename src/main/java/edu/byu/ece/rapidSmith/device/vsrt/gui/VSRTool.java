@@ -348,7 +348,6 @@ public class VSRTool extends QMainWindow {
 	private void openSite(String family, String site_name, boolean siteSaved){
 		this.setCursor(new QCursor( CursorShape.WaitCursor) );
 		//enabling/disabling parts of the GUI once a site has been selected
-		this.tool_bar.setGenerate(this.element_view.getbels().topLevelItemCount() == 1);
 		this.tool_bar.enableConfigs(true);
 		this.left_tab.setCurrentIndex(1);
 		this.site_select.setEnabled(false);
@@ -543,7 +542,6 @@ public class VSRTool extends QMainWindow {
 		this.view.setEnabled(false);
 		this.menu_bar.enableShowConfigs(false);
 		this.site_select.setEnabled(true);
-		this.tool_bar.setGenerate(false);
 		this.tool_bar.enableConfigs(false);
 		this.undoStack.clear();
 		this.tool_bar.setEnabled(false);

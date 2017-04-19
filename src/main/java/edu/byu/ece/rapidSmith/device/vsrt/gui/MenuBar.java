@@ -32,7 +32,6 @@ public class MenuBar extends QMenuBar{
 	private QAction redo;
 	private QAction undo; 
 	private QUndoStack undoStack;
-	private QAction generateOneBel;
 	private QAction save;
 	private VSRTool parent;
 	
@@ -86,17 +85,13 @@ public class MenuBar extends QMenuBar{
 		closeSite = new QAction( new QIcon(VSRTool.getImagePath("closePrimitiveSite.png")), "Close Site", this );
 		closeSite.triggered.connect(this, "closeSite()");
 		closeSite.setVisible(false);
-		
-		generateOneBel = new QAction( new QIcon(VSRTool.getImagePath("connect2.png")), "Generate One Bel Connections", this );
-		generateOneBel.triggered.connect(this.parent, "generateAllOneBelConnections()");
-		
+				
 		//Adding everything to the file menu
 		file = this.addMenu("&File");
 		file.addAction(save);
 	    //file.addAction(Import);
 	    file.addSeparator();
 	    file.addAction(closeSite);
-	    file.addAction(generateOneBel);
 	    view = file.addMenu("&View");
 	    view.setIcon(new QIcon(VSRTool.getImagePath("view.png")));
 	    view.addAction(viewSiteConfig);
@@ -153,14 +148,11 @@ public class MenuBar extends QMenuBar{
 	 */
 	@SuppressWarnings("unused")
 	private void displayAbout(){
-		// TODO: Change this link to point to online documentation rather than github master branch
-		QMessageBox.about(this, "Vivado Subsite Routing Tool", tr("This tool is designed to generate connections "
-								+ "between bels on the primitive site level in a quick and easy manner. "
-								+ "Once the TCL script 'GetAllPrimitiveDefs' has been run, "
-								+ "simply import the generated directory, choose an architecture, "
-								+ "a primitive site, and draw the connections! Read the "
-								+ "<a href=\"https://github.com/byuccl/RapidSmith2/tree/master/doc\"> VSRT User Guide</a> "
-								+ "to learn more."));
+		QMessageBox.about(this, "Vivado Subsite Routing Tool", tr("This tool is designed to help users generate sub-site connections "
+								+ "for Vivado FPGA devices, and create valid Primitive Definition files from those connections. "
+								+ "<a href=\"https://github.com/byuccl/tincr\">Tincr</a>, a Vivado Tcl plugin, is required to run VSRT. "
+								+ "Read the <a href=\"https://github.com/byuccl/RapidSmith2/tree/master/doc\"> VSRT User Guide</a> "
+								+ "for more information about how to use the tool."));
 	}
 	
 	/**
@@ -180,7 +172,6 @@ public class MenuBar extends QMenuBar{
 		this.viewSiteConfig.setEnabled(enable);
 		this.save.setEnabled(enable);
 		this.closeSite.setVisible(enable);
-		this.generateOneBel.setEnabled(!enable);
 	}
 	
 	/**
