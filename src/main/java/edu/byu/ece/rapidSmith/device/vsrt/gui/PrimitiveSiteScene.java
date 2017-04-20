@@ -222,6 +222,9 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 			}
 			else if ( this.itemsMoving ) { 
 				
+				// reset the Z values of the moving items to their default value (1)
+				this.selectedItems().forEach(item -> item.setZValue(1));
+				
 				MoveCommand move = new MoveCommand(this, (ArrayList<QGraphicsItemInterface>) this.selectedItems());
 				if (move.shouldPushMove()) {
 					this.undoStack.push(move);
@@ -313,8 +316,9 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 		if ( event.button() == MouseButton.LeftButton ) {
 			start = event.scenePos();
 			
-			if ( this.itemAt( event.scenePos() ) instanceof ElementShape || this.itemAt( event.scenePos() ) instanceof PinShape )
+			if ( this.itemAt( event.scenePos() ) instanceof ElementShape || this.itemAt( event.scenePos() ) instanceof PinShape ) {
 				this.itemClicked = true; 
+			}
 			
 			if (this.should_draw_wire )	{
 		
@@ -351,9 +355,11 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 				}
 			}
 			
-			if (this.itemClicked) 
+			if (this.itemClicked && !itemsMoving) {
 				this.itemsMoving = true;
-		
+				// temporarily change the Z values of moving items so that they display over all other items.
+				this.selectedItems().forEach(item -> item.setZValue(2));
+			}
 		}
 	}
 	

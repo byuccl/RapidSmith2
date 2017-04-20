@@ -51,7 +51,6 @@ public class AddBelCommand extends QUndoCommand {
 		PrimitiveDefPin outputPin = new PrimitiveDefPin();
 		outputPin.setDirection(PrimitiveDefPinDirection.OUTPUT);
 		String pinName = isVcc ? "P" : "G";
-		outputPin.setExternalName(pinName);
 		outputPin.setInternalName(pinName);
 		
 		belElement.addPin(outputPin);
