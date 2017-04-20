@@ -466,7 +466,7 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 	 * @param element
 	 */
 	public void addElementToScene(QTreeWidgetItem element){
-		System.out.println("hello");
+		
 		// In single bel mode, only allow pins and site pips to be added to the scene.
 		if (VSRTool.singleBelMode && (element instanceof QTreePin)) {
 			//if (element instanceof QTreePin) {
@@ -621,7 +621,6 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 	public QGraphicsItemInterface getElementAtPoint(QPointF point) {
 		
 		for (QGraphicsItemInterface item : items(point.x(),point.y(),1,1) ) {
-			System.out.println("\t" + item.getClass());
 			if ((item instanceof ElementShape) || (item instanceof PinShape)) {
 				return item;
 			}
