@@ -19,7 +19,9 @@ import com.trolltech.qt.gui.QWidget;
  * @author Thomas Townsend
  * Created: Jun 10, 2014 3:36:10 PM
  */
-public class Pip extends ElementShape {
+public class Pip extends ElementShape {	
+	QPolygonF shape;
+		
 	/**
 	 * Initializes the PIP object
 	 * @param element QTreeElement that this drawn pip represents
@@ -27,8 +29,6 @@ public class Pip extends ElementShape {
 	 * 					the distance between adjacent pip pins
 	 * @param start The starting location of the PIP 
 	 */
-	
-	QPolygonF shape;
 	public Pip (QTreeElement element, double pin_width, QPointF start) {
 		super(element, pin_width, start, false);
 		
@@ -98,6 +98,8 @@ public class Pip extends ElementShape {
 	@Override
 	public void paint(QPainter painter, QStyleOptionGraphicsItem item, QWidget widget) {
 		// TODO Auto-generated method stub
+		
+		painter.setPen(getBorderColor());
 		if ( this.isSelected() ) {
 			painter.setBrush(VsrtColor.blue);
 			painter.drawPolygon(shape);	
@@ -106,8 +108,8 @@ public class Pip extends ElementShape {
 		}
 		else {
 			painter.setBrush(VsrtColor.green);
-			painter.setPen(VsrtColor.black);
 			painter.drawPolygon(shape);	
+			painter.setPen(VsrtColor.black);
 			painter.drawText(0, (int)this.height, (int)this.width, (int)pin_width/2, AlignmentFlag.AlignTop.value(), element.getElement().getName());
 		}
 		

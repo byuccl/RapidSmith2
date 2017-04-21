@@ -25,7 +25,7 @@ public class Bel extends ElementShape{
 	
 	/**Bounding shape where the item can be selected */	
 	QRectF shape;
-	
+		
 	/**
 	 * Initializes the Bel object
 	 * @param element  QTreeElement that this drawn bel represents
@@ -50,6 +50,8 @@ public class Bel extends ElementShape{
 		this.setPos(startingPos);
 		
 		shape = new QRectF(0,0, (int)this.width, (int)this.height);
+		// border: 1px solid white 
+		
 		path.addRect(shape);
 		this.setCacheMode(CacheMode.DeviceCoordinateCache);		
 		
@@ -71,23 +73,22 @@ public class Bel extends ElementShape{
 	public void paint(QPainter painter, QStyleOptionGraphicsItem item, QWidget widget) {
 		//painter.rotate(90);
 		// TODO Auto-generated method stub
+		painter.setPen(getBorderColor());
 		if ( this.isSelected() ) {
+			
 			painter.setBrush(VsrtColor.blue);
 			painter.drawRect(shape);
+			painter.setPen(VsrtColor.black);
 			painter.drawText(0, (int)this.height, (int)this.width, (int)pin_width/2, AlignmentFlag.AlignTop.value(), element.getElement().getName());
 			painter.setPen(VsrtColor.white);
 		}
 		else {
 			painter.setBrush(VsrtColor.yellow);
-			painter.setPen(VsrtColor.black);
 			painter.drawRect(shape);
+			painter.setPen(VsrtColor.black);
 			painter.drawText(0, (int)this.height, (int)this.width, (int)pin_width/2, AlignmentFlag.AlignTop.value(), element.getElement().getName());
 		}
-		
-		//Right now, the shape of a bel is just a rectangle
-		//painter.drawRect(shape);	
-		
-		
+				
 		//only draw bel and pin names if the device view is zoomed in enough that they can be read
 		if ( ((PrimitiveSiteScene)this.scene()).get_ViewZoom() > .3 ){ 
 
@@ -95,7 +96,7 @@ public class Bel extends ElementShape{
 			//draw the input pin names in white in their corresponding position (left justified)
 			int i = 1;
 			
-			for (QTreePin pin : (this.rotationAngle==180) ? element.getOut_pins() :element.getIn_pins()) { 
+			for (QTreePin pin : (this.rotationAngle==180) ? element.getOut_pins() : element.getIn_pins()) { 
 				//helps user see which pins are of type inout.
 				if (pin.getPin().getDirection() == PrimitiveDefPinDirection.INOUT)
 					painter.setPen(VsrtColor.darkGray);
@@ -108,6 +109,10 @@ public class Bel extends ElementShape{
 			painter.setLayoutDirection(LayoutDirection.RightToLeft);
 			for (QTreePin pin : (this.rotationAngle==180) ? element.getIn_pins() :element.getOut_pins()) {
 					double xPos = this.width/2; 
+					
+					if (pin.getPin().getDirection() == PrimitiveDefPinDirection.INOUT)
+						painter.setPen(VsrtColor.darkGray);
+					
 					painter.drawText(new QRectF(xPos,(int)( i*(pin_width/2) ), width-xPos, pin_width)
 								, AlignmentFlag.AlignVCenter.value(), pin.get_pinName() );
 				i += 2;

@@ -24,6 +24,8 @@
 package edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.trolltech.qt.core.Qt.MouseButton;
 import com.trolltech.qt.gui.QGraphicsItemInterface;
@@ -33,7 +35,9 @@ import com.trolltech.qt.gui.QGraphicsItem.GraphicsItemFlag;
 
 import edu.byu.ece.rapidSmith.device.vsrt.gui.PrimitiveSiteScene;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreePin;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.VSRTool;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.ElementShape;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.PinShape;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.Wire;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.WirePart;
 
@@ -59,7 +63,7 @@ public class RemoveCommand extends QUndoCommand {
 		int itemCount = 0;
 		String itemName = null;
 		//making sure all of the wires attached to bels are accounted for, so they can be re-added when necessary
-		ArrayList<QGraphicsItemInterface> unaccountedWires = new ArrayList<QGraphicsItemInterface>();
+		Set<QGraphicsItemInterface> unaccountedWires = new HashSet<QGraphicsItemInterface>();
 		for (QGraphicsItemInterface item : items) {
 			if ( item instanceof ElementShape ) {
 				for (QTreePin pin : ((ElementShape) item).getTreeElement().get_allPins()) {
@@ -97,6 +101,9 @@ public class RemoveCommand extends QUndoCommand {
 				if ( items.get(i).scene() != null )
 					((WirePart) items.get(i)).getParentWire().removeWire();
 			}
+			else if(items.get(i) instanceof PinShape && VSRTool.singleBelMode) {
+				((PinShape)items.get(i)).deletePin();
+			}
 		}	
 		this.scene.update();
 	}
@@ -111,10 +118,11 @@ public class RemoveCommand extends QUndoCommand {
 		boolean itemsMovable = !scene.shouldDelete() && !scene.shouldDrawWire() && !scene.shouldZoomToView(); 
 		
 		for (QGraphicsItemInterface item : items) {
-			if ( item instanceof ElementShape || item instanceof WirePart )
-				this.scene.addItem(item);
+			//if ( item instanceof ElementShape || item instanceof WirePart ||  )
+			//	this.scene.addItem(item);
 		
 			if (item instanceof ElementShape){
+				this.scene.addItem(item);
 				((ElementShape)item).getTreeElement().setIsPlaced(true);
 				
 				QGraphicsSceneMouseEvent mouseEvent = new QGraphicsSceneMouseEvent();
@@ -127,8 +135,23 @@ public class RemoveCommand extends QUndoCommand {
 				item.setFlag( GraphicsItemFlag.ItemIsSelectable, itemsMovable );
 			}
 			else if (item instanceof WirePart ){
+				this.scene.addItem(item);
 				((WirePart) item).getParentWire().undoRemoveWire();
-			}		
+			}
+			else if (item instanceof PinShape && VSRTool.singleBelMode) {
+				this.scene.addItem(item);
+				PinShape pinShape = (PinShape) item;
+				pinShape.getTreePin().setIsPlaced(true);
+				
+				QGraphicsSceneMouseEvent mouseEvent = new QGraphicsSceneMouseEvent();
+				mouseEvent.setPos(item.pos());
+				mouseEvent.setButton(MouseButton.LeftButton);
+				//used to update pin positions on the graphics view
+				pinShape.mouseReleaseEvent( mouseEvent );
+				//making items movable/not movable based on the current conditions of the graphics scene 
+				pinShape.setFlag( GraphicsItemFlag.ItemIsMovable, itemsMovable ) ;
+				pinShape.setFlag( GraphicsItemFlag.ItemIsSelectable, itemsMovable );
+			}
 		}
 	}
 }

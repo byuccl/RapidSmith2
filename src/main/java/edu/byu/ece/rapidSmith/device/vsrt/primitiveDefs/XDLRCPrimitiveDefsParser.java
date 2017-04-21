@@ -93,6 +93,12 @@ public class XDLRCPrimitiveDefsParser {
 		def.setType(PrimitiveType.valueOf(name));
 		int pinCount = Integer.parseInt(tokens[2]);
 		int elementCount = Integer.parseInt(tokens[3]);
+		
+		// primitive defs with # SBS tags are marked as single bel sites
+		if (tokens.length > 4 ) {
+			def.setIsSingleBelSite(tokens[4].equals("#SBS"));
+		}
+		
 		ArrayList<PrimitiveDefPin> pins = new ArrayList<PrimitiveDefPin>(pinCount);
 		ArrayList<Element> elements = new ArrayList<Element>(elementCount);
 		
@@ -112,8 +118,8 @@ public class XDLRCPrimitiveDefsParser {
 			processed.add(name);
 		}
 		
-		if (def.belCount() == 1)
-			def.initializeOneBelPrimitiveDef(this.isAlternate);
+		//if (def.belCount() == 1)
+		//	def.initializeOneBelPrimitiveDef(this.isAlternate);
 	}
 	
 	private PrimitiveDefPin parsePrimitiveDefPin() {
@@ -152,7 +158,8 @@ public class XDLRCPrimitiveDefsParser {
 			e.setName(tokens[1]);
 			int elementPinCount = Integer.parseInt(tokens[2].replace(")", ""));
 			e.setBel(tokens.length >= 5 && tokens[3].equals("#") && tokens[4].equals("BEL"));
-		
+			e.setIsTest(e.isBel() && tokens.length >=6 && tokens[5].equals("TEST"));
+						
 			//This can be optimized
 			for (PrimitiveDefPin pin : pins) {
 				if ( e.getName().equals(pin.getInternalName()) ) {
@@ -197,7 +204,6 @@ public class XDLRCPrimitiveDefsParser {
 			this.lastElement = e;
 			return e;
 		}
-
 	}
 
 	/**

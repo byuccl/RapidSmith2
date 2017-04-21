@@ -11,6 +11,7 @@ import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.ResizeSiteCommand;
 import edu.byu.ece.rapidSmith.device.vsrt.primitiveDefs.PrimitiveDefPinDirection;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import com.trolltech.qt.core.QPointF;
@@ -65,7 +66,9 @@ public class Site extends QGraphicsItem {
 
 		this.undo = undo;
 		this.pin_width = scene.getSquare_size();
-		this.addPins(pins);
+		if (!VSRTool.singleBelMode) {
+			this.addPins(pins);
+		}
 		popupMenu  = new QMenu();
 		popupMenu.addAction(new QIcon(VSRTool.getImagePath("gear.png")), "Site Config Options", this,  "showSiteConfig()"); 
 		
@@ -75,10 +78,16 @@ public class Site extends QGraphicsItem {
 			this.setPos(xml.getGraphicsSitePos());
 			scene.setSceneRect(new QRectF(0, 0,  2* this.x() + width , height+1200));
 		}
-		else{ //initialize the site 
-			height = (inPins.size() > outPins.size()) ? 2*((double)(inPins.size()+1)*pin_width) : 
+		else{ //initialize the site
+			if (!VSRTool.singleBelMode) {
+				height = (inPins.size() > outPins.size()) ? 2*((double)(inPins.size()+1)*pin_width) : 
 														2*((double)(outPins.size()+1)*pin_width) ;
-			width = 2*height;
+				width = 2*height;
+			}
+			else {
+				height = 2000;
+				width = 2000;
+			}
 			scene.setSceneRect(new QRectF(0, 0, width + 1200, height+1200));
 			this.setPos(scene.sceneRect().x() + (scene.sceneRect().width()-width)/2, 
 					scene.sceneRect().y() + (scene.sceneRect().height()-height)/2 );
@@ -90,8 +99,11 @@ public class Site extends QGraphicsItem {
 		
 		//Adding corner resize boxes
 		this.initializeResizeBoxes(scene);
-				
-		this.placePinsOnScene(pinsSaved, xml);
+		
+		// Only place site pins if we are not running in single bel mode
+		if (!VSRTool.singleBelMode) {
+			this.placePinsOnScene(pinsSaved, xml);
+		}
 		
 		shape = new QRectF(0,0, (int)this.width, (int)this.height);
 		
@@ -172,7 +184,7 @@ public class Site extends QGraphicsItem {
 	private void addPins(ArrayList<QTreePin> pins){
 		
 		for (QTreePin pin : pins) {
-			PinShape tmp = new PinShape(pin, pin_width);
+			PinShape tmp = new PinShape(pin, pin_width, true);
 			if( pin.getPin().getDirection() == PrimitiveDefPinDirection.OUTPUT ) {
 				this.inPins.add(tmp);
 			}
@@ -205,10 +217,12 @@ public class Site extends QGraphicsItem {
 		pin.setPinPos(pinPos);
 		
 		//adding pin to the site arrays
-		if( pin.getTreePin().getPin().getDirection() == PrimitiveDefPinDirection.OUTPUT )
-			this.inPins.add(pin);
-		else 
-			this.outPins.add(pin);
+		if (!VSRTool.singleBelMode) {
+			if( pin.getTreePin().getPin().getDirection() == PrimitiveDefPinDirection.OUTPUT )
+				this.inPins.add(pin);
+			else 
+				this.outPins.add(pin);
+		}
 		
 		//adding it to this hashmap as well
 		this.pin2graphics.put(pin.getTreePin(), pin);
@@ -386,5 +400,8 @@ public class Site extends QGraphicsItem {
 	}
 	public void pushSiteResizeCommand(ResizeSiteCommand cmd){
 		this.undo.push(cmd);
+	}
+	public Collection<PinShape> getGraphicsPins() {
+		return this.pin2graphics.values();
 	}
 }

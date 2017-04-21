@@ -1,6 +1,8 @@
 package edu.byu.ece.rapidSmith.device.vsrt.gui.shapes;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import edu.byu.ece.rapidSmith.device.vsrt.gui.PrimitiveSiteScene;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreeElement;
@@ -11,6 +13,7 @@ import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.RemoveCommand;
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.Qt.MouseButton;
+import com.trolltech.qt.gui.QColor;
 import com.trolltech.qt.gui.QFont;
 import com.trolltech.qt.gui.QFontMetrics;
 import com.trolltech.qt.gui.QGraphicsItem;
@@ -50,6 +53,8 @@ public abstract class ElementShape extends QGraphicsItem{
 	protected QPainterPath path = new QPainterPath();
 	/**Rotation of the object (valid values are 0, 90, 180, and 270)*/
 	protected double rotationAngle =  0;
+	/** Wire objects that are connected to the Bel */
+	protected Set<Wire> connectedWires = new HashSet<Wire>();
 	
 	public QTreeElement getTreeElement(){
 		return this.element;  
@@ -200,18 +205,7 @@ public abstract class ElementShape extends QGraphicsItem{
 				double offsetX = (remX < pin_width/2) ? remX : -(pin_width - remX) ;
 				double offsetY = (remY < pin_width/2) ? remY : -(pin_width - remY) ;
 				
-				//making sure pins do not overlap
-				if (remX < pin_width / 2) {
-					this.setPos(this.pos().x() - pin_width/2, this.pos().y());
-					colliding = this.checkCollisions();
-					this.setPos(this.pos().x() + pin_width/2, this.pos().y());
-				}
-				else {
-					this.setPos(this.pos().x() + pin_width/2, this.pos().y());
-					colliding = this.checkCollisions();
-					this.setPos(this.pos().x() - pin_width/2, this.pos().y());
-				}
-				if ( colliding ) {
+				if (checkCollisionsX(remX) || checkCollisionsY(remY)) {
 					this.setPos(last_pos);
 				}
 				else { this.setPos(new QPointF(this.pos().x() - offsetX, this.pos().y() - offsetY)); }					
@@ -224,12 +218,76 @@ public abstract class ElementShape extends QGraphicsItem{
 		else if (event.button() == MouseButton.RightButton) {
 			QMenu popup_menu = new QMenu();
 			popup_menu.addAction(new QIcon(VSRTool.getImagePath("trash.png")), "Remove", this, "sendRemoveElementCommand()"); //delete bel option
+			
+			if (isConnected()) {
+				popup_menu.addAction(new QIcon(VSRTool.getImagePath("hideWires.png")), "Hide Wires", this, "hideWires()");
+				popup_menu.addAction(new QIcon(VSRTool.getImagePath("showWires.png")), "Show Wires", this, "showWires()");
+			}
+			
+			
 			if (this instanceof Bel)
 				popup_menu.addAction(new QIcon(VSRTool.getImagePath("bel.png")), "Bel Config Options", this,  "showConfig()"); 
 			popup_menu.popup(event.screenPos());
 		}
 	}
-
+	
+	/**
+	 * Two Elements are not allowed to be placed directly next to each other (so that their pins are touching).
+	 * This function returns true if the left or right edges of an element are two close to one another.
+	 * 
+	 * @param remX 
+	 * @return {@code true} if this element is too close to another element in the X direction. {@code false} otherwise.
+	 */
+	private boolean checkCollisionsX(double remX) {
+		boolean colliding = false;
+		//making sure pins do not overlap
+		if (remX < pin_width / 2) {
+			this.setPos(this.pos().x() - pin_width/2, this.pos().y());
+			colliding = this.checkCollisions();
+			this.setPos(this.pos().x() + pin_width/2, this.pos().y());
+		}
+		else {
+			this.setPos(this.pos().x() + pin_width/2, this.pos().y());
+			colliding = this.checkCollisions();
+			this.setPos(this.pos().x() - pin_width/2, this.pos().y());
+		}
+		return colliding; 
+	}
+	
+	/**
+	 * Two Elements are not allowed to be placed directly next to each other (so that their pins are touching).
+	 * This function returns true if the top or bottom edges of an element are two close to one another.
+	 * 
+	 * @param remX 
+	 * @return {@code true} if this element is too close to another element in the Y direction. {@code false} otherwise.
+	 */
+	private boolean checkCollisionsY(double remY) {
+		boolean colliding = false;
+		//making sure pins do not overlap
+		if (remY < pin_width / 2) {
+			this.setPos(this.pos().x(), this.pos().y() - pin_width/2);
+			colliding = this.checkCollisions();
+			this.setPos(this.pos().x(), this.pos().y() + pin_width/2);
+		}
+		else {
+			this.setPos(this.pos().x(), this.pos().y() + pin_width/2);
+			colliding = this.checkCollisions();
+			this.setPos(this.pos().x(), this.pos().y() - pin_width/2);
+		}
+		return colliding; 
+	}
+	
+	public void hideWires() {
+		connectedWires.forEach(w -> w.hideWire());
+	}
+	
+	public void showWires() {
+		connectedWires.forEach(w -> w.showWire());
+	}
+	
+	private boolean isConnected() {
+		return this.connectedWires.size() > 0;
+	}
 	
 	/**
 	 * Redraws the wires connected to each pin of the element as the element is being moved 
@@ -375,5 +433,23 @@ public abstract class ElementShape extends QGraphicsItem{
 	}
 	public void setRotationAngle(double angle){
 		this.rotationAngle = angle; 
+	}
+	
+	public String getName() {
+		return element.getElement().getName();
+	}
+	
+	public void connectToWire(Wire w) {
+		assert(!this.connectedWires.contains(w));
+		this.connectedWires.add(w);
+	}
+	
+	public void disconnectWire(Wire w) {
+		assert(this.connectedWires.contains(w));
+		this.connectedWires.remove(w);
+	}
+	
+	protected QColor getBorderColor(){
+		return element.getBorderColor();
 	}
 }

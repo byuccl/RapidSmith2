@@ -24,6 +24,7 @@
 package edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands;
 
 import com.trolltech.qt.core.QPointF;
+import com.trolltech.qt.gui.QGraphicsItemInterface;
 import com.trolltech.qt.gui.QTreeWidgetItem;
 import com.trolltech.qt.gui.QUndoCommand;
 
@@ -56,12 +57,18 @@ public class AddWireCommand extends QUndoCommand {
 	public AddWireCommand (PrimitiveSiteScene scene, QTreePin start_pin, QTreePin end_pin, QPointF start, QPointF end){
 		this.scene = scene; 
 		
+		QGraphicsItemInterface startItem = scene.getElementAtPoint(start);
+		QGraphicsItemInterface endItem = scene.getElementAtPoint(end);
+
 		//two connections need to be generated for pins that are both of type inout
 		if (start_pin.getPin().getDirection() == PrimitiveDefPinDirection.INOUT 
 				&& end_pin.getPin().getDirection()==PrimitiveDefPinDirection.INOUT) {
 			wire1 = new Wire(start, end);
 			wire2 = new Wire(start, end);
-			
+					
+			wire1.setShapeConnections(startItem, endItem);
+			wire2.setShapeConnections(startItem, endItem);
+					
 			QTreeWidgetItem conn1 = new QTreeWidgetItem(start_pin);
 			QTreeWidgetItem conn2 = new QTreeWidgetItem(start_pin);
 							
@@ -83,6 +90,8 @@ public class AddWireCommand extends QUndoCommand {
 		}
 		else {//if ((start_pin.getPin().getDirection() != end_pin.getPin().getDirection())) {	
 			wire1 = new Wire(start, end);
+						
+			wire1.setShapeConnections(startItem, endItem);
 			
 			//Create the connection on the start pin
 			QTreeWidgetItem tmp = new QTreeWidgetItem(start_pin); 
@@ -106,10 +115,13 @@ public class AddWireCommand extends QUndoCommand {
 	public void redo(){
 		wire1.addWireToScene(scene);
 		wire1.undoRemoveWire();
+		wire1.connect();
 		if (wire2 != null){
 			wire2.addWireToScene(scene);
 			wire2.undoRemoveWire();
+			wire2.connect();
 		}
+		this.scene.updateTreeView(wire1.getTreePinStart(), wire1.getTreePinEnd());
 	}
 	
 	/**
@@ -118,7 +130,11 @@ public class AddWireCommand extends QUndoCommand {
 	@Override 
 	public void undo(){
 		wire1.removeWire();
-		if(wire2 != null)
+		wire1.disconnect();
+		
+		if(wire2 != null) {
 			wire2.removeWire();
+			wire2.disconnect();
+		}
 	}
 }

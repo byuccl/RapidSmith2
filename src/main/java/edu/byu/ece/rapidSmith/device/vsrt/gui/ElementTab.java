@@ -3,7 +3,9 @@ package edu.byu.ece.rapidSmith.device.vsrt.gui;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
+import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.AddBelCommand;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.AddSitePinGroupCommand;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.DeleteElementPinCommand;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.DeleteSitePinCommand;
@@ -53,8 +55,7 @@ public class ElementTab extends QWidget {
 	private boolean underPip = false;
 	/**Undo stack to push commands onto*/
 	private QUndoStack undoStack;
-	
-	
+		
 	/*************************************************************************************
 	 *	Initialization -- methods used to initialize the element tab and its components  *
 	 *************************************************************************************/
@@ -87,8 +88,16 @@ public class ElementTab extends QWidget {
 		bels = new QTreeWidget();
 		bels.setColumnCount(1);
 		bels.setStyleSheet("selection-background-color: blue");
-		bels.setHeaderLabel("Bels");
+		//bels.setHeaderLabel("Bels");
 		bels.setAlternatingRowColors(true);
+		
+		QTreeWidgetItem belHeader = new QTreeWidgetItem();
+		belHeader.setText(0, "  Bels");
+		belHeader.setIcon(0, new QIcon(VSRTool.getImagePath("add.gif")));
+		bels.setHeaderItem(belHeader);
+		bels.header().setClickable(true);
+		bels.header().sectionClicked.connect(this, "checkBelHeaderClick()");
+		
 		bels.setContextMenuPolicy(ContextMenuPolicy.CustomContextMenu);
 		bels.customContextMenuRequested.connect(this, "showDeleteElementPinMenu()");
 	
@@ -113,7 +122,7 @@ public class ElementTab extends QWidget {
 		pips.itemDoubleClicked.connect(scene, "addElementToScene(QTreeWidgetItem)");
 		bels.itemClicked.connect(scene, "selectItemInScene(QTreeWidgetItem)");
 		pips.itemClicked.connect(scene, "selectItemInScene(QTreeWidgetItem)");
-		
+				
 		//Some additional settings for the tree
 		bels.setExpandsOnDoubleClick(false);
 		pips.setExpandsOnDoubleClick(false);
@@ -125,18 +134,24 @@ public class ElementTab extends QWidget {
 	 * for the currently selected primitive site
 	 * @param def Primitive Definition that contains all of the bel, pin, and pip info
 	 */
-	public String generate_elements(PrimitiveDef def, XMLCommands xml, boolean saveFileExists ) {
+	public void generate_elements(PrimitiveDef def, XMLCommands xml, boolean saveFileExists) {
 		
 		this.clear_all();
 		QTreeWidgetItem tmp;
-				
+		Map<String, Element> sitePinElementMap = new HashMap<String, Element>();
+		
 		//Generate bel, site pin, and site pip info. 
 		for (Element element : def.getElements()) {
 			if( element.isBel() )
 			{
 				tmp = new QTreeElement(bels, element);
 				tmp.setText(0, element.getName());
-				tmp.setForeground(0, text_brush);
+				if (element.pinCount() == 0) {
+					tmp.setForeground(0, new QBrush(VsrtColor.darkGreen));
+				}
+				else {
+					tmp.setForeground(0, text_brush);
+				}
 				
 				if (saveFileExists) {
 					QPointF savedLocation = xml.getSavedElementLocation(element.getName());
@@ -144,7 +159,6 @@ public class ElementTab extends QWidget {
 						parent.getScene().addSavedElementToScene(tmp, savedLocation, xml.getSavedElementRotation(element.getName()));
 					}
 				}
-				
 			}
 			else if( element.isPin() ) {
 
@@ -152,6 +166,7 @@ public class ElementTab extends QWidget {
 				tmp.setText(0, element.getName());
 				tmp.setForeground(0, text_brush);
 				this.pin2ElementMap.put((QTreePin)tmp, element);
+				sitePinElementMap.put(element.getName(), element);
 				
 				//set location of the pins in the site constructor...
 				if (saveFileExists) {
@@ -160,7 +175,6 @@ public class ElementTab extends QWidget {
 						tmp.setForeground(0, new QBrush(VsrtColor.gray ) ); 
 					}
 				}
-				
 			}
 			//exclude site pips that are route-through, because they are unneeded
 			else if (!element.getName().startsWith("_ROUTE")) {
@@ -183,26 +197,37 @@ public class ElementTab extends QWidget {
 		bels.sortItems(0, SortOrder.AscendingOrder);
 		pips.sortItems(0, SortOrder.AscendingOrder);
 		
-		//If the primitive site only has one bel and no site pips then we can assume that 
-		//site pin names and bel pin names will match, and so we can automatically generate
-		//the connections if the user chooses to. 
-		if ( bels.topLevelItemCount() == 1 ){ //pips.topLevelItemCount() == 0 && 
+		// If the tool is being run in Single BEL Mode, then we add any connections
+		// in the primitive def to the tree view of the GUI
+		if (VSRTool.singleBelMode) {
+			// add bel pin connections
+			for(int i = 0; i < bels.topLevelItemCount(); i++) {
+				((QTreeElement)bels.topLevelItem(i)).addExistingConnections();
+			}
 			
-			QMessageBox generateConnections = new QMessageBox();
-			generateConnections.setWindowTitle("Generate Connections Automatically?");
-			generateConnections.setText("The Primitive Site you selcted has only one bel. "
-						+ "This means we can infer the connections of this primitive site for you! "
-						+ "Would you like us to automatically generate these connections?");
-			generateConnections.setStandardButtons(QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No);
-		
-			
-			if ( generateConnections.exec() == QMessageBox.StandardButton.Yes.value() )
-				return this.bels.topLevelItem(0).text(0);
+			// add site pip connections
+			for(int i = 0; i < pips.topLevelItemCount(); i++) { 
+				((QTreeElement)pips.topLevelItem(i)).addExistingConnections();
+			}
+			addExistingSitePinConnections(sitePinElementMap);
 		}
-		
-		return null;
 	}
 
+	private void addExistingSitePinConnections(Map<String,Element> sitePinElementMap) {
+		
+		for (int i = 0; i < pins.topLevelItemCount(); i++) {
+			QTreePin treePin = (QTreePin) pins.topLevelItem(i); 
+			Element pinEl = sitePinElementMap.get(treePin.text(0));
+			
+			for (Connection conn: pinEl.getConnections()) {
+				QTreeWidgetItem treeConn = new QTreeWidgetItem(treePin);
+				String dirString = conn.isForwardConnection() ? "==>" : "<==";
+				treeConn.setText(0, dirString + " " + conn.getElement1() + " " + conn.getPin1());
+				treePin.setForeground(0, new QBrush(VsrtColor.darkGreen));
+			}
+		}
+	}
+	
 	/********************************
 	 *	General -- General methods  *
 	 ********************************/
@@ -287,6 +312,7 @@ public class ElementTab extends QWidget {
 	private void generateBelConnections(){
 	//generate all of the bel connections
 		for (int i = 0; i < this.bels.topLevelItemCount(); i++ ){
+			((QTreeElement)this.bels.topLevelItem(i)).getElement().clearConnections();
 			for (QTreeWidgetItem pin : this.bels.topLevelItem(i).takeChildren()) {
 				ArrayList<QTreeWidgetItem> conns = (ArrayList<QTreeWidgetItem>) pin.takeChildren();
 						
@@ -313,6 +339,7 @@ public class ElementTab extends QWidget {
 	private void generatePipConnections(){
 		//generate all of the pip connections
 		for (int i = 0; i < this.pips.topLevelItemCount(); i++ ){
+			((QTreeElement)this.pips.topLevelItem(i)).getElement().clearConnections();
 			for (QTreeWidgetItem pin : this.pips.topLevelItem(i).takeChildren()) {
 				ArrayList<QTreeWidgetItem> conns = (ArrayList<QTreeWidgetItem>) pin.takeChildren();
 				
@@ -339,6 +366,8 @@ public class ElementTab extends QWidget {
 		//generate all of the pin connections
 		for (int i = 0; i < this.pins.topLevelItemCount(); i++ ){
 			QTreePin pin = (QTreePin)pins.topLevelItem(i);
+			Element pinElement = this.pin2ElementMap.get(pin);
+			pinElement.clearConnections();
 			
 			//only add connections if the pin is connected
 			if ( pin.getPin().isConnected() ) {
@@ -354,7 +383,7 @@ public class ElementTab extends QWidget {
 					conn.setPin0(pin.text(0));
 					conn.setPin1(tmp[2]);
 					
-					this.pin2ElementMap.get(pin).addConnection(conn);
+					pinElement.addConnection(conn);
 				}
 			}	
 		}
@@ -392,11 +421,53 @@ public class ElementTab extends QWidget {
 	public void showDeleteElementPinMenu(){
 		this.underPip = pips.underMouse();
 		
-		if ((underPip ? pips : bels ).selectedItems().get(0).parent() instanceof QTreeElement ) {
+		QTreeWidgetItem item = (underPip ? pips : bels ).selectedItems().get(0);
+		int numSelected = (underPip ? pips : bels ).selectedItems().size();
+		
+		if (item.parent() instanceof QTreeElement ) {
 			QMenu popupMenu = new QMenu();
-			popupMenu.addAction(new QIcon("images/trash.png"), "Delete Element Pin", this, "deleteElementPin()");
-			popupMenu.popup(QCursor.pos());		
+			popupMenu.addAction(new QIcon(VSRTool.getImagePath("trash.png")), "Delete Element Pin", this, "deleteElementPin()");
+			
+			if (numSelected == 1) {
+				popupMenu.addAction(new QIcon(""), "Mark Pin as IN", this, "changeBelPinIn()");
+				popupMenu.addAction(new QIcon(""), "Mark Pin as OUT", this, "changeBelPinOut()");
+				popupMenu.addAction(new QIcon(""), "Mark Pin as INOUT", this, "changeBelPinInOut()");
+			}
+			
+			popupMenu.popup(QCursor.pos());	
 		}
+	}
+	
+	@SuppressWarnings("unused")
+	private void changeBelPinIn() {
+		QTreePin pin = (QTreePin) (underPip ? pips : bels ).selectedItems().get(0);
+		changePinDirection(pin, PrimitiveDefPinDirection.INPUT);
+	}
+	@SuppressWarnings("unused")
+	private void changeBelPinOut() {
+		QTreePin pin = (QTreePin) (underPip ? pips : bels ).selectedItems().get(0);
+		changePinDirection(pin, PrimitiveDefPinDirection.OUTPUT);
+	}
+	@SuppressWarnings("unused")
+	private void changeBelPinInOut() {
+		QTreePin pin = (QTreePin) (underPip ? pips : bels ).selectedItems().get(0);
+		changePinDirection(pin, PrimitiveDefPinDirection.INOUT);
+	}
+	
+	private void changePinDirection(QTreePin pin, PrimitiveDefPinDirection newDir) {
+			
+		if (pin.childCount() > 0) {
+			QMessageBox.critical(this, "Disconnect Pin", "Cannot change the pin direction of a connected pin.");
+			return;
+		}
+				
+		PrimitiveDefPin pdPin = pin.getPin();
+		if (pdPin.getDirection() == newDir) {
+			QMessageBox.information(this, "Nothing to do.", "Pin already has a direction of " + pdPin.getDirection());
+			return;
+		}
+		
+		pdPin.setDirection(newDir);
 	}
 	
 	/**
@@ -417,6 +488,59 @@ public class ElementTab extends QWidget {
 		}
 		catch(Exception e) {
 		}	
+	}
+	
+	/**
+	 * Checks to see if the "add static bel" icon has been clicked.
+	 * If it has, then the add site pin dialog is displayed so the user can
+	 * create a new VCC or GND bel. 
+	 */
+	public void checkBelHeaderClick(){
+	
+		int iconSize = bels.header().height() - 5;
+		
+		int x = QCursor.pos().x() - bels.mapToGlobal(bels.header().pos() ).x();
+		int y = QCursor.pos().y() - bels.mapToGlobal(bels.header().pos() ).y();
+		
+		if((x < iconSize && y < iconSize) && this.bels.topLevelItemCount() > 0) {
+			StaticBelDialog test = new StaticBelDialog();
+			if ( test.exec() == 1 ) {
+				AddBelCommand addBelCommand = new AddBelCommand(test.getBelName(), test.isVcc(), this, parent.getCurrentSite());
+				this.undoStack.push(addBelCommand);
+			}
+		}	
+	}
+	
+	/**
+	 * Creates and returns a new {@link QTreeElement} for the specified {@link PrimitiveDef} element
+	 * @param e Primitive Def element (i.e. Bel or Site Pip)
+	 */
+	public QTreeElement createNewBel(Element e){
+		QTreeElement treeElement = new QTreeElement(bels, e);
+		treeElement.setText(0, e.getName());
+		treeElement.setForeground(0, text_brush);
+		return treeElement;
+	}
+
+	/**
+	 * Adds a new Bel to the "Bels" section of the tree view
+	 * 
+	 * @param treeElement {@link QTreeElement} to add
+	 */
+	public void addBelToTree(QTreeElement treeElement){
+		bels.addTopLevelItem(treeElement);
+		bels.sortItems(0, SortOrder.AscendingOrder); 
+	}
+	
+	/**
+	 * Removes a Bel from the "Bels" section of the tree view.
+	 * NOTE: This function assumes all wires of the bel have first been
+	 * disconnected.
+	 * 
+	 * @param treeElement {@link QTreeElement} to remove
+	 */
+	public void removeBelFromTree(QTreeElement treeElement){
+		bels.takeTopLevelItem( bels.indexOfTopLevelItem(treeElement) );
 	}
 	
 	/*************************************************************
@@ -501,10 +625,48 @@ public class ElementTab extends QWidget {
 			QMenu popupMenu = new QMenu();
 			popupMenu.addAction(new QIcon(VSRTool.getImagePath("trash.png")), "Delete Selected Pins", this, "deleteSitePins()");
 			popupMenu.addAction(new QIcon(VSRTool.getImagePath("unconnected.png")), "Mark As Unconnected", this, "markSitePinsUnconnected()");
+			
+			/*
+			if (pins.selectedItems().size() == 1) {
+				popupMenu.addAction(new QIcon(""), "Mark Pin as IN", this, "changeSitePinIn()");
+				popupMenu.addAction(new QIcon(""), "Mark Pin as OUT", this, "changeSitePinOut()");
+				popupMenu.addAction(new QIcon(""), "Mark Pin as INOUT", this, "changeSitePinInOut()");
+			}
+			*/
+			
 			popupMenu.popup(event.globalPos());
 		}
 		
 	}
+
+	/*
+	private QTreePin getSelectedSingleQTreePin() {
+		ArrayList<QTreeWidgetItem> items = (ArrayList<QTreeWidgetItem>) pins.selectedItems();
+
+		if (items.size() != 1) {
+			QMessageBox.critical(this, "Multiple Pins selected", "Can only change the direction of one site pin at a time.");
+		}
+		
+		return (QTreePin) items.get(0);
+		
+	}
+	
+	@SuppressWarnings("unused")
+	private void changeSitePinIn() {
+		QTreePin pin = getSelectedSingleQTreePin();
+		changePinDirection(pin, PrimitiveDefPinDirection.INPUT);
+	}
+	@SuppressWarnings("unused")
+	private void changeSitePinOut() {
+		QTreePin pin = getSelectedSingleQTreePin();
+		changePinDirection(pin, PrimitiveDefPinDirection.OUTPUT);
+	}
+	@SuppressWarnings("unused")
+	private void changeSitePinInOut() {
+		QTreePin pin = getSelectedSingleQTreePin();
+		changePinDirection(pin, PrimitiveDefPinDirection.INOUT);
+	}
+	*/
 	
 	/**
 	 * Checks to see if the "add site pin" icon has been clicked. <br>
@@ -531,4 +693,14 @@ public class ElementTab extends QWidget {
 		}	
 	}
 	
+	public void setSingleBelMode(boolean setSingleBelMode, PrimitiveSiteScene scene) {
+		
+		if (setSingleBelMode) {
+			pins.itemDoubleClicked.connect(scene, "addElementToScene(QTreeWidgetItem)");
+			pins.itemClicked.connect(scene, "selectItemInScene(QTreeWidgetItem)");
+		} else {
+			pins.itemDoubleClicked.disconnect();
+			pins.itemClicked.disconnect();
+		}
+	}
 }//end of class

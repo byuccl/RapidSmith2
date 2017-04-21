@@ -9,6 +9,7 @@ import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.PinShape;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.Pip;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.shapes.WirePart;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.AddElementCommand;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.AddPinToSceneCommand;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.AddWireCommand;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.MoveCommand;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.RemoveCommand;
@@ -28,6 +29,7 @@ import com.trolltech.qt.gui.QGraphicsSceneMouseEvent;
 import com.trolltech.qt.gui.QGraphicsItem.GraphicsItemFlag;
 import com.trolltech.qt.gui.QGraphicsView.DragMode;
 import com.trolltech.qt.gui.QLineF;
+import com.trolltech.qt.gui.QMessageBox;
 import com.trolltech.qt.gui.QPainter;
 import com.trolltech.qt.gui.QPen;
 import com.trolltech.qt.gui.QTreeWidgetItem;
@@ -130,7 +132,6 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 	 * @param pin The pin whose position has been updated. 
 	 */
 	public void add_pin (QPointF old_point, QPointF new_point,  QTreePin pin){
-		
 		if (old_point != null) { 
 			if(pin_locations.get(old_point) == pin)
 				pin_locations.remove(old_point);
@@ -220,9 +221,17 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 				}
 			}
 			else if ( this.itemsMoving ) { 
+				
+				// reset the Z values of the moving items to their default value (1)
+				this.selectedItems().forEach(item -> item.setZValue(1));
+				
 				MoveCommand move = new MoveCommand(this, (ArrayList<QGraphicsItemInterface>) this.selectedItems());
-				if (move.shouldPushMove())
+				if (move.shouldPushMove()) {
 					this.undoStack.push(move);
+				}
+				else {
+					move.undo();
+				}
 			}
 		}
 		mousePressed = false;
@@ -307,8 +316,9 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 		if ( event.button() == MouseButton.LeftButton ) {
 			start = event.scenePos();
 			
-			if ( this.itemAt( event.scenePos() ) instanceof ElementShape || this.itemAt( event.scenePos() ) instanceof PinShape )
+			if ( this.itemAt( event.scenePos() ) instanceof ElementShape || this.itemAt( event.scenePos() ) instanceof PinShape ) {
 				this.itemClicked = true; 
+			}
 			
 			if (this.should_draw_wire )	{
 		
@@ -340,14 +350,16 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 				this.tmp_wire.setLine(new QLineF(start, event.scenePos()));
 			else if ( !should_delete && !zoomToView ) {//this.views().get(0).dragMode() == DragMode.RubberBandDrag ) {
 				for (QGraphicsItemInterface item : this.selectedItems()) {
-					if ( !item.isUnderMouse() && item instanceof ElementShape )
+					if ( !item.isUnderMouse() )
 						item.mouseMoveEvent(event);
 				}
 			}
 			
-			if (this.itemClicked) 
+			if (this.itemClicked && !itemsMoving) {
 				this.itemsMoving = true;
-		
+				// temporarily change the Z values of moving items so that they display over all other items.
+				this.selectedItems().forEach(item -> item.setZValue(2));
+			}
 		}
 	}
 	
@@ -430,10 +442,10 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 	 * @param element
 	 * @param location
 	 */
-	public void addSavedElementToScene(QTreeWidgetItem element, QPointF location, double rotation){
+	public ElementShape addSavedElementToScene(QTreeWidgetItem element, QPointF location, double rotation){
 		try {
 			QTreeElement tmp = (QTreeElement) element;
-			ElementShape item;
+			ElementShape item = null;
 			
 			if (!tmp.isPlaced()) {
 				if (tmp.getElement().isBel() )
@@ -449,30 +461,71 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 				item.rotateTo(rotation);
 				//((ElementShape)item).updatePinPosition();
 			}
+			return item;
 		}
-		catch(ClassCastException e){}
+		catch(ClassCastException e){
+			return null;
+		}
 	}
 	/**
 	 * 
 	 * @param element
 	 */
 	public void addElementToScene(QTreeWidgetItem element){
-		try {
-			QTreeElement tmp = (QTreeElement) element;
-			ElementShape item;
+		
+		// In single bel mode, only allow pins and site pips to be added to the scene.
+		if (VSRTool.singleBelMode && (element instanceof QTreePin)) {
+			//if (element instanceof QTreePin) {
+			QTreePin treePin = (QTreePin) element;
 			
-			if (!tmp.isPlaced()) {
-				if (tmp.getElement().isBel() )
-					item = new Bel(tmp, this.square_size, parent.getPlacementPosition()) ;
-				else{ 
-					item = new Pip(tmp, this.square_size, parent.getPlacementPosition() ) ;
+			// only add the pin if the parent element has not been placed on the scene
+			if (treePin.parent() instanceof QTreeElement) {
+				QTreeElement parentTreeElement = (QTreeElement)treePin.parent();
+				if (parentTreeElement.isPlaced())  {	
+					String message = String.format("Parent element %s already added to scene. If you want to add the "
+							+ "individual pin, you need to first remove the parent element", parentTreeElement.text(0));
+					QMessageBox.information(this.parent, "Cannot add pin", message);
+					return;
 				}
+			}
+			
+			// don't add the pin if it has already been placed
+			if (treePin.isPlaced()) {
+				QMessageBox.information(this.parent, "Cannot add pin", "Pin already placed");
+			}
+			else { // add the pin to the scene
+				PinShape pinShape = new PinShape(treePin, square_size, treePin.isSitePin());
+				AddPinToSceneCommand addPinCommand = new AddPinToSceneCommand(this, pinShape);
+				this.undoStack.push(addPinCommand);
+				this.parent.getToolBar().untoggleAll();
+			}
+		}
+		else if (element instanceof QTreeElement) { // add a BEL / site pip 
+			QTreeElement tmp = (QTreeElement) element;
+			
+			// do not add the element if either (1) it has already been placed, or (2) any of its pins have already been placed
+			if (tmp.isPlaced()) {
+				QMessageBox.information(this.parent, "Cannot add element", "Element already placed");
+			}
+			else if (tmp.pinsPlaced()) {
+				QMessageBox.information(this.parent, "Cannot add element", "Pins of " + tmp.text(0) + " have already been added to the scene. To add the element"
+						+ " to the scene, first remove all of its pins.");
+			}
+			else { // add the element to the scene
+				ElementShape item;
+				
+				if (tmp.getElement().isBel() ) {
+					item = new Bel (tmp, this.square_size, parent.getPlacementPosition() );
+				}
+				else { 
+					item = new Pip (tmp, this.square_size, parent.getPlacementPosition() );
+				}
+
 				AddElementCommand add = new AddElementCommand(this, item, item.pos());
 				this.undoStack.push(add);
 				this.parent.getToolBar().untoggleAll();
 			}
 		}
-		catch(ClassCastException e){}
 	}
 	/**
 	 * Enable drawing wires on the device view  
@@ -546,4 +599,49 @@ public class PrimitiveSiteScene extends QGraphicsScene{
 			this.undoStack.push(rotate);
 		}
 	}
+	
+	/**
+	 * Hides all wire objects on the current scene (makes them not visible)
+	 */
+	public void hideWires() {	
+		this.items().stream()
+			.filter(item -> (item instanceof ElementShape))
+			.map(item -> (ElementShape) item)
+			.forEach(elShape -> elShape.hideWires());
+	}
+	
+	/**
+	 * Shows all wire objects on the current scene (makes them visible)
+	 */
+	public void showWires() {
+		this.items().stream()
+			.filter(item -> (item instanceof ElementShape))
+			.map(item -> (ElementShape) item)
+			.forEach(elShape -> elShape.showWires());
+	}
+	
+	/**
+	 * Returns the {@link ElementShape} or {@link PinShape} object at the specified point
+	 * @param point {@link QPointF} to look
+	 */
+	public QGraphicsItemInterface getElementAtPoint(QPointF point) {
+		
+		for (QGraphicsItemInterface item : items(point.x(),point.y(),1,1) ) {
+			if ((item instanceof ElementShape) || (item instanceof PinShape)) {
+				return item;
+			}
+		}
+		
+		// Hack for QT bug. For some reason, when a element has been rotated
+		// 270 degrees (so the input pins are facing down), the for loop above does not
+		// include the nearest bel or site_pip. This loop, however, does 
+		for (QGraphicsItemInterface item : items(point.x(),point.y()-1,1,1) ) {
+			if ((item instanceof ElementShape) || (item instanceof PinShape)) {
+				return item;
+			}
+		}
+		
+		return null;
+	}
+	
 }//end class

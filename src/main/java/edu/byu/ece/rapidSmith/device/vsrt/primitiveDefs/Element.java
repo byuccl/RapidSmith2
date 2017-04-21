@@ -31,6 +31,7 @@ public class Element implements Serializable{
 
 	private String name;
 	private boolean bel;
+	private boolean isTest;
 	private boolean pin;
 	private ArrayList<PrimitiveDefPin> pins;
 	private ArrayList<String> cfgOptions;
@@ -44,6 +45,7 @@ public class Element implements Serializable{
 	public Element(){
 		name = null;
 		bel = false;
+		isTest = false;
 		pins = new ArrayList<PrimitiveDefPin>();
 		cfgOptions = null;
 		cfgElements = null;
@@ -85,6 +87,12 @@ public class Element implements Serializable{
 	public void setBel(boolean bel) {
 		this.bel = bel;
 	}
+	public boolean isTest() {
+		return isTest;
+	}
+	public void setIsTest(boolean isTest) {
+		this.isTest = isTest;
+	}
 	public boolean isPin() {
 		return pin;
 	}
@@ -114,6 +122,9 @@ public class Element implements Serializable{
 			}
 		}
 	}
+	public int pinCount() {
+		return pins.size();
+	}
 	public ArrayList<String> getCfgOptions() {
 		return cfgOptions;
 	}
@@ -129,6 +140,12 @@ public class Element implements Serializable{
 		for (Connection connection : connections) {
 			this.connSet.add( connection.toString() );
 		}
+	}
+	/**
+	 * Removes all of the current connections for the Element
+	 */
+	public void clearConnections() {
+		this.connections.clear();
 	}
 	public void addCfgElement(String cfgElement){
 		if(cfgElements == null){
@@ -157,7 +174,7 @@ public class Element implements Serializable{
 			}
 		}
 	}
-	
+		
 	//testing elements
 	
 	
@@ -165,7 +182,8 @@ public class Element implements Serializable{
 	public String toString(boolean printName){
 		StringBuilder s = new StringBuilder();
 		String nl = System.getProperty("line.separator");
-		s.append("(element " + name +" "+ pins.size() +(bel ? " # BEL" : "")+nl);
+		
+		s.append("(element " + name +" "+ pins.size() +(bel ? " # BEL" : "") + (isTest ? " TEST" : "") + nl);
 		for(PrimitiveDefPin p : pins){
 			s.append("\t\t\t"+p.toString(printName) + nl);
 		}
@@ -176,11 +194,11 @@ public class Element implements Serializable{
 			}
 			s.append(")"+nl);
 		}
-		if (!printName) { //only print the connections if we are writing the final primitive def and not! the original 
+		//if (!printName || VSRTool.singleBelMode) { //only print the connections if we are writing the final primitive def and not! the original 
 			for(Connection c : connections){
 				s.append("\t\t\t"+c.toString() + nl);
 			}
-		}
+		//}
 		
 		if(cfgElements != null && cfgElements.size() > 0) {
 			s.append("\t\t)" + nl); 

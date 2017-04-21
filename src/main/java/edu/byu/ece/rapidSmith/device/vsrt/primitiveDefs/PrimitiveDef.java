@@ -46,6 +46,7 @@ public class PrimitiveDef implements Serializable{
 	private HashSet<String> belPinNames;
 	private HashSet<String> sitePinNames;
 	private Element bel = null;
+	private boolean isSingleBelSite;
 
 	public PrimitiveDef(){
 		setType(null);
@@ -53,6 +54,15 @@ public class PrimitiveDef implements Serializable{
 		elements = new ArrayList<Element>();
 		pinSet = new HashMap<String, PrimitiveDefPin>();
 		elementSet = new HashMap<String, Element>();
+		isSingleBelSite = false;
+	}
+	
+	public void setIsSingleBelSite(boolean isSingleBel) {
+		this.isSingleBelSite = isSingleBel;
+	}
+	
+	public boolean isSingleBelSite() {
+		return this.isSingleBelSite;
 	}
 	
 	public void addPin(PrimitiveDefPin p){
@@ -317,7 +327,8 @@ public class PrimitiveDef implements Serializable{
 		this.calculateTotalNumElements();
 		StringBuilder s = new StringBuilder();
 		String nl = System.getProperty("line.separator");
-		s.append("\t(primitive_def " + type.toString() +" "+ pins.size() + " " + (this.numElements - (savePrint ? this.siteCfgElements.size() : 0)) + nl);
+		s.append("\t(primitive_def " + type.toString() +" "+ pins.size() + " " + (this.numElements - (savePrint ? this.siteCfgElements.size() : 0)) 
+				+ (this.isSingleBelSite ? " #SBS" :"") + nl);
 		for(PrimitiveDefPin p : pins){
 			s.append("\t\t"+p.toString(savePrint)+nl);
 		}

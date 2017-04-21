@@ -39,8 +39,6 @@ public class ToolBar extends QToolBar{
 	private QAction zoom_out;
 	/**Zoom selection option*/
 	private QAction zoomToView; 
-	/**Generate remaining connections option*/
-	private QAction generateRemaining;
 	/**View site config options*/
 	private QAction viewSiteConfigOptions;
 	/**View selected bel config options*/
@@ -57,6 +55,10 @@ public class ToolBar extends QToolBar{
 	private QToolButton undoMenu; 
 	/***/
 	private PrimitiveSiteScene scene;
+	/**Hides all the wires on the GUI scene*/
+	private QAction hideWires;
+	/**Shows all the wires on the GUI scene*/
+	private QAction showWires;
 	
 	/**
 	 * 
@@ -114,11 +116,7 @@ public class ToolBar extends QToolBar{
 	    
 	    zoomBestFit = new QAction(new QIcon(VSRTool.getImagePath("zoombestfit2.png")), "Zoom Best Fit", this);
 	    zoomBestFit.triggered.connect(view, "zoomToBestFit()");
-	    
-	    generateRemaining = new QAction(new QIcon(VSRTool.getImagePath("generateConnections.gif")), tr("Generate Remaining Connections and save Primitive Def"), this);
-	    generateRemaining.triggered.connect(parent, "generateRemainingConnections()");
-	    generateRemaining.setEnabled(false);
-	    
+	    	    
 	    viewSiteConfigOptions = new QAction(new QIcon(VSRTool.getImagePath("site.gif")), tr("View site configuration options"), this);
 	    viewSiteConfigOptions.triggered.connect(parent, "showSiteConfigDialog()");
 	    viewSiteConfigOptions.setEnabled(false);
@@ -134,7 +132,13 @@ public class ToolBar extends QToolBar{
 	    rotateCounter = new QAction (new QIcon(VSRTool.getImagePath("rotateCounterclockwise.png")), tr("Rotate the selected items Counterclockwise by 90 degrees (Ctrl+Shift+R)"), this);
 	    rotateCounter.triggered.connect(scene, "rotateItemsCounterclockwise()");
 	    rotateCounter.setShortcut("Ctrl+Shift+r");
-	     	 
+	    
+	    hideWires = new QAction(new QIcon(VSRTool.getImagePath("hideWires.png")), tr("Hide all wires"), this);
+	    hideWires.triggered.connect(scene, "hideWires()");
+	    
+	    showWires = new QAction(new QIcon(VSRTool.getImagePath("showWires.png")), tr("Show all wires"), this);
+	    showWires.triggered.connect(scene, "showWires()");
+	    
 	    //Creating a QUndoView so the user can undo/redo multiple things at a time
 	    QMenu menu = new QMenu();
 	    QUndoView list = new QUndoView(undoStack);
@@ -158,7 +162,6 @@ public class ToolBar extends QToolBar{
 		 //Add each action to the menu bar
 	    this.addAction(toggleView);
 	    this.addAction(save_site);
-	    this.addAction(generateRemaining);
 	    this.addSeparator();  
 	    this.addWidget(undoMenu);
 	    this.addAction(redo);
@@ -175,6 +178,8 @@ public class ToolBar extends QToolBar{
 	    this.addSeparator();
 	    this.addAction(viewSiteConfigOptions);
 	    this.addAction(viewBelConfigOptions);
+	    this.addAction(showWires);
+	    this.addAction(hideWires);
 	    
 	    this.setOrientation(Orientation.Vertical);
 	    this.setFloatable(true);
@@ -275,9 +280,6 @@ public class ToolBar extends QToolBar{
 		zoomToView.setChecked(false);
 	}
 	
-	public void setGenerate(boolean canGenerate){
-		this.generateRemaining.setEnabled(canGenerate);
-	}
 	public void enableConfigs(boolean enable){
 		this.viewBelConfigOptions.setEnabled(enable);
 		this.viewSiteConfigOptions.setEnabled(enable);

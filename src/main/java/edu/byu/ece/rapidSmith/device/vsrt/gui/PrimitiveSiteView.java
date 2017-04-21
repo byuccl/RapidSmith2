@@ -28,6 +28,7 @@ public class PrimitiveSiteView extends QGraphicsView{
 	/**Zooming interval*/
 	final private double scaleFactor = 1.20;
 	/**Maximum zoom out amount*/
+	@SuppressWarnings("unused")
 	private double ZOOM_OUT_MAX = .1;
 	/**Maximum zoom in amount*/
 	final private double ZOOM_IN_MAX = 3;
@@ -101,8 +102,10 @@ public class PrimitiveSiteView extends QGraphicsView{
 	 * @return none
 	 */
 	public void zoom_in(){
-		if (this.transform().m11() < ZOOM_IN_MAX) 
+		if (this.transform().m11() < ZOOM_IN_MAX)  {
+			this.setTransformationAnchor(QGraphicsView.ViewportAnchor.AnchorUnderMouse);
 			scale(scaleFactor, scaleFactor);
+		}
 	}
 	/**
 	 * Zooms out the device view by the pre-specified scale factor
@@ -110,7 +113,7 @@ public class PrimitiveSiteView extends QGraphicsView{
 	 * @return none
 	 */
 	public void zoom_out(){
-		if (this.transform().m11() > ZOOM_OUT_MAX )
+		//if (this.transform().m11() > ZOOM_OUT_MAX )
 			scale(1.0/scaleFactor, 1.0/scaleFactor);
 	}
 	/**

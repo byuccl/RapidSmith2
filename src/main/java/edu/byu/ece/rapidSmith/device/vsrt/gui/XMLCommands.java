@@ -165,6 +165,7 @@ public class XMLCommands {
 	
 		return element;
 	}
+	
 	/**
 	 * Creates an XML element that stores information for each object currently on the <br>
 	 * graphics scene.  
@@ -338,6 +339,12 @@ public class XMLCommands {
 				Wire graphicsWire = new Wire(startPoint, endPoint);
 				graphicsWire.setTree_start(startConn);
 				graphicsWire.setTree_end(endConn);
+				
+				QGraphicsItemInterface startItem = scene.getElementAtPoint(startPoint);				
+				QGraphicsItemInterface endItem = scene.getElementAtPoint(endPoint);
+				
+				graphicsWire.setShapeConnections(startItem, endItem);
+				graphicsWire.connect();
 				
 				startPin.add_wire(graphicsWire);
 				endPin.add_wire(graphicsWire);
