@@ -4,7 +4,6 @@ import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
 import com.trolltech.qt.core.Qt.AspectRatioMode;
 import com.trolltech.qt.core.Qt.CursorShape;
-import com.trolltech.qt.core.Qt.ScrollBarPolicy;
 import com.trolltech.qt.gui.QCursor;
 import com.trolltech.qt.gui.QGraphicsView;
 import com.trolltech.qt.gui.QPainter;
