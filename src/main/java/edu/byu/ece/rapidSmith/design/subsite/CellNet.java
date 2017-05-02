@@ -251,9 +251,13 @@ public class CellNet implements Serializable {
 	 */
 	public void connectToPin(CellPin pin) {
 		
+		if (pin.isInternal()) {
+			throw new Exceptions.DesignAssemblyException("Cannot connect net to internal pin of a macro. Connect the net to the external pin instead.");
+		}
+		
 		// If the cellpin is part of a macro cell, add all of the internal pins
 		// to the net instead of the external macro pins
-		if (pin.getCell().isMacro()) {
+		if (pin.isMacroPin()) {
 			pin.getCell().mapToInternalPins(pin).forEach(this::connectToLeafPin);
 			pin.setNet(this);
 		}
@@ -312,15 +316,53 @@ public class CellNet implements Serializable {
 	/**
 	 * Disconnects the net from all of its current pins
 	 */
-	public void detachNet() { 
+	public void detachNet() {
+		detachNet(true);
+	}
+	
+	/**
+	 * Disconnects the net from all of its current pins. If removeSource
+	 * is set to false, the source pin will not be removed.
+	 */
+	public void detachNet(boolean removeSource) { 
 		
-		pins.forEach(CellPin::clearNet);
+		pins.forEach(this::clearNet);
 		
-		if (sourcePin != null) {
+		if (sourcePin != null && removeSource) {
 			sourcePin = null;
 		}
 		
 		pins.clear();
+	}
+	
+	private void clearNet(CellPin pin) {
+		pin.clearNet();
+		CellPin external = pin.getExternalPin(); 
+		if (external != null) {
+			external.clearNet();
+		}
+	}
+	
+	/**
+	 * Transfers all sink {@link CellPin}s of {@link oldNet} to 
+	 * to this net. The pins are disconnected from oldNet, and oldNet
+	 * is unrouted.   
+	 * 
+	 * @param oldNet {@link CellNet} to transfer pins from
+	 */
+	public void transferSinkPins(CellNet oldNet) {
+		Collection<CellPin> sinkPins = oldNet.getSinkPins();
+		oldNet.detachNet(false);
+		oldNet.unroute();
+		for (CellPin pin : sinkPins) {
+			if (pin.isInternal()) {
+				this.forceConnectInternalPin(pin);
+				pin.getExternalPin().setNet(this);
+			}
+			else {
+				this.connectToPin(pin);
+			}
+		}
 	}
 	
 	/**
@@ -330,6 +372,22 @@ public class CellNet implements Serializable {
 	 */
 	public void disconnectFromPins(Collection<CellPin> pins) {
 		pins.forEach(this::disconnectFromPin);
+	}
+	
+	/**
+	 * Force an internal pin to be disconnected from the net. No checks are made
+	 * before removing the pin. This method is package private and shouldn't
+	 * be called by regular users.
+	 * @param pin
+	 */
+	void forceDisconnectInternalPin(CellPin pin) {
+		assert (pin.isInternal()) : "This function should only be called with internal macro cell pins";
+		disconnectFromLeafPin(pin);
+	}
+	
+	void forceConnectInternalPin(CellPin pin) {
+		assert (pin.isInternal()) : "This function should only be called with internal macro cell pins";
+		connectToLeafPin(pin);
 	}
 	
 	/**

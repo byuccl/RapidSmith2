@@ -59,7 +59,7 @@ public class CreateDesignExample {
 		System.out.println("Cell library loaded: cellLibrary.xml");
 		
 		// Create a new empty CellDesign for the designated FPGA part
-		CellDesign design = new CellDesign("HelloWorld", "xc7a100tcsg324");
+		CellDesign design = new CellDesign("HelloWorld", "xc7a100tcsg324", libCells);
 
 		// Create a new cell and add it to the current design.  It is a LUT1 cell.
 		Cell invcell = design.addCell(new Cell("lutcell", libCells.get("LUT1")));

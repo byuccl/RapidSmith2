@@ -18,7 +18,7 @@
  * also get a copy of the license at <http://www.gnu.org/licenses/>.
  */
 
-package edu.byu.ece.rapidSmith.interfaces.vivado;
+package edu.byu.ece.rapidSmith.design.subsite;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,14 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import edu.byu.ece.rapidSmith.design.NetType;
-import edu.byu.ece.rapidSmith.design.subsite.Cell;
-import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
-import edu.byu.ece.rapidSmith.design.subsite.CellNet;
-import edu.byu.ece.rapidSmith.design.subsite.CellPin;
-import edu.byu.ece.rapidSmith.design.subsite.Property;
-import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
-import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelPin;
 
@@ -142,7 +134,7 @@ public class LutRoutethroughInserter {
 	 * @param sinks List to add sink CellPins to
 	 * @return The source BelPin of the routethrough. If no routethrough is found, null is returned
 	 */
-	private BelPin tryFindRoutethroughSourcePin(RouteTree route, List<CellPin> sinks ) {
+	private BelPin tryFindRoutethroughSourcePin(RouteTree route, List<CellPin> sinks) {
 		
 		Iterator<RouteTree> rtIterator = route.getFirstSource().iterator();
 		BelPin rtSource = null;
@@ -180,28 +172,47 @@ public class LutRoutethroughInserter {
 	 * @param sinks List of cell pin sinks in the original net
 	 */
 	private void insertRouteThroughBel(CellNet net, BelPin rtSource, List<CellPin> sinks) {
-		// TODO: replace this code with a function
-		//create a new lut1 cell with the appropriate init string
+
+		//create a new LUT1 cell with the appropriate INIT string
 		Cell buffer = new Cell(ROUTETHROUGH_NAME + routethroughID, libCells.get("LUT1") );
 		buffer.getProperties().update(new Property("INIT", PropertyType.EDIF, ROUTETHROUGH_INIT_STRING));
 		design.addCell(buffer);
+		CellPin bufferInput = buffer.getInputPins().iterator().next();
+		CellPin bufferOutput = buffer.getOutputPins().iterator().next();
 		
 		// break the netlist 
-		net.disconnectFromPins(sinks);
-		net.connectToPin(buffer.getPin("I0"));
+		for (CellPin sinkPin : sinks) {
+			if (sinkPin.isInternal()) {
+				net.forceDisconnectInternalPin(sinkPin);
+			} 
+			else {
+				net.disconnectFromPin(sinkPin);
+			}
+		}
+		
+		net.connectToPin(bufferInput);
 		
 		// add new net .. TODO: randomize the naming scheme more
 		CellNet routethroughNet = new CellNet(ROUTETHROUGH_NAME + "Net" + routethroughID++, NetType.WIRE);
-		routethroughNet.connectToPin(buffer.getPin("O"));
-		routethroughNet.connectToPins(sinks);
+		routethroughNet.connectToPin(bufferOutput);
+		
+		for (CellPin sinkPin : sinks) {
+			if (sinkPin.isInternal()) {
+				routethroughNet.forceConnectInternalPin(sinkPin);
+			}
+			else {
+				routethroughNet.connectToPin(sinkPin);
+			}
+		}
+
 		routethroughNet.setIsIntrasite(true); // mark the second portion of the net as intrasite
 		netsToAdd.add(routethroughNet);
 		
-		// place lut cell and map pins correctly
+		// place LUT cell and map pins correctly
 		Bel rtBel = rtSource.getBel();
 		design.placeCell(buffer, rtBel);
-		buffer.getPin("I0").mapToBelPin(rtSource);
-		buffer.getPin("O").mapToBelPin(buffer.getPin("O").getPossibleBelPins().get(0));
+		bufferInput.mapToBelPin(rtSource);
+		bufferOutput.mapToBelPin(bufferOutput.getPossibleBelPins().get(0));
 	}
 	
 	/**

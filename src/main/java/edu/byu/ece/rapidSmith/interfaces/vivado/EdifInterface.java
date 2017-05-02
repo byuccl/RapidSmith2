@@ -59,10 +59,13 @@ import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
+import edu.byu.ece.rapidSmith.design.subsite.CellPinType;
 import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
+import edu.byu.ece.rapidSmith.design.subsite.LibraryMacro;
 import edu.byu.ece.rapidSmith.design.subsite.LibraryPin;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
 import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
+import edu.byu.ece.rapidSmith.design.subsite.SimpleLibraryCell;
 import edu.byu.ece.rapidSmith.device.PinDirection;
 import edu.byu.ece.rapidSmith.device.PortDirection;
 import edu.byu.ece.rapidSmith.util.Exceptions;
@@ -102,16 +105,20 @@ public final class EdifInterface {
 		
 		// create RS2 cell design
 		String partName = ((StringTypedValue)top.getTopDesign().getProperty("part").getValue()).getStringValue();
-		CellDesign design= new CellDesign(top.getTopDesign().getName(), partName);	
+		CellDesign design = new CellDesign(top.getTopDesign().getName(), partName, libCells);	
 		design.getProperties().updateAll(createCellProperties(topLevelCell.getPropertyList()));
+		
+		// create the global static variables for the design
+		GlobalStatic globalStatic = new GlobalStatic(libCells);
 		
 		// add all the cells and nets to the design
 		processTopLevelEdifPorts(design, topLevelCell.getInterface(), libCells);
-		processEdifCells(design, topLevelCell.getCellInstanceList(), libCells, vccNets, gndNets);
+		processEdifCells(design, topLevelCell.getCellInstanceList(), libCells, globalStatic);
 		processEdifNets(design, topLevelCell.getNetList(), vccNets, gndNets);
 				
-		collapseStaticNets(design, libCells, vccNets, gndNets);
-				
+		collapseStaticNets(design, libCells, vccNets, gndNets, globalStatic);
+		globalStatic.addToDesign(design);		
+
 		return design;
 	}
 	
@@ -156,7 +163,7 @@ public final class EdifInterface {
 	/*
 	 * Converts EDIF cell instances to equivalent RapidSmith cells and adds them to the design
 	 */
-	private static void processEdifCells(CellDesign design, Collection<EdifCellInstance> edifCellInstances, CellLibrary libCells, List<CellNet> vccNets, List<CellNet> gndNets) {
+	private static void processEdifCells(CellDesign design, Collection<EdifCellInstance> edifCellInstances, CellLibrary libCells, GlobalStatic globalStatic) {
 		// TODO: think about throwing an error or warning here
 		if (edifCellInstances == null || edifCellInstances.size() == 0) {
 			System.err.println("[Warning] No cells found in the edif netlist");
@@ -166,27 +173,149 @@ public final class EdifInterface {
 		// create equivalent RS2 cells from the edif cell instances
 		for(EdifCellInstance eci : edifCellInstances) {
 			// create the corresponding RS2 cell
-			LibraryCell lcType = libCells.get(eci.getType());
-			if (lcType == null) {
-				throw new Exceptions.ParseException("Unable to find library cell of type: " + eci.getType());
-			}
+			LibraryCell lcType = getLibraryCell(eci, libCells);
 			Cell newcell = design.addCell(new Cell(eci.getOldName(), lcType));
 			
 			// Add properties to the cell 
 			newcell.getProperties().updateAll(createCellProperties(eci.getPropertyList()));
 			
-			// look for internal macro nets
+			// look for internal macro VCC and GND nets
 			if (newcell.isMacro()) {
-				for (CellNet net : newcell.getInternalNets()) {
-					if (net.isVCCNet()) {
-						vccNets.add(net);
-					}
-					else if (net.isGNDNet()) {
-						gndNets.add(net);
-					}
-				}
+				newcell.collapseStaticNets(globalStatic.getVccNet(), globalStatic.getGndNet());
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 * @param eci
+	 * @param libCells
+	 * @return
+	 */
+	private static LibraryCell getLibraryCell(EdifCellInstance eci, CellLibrary libCells) {
+		// first try to get the cell from the CellLibrary		
+		if (libCells.contains(eci.getType())) {
+			return libCells.get(eci.getType());
+		}
+		// TODO: this assumes the primitive library will always be called "hdi_primitives"
+		else if (eci.getCellType().getLibrary().getName().equals("hdi_primitives")) {
+			throw new Exceptions.ParseException("Unable to find library cell of type: " + eci.getType() +
+					" in the CellLibrary. Make sure the CellLibrary includes this primitive");
+		}
+		
+		// If it's not in the CellLibrary, search the Edif file for the definition
+		return createNewCell(eci, libCells);
+	}
+	
+	private static LibraryCell createNewCell(EdifCellInstance eci, CellLibrary libCells) {
+		EdifCell edifCell = eci.getCellType();
+		
+		edu.byu.ece.edif.core.Property originalName = edifCell.getProperty("ORIG_REF_NAME");
+		
+		if (originalName != null) {
+			edifCell = edifCell.getLibrary().getCell(originalName.getValue().toString());
+			assert (edifCell != null) : "Invalid EDIF cell " + originalName;
+		}
+		
+		// If we have already made a cell for this instance, return it instead of creating another copy
+		if (libCells.contains(edifCell.getOldName())) {
+			return libCells.get(edifCell.getOldName());
+		}
+		
+		// Otherwise create a new macro cell and add it to the cell library
+		LibraryMacro macroCell = new LibraryMacro(edifCell.getOldName());
+		
+		// Create macro cell pins for each Edif Port
+		List<LibraryPin> macroPins = new ArrayList<>();
+		for (EdifPort edifPort : edifCell.getPortList()) {
+			
+			int portDir = edifPort.getDirection();
+			
+			if (edifPort.isBus()) {
+				String refName = getPortNameSuffix(edifPort.getOldName());
+				for (int i = 0; i < edifPort.getWidth(); i++) {
+					String memberName = String.format("%s[%d]", refName, i);
+					macroPins.add(createMacroLibraryPin(macroCell, memberName, portDir));
+				}
+			} else {
+				macroPins.add(createMacroLibraryPin(macroCell, edifPort.getOldName(), portDir));
+			}
+		}
+		macroCell.setLibraryPins(macroPins);
+		
+		// Create the internal cells to the macro
+		assert edifCell.getCellInstanceList().size() > 1 : "Expected macro cell"; 
+		for (EdifCellInstance edifInstance : edifCell.getCellInstanceList()) {
+			LibraryCell libCell = libCells.get(edifInstance.getType());
+			
+			if (libCell == null || libCell.isMacro()) {
+				throw new Exceptions.ParseException("Multiple levels of hierachy detected with cell " + edifInstance.getOldName() 
+						+ "(a macro within a macro).RapidSmith2 currently only supports one level of hierarchy. Modify your "
+						+ "Vivado design to meet this condition");
+			}
+			
+			macroCell.addInternalCell(edifInstance.getOldName(), (SimpleLibraryCell)libCell, createCellProperties(edifInstance.getPropertyList()));
+		}
+		
+		// Create the internal nets and external-to-internal map for the macro
+		for (EdifNet edifNet : edifCell.getNetList()) {
+			boolean isExternal = false;
+			String name = edifNet.getOldName();
+			LibraryPin externalPin = null;
+			List<String> pinConnections = new ArrayList<>();
+			
+			for (EdifPortRef portRef : edifNet.getPortRefList()) {
+				
+				EdifPort port = portRef.getPort();
+				
+				String pinName = portRef.isSingleBitPortRef() ? port.getOldName() : 
+	 				  String.format("%s[%d]", getPortNameSuffix(port.getName()), reverseBusIndex(port.getWidth(), portRef.getBusMember()));
+	
+				if(portRef.isTopLevelPortRef()) {
+					isExternal = true;
+					
+					if (externalPin != null) {
+						throw new AssertionError("Macro net connects to more than one external macro pin");
+					}
+					externalPin = macroCell.getLibraryPin(pinName);
+				}
+				else {
+					pinConnections.add(portRef.getCellInstance().getOldName() + "/" + pinName);
+				}
+			}
+			
+			if (isExternal) {
+				macroCell.addInternalPinConnections(externalPin, pinConnections);
+			}
+			else {
+				macroCell.addInternalNet(name, "WIRE", pinConnections);
+			}
+		}
+		
+		libCells.add(macroCell); 
+		
+		return macroCell;
+	}
+	
+	/**
+	 * 
+	 * @param parent
+	 * @param name
+	 * @param dir
+	 * @return
+	 */
+	private static LibraryPin createMacroLibraryPin(LibraryMacro parent, String name, int dir) {
+		LibraryPin pin = new LibraryPin();
+		pin.setLibraryCell(parent);
+		pin.setName(name);
+		switch(dir) {
+			case EdifPort.IN: pin.setDirection(PinDirection.IN); break;
+			case EdifPort.OUT: pin.setDirection(PinDirection.OUT); break;
+			case EdifPort.INOUT: pin.setDirection(PinDirection.INOUT); break;
+			default: throw new Exceptions.ParseException("Unrecognized pin direction from Edif: " + dir);
+		}
+		pin.setPinType(CellPinType.MACRO);
+		return pin;
 	}
 	
 	/*
@@ -336,25 +465,15 @@ public final class EdifInterface {
 		return width - 1 - busMember;
 	}
 	
-	private static void collapseStaticNets(CellDesign design, CellLibrary libCells, List<CellNet> vccNets, List<CellNet> gndNets) {
-		
-		// Create new global VCC/GND cells and nets
-		Cell globalVCC = new Cell("RapidSmithGlobalVCC", libCells.getVccSource());
-		Cell globalGND = new Cell("RapidSmithGlobalGND", libCells.getGndSource());		
-		CellNet globalVCCNet = new CellNet("RapidSmithGlobalVCCNet", NetType.VCC);
-		CellNet globalGNDNet = new CellNet("RapidSmithGlobalGNDNet", NetType.GND);
-		
-		// Connect the global sources to the global nets
-		globalVCCNet.connectToPin(globalVCC.getOutputPins().iterator().next());
-		globalGNDNet.connectToPin(globalGND.getOutputPins().iterator().next());
-		
+	private static void collapseStaticNets(CellDesign design, CellLibrary libCells, List<CellNet> vccNets, List<CellNet> gndNets, GlobalStatic globalStatic) {
+				
 		// Add all VCC/GND sink pins to the global nets
 		for(CellNet net : vccNets) {
-			transferSinkPins(net, globalVCCNet);
+			globalStatic.getVccNet().transferSinkPins(net);
 		}
 		
 		for(CellNet net : gndNets) {
-			transferSinkPins(net, globalGNDNet);
+			globalStatic.getGndNet().transferSinkPins(net);
 		}
 			
 		// Remove the old VCC/GND cells from the list
@@ -365,21 +484,8 @@ public final class EdifInterface {
 			}
 		}
 		cellsToRemove.forEach(design::removeCell);
-				
-		// Add the new master cells/nets to the design
-		design.addCell(globalVCC);
-		design.addNet(globalVCCNet);
-		design.addCell(globalGND);
-		design.addNet(globalGNDNet);
 	}
-	
-	private static void transferSinkPins(CellNet oldNet, CellNet newNet) {
-		Collection<CellPin> sinkPins = oldNet.getSinkPins();
-		oldNet.detachNet();
-		oldNet.unroute();
-		newNet.connectToPins(sinkPins);
-	}
-	
+		
 	/* *********************
 	 *    Export Section
 	 ***********************/
@@ -720,5 +826,36 @@ public final class EdifInterface {
 		}
 		
 		return PortDirection.isInputPort(portCell) ? EdifPort.IN : EdifPort.OUT; 
+	}
+	
+	private final static class GlobalStatic {
+		private final Cell globalVcc;
+		private final Cell globalGnd;
+		private final CellNet globalVccNet;
+		private final CellNet globalGndNet;
+		
+		public GlobalStatic(CellLibrary libCells) {
+			globalVcc = new Cell("RapidSmithGlobalVCC", libCells.getVccSource());
+			globalGnd = new Cell("RapidSmithGlobalGND", libCells.getGndSource());		
+			globalVccNet = new CellNet("RapidSmithGlobalVCCNet", NetType.VCC);
+			globalGndNet = new CellNet("RapidSmithGlobalGNDNet", NetType.GND);
+			globalVccNet.connectToPin(globalVcc.getOutputPins().iterator().next());
+			globalGndNet.connectToPin(globalGnd.getOutputPins().iterator().next());
+		}
+		
+		public void addToDesign(CellDesign design) {
+			design.addCell(globalVcc);
+			design.addNet(globalVccNet);
+			design.addCell(globalGnd);
+			design.addNet(globalGndNet);
+		}
+				
+		public CellNet getVccNet(){
+			return globalVccNet;
+		}
+		
+		public CellNet getGndNet(){
+			return globalGndNet;
+		}
 	}
 }
