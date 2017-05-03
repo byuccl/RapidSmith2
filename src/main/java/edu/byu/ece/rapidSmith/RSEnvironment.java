@@ -24,6 +24,7 @@ import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.FamilyType;
 import edu.byu.ece.rapidSmith.util.FileTools;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
+import edu.byu.ece.rapidSmith.util.Exceptions;
 import edu.byu.ece.rapidSmith.util.Exceptions.EnvironmentException;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
@@ -170,6 +171,13 @@ public class RSEnvironment {
 		}
 
 		Path path = getDeviceFilePath(canonicalName);
+		
+		// If the device file is not found, throw an exception telling the user
+		if (path == null) {
+			throw new Exceptions.EnvironmentException("Cannot find device file for part: \"" + partName + "\".\n" +
+					"View the RapidSmith2 Tech Report for instructions on how to generate a new device file for this part.");
+		}
+		
 		device = FileTools.loadDevice(path);
 		if (device == null)
 			return null;
@@ -202,7 +210,9 @@ public class RSEnvironment {
 	}
 
 	/**
-	 * Returns the path of the folder where the family type resides.
+	 * Returns the path of the folder where the family type resides. This
+	 * function assumes that familyType is not {@code NULL}.
+	 * 
 	 * @param familyType the family type corresponding folder path
 	 * @return the path of the folder where the parts of familyType reside
 	 */
@@ -283,11 +293,21 @@ public class RSEnvironment {
 	 * @return the full path to the device file for the specified part
 	 */
 	public Path getDeviceFilePath(String partName) {
-		return getDeviceFilePath(getFamilyTypeFromPart(partName), partName);
+		FamilyType family = getFamilyTypeFromPart(partName);
+		return family == null ? null : getDeviceFilePath(family, partName);
 	}
 
+	/**
+	 * Internal function that returns the path to the specified device file.
+	 * This function assumes that family is not {@code NULL}. If the given
+	 * device file is not found, then null is returned.
+	 * 
+	 * @param family {@link FamilyType} of the part
+	 * @param partName Name of the part 
+	 */
 	private Path getDeviceFilePath(FamilyType family, String partName) {
-		return getPartFolderPath(family).resolve(
+		Path partFolderPath = getPartFolderPath(family);
+		return partFolderPath == null ? null : partFolderPath.resolve(
 				PartNameTools.removeSpeedGrade(partName) + DEVICE_FILE_SUFFIX);
 	}
 

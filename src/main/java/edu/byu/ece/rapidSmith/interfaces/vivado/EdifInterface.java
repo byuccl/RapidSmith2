@@ -249,9 +249,9 @@ public final class EdifInterface {
 			LibraryCell libCell = libCells.get(edifInstance.getType());
 			
 			if (libCell == null || libCell.isMacro()) {
-				throw new Exceptions.ParseException("Multiple levels of hierachy detected with cell " + edifInstance.getOldName() 
-						+ "(a macro within a macro).RapidSmith2 currently only supports one level of hierarchy. Modify your "
-						+ "Vivado design to meet this condition");
+				throw new Exceptions.ParseException("Multiple levels of hierarchy detected with cell " + edifInstance.getOldName() 
+						+ " (a macro within a macro). RapidSmith2 currently only supports one level of hierarchy. Modify your "
+						+ "Vivado design to flatten the design during synthesis with the option \"-flatten_hierarchy full \".");
 			}
 			
 			macroCell.addInternalCell(edifInstance.getOldName(), (SimpleLibraryCell)libCell, createCellProperties(edifInstance.getPropertyList()));
