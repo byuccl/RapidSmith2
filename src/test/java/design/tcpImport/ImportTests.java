@@ -80,6 +80,20 @@ public class ImportTests {
 	}
 	
 	/**
+	 * This test verifies that the correct exception message is thrown when a cell 
+	 * is missing from the {@link CellLibrary}.
+	 */
+	@Test
+	@DisplayName("Missing Cell Test")
+	public void missingCellTest() throws IOException {
+		CellLibrary libCells = loadArtix7CellLibrary(false);
+		Throwable exception = expectThrows(Exceptions.ParseException.class, () -> EdifInterface.parseEdif(testDirectory.resolve("missingCell.edf").toString(), libCells));
+		String expectedMessage = "Unable to find library cell of type \"IOBUF\" in the CellLibrary. "
+				+ "Make sure the netlist.edf or the macros.xml file in the RSCP defines this primitive.";
+		assertEquals(expectedMessage, exception.getMessage(), "Wrong exception message thrown!");
+	}
+	
+	/**
 	 * This test verifies that single-level macros (a single level of hierarchy) can be parsed from EDIF 
 	 * and loaded into RapidSmith2 macro cells. The macro cell is inspected to ensure
 	 * that the internal cells, internal nets, and properties are initialized correctly. 
@@ -120,7 +134,7 @@ public class ImportTests {
 	@Test
 	@DisplayName("Macro Import Test2")
 	public void macroTest2() throws IOException {
-		CellLibrary libCells = loadArtix7CellLibrary();
+		CellLibrary libCells = loadArtix7CellLibrary(true);
 		Throwable exception = expectThrows(Exceptions.ParseException.class, () -> EdifInterface.parseEdif(testDirectory.resolve("hierarchy.edf").toString(), libCells));
 		assertTrue(exception.getMessage().startsWith("Multiple levels of hierarchy detected with cell "), "Wrong exception message thrown! " + exception.getMessage());
 	}
@@ -133,7 +147,7 @@ public class ImportTests {
 	@DisplayName("Macro Import Test3")
 	public void macroTest3() throws IOException, ParseException {
 
-		CellLibrary libCells = loadArtix7CellLibrary();
+		CellLibrary libCells = loadArtix7CellLibrary(true);
 		CellDesign design = EdifInterface.parseEdif(testDirectory.resolve("hierarchy2.edf").toString(), libCells); 
 		
 		assertTrue(design.hasCell("counter0"), "Missing macro cell \"counter0\"");
@@ -151,18 +165,20 @@ public class ImportTests {
 	/**
 	 * Loads and returns an artix7 cell library for testing
 	 */
-	private CellLibrary loadArtix7CellLibrary() throws IOException {
+	private CellLibrary loadArtix7CellLibrary(boolean loadMacro) throws IOException {
 		// load the cell library
 		CellLibrary libCells = new CellLibrary(RSEnvironment.defaultEnv()
 				.getPartFolderPath("xc7a100tcsg324-3")
 				.resolve("cellLibrary.xml"));
 		
 		// Add a missing cell for the cell library that is needed to parse the EDIF
-		libCells.loadMacroXML(RSEnvironment.defaultEnv().getEnvironmentPath()
-								.resolve("src")
-								.resolve("test")
-								.resolve("resources")
-								.resolve("macrosTest.xml"));
+		if (loadMacro) {
+			libCells.loadMacroXML(RSEnvironment.defaultEnv().getEnvironmentPath()
+									.resolve("src")
+									.resolve("test")
+									.resolve("resources")
+									.resolve("macrosTest.xml"));
+		}
 		return libCells;
 	}
 }

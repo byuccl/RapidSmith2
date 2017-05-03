@@ -199,8 +199,8 @@ public final class EdifInterface {
 		}
 		// TODO: this assumes the primitive library will always be called "hdi_primitives"
 		else if (eci.getCellType().getLibrary().getName().equals("hdi_primitives")) {
-			throw new Exceptions.ParseException("Unable to find library cell of type: " + eci.getType() +
-					" in the CellLibrary. Make sure the CellLibrary includes this primitive");
+			throw new Exceptions.ParseException("Unable to find library cell of type \"" + eci.getType() + "\" " +
+					"in the CellLibrary. Make sure the netlist.edf or the macros.xml file in the RSCP defines this primitive.");
 		}
 		
 		// If it's not in the CellLibrary, search the Edif file for the definition
