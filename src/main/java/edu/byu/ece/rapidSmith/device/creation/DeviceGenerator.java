@@ -358,7 +358,7 @@ public final class DeviceGenerator {
 			
 			// bel has routethroughs
 			if (routethroughs != null) {
-				//System.out.println(template.getType());
+				
 				for(Element routethrough : routethroughs.getChildren("routethrough")) {
 				
 					String inputPin = routethrough.getChildText("input");
