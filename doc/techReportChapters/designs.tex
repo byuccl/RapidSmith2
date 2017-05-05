@@ -586,8 +586,8 @@ part.
 This means that for each part you use in RapidSmith, a new \cls{CellLibrary}
 needs to be generated \footnote{This may change to be family-specific in the
 future. Usually, parts in the same family can use the same
-\cls{CellLibrary}. The part-specific mention is very conservative, but is one
-that we know is right}.
+\cls{CellLibrary}. The part-specific requirement is very conservative, but is
+one that we know is right}.
 The rest of this section demonstrates how to get access to a cell library in
 RapidSMith, and how to create a new cell library XML file from Tincr.
 
@@ -724,9 +724,9 @@ Xilinx part you are interested in. This can be done in a few easy steps.
   ``mycellLibrary.xml'' with the location where you want to store the generated
   cell library XML. This will generate most of what you need in the cell library
   XML automatically.
-  \item Open the generated XML file in a text editor and search for the
-  ``CARRY'' cell (could be the CARRY4 or CARRY8).
-  \item Scroll down to the ``bels'' XML element within the CARRY cell,
+  \item Series7: If you are generating a cell library for a series7 device, open
+  the generated XML file in a text editor and search for the ``CARRY4'' cell.
+  \item Series7: Scroll down to the ``bels'' XML element within the CARRY cell,
   and add the following lines to each pin that is named ``CI'':
   
   \begin{figure}[H]
@@ -736,8 +736,7 @@ Xilinx part you are interested in. This can be done in a few easy steps.
    %\label{fig:interVsIntra}
   \end{figure}
   
-  If the cell is a CARRY4, you should have to insert this line in two places
-  only.
+  You should have to insert this line in two places only.
   \item Save your changes and exit the text editor
   \item Copy the XML file to \textit{\$RapidSmith\_Path/device/family}
   directory where ``family'' is replaced by the family of your part (such as

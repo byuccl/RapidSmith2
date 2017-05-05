@@ -5,15 +5,37 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \section{Installing New Device Files}
-By default, the RapidSmith2 repository includes an Artix7 {\em xc7a100tcsg324}
-device file. This device has been well tested, and is a good place to start if
-you are learning how to use RapidSmith. However, different devices can also be created.
-This section describes the necessary steps to create new device files. You need
-\texttt{Tincr} installed to install new devices. 
+The device files included with the RapidSmith2 installation (listed in
+\autoref{sec:supportedDevices}) have been well-tested, and are great starting
+points for new users. If you are a new user, it is \emph{strongly encouraged}
+that you learn RapidSmith's APIs and data structures by first implementing CAD tools on
+these devices. However, RapidSmith2 also supports installing new device files
+for parts not listed in \autoref{sec:supportedDevices}. This section contains
+the following: (1) a description of the required intermediate files that need to be
+generated from \texttt{Tincr} to support a new device, and (2) the necessary
+steps to transform the intermediate files into compact device files that can be
+loaded into RapidSmith2.
+
+\subsection {XDLRC}
+The \texttt{Device} data structures in RapidSmith are mainly created from XDLRC
+files. XDLRC files contain a complete physical description of a Xilinx device
+(including tiles, wires, sites, etc.). For older Xilinx parts (series 7 and
+below), these files can be created in ISE with the \texttt{xdl} command. For
+newer parts (UltraScale and above), XDLRC files can be created in Vivado using
+the \texttt{Tincr} command \textit{tincr::write xdlrc}. Because XDLRC files can
+grow to be hundreds of Gigabytes in size, RapidSmith compresses them into much smaller device files
+(usually in the tens of Megabytes). \autoref{sec:appendixXDLRC} contains a more
+detailed description of XDLRC syntax for those who are interested.
 
 \subsection{FamilyInfo}
-A \textit{familyInfo.xml} file contains additional device information that is
-not included in the XDLRC files for a given family of devices. This includes:
+A \textit{familyInfo.xml} file contains useful information that is
+not included in the XDLRC files for a given family of devices. Vivado currently 
+supports 8 different family types: Artix7, Virtex7, Kintex7, Zynq, Kintex
+UltraScale, Virtex UltraScale, Kintex UltraScale+, and Virtex UltraScale+. Only
+one \textit{familyInfo.xml} file is required for each of these families (all 
+devices within a family share the same family info). The remainder of this
+section describes the important parts of a \textit{familyInfo.xml} file, and how
+they are represented in RapidSmith2.
 
 \begin{itemize}
   \item A list of \textbf{compatible types} for each site. Site A is said to be
@@ -38,7 +60,7 @@ not included in the XDLRC files for a given family of devices. This includes:
   \textbf{NOTE}: In some instances of compatibility, you have to first change
   the type of the compatible site before placing cells on it. For example, a
   RAMB36 site is compatible with a RAMBFIFO36 site. However, the site type of
-  the RAMBFIFO36 site \textbf{must be changed to a RAMB36} type before it is
+  the RAMBFIFO36 site \textbf{must be changed to a RAMB36} before it is
   truly compatible.
   
   \item A list of \textbf{routethrough connections} for each LUT BEL (including
@@ -57,9 +79,9 @@ not included in the XDLRC files for a given family of devices. This includes:
   to the corresponding \texttt{Site} data structure. This allows users to change
   site types based on what they need.
   
-    \begin{figure}[H]
+  \begin{figure}[H]
     \centering
-    \includegraphics[width=1\columnwidth]{alternateTypes.png}
+    \includegraphics[width=.8\columnwidth]{alternateTypes.png}
     \caption{Vivado GUI showing alternate types for a BITSLICE\_RX\_TX site.}
     \label{fig:alternateTypes}
   \end{figure}
@@ -86,5 +108,6 @@ not included in the XDLRC files for a given family of devices. This includes:
   INOUT (bidirectional). The Family Info file marks INOUT bel-pins so that
   their direction can be corrected in RapidSmith2.
   
-  
-\end{itemize} 
+\end{itemize}
+
+\subsection{Creating a New Vivado Device}
