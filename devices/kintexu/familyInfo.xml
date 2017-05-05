@@ -553,6 +553,10 @@
 					<name>HFF2</name>
 					<type>HFF2</type>
 				</bel>
+				<bel>
+					<name>HARD0GND</name>
+					<type>GND</type>
+				</bel>
 			</bels>
 			<corrections>
 				<polarity_selector>
@@ -1217,6 +1221,10 @@
 					<name>HFF2</name>
 					<type>HFF2</type>
 				</bel>
+				<bel>
+					<name>HARD0GND</name>
+					<type>GND</type>
+				</bel>
 			</bels>
 			<corrections>
 				<polarity_selector>
@@ -1453,6 +1461,10 @@
 				<bel>
 					<name>RAMBFIFO36E2</name>
 					<type>RAMBFIFO36E2_RAMBFIFO36E2</type>
+				</bel>
+				<bel>
+					<name>HARD0GND</name>
+					<type>GND</type>
 				</bel>
 			</bels>
 			<corrections>
@@ -2556,6 +2568,11 @@
 					<name>USR_ACCESS</name>
 					<type>USR_ACCESS</type>
 				</bel>
+				<bel>
+					<name>CFG_IO_ACCESS</name>
+					<type>CFG_IO_ACCESS</type>
+					<is_test/>
+				</bel>
 			</bels>
 			<corrections/>
 		</site_type>
@@ -2724,6 +2741,10 @@
 				<bel>
 					<name>RAMB36E2</name>
 					<type>RAMB36E2_RAMB36E2</type>
+				</bel>
+				<bel>
+					<name>HARD0GND</name>
+					<type>GND</type>
 				</bel>
 			</bels>
 			<corrections>

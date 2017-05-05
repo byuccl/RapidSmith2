@@ -24,6 +24,7 @@ import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.primitiveDefs.*;
+import edu.byu.ece.rapidSmith.util.Exceptions;
 import edu.byu.ece.rapidSmith.util.HashPool;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
 import org.jdom2.Document;
@@ -177,7 +178,7 @@ public final class DeviceGenerator {
 		// Create a template for each primitive type
 		for (PrimitiveDef def : device.getPrimitiveDefs()) {
 			Element ptEl = getSiteTypeEl(def.getType());
-
+			
 			SiteTemplate template = new SiteTemplate();
 			template.setType(def.getType());
 			template.setBelTemplates(createBelTemplates(def, ptEl));
@@ -213,7 +214,7 @@ public final class DeviceGenerator {
 		for (PrimitiveElement el : def.getElements()) {
 			if (!el.isBel())
 				continue;
-
+			
 			BelId id = new BelId(def.getType(), el.getName());
 			// Set the BEL type as defined in the deviceinfo file
 			String belType = getTypeOfBel(el.getName(), ptElement);
@@ -298,7 +299,7 @@ public final class DeviceGenerator {
 			if (belEl.getChildText("name").equals(belName))
 				return belEl.getChildText("type");
 		}
-		assert false : "No type found for the specified BEL " + belName + ptElement.getChildText("name");
+		assert false : "No type found for the specified BEL " + belName + " " + ptElement.getChildText("name");
 		return null;
 	}
 
@@ -351,23 +352,34 @@ public final class DeviceGenerator {
 		Map <Integer, Set<Integer>> belRoutethroughMap = new HashMap<>();
 		
 		for (Element belEl : siteElement.getChild("bels").getChildren("bel")) {
-			String belType = belEl.getChildText("type");
+			String belType = belEl.getChildText("name");
 			
 			Element routethroughs = belEl.getChild("routethroughs");
 			
 			// bel has routethroughs
 			if (routethroughs != null) {
-				System.out.println(template.getType());
+				//System.out.println(template.getType());
 				for(Element routethrough : routethroughs.getChildren("routethrough")) {
 				
 					String inputPin = routethrough.getChildText("input");
 					String outputPin = routethrough.getChildText("output");
 					
-					Integer startEnum = we.getWireEnum(getIntrasiteWireName(template.getType(), belType, inputPin)); 
-					Integer endEnum = we.getWireEnum(getIntrasiteWireName(template.getType(), belType, outputPin));
+					String inputWireName = getIntrasiteWireName(template.getType(), belType, inputPin);
+					String outputWireName = getIntrasiteWireName(template.getType(), belType, outputPin);
+							
+					Integer startEnum = we.getWireEnum(inputWireName); 
+					Integer endEnum = we.getWireEnum(outputWireName);
 										
-					// check that the wire names actually exist
-					assert (startEnum != null && endEnum != null) : "Intrasite wirename not found";
+					// If the wire names for the routethrough do not exist, throw a parse exception telling the user 
+					if (startEnum == null) {
+						throw new Exceptions.ParseException(String.format("Cannot find intrasite wire \"%s\" for bel routethrough \"%s:%s:%s\". "
+								+ "Check the familyInfo.xml file for this routethrough and make sure the connections are correct.", 
+								inputWireName, template.getType(), inputPin, outputPin));
+					} else if (endEnum == null) {
+						throw new Exceptions.ParseException(String.format("Cannot find intrasite wire \"%s\" for bel routethrough \"%s:%s:%s\". "
+								+ "Check the familyInfo.xml file for this routethrough and make sure the connections are correct.", 
+								outputWireName, template.getType(), inputPin, outputPin));
+					}
 					
 					// add the routethrough to the routethrough map; 
 					Set<Integer> sinkWires = belRoutethroughMap.computeIfAbsent(startEnum, k -> new HashSet<>());
@@ -1080,10 +1092,12 @@ public final class DeviceGenerator {
 			assert altEl != null;
 			Element pinmapsEl = altEl.getChild("pinmaps");
 			Element pinEl = null;
-			for (Element pinTmpEl : pinmapsEl.getChildren("pin")) {
-				if (pinTmpEl.getChildText("name").equals(sitePin)) {
-					pinEl = pinTmpEl;
-					break;
+			if (pinmapsEl != null) {
+				for (Element pinTmpEl : pinmapsEl.getChildren("pin")) {
+					if (pinTmpEl.getChildText("name").equals(sitePin)) {
+						pinEl = pinTmpEl;
+						break;
+					}
 				}
 			}
 			return pinEl;
