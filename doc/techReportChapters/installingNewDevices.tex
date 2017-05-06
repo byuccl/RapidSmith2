@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Section 11: Installing New Devices
+% Section 10: Installing New Devices
 %	This section provides a detailed walkthrough on how to install new devices
 %	to be used in RapidSmith.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -157,7 +157,7 @@ a Xilinx device. Notice the two JVM command line arguments used in the command
 above. The first option (``-ea'') enables assertions for the code. It is important
 to include this flag so that device file errors can be caught during parsing.
 If you are creating a new device file for a supported family however, there
-should be no errors during the installation process. The second options
+should be no errors during the installation process. The second option
 (``-Xmx4096m'') sets how much memory the JVM can use while running the
 installer. Since XDLRC files are so large, the memory usage of the installer can
 grow very quickly. In the command above, the JVM is set to use 4 GB of memory.
@@ -184,6 +184,13 @@ cellLibrary.xml familyInfo.xml |\textbf{xc7a100tcsg324\_db.dat}| |\textbf{xc7a10
 
 
 \subsection{Supporting New Device Families} \label{sec:newFamilies}
+
+
+
+\begin {enumerate}
+  \item 
+\end{enumerate}
+
  
 1.) Look in the tincr/cache folder of your Tincr Installation. Then try to find
 the family folder for you device (i.e. Artix7). If you look inside the family
@@ -195,14 +202,6 @@ repository.
 
 2.) Once the primitive defs are created, put them in the tincr cache folder as
 described in step (1). 
-
-% TODO: put full command here!
-3.) Run the Tincr command ::tincr::write\_xdlrc - 
-where ``myPart'' is replaced with the part of your choice
-
-4.) Look in the RapidSmith2 directory devices/family. If there is a
-familyInfo.xml file already there, then you don't have to worry about creating a
-new one yourself. Skip to step ?
 
 5.) Generate a new Family Info. If you are generating a new familyInfo.xml, then
 that means that most likely you also generated the primitive defs using VSRT. In
@@ -220,14 +219,6 @@ through each site in the family info file, and make sure there are no
 corrections that need to be made before creating a new device file in
 RApidSmith. Once the family info is created, store it in
 rapidSmithPath/devices/family/familyInfo.xml. 
-
-6.) To generate a new device file in RS2, you need to execute the java class
-with the following options  ``ece.byu.edu.rapidSmith.util.Installer --generate
-file pathToXDLRCFile''. This process requires A LOT of memory. Make sure that
-you enable assertions (-ea) and set the max memory usage of the Installer
-(-Xmx8000m) to a number big enough. Having at least 16 GB of RAM is recommended
-for this process. If the installer fails because you ran out of memory, keep
-increasing the memory until it does not fail. 
 
 \begin{enumerate}
   \item 
