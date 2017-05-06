@@ -20,10 +20,8 @@
 
 package design.subsite;
 import java.util.*;
-import java.util.concurrent.SynchronousQueue;
 
 import edu.byu.ece.rapidSmith.device.*;
-import edu.byu.ece.rapidSmith.util.RapidSmithDebug;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,41 +31,71 @@ import static org.junit.jupiter.api.Assertions.*;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 
 /**
- * jUnit test for the Cell class in RapidSmith2
+ * jUnit test for the RouteTree class in RapidSmith2
  * @author Mark Crossen
  */
 @RunWith(JUnitPlatform.class)
 public class RouteTreeTest {
 
+    /** the Site that all tested RouteTrees share through the SiteWire */
     private Site dummy_site;
+    /** the SiteWire that all tested RouteTrees will share */
     private SiteWire dummy_wire;
-    // for these tests, a RouteTree with three levels is created. each of the levels is remembered as follows:
+    /** A three-level structure will be tested. This is level 1 of 3 */
     private RouteTree root;
+    /** A three-level structure will be tested. This is level 2 of 3 */
     private RouteTree branch;
+    /** A three-level structure will be tested. This is level 3 of 3 */
     private RouteTree leaf;
 
+    /**
+     * This method is ran between tests to repair and initialize the three tested RouteTrees.
+     */
     @BeforeEach
     protected void setUp() {
+        // Create a fake device, tile, and string array. Apparently these are needed when finding the hashCode() of a SiteWireConnection
+        String[] wires = new String[1];
+        wires[0] = "dummy_wire_enum";
+        WireEnumerator dummy_wire_enumerator = new WireEnumerator();
+        dummy_wire_enumerator.setWires(wires);
+        Device dummy_device = new Device();
+        dummy_device.setWireEnumerator(dummy_wire_enumerator);
+        Tile dummy_tile = new Tile();
+        dummy_tile.setDevice(dummy_device);
+        // fill the variables that will be used for the test
         dummy_site = new Site();
+        dummy_site.setName("dummy_site");
+        dummy_site.setTile(dummy_tile);
         dummy_wire = new SiteWire(dummy_site, 0);
-        root = newDummyTree();
-        branch = root.addConnection(newDummyConnection(false));
-        leaf = branch.addConnection(newDummyConnection(true));
+        // each RouteTree has a unique value so that they hash differently
+        root = newDummyTree(); // unique value = 0
+        branch = root.addConnection(newDummyConnection(1, false)); // unique value = 1
+        leaf = branch.addConnection(newDummyConnection(2, true)); // unique value = 2
     }
 
-    // helper function to create a new dummy route tree
+    /**
+     * A helper function to create a new RouteTree.
+     *
+     * @return a new RouteTree containing a simple connection
+     */
     private RouteTree newDummyTree() {
-        return new RouteTree(dummy_wire);
+        RouteTree rt = new RouteTree(dummy_wire);
+        rt.setConnection(newDummyConnection(0, false));
+        return rt;
     }
 
-    // helper functionn to create a new dummy connection
-    public Connection newDummyConnection(boolean isPip) {
-        WireConnection wc = new WireConnection();
-        wc.setPIP(isPip);
+    /**
+     * A helper function to create a simple connection
+     *
+     * @param unique this can be any number. It is used to make each Connection have a different hashCode()
+     * @param isPip boolean to determine wether or not the Connection is a PIP
+     * @return the built connection
+     */
+    public Connection newDummyConnection(int unique, boolean isPip) {
+        WireConnection wc = new WireConnection(dummy_wire.getWireEnum(), unique, unique, isPip);
         return Connection.getSiteWireConnection(dummy_wire, wc);
     }
-
-
+    
     @Test
     @DisplayName("test RouteTree method 'isSourced'")
     public void testIsSourced() {
