@@ -351,7 +351,7 @@ public final class DeviceGenerator {
 		Map <Integer, Set<Integer>> belRoutethroughMap = new HashMap<>();
 		
 		for (Element belEl : siteElement.getChild("bels").getChildren("bel")) {
-			String belType = belEl.getChildText("type");
+			String belName = belEl.getChildText("name");
 			
 			Element routethroughs = belEl.getChild("routethroughs");
 			
@@ -363,8 +363,8 @@ public final class DeviceGenerator {
 					String inputPin = routethrough.getChildText("input");
 					String outputPin = routethrough.getChildText("output");
 					
-					Integer startEnum = we.getWireEnum(getIntrasiteWireName(template.getType(), belType, inputPin)); 
-					Integer endEnum = we.getWireEnum(getIntrasiteWireName(template.getType(), belType, outputPin));
+					Integer startEnum = we.getWireEnum(getIntrasiteWireName(template.getType(), belName, inputPin));
+					Integer endEnum = we.getWireEnum(getIntrasiteWireName(template.getType(), belName, outputPin));
 										
 					// check that the wire names actually exist
 					assert (startEnum != null && endEnum != null) : "Intrasite wirename not found";
