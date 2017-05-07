@@ -31,12 +31,12 @@ public final class BelTemplate implements Serializable {
 	private int hashCode = 0;
 	private final BelId id;
 	// Type of the BEL, not a part of XDLRC
-	private final String type;
+	private final BelType type;
 	// BelPinTemplates for each pin on the BEL
 	private Map<String, BelPinTemplate> sources = new HashMap<>();
 	private Map<String, BelPinTemplate> sinks = new HashMap<>();
 
-	public BelTemplate(BelId id, String type) {
+	public BelTemplate(BelId id, BelType type) {
 		this.id = id;
 		this.type = type;
 	}
@@ -45,7 +45,7 @@ public final class BelTemplate implements Serializable {
 		return id;
 	}
 
-	public String getType() {
+	public BelType getType() {
 		return type;
 	}
 

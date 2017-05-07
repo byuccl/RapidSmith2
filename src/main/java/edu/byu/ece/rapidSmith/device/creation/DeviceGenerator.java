@@ -216,7 +216,7 @@ public final class DeviceGenerator {
 
 			BelId id = new BelId(def.getType(), el.getName());
 			// Set the BEL type as defined in the deviceinfo file
-			String belType = getTypeOfBel(el.getName(), ptElement);
+			BelType belType = getTypeOfBel(el.getName(), ptElement);
 
 			BelTemplate template = new BelTemplate(id, belType);
 
@@ -293,10 +293,10 @@ public final class DeviceGenerator {
 	 * @param ptElement XML element detailing the primitive type
 	 * @return the BEL type
 	 */
-	private String getTypeOfBel(String belName, Element ptElement) {
+	private BelType getTypeOfBel(String belName, Element ptElement) {
 		for (Element belEl : ptElement.getChild("bels").getChildren("bel")) {
 			if (belEl.getChildText("name").equals(belName))
-				return belEl.getChildText("type");
+				return BelType.valueOf(device.getFamily(), belEl.getChildText("type"));
 		}
 		assert false : "No type found for the specified BEL " + belName + ptElement.getChildText("name");
 		return null;

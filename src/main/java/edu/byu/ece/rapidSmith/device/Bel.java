@@ -101,7 +101,7 @@ public final class Bel implements Serializable {
 	 *
 	 * @return the type of this BEL
 	 */
-	public String getType() {
+	public BelType getType() {
 		return template.getType();
 	}
 
