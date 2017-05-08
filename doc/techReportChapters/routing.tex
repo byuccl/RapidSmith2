@@ -16,26 +16,26 @@ determining the \belpins they are connected to (based on the \cellpins), and
 finding a list of physical wires that electrically connect the pins together.
 This section details how routing is done in RS2.
 
-\subsection{Wires and WireConnections} \label{wireConnSection}
+\subsection{Wires and Wire Connections} \label{wireConnSection}
 Routing in RapidSmith is done using \cls{Wire} objects, which are described in
 \autoref{wireSection}. \cls{Wire}s are uniquely identified by their
-corresponding tile and wire name (i.e. tile1/wire1), and are connected through
-\cls{WireConnection} objects. There are two types of wire connections:
+corresponding tile and wire name (i.e. tileName/wireName), and are connected
+through \cls{Connection} objects. There are two types of wire connections:
 
 \begin {enumerate}
-  \item \pgm{PIP Connections}: Connect two different wires through a
+  \item \textbf{PIP Connections}: Connect two different wires through a
   Programmable Interconnect Point. Most PIP connections are found in
   switchbox tiles of an FPGA part (as shown in \autoref{fig:switchboxPIP}).
   These types of connections are important to FPGA routing, because they
   dynamically configure the routing network for a given design.
    
-  \item \pgm{Non-PIP Connections}: Connect the same physical wire across two
+  \item \textbf{Non-PIP Connections}: Connect the same physical wire across two
   different tiles. In general, wires stretch across multiple tiles in a device, having
   a different name in each tile. This is demonstrated in
   \autoref{fig:wireFigure}. The example wire shown in the figure spans 5
   different tiles, but has a different name in each. To save space, only the
   source and sink wire segments are kept in RapidSmith data structures
-  (\texttt{INT\_X1Y1/E2BEG4}, \texttt{INT\_X2Y1/E2MID4}, and
+  (i.e. \texttt{INT\_X1Y1/E2BEG4}, \texttt{INT\_X2Y1/E2MID4}, and
   \texttt{INT\_X3Y1/E2END4}). The source segment is connected to each sink
   segment through a non-PIP wire connection. It is also possible to have non-PIP
   connections within a \tile, but this is rare.
@@ -51,17 +51,17 @@ different name depending on the tile it is located in}
 
 \subsection{Traversing Wire Objects}
 Traversing through wires in a device is straightforward. Given a handle to a
-\cls{Wire} object named "mywire" or a \cls{WireConnection} object named
-"wc", the following function calls can be used:
+\cls{Wire} object named "mywire" or a \cls{Connection} object named
+"conn", the following function calls can be used:
 
 \begin {itemize}
   \item \texttt{mywire.getWireConnections()}: Returns a collection of all
-  \cls{WireConnection}s with the source wire of mywire. This collection can be
-  iterated through to find all places a specific wire goes (i.e. what wires it
+  \cls{Connection} objects whose source is ``mywire''. This collection can
+  be iterated over to find all places a specific wire goes (i.e. what wires it
   connects to).
-  \item  \texttt{wc.isPip()}: Returns true if the wire connection ``wc'' is a PIP
-  connection. Returns false otherwise.
-  \item \texttt{wc.getSinkWire()}: Returns the sink wire of a wire connection.
+  \item  \texttt{conn.isPip()}: Returns true if the wire connection ``conn'' is
+  a PIP connection. Returns false otherwise.
+  \item \texttt{conn.getSinkWire()}: Returns the sink wire of a wire connection.
 \end{itemize} 
 
 \noindent
@@ -70,8 +70,8 @@ search through the wires of a FPGA device. It is important to note however that
 the first wire in the route has to be either (a) created using a \cls{TileWire}
 constructor, or (b) retrieved from a function call of another object (such as
 \texttt{SitePin::getExternalWire()}). \autoref{code:connections} demonstrates
-how to iterate through \cls{WireConnection} objects. To gain a better
-understanding of how to use \cls{Wire}s and \cls{WireConnection}s, see the
+how to iterate over \cls{Connection} objects. To gain a better
+understanding of how to use \cls{Wire}s and \cls{Connection}s, see the
 \pgm{HandRouter} example in the RapidSmith repository.
 
 \subsection{Other Types of Connections} \label{otherConns}

@@ -31,7 +31,7 @@ needed.
 \subsubsection{Tiles}
 Conceptually, a Xilinx FPGA can be thought of as a two dimensional
 array of \cls{Tile}s. A \cls{Tile} is a template section within a FPGA that
-performs a specific function (say, implementing logic equations). Templates are
+performs a specific function (i.e. implementing logic equations). Templates are
 then duplicated across the device (all copies are identical) and different
 \cls{Tile} types are wired together. As an example, \autoref{fig:tileExample}
 displays three types of template \cls{Tile}s in an Artix7 part.
@@ -84,7 +84,7 @@ to/from its \cls{Site}s. \autoref{fig:site} shows a SLICEL, one of the
 components to \cls{Site}s in Xilinx FPGAs:
 
 \begin{itemize}
-  \item \cls{Site} \cls{PIP}s: Reconfigurable routing PIPS used for intrasite
+  \item \cls{Site} \cls{PIP}s: Reconfigurable routing PIPs used for intrasite
   routing (also called routing muxes). In Vivado, \cls{Site} \cls{PIP}s are usually configured
   automatically as cells in a design are being placed (based on cell properties
   and placement location).
@@ -126,7 +126,7 @@ In the original RapidSmith, the \cls{Device} architecture stopped at the
 configured using string attributes, but the actual components were unknown.
 RapidSmith 2 extends the \cls{Device} architecture to include all components
 \pgm{within} a \cls{Site} as well. \autoref{fig:deviceDataStructures}
-shows the new data structure hierarchy, which can be found in the {\em
+shows the new device data structure hierarchy, which can be found in the {\em
 edu.byu.ece.rapidSmith.device} package.
 
 \begin{figure}[H]
@@ -199,5 +199,38 @@ RapidSmith, it is suggested that the user use these interfaces. Several of the
 examples referenced in \autoref{examples} demonstrate the use of these
 interfaces.
 
-\subsection{Supported Device Files}
-TODO section:
+\subsection{Loading a Device}
+
+The code sample below demonstrates how to load a supported device in
+RapidSmith2.
+
+\begin{lstlisting}[caption=Loading a Device, label=code:loadDevice]
+Device device = RSEnvironment.defaultEnv().getDevice("xc7a100tcsg324");
+//or
+Device deviceReloaded = RSEnvironment.defaultEnv().getDevice("xc7a100tcsg324", true);
+\end{lstlisting}
+
+\noindent The first function call will only load the device into memory if it
+has not yet been loaded. If it has been loaded, then the cached \texttt{Device}
+data structure will be returned. The second function call will reload the device from
+disk, creating a completely separate \texttt{Device} data structure. This is
+useful when implementing multi-threaded code that targets the same part.
+\textbf{NOTE:} When a Vivado design is loaded into RapidSmith2 via a RSCP, the
+corresponding device is also loaded.
+
+\subsection{Supported Device Files} \label{sec:supportedDevices}
+RapidSmith2 currently supports the following device families and parts.
+
+\begin {itemize}
+  \item Artix7 
+  	\begin{itemize}
+  	  \item xc7a100t-csg324-3
+  	\end{itemize}
+  \item Kintex Ultrascale (kintexu)
+    \begin{itemize}
+  	  \item xcku025-ffva1156 
+  	\end{itemize}
+\end{itemize}
+
+\noindent Section \ref{sec:installingDeviceFiles} describes how to install new
+RapidSmith2 device files if you wish to add to this list. 

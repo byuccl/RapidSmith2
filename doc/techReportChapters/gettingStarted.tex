@@ -40,9 +40,10 @@ Tools.
   {\color{blue}{\url{https://github.com/byuccl/RapidSmith2}}}. If you are not
   familiar with GitHub, you will need to install Git on your computer, and run the
   following command in an open terminal: 
-  \begin{code}
-  git clone https://github.com/byuccl/RapidSmith2
-  \end{code} 
+\vspace{-0.07in}
+\begin{code}
+git clone https://github.com/byuccl/RapidSmith2
+\end{code} 
   \noindent This will copy the RS2 repository into a local directory.
   \item Create a new environment variable called RAPIDSMITH\_PATH, and point it
   to your local repository of RS2 that you setup in step (1). This is needed so
@@ -153,9 +154,9 @@ Some points to keep in mind while configuring and running RS2 programs:
 \subsubsection{Testing Your Installation}
 \noindent At this point you can test your installation by executing the java
 \pgm{DeviceBrowser} program: 
-\vspace{-0.15in}  \begin{code}
+\begin{code}
 java edu.byu.ece.rapidSmith.device.browser.DeviceBrowser
-\end{code}    
+\end{code} \vspace{0.1in}    
 
 \noindent This can be done either from within Eclipse or from the command line,
 depending on how you are running RS2 (if running under OS X be sure to provide the
@@ -170,12 +171,3 @@ want to zoom out to see the entire chip layout.
 \caption{\pgm{DeviceBrowser} Sample Display}
 \label{fig:deviceBrowser}
 \end{figure}
-
-\subsection{Device Files For Use With RS2}
-Device files for one part (the {\em xc7a100tcsg324}) are included in the
-distribution so you can immediately start working with RS2 (initially, it
-will be the only device available when you run the \pgm{DeviceBrowser} program
-above).  The device files for this part can be found in the
-\dir{\${RAPIDSMITH\_PATH}/devices/artix7} directory. If you desire to work with
-additional parts, follow the instructions found in the file
-\fil{\$RAPIDSMITH\_PATH/\-doc/Installing\-NewDevices.txt}.

@@ -713,7 +713,8 @@ a normal cell.
 During runtime, a \cls{CellLibrary} data structure is created by parsing a
 \textit{cellLibrary.xml} file into memory. So, to create a new \cls{CellLibrary}
 all you have to do is generate a new \textit{cellLibrary.xml} file for the
-Xilinx part you are interested in. This can be done in a few easy steps.
+Xilinx part you are interested in. This can be done in a few easy steps (the
+items marked with \textbf{SERIES7} only need to be done for series7 families).
 
 \begin{enumerate}
   \item Open Vivado in Tcl mode, and type the following into the console:
@@ -724,26 +725,22 @@ Xilinx part you are interested in. This can be done in a few easy steps.
   ``mycellLibrary.xml'' with the location where you want to store the generated
   cell library XML. This will generate most of what you need in the cell library
   XML automatically.
-  \item Series7: If you are generating a cell library for a series7 device, open
-  the generated XML file in a text editor and search for the ``CARRY4'' cell.
-  \item Series7: Scroll down to the ``bels'' XML element within the CARRY cell,
-  and add the following lines to each pin that is named ``CI'':
+  \item \textbf{SERIES7}: Open the generated XML file in a text editor and
+  search for the ``CARRY4'' cell. Scroll down to the ``bels'' XML element within
+  the CARRY4 cell, and add the following lines to each pin that is named ``CI'':
   
   \begin{figure}[H]
    \centering
    \includegraphics[width=.9\columnwidth]{cellLibHandEdit.png}
-   %\caption{Example of an INTRASITE net (left) and an INTERSITE net (right).}
-   %\label{fig:interVsIntra}
   \end{figure}
   
   You should have to insert this line in two places only.
   \item Save your changes and exit the text editor
-  \item Copy the XML file to \textit{\$RapidSmith\_Path/device/family}
+  \item Copy the XML file to \textit{RapidSmithPath/device/family}
   directory where ``family'' is replaced by the family of your part (such as
-  Artix7), and ``\$RapidSmith\_Path'' is your RapidSmith repository location.
-  Once this is done the new \cls{CellLibrary} should be ready to use. 
+  artix7), and ``RapidSmithPath'' is the location of your RapidSmith repository.
+  Once this is complete the new \cls{CellLibrary} should be ready to use. 
 \end{enumerate}
 
-\pgm{NOTE}: Usually, parts in the same family can use the same
+\pgm{NOTE}: Parts in the same family can usually use the same
 \cls{CellLibrary}.
-
