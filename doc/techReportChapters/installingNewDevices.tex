@@ -184,43 +184,197 @@ cellLibrary.xml familyInfo.xml |\textbf{xc7a100tcsg324\_db.dat}| |\textbf{xc7a10
 
 
 \subsection{Supporting New Device Families} \label{sec:newFamilies}
+Vivado supports implementing FPGA designs on devices for the following families
+(also called architectures):
 
+\begin{multicols}{2}
+	\begin {itemize}
+	  \item \textbf{Artix7 (artix7)}
+	  \item Kintex7 (kintex7)
+	  \item Virtex7 (virtex7)
+	  \item Zynq (zynq)
+	  \item \textbf{Kintex Ultrascale (kintexu)}
+	  \item Virtex Ultrascale (virtexu)
+	  \item Kintex Ultrascale+ (kintexuplus)
+	  \item Virtex Ultrascale+ (virtexuplus)
+	  \item *Future Devices
+	\end{itemize}
+\end{multicols}
 
+\noindent The name in parenthesis is the Vivado Tcl name for the family. Bolded
+items are families that are currently supported in RapidSmith2 and
+\texttt{Tincr}. To add RapidSmith support for another Vivado family, follow the
+steps listed below.
 
 \begin {enumerate}
-  \item 
-\end{enumerate}
+  \item Create the primitive definitions for the family using VSRT. As
+  described in \autoref{sec:appendixXDLRC}, the primitive definitions are the
+  portion of the XDLRC file that define the components of primitive sites. Due
+  to Vivado Tcl limations however, a complete set of primitive definitions
+  cannot be automatically generated using Vivado Tcl commands. You will have
+  to do some manual work to create the primitive definitions for the new family.
+  The VSRT user guide
+  {\color{blue}\url{https://github.com/byuccl/RapidSmith2/blob/ultrascale/doc/VSRTUserGuide.pdf}}
+  describes in great detail how to generate a complete set of primitive
+  definitions for a Vivado family of devices. Follow the guide to create the
+  primitive definitions for your family. \textbf{NOTE}: Families within
+  the same series (i.e. series 7, ultrascale, ultrascale+, etc.) share
+  several primitive definitions. For example, many primitive defs between Kintex
+  UltraScale and Virtex UltraScale families are identical. You may be able to
+  reuse existing primitive definitions between families.
+  
+  \item Copy the primitive definitions you created in step (1) to the
+   directory \textit{tincrPath/cache/family/primitiveDefs}, where ``tincrPath
+   is the path to your \texttt{Tincr} installation and ``family'' is the family
+   for the primitive defs you just generated (use the Vivado Tcl name if you
+   need to create a new folder).
+   
+   \item Create the \textit{familyInfo.xml}. To do this, open Vivado in Tcl mode
+   and execute the command \\
+   \textit{::tincr::create\_xml\_family\_info}. An example usage of the command
+   is shown below for Kintex UltraScale. 
+   
+\begin{lstlisting}[numbers=none]
+[ttown523@CB461-EE09968:˜] vivado -mode tcl
 
+****** Vivado v2014.2 (64-bit)
+ **** SW Build 928826 on Thu Jun 5 17:55:10 MDT 2014
+ **** IP Build 924643 on Fri May 30 09:20:16 MDT 2014
+  ** Copyright 1986-2014 Xilinx, Inc. All Rights Reserved.
+
+Vivado% ::tincr::create_xml_family_info familyInfo.xml kintexu addedBels.txt 
+\end{lstlisting}
+	
+	\noindent As the listing shows, there are three arguments to the command:
+	\begin{itemize}
+	  \item \textbf{familyInfo.xml}: The file name to store the generated family
+	  info. The file ending ``.xml" will be appended if it is not included.
+	  \item \textbf{kintexu}: The Vivado family name.
+	  \item \textbf{addedBels.txt}: When you are generating primitive defs
+	  using VSRT (in step 1), a text file called ``addedBels.txt" is created in
+	  your VSRT directory. This file contains a list of added VCC/GND BELs for
+	  each family. To generate a complete Family Info file, pass this text file as
+	  the third argument to the above command.
+	\end{itemize}    
+    
+    \item Modify the generated Family Info. After step (3) is complete, a few
+    hand edits are required to complete the family info file. The required hand
+    edits are different between series7 and other devices.
+    
+    \bigbreak \noindent
+	\begin{large}
+	\textbf{Series7}
+	\end{large}
+    
+    \noindent Due to complications with Vivado's Tcl interface, there are
+    several hand edits that are required to complete the series7 family info
+    files. This is why RapidSmith2 already provides support for series7 devices.
+    However, the required manual edits are documented here in case they need to
+    be regenerated for some reason. 
+    
+    \begin{enumerate}
+      \item The first hand edit is to remove invalid alternate types. For a site
+      type of IPAD, for example, Vivado's Tcl interface reports two alternate
+      site types: IOB18M and IOB18S. These site types are not actually valid
+      alternate types, meaning they have to be removed. The figure below
+      demonstrates the actual alternate types for an IPAD site. 
+      
+      !!!!TODO add figure of IPAD alternate tyes in GUI.
+      
+      \noindent As can be seen, there are no valid alternate types. The only way
+      to find invalid alternate types is to go site-by-site in the family info, select an instance of the site type in
+      Vivado's device browser, and click the site type dropdown box. If there
+      are any site types reported in the family info XML that are not shown in
+      the GUI, they need to be removed from the XML.
+      
+      \item  The second hand edit is to add alternate type pin mappings. When a
+      site is changed to one of its alternate types in Vivado, the site pins can
+      be renamed. An example is shown in \autoref{fig:alternatePinRename} for an
+      IDELAYE3 site that has been changed to type ISERDESE2.
+      
+      TODO: ADD FIGURE HERE SHOWING PIN RENAMINGS
+      
+      Unfortunatly the pin renamings cannot be automatically extracted from
+      Vivado's Tcl interface, and so must be added manually. The XML example
+      below shows how to add pin renamings to the Family Info.
+
+\begin{lstlisting}[numbers=none]
+    <site_type>
+      <name>ILOGICE3</name>
+      <alternatives>
+        <alternative>
+          <name>ILOGICE2</name>
+          |\textbf{<pinmaps>}|
+          |\textbf{</pinmaps>}|
+        </alternative>
+        <alternative>
+          <name>ISERDESE2</name>
+          |\textbf{<pinmaps>}|
+	        |\textbf{<pin>}|
+	          |\textbf{<name>RST</name>}|
+	          |\textbf{<map>SR</map>}|
+	        |\textbf{</pin>}|
+          |\textbf{</pinmaps>}|
+        </alternative>
+      </alternatives>
+\end{lstlisting}
+      
+      \noindent The XML ``pinmaps'' tag is included for all alternate types in
+      the initial XML file created from \textit{create\_xml\_family\_info}, all
+      you need to do is fill in the pin mappings. To determine the actual pin
+      mappings, you need to open two instances of the Vivado GUI. For each site
+      in the Family Info, load the default type in one Vivado instance, load the
+	  the alternate type in the other instance, and visibly check what pins are
+	  renamed in the alternate type (as demonstrated in
+	  \autoref{fig:alternatePinRename}). This process can be tedious, but there is
+	  currently no other solution. \textbf{NOTE}: Steps (a) and (b) are generally
+	  done at the same time for each site.
+	  
+	  \item The third hand edit is to remove invalid mux corrections. In some
+	  cases, BELs might be incorrectly tagged as ``routing muxes'' or ``polarity selectors'' even though they are
+	  not. This issue has mostly been fixed, but it is still good practice to
+	  examine all of the mux corrections in the Family Info and verify that they
+	  are correct.
+	  
+	  \item The final hand edit is to add missing compatible types. Some compatible
+	  types can be automatically generated from Vivado, but not all. This means
+	  that the missing compatible types must be added manually. The next section
+	  (``Other Devices'') describes in more detail how to add compatible types to the Family Info.
+	  
+    \end{enumerate}
+    
+    \bigbreak \noindent
+	\begin{large}
+	\textbf{Other Devices}
+	\end{large}
+	  	
+  	\noindent UltraScale and later devices require only one hand edit: adding 
+  	compatible types that are missing (although most compatible types can be
+  	determined automatically). The XML listings below show the compatible types
+  	that were missing for Kintex UltraScale (which need to be added manually).
+
+\begin{lstlisting}[numbers=none]
+    <site_type>
+      <name>SLICEL</name>
+      <is_slice/>
+      |\textbf{<compatible\_types>}|
+        |\textbf{<compatible\_type>SLICEM</compatible\_type>}|
+      |\textbf{</compatible\_types>}|
+\end{lstlisting}  
+
+\begin{lstlisting}[numbers=none]
+    <site_type>
+      <name>HRIO</name> 
+      <is_iob/>
+      |\textbf{<compatible\_types>}|
+        |\textbf{<compatible\_type>HPIOB</compatible\_type>}|
+      |\textbf{</compatible\_types>}|
+\end{lstlisting} 
+   
+	\noindent For other device families, you may have to add additional compatible
+	sites. It is up to you to determine what compatible sites need to be added
+	through experimentation.
+  
+  	\noindent 
+\end{enumerate}
  
-1.) Look in the tincr/cache folder of your Tincr Installation. Then try to find
-the family folder for you device (i.e. Artix7). If you look inside the family
-folder and there is no ``primitive defs'' folder (or the family folder does not
-exist), then you will need to generate the primitive defs before creating the
-XDLRC file. To do this, you will need to use the VSRT GUI. The process to
-create a new set of primitive defs is given in the VSRTUserGuide.pdf of the RS2
-repository. 
-
-2.) Once the primitive defs are created, put them in the tincr cache folder as
-described in step (1). 
-
-5.) Generate a new Family Info. If you are generating a new familyInfo.xml, then
-that means that most likely you also generated the primitive defs using VSRT. In
-the VSRT folder you used, there is a file called ``addedBels.txt''.
-To generate a new family info file, run the Vivado command
-::tincr::create\_xml\_family\_info ``familyInfo.xml'' family addedBels.txt. 
-This will generate most of the information you need for the family info file.
-However, there are some compatible sites that are NOT included with this file. 
-For ultrascale, we needed to manually add these two compatible types manually:
-!!put pictures here with highlighted text!!
-For your device, you will have to determine what compatible types are missing
-(SLICEL->SLICEM will always be one, and there should be some IOB sites that are
-compatible, but the rest is up to you to determine). It is best practice to go
-through each site in the family info file, and make sure there are no
-corrections that need to be made before creating a new device file in
-RApidSmith. Once the family info is created, store it in
-rapidSmithPath/devices/family/familyInfo.xml. 
-
-\begin{enumerate}
-  \item 
-\end{enumerate}
-
