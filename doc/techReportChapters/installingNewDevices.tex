@@ -249,11 +249,12 @@ Vivado% ::tincr::create_xml_family_info familyInfo.xml kintexu addedBels.txt
 	  \item \textbf{familyInfo.xml}: The file name to store the generated family
 	  info. The file ending ``.xml" will be appended if it is not included.
 	  \item \textbf{kintexu}: The Vivado family name.
-	  \item \textbf{addedBels.txt}: When you are generating primitive defs
-	  using VSRT (in step 1), a text file called ``addedBels.txt" is created in
+	  \item \textbf{addedBels.txt} (Optional): When you are generating primitive
+	  defs using VSRT (in step 1), a text file called ``addedBels.txt" is created in
 	  your VSRT directory. This file contains a list of added VCC/GND BELs for
 	  each family. To generate a complete Family Info file, pass this text file as
-	  the third argument to the above command.
+	  the third argument to the above command. The default argument is an empty
+	  string so that no extra BELs will be added to the family info.
 	\end{itemize}    
     
     \item Modify the generated Family Info. After step (3) is complete, a few
