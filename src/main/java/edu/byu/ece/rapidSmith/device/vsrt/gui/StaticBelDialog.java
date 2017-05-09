@@ -19,6 +19,8 @@
  */
 package edu.byu.ece.rapidSmith.device.vsrt.gui;
 
+import java.util.Set;
+
 import com.trolltech.qt.core.Qt;
 import com.trolltech.qt.core.Qt.AlignmentFlag;
 import com.trolltech.qt.gui.QDialog;
@@ -45,11 +47,14 @@ public class StaticBelDialog extends QDialog {
 	private QPushButton add;
 	/**Button that closes the dialog*/
 	private QPushButton cancel;
+	/** A set of existing BEL names in the site*/
+	private Set<String> existingBels;
 	
-	public StaticBelDialog() {
+	public StaticBelDialog(Set<String> existingBels) {
 		this.setWindowTitle("Add VCC/GND");
 		this.initializeComponents();
 		this.initializeLayout();
+		this.existingBels = existingBels;
 		
 		//making the dialog not re-sizable
 		this.layout().setSizeConstraint( QLayout.SizeConstraint.SetFixedSize );
@@ -106,8 +111,13 @@ public class StaticBelDialog extends QDialog {
 	
 	@SuppressWarnings("unused")
 	private void addBel() {
-		if (this.nameTextBox.text().trim().equals("")) {
+		String proposedName = this.nameTextBox.text().trim(); 
+		if (proposedName.equals("")) {
 			QMessageBox.information(this, "Missing Element Name", "Enter a valid element name");
+		}
+		else if(this.existingBels.contains(proposedName)) {
+			QMessageBox.information(this, "Name Collision", "Entered name " + proposedName + " is already a BEL in the site. "
+					+ "Please choose another name.");
 		}
 		else if (!this.vcc.isChecked() && !this.gnd.isChecked()) {
 			QMessageBox.information(this, "Missing Type", "Select either VCC or GND");

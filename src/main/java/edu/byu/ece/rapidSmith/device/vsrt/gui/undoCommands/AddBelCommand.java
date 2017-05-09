@@ -23,6 +23,7 @@ import com.trolltech.qt.gui.QUndoCommand;
 
 import edu.byu.ece.rapidSmith.device.vsrt.gui.ElementTab;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreeElement;
+import edu.byu.ece.rapidSmith.device.vsrt.gui.VSRTool;
 import edu.byu.ece.rapidSmith.device.vsrt.primitiveDefs.Element;
 import edu.byu.ece.rapidSmith.device.vsrt.primitiveDefs.PrimitiveDef;
 import edu.byu.ece.rapidSmith.device.vsrt.primitiveDefs.PrimitiveDefPin;
@@ -38,11 +39,14 @@ public class AddBelCommand extends QUndoCommand {
 	private PrimitiveDef primitiveDef; 
 	/**QWidget that has access to the tree view*/
 	private ElementTab elementTab;
+	/** Parent VSRTool*/
+	private VSRTool parentProcess;
+	/** Tree element representing the new BEL*/
+	private QTreeElement belTreeElement;
 	
-	QTreeElement belTreeElement;
-	
-	public AddBelCommand(String name, boolean isVcc, ElementTab elementTab, PrimitiveDef def) {
+	public AddBelCommand(String name, boolean isVcc, ElementTab elementTab, VSRTool parentProcess) {
 		// Create the new primitive def element
+		PrimitiveDef def = parentProcess.getCurrentSite();
 		Element belElement = new Element();
 		belElement.setBel(true);
 		belElement.setName(name);
@@ -58,6 +62,7 @@ public class AddBelCommand extends QUndoCommand {
 		this.belTreeElement = elementTab.createNewBel(belElement);
 		this.elementTab = elementTab;
 		this.primitiveDef = def;
+		this.parentProcess = parentProcess;
 	}
 	
 	/**
@@ -67,6 +72,7 @@ public class AddBelCommand extends QUndoCommand {
 	public void redo(){
 		elementTab.addBelToTree(belTreeElement);
 		primitiveDef.addElement(belTreeElement.getElement());
+		parentProcess.registerAddedBel(belTreeElement.text(0));
 	}
 	
 	/**
@@ -76,5 +82,6 @@ public class AddBelCommand extends QUndoCommand {
 	public void undo(){
 		elementTab.removeBelFromTree(belTreeElement);
 		primitiveDef.getElements().remove(belTreeElement.getElement());
+		parentProcess.removeAddedBel(belTreeElement.text(0));
 	}
 }

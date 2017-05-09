@@ -28,14 +28,14 @@ public class PrimitiveDefList  extends ArrayList<PrimitiveDef> implements Serial
 
 	private static final long serialVersionUID = 4988664481262250467L;
 
-	private HashMap<PrimitiveType,PrimitiveDef> primitiveMap;
+	private HashMap<String,PrimitiveDef> primitiveMap;
 	
 	public PrimitiveDefList(){
 		super();
-		primitiveMap = new HashMap<PrimitiveType,PrimitiveDef>();
+		primitiveMap = new HashMap<String,PrimitiveDef>();
 	}
 	
-	public PrimitiveDef getPrimitiveDef(PrimitiveType type){
+	public PrimitiveDef getPrimitiveDef(String type){
 		return primitiveMap.get(type);
 	}
 	

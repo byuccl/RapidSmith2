@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.AddBelCommand;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.undoCommands.AddSitePinGroupCommand;
@@ -503,9 +506,17 @@ public class ElementTab extends QWidget {
 		int y = QCursor.pos().y() - bels.mapToGlobal(bels.header().pos() ).y();
 		
 		if((x < iconSize && y < iconSize) && this.bels.topLevelItemCount() > 0) {
-			StaticBelDialog test = new StaticBelDialog();
+			
+			// create a set of BEL names that already exist in the site
+			Set<String> existingBels = IntStream.range(0, this.bels.topLevelItemCount())
+												.boxed()
+												.map(i -> this.bels.topLevelItem(i).text(0))
+												.collect(Collectors.toSet());
+			
+			StaticBelDialog test = new StaticBelDialog(existingBels);
+			
 			if ( test.exec() == 1 ) {
-				AddBelCommand addBelCommand = new AddBelCommand(test.getBelName(), test.isVcc(), this, parent.getCurrentSite());
+				AddBelCommand addBelCommand = new AddBelCommand(test.getBelName(), test.isVcc(), this, parent);
 				this.undoStack.push(addBelCommand);
 			}
 		}	

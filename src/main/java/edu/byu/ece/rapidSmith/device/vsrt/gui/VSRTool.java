@@ -1,17 +1,25 @@
 package edu.byu.ece.rapidSmith.device.vsrt.gui;
 
 import java.awt.GraphicsEnvironment;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.Qt;
@@ -31,6 +39,7 @@ import com.trolltech.qt.gui.QMessageBox;
 import com.trolltech.qt.gui.QProgressDialog;
 import com.trolltech.qt.gui.QMessageBox.StandardButton;
 import com.trolltech.qt.gui.QMessageBox.StandardButtons;
+
 import com.trolltech.qt.gui.QSizePolicy;
 import com.trolltech.qt.gui.QStatusBar;
 import com.trolltech.qt.gui.QStyleFactory;
@@ -70,6 +79,7 @@ public class VSRTool extends QMainWindow {
 	/**Back end components*/
 	private XDLRCPrimitiveDefsParser parser;
 	private PrimitiveDef current_site;
+	private String currentFamily;
 	private String directory = null;
 	private ArrayList<String> siteCfgElements = new ArrayList<String>(); 
 	private QUndoStack undoStack = new QUndoStack();  
@@ -77,6 +87,7 @@ public class VSRTool extends QMainWindow {
 	private static String vsrtImagePath;
 	public static boolean singleBelMode;
 	private HashMap<String, HashSet<String>> sites2arch = new HashMap<String, HashSet<String>>();
+	private AddedBelMap addedBelMap;
 	
 	/********************************************
 	 **		 	Initialization Methods 	       **
@@ -101,6 +112,7 @@ public class VSRTool extends QMainWindow {
 		this.initSize();
 		this.initUI();
 		this.openDirectory(dir);
+		this.addedBelMap = new AddedBelMap(dir);
 	}
 	/**
 	 * Initializes the size and position of the GUI based on the screen size of the device <br>
@@ -224,9 +236,10 @@ public class VSRTool extends QMainWindow {
 			if ( archDir.isDirectory() ) {
 				for (File primDef : archDir.listFiles(defFilter)) {
 					String name = primDef.getName().substring(0, primDef.getName().lastIndexOf(".")); 
+					
 					try {
 						this.sites2arch.get(name).add(archDir.getName());
-					}catch ( NullPointerException e ) {
+					} catch ( NullPointerException e ) {
 						HashSet<String> archNames = new HashSet<String>();
 						archNames.add( archDir.getName() );
 						this.sites2arch.put(name, archNames);
@@ -262,7 +275,7 @@ public class VSRTool extends QMainWindow {
 	 * It opens a QFileDialog and allows the user to choose the appropriate directory that <br>
 	 * contains the family/architecture folders and primitive def files within them. 
 	 */
-	public void openDirectory(String dir) throws NullPointerException{
+	public void openDirectory(String dir) throws NullPointerException {
 		this.directory = dir;
 	
 		this.loadArchitecturesAndSites(directory);
@@ -294,6 +307,7 @@ public class VSRTool extends QMainWindow {
 
 		//we know that there is only going to be one primitive site
 		current_site = parser.getPrimitiveDefs().get(0);
+		currentFamily = family;
 		
 		singleBelMode = openInSingleBelMode(current_site);
 		
@@ -690,6 +704,25 @@ public class VSRTool extends QMainWindow {
 	public void disableLeftTab(){
 		this.left_tab.setEnabled(false);
 	}
+	
+	/**
+	 * Adds a new BEL to the "addedBels.txt" file 
+	 * 
+	 * @param bel Name of BEL to add
+	 */
+	public void registerAddedBel(String bel) {
+		addedBelMap.add(currentFamily, current_site.getType(), bel);
+	}
+	
+	/**
+	 * Removes a BEL from the "addedBels.txt" file 
+	 * 
+	 * @param bel Name of BEL to remove
+	 */
+	public void removeAddedBel(String bel) {
+		addedBelMap.remove(currentFamily, current_site.getType(), bel);
+	}
+	
 	/********************************************
 	 **		 Overridden event handlers         **
 	 ********************************************/
@@ -712,6 +745,11 @@ public class VSRTool extends QMainWindow {
 				event.ignore();
 			}
 		}
+		
+		// Save the added bels to the file when the user exits
+		try {
+			addedBelMap.print();
+		} catch(IOException e) {}
 	}
 	
 	/**
@@ -751,7 +789,7 @@ public class VSRTool extends QMainWindow {
 	public static void main(String[] args) {
 		
 		if(args.length != 1){
-			System.out.println("USAGE: java edu.byu.ece.rapidSmith.vivado.vxdlTool.gui.VSRTool <Import Directory>");
+			System.out.println("USAGE: java edu.byu.ece.rapidSmith.device.vsrt.gui.VSRTool <Import Directory>");
 		}
 		else if (!new File(args[0]).exists())
 		{
@@ -772,4 +810,136 @@ public class VSRTool extends QMainWindow {
 			}
 		}
 	}
+	
+	/* ***********************************
+	 *        Nested Classes
+	 ************************************/
+	
+	/**
+	 * Nested class used to keep track of the BELs that have been added to VSRT
+	 * sites. In Ultrascale, this will be GND and VCC BELs
+	 */
+	private class AddedBelMap {
+		private Map<String, Map<String, Set<String>>> addedBelMap;
+		private String vsrtDirectory;
+				
+		public AddedBelMap(String vsrtDirectory) {
+			this.vsrtDirectory = vsrtDirectory;
+			addedBelMap = new HashMap<String, Map<String, Set<String>>>();
+			
+			Path belPath = null;
+			try {
+				belPath = Paths.get(vsrtDirectory).resolve("addedBels.txt");
+			} catch (InvalidPathException e ) {
+				return;
+			}
+			
+			// Parse the "addedBels.txt" file which is in the form: 
+			//kintexu slicel bels 
+			BufferedReader br;
+			String line;
+			
+			try {
+				br = new BufferedReader(new FileReader(belPath.toFile()));
+				
+				while ((line = br.readLine()) != null) {
+					String[] toks = line.split("\\s+");
+					assert (toks.length == 3);
+					this.add(toks[0], toks[1], toks[2]);
+				}
+			}
+			catch (IOException e ) {
+				
+			}			
+		}
+		
+		/**
+		 * Returns true if the specified BEL has been added in VSRT for the 
+		 * specified family and site.
+		 * 
+		 * @param family Name of the family (i.e. artix7)
+		 * @param site Name of the site (i.e. SLICEL)
+		 * @param bel Name of the bel (i.e. HARD0GND)
+		 * 
+		 * @return {@code true} if the specified bel has already been added to the map. {@code false} otherwise
+		 */
+		@SuppressWarnings("unused")
+		public boolean contains(String family, String site, String bel) {
+			
+			if (addedBelMap.containsKey(family.toLowerCase())){
+				Set<String> bels = addedBelMap.get(family).getOrDefault(site.toLowerCase(), Collections.emptySet());
+				return bels.contains(bel);
+			}
+			
+			return false;
+		}
+		
+		/**
+		 * Adds the specified BEL (based on its current family and site) to
+		 * the map. 
+		 * 
+		 * @param family Name of the family (i.e. artix7)
+		 * @param site Name of the site (i.e. SLICEL)
+		 * @param bel Name of the bel (i.e. HARD0GND)
+		 */
+		public void add(String family, String site, String bel) {
+			getBelSet(getSiteMap(family.toLowerCase()), site.toLowerCase()).add(bel);
+		}
+		
+		/**
+		 * Removes the specified BEL (based on its current family and site) from
+		 * the map. 
+		 * 
+		 * @param family Name of the family (i.e. artix7)
+		 * @param site Name of the site (i.e. SLICEL)
+		 * @param bel Name of the bel (i.e. HARD0GND)
+		 */
+		public void remove(String family, String site, String bel) {
+			getBelSet(getSiteMap(family.toLowerCase()), site.toLowerCase()).remove(bel);
+		}
+		
+		private Map<String, Set<String>> getSiteMap(String family) {
+			
+			if (addedBelMap.containsKey(family)) {
+				return addedBelMap.get(family);
+			} 
+			else {
+				Map<String, Set<String>> siteMap = new HashMap<String, Set<String>>();
+				addedBelMap.put(family, siteMap);
+				return siteMap;
+			}
+		}
+		
+		private Set<String> getBelSet(Map<String, Set<String>> siteMap, String site) {
+			if (siteMap.containsKey(site)) {
+				return siteMap.get(site);
+			}
+			else {
+				Set<String> belSet = new HashSet<String>();
+				siteMap.put(site, belSet);
+				return belSet;
+			}
+		}
+		
+		/**
+		 * Prints the addedBelMap to an "addedBel.txt" file in the current VSRT
+		 * directory.
+		 * 
+		 * @throws IOException
+		 */
+		public void print() throws IOException {
+			BufferedWriter fileout = new BufferedWriter (new FileWriter(Paths.get(vsrtDirectory).resolve("addedBels.txt").toString()));
+			
+			for (String family : addedBelMap.keySet()) {
+				Map<String, Set<String>> siteMap = addedBelMap.get(family);
+				for (String site : siteMap.keySet()) {
+					for (String bel : siteMap.get(site)) {
+						fileout.write(family + " " + site + " " + bel + "\n");
+					}
+				}
+			}
+			fileout.close();
+		}
+	}
+	
 }//end class
