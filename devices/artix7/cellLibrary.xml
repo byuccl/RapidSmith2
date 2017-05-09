@@ -1,33 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 	<!--
-  ~ Copyright (c) 2016 Brigham Young University
-  ~
-  ~ This file is part of the BYU RapidSmith Tools.
-  
-~
-  ~ BYU RapidSmith Tools is free software: you may redistribute it
-  ~ and/or modify it under the terms 
-of the GNU General Public License
-  ~ as published by the Free Software Foundation, either version 3 
+ ~ Copyright (c) 2016 Brigham Young University
+ ~ 
+ ~ This file is part of the BYU RapidSmith Tools.
+
+ 
+~ BYU RapidSmith Tools is free software: you may redistribute it
+ ~ and/or modify it under the terms 
+of the GNU General Public License 
+ ~ as published by the Free Software Foundation, either version 3 
 of
-  ~ the License, or (at your option) any later version.
-  ~
-  ~ BYU RapidSmith Tools is distributed 
-in the hope that it will be
-  ~ useful, but WITHOUT ANY WARRANTY; without even the implied warranty
-  
+ ~ the License, or (at your option) any later version.
+ ~ 
+ ~ BYU RapidSmith Tools is distributed 
+in the hope that it will be 
+ ~ useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ 
 ~ of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  ~ GNU General Public License for 
-more details.
-  ~
-  ~ A copy of the GNU General Public License is included with the BYU
-  ~ RapidSmith 
-Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
-  ~ also get a copy of the license at <http://www.gnu.org/licenses/>.
-  
-~
-  ~
-  ~
+ ~ GNU General Public License for more 
+details.
+ ~ 
+ ~ A copy of the GNU General Public License is included with the BYU RapidSmith
+ ~ Tools. 
+It can be found at doc/LICENSE.GPL3.TXT. You may
+ ~ also get a copy of the license at <http://www.gnu.org/licenses/>.
+ 
+~ 
 	-->
 <root>
 	<family>ARTIX7</family>
@@ -24284,192 +24282,328 @@ Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
 						<site_type>SLICEL</site_type>
 						<name>D6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>D5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>C6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>C5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>B6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>B5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>A6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>A5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>D6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>D5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>C6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>C5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>B6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>B5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>A6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>A5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 			</bels>
 		</cell>
@@ -24517,240 +24651,464 @@ Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
 						<site_type>SLICEL</site_type>
 						<name>D6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>D5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>C6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>C5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>B6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>B5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>A6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>A5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>D6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>D5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>C6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>C5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>B6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>B5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>A6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>A5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 			</bels>
 		</cell>
@@ -24803,288 +25161,600 @@ Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
 						<site_type>SLICEL</site_type>
 						<name>D6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>D5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>C6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>C5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>B6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>B5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>A6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>A5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>D6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>D5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>C6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>C5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>B6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>B5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>A6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>A5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 			</bels>
 		</cell>
@@ -25142,336 +25812,736 @@ Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
 						<site_type>SLICEL</site_type>
 						<name>D6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>D5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>C6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>C5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>B6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>B5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>A6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>A5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>D6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>D5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>C6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>C5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>B6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>B5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>A6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>A5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 			</bels>
 		</cell>
@@ -25534,384 +26604,872 @@ Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
 						<site_type>SLICEL</site_type>
 						<name>D6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>D5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>C6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>C5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>B6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>B5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>A6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>A5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>D6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>D5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>C6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>C5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>B6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>B5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>A6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>A5LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O5</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+						</pin>
+					</pins>
 				</bel>
 			</bels>
 		</cell>
@@ -25979,216 +27537,528 @@ Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
 						<site_type>SLICEL</site_type>
 						<name>D6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
-					<pin>
-						<name>I5</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I5</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>C6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
-					<pin>
-						<name>I5</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I5</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>B6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
-					<pin>
-						<name>I5</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I5</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEL</site_type>
 						<name>A6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
-					<pin>
-						<name>I5</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I5</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>D6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
-					<pin>
-						<name>I5</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I5</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>C6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
-					<pin>
-						<name>I5</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I5</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>B6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
-					<pin>
-						<name>I5</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I5</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 				<bel>
 					<id>
 						<site_type>SLICEM</site_type>
 						<name>A6LUT</name>
 					</id>
-					<pin>
-						<name>O</name>
-					</pin>
-					<pin>
-						<name>I0</name>
-					</pin>
-					<pin>
-						<name>I1</name>
-					</pin>
-					<pin>
-						<name>I2</name>
-					</pin>
-					<pin>
-						<name>I3</name>
-					</pin>
-					<pin>
-						<name>I4</name>
-					</pin>
-					<pin>
-						<name>I5</name>
-					</pin>
+					<pins>
+						<pin>
+							<name>O</name>
+							<possible>O6</possible>
+						</pin>
+						<pin>
+							<name>I0</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I1</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I2</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I3</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I4</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+						<pin>
+							<name>I5</name>
+							<possible>A1</possible>
+							<possible>A2</possible>
+							<possible>A3</possible>
+							<possible>A4</possible>
+							<possible>A5</possible>
+							<possible>A6</possible>
+						</pin>
+					</pins>
 				</bel>
 			</bels>
 		</cell>

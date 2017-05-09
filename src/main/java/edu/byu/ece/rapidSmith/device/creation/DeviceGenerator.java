@@ -352,7 +352,7 @@ public final class DeviceGenerator {
 		Map <Integer, Set<Integer>> belRoutethroughMap = new HashMap<>();
 		
 		for (Element belEl : siteElement.getChild("bels").getChildren("bel")) {
-			String belType = belEl.getChildText("name");
+			String belName = belEl.getChildText("name");
 			
 			Element routethroughs = belEl.getChild("routethroughs");
 			
@@ -364,8 +364,8 @@ public final class DeviceGenerator {
 					String inputPin = routethrough.getChildText("input");
 					String outputPin = routethrough.getChildText("output");
 					
-					String inputWireName = getIntrasiteWireName(template.getType(), belType, inputPin);
-					String outputWireName = getIntrasiteWireName(template.getType(), belType, outputPin);
+					String inputWireName = getIntrasiteWireName(template.getType(), belName, inputPin);
+					String outputWireName = getIntrasiteWireName(template.getType(), belName, outputPin);
 							
 					Integer startEnum = we.getWireEnum(inputWireName); 
 					Integer endEnum = we.getWireEnum(outputWireName);
