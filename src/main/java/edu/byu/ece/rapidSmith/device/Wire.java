@@ -44,8 +44,8 @@ public interface Wire extends Serializable {
 	/**
 	 * Returns connection linking this wire to another wire in a different
 	 * hierarchical level through a pin.
-	 * @deprecated
 	 */
+	@Deprecated
 	Collection<Connection> getPinConnections();
 
 	/**
@@ -62,8 +62,8 @@ public interface Wire extends Serializable {
 
 	/**
 	 * Returns the terminals (BelPins) this wire drives.
-	 * @deprecated
 	 */
+	@Deprecated
 	Collection<Connection> getTerminals();
 
 	/**
@@ -86,8 +86,8 @@ public interface Wire extends Serializable {
 	/**
 	 * Return connection linking this wire to its drivers in the different
 	 * levels of hierarchy.
-	 * @deprecated
 	 */
+	@Deprecated
 	Collection<Connection> getReversePinConnections();
 
 	/**
@@ -98,8 +98,8 @@ public interface Wire extends Serializable {
 
 	/**
 	 * Returns the sources (BelPins) which drive this wire.
-	 * @deprecated
 	 */
+	@Deprecated
 	Collection<Connection> getSources();
 
 	/**
