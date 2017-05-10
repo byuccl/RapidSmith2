@@ -106,8 +106,7 @@ public final class RouteTree implements
 	 * object is connected, null is returned.
 	 */
 	public SitePin getConnectingSitePin() {
-		Collection<Connection> pinConnections = wire.getPinConnections();
-		return (pinConnections.isEmpty()) ? null : pinConnections.iterator().next().getSitePin(); 
+		return wire.getConnectedPin();
 	}
 	
 	/**
@@ -115,8 +114,7 @@ public final class RouteTree implements
 	 * object is connected, null is returned.
 	 */
 	public BelPin getConnectingBelPin() {
-		Collection<Connection> terminalConnections = wire.getTerminals();
-		return terminalConnections.isEmpty() ? null : terminalConnections.iterator().next().getBelPin();
+		return wire.getTerminal();
 	}
 
 	public RouteTree addConnection(Connection c) {

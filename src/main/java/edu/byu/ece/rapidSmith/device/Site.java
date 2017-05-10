@@ -211,7 +211,7 @@ public final class Site implements Serializable{
 		return template;
 	}
 
-	SiteTemplate getTemplate(SiteType type) {
+	private SiteTemplate getTemplate(SiteType type) {
 		if (getType() == type)
 			return getTemplate();
 
@@ -290,6 +290,10 @@ public final class Site implements Serializable{
 		return getBel(getTemplate(), belName);
 	}
 
+	public Bel getBel(SiteType type, String belName) {
+		return getBel(getTemplate(type), belName);
+	}
+
 	public Bel getBel(BelId belId) {
 		return getBel(getTemplate(belId.getSiteType()), belId.getName());
 	}
@@ -330,9 +334,9 @@ public final class Site implements Serializable{
 		return getWires(getTemplate(type));
 	}
 
-	public Collection<Wire> getWires(SiteTemplate template) {
+	private Collection<Wire> getWires(SiteTemplate template) {
 		return template.getWires().stream()
-				.map(i -> new SiteWire(this, i))
+				.map(i -> new SiteWire(this, template.getType(), i))
 				.collect(Collectors.toCollection(ArrayList::new));
 	}
 
@@ -343,11 +347,22 @@ public final class Site implements Serializable{
 	 * @return the wire in this site with the given name
 	 */
 	public SiteWire getWire(String wireName) {
+		return getWire(this.getType(), wireName);
+	}
+
+	/**
+	 * Returns the wire in this site with the given name and type.  This method does
+	 * not guarantee that the requested wire exists in this site.
+	 * @param wireName the name of the wire to get
+	 * @return the wire in this site with the given name
+	 */
+	// Included just for consistency with other methods.
+	public SiteWire getWire(SiteType type, String wireName) {
 		Device device = getTile().getDevice();
 		Integer wireEnum = device.getWireEnumerator().getWireEnum(wireName);
 		if (wireEnum == null)
 			return null;
-		return new SiteWire(this, wireEnum);
+		return new SiteWire(this, type, wireEnum);
 	}
 
 	/**
@@ -387,7 +402,7 @@ public final class Site implements Serializable{
 		return getWireConnections(getTemplate(type), wire);
 	}
 
-	WireConnection[] getWireConnections(SiteTemplate template, int wire) {
+	private WireConnection[] getWireConnections(SiteTemplate template, int wire) {
 		return template.getWireConnections(wire);
 	}
 
@@ -399,7 +414,7 @@ public final class Site implements Serializable{
 		return getReverseConnections(getTemplate(type), wire);
 	}
 
-	WireConnection[] getReverseConnections(SiteTemplate template, int wire) {
+	private WireConnection[] getReverseConnections(SiteTemplate template, int wire) {
 		return template.getReverseWireConnections(wire);
 	}
 
@@ -417,7 +432,7 @@ public final class Site implements Serializable{
 		return getSourcePinNames(getTemplate(type));
 	}
 
-	public Set<String> getSourcePinNames(SiteTemplate template) {
+	private Set<String> getSourcePinNames(SiteTemplate template) {
 		return template.getSources().keySet();
 	}
 
@@ -430,12 +445,16 @@ public final class Site implements Serializable{
 		return getSourcePins(getTemplate());
 	}
 
+	/**
+	 * Creates and returns the source pins for this site when configured as type.
+	 * The SitePin objects are recreated upon each call.
+	 * @return the source pins for this site
+	 */
 	public List<SitePin> getSourcePins(SiteType type) {
 		return getSourcePins(getTemplate(type));
 	}
 	
-	// TODO: this should be private
-	public List<SitePin> getSourcePins(SiteTemplate template) {
+	private List<SitePin> getSourcePins(SiteTemplate template) {
 		Map<String, SitePinTemplate> sourceTemplates = template.getSources();
 		List<SitePin> pins = new ArrayList<>(sourceTemplates.size());
 		for (SitePinTemplate pinTemplate : sourceTemplates.values()) {
@@ -455,11 +474,18 @@ public final class Site implements Serializable{
 		return getSourcePin(getTemplate(), pinName);
 	}
 
+	/**
+	 * Creates and returns the source pin on this site when configured as type with
+	 * the specified name.
+	 * @param pinName the name of the pin to create
+	 * @return the source pin on this site with the specified name or
+	 *   null if the pin does not exist
+	 */
 	public SitePin getSourcePin(SiteType type, String pinName) {
 		return getSourcePin(getTemplate(type), pinName);
 	}
 
-	public SitePin getSourcePin(SiteTemplate template, String pinName) {
+	private SitePin getSourcePin(SiteTemplate template, String pinName) {
 		SitePinTemplate pinTemplate = template.getSources().get(pinName);
 		if (pinTemplate == null)
 			return null;
@@ -477,11 +503,18 @@ public final class Site implements Serializable{
 		return getSinkPinNames(getTemplate());
 	}
 
+	/**
+	 * Returns the names of all sink pins on this site when configured as the type.
+	 * Unlike {@link #getSinkPins()}, this method will not dynamically create any
+	 * objects.
+
+	 * @return the names of all sink pins on the site
+	 */
 	public Set<String> getSinkPinNames(SiteType type) {
 		return getSinkPinNames(getTemplate(type));
 	}
 
-	public Set<String> getSinkPinNames(SiteTemplate template) {
+	private Set<String> getSinkPinNames(SiteTemplate template) {
 		return template.getSinks().keySet();
 	}
 
@@ -494,11 +527,16 @@ public final class Site implements Serializable{
 		return getSinkPins(getTemplate());
 	}
 
+	/**
+	 * Creates and returns all sink pins on this site when configured as type.
+	 * The SitePin objects are recreated upon each call.
+	 * @return all sink pins on this site
+	 */
 	public List<SitePin> getSinkPins(SiteType type) {
 		return getSinkPins(getTemplate(type));
 	}
 
-	public List<SitePin> getSinkPins(SiteTemplate template) {
+	private List<SitePin> getSinkPins(SiteTemplate template) {
 		Map<String, SitePinTemplate> sinkTemplates = template.getSinks();
 		List<SitePin> pins = new ArrayList<>(sinkTemplates.size());
 		for (SitePinTemplate pinTemplate : sinkTemplates.values()) {
@@ -518,15 +556,23 @@ public final class Site implements Serializable{
 		return getSinkPin(getTemplate(), pinName);
 	}
 
+	/**
+	 * Creates and returns the sink pin on this site when configured as type with
+	 * the specified name.
+	 * @param pinName the name of the pin to create
+	 * @return the sink pin on this site with the specified name or
+	 *   null if the pin does not exist
+	 */
 	public SitePin getSinkPin(SiteType type, String pinName) {
 		return getSinkPin(getTemplate(type), pinName);
 	}
 
-	public SitePin getSinkPin(SiteTemplate template, String pinName) {
+	private SitePin getSinkPin(SiteTemplate template, String pinName) {
 		SitePinTemplate pinTemplate = template.getSinks().get(pinName);
 		if (pinTemplate == null)
 			return null;
-		return new SitePin(this, pinTemplate, getExternalWire(template.getType(), pinName));
+		int externalWire = getExternalWire(template.getType(), pinName);
+		return new SitePin(this, pinTemplate, externalWire);
 	}
 
 	/**
@@ -538,11 +584,17 @@ public final class Site implements Serializable{
 		return getSitePin(getTemplate(), pinName);
 	}
 
+	/**
+	 * Creates and returns the pin on this site when configured as type with the
+	 * specified name.
+	 * @param pinName the name of the pin to create
+	 * @return the pin on this site with the specified name
+	 */
 	public SitePin getSitePin(SiteType type, String pinName) {
 		return getSitePin(getTemplate(type), pinName);
 	}
 
-	public SitePin getSitePin(SiteTemplate template, String pinName) {
+	private SitePin getSitePin(SiteTemplate template, String pinName) {
 		SitePinTemplate pinTemplate = template.getSinks().get(pinName);
 		if (pinTemplate == null)
 			pinTemplate = template.getSources().get(pinName);
@@ -562,7 +614,8 @@ public final class Site implements Serializable{
 		SitePinTemplate pinTemplate = externalWireToPinNameMap.get(type).get(wire);
 		if (pinTemplate == null)
 			return null;
-		return new SitePin(this, pinTemplate, getExternalWire(type, pinTemplate.getName()));
+		int externalWire = getExternalWire(type, pinTemplate.getName());
+		return new SitePin(this, pinTemplate, externalWire);
 	}
 
 	/**
@@ -572,8 +625,8 @@ public final class Site implements Serializable{
 	 * @return the pin on thes site which connects to the specified internal wire
 	 *   or null if the wire connects to no pins on this site
 	 */
-	SitePin getSitePinOfInternalWire(int wire) {
-		SiteTemplate template = getTemplate();
+	SitePin getSitePinOfInternalWire(SiteType type, int wire) {
+		SiteTemplate template = getTemplate(type);
 		Map<Integer, SitePinTemplate> internalSiteWireMap = template.getInternalSiteWireMap();
 		SitePinTemplate pinTemplate = internalSiteWireMap.get(wire);
 		if (pinTemplate == null)
@@ -593,8 +646,8 @@ public final class Site implements Serializable{
 	 * @param wire the site wire
 	 * @return the pin of the BEL in this site which connects to the specified wire
 	 */
-	BelPin getBelPinOfWire(int wire) {
-		SiteTemplate template = getTemplate();
+	BelPin getBelPinOfWire(SiteType type, int wire) {
+		SiteTemplate template = getTemplate(type);
 		BelPinTemplate pinTemplate = template.getBelPins().get(wire);
 		if (pinTemplate == null)
 			return null;
@@ -623,7 +676,7 @@ public final class Site implements Serializable{
 		return externalWires;
 	}
 
-	Map<SiteType, Map<Integer, SitePinTemplate>> getExternalWireToPinNameMap() {
+	public Map<SiteType, Map<Integer, SitePinTemplate>> getExternalWireToPinNameMap() {
 		return externalWireToPinNameMap;
 	}
 
@@ -632,8 +685,8 @@ public final class Site implements Serializable{
 	 * each possible type this site can take.
 	 * @param externalWireToPinNameMap the mapping of wires to pin names
 	 */
-	public void setExternalWireToPinNameMap(
-			Map<SiteType, Map<Integer, SitePinTemplate>> externalWireToPinNameMap) {
+	void setExternalWireToPinNameMap(
+		Map<SiteType, Map<Integer, SitePinTemplate>> externalWireToPinNameMap) {
 		this.externalWireToPinNameMap = externalWireToPinNameMap;
 	}
 
@@ -662,9 +715,13 @@ public final class Site implements Serializable{
 	 * @return True if the wires form a routethrough
 	 */
 	boolean isRoutethrough(Integer startWire, Integer endWire) {
-		return this.template.isRoutethrough(startWire, endWire);
+		return getTemplate().isRoutethrough(startWire, endWire);
 	}
-	
+
+	boolean isRoutethrough(SiteType type, Integer startWire, Integer endWire) {
+		return getTemplate(type).isRoutethrough(startWire, endWire);
+	}
+
 	/**
 	 * This method gets the type of otherSite and calls the other method
 	 * public boolean isCompatibleSiteType(SiteType otherType);

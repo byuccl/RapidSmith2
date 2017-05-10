@@ -80,10 +80,8 @@ public class DeviceAnalyzer {
 				s = c.getSinkWire().getWireName();	 
 			if (c.isPip())	
 				msg("  [PIP] " + s);	 
-			else if (c.isWireConnection())	 
+			else
 				msg("  [nonPIP] " + s);	
-			else	
-				msg("  [???] " + s); 
 		}
 	}	
 	

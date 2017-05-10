@@ -22,7 +22,6 @@ package edu.byu.ece.rapidSmith.device;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -79,7 +78,9 @@ public final class BelPin implements Serializable {
 	 * @return the site wire connecting to this pin
 	 */
 	public SiteWire getWire() {
-		return new SiteWire(getBel().getSite(), template.getWire());
+		Bel bel = getBel();
+		SiteType siteType = bel.getId().getSiteType();
+		return new SiteWire(bel.getSite(), siteType, template.getWire());
 	}
 
 	public PinDirection getDirection() {
@@ -120,14 +121,14 @@ public final class BelPin implements Serializable {
 	 * @see #getSitePinNames()
 	 */
 	public Set<SitePin> getSitePins() {
-		bel.getSite().setType(bel.getId().getSiteType());
 		if (template.getSitePins() == null)
 			return Collections.emptySet();
-		Set<SitePin> sitePins = new HashSet<>();
-		sitePins.addAll(template.getSitePins().stream()
-				.map(sitePinName -> bel.getSite().getSitePin(sitePinName))
-				.collect(Collectors.toList()));
-		return sitePins;
+
+		Site site = bel.getSite();
+		SiteType siteType = getBel().getId().getSiteType();
+		return template.getSitePins().stream()
+				.map(sitePinName -> site.getSitePin(siteType, sitePinName))
+				.collect(Collectors.toSet());
 	}
 
 	/**

@@ -65,6 +65,15 @@ public final class SitePin implements Serializable {
 	}
 
 	/**
+	 * Provides access to the internal template backing this object.  This method
+	 * is not needed for normal use.
+	 * @return the template backing this object
+	 */
+	public SitePinTemplate getTemplate() {
+		return template;
+	}
+
+	/**
 	 * Returns the site this pin exists on.
 	 * @return the site this pin exists on
 	 */
@@ -85,7 +94,7 @@ public final class SitePin implements Serializable {
 	 * @return the site wire that connects to this pin
 	 */
 	public SiteWire getInternalWire() {
-		return new SiteWire(getSite(), template.getInternalWire());
+		return new SiteWire(getSite(), getSiteType(), template.getInternalWire());
 	}
 
 	/**
@@ -126,15 +135,12 @@ public final class SitePin implements Serializable {
 			return false;
 		}
 		final SitePin other = (SitePin) obj;
-		return Objects.equals(this.site, other.site) && Objects.equals(this.template, other.template);
+		return Objects.equals(this.site, other.site) &&
+			Objects.equals(this.template, other.template);
 	}
 
 	@Override
 	public String toString() {
 		return getSite().getName() + "/" + template.getName();
-	}
-
-	public SitePinTemplate getTemplate() {
-		return template;
 	}
 }

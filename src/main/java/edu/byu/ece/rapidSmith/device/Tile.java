@@ -468,6 +468,16 @@ public class Tile implements Serializable {
 		return site.getSitePinOfExternalWire(site.getType(), wire);
 	}
 
+	public Collection<SitePin> getSitePinsOfWire(Integer wire) {
+		if (wireSites == null || !wireSites.containsKey(wire))
+			return Collections.emptyList();
+		Integer siteIndex = wireSites.get(wire);
+		Site site = getSites()[siteIndex];
+		return Arrays.stream(site.getPossibleTypes())
+			.map(it -> site.getSitePinOfExternalWire(it, wire))
+			.collect(Collectors.toList());
+	}
+
 	public SitePin getSitePinOfWire(SiteType siteType, Integer wire) {
 		if (wireSites == null || !wireSites.containsKey(wire))
 			return null;

@@ -179,7 +179,7 @@ public class AStarRouter {
 	 */
 	private RouteTree finializeRoute(RouteTree route) {
 		
-		while (route.getWire().getPinConnections().isEmpty()) {
+		while (route.getWire().getConnectedPin() == null) {
 			assert (route.getWire().getWireConnections().size() == 1);
 			route = route.addConnection(route.getWire().getWireConnections().iterator().next());
 		}

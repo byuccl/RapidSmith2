@@ -653,12 +653,12 @@ public class XdcRoutingInterface {
 
 			// reached a used bel pin that is not the source
 			if (intrasiteRoute.isValidBelPinSink(currentWire) && !currentWire.equals(startWire)) {
-				BelPin bp = currentWire.getTerminals().iterator().next().getBelPin();
+				BelPin bp = currentWire.getTerminal();
 				intrasiteRoute.addBelPinSink(bp, currentRoute);
 			}
 			// reached a site pin
 			else if (connectsToSitePin(currentWire)) {
-				SitePin sinkPin = currentWire.getPinConnections().iterator().next().getSitePin();	
+				SitePin sinkPin = currentWire.getConnectedPin();
 				intrasiteRoute.addSitePinSink(sinkPin, currentRoute);
 			}
 			else {
@@ -691,7 +691,7 @@ public class XdcRoutingInterface {
 	 * @param currentWire {@link Wire} object
 	 */
 	private boolean connectsToSitePin(Wire currentWire) {
-		return !currentWire.getPinConnections().isEmpty();
+		return currentWire.getConnectedPin() != null;
 	}
 	
 	/**
@@ -733,8 +733,8 @@ public class XdcRoutingInterface {
 		}
 		
 		// a bel routethrough must also be connected to a BEL pin 
-		assert (!sourceWire.getTerminals().isEmpty()) : "Wire: " + sourceWire + " should connect to BelPin!";
-		BelPin source = sourceWire.getTerminals().iterator().next().getBelPin();
+		assert sourceWire.getTerminal() != null : "Wire: " + sourceWire + " should connect to BelPin!";
+		BelPin source = sourceWire.getTerminal();
 		
 		BelRoutethrough routethrough = this.belRoutethroughMap.get(source.getBel());
 		
@@ -1152,14 +1152,13 @@ public class XdcRoutingInterface {
 		@Override
 		public boolean isValidBelPinSink(Wire currentWire) {
 			
-			Collection<Connection> terminals = currentWire.getTerminals(); 
+			BelPin terminal = currentWire.getTerminal();
 						
 			// BEL pin sink is valid if the wire connects to
 			// a bel pin and either:
 			// (1) The net is a static net (GND or VCC)
 			// (2) The BelPin is being used (i.e. a cell pin has been mapped to it)
-			return !terminals.isEmpty() &&
-					(allowUnusedBelPins || isBelPinUsed(terminals.iterator().next().getBelPin()));
+			return terminal != null && (allowUnusedBelPins || isBelPinUsed(terminal));
 		}
 		
 		// TODO: document this
@@ -1284,10 +1283,9 @@ public class XdcRoutingInterface {
 
 		@Override
 		public boolean isValidBelPinSink(Wire currentWire) {
-			Collection<Connection> terminals = currentWire.getTerminals(); 
+			BelPin terminal = currentWire.getTerminal();
 			
-			return !terminals.isEmpty() &&
-					isBelPinUsed(terminals.iterator().next().getBelPin());
+			return terminal != null && isBelPinUsed(terminal);
 		}
 	}
 }
