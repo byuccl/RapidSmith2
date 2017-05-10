@@ -214,13 +214,14 @@ public final class Bel implements Serializable {
 	 */
 	public SiteWire getWireOfPin(String pinName) {
 		// Check both the sources and sinks structures to find the pin.
+		SiteType siteType = getId().getSiteType();
 		if (template.getSources().containsKey(pinName)) {
 			int wireEnum = template.getSources().get(pinName).getWire();
-			return new SiteWire(this.getSite(), wireEnum);
+			return new SiteWire(this.getSite(), siteType, wireEnum);
 		}
 		if (template.getSinks().containsKey(pinName)) {
 			int wireEnum = template.getSinks().get(pinName).getWire();
-			return new SiteWire(this.getSite(), wireEnum);
+			return new SiteWire(this.getSite(), siteType, wireEnum);
 		}
 		return null;
 	}

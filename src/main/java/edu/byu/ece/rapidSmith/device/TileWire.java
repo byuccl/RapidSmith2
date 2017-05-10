@@ -21,9 +21,15 @@
 package edu.byu.ece.rapidSmith.device;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static edu.byu.ece.rapidSmith.device.Connection.getTileToSiteConnection;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singleton;
 
 /**
  * A wire inside a tile but outside a site.  This is part of the general
@@ -85,33 +91,52 @@ public class TileWire implements Wire, Serializable {
 				.collect(Collectors.toList());
 	}
 
+	@Override
+	public Collection<SitePin> getAllConnectedPins() {
+		Collection<SitePin> sitePins = tile.getSitePinsOfWire(this.wire);
+		return sitePins.stream().filter(it -> !it.isInput())
+			.collect(Collectors.toSet());
+	}
+
 	/**
 	 * Returns all connections into primitive sites this wire drives.
 	 */
 	@Override
+	@Deprecated
 	public Collection<Connection> getPinConnections() {
+		SitePin sitePin = getConnectedPin();
+		if (sitePin == null)
+			return emptyList();
+		Connection c = getTileToSiteConnection(sitePin);
+		return singleton(c);
+	}
+
+	/**
+	 * Returns all connections into primitive sites this wire drives.
+	 */
+	@Override
+	public SitePin getConnectedPin() {
 		SitePin sitePin = tile.getSitePinOfWire(this.wire);
-		if (sitePin != null && sitePin.isInput()) {
-			return Collections.singletonList(Connection.getTileToSiteConnection(sitePin));
-		} else {
-			return Collections.emptyList();
-		}
+		if (sitePin == null || !sitePin.isInput())
+			return null;
+		return sitePin;
 	}
 
 	/**
 	 * Always return an empty list.
 	 */
 	@Override
+	@Deprecated
 	public Collection<Connection> getTerminals() {
 		return Collections.emptyList();
 	}
 
 	/**
-	 * Returns a stream containing wire and pin connections.
+	 * Always returns null.
 	 */
 	@Override
-	public Stream<Connection> getAllConnections() {
-		return Stream.concat(getWireConnections().stream(), getPinConnections().stream());
+	public BelPin getTerminal() {
+		return null;
 	}
 
 	/**
@@ -125,38 +150,55 @@ public class TileWire implements Wire, Serializable {
 			return Collections.emptyList();
 
 		return Arrays.stream(wireConnections)
-				.map(wc -> Connection.getReveserTileWireConnection(this, wc))
+				.map(wc -> Connection.getReverseTileWireConnection(this, wc))
 				.collect(Collectors.toList());
+	}
+
+	@Override
+	public Collection<SitePin> getAllReverseSitePins() {
+		Collection<SitePin> sitePins = tile.getSitePinsOfWire(this.wire);
+		return sitePins.stream().filter(it -> !it.isOutput())
+			.collect(Collectors.toSet());
 	}
 
 	/**
 	 * Returns all site pin connections driving this wire.
 	 */
 	@Override
+	@Deprecated
 	public Collection<Connection> getReversePinConnections() {
+		SitePin sitePin = getReverseConnectedPin();
+		if (sitePin == null)
+			return emptyList();
+		return singleton(getTileToSiteConnection(sitePin));
+	}
+
+	/**
+	 * Returns all site pin connections driving this wire.
+	 */
+	@Override
+	public SitePin getReverseConnectedPin() {
 		SitePin sitePin = tile.getSitePinOfWire(this.wire);
-		if (sitePin != null && sitePin.isOutput()) {
-			return Collections.singletonList(Connection.getTileToSiteConnection(sitePin));
-		} else {
-			return Collections.emptyList();
-		}
+		if (sitePin == null || !sitePin.isOutput())
+			return null;
+		return sitePin;
 	}
 
 	/**
 	 * Always returns an empty list.
 	 */
 	@Override
+	@Deprecated
 	public Collection<Connection> getSources() {
 		return Collections.emptyList();
 	}
 
 	/**
-	 * Returns a stream of reverse wire and pin connections.
+	 * Always returns null.
 	 */
 	@Override
-	public Stream<Connection> getAllReverseConnections() {
-		return Stream.concat(getReverseWireConnections().stream(),
-				getReversePinConnections().stream());
+	public BelPin getSource() {
+		return null;
 	}
 
 	/**

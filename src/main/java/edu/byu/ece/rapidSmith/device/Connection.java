@@ -21,11 +21,9 @@
 package edu.byu.ece.rapidSmith.device;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Objects;
-import java.util.stream.Stream;
 
-import static edu.byu.ece.rapidSmith.util.Exceptions.*;
+import static edu.byu.ece.rapidSmith.util.Exceptions.DesignAssemblyException;
 
 /**
  *
@@ -39,7 +37,7 @@ public abstract class Connection implements Serializable {
 		return new TileWireConnection(sourceWire, wc);
 	}
 
-	public static Connection getReveserTileWireConnection(
+	public static Connection getReverseTileWireConnection(
 			TileWire sourceWire, WireConnection wc
 	) {
 		return new ReverseTileWireConnection(sourceWire, wc);
@@ -49,28 +47,31 @@ public abstract class Connection implements Serializable {
 		return new SiteWireConnection(sourceWire, wc);
 	}
 
+	@Deprecated
 	public static Connection getTileToSiteConnection(SitePin pin) {
 		return new TileToSiteConnection(pin);
 	}
 
+	@Deprecated
 	public static Connection getSiteToTileConnection(SitePin pin) {
 		return new SiteToTileConnection(pin);
 	}
 
+	@Deprecated
 	public static Connection getTerminalConnection(BelPin belPin) {
 		return new Terminal(belPin);
 	}
 
+	@Deprecated
 	public abstract boolean isWireConnection();
 
-	// TODO: Update this to have a cache of created wires?
 	private final static class TileWireConnection extends Connection {
 		private static final long serialVersionUID = 7549238102833227662L;
 		private final TileWire sourceWire;
 		private final WireConnection wc;
 		private TileWire sinkWire;
 		
-		public TileWireConnection(TileWire sourceWire, WireConnection wc) {
+		TileWireConnection(TileWire sourceWire, WireConnection wc) {
 			this.sourceWire = sourceWire;
 			this.wc = wc;
 			this.sinkWire = null;
@@ -225,7 +226,9 @@ public abstract class Connection implements Serializable {
 
 		@Override
 		public Wire getSinkWire() {
-			return new SiteWire(sourceWire.getSite(), wc.getWire());
+			Site site = sourceWire.getSite();
+			SiteType siteType = sourceWire.getSiteType();
+			return new SiteWire(site, siteType, wc.getWire());
 		}
 
 		@Override
@@ -241,7 +244,9 @@ public abstract class Connection implements Serializable {
 		@Override
 		public boolean isRouteThrough() {
 			// bel routethrough
-			return sourceWire.getSite().isRoutethrough(sourceWire.getWireEnum(), wc.getWire());
+			SiteType siteType = sourceWire.getSiteType();
+			int sourceEnum = sourceWire.getWireEnum();
+			return sourceWire.getSite().isRoutethrough(siteType, sourceEnum, wc.getWire());
 		}
 
 		@Override
@@ -287,6 +292,7 @@ public abstract class Connection implements Serializable {
 		}
 	}
 
+	@Deprecated
 	private final static class TileToSiteConnection extends Connection {
 		private static final long serialVersionUID = -5352375975919207638L;
 		private final SitePin pin;
@@ -354,6 +360,7 @@ public abstract class Connection implements Serializable {
 		}
 	}
 
+	@Deprecated
 	private final static class SiteToTileConnection extends Connection {
 		private static final long serialVersionUID = 6090945282983450142L;
 		private final SitePin pin;
@@ -421,6 +428,7 @@ public abstract class Connection implements Serializable {
 		}
 	}
 
+	@Deprecated
 	private final static class Terminal extends Connection {
 		private static final long serialVersionUID = 5789458862592782873L;
 		private final BelPin belPin;
@@ -494,30 +502,17 @@ public abstract class Connection implements Serializable {
 
 	public abstract boolean isRouteThrough();
 
+	@Deprecated
 	public abstract boolean isPinConnection();
 
+	@Deprecated
 	public abstract SitePin getSitePin();
 
 	public abstract PIP getPip();
 
+	@Deprecated
 	public abstract boolean isTerminal();
 
+	@Deprecated
 	public abstract BelPin getBelPin();
-
-	public Collection<Connection> getWireConnections() {
-		return getSinkWire().getWireConnections();
-	}
-
-	public Collection<Connection> getPinConnections() {
-		return getSinkWire().getPinConnections();
-	}
-
-	public Collection<Connection> getTerminals() {
-		return getSinkWire().getTerminals();
-	}
-
-	public Stream<Connection> getAllConnections() {
-		return getSinkWire().getAllConnections();
-	}
-
 }

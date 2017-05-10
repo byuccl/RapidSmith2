@@ -195,7 +195,7 @@ public class ExtendedDeviceInfo implements Serializable {
 			return Collections.emptyList();
 		ArrayList<Connection> reversed = new ArrayList<>();
 		for (WireConnection c : cs) {
-			reversed.add(Connection.getReveserTileWireConnection((TileWire) wire, c));
+			reversed.add(Connection.getReverseTileWireConnection((TileWire) wire, c));
 		}
 		return reversed;
 	}
