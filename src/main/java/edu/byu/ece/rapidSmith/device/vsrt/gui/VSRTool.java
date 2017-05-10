@@ -867,7 +867,7 @@ public class VSRTool extends QMainWindow {
 		public boolean contains(String family, String site, String bel) {
 			
 			if (addedBelMap.containsKey(family.toLowerCase())){
-				Set<String> bels = addedBelMap.get(family).getOrDefault(site.toLowerCase(), Collections.emptySet());
+				Set<String> bels = addedBelMap.get(family.toLowerCase()).getOrDefault(site.toUpperCase(), Collections.emptySet());
 				return bels.contains(bel);
 			}
 			
@@ -883,7 +883,7 @@ public class VSRTool extends QMainWindow {
 		 * @param bel Name of the bel (i.e. HARD0GND)
 		 */
 		public void add(String family, String site, String bel) {
-			getBelSet(getSiteMap(family.toLowerCase()), site.toLowerCase()).add(bel);
+			getBelSet(getSiteMap(family.toLowerCase()), site.toUpperCase()).add(bel);
 		}
 		
 		/**
@@ -895,7 +895,7 @@ public class VSRTool extends QMainWindow {
 		 * @param bel Name of the bel (i.e. HARD0GND)
 		 */
 		public void remove(String family, String site, String bel) {
-			getBelSet(getSiteMap(family.toLowerCase()), site.toLowerCase()).remove(bel);
+			getBelSet(getSiteMap(family.toLowerCase()), site.toUpperCase()).remove(bel);
 		}
 		
 		private Map<String, Set<String>> getSiteMap(String family) {

@@ -42,5 +42,5 @@ public interface FamilyInfo {
 	Set<SiteType> ioSites();
 	Set<SiteType> dspSites();
 	Set<SiteType> bramSites();
-
+	Set<SiteType> fifoSites();
 }
