@@ -20,12 +20,13 @@
 
 package edu.byu.ece.rapidSmith.device;
 
+import edu.byu.ece.rapidSmith.device.Connection.SiteToTileConnection;
+import edu.byu.ece.rapidSmith.device.Connection.SiteWireConnection;
+
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static edu.byu.ece.rapidSmith.device.Connection.getSiteToTileConnection;
-import static edu.byu.ece.rapidSmith.device.Connection.getTerminalConnection;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 
@@ -87,7 +88,7 @@ public class SiteWire implements Wire, Serializable {
 			return Collections.emptyList();
 
 		return Arrays.stream(wireConnections)
-				.map(wc -> Connection.getSiteWireConnection(this, wc))
+				.map(wc -> new SiteWireConnection(this, wc))
 				.collect(Collectors.toList());
 	}
 
@@ -96,7 +97,7 @@ public class SiteWire implements Wire, Serializable {
 		SitePin pin = getConnectedPin();
 		if (pin == null)
 			return emptyList();
-		Connection c = getSiteToTileConnection(pin);
+		Connection c = new SiteToTileConnection(pin);
 		return singleton(c);
 	}
 
@@ -118,7 +119,7 @@ public class SiteWire implements Wire, Serializable {
 		BelPin pin = getTerminal();
 		if (pin == null)
 			return emptyList();
-		Connection c = getTerminalConnection(pin);
+		Connection c = new Connection.Terminal(pin);
 		return singleton(c);
 	}
 
@@ -137,7 +138,7 @@ public class SiteWire implements Wire, Serializable {
 			return Collections.emptyList();
 
 		return Arrays.stream(wireConnections)
-				.map(wc -> Connection.getSiteWireConnection(this, wc))
+				.map(wc -> new SiteWireConnection(this, wc))
 				.collect(Collectors.toList());
 	}
 
@@ -151,7 +152,7 @@ public class SiteWire implements Wire, Serializable {
 		SitePin pin = getReverseConnectedPin();
 		if (pin == null)
 			return emptyList();
-		Connection c = getSiteToTileConnection(pin);
+		Connection c = new SiteToTileConnection(pin);
 		return singleton(c);
 	}
 
@@ -168,7 +169,7 @@ public class SiteWire implements Wire, Serializable {
 		BelPin pin = getSource();
 		if (pin == null)
 			return emptyList();
-		Connection c = getTerminalConnection(pin);
+		Connection c = new Connection.Terminal(pin);
 		return singleton(c);
 	}
 

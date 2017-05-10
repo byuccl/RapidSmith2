@@ -31,60 +31,24 @@ import static edu.byu.ece.rapidSmith.util.Exceptions.DesignAssemblyException;
 public abstract class Connection implements Serializable {
 	private static final long serialVersionUID = 3236104431137672033L;
 
-	public static Connection getTileWireConnection(
-			TileWire sourceWire, WireConnection wc
-	) {
-		return new TileWireConnection(sourceWire, wc);
-	}
-
-	public static Connection getReverseTileWireConnection(
-			TileWire sourceWire, WireConnection wc
-	) {
-		return new ReverseTileWireConnection(sourceWire, wc);
-	}
-
-	public static Connection getSiteWireConnection(SiteWire sourceWire, WireConnection wc) {
-		return new SiteWireConnection(sourceWire, wc);
-	}
-
-	@Deprecated
-	public static Connection getTileToSiteConnection(SitePin pin) {
-		return new TileToSiteConnection(pin);
-	}
-
-	@Deprecated
-	public static Connection getSiteToTileConnection(SitePin pin) {
-		return new SiteToTileConnection(pin);
-	}
-
-	@Deprecated
-	public static Connection getTerminalConnection(BelPin belPin) {
-		return new Terminal(belPin);
-	}
-
-	@Deprecated
-	public abstract boolean isWireConnection();
-
-	private final static class TileWireConnection extends Connection {
+	public final static class TileWireConnection extends Connection {
 		private static final long serialVersionUID = 7549238102833227662L;
 		private final TileWire sourceWire;
 		private final WireConnection wc;
-		private TileWire sinkWire;
-		
-		TileWireConnection(TileWire sourceWire, WireConnection wc) {
+
+		public TileWireConnection(TileWire sourceWire, WireConnection wc) {
 			this.sourceWire = sourceWire;
 			this.wc = wc;
-			this.sinkWire = null;
+		}
+
+		@Override
+		public TileWire getSourceWire() {
+			return sourceWire;
 		}
 
 		@Override
 		public TileWire getSinkWire() {
-		
-			if (sinkWire == null) {				
-				sinkWire = new TileWire(wc.getTile(sourceWire.getTile()), wc.getWire());
-			}
-			
-			return sinkWire;
+			return new TileWire(wc.getTile(sourceWire.getTile()), wc.getWire());
 		}
 
 		@Override
@@ -143,7 +107,7 @@ public abstract class Connection implements Serializable {
 		}
 	}
 
-	private final static class ReverseTileWireConnection extends Connection {
+	public final static class ReverseTileWireConnection extends Connection {
 		private static final long serialVersionUID = -3585646572632532927L;
 		private final TileWire sourceWire;
 		private final WireConnection wc;
@@ -151,6 +115,11 @@ public abstract class Connection implements Serializable {
 		public ReverseTileWireConnection(TileWire sourceWire, WireConnection wc) {
 			this.sourceWire = sourceWire;
 			this.wc = wc;
+		}
+
+		@Override
+		public TileWire getSourceWire() {
+			return sourceWire;
 		}
 
 		@Override
@@ -214,7 +183,7 @@ public abstract class Connection implements Serializable {
 		}
 	}
 
-	private final static class SiteWireConnection extends Connection {
+	public final static class SiteWireConnection extends Connection {
 		private static final long serialVersionUID = -6889841775729826036L;
 		private final SiteWire sourceWire;
 		private final WireConnection wc;
@@ -225,7 +194,12 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
-		public Wire getSinkWire() {
+		public SiteWire getSourceWire() {
+			return sourceWire;
+		}
+
+		@Override
+		public SiteWire getSinkWire() {
 			Site site = sourceWire.getSite();
 			SiteType siteType = sourceWire.getSiteType();
 			return new SiteWire(site, siteType, wc.getWire());
@@ -293,12 +267,17 @@ public abstract class Connection implements Serializable {
 	}
 
 	@Deprecated
-	private final static class TileToSiteConnection extends Connection {
+	public final static class TileToSiteConnection extends Connection {
 		private static final long serialVersionUID = -5352375975919207638L;
 		private final SitePin pin;
 
 		public TileToSiteConnection(SitePin pin) {
 			this.pin = pin;
+		}
+
+		@Override
+		public Wire getSourceWire() {
+			return pin.getExternalWire();
 		}
 
 		@Override
@@ -361,12 +340,17 @@ public abstract class Connection implements Serializable {
 	}
 
 	@Deprecated
-	private final static class SiteToTileConnection extends Connection {
+	public final static class SiteToTileConnection extends Connection {
 		private static final long serialVersionUID = 6090945282983450142L;
 		private final SitePin pin;
 
 		public SiteToTileConnection(SitePin pin) {
 			this.pin = pin;
+		}
+
+		@Override
+		public Wire getSourceWire() {
+			return pin.getInternalWire();
 		}
 
 		@Override
@@ -429,12 +413,17 @@ public abstract class Connection implements Serializable {
 	}
 
 	@Deprecated
-	private final static class Terminal extends Connection {
+	public final static class Terminal extends Connection {
 		private static final long serialVersionUID = 5789458862592782873L;
 		private final BelPin belPin;
 
 		public Terminal(BelPin belPin) {
 			this.belPin = belPin;
+		}
+
+		@Override
+		public Wire getSourceWire() {
+			return belPin.getWire();
 		}
 
 		@Override
@@ -496,7 +485,12 @@ public abstract class Connection implements Serializable {
 		}
 	}
 
+	public abstract Wire getSourceWire();
+
 	public abstract Wire getSinkWire();
+
+	@Deprecated
+	public abstract boolean isWireConnection();
 
 	public abstract boolean isPip();
 

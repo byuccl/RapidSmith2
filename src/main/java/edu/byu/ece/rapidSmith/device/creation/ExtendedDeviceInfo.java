@@ -24,6 +24,7 @@ import com.caucho.hessian.io.Hessian2Input;
 import com.caucho.hessian.io.Hessian2Output;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.*;
+import edu.byu.ece.rapidSmith.device.Connection.ReverseTileWireConnection;
 import edu.byu.ece.rapidSmith.util.FileTools;
 import edu.byu.ece.rapidSmith.util.HashPool;
 
@@ -195,7 +196,7 @@ public class ExtendedDeviceInfo implements Serializable {
 			return Collections.emptyList();
 		ArrayList<Connection> reversed = new ArrayList<>();
 		for (WireConnection c : cs) {
-			reversed.add(Connection.getReverseTileWireConnection((TileWire) wire, c));
+			reversed.add(new ReverseTileWireConnection((TileWire) wire, c));
 		}
 		return reversed;
 	}

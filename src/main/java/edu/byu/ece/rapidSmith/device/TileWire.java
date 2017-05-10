@@ -20,6 +20,10 @@
 
 package edu.byu.ece.rapidSmith.device;
 
+import edu.byu.ece.rapidSmith.device.Connection.ReverseTileWireConnection;
+import edu.byu.ece.rapidSmith.device.Connection.TileToSiteConnection;
+import edu.byu.ece.rapidSmith.device.Connection.TileWireConnection;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,7 +31,6 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static edu.byu.ece.rapidSmith.device.Connection.getTileToSiteConnection;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 
@@ -87,7 +90,7 @@ public class TileWire implements Wire, Serializable {
 			return Collections.emptyList();
 		
 		return Arrays.stream(wireConnections)
-				.map(wc -> Connection.getTileWireConnection(this, wc))
+				.map(wc -> new TileWireConnection(this, wc))
 				.collect(Collectors.toList());
 	}
 
@@ -107,7 +110,7 @@ public class TileWire implements Wire, Serializable {
 		SitePin sitePin = getConnectedPin();
 		if (sitePin == null)
 			return emptyList();
-		Connection c = getTileToSiteConnection(sitePin);
+		Connection c = new TileToSiteConnection(sitePin);
 		return singleton(c);
 	}
 
@@ -150,7 +153,7 @@ public class TileWire implements Wire, Serializable {
 			return Collections.emptyList();
 
 		return Arrays.stream(wireConnections)
-				.map(wc -> Connection.getReverseTileWireConnection(this, wc))
+				.map(wc -> new ReverseTileWireConnection(this, wc))
 				.collect(Collectors.toList());
 	}
 
@@ -170,7 +173,7 @@ public class TileWire implements Wire, Serializable {
 		SitePin sitePin = getReverseConnectedPin();
 		if (sitePin == null)
 			return emptyList();
-		return singleton(getTileToSiteConnection(sitePin));
+		return singleton(new TileToSiteConnection(sitePin));
 	}
 
 	/**
