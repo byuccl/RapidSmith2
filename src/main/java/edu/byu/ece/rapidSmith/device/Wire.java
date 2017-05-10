@@ -22,7 +22,6 @@ package edu.byu.ece.rapidSmith.device;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.stream.Stream;
 
 /**
  * Wires represent a piece of metal on a device.  Wires are composed of two
@@ -38,11 +37,6 @@ public interface Wire extends Serializable {
 	Site getSite();
 
 	/**
-	 * Returns a stream comprised of wire, pin and terminal connections.
-	 */
-	Stream<Connection> getAllConnections();
-
-	/**
 	 * Return connection linking this wire to other wires in the same hierarchy.
 	 */
 	Collection<Connection> getWireConnections();
@@ -51,18 +45,32 @@ public interface Wire extends Serializable {
 	 * Returns connection linking this wire to another wire in a different
 	 * hierarchical level through a pin.
 	 */
+	@Deprecated
 	Collection<Connection> getPinConnections();
+
+	/**
+	 * Returns the connected site pins for each possible type of the connected site.
+	 * @return all connected sites pins of this wire
+	 */
+	Collection<SitePin> getAllConnectedPins();
+
+	/**
+	 * Returns connection linking this wire to another wire in a different
+	 * hierarchical level through a pin.
+	 */
+	SitePin getConnectedPin();
 
 	/**
 	 * Returns the terminals (BelPins) this wire drives.
 	 */
+	@Deprecated
 	Collection<Connection> getTerminals();
 
 	/**
-	 * Returns a stream comprised of wire, pin and terminal connection in the
-	 * reverse direction, ie sink to source.
-	 * */
-	Stream<Connection> getAllReverseConnections();
+	 * Returns connection linking this wire to another wire in a different
+	 * hierarchical level through a pin.
+	 */
+	BelPin getTerminal();
 
 	/**
 	 * Returns connection linking this wire to its drivers in the same hierarchy.
@@ -70,13 +78,32 @@ public interface Wire extends Serializable {
 	Collection<Connection> getReverseWireConnections();
 
 	/**
+	 * Returns the connected site pins for each possible type of the connected site.
+	 * @return all connected sites pins of this wire
+	 */
+	Collection<SitePin> getAllReverseSitePins();
+
+	/**
 	 * Return connection linking this wire to its drivers in the different
 	 * levels of hierarchy.
 	 */
+	@Deprecated
 	Collection<Connection> getReversePinConnections();
+
+	/**
+	 * Return connection linking this wire to its drivers in the different
+	 * levels of hierarchy.
+	 */
+	SitePin getReverseConnectedPin();
 
 	/**
 	 * Returns the sources (BelPins) which drive this wire.
 	 */
+	@Deprecated
 	Collection<Connection> getSources();
+
+	/**
+	 * Returns the sources (BelPins) which drive this wire.
+	 */
+	BelPin getSource();
 }
