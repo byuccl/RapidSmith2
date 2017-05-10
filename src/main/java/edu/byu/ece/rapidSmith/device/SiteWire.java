@@ -20,6 +20,7 @@
 
 package edu.byu.ece.rapidSmith.device;
 
+import edu.byu.ece.rapidSmith.device.Connection.ReverseSiteWireConnection;
 import edu.byu.ece.rapidSmith.device.Connection.SiteToTileConnection;
 import edu.byu.ece.rapidSmith.device.Connection.SiteWireConnection;
 
@@ -138,7 +139,7 @@ public class SiteWire implements Wire, Serializable {
 			return Collections.emptyList();
 
 		return Arrays.stream(wireConnections)
-				.map(wc -> new SiteWireConnection(this, wc))
+				.map(wc -> new ReverseSiteWireConnection(this, wc))
 				.collect(Collectors.toList());
 	}
 

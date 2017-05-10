@@ -266,6 +266,89 @@ public abstract class Connection implements Serializable {
 		}
 	}
 
+	public final static class ReverseSiteWireConnection extends Connection {
+		private static final long serialVersionUID = -6889841775729826036L;
+		private final SiteWire sourceWire;
+		private final WireConnection wc;
+
+		public ReverseSiteWireConnection(SiteWire sourceWire, WireConnection wc) {
+			this.sourceWire = sourceWire;
+			this.wc = wc;
+		}
+
+		@Override
+		public SiteWire getSourceWire() {
+			return sourceWire;
+		}
+
+		@Override
+		public SiteWire getSinkWire() {
+			Site site = sourceWire.getSite();
+			SiteType siteType = sourceWire.getSiteType();
+			return new SiteWire(site, siteType, wc.getWire());
+		}
+
+		@Override
+		public boolean isWireConnection() {
+			return true;
+		}
+
+		@Override
+		public boolean isPip() {
+			return wc.isPIP();
+		}
+
+		@Override
+		public boolean isRouteThrough() {
+			// bel routethrough
+			SiteType siteType = sourceWire.getSiteType();
+			int sourceEnum = sourceWire.getWireEnum();
+			return sourceWire.getSite().isRoutethrough(siteType, wc.getWire(), sourceEnum);
+		}
+
+		@Override
+		public boolean isPinConnection() {
+			return false;
+		}
+
+		@Override
+		public SitePin getSitePin() {
+			return null;
+		}
+
+		@Override
+		public PIP getPip() {
+			if (!wc.isPIP())
+				throw new DesignAssemblyException("Attempting to create PIP " +
+					"of non-PIP connection");
+			return new PIP(sourceWire, getSinkWire());
+		}
+
+		@Override
+		public boolean isTerminal() {
+			return false;
+		}
+
+		@Override
+		public BelPin getBelPin() {
+			return null;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			SiteWireConnection that = (SiteWireConnection) o;
+			return Objects.equals(sourceWire, that.sourceWire) &&
+				Objects.equals(wc, that.wc);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(sourceWire, wc);
+		}
+	}
+
 	@Deprecated
 	public final static class TileToSiteConnection extends Connection {
 		private static final long serialVersionUID = -5352375975919207638L;

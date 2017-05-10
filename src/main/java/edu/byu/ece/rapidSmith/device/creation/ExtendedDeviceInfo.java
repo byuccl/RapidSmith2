@@ -167,40 +167,6 @@ public class ExtendedDeviceInfo implements Serializable {
 		return wireHashMap;
 	}
 
-	private static class WireDistancePair {
-		public Wire wire;
-		int distance;
-
-		WireDistancePair(Wire wire, int distance) {
-			this.wire = wire;
-			this.distance = distance;
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
-			WireDistancePair that = (WireDistancePair) o;
-			return Objects.equals(wire, that.wire);
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hash(wire);
-		}
-	}
-
-	private Iterable<Connection> getReverseConnection(Wire wire) {
-		WireConnection[] cs = wire.getTile().getReverseConnections(wire.getWireEnum());
-		if (cs == null)
-			return Collections.emptyList();
-		ArrayList<Connection> reversed = new ArrayList<>();
-		for (WireConnection c : cs) {
-			reversed.add(new ReverseTileWireConnection((TileWire) wire, c));
-		}
-		return reversed;
-	}
-
 	public static void loadExtendedInfo(Device device) {
 		Path partFolderPath = getExtendedInfoPath(device);
 		ExtendedDeviceInfo info;
