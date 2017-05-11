@@ -509,9 +509,9 @@ public class ElementTab extends QWidget {
 			
 			// create a set of BEL names that already exist in the site
 			Set<String> existingBels = IntStream.range(0, this.bels.topLevelItemCount())
-												.boxed()
-												.map(i -> this.bels.topLevelItem(i).text(0))
-												.collect(Collectors.toSet());
+			                                    .boxed()
+			                                    .map(i -> this.bels.topLevelItem(i).text(0))
+			                                    .collect(Collectors.toSet());
 			
 			StaticBelDialog test = new StaticBelDialog(existingBels);
 			
