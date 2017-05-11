@@ -31,13 +31,13 @@ import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
+import edu.byu.ece.rapidSmith.design.subsite.LutRoutethroughInserter;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Connection;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.Wire;
-import edu.byu.ece.rapidSmith.interfaces.vivado.LutRoutethroughInserter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -119,7 +119,7 @@ public class RoutethroughInserterTest {
 	 * Creates a small design that can be used to test the RoutethroughInserter 
 	 */
 	private CellDesign createTestDesign() {
-		CellDesign design = new CellDesign("TestDesign", device.getPartName());
+		CellDesign design = new CellDesign("TestDesign", device.getPartName(), libCells);
 
 		// create partial netlist
 		Cell lut1 = design.addCell(new Cell("lut1", libCells.get("LUT1")));

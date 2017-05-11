@@ -35,6 +35,7 @@ import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
+import edu.byu.ece.rapidSmith.design.subsite.LutRoutethroughInserter;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
