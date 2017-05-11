@@ -180,7 +180,20 @@ contains the serialized \texttt{Device} data structures for RapidSmith. The file
 ending in ``\_info.dat'' contains additional serialized data (such as reverse
 wire connections) that can be optionally loaded with the device.
 
+\item Run the Family Builder in RapidSmith2 and pass your part as the command
+line argument. An example usage is shown below for an Artix7 device.
+
+\begin{lstlisting}[numbers=none]
+[ttown523@CB461-EE09968:˜] java edu.byu.ece.rapidSmith.util.FamilyBuilders xc7a100tcsg324
+\end{lstlisting}
+
+\noindent An Artix7.java (or whatever family your device is in) will already
+exist, but will be updated with new sites and tile types from your newly
+installed part.
 \end{enumerate}
+
+\noindent After running these steps, the part is ready to be used in RapidSmith.
+See \autoref{sec:loadingDevice} for how to load the device and begin using it.
 
 \subsection{Supporting New Device Families} \label{sec:newFamilies}
 Vivado supports implementing FPGA designs on devices for the following families
