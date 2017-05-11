@@ -462,8 +462,7 @@ TileType tileType = Artix7.TileTypes.CLBLL_L;
 	together. The classifications for Artix7 is shown below for reference.  
 
 \begin{lstlisting}[language=java,numbers=none]
-    /* ------ CLASSIFICATIONS GO HERE ------ */
-        // Tile classifications
+ /* ------ CLASSIFICATIONS GO HERE ------ */
         _CLB_TILES.add(TileTypes.CLBLL_L);
         _CLB_TILES.add(TileTypes.CLBLL_R);
         _CLB_TILES.add(TileTypes.CLBLM_L);
@@ -478,25 +477,24 @@ TileType tileType = Artix7.TileTypes.CLBLL_L;
         _DSP_TILES.add(TileTypes.DSP_L);
         _DSP_TILES.add(TileTypes.DSP_R);
 	
-        _IO_TILES.add(TileTypes.LIOI3_TBYTESRC);
         _IO_TILES.add(TileTypes.LIOB33_SING);
-        _IO_TILES.add(TileTypes.LIOI3_SING);
-        _IO_TILES.add(TileTypes.LIOI3_TBYTETERM);
-        _IO_TILES.add(TileTypes.LIOI3);
         _IO_TILES.add(TileTypes.LIOB33);
-        _IO_TILES.add(TileTypes.RIOI3);
         _IO_TILES.add(TileTypes.RIOB33);
-        _IO_TILES.add(TileTypes.RIOI3_SING);
-        _IO_TILES.add(TileTypes.RIOI3_TBYTETERM);
+        _IO_TILES.add(TileTypes.RIOB33_SING);
 
-		// Site classifications
         _SLICE_SITES.add(SiteTypes.SLICEL);
         _SLICE_SITES.add(SiteTypes.SLICEM);
-	
+
         _BRAM_SITES.add(SiteTypes.RAMB18E1);
         _BRAM_SITES.add(SiteTypes.RAMB36E1);
         _BRAM_SITES.add(SiteTypes.RAMBFIFO36E1);
 
+        _FIFO_SITES.add(SiteTypes.FIFO18E1);
+        _FIFO_SITES.add(SiteTypes.FIFO36E1);
+        _FIFO_SITES.add(SiteTypes.IN_FIFO);
+        _FIFO_SITES.add(SiteTypes.OUT_FIFO);
+        _FIFO_SITES.add(SiteTypes.RAMBFIFO36E1);
+        
         _DSP_SITES.add(SiteTypes.DSP48E1);
 
         _IO_SITES.add(SiteTypes.IOB33);

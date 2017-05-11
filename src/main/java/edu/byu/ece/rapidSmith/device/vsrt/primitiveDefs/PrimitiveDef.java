@@ -29,7 +29,7 @@ import java.util.HashSet;
 public class PrimitiveDef implements Serializable{
 
 	private static final long serialVersionUID = -7246158565182505932L;
-	private PrimitiveType type;
+	private String type;
 	private ArrayList<PrimitiveDefPin> pins;
 	private ArrayList<Element> elements;
 	
@@ -77,10 +77,10 @@ public class PrimitiveDef implements Serializable{
 		this.siteCfgElements = cfgs; 
 	}
 	// Setters and Getters
-	public void setType(PrimitiveType type) {
+	public void setType(String type) {
 		this.type = type;
 	}
-	public PrimitiveType getType() {
+	public String getType() {
 		return type;
 	}
 	public ArrayList<PrimitiveDefPin> getPins() {
@@ -327,7 +327,7 @@ public class PrimitiveDef implements Serializable{
 		this.calculateTotalNumElements();
 		StringBuilder s = new StringBuilder();
 		String nl = System.getProperty("line.separator");
-		s.append("\t(primitive_def " + type.toString() +" "+ pins.size() + " " + (this.numElements - (savePrint ? this.siteCfgElements.size() : 0)) 
+		s.append("\t(primitive_def " + type +" "+ pins.size() + " " + (this.numElements - (savePrint ? this.siteCfgElements.size() : 0)) 
 				+ (this.isSingleBelSite ? " #SBS" :"") + nl);
 		for(PrimitiveDefPin p : pins){
 			s.append("\t\t"+p.toString(savePrint)+nl);

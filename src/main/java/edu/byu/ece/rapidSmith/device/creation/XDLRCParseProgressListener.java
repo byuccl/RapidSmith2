@@ -52,13 +52,14 @@ public class XDLRCParseProgressListener extends XDLRCParserListener {
 	@Override
 	protected void enterTiles(List<String> tokens) {
 		totalTiles = Integer.parseInt(tokens.get(1)) * Integer.parseInt(tokens.get(2));
-		System.out.print(String.format("Parsing tile %6d of %6d tiles.", tilesParsed, totalTiles));
+		System.out.println(String.format("Parsing tile %6d of %6d tiles.", tilesParsed, totalTiles));
 	}
 
 	@Override
 	protected void enterTile(List<String> tokens) {
-		tilesParsed++;
-		System.out.print("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
-		System.out.print(String.format("Parsing tile %6d of %6d tiles.", tilesParsed, totalTiles));
+		// print out a heartbeat to the console every 10,000 tiles
+		if (++tilesParsed % 10000 == 0) {
+			System.out.println(String.format("Parsing tile %6d of %6d tiles.", tilesParsed, totalTiles));
+		}
 	}
 }

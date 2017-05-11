@@ -50,7 +50,6 @@ public class XDLRCPrimitiveDefsParser {
 	private String currentFileName;
 	private int lineCount;
 	private Element lastElement = null;
-	private boolean isAlternate = false;
 
 	 public PrimitiveDefList getPrimitiveDefs() {
 		  return defs;
@@ -62,9 +61,7 @@ public class XDLRCPrimitiveDefsParser {
 	 * @param file Names of the XDLRC files to parse.
 	 * @return The populated PrimitiveDefList.
 	 */
-	public void parseXDLRCFile(String file) {
-		isAlternate = file.endsWith("_ALTERNATE.def") ;
-			
+	public void parseXDLRCFile(String file) {			
 		loadFile(file);
 		parseFile();
 		closeFile();
@@ -90,7 +87,7 @@ public class XDLRCPrimitiveDefsParser {
 	private void parsePrimitiveDef() {
 		PrimitiveDef def = new PrimitiveDef();
 		String name = tokens[1].toUpperCase();
-		def.setType(PrimitiveType.valueOf(name));
+		def.setType(name);
 		int pinCount = Integer.parseInt(tokens[2]);
 		int elementCount = Integer.parseInt(tokens[3]);
 		
@@ -117,9 +114,6 @@ public class XDLRCPrimitiveDefsParser {
 			defs.add(def);
 			processed.add(name);
 		}
-		
-		//if (def.belCount() == 1)
-		//	def.initializeOneBelPrimitiveDef(this.isAlternate);
 	}
 	
 	private PrimitiveDefPin parsePrimitiveDefPin() {

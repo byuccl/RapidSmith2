@@ -130,6 +130,7 @@ public class FamilyBuilders {
 		addSetField(clazz, "BRAM_SITES", "SiteType");
 		addSetField(clazz, "DSP_SITES", "SiteType");
 		addSetField(clazz, "IO_SITES", "SiteType");
+		addSetField(clazz, "FIFO_SITES", "SiteType");
 
 		addTilesClass(clazz);
 		addSitesClass(clazz);
@@ -465,7 +466,10 @@ public class FamilyBuilders {
 		updateFamiliesInFamilyInfo(cu, updatedFamilies);
 		PrettyPrinter pp = new PrettyPrinter(new PrettyPrinterConfiguration());
 		String output = pp.print(cu);
-		System.out.println(output);
+		
+		try (BufferedWriter bw = Files.newBufferedWriter(fileLocation, Charset.defaultCharset())) {
+			bw.write(output);
+		}
 	}
 
 	private void updateFamiliesInFamilyInfo(CompilationUnit cu, Set<FamilyType> updatedFamilies) {

@@ -149,7 +149,8 @@ public class PrimitiveSiteTable extends QTableWidget {
 		int row = 0;
 		for (File file: currentFamily.listFiles(this.defFilter)) {
 				String sitename = file.getName().substring(0, file.getName().length() - 4);
-				QTableWidgetItem test = new QTableWidgetItem (sitename); 
+				QTableWidgetItem test = new QTableWidgetItem (sitename);
+				
 				if ( this.completedSites.get(currentFamily.getName()) != null ) {
 					if ( this.completedSites.get(currentFamily.getName()).contains(sitename)  )
 						test.setIcon(checked);

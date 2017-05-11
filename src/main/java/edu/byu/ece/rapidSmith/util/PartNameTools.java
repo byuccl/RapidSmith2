@@ -19,12 +19,19 @@
  */
 package edu.byu.ece.rapidSmith.util;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Provides a method to remove the speed grade.
  * @author Chris Lavin
  * Created on: Jan 27, 2011
  */
 public class PartNameTools {
+	
+	/** Pattern used to separate part names from their speed grade*/
+	private static Pattern partNamePattern = Pattern.compile("^(x[a-z0-9]+(?:-[a-z0-9]+)?)-.+");
+
 	/**
 	 * This method removes the speed grade (ex: -10) from a conventional Xilinx part name.
 	 * @param partName The name of the part to remove the speed grade from.
@@ -32,11 +39,7 @@ public class PartNameTools {
 	 * the original string.
 	 */
 	public static String removeSpeedGrade(String partName) {
-		if(partName != null && partName.contains("-")){
-			return partName.substring(0, partName.indexOf("-"));
-		}
-		else{
-			return partName;
-		}
+		Matcher matcher = partNamePattern.matcher(partName);
+		return matcher.matches() ? matcher.group(1).replaceAll("-", "") : partName;
 	}
 }
