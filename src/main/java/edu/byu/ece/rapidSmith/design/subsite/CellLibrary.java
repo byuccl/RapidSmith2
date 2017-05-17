@@ -114,11 +114,13 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		}
 		// then load the macro cells if any exist
 		Element macrosEl = doc.getRootElement().getChild("macros");
-		List<Element> childrenMacros = macrosEl.getChildren("macro"); 
 		
-		if (childrenMacros != null) {
-			for (Element macroEl : childrenMacros) {
-				loadMacroFromXml(macroEl);
+		if (macrosEl != null) {
+		List<Element> childrenMacros = macrosEl.getChildren("macro"); 
+			if (childrenMacros != null) {
+				for (Element macroEl : childrenMacros) {
+					loadMacroFromXml(macroEl);
+				}
 			}
 		}
 	}

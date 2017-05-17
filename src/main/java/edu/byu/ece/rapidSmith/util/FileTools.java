@@ -368,9 +368,6 @@ public class FileTools {
 		}
 	}
 
-
-
-	
 	/**
 	 * This method will get and return the current time as a string
 	 * formatted in the same way used in most Xilinx report and XDL

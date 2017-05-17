@@ -41,10 +41,11 @@ import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.device.PackagePin;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.SiteType;
 
-import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
+import static edu.byu.ece.rapidSmith.util.Exceptions.*;
 
 /**
  * This class is used for parsing and writing placement XDC files in a TINCR checkpoint.
@@ -139,20 +140,27 @@ public class XdcPlacementInterface {
 	
 	private void applyPortPlacement(String[] toks) {
 		
-		Site site = tryGetSite(toks[1]);
-		Cell cell = tryGetCell(toks[2]);
-				
-		// TODO: update this so PAD is not hardcoded in this location. Not sure if there is a way to do this...
-		Bel bel = tryGetBel(site, "PAD"); 
+		if (toks.length != 4) {
+			throw new ParseException("PACKAGE_PIN declaration should be followed by 3 tokens: cell site bel.\n"
+					+ "On line: " + currentLineNumber + " of " + currentFile);
+		}
+		
+		Cell cell = tryGetCell(toks[1]);
+		Site site = tryGetSite(toks[2]);
+		Bel bel = tryGetBel(site, toks[3]);
+		
 		design.placeCell(cell, bel);
 		
-		BelPin belPin = tryGetBelPin(bel, "PAD");
-		CellPin cellPin = tryGetCellPin(cell, "PAD");
+		assert (cell.getPins().size() == 1) : "PAD cell should only have one pin";
+		assert (bel.getBelPins().count() == 1) : "PAD BEL " + site.getName() + "/" + bel.getName() + " should only have one pin. but has " + bel.getBelPins().count();
+		
+		BelPin belPin = bel.getBelPins().findFirst().get();
+		CellPin cellPin = cell.getPins().iterator().next();
 		
 		cellPin.mapToBelPin(belPin);
 		belPinToCellPinMap.put(belPin, cellPin);
 	}
-	
+
 	/*
 	 * Applies a property to an internal cell based on the tokens read from the placement.rsc file
 	 * Expected format of toks : "IPROP cellName propertyName propertyValue"
@@ -291,7 +299,7 @@ public class XdcPlacementInterface {
 	}
 		
 	/**
-	 * Creates a placement.xdc file from the cells of the given design <br>
+	 * Creates a placement.xdc file from the cells of the given design 
 	 * This file can be imported into Vivado to constrain the cells to a physical location
 	 * 
 	 * @param xdcOut Output placement.xdc file location
@@ -299,43 +307,55 @@ public class XdcPlacementInterface {
 	 */
 	public void writePlacementXDC(String xdcOut) throws IOException {
 		
-		BufferedWriter fileout = new BufferedWriter (new FileWriter(xdcOut));
-		
-		//TODO: Assuming that the logical design has not been modified...can no longer assume this with insertion/deletion
-		Iterator<Cell> cellIt = sortCellsForXdcExport(design).iterator();
-		//for (Cell cell : sortCellsForXdcExport(design)) {
-		while (cellIt.hasNext()) {
-			Cell cell = cellIt.next();
+		try (BufferedWriter fileout = new BufferedWriter (new FileWriter(xdcOut)) ) {
+
+			Iterator<Cell> cellIt = sortCellsForXdcExport(design).iterator();
+			
+			// All cells are assumed placed in this while loop
+			while (cellIt.hasNext()) {
+				Cell cell = cellIt.next();
+				Site site = cell.getSite();
+				Bel bel = cell.getBel();
+				String cellname = cell.getName();
+				
+				// ports need a package pin reference, and aren't placed in Vivado
+				if (cell.isPort()) {
+					PackagePin packagePin = device.getPackagePin(bel);
+					// if the port is not mapped to a valid package pin, thrown an exception
+					if (packagePin == null) {
+						if (device.getPackagePins().isEmpty()) {
+							throw new ImplementationException("Device " + device.getPartName() + " is missing package pin information: cannot generate TCP without it.\n"
+									+ "To generate the package pin information and add it to your device follow these three steps: \n"
+									+ "1.) Run the Tincr command \"tincr::create_xml_device_info\" for your part.\n"
+									+ "2.) Store the generated XML file to the devices/family directory which corresponds to your part.\n"
+									+ "3.) Run the DeviceInfoInstaller in the util package to add the package pins to the device");
+						}
 						
-			Site ps = cell.getSite();
-			Bel b = cell.getBel();
-			String cellname = cell.getName();
-			
-			// ports need a package pin reference, and aren't placed in Vivado
-			if (cell.isPort()) {
-				fileout.write(String.format("set_property PACKAGE_PIN %s [get_ports {%s}]\n", ps.getName(), cellname));
-				continue;
-			}
-			
-			fileout.write(String.format("set_property BEL %s.%s [get_cells {%s}]\n", ps.getType().name(), b.getName(), cellname));
-			fileout.write(String.format("set_property LOC %s [get_cells {%s}]\n", ps.getName(), cellname));
-								
-			//TODO: Update this function when more cells with LOCK_PINS are discovered
-			if(cell.getLibCell().isLut()) { 
-				fileout.write("set_property LOCK_PINS { ");
-				for(CellPin cp: cell.getInputPins()) {
-					if (!cp.isPseudoPin()) {
-						fileout.write(String.format("%s:%s ", cp.getName(), cp.getMappedBelPin().getName()));
+						throw new ImplementationException("Cannot export placement information for port cell " + cellname + ".\n"
+								+ "Package Pin for BEL " + bel.getFullName() + " cannot be found.");
+					}
+					fileout.write(String.format("set_property PACKAGE_PIN %s [get_ports {%s}]\n", packagePin.getName(), cellname));
+				}
+				else {
+					fileout.write(String.format("set_property BEL %s.%s [get_cells {%s}]\n", site.getType().name(), bel.getName(), cellname));
+					fileout.write(String.format("set_property LOC %s [get_cells {%s}]\n", site.getName(), cellname));
+										
+					//TODO: Update this function when more cells with LOCK_PINS are discovered
+					if (cell.isLut()) { 
+						fileout.write("set_property LOCK_PINS { ");
+						for(CellPin cp: cell.getInputPins()) {
+							if (!cp.isPseudoPin()) {
+								fileout.write(String.format("%s:%s ", cp.getName(), cp.getMappedBelPin().getName()));
+							}
+						}
+						
+						fileout.write("} [get_cells {" + cellname + "}]\n");
 					}
 				}
-				
-				fileout.write("} [get_cells {" + cellname + "}]\n");
 			}
 		}
-		
-		fileout.close();
 	}
-	
+
 	/*
 	 * Sorts the cells of the design in the order required for TINCR export. 
 	 * Uses a bin sorting algorithm to have a complexity of O(n). 

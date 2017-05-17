@@ -153,10 +153,14 @@ public final class DeviceGenerator {
 		wireArrayPool = new HashPool<>();
 		tileWiresPool = new HashPool<>();
 
+		if (parseDeviceInfo(device) == false) {
+			System.err.println("[Warning]: The device info file for the part " + device.getPartName() + " cannot be found.");
+		}
+		
 		makeWireCorrections(wcsToAdd, wcsToRemove);
 	
 		device.constructDependentResources();
-
+		
 		// free unneeded pools for garbage collection when done with
 		routeThroughPool = null;
 		tileSourcesPool = null;
@@ -736,6 +740,51 @@ public final class DeviceGenerator {
 		return "intrasite:" + type.name() + "/" + element + "." + pinName;
 	}
 
+	/**
+	 * Parses the device info XML file for the specified device, and adds the information
+	 * to the {@link Device} object that is being created. If no device info file can be found
+	 * for the part, then a warning is printed to the console.
+	 * 
+	 * TODO: parse the clock pads and add them to the device file
+	 * 
+	 * @param device Device object created from the XDLRC parser
+	 */
+	public static boolean parseDeviceInfo(Device device) {
+		Document deviceInfo = RSEnvironment.defaultEnv().loadDeviceInfo(device.getFamily(), device.getPartName());
+		
+		if (deviceInfo != null) {
+			createPackagePins(device, deviceInfo);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Creates a map from pad bel name -> corresponding package pin. This
+	 * information is needed when generating Tincr Checkpoints from
+	 * RS to be loaded into Vivado.
+	 * @param deviceInfo
+	 */
+	private static void createPackagePins(Device device, Document deviceInfo) {
+		Element pinMapRootEl = deviceInfo.getRootElement().getChild("package_pins");
+		
+		if (pinMapRootEl == null) {
+			throw new Exceptions.ParseException("No package pin information found in device info file: " + deviceInfo.getBaseURI() + ".\n"
+				+ "Either add the package pin mappings, or remove the device info file and regenerate.");
+		}
+		
+		// Add the package pins to the device
+		pinMapRootEl.getChildren("package_pin")
+			.stream()
+			.map(ppEl -> new PackagePin(ppEl.getChildText("name"), ppEl.getChildText("bel"), ppEl.getChild("is_clock") != null))
+			.forEach(packagePin -> device.addPackagePin(packagePin));
+			
+		if (device.getPackagePins().isEmpty()) {
+			throw new Exceptions.ParseException("No package pin information found in device info file: " + deviceInfo.getBaseURI() + ".\n"
+					+ "Either add the package pin mappings, or remove the device info file and regenerate.");
+		}
+	}
+	
 	private final class FamilyTypeListener extends XDLRCParserListener {
 		@Override
 		protected void enterXdlResourceReport(List<String> tokens) {

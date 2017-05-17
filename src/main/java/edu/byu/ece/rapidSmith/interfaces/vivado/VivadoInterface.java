@@ -198,7 +198,7 @@ public final class VivadoInterface {
 		
 		// write design.info
 		String partInfoOut = Paths.get(tcpDirectory, "design.info").toString();
-		DesignInfoInterface.writeInfoFile(partInfoOut, device.getPartName());
+		DesignInfoInterface.writeInfoFile(partInfoOut, design.getPartName());
 	}
 	
 	/**

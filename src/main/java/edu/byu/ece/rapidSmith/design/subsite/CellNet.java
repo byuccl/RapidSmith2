@@ -70,6 +70,8 @@ public class CellNet implements Serializable {
 	// Physical route information
 	/** SitePin source of the net (i.e. where the net leaves the site)*/
 	private SitePin sourceSitePin;
+	/** */ 
+	private List<SitePin> sourceSitePinList; 
 	/** Route Tree connecting to the source pin of the net*/
 	private RouteTree source;
 	/** List of intersite RouteTree objects for the net*/
@@ -475,26 +477,62 @@ public class CellNet implements Serializable {
 	/* **********************************
 	 * 	    Physical Route Functions
 	 * **********************************/
-	
+		
 	/**
-	 * Sets the {@link SitePin} source of the net. This is used to
-	 * set the source of a net when loading a Tincr Checkpoint. If you are
-	 * writing a intersite router, this will give you the site pin where the 
-	 * route needs to start.
-	 * @param sitePin {@link SitePin} 
+	 * Adds a {@link SitePin} source to the net. <b>NOTE</b>: Only two site pins can be marked
+	 * as sources for a net. An exception will be thrown if you try to add more.
+	 * 
+	 * @param sitePin
 	 */
-	public void setSourceSitePin(SitePin sitePin) {
-		this.sourceSitePin = sitePin;
+	public void addSourceSitePin(SitePin sitePin) {
+		if (this.sourceSitePinList == null) {
+			this.sourceSitePinList = new ArrayList<SitePin>(2);
+		}
+		
+		// Throw an exception if the net already has two source pins
+		if (this.sourceSitePinList.size() >= 2) {
+			throw new AssertionError("CellNets should have at most two source site pins, not more. If you think this is incorrect, create a new issue "
+					+ "at the RapidSmith2 github repository.");
+		}
+		
+		this.sourceSitePinList.add(sitePin); 
 	}
 	
 	/**
-	 * Gets the {@link SitePin} where this net is sourced.
-	 * @return {@link SitePin}
+	 * Removes the specified {@link SitePin} from the list of net site pin sources.
+	 *  
+	 * @param sitePin
+	 * @return {@code true} if the site pin was successfully removed as a source, {@code false} otherwise.
+	 * 		If the site pin was not a source pin for the net, {@code false} will be returned.
+	 */
+	public boolean removeSourceSitePin(SitePin sitePin) {
+		return this.sourceSitePinList == null ? false : this.sourceSitePinList.remove(sitePin); 
+	}
+	
+	/**
+	 * Returns an unmodifiable list of {@link SitePin} objects that are
+	 * sources for the net.
+	 */
+	public List<SitePin> getSourceSitePins() {
+		return this.sourceSitePinList == null ? Collections.emptyList() 
+					: Collections.unmodifiableList(this.sourceSitePinList);
+	}
+	
+	/**
+	 * Returns the first {@link SitePin} in the list of site pin sources. If you 
+	 * know the net has only onw site pin source, then use this function.
 	 */
 	public SitePin getSourceSitePin() {
-		return this.sourceSitePin;
+		return this.sourceSitePinList == null ? null : this.sourceSitePinList.get(0);
 	}
 	
+	/**
+	 * Returns the number of site pin sources on the net. 
+	 */
+	public int sourceSitePinCount() {
+		return this.sourceSitePinList == null ? 0  : this.sourceSitePinList.size();
+	}
+		
 	/**
 	 * Gets the {@link BelPin} where this net is sourced
 	 * @return {@link BelPin}

@@ -58,8 +58,16 @@ public final class RapidSmithDebug {
 	 */
 	private static void printRouteTree(RouteTree rt, int level) {
 		Wire w = rt.getWire();
-		System.out.println(w.getTile() + "/" + w.getWireName() + "--> " + level);
-			
+		System.out.print(w.getTile() + "/" + w.getWireName());
+		
+		if (w.getConnectedPin() != null) {
+			System.out.print(" (SitePin)");
+		} 
+		else if (w.getTerminal() != null) {
+			System.out.print(" (BelPin)");
+		}
+		System.out.println("--> " + level);
+		
 		level++;
 		for(RouteTree r: rt.getSinkTrees()) {
 			printRouteTree(r, level);

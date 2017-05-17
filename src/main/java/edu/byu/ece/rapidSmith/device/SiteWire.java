@@ -79,7 +79,7 @@ public class SiteWire implements Wire, Serializable {
 
 	@Override
 	public String getFullWireName() {
-		return getSite().getName() + "/" + getTile().getName() + "/" + getWireName();
+		return getSite().getName() + "/" + getWireName();
 	}
 
 	@Override

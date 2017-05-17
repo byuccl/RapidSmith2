@@ -34,6 +34,9 @@ public class PartNameTools {
 
 	/**
 	 * This method removes the speed grade (ex: -10) from a conventional Xilinx part name.
+	 * NOTE: this function expects a valid, full xilinx part name (i.e. xcku025-ffva1156-1-c and 
+	 * not xcku025-ffva1156). 
+	 * 
 	 * @param partName The name of the part to remove the speed grade from.
 	 * @return The base part name with speed grade removed.  If no speed grade is present, returns
 	 * the original string.
