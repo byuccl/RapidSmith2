@@ -115,7 +115,6 @@ public class LibraryMacro extends LibraryCell {
 		List<InternalPin> internalPins = new ArrayList<>(pinNames.size());
 		
 		for(String pinName : pinNames) {
-			System.out.println(pinName);
 			String[] nameToks = pinName.split("/");
 			assert(nameToks.length == 2);
 			internalPins.add(new InternalPin(nameToks[0], nameToks[1]));

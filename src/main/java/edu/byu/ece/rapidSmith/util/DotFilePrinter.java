@@ -62,22 +62,39 @@ public class DotFilePrinter {
 	private BufferedWriter outputStream; 
 	private final Map<String,String> dotProperties; 
 	private final CellDesign design;
-	private final int MAX_FANOUT = 3;
+	// Default max fanout parameter 
+	private int MAX_FANOUT = 10;
 	
 	/**
-	 * Creates a new DotFilePrinter for the specified CellDesign
+	 * Creates a new DotFilePrinter for the specified CellDesign.
 	 * 
 	 * @param design CellDesign
 	 */
 	public DotFilePrinter(CellDesign design) {
 		this.design = design;
-
+		this.MAX_FANOUT = 10000;
 		// initialize dot configuration with default options
 		dotProperties = new HashMap<>();
 		dotProperties.put("rankdir", "LR");
 		dotProperties.put("concentrate", "true");
 	}
 	
+	/**
+	 * Creates a new DotFilePrinter for the specified CellDesign. Only nets
+	 * with the number of sink connections less than maxFanout will be printed.
+	 * 
+	 * @param design CellDesign
+	 * @param maxFanout
+	 */
+	public DotFilePrinter(CellDesign design, int maxFanout) {
+		this.design = design;
+		this.MAX_FANOUT = maxFanout;
+		// initialize dot configuration with default options
+		dotProperties = new HashMap<>();
+		dotProperties.put("rankdir", "LR");
+		dotProperties.put("concentrate", "true");
+	}
+		
 	/**
 	 * Creates a new DotFilePrinter for the specified CellDesign and top-level graph <br>
 	 * properties. Only use this function if you are familiar with DOT file formats
@@ -89,9 +106,24 @@ public class DotFilePrinter {
 		this.design = design;
 		this.dotProperties = dotProperties;
 	}
+	
+	/**
+	 * Creates a new DotFilePrinter for the specified CellDesign and top-level graph 
+	 * properties. Only use this function if you are familiar with DOT file formats. Only nets
+	 * with the number of sink connections less than maxFanout will be printed.
+	 * 
+	 * @param design CellDesign
+	 * @param dotProperties Map of top-level graph properties for the DOT file
+	 * @param maxFanout
+	 */
+	public DotFilePrinter(CellDesign design, Map<String,String> dotProperties, int maxFanout) {
+		this.design = design;
+		this.dotProperties = dotProperties;
+		this.MAX_FANOUT = maxFanout;
+	}
 		
 	/**
-	 * Prints a DOT file of the design netlist with the configured dot properties. <br>
+	 * Prints a DOT file of the design netlist with the configured dot properties. 
 	 * 
 	 * @param outputFile Output .dot location (C:/example.dot)
 	 * @throws IOException
