@@ -68,10 +68,22 @@
 				<bel>
 					<name>AFF</name>
 					<type>AFF</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>AFF2</name>
 					<type>AFF2</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>B5LUT</name>
@@ -132,10 +144,22 @@
 				<bel>
 					<name>BFF</name>
 					<type>BFF</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>BFF2</name>
 					<type>BFF2</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>C5LUT</name>
@@ -200,10 +224,22 @@
 				<bel>
 					<name>CFF</name>
 					<type>CFF</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>CFF2</name>
 					<type>CFF2</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>D5LUT</name>
@@ -264,10 +300,22 @@
 				<bel>
 					<name>DFF</name>
 					<type>DFF</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>DFF2</name>
 					<type>DFF2</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>E5LUT</name>
@@ -328,10 +376,22 @@
 				<bel>
 					<name>EFF</name>
 					<type>EFF</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>EFF2</name>
 					<type>EFF2</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>F5LUT</name>
@@ -420,10 +480,22 @@
 				<bel>
 					<name>FFF</name>
 					<type>FFF</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>FFF2</name>
 					<type>FFF2</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>G5LUT</name>
@@ -484,10 +556,22 @@
 				<bel>
 					<name>GFF</name>
 					<type>GFF</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>GFF2</name>
 					<type>GFF2</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>H5LUT</name>
@@ -548,10 +632,22 @@
 				<bel>
 					<name>HFF</name>
 					<type>HFF</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>HFF2</name>
 					<type>HFF2</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>HARD0GND</name>
@@ -736,10 +832,22 @@
 				<bel>
 					<name>AFF</name>
 					<type>AFF</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>AFF2</name>
 					<type>AFF2</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>B5LUT</name>
@@ -800,10 +908,22 @@
 				<bel>
 					<name>BFF</name>
 					<type>BFF</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>BFF2</name>
 					<type>BFF2</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>C5LUT</name>
@@ -868,10 +988,22 @@
 				<bel>
 					<name>CFF</name>
 					<type>CFF</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>CFF2</name>
 					<type>CFF2</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>D5LUT</name>
@@ -932,10 +1064,22 @@
 				<bel>
 					<name>DFF</name>
 					<type>DFF</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>DFF2</name>
 					<type>DFF2</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>E5LUT</name>
@@ -996,10 +1140,22 @@
 				<bel>
 					<name>EFF</name>
 					<type>EFF</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>EFF2</name>
 					<type>EFF2</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>F5LUT</name>
@@ -1088,10 +1244,22 @@
 				<bel>
 					<name>FFF</name>
 					<type>FFF</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>FFF2</name>
 					<type>FFF2</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>G5LUT</name>
@@ -1152,10 +1320,22 @@
 				<bel>
 					<name>GFF</name>
 					<type>GFF</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>GFF2</name>
 					<type>GFF2</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>H5LUT</name>
@@ -1216,10 +1396,22 @@
 				<bel>
 					<name>HFF</name>
 					<type>HFF</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>HFF2</name>
 					<type>HFF2</type>
+					<routethroughs>
+						<routethrough>
+							<input>D</input>
+							<output>Q</output>
+						</routethrough>
+					</routethroughs>
 				</bel>
 				<bel>
 					<name>HARD0GND</name>
@@ -3152,6 +3344,24 @@
 				</bel>
 			</bels>
 			<corrections/>
+		</site_type>
+		<site_type>
+			<name>VCC</name>
+			<bels>
+				<bel>
+					<name>HARD1VCC</name>
+					<type>VCC</type>
+				</bel>
+			</bels>
+		</site_type>
+		<site_type>
+			<name>GND</name>
+			<bels>
+				<bel>
+					<name>HARD0GND</name>
+					<type>GND</type>
+				</bel>
+			</bels>
 		</site_type>
 	</site_types>
 </device_description>
