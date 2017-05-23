@@ -17,7 +17,6 @@
  * RapidSmith Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
  * also get a copy of the license at <http://www.gnu.org/licenses/>.
  */
-
 package edu.byu.ece.rapidSmith.interfaces.vivado;
 
 import java.io.BufferedReader;
@@ -122,14 +121,16 @@ public class XdcRoutingInterface {
 	public void parseRoutingXDC(String xdcFile) throws IOException {
 		
 		currentFile = xdcFile;
-
+		// Regex used to split lines via whitespace
+		Pattern whitespacePattern = Pattern.compile("\\s+");
+		
 		// try-with-resources to guarantee no resource leakage
 		try (LineNumberReader br = new LineNumberReader(new BufferedReader(new FileReader(xdcFile)))) {
 		
 			String line;
 			while ((line = br.readLine()) != null) {
 				this.currentLineNumber = br.getLineNumber();
-				String[] toks = line.split("\\s+");
+				String[] toks = whitespacePattern.split(line);
 	
 				// TODO: I know the order these things appear in the file, so I probably don't need a big switch statement
 				// SITE_PIPS -> STATIC_SOURCES -> LUT_RTS -> INTRASITE/INTERSITE/ROUTE
@@ -294,13 +295,6 @@ public class XdcRoutingInterface {
 			RouteTree netRouteTree = recreateRoutingNetwork(net, startWire, wiresInNet, visitedWires);
 			net.addIntersiteRouteTree(netRouteTree);
 		}
-		
-		for (Wire wire : visitedWires) {
-			if (wire.getFullWireName().equals("CLE_M_X35Y35/CLE_CLE_M_SITE_0_AX")) {
-				System.out.println("I visited the expected wire!");
-			}
-		}
-		
 	}
 	
 	private void processStaticNet2(String[] wireToks, String[] startWires) {
@@ -551,15 +545,10 @@ public class XdcRoutingInterface {
 		// update the net with the routed cell pins
 		IntrasiteRoute internalRoute = sitePinToRouteMap.get(sinkSitePin);
 		
-		if ("SLICE_X50Y35/AX".equals(sinkSitePin.getSite().getName() + "/" + sinkSitePin.getName())) {
-			System.out.println("!!Reached site pin sink SLICE_X50Y35/AX: ");
-		}
-		
 		if (internalRoute != null) { 
 			internalRoute.setSinksAsRouted();
 		}
 		else if (net.isStaticNet()) {
-			//System.out.println(sinkSitePin);
 			// implicit intrasite net. An Example is a GND/VCC net going to the A6 pin of a LUT.
 			// I does not actually show the bel pin as used, but it is being used.
 			// another example is the A1 pin on a SRL cell
@@ -1317,12 +1306,7 @@ public class XdcRoutingInterface {
 		public void applyRouting() {
 
 			net.addSinkRouteTree(source, route);
-			if ("SLICE_X50Y35/AX".equals(source.getSite().getName() + "/" + source.getName())) {
-				System.out.println("!!BelPinSinks for SLICE_X50Y35/AX: ");
-				for (BelPin pin : this.belPinSinks) {
-					System.out.println(" -> " + pin.getBel().getName() + "/" + pin.getName());
-				}
-			}
+
 			for (BelPin pin : this.belPinSinks) {
 				net.addSinkRouteTree(pin, route);
 				 

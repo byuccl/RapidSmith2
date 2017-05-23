@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
@@ -80,11 +81,13 @@ public class XdcPlacementInterface {
 		currentFile = xdcFile;
 		LineNumberReader br = new LineNumberReader(new BufferedReader(new FileReader(xdcFile)));
 		String line;
+		// Regex used to split lines via whitespace
+		Pattern whitespacePattern = Pattern.compile("\\s+");
 		
 		while ((line = br.readLine()) != null) {
 			currentLineNumber = br.getLineNumber();
 			
-			String[] toks = line.split("\\s+");
+			String[] toks = whitespacePattern.split(line);
 			
 			switch (toks[0]) {
 				case "LOC" : applyCellPlacement(toks);
@@ -357,15 +360,20 @@ public class XdcPlacementInterface {
 	}
 
 	/*
-	 * Sorts the cells of the design in the order required for TINCR export. 
+	 * Sorts the cells of the design in the order required for TINCR export.
+	 * Cells that are unplaced are not included in the sorted list. 
 	 * Uses a bin sorting algorithm to have a complexity of O(n). 
 	 * 
 	 * TODO: Add <is_lut>, <is_carry>, and <is_ff> tags to cell library
 	 */
 	private Stream<Cell> sortCellsForXdcExport(CellDesign design) {
 		
+		design.getDevice().getAllSitesOfType(SiteType.valueOf(design.getFamily(), "SLICEL"));
+		
+		
 		// cell bins
 		ArrayList<Cell> sorted = new ArrayList<>(design.getCells().size());		
+		ArrayList<Cell> lutCellsH = new ArrayList<>();
 		ArrayList<Cell> lutCellsD = new ArrayList<>();
 		ArrayList<Cell> lutCellsABC = new ArrayList<>();
 		ArrayList<Cell> carryCells = new ArrayList<>();
@@ -379,7 +387,7 @@ public class XdcPlacementInterface {
 			Cell cell = cellIt.next();
 			
 			// only add cells that are placed to the list
-			if( !cell.isPlaced() ) {
+			if ( !cell.isPlaced() ) {
 				continue;
 			}
 			
@@ -387,7 +395,10 @@ public class XdcPlacementInterface {
 			String belName = cell.getBel().getName();
 			
 			if (belName.endsWith("LUT")) {
-				if (belName.contains("D")) {
+				if (belName.contains("H")) {
+					lutCellsH.add(cell);
+				}
+				else if (belName.contains("D")) {
 					lutCellsD.add(cell);
 				}
 				else {
@@ -409,7 +420,8 @@ public class XdcPlacementInterface {
 		}
 				
 		// append all other cells in the correct order
-		return Stream.of(sorted.stream(), 
+		return Stream.of(sorted.stream(),
+				lutCellsH.stream(),
 				lutCellsD.stream(), 
 				lutCellsABC.stream(), 
 				ffCells.stream(), 

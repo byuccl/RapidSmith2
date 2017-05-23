@@ -88,6 +88,8 @@ public final class DeviceGenerator {
 	private HashPool<Map<String, Integer>> externalWiresPool;
 	private HashPool<Map<SiteType, Map<String, Integer>>> externalWiresMapPool;
 	private HashPool<AlternativeTypes> alternativeTypesPool;
+	private Set<Integer> siteWireSourceSet;
+	private Set<Integer> siteWireSinkSet;
 
 	/**
 	 * Generates and returns the Device created from the XDLRC at the specified
@@ -153,10 +155,11 @@ public final class DeviceGenerator {
 		wireArrayPool = new HashPool<>();
 		tileWiresPool = new HashPool<>();
 
+		System.out.println("Parsing Device Info file");
 		if (parseDeviceInfo(device) == false) {
 			System.err.println("[Warning]: The device info file for the part " + device.getPartName() + " cannot be found.");
 		}
-		
+				
 		makeWireCorrections(wcsToAdd, wcsToRemove);
 	
 		device.constructDependentResources();
@@ -656,8 +659,9 @@ public final class DeviceGenerator {
 		Set<Integer> sourceWires = new HashSet<>();
 		for (Wire wire : tile.getWires()) {
 			int wireEnum = wire.getWireEnum();
-			if (we.getWireType(wireEnum) == WireType.SITE_SOURCE)
+			if (siteWireSourceSet.contains(wireEnum)) {
 				sourceWires.add(wireEnum);
+			}
 			for (WireConnection wc : tile.getWireConnections(wireEnum)) {
 				if (wc.isPIP()) {
 					sourceWires.add(wc.getWire());
@@ -671,8 +675,9 @@ public final class DeviceGenerator {
 	// the wire type check is easier and should be sufficient or the wire is the source of
 	// a PIP.
 	private boolean wireIsSink(Tile tile, Integer wire) {
-		if (we.getWireType(wire) == WireType.SITE_SINK)
+		if (siteWireSinkSet.contains(wire)) {
 			return true;
+		}
 		if (tile.getWireHashMap() == null || tile.getWireConnections(wire) == null)
 			return false;
 		for (WireConnection wc : tile.getWireConnections(wire)) {
@@ -814,7 +819,7 @@ public final class DeviceGenerator {
 		@Override
 		protected void enterPinWire(List<String> tokens) {
 			String externalName = stripTrailingParenthesis(tokens.get(3));
-
+			
 			if (tokens.get(2).equals("input")) {
 				inpinSet.add(externalName);
 			} else {
@@ -854,35 +859,33 @@ public final class DeviceGenerator {
 
 		@Override
 		protected void exitXdlResourceReport(List<String> tokens) {
-			WireExpressions wireExp = new WireExpressions();
-
 			Map<String, Integer> wireMap = new HashMap<>((int) (wireSet.size() / 0.75 + 1));
 			String[] wires = new String[wireSet.size()];
-			WireType[] wireTypes = new WireType[wireSet.size()];
-			WireDirection[] wireDirections = new WireDirection[wireSet.size()];
-
+			
+			Set<Integer> sourceWireSetLocal = new HashSet<Integer> (outpinSet.size());
+			Set<Integer> sinkWireSetLocal = new HashSet<Integer> (inpinSet.size());
+						
 			int i = 0;
 			for (String wire : wireSet) {
 				wires[i] = wire;
 				wireMap.put(wire, i);
 
 				if (inpinSet.contains(wire)) {
-					wireTypes[i] = WireType.SITE_SINK;
-					wireDirections[i] = WireDirection.EXTERNAL;
-				} else if (outpinSet.contains(wire)) {
-					wireTypes[i] = WireType.SITE_SOURCE;
-					wireDirections[i] = WireDirection.EXTERNAL;
-				} else {
-					wireTypes[i] = wireExp.getWireType(wire);
-					wireDirections[i] = wireExp.getWireDirection(wire);
-				}
+					sinkWireSetLocal.add(i);
+				} 
+				if (outpinSet.contains(wire)) {
+					sourceWireSetLocal.add(i);
+				} 
+
 				i++;
 			}
 
 			we.setWireMap(wireMap);
 			we.setWires(wires);
-			we.setWireTypes(wireTypes);
-			we.setWireDirections(wireDirections);
+			
+			// create the global source and sinks wire set
+			siteWireSourceSet = sourceWireSetLocal;
+			siteWireSinkSet = sinkWireSetLocal;
 		}
 	}
 
@@ -980,9 +983,7 @@ public final class DeviceGenerator {
 		protected void enterWire(List<String> tokens) {
 			String wireName = tokens.get(1);
 			currTileWire = we.getWireEnum(wireName);
-			currTileWireIsSource =
-					we.getWireType(currTileWire) == WireType.SITE_SOURCE ||
-							pipSinks.contains(wireName);
+			currTileWireIsSource = siteWireSourceSet.contains(currTileWire) || pipSinks.contains(wireName);
 		}
 
 		@Override
@@ -994,7 +995,7 @@ public final class DeviceGenerator {
 		protected void enterConn(List<String> tokens) {
 			String currWireName = tokens.get(2).substring(0, tokens.get(2).length() - 1);
 			int currWire = we.getWireEnum(currWireName);
-			boolean currWireIsSiteSink = we.getWireType(currWire) == WireType.SITE_SINK;
+			boolean currWireIsSiteSink = siteWireSinkSet.contains(currWire);
 			boolean currWireIsPIPSource = pipSources.contains(currWireName);
 			boolean currWireIsSink = currWireIsSiteSink || currWireIsPIPSource;
 			if (currTileWireIsSource || currWireIsSink) {

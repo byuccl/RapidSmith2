@@ -172,7 +172,7 @@ public class RSEnvironment {
 		}
 
 		Path path = getDeviceFilePath(canonicalName);
-		
+
 		// throw an exception if the device cannot be found
 		if (path == null) {
 			throw new Exceptions.EnvironmentException("Cannot find device file for part: \"" + partName + "\".\n" +
