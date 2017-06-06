@@ -97,7 +97,7 @@ public class ImportTests {
 	@Test
 	@DisplayName("CounterTMR UltraScale")
 	public void counterTMRUltrascaleTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("TCP").resolve("ultrascale").resolve("counterTMR.tcp").toString());
+		VivadoInterface.loadTCP(testDirectory.resolve("TCP").resolve("ultrascale").resolve("counterTmr.tcp").toString());
 	}
 	
 	@Test
