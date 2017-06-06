@@ -221,7 +221,7 @@ public class CellDesign extends AbstractDesign {
 
 	private Cell registerCell(Cell cell) {
 		if (hasCell(cell.getName()))
-			throw new Exceptions.DesignAssemblyException("Cell with name already exists in design.");
+			throw new Exceptions.DesignAssemblyException("Cell with name already exists in design: " + cell.getName());
 
 		cell.setDesign(this);
 		cellMap.put(cell.getName(), cell);
@@ -572,7 +572,7 @@ public class CellDesign extends AbstractDesign {
 		if (cell.getDesign() != this)
 			throw new Exceptions.DesignAssemblyException("Cannot place cell not in the design.");
 		if (cell.isPlaced())
-			throw new Exceptions.DesignAssemblyException("Cell is already placed. Cannot re-place cell.");
+			throw new Exceptions.DesignAssemblyException("Cell is already placed. Cannot re-place cell: " + cell.getName());
 		if (cell.isMacro()) 
 			throw new Exceptions.DesignAssemblyException("Cannot place macro cell. Can only place internal cells to the macro.");
 		

@@ -724,7 +724,7 @@ public class Device implements Serializable {
 			device.packagePinMap = packagePinMap;
 		}
 
-		@SuppressWarnings("UnusedDeclaration")
+		@SuppressWarnings("unused")
 		private Device readResolve() {
 			if (!version.equals(LATEST_DEVICE_FILE_VERSION))
 				return null;
@@ -734,6 +734,7 @@ public class Device implements Serializable {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private DeviceReplace writeReplace() {
 		DeviceReplace repl = new DeviceReplace();
 		writeReplace(repl);

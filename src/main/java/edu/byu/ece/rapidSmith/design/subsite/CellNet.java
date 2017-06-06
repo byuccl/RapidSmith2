@@ -68,9 +68,7 @@ public class CellNet implements Serializable {
 	private RouteStatus routeStatus;
 	
 	// Physical route information
-	/** SitePin source of the net (i.e. where the net leaves the site)*/
-	private SitePin sourceSitePin;
-	/** */ 
+	/** List of pins where the net leaves its source site*/ 
 	private List<SitePin> sourceSitePinList; 
 	/** Route Tree connecting to the source pin of the net*/
 	private RouteTree source;
@@ -267,7 +265,7 @@ public class CellNet implements Serializable {
 	private void connectToLeafPin(CellPin pin) {
 		Objects.requireNonNull(pin);
 		if (pins.contains(pin))
-			throw new Exceptions.DesignAssemblyException("Pin already exists in net.");
+			throw new Exceptions.DesignAssemblyException("Pin already exists in net: " + this.name + " " + pin.getFullName());
 		if (pin.getNet() != null)
 			throw new Exceptions.DesignAssemblyException("Pin already connected to net.");
 		
@@ -619,8 +617,8 @@ public class CellNet implements Serializable {
 	public void addRoutedSink(CellPin cellPin) {
 		
 		if (!pins.contains(cellPin)) {
-			throw new IllegalArgumentException("CellPin" + cellPin.getName() + " not attached to net. "
-					+ "Cannot be added to the routed sinks of the net!");
+			throw new IllegalArgumentException("CellPin " + cellPin.getFullName() + " not attached to net " + this.getName()
+					+ " Cannot be added to the routed sinks of the net!");
 		}
 		
 		if (cellPin.getDirection().equals(PinDirection.OUT)) {

@@ -103,6 +103,7 @@ public final class TileType implements Comparable<TileType>, Serializable {
 		private FamilyType familyType;
 		private String name;
 
+		@SuppressWarnings("unused")
 		TileTypeReplace() { }
 
 		TileTypeReplace(TileType type) {

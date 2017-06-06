@@ -31,7 +31,6 @@ import java.time.LocalDateTime;
 
 import edu.byu.ece.edif.core.EdifNameConflictException;
 import edu.byu.ece.edif.core.InvalidEdifNameException;
-import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
@@ -39,17 +38,14 @@ import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
 /**
- * This class is used to interface Vivado and RapidSmith. <br>
- * It parses TINCR checkpoints and creates equivalent RapidSmith designs. <br>
- * It can also create TINCR checkpoints from existing RapidSmith designs.
- * 
- * @author Thomas Townsend
- *
+ * This class is used to interface Vivado and RapidSmith2. 
+ * It parses TINCR checkpoints and creates equivalent RapidSmith {@link CellDesign}s.
+ * It can also create TINCR checkpoints from existing RapidSmith {@link CellDesign}s.
  */
 public final class VivadoInterface {
 
 	private static final String CELL_LIBRARY_NAME = "cellLibrary.xml";
-
+	
 	public static TincrCheckpoint loadTCP(String tcp) throws IOException {
 		return loadTCP(tcp, false);
 	}
@@ -91,12 +87,7 @@ public final class VivadoInterface {
 		
 		// create the RS2 netlist
 		String edifFile = Paths.get(tcp, "netlist.edf").toString();
-		CellDesign design;
-		try {
-			design = EdifInterface.parseEdif(edifFile, libCells);
-		} catch (edu.byu.ece.edif.util.parse.ParseException e) {
-			throw new ParseException(e);
-		}
+		CellDesign design = EdifInterface.parseEdif(edifFile, libCells);
 		
 		// parse the constraints into RapidSmith
 		parseConstraintsXDC(design, Paths.get(tcp, "constraints.rsc").toString());
@@ -185,13 +176,7 @@ public final class VivadoInterface {
 		
 		// Write EDIF netlist
 		String edifOut = Paths.get(tcpDirectory, "netlist.edf").toString();
-		
-		try {
-			EdifInterface.writeEdif(edifOut, design);
-		} 
-		catch (EdifNameConflictException | InvalidEdifNameException e) {
-			throw new AssertionError(e); 
-		}
+		EdifInterface.writeEdif(edifOut, design);
 
 		// write constraints.xdc
 		writeConstraintsXdc(design, Paths.get(tcpDirectory, "constraints.xdc").toString());

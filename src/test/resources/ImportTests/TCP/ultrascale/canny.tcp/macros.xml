@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <macros>
+    <macro>
+        <type>IBUF</type>
+        <cells>
+            <internal>
+                <name>IBUFCTRL_INST</name>
+                <type>IBUFCTRL</type>
+            </internal>
+            <internal>
+                <name>INBUF_INST</name>
+                <type>INBUF</type>
+            </internal>
+        </cells>
+        <pins>
+            <pin>
+                <name>O</name>
+                <direction>output</direction>
+                <type>MACRO</type>
+                <internalConnections>
+                    <pinname>IBUFCTRL_INST/O</pinname>
+                </internalConnections>
+            </pin>
+            <pin>
+                <name>I</name>
+                <direction>input</direction>
+                <type>MACRO</type>
+                <internalConnections>
+                    <pinname>INBUF_INST/PAD</pinname>
+                </internalConnections>
+            </pin>
+        </pins>
+        <internalNets>
+            <internalNet>
+                <name>OUT</name>
+                <pins>
+                    <pinname>IBUFCTRL_INST/I</pinname>
+                    <pinname>INBUF_INST/O</pinname>
+                </pins>
+            </internalNet>
+        </internalNets>
+    </macro>
+  </macros>
+</root>

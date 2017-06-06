@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.device.Bel;
@@ -43,6 +45,13 @@ public class LibraryMacro extends LibraryCell {
 	private Map<String, String> internalToExternalPinMap;	
 	private List<InternalCell> internalCells;
 	private List<InternalNet> internalNets;
+	private static Pattern pinNamePattern;
+	
+	static 
+	{
+		pinNamePattern = Pattern.compile("(.+)/([^/]+)$");
+	}
+	
 	
 	/**
 	 * Creates a new library macro
@@ -115,10 +124,16 @@ public class LibraryMacro extends LibraryCell {
 		List<InternalPin> internalPins = new ArrayList<>(pinNames.size());
 		
 		for(String pinName : pinNames) {
-			String[] nameToks = pinName.split("/");
-			assert(nameToks.length == 2);
-			internalPins.add(new InternalPin(nameToks[0], nameToks[1]));
-			this.internalToExternalPinMap.put(nameToks[0] + "/" + nameToks[1], libraryPin.getName());
+			Matcher m = pinNamePattern.matcher(pinName);
+			if (!m.matches()) {
+				throw new AssertionError("Invalid pin name in macro XML file: " + pinName);
+			}
+			assert m.groupCount() == 2;
+			
+			String cellName = m.group(1);
+			String refPinName = m.group(2);
+			internalPins.add(new InternalPin(cellName, refPinName));
+			this.internalToExternalPinMap.put(cellName + "/" + refPinName, libraryPin.getName());
 		}
 		
 		this.pinMap.put(libraryPin, internalPins);
@@ -290,9 +305,14 @@ public class LibraryMacro extends LibraryCell {
 			this.type = NetType.valueOf(type); 
 			
 			for (String fullPinName : fullPinNames) {
-				String[] nameToks = fullPinName.split("/");
-				assert (nameToks.length==2);
-				internalPins.add(new InternalPin(nameToks[0], nameToks[1]));
+				Matcher m = pinNamePattern.matcher(fullPinName);
+				
+				if (!m.matches()) {
+					throw new AssertionError("Invalid pin name in macro XML file: " + fullPinName);
+				}
+				assert m.groupCount() == 2;
+				
+				internalPins.add(new InternalPin(m.group(1), m.group(2)));
 			}
 		}
 		

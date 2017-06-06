@@ -40,6 +40,7 @@ public class DeviceInfoInstaller {
 		
 		if (args.length != 1) {
 			System.err.println("USAGE: edu.byu.ece.rapidSmith.util.DeviceInfoInstaller <Full Xilinx Partname>");
+			return;
 		}
 		
 		String partname = args[0];

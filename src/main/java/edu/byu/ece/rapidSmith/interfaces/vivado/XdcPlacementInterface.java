@@ -149,9 +149,14 @@ public class XdcPlacementInterface {
 		}
 		
 		Cell cell = tryGetCell(toks[1]);
+		
+		if (!cell.isPort()) {
+			cell = tryGetCell(toks[1] + "_rsport");
+		}
+		
 		Site site = tryGetSite(toks[2]);
 		Bel bel = tryGetBel(site, toks[3]);
-		
+				
 		design.placeCell(cell, bel);
 		
 		assert (cell.getPins().size() == 1) : "PAD cell should only have one pin";
@@ -204,7 +209,7 @@ public class XdcPlacementInterface {
 		Cell cell = design.getCell(cellName);
 		
 		if (cell == null) {
-			throw new ParseException("Cell \"" + cellName + "\" not found in the current device. \n" 
+			throw new ParseException("Cell \"" + cellName + "\" not found in the current design. \n" 
 									+ "On line " + this.currentLineNumber + " of " + currentFile);
 		}
 		
@@ -379,6 +384,7 @@ public class XdcPlacementInterface {
 		ArrayList<Cell> carryCells = new ArrayList<>();
 		ArrayList<Cell> ffCells = new ArrayList<>();
 		ArrayList<Cell> ff5Cells = new ArrayList<>();
+		ArrayList<Cell> muxCells = new ArrayList<>();
 		
 		// traverse the cells and drop them in the correct bin
 		Iterator<Cell> cellIt = design.getLeafCells().iterator();
@@ -414,6 +420,9 @@ public class XdcPlacementInterface {
 			else if (belName.endsWith("FF")) {
 				ffCells.add(cell);
 			}
+			else if(belName.endsWith("MUX")) {
+				muxCells.add(cell);
+			}
 			else {
 				sorted.add(cell);
 			}
@@ -425,7 +434,8 @@ public class XdcPlacementInterface {
 				lutCellsD.stream(), 
 				lutCellsABC.stream(), 
 				ffCells.stream(), 
-				carryCells.stream(), 
+				carryCells.stream(),
+				muxCells.stream(),
 				ff5Cells.stream())
 				.flatMap(Function.identity());
 	}

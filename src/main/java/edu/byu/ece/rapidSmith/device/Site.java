@@ -754,7 +754,7 @@ public final class Site implements Serializable{
 		private Map<SiteType, Map<String, Integer>> externalWires;
 		private BondedType bondedType;
 
-		@SuppressWarnings("UnusedDeclaration")
+		@SuppressWarnings("unused")
 		private Site readResolve() {
 			Site site = new Site();
 			site.setName(name);
@@ -765,7 +765,7 @@ public final class Site implements Serializable{
 		}
 	}
 
-	@SuppressWarnings("UnusedDeclaration")
+	@SuppressWarnings("unused")
 	private SiteReplace writeReplace() {
 		SiteReplace repl = new SiteReplace();
 		repl.name = name;
