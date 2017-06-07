@@ -119,7 +119,12 @@ public class LibraryMacro extends LibraryCell {
 	 */
 	void addInternalPinConnections(LibraryPin libraryPin, List<String> pinNames) {
 		
-		assert (pinNames.size() > 0);
+		if (pinNames.size() == 0) {
+			System.err.println("[Warning]: External macro pin " + libraryPin.getName() + " is not connected to any internal pins.");
+			return;
+		}
+		
+		assert (pinNames.size() > 0) : "Macro pin " + libraryPin.getName() + " has no internal pin connections";
 		
 		List<InternalPin> internalPins = new ArrayList<>(pinNames.size());
 		
@@ -298,7 +303,13 @@ public class LibraryMacro extends LibraryCell {
 		
 		public InternalNet(String name, String type, List<String> fullPinNames) {
 			this.name = name;
-			assert (fullPinNames.size() > 1) : "Need at least two pins for a complete net.";
+			
+			if (fullPinNames.size() <= 1) {
+				System.err.println("[Warning]: Internal net " + name + " has " + fullPinNames.size() + " connections. This is not enough for a complete net");
+			}
+			
+			// TODO: re-enable this assertion
+			//assert (fullPinNames.size() > 1) : "Need at least two pins for a complete net: " + name + " " + type + " " + fullPinNames.size();
 			
 			this.internalPins = new ArrayList<>();
 			
