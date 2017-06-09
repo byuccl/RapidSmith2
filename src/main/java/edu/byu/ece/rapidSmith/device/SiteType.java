@@ -84,6 +84,10 @@ public final class SiteType implements Comparable<SiteType>, Serializable {
 			return familyTypes.computeIfAbsent(name, k -> new SiteType(family, k, nextOrdinal++));
 		}
 	}
+	
+	public static Map<String, SiteType> getSiteTypes(FamilyType family) {
+		return types.get(family);
+	}
 
 	private static class SiteTypeReplace implements Serializable {
 		private static final long serialVersionUID = 4803134026521902169L;
