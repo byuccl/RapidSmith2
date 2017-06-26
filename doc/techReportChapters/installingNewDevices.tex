@@ -27,6 +27,12 @@ grow to be hundreds of Gigabytes in size, RapidSmith compresses them into much s
 (usually in the tens of Megabytes). \autoref{sec:appendixXDLRC} contains a more
 detailed description of XDLRC syntax for those who are interested.
 
+\subsection{DeviceInfo}
+RapidSmith2 uses the deviceInfo XML file to store
+device-specific information not contained in the familyInfo file. Currently, the
+deviceInfo file stores additional information about pads in a device (i.e. clock
+pads and bel to package pin mappings).
+
 \subsection{FamilyInfo}
 A \textit{familyInfo.xml} file contains useful information that is
 not included in the XDLRC files for a given family of devices. Vivado currently 
@@ -123,7 +129,7 @@ steps:
 Artix7 part \textit{xc7a100tcsg324-3}.
 
 \begin{lstlisting}[numbers=none]
-[ttown523@CB461-EE09968:˜] vivado -mode tcl
+[ttown523@CB461-EE09968:ï¿½] vivado -mode tcl
 
 ****** Vivado v2014.2 (64-bit)
  **** SW Build 928826 on Thu Jun 5 17:55:10 MDT 2014
@@ -143,12 +149,34 @@ your regular work machine. Also, be aware that these XDLRC files are massive. 10
 for the largest XDLRC files is not uncommon. Make sure you have enough space on
 your hard drive before generating the XDLRC for a device.
 
+\item Create a DeviceInfo XML file. Open Vivado in Tcl mode, and execute the
+\texttt{Tincr} command \textit{tincr::create\_xml\_device\_info}. The parameters
+to this function are, first, an existing directory to save the DeviceInfo file
+in.
+Second, the part name of the target device. Below is an example of how to create
+the DeviceInfo file for the Artix 7 part \textit{xc7a100tcsg324-3}.
+
+\begin{lstlisting}[numbers=none]
+bond@CB461-EE10342:~$ vivado -mode tcl
+
+****** Vivado v2016.2 (64-bit)
+  **** SW Build 1577090 on Thu Jun  2 16:32:35 MDT 2016
+  **** IP Build 1577682 on Fri Jun  3 12:00:54 MDT 2016
+    ** Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
+
+Vivado% tincr::create_xml_device_info /home/bond/RapidSmith2/devices/artix7/ xc7a100tcsg324-3
+\end{lstlisting}
+
+\noindent You will need to save the deviceInfo file in the corresponding device
+folder in RapidSmith2. In the above example, it was created there so no further
+steps are necessary.
+
 \item Run the device installer in RapidSmith2 and pass the newly created XDLRC
 as an argument. An example command line usage is shown below. The device
 installer can also be run in an IDE.
 
 \begin{lstlisting}[numbers=none]
-[ttown523@CB461-EE09968:˜] java -ea -Xmx4096m edu.byu.ece.rapidSmith.util.Installer --generate file xc7a100tcsg324_full.xdlrc
+[ttown523@CB461-EE09968:ï¿½] java -ea -Xmx4096m edu.byu.ece.rapidSmith.util.Installer --generate file xc7a100tcsg324_full.xdlrc
 \end{lstlisting} 
 
 \noindent The device installer parses the verbose XDLRC file, and creates
@@ -184,7 +212,7 @@ wire connections) that can be optionally loaded with the device.
 line argument. An example usage is shown below for an Artix7 device.
 
 \begin{lstlisting}[numbers=none]
-[ttown523@CB461-EE09968:˜] java edu.byu.ece.rapidSmith.util.FamilyBuilders xc7a100tcsg324
+[ttown523@CB461-EE09968:ï¿½] java edu.byu.ece.rapidSmith.util.FamilyBuilders xc7a100tcsg324
 \end{lstlisting}
 
 \noindent An Artix7.java (or whatever family your device is in) will already
@@ -236,8 +264,8 @@ steps listed below.
   devices, they already exist from ISE.
   
   \item Copy the primitive definitions you created in step (1) to the
-   directory \textit{tincrPath/cache/family/primitiveDefs}, where ``tincrPath''
-   is the path to your \texttt{Tincr} installation and ``family'' is the family
+   directory \textit{tincrPath/cache/family/primitive\_defs}, where
+   ``tincrPath'' is the path to your \texttt{Tincr} installation and ``family'' is the family
    for the primitive defs you just generated (use the Vivado Tcl name if you
    need to create a new folder).
    
@@ -247,7 +275,7 @@ steps listed below.
    is shown below for Kintex UltraScale. 
    
 \begin{lstlisting}[numbers=none]
-[ttown523@CB461-EE09968:˜] vivado -mode tcl
+[ttown523@CB461-EE09968:ï¿½] vivado -mode tcl
 
 ****** Vivado v2014.2 (64-bit)
  **** SW Build 928826 on Thu Jun 5 17:55:10 MDT 2014
@@ -434,6 +462,13 @@ Vivado% select $site
 	\noindent For other device families, you may have to add additional compatible
 	sites. It is up to you to determine what compatible sites need to be added
 	through experimentation.
+    
+    \item Rename the generated family info file to ``familyInfo.xml'' (if not
+    already) and save it in the following directory: \\\\
+    \centerline{\textit{RAPIDSMITH\_PATH/devices/family\_name/ }}\\\\
+     where ``RAPIDSMITH\_PATH'' is the
+    path to your RapidSmith2 installation, and ``family\_name'' is the name of
+    the family you are working with.
     	 
 	\item Generate an XDLRC file from \texttt{Tincr} and RapidSmith2 device
 	files using the steps shown in \autoref{sec:creatingNewSupportedDevices}.
@@ -441,7 +476,7 @@ Vivado% select $site
 	\item Run the Family Builder in RapidSmith2. An example usage is shown below.
 
 \begin{lstlisting}[numbers=none]
-[ttown523@CB461-EE09968:˜] java edu.byu.ece.rapidSmith.util.FamilyBuilders xc7a100tcsg324
+[ttown523@CB461-EE09968:ï¿½] java edu.byu.ece.rapidSmith.util.FamilyBuilders xc7a100tcsg324
 \end{lstlisting}
 
 	\noindent The Family Builder accepts one command line argument: a part name of
