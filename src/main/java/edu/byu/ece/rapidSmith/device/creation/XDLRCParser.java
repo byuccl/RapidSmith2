@@ -304,28 +304,24 @@ public class XDLRCParser {
 	}
 
 	/**
-	 * Closes the current reader
-	 */
-	private void closeFile() throws IOException {
-		in.close();
-	}
-
-	/**
 	 * Reads the next line from the file and parses it into tokens
 	 */
 	private boolean readLine() throws IOException {
-		// read next line
-		String line;
-		line = in.readLine();
+		// filter out empty lines
+		while (true) {
+			// read next line
+			String line = in.readLine();
 
-		// check if end of file
-		if (line == null) {
-			tokens = null;
-			return false;
+			// check if end of file
+			if (line == null) {
+				tokens = null;
+				return false;
+			}
+
+			tokens = split(line);
+			if (!tokens.isEmpty())
+				return true;
 		}
-
-		tokens = split(line);
-		return true;
 	}
 
 	private static List<String> split(String line) {
