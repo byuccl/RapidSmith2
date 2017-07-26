@@ -354,7 +354,19 @@ public class XdcRoutingInterface {
 		
 		// remove all invalid site pins sources for the net
 		pinsToRemove.forEach(pin -> net.removeSourceSitePin(pin));
-		assert net.sourceSitePinCount() > 0 : "Net " + net.getName() + " should have a source site pin.";
+		
+		// check if the net is connected to a port...
+		// TODO: add an out-of-context mode for checkpoints with no ports.
+		boolean connectedToPort = false;
+		if (net.sourceSitePinCount() == 0) {
+			for (CellPin pin : net.getPins()) {
+				if (pin.getCell().isPort()) {
+					connectedToPort = true;
+					break;
+				}
+			}
+		}
+		assert net.sourceSitePinCount() > 0 || connectedToPort : "Net " + net.getName() + " should have a source site pin. ";
 		net.computeRouteStatus();
 	}
 	

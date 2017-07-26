@@ -45,6 +45,7 @@ public class LibraryMacro extends LibraryCell {
 	private Map<String, String> internalToExternalPinMap;	
 	private List<InternalCell> internalCells;
 	private List<InternalNet> internalNets;
+	private Map<String, Integer> pinOffsetMap;
 	private static Pattern pinNamePattern;
 	
 	static 
@@ -266,6 +267,26 @@ public class LibraryMacro extends LibraryCell {
 		}
 		
 		return internalCellPins;
+	}
+	
+	void addPinOffset(String pinname, int busMember) {
+		
+		if (this.pinOffsetMap == null) {
+			this.pinOffsetMap = new HashMap<>();
+		}
+		
+		int offset = this.pinOffsetMap.getOrDefault(pinname, Integer.MAX_VALUE);
+		
+		if (busMember < offset) {
+			this.pinOffsetMap.put(pinname, busMember);
+		}
+	}
+	
+	public int getPinOffset(String pinname) {
+		if (this.pinOffsetMap == null) {
+			return 0;
+		}
+		return this.pinOffsetMap.getOrDefault(pinname, 0);
 	}
 	
 	/* *********************

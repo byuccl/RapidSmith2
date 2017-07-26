@@ -690,10 +690,11 @@ public class CellDesign extends AbstractDesign {
 	}
 
 	/**
-	 * Returns a list of XDC contraints on the design.
+	 * Returns a list of XDC constraints on the design. If there are no constraints on the design,
+	 * an empty list is returned.
 	 */
 	public List<XdcConstraint> getVivadoConstraints() {
-		return this.vivadoConstraints;
+		return vivadoConstraints == null ? Collections.emptyList() : this.vivadoConstraints;
 	}
 	
 	/**

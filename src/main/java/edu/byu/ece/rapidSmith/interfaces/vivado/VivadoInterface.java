@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
@@ -51,25 +52,22 @@ public final class VivadoInterface {
 	}
 	
 	/**
-	 * Parses a TINCR checkpoint, and creates an equivalent RapidSmith 2 design.
+	 * Parses a RSCP generated from Tincr, and creates an equivalent RapidSmith2 design.
 	 * 
-	 * @param tcp Path to the TINCR checkpoint to import
+	 * @param rscp Path to the RSCP to import
 	 * @throws InvalidEdifNameException 
 	 * @throws EdifNameConflictException 
 	 */
-	public static TincrCheckpoint loadTCP (String tcp, boolean storeAdditionalInfo) throws IOException {
+	public static TincrCheckpoint loadTCP (String rscp, boolean storeAdditionalInfo) throws IOException {
 	
-		if (tcp.endsWith("/") || tcp.endsWith("\\")) {
-			tcp = tcp.substring(0, tcp.length()-1);
-		}
+		Path rscpPath = Paths.get(rscp);
 		
-		// check to make sure the specified directory is a TINCR checkpoint
-		if (!tcp.endsWith(".tcp")) {
-			throw new AssertionError("Specified directory is not a TINCR checkpoint.");
+		if (!rscpPath.getFileName().toString().endsWith(".rscp")) {
+			throw new AssertionError("Specified directory is not a RSCP. The directory should end in \".rscp\"");
 		}
-			
+					
 		// load the device
-		String partName = DesignInfoInterface.parseInfoFile(Paths.get(tcp, "design.info").toString());
+		String partName = DesignInfoInterface.parseInfoFile(rscpPath.resolve("design.info").toString());
 		
 		Device device = RSEnvironment.defaultEnv().getDevice(partName);
 		
@@ -83,21 +81,21 @@ public final class VivadoInterface {
 				.resolve(CELL_LIBRARY_NAME));
 		
 		// add additional macro cell specifications to the cell library before parsing the EDIF netlist
-		libCells.loadMacroXML(Paths.get(tcp, "macros.xml"));
+		libCells.loadMacroXML(rscpPath.resolve("macros.xml"));
 		
 		// create the RS2 netlist
-		String edifFile = Paths.get(tcp, "netlist.edf").toString();
+		String edifFile = rscpPath.resolve("netlist.edf").toString();
 		CellDesign design = EdifInterface.parseEdif(edifFile, libCells);
 		
 		// parse the constraints into RapidSmith
-		parseConstraintsXDC(design, Paths.get(tcp, "constraints.rsc").toString());
+		parseConstraintsXDC(design, rscpPath.resolve("constraints.xdc").toString());
 		
 		// re-create the placement and routing information
-		String placementFile = Paths.get(tcp, "placement.rsc").toString();
+		String placementFile = rscpPath.resolve("placement.rsc").toString();
 		XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device);
 		placementInterface.parsePlacementXDC(placementFile);
  
-		String routingFile = Paths.get(tcp, "routing.rsc").toString();
+		String routingFile = rscpPath.resolve("routing.rsc").toString();
 		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap());
 		routingInterface.parseRoutingXDC(routingFile);
 		

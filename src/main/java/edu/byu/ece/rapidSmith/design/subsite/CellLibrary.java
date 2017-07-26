@@ -33,6 +33,8 @@ import org.jdom2.input.SAXBuilder;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -225,6 +227,9 @@ public class CellLibrary implements Iterable<LibraryCell> {
 	private void loadPinsFromXml(Element cellEl, LibraryCell libCell) {
 		List<LibraryPin> pins = new ArrayList<>();
 		Element pinsEl = cellEl.getChild("pins");
+		
+		Pattern pinNamePattern = Pattern.compile("(.*)\\[(.*)\\]");
+		
 		for (Element pinEl : pinsEl.getChildren("pin")) {
 			LibraryPin pin = new LibraryPin();
 			pin.setLibraryCell(libCell);
@@ -242,6 +247,12 @@ public class CellLibrary implements Iterable<LibraryCell> {
 			
 			// for macro cells, add the internal connection information
 			if (libCell.isMacro()) {
+				Matcher m = pinNamePattern.matcher(pin.getName());
+				
+				if (m.matches()) {
+					((LibraryMacro)libCell).addPinOffset(m.group(1), Integer.parseInt(m.group(2)));
+				}
+				
 				List<String> internalPinNames = pinEl.getChild("internalConnections")
 													.getChildren("pinname")
 													.stream().map(el -> el.getText())

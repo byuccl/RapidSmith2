@@ -210,6 +210,9 @@
     <site_type>
       <name>SLICEL</name>
       <is_slice/>
+	  <compatible_types>
+		<compatible_type>SLICEM</compatible_type>
+	  </compatible_types>
       <bels>
         <bel>
           <name>CYINITGND</name>

@@ -63,6 +63,7 @@ import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
 import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
+import edu.byu.ece.rapidSmith.design.subsite.LibraryMacro;
 import edu.byu.ece.rapidSmith.design.subsite.LibraryPin;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
 import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
@@ -336,15 +337,21 @@ public final class EdifInterface {
 				continue; 
 			}
 			
-			// Connects to a cell pin
-			// TODO: take a closer look at this...I am using the edif name of a cell pin name which should be ok, but be aware
-			String pinname = portRef.isSingleBitPortRef() ? port.getName() 
-					 : String.format("%s[%d]", port.getName(), reverseBusIndex(port.getWidth(), portRef.getBusMember(), 0));
-			
 			Cell node = design.getCell(portRef.getCellInstance().getOldName()); 
 			if (node == null) {
 				throw new Exceptions.ParseException("Cell: " + portRef.getCellInstance().getOldName()  + " does not exist in the design!");
 			}
+			
+			int busOffset = 0;
+			if (node.isMacro()) {
+				LibraryMacro macro = (LibraryMacro)node.getLibCell(); 
+				busOffset = macro.getPinOffset(port.getName());
+			}
+			
+			// Connects to a cell pin
+			// TODO: take a closer look at this...I am using the edif name of a cell pin name which should be ok, but be aware
+			String pinname = portRef.isSingleBitPortRef() ? port.getName() 
+					 : String.format("%s[%d]", port.getName(), reverseBusIndex(port.getWidth(), portRef.getBusMember(), busOffset));
 			
 			// Mark GND and VCC nets 
 			if (node.isVccSource()) {
@@ -353,6 +360,10 @@ public final class EdifInterface {
 			else if (node.isGndSource()) {
 				net.setType(NetType.GND);
 			}
+			
+			//if (net.getName().equals("vga_o[76]")) {
+			//	System.out.println(" --> " + pinname  + " " + node.getPin(pinname) + " " + node.isMacro());
+			//}
 			
 			net.connectToPin(node.getPin(pinname));						
 		}		

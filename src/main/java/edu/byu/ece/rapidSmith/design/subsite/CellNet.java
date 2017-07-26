@@ -267,7 +267,7 @@ public class CellNet implements Serializable {
 		if (pins.contains(pin))
 			throw new Exceptions.DesignAssemblyException("Pin already exists in net: " + this.name + " " + pin.getFullName());
 		if (pin.getNet() != null)
-			throw new Exceptions.DesignAssemblyException("Pin already connected to net.");
+			throw new Exceptions.DesignAssemblyException("Pin " + pin.getFullName() + " already connected to net: " + pin.getNet().getName());
 		
 		pins.add(pin);
 		pin.setNet(this);

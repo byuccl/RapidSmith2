@@ -64,7 +64,7 @@ public class DotFilePrinter {
 	private final CellDesign design;
 	// Default max fanout parameter 
 	private int MAX_FANOUT = 10;
-	
+		
 	/**
 	 * Creates a new DotFilePrinter for the specified CellDesign.
 	 * 
@@ -602,4 +602,16 @@ public class DotFilePrinter {
 			dotBuilder.append(joiner.toString() + ";\n");
 		}
 	}
+	
+	/**
+	 * Sets the maximum fanout connections that will be printed to the DOT file.
+	 * This can be used to ignore large fanout nets to produce an easier to view
+	 * DOT file. The default max fanout is 10,000.
+	 * 
+	 * @param maxFanout Max fanout nets to print
+	 */
+	public void setMaxFanout(int maxFanout) {
+		this.MAX_FANOUT = maxFanout;
+	}
+
  }
