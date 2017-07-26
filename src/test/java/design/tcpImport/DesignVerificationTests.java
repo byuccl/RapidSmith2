@@ -24,9 +24,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.platform.runner.JUnitPlatform;
 
 /**
- * This class holds TINCR checkpoint import tests.
- * 
- * @author Thomas Townsend
+ * This class holds RSCP import tests.
  */
 public class DesignVerificationTests {
 	
@@ -37,6 +35,11 @@ public class DesignVerificationTests {
 		public String getCheckpointName() {
 			return "superCounter";
 		}
+
+		@Override
+		public String familyName() {
+			return "artix7";
+		}
 	}
 	
 	@RunWith(JUnitPlatform.class)
@@ -46,6 +49,11 @@ public class DesignVerificationTests {
 		public String getCheckpointName() {
 			return "count16";
 		}
+
+		@Override
+		public String familyName() {
+			return "artix7";
+		}
 	}
 	
 	@RunWith(JUnitPlatform.class)
@@ -54,6 +62,11 @@ public class DesignVerificationTests {
 		@Override
 		public String getCheckpointName() {
 			return "cordic";
+		}
+		
+		@Override
+		public String familyName() {
+			return "artix7";
 		}
 	}
 }

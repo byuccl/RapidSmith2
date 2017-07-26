@@ -42,37 +42,37 @@ public class ImportTests {
 	@Test
 	@DisplayName("Count16 Series7")
 	public void count16Test() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("TCP").resolve("count16.tcp").toString());
+		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("count16.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("BramDSP Series7")
 	public void bramdspTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("TCP").resolve("bramdsp.tcp").toString());
+		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("bramdsp.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("Cordic Series7")
 	public void cordicTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("TCP").resolve("cordic.tcp").toString());
+		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("cordic.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("SuperCounter Series7")
 	public void superCounterTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("TCP").resolve("superCounter.tcp").toString());
+		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("superCounter.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("Leon3 Series7")
 	public void leon3Test() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("TCP").resolve("leon3.tcp").toString());
+		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("leon3.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("Simon Series7")
 	public void simonTest() throws IOException {
-		TincrCheckpoint tcp = VivadoInterface.loadTCP(testDirectory.resolve("TCP").resolve("simon.tcp").toString());
+		TincrCheckpoint tcp = VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("simon.rscp").toString());
 		CellDesign design = tcp.getDesign();
 		
 		// test that internal properties were imported correctly
@@ -85,36 +85,36 @@ public class ImportTests {
 	@Test
 	@DisplayName("Cordic UltraScale")
 	public void cordicUltrascaleTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("TCP").resolve("ultrascale").resolve("cordic.tcp").toString());
+		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("kintexu").resolve("cordic.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("Canny UltraScale")
 	public void cannyUltrascaleTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("TCP").resolve("ultrascale").resolve("canny.tcp").toString());
+		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("kintexu").resolve("canny.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("CounterTMR UltraScale")
 	public void counterTMRUltrascaleTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("TCP").resolve("ultrascale").resolve("counterTmr.tcp").toString());
+		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("kintexu").resolve("counterTmr.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("Flappy Bird UltraScale")
 	public void flappyUltrascaleTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("TCP").resolve("ultrascale").resolve("flappy.tcp").toString());
+		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("kintexu").resolve("flappy.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("MSP430 UltraScale")
 	public void msp430UltrascaleTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("TCP").resolve("ultrascale").resolve("msp430.tcp").toString());
+		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("kintexu").resolve("msp430.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("Viterbi UltraScale")
 	public void viterbiUltrascaleTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("TCP").resolve("ultrascale").resolve("viterbi.tcp").toString());
+		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("kintexu").resolve("viterbi.rscp").toString());
 	}
 }
