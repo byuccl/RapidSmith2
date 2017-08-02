@@ -24,6 +24,7 @@ import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.FamilyType;
 import edu.byu.ece.rapidSmith.util.FileTools;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
+import edu.byu.ece.rapidSmith.util.Exceptions;
 import edu.byu.ece.rapidSmith.util.Exceptions.EnvironmentException;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
@@ -32,6 +33,7 @@ import org.jdom2.input.SAXBuilder;
 import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -170,6 +172,14 @@ public class RSEnvironment {
 		}
 
 		Path path = getDeviceFilePath(canonicalName);
+
+		// throw an exception if the device cannot be found
+		if (path == null) {
+			throw new Exceptions.EnvironmentException("Cannot find device file for part: \"" + partName + "\".\n" +
+					"If the device files for the part exist, make sure your RapidSmithPath variable is properly set. \n"
+					+ "If the device files don't exist, view the RapidSmith2 Tech Report for instructions on how to generate a new device file for this part.");
+		}
+		
 		device = FileTools.loadDevice(path);
 		if (device == null)
 			return null;
@@ -190,6 +200,30 @@ public class RSEnvironment {
 		SAXBuilder builder = new SAXBuilder();
 		return builder.build(path.toFile());
 	}
+	
+	/**
+	 * Loads the device info file for the specified partname and family. The device info file
+	 * contains additional information about a specific device not found in the XDLRC file
+	 * or family info. For example, a list of clock pads for a device are included in the device
+	 * info file
+	 *  
+	 * @param family Family of the part
+	 * @param partname Name of the part
+	 * @return A Document object representing the XML device info file. If device info does not exist
+	 * 	for the specified part and family, {@code NULL} is returned.
+	 */
+	public Document loadDeviceInfo(FamilyType family, String partname) {
+		String partnameNoDashes = PartNameTools.removeSpeedGrade(partname);
+		Path path = getPartFolderPath(family).resolve("deviceInfo_" + partnameNoDashes + ".xml");
+		SAXBuilder builder = new SAXBuilder();
+		Document doc = null;
+		try {
+			doc = builder.build(path.toFile());
+			return doc;
+		} catch (JDOMException | IOException e) {
+			return null;
+		}
+	}
 
 	/**
 	 * Returns the path of the folder where the device file resides for {@code partName}.
@@ -202,11 +236,14 @@ public class RSEnvironment {
 	}
 
 	/**
-	 * Returns the path of the folder where the family type resides.
+	 * Returns the path of the folder where the family type resides. This
+	 * function assumes that familyType is not {@code NULL}
+	 * 
 	 * @param familyType the family type corresponding folder path
 	 * @return the path of the folder where the parts of familyType reside
 	 */
 	public Path getPartFolderPath(FamilyType familyType) {
+		Objects.requireNonNull(familyType);
 		return getDevicePath().resolve(familyType.name().toLowerCase());
 	}
 
@@ -283,12 +320,32 @@ public class RSEnvironment {
 	 * @return the full path to the device file for the specified part
 	 */
 	public Path getDeviceFilePath(String partName) {
-		return getDeviceFilePath(getFamilyTypeFromPart(partName), partName);
+		FamilyType family = getFamilyTypeFromPart(partName);
+		return family == null ? null : getDeviceFilePath(family, partName);
 	}
 
+	/**
+	 * Internal function that returns the path to the specified device file.
+	 * This function assumes that family is not {@code NULL}. If the given
+	 * device file is not found, then null is returned.
+	 * 
+	 * @param family {@link FamilyType} of the part
+	 * @param partName Name of the part 
+	 */
 	private Path getDeviceFilePath(FamilyType family, String partName) {
-		return getPartFolderPath(family).resolve(
-				PartNameTools.removeSpeedGrade(partName) + DEVICE_FILE_SUFFIX);
+		Objects.requireNonNull(family);
+		Path partFolderPath = getPartFolderPath(family);
+		
+		if (partFolderPath == null) {
+			return null; 
+		}
+
+		try {
+			Path path = partFolderPath.resolve(PartNameTools.removeSpeedGrade(partName) + DEVICE_FILE_SUFFIX);
+			return path;
+		} catch (InvalidPathException e) {
+			return null;
+		}
 	}
 
 	/**

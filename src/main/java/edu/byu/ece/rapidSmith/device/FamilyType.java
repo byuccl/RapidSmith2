@@ -79,6 +79,7 @@ public final class FamilyType implements Comparable<FamilyType>, Serializable {
 		private static final long serialVersionUID = -9010197157638586336L;
 		private String name;
 
+		@SuppressWarnings("unused")
 		FamilyTypeReplace() {}
 
 		FamilyTypeReplace(FamilyType type) {

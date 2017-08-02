@@ -29,6 +29,40 @@ package edu.byu.ece.rapidSmith.util;
 public class Exceptions {
 
 	/**
+	 * Exception for design implementation errors. An example of a design
+	 * implementation error is placing a port on a non-pad BEL. During TCP
+	 * generation, if the tools detect a port has been placed on a non-pad 
+	 * BEL, an ImplementationException will be thrown.
+	 */
+	public static class ImplementationException extends RuntimeException {
+		private static final long serialVersionUID = 9155970893540903136L;
+
+		public ImplementationException() {
+			super();
+		}
+		
+		public ImplementationException(String message) {
+			super(message);
+		}
+		
+		public ImplementationException(String message, Throwable cause) {
+			super(message, cause);
+		}
+		
+		public ImplementationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+			super(message, cause, enableSuppression, writableStackTrace);
+		}
+		
+		public ImplementationException(Throwable cause) {
+			super(cause);
+		}
+
+		public ImplementationException(String expected, String actual) {
+			super("expected " + expected + ", got " + actual);
+		}
+	}
+	
+	/**
 	 * Exception thrown if an unexpected state is encountered while parsing a file 
 	 * 
 	 * @author Thomas Townsend

@@ -259,6 +259,7 @@ public class WireHashMap implements Serializable {
 		private int[] indices;
 		private WireConnection[][] values;
 
+		@SuppressWarnings("unused")
 		private WireHashMap readResolve() {
 			WireHashMap whm = new WireHashMap(loadFactor);
 			whm.keys = new int[arrSize];
@@ -276,6 +277,7 @@ public class WireHashMap implements Serializable {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private WireHashMapReplace writeReplace() {
 		WireHashMapReplace repl = new WireHashMapReplace();
 		repl.arrSize = keys.length;

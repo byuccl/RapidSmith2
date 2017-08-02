@@ -190,7 +190,7 @@ public final class Bel implements Serializable {
 	}
 
 	public Stream<BelPin> getBelPins() {
-		return Stream.concat(getSources().stream(), getSinks().stream());
+		return Stream.concat(getSources().stream(), getSinks().stream()).distinct();
 	}
 
 	private Map<String, BelPin> buildSinks() {

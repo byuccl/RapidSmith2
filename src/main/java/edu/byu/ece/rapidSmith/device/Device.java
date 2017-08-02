@@ -25,6 +25,7 @@ import edu.byu.ece.rapidSmith.primitiveDefs.PrimitiveDefList;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * This is the main class that stores information about each Xilinx part.  It contains
@@ -75,7 +76,9 @@ public class Device implements Serializable {
 	//========================================================================//
 	/** Created on demand when user calls getSitesOfTypeMap() */
 	private Map<SiteType, ArrayList<Site>> sitesOfTypeMap;
-
+	/** Maps the pad bel name to the corresponding package pin */
+	private Map<String, PackagePin> packagePinMap;
+	
 	/**
 	 * Constructor, initializes all objects to null
 	 */
@@ -135,7 +138,7 @@ public class Device implements Serializable {
 	public void setFamily(FamilyType family) {
 		this.family = family;
 	}
-
+	
 	/**
 	 * Returns the number of rows of tiles in this device.
 	 *
@@ -469,6 +472,56 @@ public class Device implements Serializable {
 		return getSitesOfTypeMap().get(type);
 	}
 
+	/**
+	 * Adds a package pin to the device.
+	 */
+	public void addPackagePin(PackagePin packagePin) {
+		if (this.packagePinMap == null) {
+			this.packagePinMap = new HashMap<String, PackagePin>();
+		}
+		this.packagePinMap.put(packagePin.getSite() + "/" + packagePin.getBel(), packagePin);
+	}
+	
+	/**
+	 * Returns the package pin of the corresponding pad bel. If no package pin is mapped to the
+	 * bel, then {@code NULL} is returned.
+	 *  
+	 * @param bel Bel object
+	 */
+	public PackagePin getPackagePin(Bel bel) {
+		return this.packagePinMap == null ? null : this.packagePinMap.get(bel.getFullName());
+	}
+	
+	/**
+	 * Returns a collection of package pins for the device. Package pins represent
+	 * valid placement locations for ports in Vivado.
+	 */
+	public Collection<PackagePin> getPackagePins() {
+		return this.packagePinMap == null ? 
+			Collections.emptyList() :
+			Collections.unmodifiableCollection(this.packagePinMap.values());
+	}
+	
+	/**
+	 * Returns a stream of package pins that can access the dedicated clock
+	 * routing network of the device.
+	 */
+	public Stream<PackagePin> getClockPads() {
+		return this.packagePinMap == null ? Stream.empty() : this.packagePinMap.values().stream().filter(pp -> pp.isClockPad());
+	}
+	
+	/**
+	 * Returns the {@link Bel} object of the specified package pin. If the package
+	 * pin is incorrectly formatted and does not map to a valid bel, {@code null}
+	 * will be returned.
+	 * 
+	 * @param packagePin Package pin object
+	 */
+	public Bel getPackagePinBel(PackagePin packagePin) {
+		Site site = this.getSite(packagePin.getSite());
+		return site == null ? null : site.getBel(packagePin.getBel());
+	}
+		
 	//========================================================================//
 	// Object Population Methods
 	//========================================================================//
@@ -643,6 +696,7 @@ public class Device implements Serializable {
 		private Collection<SiteTemplate> siteTemplates;
 		private WireEnumerator we;
 		private PrimitiveDefList primitiveDefs;
+		private Map<String, PackagePin> packagePinMap;
 
 		public void readResolve(Device device) {
 			device.partName = partName;
@@ -667,9 +721,10 @@ public class Device implements Serializable {
 
 			device.constructTileMap();
 			device.constructDependentResources();
+			device.packagePinMap = packagePinMap;
 		}
 
-		@SuppressWarnings("UnusedDeclaration")
+		@SuppressWarnings("unused")
 		private Device readResolve() {
 			if (!version.equals(LATEST_DEVICE_FILE_VERSION))
 				return null;
@@ -679,6 +734,7 @@ public class Device implements Serializable {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private DeviceReplace writeReplace() {
 		DeviceReplace repl = new DeviceReplace();
 		writeReplace(repl);
@@ -694,5 +750,6 @@ public class Device implements Serializable {
 		repl.siteTemplates = siteTemplates.values();
 		repl.we = we;
 		repl.primitiveDefs = primitiveDefs;
+		repl.packagePinMap = packagePinMap;
 	}
 }

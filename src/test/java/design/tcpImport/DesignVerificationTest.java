@@ -58,17 +58,19 @@ import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.util.VivadoConsole;
 
 /**
- * This class is used to test design import by verifying the following for a single TINCR Checkpoint (TCP): <br> 
- * <br>
- * (1) The checkpoint was loaded into RapidSmith without errors, and <br>
- * (2) The representation of the design in RapidSmith matches that of Vivado. <br> 
- * <br>
- * To create a new checkpoint test, extend this class and implement the {@link DesignVerificationTest#getCheckpointName()} method.<br>
- * (1) Extend this class and implement the {@link DesignVerificationTest#getCheckpointName()} method <br>
- * (2) Generate a TINCR Checkpoint (TCP) of the design in Vivado and add the .tcp to "RAPIDSMITH_PATH/ImportTest/TCP" <br>
- * (3) Generate a Vivado Checkpoint (DCP) of the design, and add the .dcp file to "RAPIDSMITH_PATH/ImportTest/DCP" <br>
- * 
- * @author Thomas Townsend
+ * This class is used to test design import by verifying the following for a single RSCP: <br> 
+ * <ul>
+ * 1. The checkpoint was loaded into RapidSmith without errors, and <br>
+ * 2. The representation of the design in RapidSmith matches that of Vivado. <br> 
+ * </ul>
+ * To create a new checkpoint test follow the instructions below: 
+ * <ul>
+ * 1. Extend this class and implement the {@link DesignVerificationTest#getCheckpointName()} method <br>
+ * 2. Also implement the abstract method {@link DesignVerificationTest#familyName()}. This function should return
+ * 		the name of the family the design is implemented on (i.e. artix7, kintexu, etc.). <br> 
+ * 3. Generate a RSCP of the design in Vivado and add the .rscp to the directory"RAPIDSMITH_PATH/ImportTest/RSCP/familyName" <br>
+ * 4. Generate a Vivado Checkpoint (DCP) of the design, and add the .dcp file to "RAPIDSMITH_PATH/ImportTest/DCP/familyName" <br>
+ * </ul>
  */
 public abstract class DesignVerificationTest {
 	/** Set to true if you want to run the tests in debug mode, which prints additional information */
@@ -92,12 +94,19 @@ public abstract class DesignVerificationTest {
 	private static boolean initialized = false;
 	/** Name of the current checkpoint design under test*/
 	private static String testName ;
+	/** Name of the current family*/
+	private static String familyName;
 	
 	/**
 	 * Returns the checkpoint name of the import test to run. To add a new test,
 	 * extend {@link DesignVerificationTest} and implement this method.
 	 */
 	public abstract String getCheckpointName();
+	
+	/**
+	 * Returns the family name of the design checkpoint
+	 */
+	public abstract String familyName();
 	
 	/**
 	 * Initializes an import test.
@@ -161,28 +170,29 @@ public abstract class DesignVerificationTest {
 	public void initializeTest() throws JDOMException {
 		
 		if (initialized == false) {
-			debugPrint("Loading TCP...");
+			debugPrint("Loading RSCP...");
 			String checkpointName = getCheckpointName();
 			testName = checkpointName;
-			tcp = loadTCP(checkpointName + ".tcp");
+			familyName = familyName();
+			tcp = loadTCP(checkpointName + ".rscp", familyName);
 			
 			debugPrint("Loading DCP...");
-			console = loadDCP(checkpointName + ".dcp");
+			console = loadDCP(checkpointName + ".dcp", familyName);
 			initialized = true;			
 			setTclDisplayLimit();
 		}
 	}
 	
 	/**
-	 * Loads a Tincr Checkpoint into RapidSmith for testing
+	 * Loads a RSCP into RapidSmith for testing
 	 * 
-	 * @param tcpCheckpointFile checkpoint file name
+	 * @param rscpCheckpointFile checkpoint file name
 	 * @return Newly created {@link TincrCheckpoint} object
 	 */
-	private static TincrCheckpoint loadTCP(String tcpCheckpointFile) throws JDOMException {
+	private static TincrCheckpoint loadTCP(String rscpCheckpointFile, String familyName) throws JDOMException {
 		TincrCheckpoint tcp = null;
 		try {
-			tcp = VivadoInterface.loadTCP(testDirectory.resolve("TCP").resolve(tcpCheckpointFile).toString(), true);			
+			tcp = VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve(familyName).resolve(rscpCheckpointFile).toString(), true);			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -196,9 +206,10 @@ public abstract class DesignVerificationTest {
 	 * @param dcpCheckpointFile checkpoint name
 	 * @return a {@link VivadoConsole} that can be used to communicate with the Vivado process
 	 */
-	private static VivadoConsole loadDCP(String dcpCheckpointFile) {
+	private static VivadoConsole loadDCP(String dcpCheckpointFile, String familyName) {
 		VivadoConsole console = new VivadoConsole(testDirectory.resolve("vivadoTmp").toString());
 		console.runCommand("open_checkpoint " +  testDirectory.resolve("DCP")
+															.resolve(familyName)
 															.resolve(dcpCheckpointFile)
 															.toString().replaceAll("\\\\", "/"));
 		return console;
@@ -213,7 +224,7 @@ public abstract class DesignVerificationTest {
 	private static void restartVivado() {
 		debugPrint("Starting new Vivado instance...");
 		console.close(false); 
-		console = loadDCP(testName + ".dcp");
+		console = loadDCP(testName + ".dcp", familyName);
 		setTclDisplayLimit();
 	}
 	
@@ -221,7 +232,7 @@ public abstract class DesignVerificationTest {
 	 * 
 	 */
 	private static void setTclDisplayLimit() {
-		String command = "tincr::set_tcl_display_limit 100000";
+		String command = "tincr::set_tcl_display_limit 0";
 		console.runCommand(command);
 	}
 	

@@ -90,6 +90,7 @@ public final class SiteType implements Comparable<SiteType>, Serializable {
 		private FamilyType familyType;
 		private String name;
 
+		@SuppressWarnings("unused")
 		SiteTypeReplace() { }
 
 		private SiteTypeReplace(SiteType type) {
