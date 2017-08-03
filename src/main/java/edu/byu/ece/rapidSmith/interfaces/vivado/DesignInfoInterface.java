@@ -25,19 +25,90 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+
+import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
 
 import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
 
 /**
- * This class is used for parsing and writing design.info files in a TINCR checkpoint. <br>
- * Currently, the design.info file only contains the part-name of the TCP device. <br>
- * We may add to what is in this file in the future
+ * This class is used for parsing and writing design.info files in a RSCP. <br>
+ * Currently, the design.info file only two items: 
+ *<ul>
+ *<li> The part name the design is implemented on
+ *<li> The implementation mode of the design (regular or out-of-context)
+ *</ul>
  * 
- * @author Thomas Townsend
- *
+ * The design.info file may be updated to add additional information in future releases.
  */
 public class DesignInfoInterface {
-
+	
+	String part;
+	ImplementationMode mode;
+	
+	/**
+	 * Default constructor. Initializes the part to {@code NULL} and the the
+	 * implementation mode to {@code REGULAR}
+	 */
+	public DesignInfoInterface() {
+		part = null;
+		mode = ImplementationMode.REGULAR;
+	}
+	
+	/**
+	 * Parses the design.info file of a RSCP. Currently, this parser looks for two tokens:
+	 * <ul>
+	 * <li> part=partname
+	 * <li> mode=implementationMode
+	 * </ul>
+	 * 
+	 * Other token types may be added in the future. The functions {@link DesignInfoInterface#getPart()} and
+	 * {@link DesignInfoInterface#getMode()} can be used to obtain the values parsed from this file.
+	 * 
+	 * @param rscp RSCP file path
+	 * @throws IOException if the specified design.info file cannot be found
+	 */
+	public void parse(Path rscp) throws IOException {
+	
+		try (BufferedReader br = new BufferedReader(new FileReader(rscp.resolve("design.info").toString()))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				String[] toks = line.split("=");
+				assert (toks.length==2) : "Incorrect format for key/value pair in design.info file. Expected \"key=value\"";
+				
+				switch (toks[0]) {
+					case "part": setPart(toks[1]);
+						break;
+					case "mode": setMode(toks[1]);
+						break;
+					default: throw new ParseException("Unknown token found in design.info file \"" + toks[0] + "\""); 
+				}
+			}
+		}
+	}
+	
+	// Getter and Setter functions
+	public void setPart(String part) {
+		this.part = part;
+	}
+	
+	public void setMode(String mode) {
+		this.mode = ImplementationMode.valueOf(mode.toUpperCase());
+	}
+	
+	public void setMode(ImplementationMode mode) {
+		this.mode = mode;
+	}
+	
+	public String getPart(){
+		return this.part;
+	}
+	
+	public ImplementationMode getMode(){
+		return this.mode;
+	}
+	
+	/*
 	/**
 	 * Reads the part name from the TINCR checkpoint file
 	 *  
@@ -45,7 +116,7 @@ public class DesignInfoInterface {
 	 * @param design Design to apply placement
 	 * @param device Device which the design is implemented on
 	 * @throws IOException
-	 */
+	 *
 	public static String parseInfoFile (String tcp) throws IOException {
 		
 		BufferedReader br = null;
@@ -66,9 +137,12 @@ public class DesignInfoInterface {
 		
 		return part;
 	}
+	*/
 	
 	/**
 	 * Creates a design.info file given a partName<br>
+	 * 
+	 * TODO: Update this file to output the mode as well?
 	 * 
 	 * @param partInfoOut Output design.info file location
 	 * @param partname Name of part this design is mapped to
