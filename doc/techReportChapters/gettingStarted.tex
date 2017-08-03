@@ -248,9 +248,51 @@ is provided in the RS2 distribution which illustrates how to import
 and export designs from RS2.  This program, when run, will read in a
 RapidSmith checkpoint (RSCP), walk the resulting data structures and
 ten prettyprint the design contents, and then write out the
-corresponding Tincr checkpoint.   You should examine the code for that
+corresponding Tincr checkpoint.   
+
+You should examine the code for that
 program to understand its operation and the subroutine calls that can
 be used to do those steps.  The net result from running that program
-is a Tincr checkpoint, stored in a directory with a ``tcp'' extension.
+is to export a Tincr checkpoint, stored in a directory with a ``tcp'' extension.
 
 \subsubsection{Importing a Tincr Checkpoint Back into Vivado}
+At this point you can import the resulting Tincr checkpoint back into Vivado. 
+Assuming the original RSCP was ``add.rscp'', after running the import/export
+example program  you will have a ``add.rscp.tcp'' directory.  After starting
+Vivado up in Tcl mode (``vivado -mode tcl'') you can execute the following
+commands to import the checkpoint:
+
+\vspace{-0.15in}  \begin{code}
+	Vivado\% cd <path to directory containing your add.rscp.tcp directory>
+	Vivado\% package require tincr
+	Vivado\% tincr::read_tcp add.rscp.tcp
+	Vivado\% start_gui
+\end{code}
+
+At this point the Vivado GUI will open and you will see that there are cells and
+nets associated with this design.  If you want to save the imported design for
+later you could also do the following command:
+
+\vspace{-0.15in}  \begin{code}
+	Vivado\% write_checkpoint -force add.dcp
+\end{code}
+
+You could then later re-load that into Vivado using the following commands from
+the Tcl window:
+
+\vspace{-0.15in}  \begin{code}
+	Vivado\% link_design -part xc7a100t-csg324-3
+	Vivado\% open_checkpoint add.dcp
+\end{code}
+
+You will notice that these instructions focus on running Vivado in Tcl mode to
+do all the commands given.  The Vivado GUI is then started once the
+commands have executed.  Why not just always run in GUI mode since those same
+commands could have been typed into the command window in the GUI? It turns out
+that running commands such as these while the GUI window is open makes them run
+many times slower than if they were run just in Tcl mode.  So, a typical use
+case you might find helpful is to always start Vivado in Tcl mode, do the
+commands needed to export or import things, and then open the GUI (using
+``start\_gui'') and close the GUI (using ``stop\_gui'') as needed.
+
+
