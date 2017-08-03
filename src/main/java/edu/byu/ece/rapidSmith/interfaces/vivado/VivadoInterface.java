@@ -40,15 +40,15 @@ import edu.byu.ece.rapidSmith.util.Exceptions;
 
 /**
  * This class is used to interface Vivado and RapidSmith2. 
- * It parses TINCR checkpoints and creates equivalent RapidSmith {@link CellDesign}s.
+ * It parses RSCP checkpoints and creates equivalent RapidSmith {@link CellDesign}s.
  * It can also create TINCR checkpoints from existing RapidSmith {@link CellDesign}s.
  */
 public final class VivadoInterface {
 
 	private static final String CELL_LIBRARY_NAME = "cellLibrary.xml";
 	
-	public static TincrCheckpoint loadTCP(String tcp) throws IOException {
-		return loadTCP(tcp, false);
+	public static VivadoDesignCheckpoint loadRSCP(String rscp) throws IOException {
+		return loadRSCP(rscp, false);
 	}
 	
 	/**
@@ -58,7 +58,7 @@ public final class VivadoInterface {
 	 * @throws InvalidEdifNameException 
 	 * @throws EdifNameConflictException 
 	 */
-	public static TincrCheckpoint loadTCP (String rscp, boolean storeAdditionalInfo) throws IOException {
+	public static VivadoDesignCheckpoint loadRSCP (String rscp, boolean storeAdditionalInfo) throws IOException {
 	
 		Path rscpPath = Paths.get(rscp);
 		
@@ -99,7 +99,7 @@ public final class VivadoInterface {
 		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap());
 		routingInterface.parseRoutingXDC(routingFile);
 		
-		TincrCheckpoint tincrCheckpoint = new TincrCheckpoint(partName, design, device, libCells); 
+		VivadoDesignCheckpoint tincrCheckpoint = new VivadoDesignCheckpoint(partName, design, device, libCells); 
 		
 		if (storeAdditionalInfo) {
 			tincrCheckpoint.setRoutethroughBels(routingInterface.getRoutethroughsBels());
@@ -117,7 +117,7 @@ public final class VivadoInterface {
 	 * TODO: Update how we handle constraints files to make them easier to move
 	 * 
 	 * @param design {@link CellDesign}  
-	 * @param constraintPath File location of the constraints file. Typically tcpDirectory/constraints.rsc is the constraints file.
+	 * @param constraintPath File location of the constraints file. Typically rscpDirectory/constraints.rsc is the constraints file.
 	 */
 	private static void parseConstraintsXDC(CellDesign design, String constraintPath) {
 				

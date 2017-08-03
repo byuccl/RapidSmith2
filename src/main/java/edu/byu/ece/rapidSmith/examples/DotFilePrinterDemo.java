@@ -20,7 +20,7 @@
 
 package edu.byu.ece.rapidSmith.examples;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
+import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoDesignCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.util.DotFilePrinter;
 
@@ -55,9 +55,9 @@ public class DotFilePrinterDemo {
 		System.out.println("Loading Device and Design...");		
 		// replace with your file location
 		String checkpoint = args[0];
-		TincrCheckpoint tcp = null;
+		VivadoDesignCheckpoint tcp = null;
 		try {
-			tcp = VivadoInterface.loadTCP(checkpoint);
+			tcp = VivadoInterface.loadRSCP(checkpoint);
 		} catch (IOException e) {
 			System.err.println("Failed loading TCP");
 			e.printStackTrace();

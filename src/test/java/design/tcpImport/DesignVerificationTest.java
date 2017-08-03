@@ -53,7 +53,7 @@ import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.device.Wire;
-import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
+import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoDesignCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.util.VivadoConsole;
 
@@ -89,7 +89,7 @@ public abstract class DesignVerificationTest {
 	/** Vivado process link */
 	private static VivadoConsole console;
 	/** Loaded TincrCheckpoint of the design under test*/
-	private static TincrCheckpoint tcp;
+	private static VivadoDesignCheckpoint tcp;
 	/** Flag used to determine if we need to load the TCP and DCP*/
 	private static boolean initialized = false;
 	/** Name of the current checkpoint design under test*/
@@ -187,12 +187,12 @@ public abstract class DesignVerificationTest {
 	 * Loads a RSCP into RapidSmith for testing
 	 * 
 	 * @param rscpCheckpointFile checkpoint file name
-	 * @return Newly created {@link TincrCheckpoint} object
+	 * @return Newly created {@link VivadoDesignCheckpoint} object
 	 */
-	private static TincrCheckpoint loadTCP(String rscpCheckpointFile, String familyName) throws JDOMException {
-		TincrCheckpoint tcp = null;
+	private static VivadoDesignCheckpoint loadTCP(String rscpCheckpointFile, String familyName) throws JDOMException {
+		VivadoDesignCheckpoint tcp = null;
 		try {
-			tcp = VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve(familyName).resolve(rscpCheckpointFile).toString(), true);			
+			tcp = VivadoInterface.loadRSCP(testDirectory.resolve("RSCP").resolve(familyName).resolve(rscpCheckpointFile).toString(), true);			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

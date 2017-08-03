@@ -23,7 +23,7 @@ package edu.byu.ece.rapidSmith.examples;
 import java.io.IOException;
 import java.util.*;
 
-import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
+import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoDesignCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
@@ -52,7 +52,7 @@ public class DesignAnalyzer {
 		
 		// Load a TINCR checkpoint
 		System.out.println("Loading Design...");
-		TincrCheckpoint tcp = VivadoInterface.loadTCP(args[0] + ".tcp");
+		VivadoDesignCheckpoint tcp = VivadoInterface.loadRSCP(args[0] + ".tcp");
 		CellDesign design = tcp.getDesign();
 		
 		// Print out a representation of the design 

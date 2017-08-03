@@ -13,7 +13,7 @@ import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.interfaces.vivado.EdifInterface;
-import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
+import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoDesignCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 
 /**
@@ -42,37 +42,37 @@ public class ImportTests {
 	@Test
 	@DisplayName("Count16 Series7")
 	public void count16Test() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("count16.rscp").toString());
+		VivadoInterface.loadRSCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("count16.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("BramDSP Series7")
 	public void bramdspTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("bramdsp.rscp").toString());
+		VivadoInterface.loadRSCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("bramdsp.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("Cordic Series7")
 	public void cordicTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("cordic.rscp").toString());
+		VivadoInterface.loadRSCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("cordic.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("SuperCounter Series7")
 	public void superCounterTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("superCounter.rscp").toString());
+		VivadoInterface.loadRSCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("superCounter.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("Leon3 Series7")
 	public void leon3Test() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("leon3.rscp").toString());
+		VivadoInterface.loadRSCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("leon3.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("Simon Series7")
 	public void simonTest() throws IOException {
-		TincrCheckpoint tcp = VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("simon.rscp").toString());
+		VivadoDesignCheckpoint tcp = VivadoInterface.loadRSCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("simon.rscp").toString());
 		CellDesign design = tcp.getDesign();
 		
 		// test that internal properties were imported correctly
@@ -85,36 +85,36 @@ public class ImportTests {
 	@Test
 	@DisplayName("Cordic UltraScale")
 	public void cordicUltrascaleTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("kintexu").resolve("cordic.rscp").toString());
+		VivadoInterface.loadRSCP(testDirectory.resolve("RSCP").resolve("kintexu").resolve("cordic.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("Canny UltraScale")
 	public void cannyUltrascaleTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("kintexu").resolve("canny.rscp").toString());
+		VivadoInterface.loadRSCP(testDirectory.resolve("RSCP").resolve("kintexu").resolve("canny.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("CounterTMR UltraScale")
 	public void counterTMRUltrascaleTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("kintexu").resolve("counterTmr.rscp").toString());
+		VivadoInterface.loadRSCP(testDirectory.resolve("RSCP").resolve("kintexu").resolve("counterTmr.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("Flappy Bird UltraScale")
 	public void flappyUltrascaleTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("kintexu").resolve("flappy.rscp").toString());
+		VivadoInterface.loadRSCP(testDirectory.resolve("RSCP").resolve("kintexu").resolve("flappy.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("MSP430 UltraScale")
 	public void msp430UltrascaleTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("kintexu").resolve("msp430.rscp").toString());
+		VivadoInterface.loadRSCP(testDirectory.resolve("RSCP").resolve("kintexu").resolve("msp430.rscp").toString());
 	}
 	
 	@Test
 	@DisplayName("Viterbi UltraScale")
 	public void viterbiUltrascaleTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("kintexu").resolve("viterbi.rscp").toString());
+		VivadoInterface.loadRSCP(testDirectory.resolve("RSCP").resolve("kintexu").resolve("viterbi.rscp").toString());
 	}
 }

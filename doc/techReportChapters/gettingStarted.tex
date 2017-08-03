@@ -147,7 +147,7 @@ Some points to keep in mind while configuring and running RS2 programs:
   folder as well as all the jar files in the \dir{/lib} subdirectory. An example
   \env{CLASSPATH} could look like this:
   \vspace{-0.15in}  \begin{code}
-  Â  Â  Â RAPIDSMITH2-SNAPSHOT/*:RAPIDSMITH2-SNAPSHOT/lib/*
+  ï¿½  ï¿½  ï¿½ RAPIDSMITH2-SNAPSHOT/*:RAPIDSMITH2-SNAPSHOT/lib/*
   \end{code}
 \end{itemize}
 
@@ -171,3 +171,86 @@ want to zoom out to see the entire chip layout.
 \caption{\pgm{DeviceBrowser} Sample Display}
 \label{fig:deviceBrowser}
 \end{figure}
+
+\subsection{Running Real Designs - An Overview}
+This section will lead you through running an entire design from Vivado through
+RS2 and back.  In this example you will fully synthesize and implement a
+complete design in Vivado and then move it into RS2.  However, later as you gain
+experience you may choose to only synthesize  designs before exporting
+them to RS2 or you may choose to export and work with Vivado Out-Of-Context
+(OOC) Checkpoints.
+
+The steps to be covered include:
+
+\begin{enumerate}
+  \item Synthesize, place and route a design in Vivado
+  \item  Export the design from Vivado in the form of an RSCP (RapidSmith
+  Checkpoint)
+  \item Import the RSCP  into RS2
+  \item Run some analysis on the design
+  \item Export the design from RS2 as a TCP (Tincr Checkpoint)
+  \item Import the TCP back into Vivado
+\end{enumerate}
+
+In a real CAD flow you would likely do something more interesting
+than the analysis in Step 4 above, but this overview is intended to help you
+through the Vivado-to-RS2-back-to process so you can get started.
+
+Note: the entire flow requires the installation of Tincr as well as RS2 so if
+you skipped the Tincr installation above, go and install it now.
+
+\subsubsection{Synthesize, Place, and Route a Design in Vivado and Then Export
+It As a RSCP} If you desire, you may do this step any way you are used to using
+Vivado (with or without using the Vivado GUI for example).  In this step, we
+will do it using the Vivado Tcl interface.
+
+First, start up Vivado in command line mode.  This can be done using the
+``Vivado Tcl Shell'' program item or by executing ``vivado -mode tcl''.  Once
+the shell has started up, you may execute the following:
+                
+\vspace{-0.15in}  \begin{code}
+	Vivado\% cd <path to directory containing your HDL files>
+	Vivado\% link_design -part xc7a100t-csg324-3
+	Vivado\% read_verilog [glob *.v]
+	Vivado\% synth_design -top myTopLevelEntityName -flatten_hierarchy full 
+	Vivado\% place_design
+	Vivado\% route_design
+	Vivado\% package require tincr
+	Vivado\% tincr::write_rscp myTopLevelEntityName
+	Vivado\% close_project
+\end{code}
+Most of the above commands should be self-explanatory and can be adapted to
+compile VHDL or SystemVerilog files.
+Importantly,  you must flatten the design hierarchy when running
+the synthesis step as shown above.  The result of executing this will be a new
+directory which contains the RapidSmith Checkpoint.
+
+As already mentioned, this shows how to create a fully placed and routed design
+in Vivado prior to export.  There is no requirement, however, that the design is
+either placed or routed prior to export.  You may choose to export it any time
+after it has been synthesized.
+
+Finally, note that a set of sample HDL designs are provided in the RS2
+distribution and which you could use for your learning.
+You can read about them as well as a script which implements a version of the
+above compilation steps in Section~\ref{sampledesigns} of this report.  Note
+that the compilation script described there expects a particular directory
+structure to hold your source files.  Otherwise, the script implements 
+essentially what is shown above.
+
+\subsubsection{Import the RSCP into RS2}
+Once you have a RSCP you are ready to create a Java program for RS2 that will be
+able to import that RSCP into RS2 so you can do something with it.
+
+As described in Section~\ref{examples} of this report (and
+Section~\ref{sec:importExportExample} in particular) a sample import/export program
+is provided in the RS2 distribution which illustrates how to import
+and export designs from RS2.  This program, when run, will read in a
+RapidSmith checkpoint (RSCP), walk the resulting data structures and
+ten prettyprint the design contents, and then write out the
+corresponding Tincr checkpoint.   You should examine the code for that
+program to understand its operation and the subroutine calls that can
+be used to do those steps.  The net result from running that program
+is a Tincr checkpoint, stored in a directory with a ``tcp'' extension.
+
+\subsubsection{Importing a Tincr Checkpoint Back into Vivado}

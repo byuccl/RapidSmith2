@@ -38,7 +38,7 @@ import edu.byu.ece.rapidSmith.device.Device;
  * @author Thomas Townsend
  *
  */
-public final class TincrCheckpoint {
+public final class VivadoDesignCheckpoint {
 	
 	private final CellLibrary libCells;
 	private final Device device;
@@ -49,7 +49,7 @@ public final class TincrCheckpoint {
 	private Collection<Bel> staticSourceBels;
 	private Map<BelPin, CellPin> belPinToCellPinMap;
 
-	public TincrCheckpoint(String partName, CellDesign design, Device device, CellLibrary libCells) {
+	public VivadoDesignCheckpoint(String partName, CellDesign design, Device device, CellLibrary libCells) {
 		this.partName = partName;
 		this.design = design;
 		this.device = device;
@@ -57,28 +57,28 @@ public final class TincrCheckpoint {
 	}
 	
 	/**
-	 * Returns the FPGA device associated with the TCP
+	 * Returns the FPGA device associated with the RSCP
 	 */
 	public Device getDevice() {
 		return device;
 	}
 	
 	/**
-	 * Returns the cell library associated with the TCP
+	 * Returns the cell library associated with the RSCP
 	 */
 	public CellLibrary getLibCells() {
 		return libCells;
 	}
 	
 	/**
-	 * Returns the FPGA design associated with the TCP
+	 * Returns the FPGA design associated with the RSCP
 	 */
 	public CellDesign getDesign() {
 		return design;
 	}
 	
 	/**
-	 * Returns the part name of the device associated with the TCP
+	 * Returns the part name of the device associated with the RSCP
 	 * 
 	 * TODO: Do we need this? The device should already have this...
 	 */

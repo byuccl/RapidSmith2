@@ -24,7 +24,7 @@ package edu.byu.ece.rapidSmith.examples.placerDemo;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.interfaces.vivado.TincrCheckpoint;
+import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoDesignCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import joptsimple.OptionException;
@@ -91,7 +91,7 @@ public class PlacerDemo {
 		classSetup();
 		
 		System.out.println("Loading Design...");
-		TincrCheckpoint tcp = VivadoInterface.loadTCP(tcpDirectory);
+		VivadoDesignCheckpoint tcp = VivadoInterface.loadRSCP(tcpDirectory);
 		
 		CellDesign design = tcp.getDesign();
 		
