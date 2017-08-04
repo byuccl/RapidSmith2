@@ -35,6 +35,7 @@ import edu.byu.ece.edif.core.InvalidEdifNameException;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
+import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
@@ -67,7 +68,13 @@ public final class VivadoInterface {
 		}
 					
 		// load the device
-		String partName = DesignInfoInterface.parseInfoFile(rscpPath.resolve("design.info").toString());
+		DesignInfoInterface designInfo = new DesignInfoInterface();
+		designInfo.parse(rscpPath);
+		String partName = designInfo.getPart();
+		ImplementationMode mode = designInfo.getMode();
+		if (partName == null) {
+			throw new Exceptions.ParseException("Part name for the design not found in the design.info file!");
+		}
 		
 		Device device = RSEnvironment.defaultEnv().getDevice(partName);
 		
@@ -86,6 +93,7 @@ public final class VivadoInterface {
 		// create the RS2 netlist
 		String edifFile = rscpPath.resolve("netlist.edf").toString();
 		CellDesign design = EdifInterface.parseEdif(edifFile, libCells);
+		design.setImplementationMode(mode);
 		
 		// parse the constraints into RapidSmith
 		parseConstraintsXDC(design, rscpPath.resolve("constraints.xdc").toString());
@@ -96,7 +104,7 @@ public final class VivadoInterface {
 		placementInterface.parsePlacementXDC(placementFile);
  
 		String routingFile = rscpPath.resolve("routing.rsc").toString();
-		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap());
+		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap(), mode);
 		routingInterface.parseRoutingXDC(routingFile);
 		
 		TincrCheckpoint tincrCheckpoint = new TincrCheckpoint(partName, design, device, libCells); 
@@ -169,7 +177,7 @@ public final class VivadoInterface {
 		
 		// Write routing.xdc
 		String routingOut = Paths.get(tcpDirectory, "routing.xdc").toString();
-		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, null);
+		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, null, ImplementationMode.REGULAR);
 		routingInterface.writeRoutingXDC(routingOut, design);
 		
 		// Write EDIF netlist
