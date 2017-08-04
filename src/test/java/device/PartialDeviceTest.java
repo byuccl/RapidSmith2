@@ -26,6 +26,7 @@ import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,28 +47,28 @@ import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.device.creation.ExtendedDeviceInfo;
 import edu.byu.ece.rapidSmith.device.creation.PartialDeviceGenerator;
 import edu.byu.ece.rapidSmith.device.families.Artix7;
+import edu.byu.ece.rapidSmith.util.FileTools;
 
 /**
- * This class contains unit tests for the class {@link PartialDeviceGenerator}.
+ * This class contains unit tests for {@link PartialDeviceGenerator}.
  */
 @RunWith(JUnitPlatform.class)
 public class PartialDeviceTest {
 
+	// class members
 	private static Device device;
 	private static Tile portTile;
 	
 	/**
-	 * Executes before running the tests. Creates a partial device file in the specified
-	 * region of an Artix7 FPGA part.
+	 * Creates a partial device file in the specified region of an Artix7 FPGA part to be 
+	 * used for the rest of the unit tests in this file.
 	 */
 	@BeforeAll
 	public static void createPartialDevice() {
-		
 		Device largeDevice = RSEnvironment.defaultEnv().getDevice("xc7a100tcsg324-3");
 		ExtendedDeviceInfo.loadExtendedInfo(largeDevice);
 		PartialDeviceGenerator generator = new PartialDeviceGenerator();
-		
-		device = generator.generatePartialDevice("test", largeDevice, "INT_R_X39Y130", "INT_L_X40Y126");
+		device = generator.generatePartialDevice("xc7a_small", largeDevice, "INT_R_X39Y130", "INT_L_X40Y126");
 		portTile = device.getTile(0, device.getColumns() - 1);
 	}
 	
@@ -91,13 +92,19 @@ public class PartialDeviceTest {
 		assertEquals(EXPECTED_ROW_COUNT, device.getRows(), "Incorrect number of device rows");
 		assertEquals(EXPECTED_COLUMN_COUNT, device.getColumns(), "Incorrect number of device columns");
 		assertEquals(FamilyType.valueOf("artix7"), device.getFamily(), "Incorrect device family");
-		assertEquals("test", device.getPartName(), "Incorrect part name");
+		assertEquals("xc7a_small", device.getPartName(), "Incorrect part name");
 		
 		for (int i = 0; i < device.getRows(); i++) {
 			for (int j = 0; j < device.getColumns(); j++) {
 				assertEquals(expectedTileTypes[i*EXPECTED_COLUMN_COUNT + j], device.getTile(i,j).getType(), i + " " + j);
 			}
 		}
+		
+		// Test the tile and site map are populated correctly
+		assertEquals(30, device.getTiles().size(), "Tile Map data structure in device not populated correctly");
+		assertNotNull(device.getTile("INT_R_X39Y130"), "Tile Map data structure in device not populated correctly");
+		assertEquals(1932, device.getSites().size(), "Site Map data structure in device not populated correctly");
+		assertNotNull(device.getSite("SLICE_X63Y130"), "Site Map data structure in device not populated correctly");
 	}
 	
 	/**
@@ -284,6 +291,7 @@ public class PartialDeviceTest {
 		assertEquals(0, internalWire.getWireConnections().size(), "Incorrect number of wire connections for wire " + internalWire.getWireName());
 		assertNotNull(internalWire.getConnectedPin(), "Wire " + internalWire.getWireName() + " should connect to a site pin");
 		assertEquals(sitePin, internalWire.getConnectedPin(), "Wire " + internalWire.getWireName() + " connects to incorrect site pin");
+		
 		assertEquals(1, internalWire.getReverseWireConnections().size(), "Incorrect number of reverse connections for wire " + internalWire.getWireName());
 		Wire sourceWire = internalWire.getReverseWireConnections().iterator().next().getSinkWire();
 		assertEquals("intrasite:IPORT/IPAD.PAD", sourceWire.getWireName(), "Incorrect reverse wire connection for wire " + internalWire.getWireName());
@@ -373,5 +381,27 @@ public class PartialDeviceTest {
 		assertEquals(sitePin, belPin.getSitePins().iterator().next(), "Bel pin \"PAD\" should connect to site pin");
 		Wire belPinWire = belPin.getWire();
 		assertEquals("intrasite:OPORT/OPAD.PAD", belPinWire.getWireName(), "Bel pin \"PAD\" connects to incorrect wire");
+	}
+	
+	/**
+	 * This test verifies that a device created from {@link PartialDeviceInstaller}
+	 * can be loaded without error.
+	 */
+	@Test
+	@DisplayName("LoadingTest")
+	public void loadPartialDeviceTest() {
+		
+		Path deviceFilePath = RSEnvironment.defaultEnv().getEnvironmentPath()
+				.resolve("src")
+				.resolve("test")
+				.resolve("resources")
+				.resolve("xc7a_small_db.dat");
+		
+		assertNotNull(deviceFilePath, "Missing test device file " +  RSEnvironment.defaultEnv().getEnvironmentPath() + "src/test/resources/xc7a_small_db.dat");
+		
+		Device test = FileTools.loadDevice(deviceFilePath);
+		assertNotNull(test, "Error loading device file");
+		assertEquals(5, device.getRows());
+		assertEquals(6, device.getColumns());
 	}
 }

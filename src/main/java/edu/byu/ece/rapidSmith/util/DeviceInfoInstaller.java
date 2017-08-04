@@ -56,6 +56,7 @@ public class DeviceInfoInstaller {
 		
 		if (!success) {
 			System.out.println("Device info for part " + partname + " cannot be found. Generate the device info and re-run.");
+			return;
 		}
 		
 		System.out.println("Writing Updated Device File...");

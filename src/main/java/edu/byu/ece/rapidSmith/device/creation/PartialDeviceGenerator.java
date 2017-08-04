@@ -45,21 +45,82 @@ import edu.byu.ece.rapidSmith.device.WireConnection;
 import edu.byu.ece.rapidSmith.device.WireEnumerator;
 import edu.byu.ece.rapidSmith.device.WireHashMap;
 import edu.byu.ece.rapidSmith.util.Exceptions;
-import edu.byu.ece.rapidSmith.util.Exceptions.ImplementationException;
 
 /**
+ * This class can be used to create small device files that represent
+ * a sub-region of a larger Xilinx FPGA part. An example for a 3X3
+ * partial device is shown below: <br>
+ * 	
+ * <pre>
+ * ------------------------------------------- <br>
+ * |         |       |        ||             | <br>
+ * |  INT_R  |  CLB  |  VBRK  ||  HIER_PORT  | <br>
+ * |         |       |        ||             | <br>
+ * |------------------------------------------ <br>
+ * |         |       |        ||             | <br>
+ * |  INT_R  |  CLB  |  VBRK  ||    NULL     | <br>
+ * |         |       |        ||             | <br>
+ * |------------------------------------------ <br>
+ * |         |       |        ||             | <br>
+ * |  INT_R  |  CLB  |  VBRK  ||    NULL     | <br>
+ * |         |       |        ||             | <br>
+ * |------------------------------------------ <br>
+ *                                   |         <br>
+ *                     Extra Column for hierarchical ports <br>
+ * </pre>
+ * As can be seen, when creating a 3X3 device file,
+ * an extra column is added to the device. The purpose of this column is to
+ * represent hierarchical ports for the device. Hierarchical ports are for
+ * wires which start <b>within</b> the partial device, but are routed
+ * <b>outside</b> the small device boundaries. Each wire that fits this  
+ * criteria is instead connected to an individual output port in the "HEIR_PORT" 
+ * tile in the upper right corner of the device. Similarly, for wires
+ * that start <b>outside</b> of the partial boundaries and are routed
+ * <b> within</b> the small device, an input port is created and
+ * which is connected to the sink wire in the device. For each port,
+ * either an "OPORT" or "IPORT" site is created  within the "HEIR_PORT"
+ * tile, with a single PAD BEL. All other tiles in the rightmost column are
+ * set to be of type NULL so they take up as little memory as possible. 
  * 
- *
+ * <p>
+ * Run the Java class {@link PartialDeviceInstaller} to create a new partial device and
+ * install it to the corresponding family of the RapidSmith2 "device" folder.
+ * 
+ * <p>
+ * Possible Improvements:
+ * <ul>
+ * <li> Add an option to NOT include reverse wire connections. Reverse wire connections are currently
+ * 		being generated and so leaving them out will help reduce the size of the final device file
+ * <li> Currently, PORT sites have the name format of "IPORT_0" or "OPORT_1". It would be
+ *      better to have a naming convention of something like "OPORT:INT_R_X27Y134/SR1BEG1" 
+ *      where the source or sink wire outside of the partial device is directly included in the
+ *      port name. This can give users information about where the hierarchical port goes
+ *      (or comes from) in the original device.  
+ * <li> More error checking. Currently this class only checks that the specified corner tiles
+ * 		are valid tiles in the large device and form a rectangle. Its unclear if we want to allow
+ *      IOB tiles in a small device, so we may need to check for this.
+ * <li> Add support for more generate functions with different options as parameters. For example
+ * 		the function generate(String newDeviceName, Tile topLeft, int width, int height) is another
+ * 		potentially useful way to create a partial device.
+ * <li> Remove unused wires from the WireEnumerator so that it makes the data structure slightly smaller.
+ * 		This also applies to the device site templates that aren't used.
+ * <li> Add an area limit for the partial device. I don't think it makes sense to make a partial device
+ *      more than 20X20, so this may be the limit
+ * <li> Add support for general shapes and not just rectangles? I'm not sure how useful this would be.
+ * <li> Integrate this function with the device browser. 
+ * </ul>
  */
 public class PartialDeviceGenerator {
 
 	/**
+	 * Creates a <b>rectangular</b> partial device from a larger Xilinx FPGA part
 	 * 
-	 * @param newDeviceName
-	 * @param oldDevice
-	 * @param topLeftTile
-	 * @param bottomRightTile
-	 * @return
+	 * @param newDeviceName The name of the new device. This name can be used to load the device once a RS2 device file has been created.
+	 * @param oldDevice The original larger device to create a subsection from
+	 * @param topLeftTile The name of the top-left tile of the rectangular region
+	 * @param bottomRightTile The name of the bottom-right tile of the rectangular region 
+	 * 
+	 * @return a {@link Device} object which represents a sub-section of the original part
 	 */
 	public Device generatePartialDevice(String newDeviceName, Device oldDevice, String topLeftTile, String bottomRightTile) {
 
@@ -102,28 +163,44 @@ public class PartialDeviceGenerator {
 		// Step Five: Set the types of the unused tiles in the last column to NULL;
 		generateNullTiles(newDevice);
 		
+		// Set Six: Construct the tile and site maps in the device
+		newDevice.constructTileMap();
+		
 		return newDevice;
 	}
 	
 	/**
+	 * Copies key properties from the old, large device to the new partial device.
+	 * These properties currently include:
+	 * <ul>
+	 * <li> {@link FamilyType} (i.e. Artix7}
+	 * <li> {@link WireEnumerator} Wires all have the same enumerations in the partial device
+	 * 		as they did for the old device.
+	 * <li> The list of {@link SiteTemplates} which detail the internals of a site
+	 * </ul>
 	 * 
-	 * @param oldDevice
-	 * @param newDevice
+	 * TODO: Make a copy of the WireEnumerator and SiteTemplates? If we are just creating 
+	 *  a partial device and not using the older device in the same Java code run, we 
+	 *  don't have to make a copy
+	 * 
+	 * @param oldDevice Original device file
+	 * @param newDevice Partial device file
 	 */
 	private void copyDeviceProperties(Device oldDevice, Device newDevice) {
 		newDevice.setFamily(oldDevice.getFamily());
-		// TODO: we need to make a copy of this data structure instead of 
 		newDevice.setWireEnumerator(oldDevice.getWireEnumerator());
-		//TODO: this is not right, we need to make a copy of this data structure
 		newDevice.setSiteTemplates(oldDevice.getSiteTemplates());
 	}
 	
 	/**
+	 * Creates a set of {@link Tile}s in the original device that needs to be included
+	 * in the new partial device. This set is used to test if a wire leaves the partial
+	 * device boundaries.
 	 * 
-	 * @param oldDevice
-	 * @param newDevice
-	 * @param topLeft
-	 * @return
+	 * @param oldDevice Original {@link Device} object
+	 * @param newDevice Partial {@link Device} object
+	 * @param topLeft Top-left tile in the rectangular partial device region
+	 * @return A set of {@link Tile} objects used in the partial region
 	 */
 	private Set<Tile> generateTileSet(Device oldDevice, Device newDevice, Tile topLeft) {
 		// first pass: make a set of all tiles in the rectangular map
@@ -135,19 +212,17 @@ public class PartialDeviceGenerator {
 			}
 		}
 		
-		/*
-		for (Tile tile : tileSet) {
-			System.out.print(tile.getName()  + " ");
-		}
-		System.out.println();
-		*/
 		return tileSet;
 	}
 	
 	/**
-	 * 
-	 * @param topLeft
-	 * @param bottomRight
+	 * Checks that the specified topLeft and bottomRight Tiles form a valid rectangular
+	 * region, and creates the tile array for the new partial device based on this
+	 * region. An extra column is added for the "HEIR_PORT" tile which contains 
+	 * all of the hierarchical ports in the device.
+	 *  
+	 * @param topLeft Top-left Tile in the partial region
+	 * @param bottomRight Bottom-right Tile in the partial region
 	 */
 	private void createTileArray(Device device, Tile topLeft, Tile bottomRight) {
 		
@@ -171,12 +246,25 @@ public class PartialDeviceGenerator {
 	}
 	
 	/**
+	 * Copies the properties of a {@link Tile} from the original device to the new partial device. 
+	 * This includes:
+	 * <ul>
+	 * <li> The name of the tile for reference to the old device
+	 * <li> {@link TileType}
+	 * <li> Sites
+	 * <li> Source and sink wires
+	 * <li> WireSite map (see {@Tile} source code)
+	 * <li> The forward <b>and</b> reverse wire connections of the tile 
+	 * </ul>
 	 * 
-	 * @param oldTile
-	 * @param newTile
-	 * @param tileSet
-	 * @param toOutputPorts
-	 * @param toInputPorts
+	 * This function also records which wires leave the partial device boundaries
+	 * so they can be connected to ports in the "HEIR_PORT" tile. 
+	 * 
+	 * @param oldTile Tile in the original device
+	 * @param newTile Corresponding Tile in the partial device
+	 * @param tileSet Set of tiles within the partial device region (used for determining if a wire leaves the region)
+	 * @param toOutputPorts Set of {@link TileWire}s that leave the partial device region. This is populated in this function.
+	 * @param toInputPorts Set of {@link TileWire}s that are sourced by wires outside the partial device region. This is populated in this function.
 	 */
 	private void copyTile(Tile oldTile, Tile newTile, Set<Tile> tileSet, List<TileWire> toOutputPorts, List<TileWire> toInputPorts) {
 		newTile.setName(oldTile.getName());
@@ -185,7 +273,7 @@ public class PartialDeviceGenerator {
 		newTile.setSinks(oldTile.getSinks().stream().map(w -> w.getWireEnum()).mapToInt(i -> i).toArray());
 		newTile.setSources(oldTile.getSources().stream().map(w -> w.getWireEnum()).mapToInt(i -> i).toArray());
 		newTile.setWireSites(oldTile.getWireSites());
-				
+		
 		// process the forward connections
 		WireHashMap oldHashMap = oldTile.getWireHashMap();
 		WireHashMap forwardMap = new WireHashMap();
@@ -202,6 +290,7 @@ public class PartialDeviceGenerator {
 					bounded.add(newConn);
 				}
 				else {
+					// the wire connection leaves the small device region 
 					toOutputPorts.add(new TileWire(newTile, sourceWire));
 				}
 			}
@@ -232,7 +321,7 @@ public class PartialDeviceGenerator {
 					bounded.add(newConn);
 				}
 				else {
-					// the wire connection leaves the device
+					// the wire is sourced from a wire outside the small device region
 					toInputPorts.add(new TileWire(newTile, sourceWire));
 				}
 			}
@@ -247,12 +336,47 @@ public class PartialDeviceGenerator {
 	}
 	
 	/**
+	 * Creates the hierarchical port tile.
 	 * 
-	 * @param device
-	 * @param outputPortCount
-	 * @param inputPortCount
-	 * @param tileSources
-	 * @param tileSinks
+	 * @param newDevice Partial device data structure
+	 * @param toOutput Set of {@link TileWire} objects that need to be connected to an "OPORT"  
+	 * @param fromInput Set of {@link TileWire} objects that need to be connected to an "IPORT"
+	 */
+	private void createPortTile(Device newDevice, List<TileWire> toOutputPorts, List<TileWire> toInputPorts) {
+		Tile portTile = newDevice.getTile(0,  newDevice.getColumns() - 1);
+		portTile.setName("HEIR_PORT_X0Y0");
+		portTile.setType(TileType.valueOf(newDevice.getFamily(), "HIERARCHICAL_PORT"));
+		
+		int[] tileSources = new int[toInputPorts.size()];
+		int[] tileSinks = new int[toOutputPorts.size()];
+		
+		// create 
+		createPortWires(newDevice, toOutputPorts.size(), toInputPorts.size(), tileSources, tileSinks);
+		portTile.setSources(tileSources);
+		portTile.setSinks(tileSinks);
+		
+		createPortTileWireMaps(portTile, toOutputPorts, toInputPorts);
+		createInputPortSiteTemplate(newDevice);
+		createOutputPortSiteTemplate(newDevice);
+		
+		Site[] portSiteArray = new Site[toOutputPorts.size() + toInputPorts.size()];
+		Map<Integer, Integer> wireSites = new HashMap<>();
+		createPortSites("IPORT", portTile, portSiteArray, toInputPorts.size(), 0, wireSites);
+		createPortSites("OPORT", portTile, portSiteArray, toOutputPorts.size(), toInputPorts.size(), wireSites);
+		portTile.setSites(portSiteArray);
+		portTile.setWireSites(wireSites);
+	}
+	
+	/**
+	 * Creates new wires that are needed for the partial device file and adds them 
+	 * to the {@link WireEnumerator}. These wires include the intrasite wires for the 
+	 * "IPORT" and "OPORT" sites, and all wires in the new "HEIR_PORT" tile.
+	 *  
+	 * @param device Partial device data structure
+	 * @param outputPortCount Number of output ports to create
+	 * @param inputPortCount Number of input ports to create
+	 * @param tileSources Source wire array for the "HIER_PORT" tile. Populated in this method.
+	 * @param tileSinks Sink wire array for the "HIER_PORT" tile. Populated in this method.
 	 */
 	private void createPortWires(Device device, int outputPortCount, int inputPortCount, int[] tileSources, int[] tileSinks) {
 		WireEnumerator we = device.getWireEnumerator();
@@ -298,11 +422,11 @@ public class PartialDeviceGenerator {
 	}
 	
 	/**
+	 * Creates a {@link SiteTemplate} for an "IPORT" site and adds it to the partial device
 	 * 
-	 * @param device
-	 * @return
+	 * @param device Partial Device data structure
 	 */
-	private SiteTemplate createInputPortSiteTemplate(Device device) {
+	private void createInputPortSiteTemplate(Device device) {
 		
 		WireEnumerator we = device.getWireEnumerator();
 		Integer sitePinWire = we.getWireEnum("intrasite:IPORT/O.O");
@@ -361,14 +485,12 @@ public class PartialDeviceGenerator {
 	
 		Map<SiteType, SiteTemplate> templateMap =  device.getSiteTemplates();
 		templateMap.put(siteType, siteTemplate);
-		
-		return siteTemplate;
 	}
 	
 	/**
+	 * Creates a {@link SiteTemplate} for an "OPORT" site and adds it to the partial device
 	 * 
-	 * @param device
-	 * @return
+	 * @param device Partial Device data structure
 	 */
 	private SiteTemplate createOutputPortSiteTemplate(Device device) {
 		
@@ -434,12 +556,13 @@ public class PartialDeviceGenerator {
 	}
 	
 	/**
-	 * 
-	 * @param portTile
-	 * @param toOutput
-	 * @param fromInput
+	 * Creates the forward and reverse wire connections for the "HIER_PORT" tile.
+	 *  
+	 * @param portTile Hierarchical port tile (top-right tile of the partial device)
+	 * @param toOutput Set of {@link TileWire} objects that need to be connected to an "OPORT"  
+	 * @param fromInput Set of {@link TileWire} objects that need to be connected to an "IPORT"
 	 */
-	private void createTileWireMaps(Tile portTile, List<TileWire> toOutput, List<TileWire> fromInput) {
+	private void createPortTileWireMaps(Tile portTile, List<TileWire> toOutput, List<TileWire> fromInput) {
 		
 		WireEnumerator we = portTile.getDevice().getWireEnumerator();
 		
@@ -489,10 +612,13 @@ public class PartialDeviceGenerator {
 	}
 	
 	/**
+	 * Adds a new {@link WireConnection} to an existing array of WireConnections.
 	 * 
-	 * @param connArray
-	 * @param newConn
-	 * @return
+	 * @param connArray Old connection array
+	 * @param newConn Wire connection to add
+	 * 
+	 * @return A new array of {@link WireConnection}s where the new connection is appended to the end.
+	 * 		This returned array one size bigger than the original.
 	 */
 	private WireConnection[] addConnection(WireConnection[] connArray, WireConnection newConn) {
 		WireConnection[] newArray = new WireConnection[connArray.length + 1]; 
@@ -507,13 +633,14 @@ public class PartialDeviceGenerator {
 	}
 	
 	/**
+	 * Creates the required IPORT and OPORT sites within the hierarchical port tile.
 	 * 
-	 * @param type
-	 * @param portTile
-	 * @param siteArray
-	 * @param numSites
-	 * @param startIndex
-	 * @param wireSites
+	 * @param type Type of ports to create. Valid options are "IPORT" and "OPORT"
+	 * @param portTile	Hierarchical port {@link Tile} in the partial device
+	 * @param siteArray Site array for the port tile. Populated in this method
+	 * @param numSites Number of port sites to create
+	 * @param startIndex Starting number to index the ports
+	 * @param wireSites Map of wire to site index for wires in the port tile
 	 */
 	private void createPortSites(String type, Tile portTile, Site[] siteArray, int numSites, int startIndex, Map<Integer, Integer> wireSites) {
 		Device device = portTile.getDevice();
@@ -553,45 +680,18 @@ public class PartialDeviceGenerator {
 	}
 	
 	/**
-	 * 
-	 * @param device
+	 * Sets the tile types of all tiles in the right-most column 
+	 * to NULL (besides the port tile)
+	 *  
+	 * @param device Partial device data structure
 	 */
 	private void generateNullTiles(Device device) {
 		// Set the tile types of all unused tiles to NULL
 		TileType nullType = TileType.valueOf(device.getFamily(), "NULL");
 		for (int i = 1; i < device.getRows(); i++) {
-			device.getTile(i, device.getColumns()-1).setType(nullType);
+			Tile nullTile =  device.getTile(i, device.getColumns()-1);
+			nullTile.setType(nullType);
+			nullTile.setName("NULL_X0Y" + (i-1));
 		}
-	}
-	
-	/**
-	 * 
-	 * @param newDevice
-	 * @param toOutputPorts
-	 * @param toInputPorts
-	 */
-	private void createPortTile(Device newDevice, List<TileWire> toOutputPorts, List<TileWire> toInputPorts) {
-		Tile portTile = newDevice.getTile(0,  newDevice.getColumns() - 1);
-		portTile.setName("HEIR_PORT_X0Y0");
-		portTile.setType(TileType.valueOf(newDevice.getFamily(), "HIERARCHICAL_PORT"));
-		
-		int[] tileSources = new int[toInputPorts.size()];
-		int[] tileSinks = new int[toOutputPorts.size()];
-		
-		// create 
-		createPortWires(newDevice, toOutputPorts.size(), toInputPorts.size(), tileSources, tileSinks);
-		portTile.setSources(tileSources);
-		portTile.setSinks(tileSinks);
-		
-		createTileWireMaps(portTile, toOutputPorts, toInputPorts);
-		createInputPortSiteTemplate(newDevice);
-		createOutputPortSiteTemplate(newDevice);
-		
-		Site[] portSiteArray = new Site[toOutputPorts.size() + toInputPorts.size()];
-		Map<Integer, Integer> wireSites = new HashMap<>();
-		createPortSites("IPORT", portTile, portSiteArray, toInputPorts.size(), 0, wireSites);
-		createPortSites("OPORT", portTile, portSiteArray, toOutputPorts.size(), toInputPorts.size(), wireSites);
-		portTile.setSites(portSiteArray);
-		portTile.setWireSites(wireSites);
 	}
 }

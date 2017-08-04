@@ -214,6 +214,7 @@ public final class SiteTemplate implements Serializable {
 		private Collection<BelTemplate> belTemplates;
 		private SiteType[] compatibleTypes;
 		private WireHashMap routing;
+		private WireHashMap reverseWireConnections;
 		private Collection<SitePinTemplate> sources;
 		private Collection<SitePinTemplate> sinks;
 		private Map<Integer, Map<Integer, XdlAttribute>> pipAttributes;
@@ -230,6 +231,7 @@ public final class SiteTemplate implements Serializable {
 			}
 			template.compatibleTypes = compatibleTypes;
 			template.routing = routing;
+			template.reverseWireConnections = reverseWireConnections;
 			if (sources != null) {
 				template.sources = new HashMap<>();
 				for (SitePinTemplate pin : sources) {
@@ -256,6 +258,7 @@ public final class SiteTemplate implements Serializable {
 		repl.belTemplates = belTemplates.values();
 		repl.compatibleTypes = compatibleTypes;
 		repl.routing = routing;
+		repl.reverseWireConnections = reverseWireConnections; 
 		repl.sources = sources.values();
 		repl.sinks = sinks.values();
 		repl.pipAttributes = pipAttributes;
