@@ -387,7 +387,7 @@ public class XdcRoutingInterface {
 				//assert this.pipUsedInRoute;
 			}
 		}
-		
+
 		assert net.sourceSitePinCount() > 0 || implementationMode==ImplementationMode.OUT_OF_CONTEXT : 
 			"Net " + net.getName() + " should have a source site pin. ";
 		net.computeRouteStatus();
