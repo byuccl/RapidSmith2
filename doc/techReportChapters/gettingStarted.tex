@@ -208,7 +208,7 @@ First, start up Vivado in command line mode.  This can be done using the
 ``Vivado Tcl Shell'' program item or by executing ``vivado -mode tcl''.  Once
 the shell has started up, you may execute the following:
                 
-\vspace{-0.15in}  \begin{code}
+\begin{lstlisting}
 	Vivado\% cd <path to directory containing your HDL files>
 	Vivado\% link_design -part xc7a100t-csg324-3
 	Vivado\% read_verilog [glob *.v]
@@ -218,7 +218,7 @@ the shell has started up, you may execute the following:
 	Vivado\% package require tincr
 	Vivado\% tincr::write_rscp myTopLevelEntityName
 	Vivado\% close_project
-\end{code}
+\end{lstlisting}
 Most of the above commands should be self-explanatory and can be adapted to
 compile VHDL or SystemVerilog files.
 Importantly,  you must flatten the design hierarchy when running
