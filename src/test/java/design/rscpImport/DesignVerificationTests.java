@@ -1,4 +1,4 @@
-package design.tcpImport;
+package design.rscpImport;
 /*
  * Copyright (c) 2016 Brigham Young University
  *

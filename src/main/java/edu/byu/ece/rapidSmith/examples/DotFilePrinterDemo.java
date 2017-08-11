@@ -20,7 +20,7 @@
 
 package edu.byu.ece.rapidSmith.examples;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoDesignCheckpoint;
+import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.util.DotFilePrinter;
 
@@ -55,14 +55,14 @@ public class DotFilePrinterDemo {
 		System.out.println("Loading Device and Design...");		
 		// replace with your file location
 		String checkpoint = args[0];
-		VivadoDesignCheckpoint tcp = null;
+		VivadoCheckpoint vcp = null;
 		try {
-			tcp = VivadoInterface.loadRSCP(checkpoint);
+			vcp = VivadoInterface.loadRSCP(checkpoint);
 		} catch (IOException e) {
-			System.err.println("Failed loading TCP");
+			System.err.println("Failed loading RSCP");
 			e.printStackTrace();
 		}
-		CellDesign design = tcp.getDesign();
+		CellDesign design = vcp.getDesign();
 	
 		System.out.println("Printing DOT file...");
 		// testing dot string stuff	

@@ -38,7 +38,7 @@ import edu.byu.ece.rapidSmith.device.Device;
  * @author Thomas Townsend
  *
  */
-public final class VivadoDesignCheckpoint {
+public final class VivadoCheckpoint {
 	
 	private final CellLibrary libCells;
 	private final Device device;
@@ -49,7 +49,7 @@ public final class VivadoDesignCheckpoint {
 	private Collection<Bel> staticSourceBels;
 	private Map<BelPin, CellPin> belPinToCellPinMap;
 
-	public VivadoDesignCheckpoint(String partName, CellDesign design, Device device, CellLibrary libCells) {
+	public VivadoCheckpoint(String partName, CellDesign design, Device device, CellLibrary libCells) {
 		this.partName = partName;
 		this.design = design;
 		this.device = device;

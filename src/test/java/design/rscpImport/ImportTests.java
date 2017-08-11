@@ -1,4 +1,4 @@
-package design.tcpImport;
+package design.rscpImport;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -13,7 +13,7 @@ import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.interfaces.vivado.EdifInterface;
-import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoDesignCheckpoint;
+import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 
 /**
@@ -72,7 +72,7 @@ public class ImportTests {
 	@Test
 	@DisplayName("Simon Series7")
 	public void simonTest() throws IOException {
-		VivadoDesignCheckpoint tcp = VivadoInterface.loadRSCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("simon.rscp").toString());
+		VivadoCheckpoint tcp = VivadoInterface.loadRSCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("simon.rscp").toString());
 		CellDesign design = tcp.getDesign();
 		
 		// test that internal properties were imported correctly

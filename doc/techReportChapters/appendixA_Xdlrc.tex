@@ -1,14 +1,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Appendix A: XDLRC Syntax
 %	This section provides a detailed description of XDLRC files, and their syntax.
-%	Most users of RapidSmith don't need to know the syntax of XDLRC files, but
+%	Most users of RS2 don't need to know the syntax of XDLRC files, but
 % 	this information may be useful to new lab members working on the project.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \appendix
 \section{XDLRC Files and Syntax} \label{sec:appendixXDLRC}
-In general, users of RapidSmith do not need to understand the syntax of XDLRC
-files to create CAD tools in RapidSmith. The syntax is introduced here for those
+In general, users of RS2 do not need to understand the syntax of XDLRC
+files to create CAD tools in RS2. The syntax is introduced here for those
 who are interested, and for those who want to modify the XDLRC parser
 in some way. If these don't apply to you, then go ahead and skip this section.
 XDLRC files are textual descriptions of Xilinx FPGA devices and can be very
@@ -58,7 +58,7 @@ pinwire declared in the example above is the BX input pin which is the internal
 name to the SLICEL primitive site. Pinwires have an external name as well to
 differentiate the multiple primitive sites that may be present in the same
 tile. In this case, BX of SLICE\_X9Y127 has the external name BX\_PINWIRE3. In
-RapidSmith, only the first pin name (i.e. BX above) is used.
+RS2, only the first pin name (i.e. BX above) is used.
 
 \bigbreak \noindent
 \begin{large}
@@ -80,7 +80,7 @@ by ``conn'') are described using the unique tile name and wire name of that tile
 to denote connectivity. The connections are not programmable, but hard wired
 into the FPGA. Wire portions of the XDLRC file are included in the definition of
 every tile (even if the same tile type has already been printed), which has a
-big impact on the final size of XDLRC files. How RapidSmith handles wire
+big impact on the final size of XDLRC files. How RS2 handles wire
 duplication is described in \autoref{wireEnum}. The \cls{WireConnection}
 objects that are created from this part of the XDLRC are described in
 \autoref{wireConnSection}.
@@ -106,7 +106,7 @@ declares that the wire ``BEST\_LOGIC\_OUTS0'' can drive the wire
 ``BYP\-\_INT\_B5''. A collection of these PIPs in a net define how a net is
 routed and is consistent with saying that those PIPs are “turned on.”
 \autoref{wireConnSection} describes in detail how PIPs are represented in
-RapidSmith.
+RS2.
 
 \bigbreak \noindent
 \begin{large}
@@ -129,10 +129,10 @@ and how they are connected. This includes:
 \end{itemize}
 
 \noindent An example of a complete primitive definition file of type BUFHCE can
-be seen in \autoref{fig:xdlrcDef}. The sub-site data structures in RapidSmith
+be seen in \autoref{fig:xdlrcDef}. The sub-site data structures in RS2
 (\cls{Bels}, \cls{SiteWire}s, etc.) are built by parsing this section of the
 XDLRC file. For a more detailed description of primitive definitions, view the
-VSRT User Guide in the RapidSmith2 repository.
+VSRT User Guide in the RS2 repository.
 
 \begin{figure}[H]
 	\centering

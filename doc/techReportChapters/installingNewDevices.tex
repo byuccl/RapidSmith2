@@ -1,29 +1,29 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Section 10: Installing New Devices
 %	This section provides a detailed walkthrough on how to install new devices
-%	to be used in RapidSmith.
+%	to be used in RS2.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \section{Installing New Device Files} \label{sec:installingDeviceFiles}
-The device files included with the RapidSmith2 installation (listed in
+The device files included with the RS2 installation (listed in
 \autoref{sec:supportedDevices}) have been well-tested, and are great starting
 points for new users. If you are a new user, it is \emph{strongly encouraged}
-that you learn RapidSmith's APIs and data structures by first implementing CAD tools on
-these devices. However, RapidSmith2 also supports installing new device files
+that you learn RS2's APIs and data structures by first implementing CAD tools on
+these devices. However, RS2 also supports installing new device files
 for parts not listed in \autoref{sec:supportedDevices}. This section contains
 the following: (1) a description of the required intermediate files that need to be
 generated from \texttt{Tincr} to support a new device, and (2) the necessary
 steps to transform the intermediate files into compact device files that can be
-loaded into RapidSmith2.
+loaded into RS2.
 
 \subsection {XDLRC}
-The \texttt{Device} data structures in RapidSmith are mainly created from XDLRC
+The \texttt{Device} data structures in RS2 are mainly created from XDLRC
 files. XDLRC files contain a complete physical description of a Xilinx device
 (including tiles, wires, sites, etc.). For older Xilinx parts (series 7 and
 below), these files can be created in ISE with the \texttt{xdl} command. For
 newer parts (UltraScale and above), XDLRC files can be created in Vivado using
 the \texttt{Tincr} command \textit{tincr::write xdlrc}. Because XDLRC files can
-grow to be hundreds of Gigabytes in size, RapidSmith compresses them into much smaller device files
+grow to be hundreds of Gigabytes in size, RS2 compresses them into much smaller device files
 (usually in the tens of Megabytes). \autoref{sec:appendixXDLRC} contains a more
 detailed description of XDLRC syntax for those who are interested.
 
@@ -35,7 +35,7 @@ UltraScale, Virtex UltraScale, Kintex UltraScale+, and Virtex UltraScale+. Only
 one \textit{familyInfo.xml} file is required for each of these families (all 
 devices within a family share the same family info). The remainder of this
 section describes the important parts of a \textit{familyInfo.xml} file, and how
-they are represented in RapidSmith2.
+they are represented in RS2.
 
 \begin{itemize}
   \item A list of \textbf{compatible types} for each site. Site A is said to be
@@ -65,7 +65,7 @@ they are represented in RapidSmith2.
   
   \item A list of \textbf{routethrough connections} for each LUT BEL (including
   the input bel-pin and output bel-pin of the routethrough). These routethrough
-  connections are turned into \texttt{Connection} objects in RapidSmith2 that
+  connections are turned into \texttt{Connection} objects in RS2 that
   can be used for internal site routing. Sections \ref{sec:routing} and
   \ref{sec:additionalInfo} give more information about LUT routethroughs.
   
@@ -75,7 +75,7 @@ they are represented in RapidSmith2.
   BITSLICE\_RX\_TX site is shown in \autoref{fig:alternateTypes}. As the figure
   shows, a BITSLICE\_RX\_TX site can also be configured to be of type
   BITSLICE\_COMPONENT\_RX\_TX, BITSLICE\_RXTX\_RX, or BITSLICE\_RXTX\_TX.
-  RapidSmith2 parses the alternate site information from the XML and applies it
+  RS2 parses the alternate site information from the XML and applies it
   to the corresponding \texttt{Site} data structure. This allows users to change
   site types based on what they need.
   
@@ -87,10 +87,10 @@ they are represented in RapidSmith2.
   \end{figure}
   
   \item A list of \textbf{site pip corrections}. In the XDLRC files that are
-  parsed into RapidSmith, site pips (or routing muxes) are not distinguished
+  parsed into RS2, site pips (or routing muxes) are not distinguished
   from the functional BELs (such as LUTs and Flip Flops) of a site. The
   Family Info XML identifies the site pips of a site and marks them as either
-  a ``mux'' or a ``polarity\_selector.'' RapidSmith2 transforms these routing
+  a ``mux'' or a ``polarity\_selector.'' RS2 transforms these routing
   muxes into individual pips as shown in \autoref{fig:sitePipDecomposition} so
   that they are no longer represented as BELs. After the decomposition, each pip
   is a routing resource of the site.
@@ -98,7 +98,7 @@ they are represented in RapidSmith2.
   \begin{figure}[H]
     \centering
     \includegraphics[width=.5\columnwidth]{sitePipDecomposition.png}
-    \caption{RapidSmith2 site pip decomposition.}
+    \caption{RS2 site pip decomposition.}
     \label{fig:sitePipDecomposition}
   \end{figure}
   
@@ -106,16 +106,16 @@ they are represented in RapidSmith2.
   files, all bel-pins are given a direction of either INPUT or OUTPUT. However,
   there are several bel-pins in Xilinx devices that are actually of direction
   INOUT (bidirectional). The Family Info file marks INOUT bel-pins so that
-  their direction can be corrected in RapidSmith2.
+  their direction can be corrected in RS2.
   
 \end{itemize}
 
 \subsection{Creating New Device Files for Supported Families} \label{sec:creatingNewSupportedDevices} 
 Subsection \ref{sec:supportedDevices} gives a list of currently supported
-families in RapidSmith2. If the device you want to install is \textbf{not} within a
+families in RS2. If the device you want to install is \textbf{not} within a
 supported family, see \autoref{sec:newFamilies} for how to add support for a
-new family in RapidSmith. Otherwise, a new device file can be added in two easy
-steps:
+new family in RS2. Otherwise, a new device file can be added in four
+easy steps:
 
 \begin {enumerate}
 \item Open Vivado in Tcl mode, and execute the \texttt{Tincr} command
@@ -123,7 +123,7 @@ steps:
 Artix7 part \textit{xc7a100tcsg324-3}.
 
 \begin{lstlisting}[numbers=none]
-[ttown523@CB461-EE09968:˜] vivado -mode tcl
+[ttown523@CB461-EE09968:ï¿½] vivado -mode tcl
 
 ****** Vivado v2014.2 (64-bit)
  **** SW Build 928826 on Thu Jun 5 17:55:10 MDT 2014
@@ -143,16 +143,16 @@ your regular work machine. Also, be aware that these XDLRC files are massive. 10
 for the largest XDLRC files is not uncommon. Make sure you have enough space on
 your hard drive before generating the XDLRC for a device.
 
-\item Run the device installer in RapidSmith2 and pass the newly created XDLRC
+\item Run the device installer in RS2 and pass the newly created XDLRC
 as an argument. An example command line usage is shown below. The device
 installer can also be run in an IDE.
 
 \begin{lstlisting}[numbers=none]
-[ttown523@CB461-EE09968:˜] java -ea -Xmx4096m edu.byu.ece.rapidSmith.util.Installer --generate file xc7a100tcsg324_full.xdlrc
+[ttown523@CB461-EE09968:ï¿½] java -ea -Xmx4096m edu.byu.ece.rapidSmith.util.Installer --generate file xc7a100tcsg324_full.xdlrc
 \end{lstlisting} 
 
 \noindent The device installer parses the verbose XDLRC file, and creates
-compact RapidSmith device files (Megabytes instead of Gigabytes) that represent
+compact RS2 device files (Megabytes instead of Gigabytes) that represent
 a Xilinx device. Notice the two JVM command line arguments used in the command
 above. The first option (``-ea'') enables assertions for the code. It is important
 to include this flag so that device file errors can be caught during parsing.
@@ -165,7 +165,7 @@ If the device installer fails with an out of memory exception, you will
 need to increase the number of this parameter and re-run the installer (you may
 need up to 32 GB of memory here). Once the device installer is done executing,
 the compact devices files are stored in the corresponding family directory of
-the RapidSmith2 ``devices'' folder. For example, the device files generated
+the RS2 ``devices'' folder. For example, the device files generated
 from the example part \textit{xc7a100tcsg324-3} are stored in the ``artix7''
 sub-directory. The listing below shows the two device files that are created
 after the device installer has completed (the device files are bolded).
@@ -176,23 +176,62 @@ cellLibrary.xml familyInfo.xml |\textbf{xc7a100tcsg324\_db.dat}| |\textbf{xc7a10
 \end{lstlisting} 
 
 \noindent  The file ending in ``\_db.dat''
-contains the serialized \texttt{Device} data structures for RapidSmith. The file
+contains the serialized \texttt{Device} data structures for RS2. The file
 ending in ``\_info.dat'' contains additional serialized data (such as reverse
 wire connections) that can be optionally loaded with the device.
 
-\item Run the Family Builder in RapidSmith2 and pass your part as the command
+\item Run the Family Builder in RS2 and pass your part as the command
 line argument. An example usage is shown below for an Artix7 device.
 
 \begin{lstlisting}[numbers=none]
-[ttown523@CB461-EE09968:˜] java edu.byu.ece.rapidSmith.util.FamilyBuilders xc7a100tcsg324
+[ttown523@CB461-EE09968:ï¿½] java edu.byu.ece.rapidSmith.util.FamilyBuilders xc7a100tcsg324
 \end{lstlisting}
 
 \noindent An Artix7.java (or whatever family your device is in) will already
 exist, but will be updated with new sites and tile types from your newly
 installed part.
+
+\item Finally, you need a   \textit{cellLibrary.xml} file to go with your
+device.  As described in Section~\ref{sec:cellLibraryinDesignSection} this is
+required to work with a design for a particular device.  Also, 
+Section~\ref{sec:cellLibraryinDesignSection} describes that, although the same 
+\textit{cellLibrary.xml} file should work for a given family, the safe approach
+(it is known to always work) is to generate a device-specific
+\textit{cellLibrary.xml} file each time you create a new device file.
+
+This can be done in a few easy steps (the
+items marked with \textbf{SERIES7} only need to be done for series7 families).
+
+\begin{enumerate}
+  \item Open Vivado in Tcl mode, and type the following into the console:
+  \begin{code}
+::tincr::create_xml_cell_library xc7a100tcsg324-3 mycellLibrary.xml
+  \end{code}
+  Replace ``xc7a100tcsg324-3'' with the part you want to generate and
+  ``mycellLibrary.xml'' with the location where you want to store the generated
+  cell library XML. This will generate most of what you need in the cell library
+  XML automatically.
+  \item \textbf{SERIES7}: Open the generated XML file in a text editor and
+  search for the ``CARRY4'' cell. Scroll down to the ``bels'' XML element within
+  the CARRY4 cell, and add the following lines to each pin that is named ``CI'':
+  
+  \begin{figure}[H]
+   \centering
+   \includegraphics[width=.9\columnwidth]{cellLibHandEdit.png}
+  \end{figure}
+  
+  You should have to insert this line in two places only.
+  \item Save your changes and exit the text editor
+  \item Copy the XML file to \textit{RapidSmithPath/device/family}
+  directory where ``family'' is replaced by the family of your part (such as
+  artix7), and ``RapidSmithPath'' is the location of your RS2 repository.
+  Once this is complete the new \cls{CellLibrary} should be ready to use. 
 \end{enumerate}
 
-\noindent After running these steps, the part is ready to be used in RapidSmith.
+\end{enumerate}
+
+
+\noindent After running these steps, the part is ready to be used in RS2.
 See \autoref{sec:loadingDevice} for how to load the device and begin using it.
 
 \subsection{Supporting New Device Families} \label{sec:newFamilies}
@@ -214,8 +253,8 @@ Vivado supports implementing FPGA designs on devices for the following families
 \end{multicols}
 
 \noindent The name in parentheses is the Vivado Tcl name for the family. Bolded
-items are families that are currently supported in RapidSmith2 and
-\texttt{Tincr}. To add RapidSmith support for another Vivado family, follow the
+items are families that are currently supported in RS2 and
+\texttt{Tincr}. To add RS2 support for another Vivado family, follow the
 steps listed below.
 
 \begin {enumerate}
@@ -247,7 +286,7 @@ steps listed below.
    is shown below for Kintex UltraScale. 
    
 \begin{lstlisting}[numbers=none]
-[ttown523@CB461-EE09968:˜] vivado -mode tcl
+[ttown523@CB461-EE09968:ï¿½] vivado -mode tcl
 
 ****** Vivado v2014.2 (64-bit)
  **** SW Build 928826 on Thu Jun 5 17:55:10 MDT 2014
@@ -281,7 +320,7 @@ Vivado% ::tincr::create_xml_family_info familyInfo.xml kintexu addedBels.txt
     
     \noindent Due to complications with Vivado's Tcl interface, there are
     several hand edits that are required to complete the series7 family info
-    files. RapidSmith2 already provides support for all series7 families, 
+    files. RS2 already provides support for all series7 families, 
     but the required manual edits are documented here in case they need to
     be regenerated for some reason. 
     
@@ -435,13 +474,13 @@ Vivado% select $site
 	sites. It is up to you to determine what compatible sites need to be added
 	through experimentation.
     	 
-	\item Generate an XDLRC file from \texttt{Tincr} and RapidSmith2 device
+	\item Generate an XDLRC file from \texttt{Tincr} and RS2 device
 	files using the steps shown in \autoref{sec:creatingNewSupportedDevices}.
 	    
-	\item Run the Family Builder in RapidSmith2. An example usage is shown below.
+	\item Run the Family Builder in RS2. An example usage is shown below.
 
 \begin{lstlisting}[numbers=none]
-[ttown523@CB461-EE09968:˜] java edu.byu.ece.rapidSmith.util.FamilyBuilders xc7a100tcsg324
+[ttown523@CB461-EE09968:ï¿½] java edu.byu.ece.rapidSmith.util.FamilyBuilders xc7a100tcsg324
 \end{lstlisting}
 
 	\noindent The Family Builder accepts one command line argument: a part name of
@@ -507,7 +546,7 @@ TileType tileType = Artix7.TileTypes.CLBLL_L;
 \end{enumerate}
 
 
-\noindent After these steps are complete, RapidSmith2 will have full support for
+\noindent After these steps are complete, RS2 will have full support for
 the generated family. This means that device files for any part within the
 family can now be created.
  

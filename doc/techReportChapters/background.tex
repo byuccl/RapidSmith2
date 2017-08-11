@@ -116,14 +116,15 @@ and importing/exporting designs to/from Vivado is now fully supported.
 \subsection{RS2 Usage Model and Structure}
 The usage model for RS2 is shown in \autoref{fig:UsageModels}.  As can be
 seen, a design can be exported from Vivado at multiple different points in the
-Vivado design flow.  In each case, Tincr is used to export a Tincr Checkpoint
-which can then be imported into RS2.  At those same points in the design flow,
-RS2 can export a Tincr Checkpoint which can then be imported back into Vivado. 
+Vivado design flow.  In each case, Tincr is used to export a RapidSmith
+Checkpoint (RSCP)) which can then be imported into RS2.  At those same points in
+the design flow, RS2 can export a Tincr Checkpoint (TCP) which can then be
+imported back into Vivado.
 Thus, a complete solution involves Vivado, Tincr, and RS2.
 
 \begin{figure}[htb]
 \centering
-\includegraphics[width=\columnwidth]{UsageModels}
+\includegraphics[width=\columnwidth]{UsageModels2}
 \caption{Vivado and RS2 Usage Model}
 \label{fig:UsageModels}
 \end{figure} 

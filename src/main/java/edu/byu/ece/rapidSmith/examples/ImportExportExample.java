@@ -23,7 +23,7 @@ package edu.byu.ece.rapidSmith.examples;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoDesignCheckpoint;
+import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import org.jdom2.JDOMException;
 
@@ -52,7 +52,7 @@ public class ImportExportExample {
 
 		// Load in in a TINCR checkpoint
 		System.out.println("Loading Design...");
-		VivadoDesignCheckpoint vcp = VivadoInterface.loadRSCP(checkpointIn);
+		VivadoCheckpoint vcp = VivadoInterface.loadRSCP(checkpointIn);
 		
 		// Get the pieces out of the checkpoint for use in manipulating it
 		CellDesign design = vcp.getDesign();

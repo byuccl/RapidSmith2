@@ -24,7 +24,7 @@ package edu.byu.ece.rapidSmith.examples.placerDemo;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoDesignCheckpoint;
+import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.util.MessageGenerator;
 import joptsimple.OptionException;
@@ -65,25 +65,25 @@ public class PlacerDemo {
 	
 	//List of Benchmarks
 	//-------------
-	// seven_seg.tcp (629_checkpoints)
-	// bram_dsp.tcp
-	// tx.tcp
-	// cordic.tcp
-	// leon3.tcp
-	// fht.tcp
-	// diffeq2.tcp
-	// hilbert.tcp
-	// vga_chargen.tcp (629_checkpoints/Final)
-	// jpeg.tcp 
-	// fir.tcp
-	// counter16bit.tcp (Research/Tincr)
-	// 5bit_adder.tcp
+	// seven_seg.rscp (629_checkpoints)
+	// bram_dsp.rscp
+	// tx.rscp
+	// cordic.rscp
+	// leon3.rscp
+	// fht.rscp
+	// diffeq2.rscp
+	// hilbert.rscp
+	// vga_chargen.rscp (629_checkpoints/Final)
+	// jpeg.rscp 
+	// fir.rscp
+	// counter16bit.rscp (Research/Tincr)
+	// 5bit_adder.rscp
 	public static void main(String[] args) throws IOException {
 		
 		// Parse the input arguments
 		ArrayList<String> pathArgs = new ArrayList<>();
 		boolean interactiveMode = parseArgs(args, pathArgs);
-		String tcpDirectory = pathArgs.get(0);
+		String rscpDirectory = pathArgs.get(0);
 		String vivadoInstanceDirectory = pathArgs.size() == 2 ? pathArgs.get(1) : ".";
 		
 		// Load device and design
@@ -91,25 +91,25 @@ public class PlacerDemo {
 		classSetup();
 		
 		System.out.println("Loading Design...");
-		VivadoDesignCheckpoint tcp = VivadoInterface.loadRSCP(tcpDirectory);
+		VivadoCheckpoint vcp = VivadoInterface.loadRSCP(rscpDirectory);
 		
-		CellDesign design = tcp.getDesign();
+		CellDesign design = vcp.getDesign();
 		
 		// create a stream to vivado if in interactive mode
-		BufferedWriter out = (interactiveMode) ? createVivadoOutputStream(tcpDirectory, vivadoInstanceDirectory) : null;
+		BufferedWriter out = (interactiveMode) ? createVivadoOutputStream(rscpDirectory, vivadoInstanceDirectory) : null;
 		
 		// Run the placer
 		System.out.println("Placing Design...");
 		SimulatedAnnealingPlacer placer = new SimulatedAnnealingPlacer(device, design);
 		if (interactiveMode) {
-			placer.setVivadoOutputStream(out, tcpDirectory);
+			placer.setVivadoOutputStream(out, rscpDirectory);
 		}
 		placer.placeDesign();
 		
 		// Export the design to a TCP file
 		System.out.println("Exporting Placed Design...");
-		VivadoInterface.writeTCP(tcpDirectory, design, tcp.getDevice(), tcp.getLibCells());
-		System.out.println("Successfully added placement constraints to TINCR checkpoint: " + tcpDirectory);
+		VivadoInterface.writeTCP(rscpDirectory, design, vcp.getDevice(), vcp.getLibCells());
+		System.out.println("Successfully added placement constraints to TINCR checkpoint: " + rscpDirectory);
 		
 		if (interactiveMode) {
 			out.close();
@@ -163,7 +163,7 @@ public class PlacerDemo {
 		
 		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(vivadoProcess.getOutputStream()));		
 		
-		// read the netlist and the constraints file for the tcp, and loas the design
+		// read the netlist and the constraints file for the rscp, and loas the design
 		out.write("read_edif -quiet " + Paths.get(tcpDirectory, "netlist.edf").toString().replace("\\", "/") + "\n");
 		out.flush();
 		

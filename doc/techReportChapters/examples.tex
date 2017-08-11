@@ -22,9 +22,9 @@ programs, a small set of pre-compiled Vivado designs have been included in the
 distribution. They are located in the \dir{exampleVivadoDesigns} directory of
 the repository, and consist of 3 designs: 
 \begin{itemize}
-\item \textbf{add.tcp}: synthesized only
-\item \textbf{cordic.tcp}: synthesized and placed
-\item \textbf{count16.tcp}: synthesized, placed and routed
+\item \textbf{add.rscp}: synthesized only
+\item \textbf{cordic.rscp}: synthesized and placed
+\item \textbf{count16.rscp}: synthesized, placed and routed
 \end{itemize} 
 There is a sample design to demonstrate each possible tool flow between Vivado
 and RS2. Equivalent Vivado checkpoints files (.dcp) are also included in
@@ -46,7 +46,7 @@ mode, and type the following commands to re-build one of the example designs.
 	Vivado\% close_project
 \end{code}
 This will synthesize, place, and route a design and, from that compiled
-design, generate the \dir{.tcp} directory and the \fil{.dcp} file. For example
+design, generate the \dir{.rscp} directory and the \fil{.dcp} file. For example
 programs that only explore the architecture, opening the device browser in
 Vivado can also be helpful.
 
@@ -94,13 +94,13 @@ includes how to query for and print tiles in a device, how to use wires and
 wire connections, and other useful device functions.
 
 \subsection{\pgm{ImportExportExample}} \label{sec:importExportExample}
-The ImportExportExample demonstrates how to load a Tincr checkpoint into
-RapidSmith, and how to export a RapidSmith netlist back into a Tincr
-checkpoint. This is a very important step in passing digital designs back
-and forth between Vivado and RapidSmith.
+The ImportExportExample demonstrates how to load a RapidSmith Checkpoint
+(RSCP) into RS2, and how to export a RS2 design back into a Tincr
+Checkpoint (TCP). This is a very important step in passing digital designs back
+and forth between Vivado and RS2.
 
 \subsection{\pgm{DesignAnalyzer}}
-The DesignAnalyzer loads a Tincr checkpoint into RapidSmith, walks
+The DesignAnalyzer loads a RapidSmith Checkpoint into RS2, walks
 the design data structures, and prints what it finds as it goes in a
 readable format. As such, it provides a nice example of a number of things which would
 be useful for getting started with RS2 including:
@@ -114,10 +114,10 @@ be useful for getting started with RS2 including:
 \end{itemize}
 
 \subsection{CreateDesignExample} \label{sec:createDesignExample}
-The CreateDesignExample program builds a RapidSmith netlist from scratch (using
+The CreateDesignExample program builds a RS2 netlist from scratch (using
 \cells and \cellnets) and then places the design. While this is certainly not
 recommended for substantial designs, it does demonstrate how to do the
-following useful tasks in RapidSmith:
+following useful tasks in RS2:
 
 \begin{itemize}
   \item Create new \cells and add them to an existing netlist
@@ -129,7 +129,7 @@ following useful tasks in RapidSmith:
 
 \subsection{Other Test Programs}
 The programs introduced in this section are designed for beginners of RS2. Once
-you start becoming more comfortable with RapidSmith and its data structures,
+you start becoming more comfortable with RS2 and its data structures,
 there are several other more advanced examples. These examples include the
 \pgm{HandRouter}, \pgm{AStarRouter}, and \pgm{SimulatedAnnealingPlacer}
 programs. See the README.txt file for more information about each of these

@@ -17,7 +17,7 @@
  * RapidSmith Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
  * also get a copy of the license at <http://www.gnu.org/licenses/>.
  */
-package design.tcpImport;
+package design.rscpImport;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

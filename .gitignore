@@ -23,5 +23,5 @@
 /doc/*.out
 /doc/*.toc
 /doc/*.log
-/doc/*.synctex.gz
+
 /doc/

@@ -47,7 +47,7 @@ public final class VivadoInterface {
 
 	private static final String CELL_LIBRARY_NAME = "cellLibrary.xml";
 	
-	public static VivadoDesignCheckpoint loadRSCP(String rscp) throws IOException {
+	public static VivadoCheckpoint loadRSCP(String rscp) throws IOException {
 		return loadRSCP(rscp, false);
 	}
 	
@@ -58,7 +58,7 @@ public final class VivadoInterface {
 	 * @throws InvalidEdifNameException 
 	 * @throws EdifNameConflictException 
 	 */
-	public static VivadoDesignCheckpoint loadRSCP (String rscp, boolean storeAdditionalInfo) throws IOException {
+	public static VivadoCheckpoint loadRSCP (String rscp, boolean storeAdditionalInfo) throws IOException {
 	
 		Path rscpPath = Paths.get(rscp);
 		
@@ -99,15 +99,15 @@ public final class VivadoInterface {
 		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap());
 		routingInterface.parseRoutingXDC(routingFile);
 		
-		VivadoDesignCheckpoint tincrCheckpoint = new VivadoDesignCheckpoint(partName, design, device, libCells); 
+		VivadoCheckpoint vivadoCheckpoint = new VivadoCheckpoint(partName, design, device, libCells); 
 		
 		if (storeAdditionalInfo) {
-			tincrCheckpoint.setRoutethroughBels(routingInterface.getRoutethroughsBels());
-			tincrCheckpoint.setStaticSourceBels(routingInterface.getStaticSourceBels());
-			tincrCheckpoint.setBelPinToCellPinMap(placementInterface.getPinMap());
+			vivadoCheckpoint.setRoutethroughBels(routingInterface.getRoutethroughsBels());
+			vivadoCheckpoint.setStaticSourceBels(routingInterface.getStaticSourceBels());
+			vivadoCheckpoint.setBelPinToCellPinMap(placementInterface.getPinMap());
 		}
 		
-		return tincrCheckpoint;
+		return vivadoCheckpoint;
 	}
 	
 	/**

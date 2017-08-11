@@ -124,7 +124,7 @@ example of a switchbox.
 In the original RapidSmith, the \cls{Device} architecture stopped at the
 \cls{Site} level. A \cls{Site} was considered a black box who could be
 configured using string attributes, but the actual components were unknown.
-RapidSmith 2 extends the \cls{Device} architecture to include all components
+RS2 extends the \cls{Device} architecture to include all components
 \pgm{within} a \cls{Site} as well. \autoref{fig:deviceDataStructures}
 shows the new device data structure hierarchy, which can be found in the {\em
 edu.byu.ece.rapidSmith.device} package.
@@ -132,17 +132,17 @@ edu.byu.ece.rapidSmith.device} package.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=1\columnwidth]{deviceDS.eps}
-	\caption{RapidSmith2 \cls{Device} data structure tree. Green arrows represent
+	\caption{RS2 \cls{Device} data structure tree. Green arrows represent
 	inheritance, and black arrows represent association. Classes and Interfaces
-	bolded in blue are new to RapidSmith 2.}
+	bolded in blue are new to RS2.}
 	\label{fig:deviceDataStructures}
 \end{figure}
 
 \noindent
 The classes and interfaces within {\em edu.byu.ece.rapidSmith.device} are named
 to reflect the terminology used by Xilinx. Many classes that exist in Vivado's
-Tcl interface have a direct map to a class in RapidSmith (such as a \cls{Tile}).
-Because of this, most RapidSmith data structures represent a straightforward
+Tcl interface have a direct map to a class in RS2 (such as a \cls{Tile}).
+Because of this, most RS2 data structures represent a straightforward
 part of a Xilinx FPGA, The reader is referred to the documentation in the
 source code to learn more about each data structure. Also, The
 \pgm{DeviceBrowser} and \pgm{DeviceAnalyzer} programs described in 
@@ -151,16 +151,16 @@ source code to learn more about each data structure. Also, The
 
 \subsubsection{Templates}
 As \autoref{fig:deviceDataStructures} shows, there are several template
-classes in RapidSmith. Template classes are used to specify the configuration of
+classes in RS2. Template classes are used to specify the configuration of
 certain structures only once, and then reuse the configuration across
 identical objects. The usefulness of templates is best shown with an example. In
 an Artix-7 {\em xc7a100tcsg324} part, there are 11,100 \cls{Site}s of type
 SLICEL. Each of these SLICELs have 215 \cls{BEL}s, \cls{Site} \cls{Pin}s, and
-\cls{Site} \cls{PIP}s combined. In order to save memory, RapidSmith
+\cls{Site} \cls{PIP}s combined. In order to save memory, RS2
 lazily creates these objects only when a SLICEL \cls{Site} is being used. The
 alternative would be to create each of the objects when a device is loaded.
 Template classes should \pgm{NOT} be used by the normal user. When creating
-algorithms using RapidSmith's API, use the non-template version of classes.
+algorithms using RS2's API, use the non-template version of classes.
 
 \subsubsection{WireEnumerator} \label{wireEnum}
 Wires with the same name can occur several times throughout a Xilinx FPGA
@@ -168,12 +168,12 @@ device. For example, the wire ``CLBLL\-\_L\_C2'' exists in every \cls{Tile} of
 type ``CLBLL\_L''. In order to make the device files small, each uniquely named \cls{Wire}
 is assigned an integer enumeration. This avoids moving strings around in
 memory which would be costly in terms of both space and comparison times.
-RapidSmith manages all uniquely named wires in an FPGA family with a
+RS2 manages all uniquely named wires in an FPGA family with a
 \cls{WireEnumerator}. The \cls{WireEnumerator} class has methods that convert to
 and from the wire name and enumeration of a \cls{Wire}, and also stores other
 \cls{Wire} information such as direction and type. In previous versions of
 RapidSmith, the user had to use the \cls{WireEnumerator} extensively while
-building CAD tools. RapidSmith 2 has changed this, largely abstracting the
+building CAD tools. RS2 has changed this, largely abstracting the
 \cls{WireEnumerator} away in favor of more convenient methods in all classes and
 interfaces that deal with \cls{Wire}s. For example, the name or enumeration of a
 \cls{Wire} can now be obtained with the function calls {\em Wire.getWireName()}
@@ -182,10 +182,10 @@ and {\em Wire.getWireEnum()} respectively. A handle to the
 want to use it, but this is not recommended. 
 
 \subsubsection{TileWire and SiteWire} \label{wires}
-\cls{Wire}s in RapidSmith are uniquely identified not only by their name
+\cls{Wire}s in RS2 are uniquely identified not only by their name
 (or enumeration), but also by the \cls{Tile} or \cls{Site} in which they exist.
-RapidSmith 2 introduces the \cls{TileWire} and \cls{SiteWire} classes to
-encapsulate this information for the user. Many functions in RapidSmith now
+RS2 introduces the \cls{TileWire} and \cls{SiteWire} classes to
+encapsulate this information for the user. Many functions in RS2 now
 return a \cls{TileWire} or \cls{SiteWire} (wrapped in a generic \cls{Wire}
 object) to the user instead of an integer wire enumeration.
 
@@ -193,16 +193,16 @@ object) to the user instead of an integer wire enumeration.
 As \autoref{fig:deviceDataStructures} shows, there are two classes that
 inherit the \cls{Wire} interface (described in \autoref{wires}) and
 three classes that inherit the \cls{Connection} interface (described in 
-\autoref{otherConns}). In general, most methods in RapidSmith return the
+\autoref{otherConns}). In general, most methods in RS2 return the
 generic interface instead of the subclasses. When creating CAD tools in
-RapidSmith, it is suggested that the user use these interfaces. Several of the
+RS2, it is suggested that the user use these interfaces. Several of the
 examples referenced in \autoref{examples} demonstrate the use of these
 interfaces.
 
 \subsection{Loading a Device} \label{sec:loadingDevice}
 
 The code sample below demonstrates how to load a supported device in
-RapidSmith2.
+RS2.
 
 \begin{lstlisting}[caption=Loading a Device, label=code:loadDevice]
 Device device = RSEnvironment.defaultEnv().getDevice("xc7a100tcsg324");
@@ -215,11 +215,11 @@ has not yet been loaded. If it has been loaded, then the cached \texttt{Device}
 data structure will be returned. The second function call will reload the device from
 disk, creating a completely separate \texttt{Device} data structure. This is
 useful when implementing multi-threaded code that targets the same part.
-\textbf{NOTE:} When a Vivado design is loaded into RapidSmith2 via a RSCP, the
+\textbf{NOTE:} When a Vivado design is loaded into RS2 via a RSCP, the
 corresponding device is also loaded.
 
 \subsection{Supported Device Files} \label{sec:supportedDevices}
-RapidSmith2 currently supports the following device families and parts.
+RS2 currently supports the following device families and parts.
 
 \begin {itemize}
   \item Artix7 
@@ -233,4 +233,4 @@ RapidSmith2 currently supports the following device families and parts.
 \end{itemize}
 
 \noindent Section \ref{sec:installingDeviceFiles} describes how to install new
-RapidSmith2 device files if you wish to add to this list. 
+RS2 device files if you wish to add to this list. 

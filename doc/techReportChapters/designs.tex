@@ -1,8 +1,8 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+;%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Section 5: Xilinx Designs
 %	This section contains a description of the following:
 %	- Vivado FPGA designs and netlists (with terminology)
-%	- Design data structures in RapidSmith, 
+%	- Design data structures in RS2, 
 %	- Cell Libraries and how to generate new cell libraries  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
@@ -19,7 +19,7 @@ can be found
 \href{http://www.xilinx.com/support/documentation/sw_manuals/xilinx2016_2/ug953-vivado-7series-libraries.pdf}{\color{blue}{here}}
 for 7 Series devices and
 \href{http://www.xilinx.com/support/documentation/sw_manuals/xilinx2014_1/ug974-vivado-ultrascale-libraries.pdf}{\color{blue}{here}}
-for Ultrascale devices. It is suggested that users of RapidSmith become
+for Ultrascale devices. It is suggested that users of RS2 become
 familiar with the primitives found in these documents, and how they are used.
 The primitives of a Xilinx netlist are wired together to create a digital
 circuit (such as an 32-bit adder) capable of being implemented on an FPGA.
@@ -67,22 +67,22 @@ a Xilinx netlist is purely logical, there is no physical information within the
 netlist (i.e. there is not information about where the \cls{Cell}s have been
 placed, or how the \cls{Net}s have been routed). When exporting a design from
 Vivado, the Xilinx netlist representation is converted to EDIF. In order to
-recreate the design in RapidSmith, the EDIF file is parsed and converted to a
+recreate the design in RS2, the EDIF file is parsed and converted to a
 custom netlist structure described in the next section.
 
 \subsection {RS2 Netlist Data Structures} \label{sec:designDS}
 
-RapidSmith netlists are modeled closely after Xilinx netlists. In fact,
+RS2 netlists are modeled closely after Xilinx netlists. In fact,
 much of the terminology between the two are identical or very similar. For those
 that are familiar with Vivado designs, this should make the transition to
-RapidSmith straightforward. The data structures that constitute a RapidSmith
+RS2 straightforward. The data structures that constitute a RS2
 netlist can be found in the package \pkg{byu.edu.ece.rapidSmith.design.subsite}.
 The package hierarchy can be seen in \autoref{fig:designDS}.
 
 \begin{figure}[H]
  \centering
  \includegraphics[width=.6\columnwidth]{designDS.eps}
- \caption{RapidSmith 2 design data structure tree. Black arrows represent
+ \caption{RS2 design data structure tree. Black arrows represent
  composition (i.e. a \cls{CellDesign} contains an array of \cls{CellNet}s and
  an array of \cls{Cell}s). Green arrows represent inheritance (i.e. a
  \cls{CellPin} can be either a \cls{BackedCellPin} or a
@@ -93,9 +93,9 @@ The package hierarchy can be seen in \autoref{fig:designDS}.
 \end{figure}
 
 \noindent
-A \cls{CellDesign} is the top level design object in RapidSmith. It consists of
-a collection of \cls{Cell} objects, interconnected by \cls{CellNet}s. RapidSmith
-\cls{Cell}s are equivalent to Xilinx \cls{Cell}s and RapidSmith \cls{CellNet}s
+A \cls{CellDesign} is the top level design object in RS2. It consists of
+a collection of \cls{Cell} objects, interconnected by \cls{CellNet}s. RS2
+\cls{Cell}s are equivalent to Xilinx \cls{Cell}s and RS2 \cls{CellNet}s
 are equivalent to Xilinx \cls{Net}s. \cls{Cell} objects have a template
 \cls{LibraryCell}, which represents a Xilinx primitive. They also have a
 collection of \cls{CellPin}s, which can be thought of as \cls{Cell} IO. 
@@ -112,9 +112,9 @@ important aspects of each class is included in the following subsections.
 
 \subsubsection{\cls{CellDesign}}
 As previously mentioned, the \cls{CellDesign} class is the top level netlist
-structure. A Vivado design is converted from a Tincr checkpoint to a
+structure. A Vivado design is converted from a RapidSmith Checkpoint to a
 \cls{CellDesign} on import, and converted from a \cls{CellDesign} to a Tincr
-checkpoint on design export. It contains the following:
+Checkpoint on design export. It contains the following:
 
 \begin{itemize}
   \item A list of uniquely named \cls{Cell}s in the design.
@@ -125,7 +125,7 @@ checkpoint on design export. It contains the following:
   form of \cls{Site} \cls{PIP}s)
   \item A list of XDC constraints imported from Vivado. See \autoref{sec:import}
   for more information about XDC constraints and how they are represented in
-  RapidSmith.
+  RS2.
 \end{itemize}
 
 \noindent
@@ -147,10 +147,10 @@ particular order.
   \cls{Cell} objects. The template is used to save memory when creating several
   \cls{Cell}s of the same type. Whenever a new \cls{Cell} object is created, a
   corresponding \cls{LibraryCell} must be specified in the constructor.
-  \autoref{code:cells} demonstrates how to create a new cell in RapidSmith and
+  \autoref{code:cells} demonstrates how to create a new cell in RS2 and
   filter cells based on their type.
   
-\begin{lstlisting}[caption=How to create new cells in RapidSmith,
+\begin{lstlisting}[caption=How to create new cells in RS2,
 label=code:cells] 
 // You need to have a cell library to create a cell
 CellLibrary libCells = new CellLibrary(RSEnvironment.defaultEnv()
@@ -179,7 +179,7 @@ Stream<Cell> cells = design.getCellsOfType(libCells.get("FDRE"));
   current \cls{Device}. See \autoref{sec:placement} for more information about
   cell placement.
   \item Top-level \cls{Port}s in Vivado (design input/output) are represented as
-  Port \cls{Cell}s in RapidSmith. Specifically, there are three types of port cells: IPORT, 
+  Port \cls{Cell}s in RS2. Specifically, there are three types of port cells: IPORT, 
   OPORT, and IOPORT. The method \texttt{CellDesign.getPorts()} can
   be used to iterate through the port \cls{Cell}s in a design, and the method
   \texttt{Cell.isPort()} can be used to determine if a given \cls{Cell} is
@@ -191,7 +191,7 @@ Stream<Cell> cells = design.getCellsOfType(libCells.get("FDRE"));
 
 \subsubsection{\cls{CellPin}} \label{sec:cellPin}
 
-There are two types of \cls{CellPin} objects in RapidSmith:
+There are two types of \cls{CellPin} objects in RS2:
 (1) \cls{BackedCellPin}s and (2) \cls{PseudoCellPin}s. \cls{BackedCellPin}s are
 straightforward. They represent a \cls{LibraryCellPin}, which is a pin attached
 to the corresponding \cls{LibraryCell} of a \cls{Cell}. These pins are used as
@@ -204,7 +204,7 @@ the \cls{Cell} has been created. They don't affect the functionality of the
 \begin{figure}[H]
  \centering
  \includegraphics[width=.5\columnwidth]{pseudoPin.png}
- \caption{An example where a \cls{PseudoCellPin} in RapidSmith may be needed.
+ \caption{An example where a \cls{PseudoCellPin} in RS2 may be needed.
  Both a \cls{PseudoCellPin} and \cls{BackedCellPin} are pointed out. The red net
  in the image (going into the A6 pin) is the power net (VCC).}
  \label{fig:pseudoPin}
@@ -220,11 +220,11 @@ necessary due to the hardware implementation of LUTs. However, in the
 netlist view of the circuit, the fact that VCC needs to be routed to the A6 pin
 is not at all represented (a \cls{CellNet} can only be connected to
 \cls{CellPin}s). This is where \cls{PseudoCellPin}s are helpful.
-In RapidSmith, a \cls{PseudoCellPin} can be added to the LUT2 cell (called
+In RS2, a \cls{PseudoCellPin} can be added to the LUT2 cell (called
 ``VCCPin''), mapped to the A6 \cls{BelPin}, and attached to the global VCC
 \cls{CellNet}. This gives a more complete view of how the netlist needs to be
 physically implemented. \cls{PseudoCellPin}s are created and added
-automatically to \cls{Cell}s when importing a Tincr checkpoint. If you are
+automatically to \cls{Cell}s when importing a RapidSmith Checkpoint. If you are
 creating \cls{Cell}s from scratch, a \cls{PseudoCellPin} can be added with the
 method call \texttt{Cell.attachPseudoPin(string,PinDirection)}. To determine if
 a \cls{CellPin} is a \cls{PseudoCellPin}, the method call
@@ -279,21 +279,21 @@ is of type INOUT.
 together. Specifically, a \cls{CellNet} connects an output
 \cls{CellPin} to several input \cls{CellPin}s with the purpose of transferring
 a signal from one \cls{Cell} to another. The remainder of this section details
-important aspects about \cls{CellNet}s in RapidSmith.
+important aspects about \cls{CellNet}s in RS2.
 
 \begin{itemize}
   \item \cls{CellNet}s are routed using the \cls{RouteTree} data structure.
-  Routing in RapidSmith is described in more detail in \autoref{sec:routing}.
+  Routing in RS2 is described in more detail in \autoref{sec:routing}.
   \item All \cls{CellNet}s have a \cls{NetType} enumeration. Possible values for
   \cls{NetType} include VCC, GND, and WIRE. VCC is reserved for power nets, GND
   is reserved for ground nets, and WIRE represents all other nets in the design.
   Other \cls{NetType}s could be added to this list in the future (such
   as CLOCK), but for now they are not differentiated.
   \item VCC and GND nets (also called static nets) are treated specially in
-  RapidSmith in two ways. (1) Vivado designs can have multiple nets that
+  RS2 in two ways. (1) Vivado designs can have multiple nets that
   correspond to VCC or GND, but they all logically represent the same thing.
   This representation can be challenging to work with when designing CAD tools.
-  RapidSmith takes a different approach. When a design is imported from Vivado,
+  RS2 takes a different approach. When a design is imported from Vivado,
   all VCC nets are collapsed into a single VCC net that is sourced by a global
   VCC cell (the same applies to GND nets). We have found this representation
   much easier to work with. The function calls \texttt{CellDesign.getVccNet()}
@@ -314,7 +314,7 @@ important aspects about \cls{CellNet}s in RapidSmith.
    \label{fig:staticNetSources}
   \end{figure}
   
-  RapidSmith handles this oddity by allowing \cls{CellNet}s to have more than
+  RS2 handles this oddity by allowing \cls{CellNet}s to have more than
   one RouteTree object associated with it. In the case of
   \autoref{fig:staticNetSources} the GND net would have two \cls{RouteTree}
   objects associated with it, one for each source TIEOFF.
@@ -326,7 +326,7 @@ important aspects about \cls{CellNet}s in RapidSmith.
   in the bullet point above) and (2) nets with multiple drivers (involving IO
   pins). In a Xilinx FPGA, this is most often seen in IOB pads. An example is
   shown in \autoref{fig:iobNet}. The highlighted net can be driven by both the OBUF output, and from an
-  external source. RapidSmith 2 supports nets with multiple drivers. The
+  external source. RS2 supports nets with multiple drivers. The
   function call \texttt{CellNet.getAllSources()} can be used to retrieve all
   possible source \cls{CellPin}s of a net.
   
@@ -356,7 +356,7 @@ important aspects about \cls{CellNet}s in RapidSmith.
 \end{itemize}
 
 \subsubsection{Macro Cells} \label{sec:macros}
-Most cells in RapidSmith or Vivado designs are leaf cells (LUTs, Flip Flops,
+Most cells in RS2 or Vivado designs are leaf cells (LUTs, Flip Flops,
 etc.). However, macro cells can also exist. A macro cell can conceptually be
 thought of as a wrapper for related leaf cells. \autoref{fig:macros} shows an
 example of an ``IOBUF'' macro cell in Vivado, which is a bidirectional buffer.
@@ -374,11 +374,11 @@ As the figure shows, the macro consists of two internal cells: one of type
 into an external macro cell with the name ``MemDB\_IOBUF[0]\_inst'', and wired
 together accordingly. External cell pins of the macro connect to one or more
 internal cell pins. Also, internal nets can exist in macros that connect two
-internal cells together. RapidSmith now supports importing macro cells from
+internal cells together. RS2 now supports importing macro cells from
 Vivado and adding them to a \cls{CellDesign}. \autoref{code:macros} gives a
-brief introduction to using macro in RapidSmith.
+brief introduction to using macro in RS2.
 
-\begin{lstlisting}[caption=How to use macros in RapidSmith,
+\begin{lstlisting}[caption=How to use macros in RS2,
 label=code:macros] 
 // Get a handle to a design and cell library
 CellDesign design = getCellDesign();
@@ -417,17 +417,17 @@ between macro cells and leaf cells.
   cells and internal nets are automatically added to the design as well. You do
   not have to worry about adding these yourself. When a macro cell is removed
   from a \cls{CellDesign}, the internal cells and nets are also removed.
-  \item When a macro cell pin is connected to a \cellnet, RapidSmith
+  \item When a macro cell pin is connected to a \cellnet, RS2
   automatically connects the net to the corresponding internal pins. When a
   macro cell pin is disconnected from a \cellnet, the internal cell pins are
-  disconnected. Nets in RapidSmith only connect to leaf cells (i.e. it is
+  disconnected. Nets in RS2 only connect to leaf cells (i.e. it is
   essentially a flattened netlist).
   \item Internal cells and nets within a macro cannot be individually added or
   removed from a \cls{CellDesign}. An exception will be thrown if you try to do
   this. Instead, the entire macro cell must be added or removed.
   \item Macros cannot be placed. Rather, the internal cells of a macro should be
   placed instead.
-  \item When a \cls{CellDesign} is exported from RapidSmith, macro cells are not
+  \item When a \cls{CellDesign} is exported from RS2, macro cells are not
   exported. Only the internal cells and nets are exported and the macro is not
   rebuilt in Vivado.
 \end{itemize}
@@ -465,12 +465,12 @@ operation of the BRAM is different depending on how this property is set. Anothe
 a D flip flop cell (FDRE) and its ``IS\_C\_INVERTED'' property. This property
 indicates if the flip flop will be rising-edge or falling-edge triggered. On
 design export, the properties of cells, nets, and the top-level design are
-included in the output EDIF netlist of a Tincr Checkpoint (\pgm{if they are not
-the default value}).
+included in the output EDIF netlist of a RapidSmith Checkpoint (\pgm{if they are
+not the default value}).
 
-When RapidSmith parses the EDIF file in a Tincr Checkpoint, the properties
+When RS2 parses the EDIF file in a RapidSmith Checkpoint, the properties
 within are stored in a data structure called a \cls{PropertyList}. Each
-\cls{CellDesign}, \cls{Cell}, and \cls{CellNet} in RapidSmith has an associated
+\cls{CellDesign}, \cls{Cell}, and \cls{CellNet} in RS2 has an associated
 \cls{PropertyList} object. The \cls{PropertyList} for each \cell in the design
 also has a list of default configuration properties. Configuration properties
 for \cells are always included in the \cls{PropertyList} even if they are not
@@ -478,7 +478,7 @@ explicitly set by the user. As previously stated, this is because the
 functionality of the cell is dependent on the values of its configuration
 properties. \autoref{code:properties} shows some basic property usage.
 
-\begin{lstlisting}[caption=Using PropertyLists in RapidSmith,
+\begin{lstlisting}[caption=Using PropertyLists in RS2,
 label=code:properties] 
 // Create a new FF cell with default properties
 CellLibrary libCells = getCellLibrary();
@@ -526,7 +526,7 @@ helpful:
   \item Because EDIF properties only support String, Integer, and Boolean types,
   any properties imported from the EDIF file will be one of these types.
   However, from our testing, Vivado always exports its properties as strings.
-  \pgm{RapidSmith makes no attempt to parse the Vivado properties into their
+  \pgm{RS2 makes no attempt to parse the Vivado properties into their
   corresponding data structures. All Vivado properties are represented using
   Strings, and it is currently up to the user to parse the properties if they
   need to}.
@@ -535,7 +535,7 @@ helpful:
   tag ``libcellproperty.'' Pin mappings are described in more detail in
   \autoref{sec:placement}.
   \item Only properties of type \cls{PropertyType.EDIF} will be exported from
-  RapidSmith.
+  RS2.
   If you create cells in your design and add properties to them, make sure that you
   mark the properties as EDIF properties if you want them to be exported
   All other properties will be ignored during design export.
@@ -548,9 +548,9 @@ helpful:
   decided by the property ``IS\_C\_INVERTED'' of the flip flops cells \pgm{that
   have been placed onto the SLICEL}. The clock inverter is programmed
   automatically based on the cell properties. There are other such properties,
-  but they will not be listed here. When creating designs in RapidSmith, it is
+  but they will not be listed here. When creating designs in RS2, it is
   important to not place \cls{Cell}s together that may have conflicting
-  properties. RapidSmith does not perform any error checking, and so an error
+  properties. RS2 does not perform any error checking, and so an error
   in Vivado will be thrown if you violate property restrictions.
   
 \begin{figure}[H]
@@ -564,9 +564,9 @@ helpful:
   
 \end{itemize}
 
-\subsection{The Cell Library}
+\subsection{The Cell Library} \label{sec:cellLibraryinDesignSection}
 
-The \cls{CellLibrary} in RapidSmith stores important information about each of
+The \cls{CellLibrary} in RS2 stores important information about each of
 the \cls{LibraryCell}s compatible with a specific Xilinx FPGA part.
 This includes: 
 
@@ -583,27 +583,27 @@ This includes:
 When doing any type of netlist modification, the \cls{CellLibrary} is needed.
 Currently, each \cls{CellLibrary} corresponds to a specific Xilinx
 part.
-This means that for each part you use in RapidSmith, a new \cls{CellLibrary}
+This means that for each part you use in RS2, a new \cls{CellLibrary}
 needs to be generated \footnote{This may change to be family-specific in the
 future. Usually, parts in the same family can use the same
 \cls{CellLibrary}. The part-specific requirement is very conservative, but is
 one that we know is right}.
 The rest of this section demonstrates how to get access to a cell library in
-RapidSMith, and how to create a new cell library XML file from Tincr.
+RS2, and how to create a new cell library XML file from Tincr.
 
 \subsubsection{Loading a Cell Library}
-When a Tincr checkpoint is imported into RapidSmith, a \cls{CellLibrary} is
+When a RapidSmith Checkpoint is imported into RS2, a \cls{CellLibrary} is
 automatically loaded. To get a handle to the \cls{CellLibrary}, you can use
-the method call \texttt{TincrCheckpoint.getLibCells()} on the loaded checkpoint
-object. If you don't have a handle to a Tincr Checkpoint, then the cell
+the method call \texttt{VivadoCheckpoint.getLibCells()} on the loaded checkpoint
+object. If you don't have a handle to a RapidSmith Checkpoint, then the cell
 library XML can be loaded directly from disk. \autoref{code:cellLibrary}
 demonstrates both methods of loading a \cls{CellLibrary}.
 
 \begin{lstlisting}[caption=How to load a CellLibrary,
 label=code:cellLibrary] 
-// First way, load a Tincr Checkpoint
-TincrCheckpoint tcp = VivadoInterface.loadTcp("checkpoint.tcp");
-CellLibrary libCells1 = tcp.getLibCells();
+// First way, load a RapidSmith Checkpoint
+VivadoCheckpoint vcp = VivadoInterface.loadRSCP("checkpoint.rscp");
+CellLibrary libCells1 = vcp.getLibCells();
 
 // Second way, directly load the cell library from disk
 CellLibrary libCells2 = new CellLibrary(RSEnvironment.defaultEnv()
@@ -709,38 +709,3 @@ libCells.loadMacroXML(Paths.get("myMacro.xml");
 Once this is complete, you can use your custom macro in a \cls{CellDesign} like
 a normal cell.
 
-\subsubsection{Creating a New Cell Library}
-During runtime, a \cls{CellLibrary} data structure is created by parsing a
-\textit{cellLibrary.xml} file into memory. So, to create a new \cls{CellLibrary}
-all you have to do is generate a new \textit{cellLibrary.xml} file for the
-Xilinx part you are interested in. This can be done in a few easy steps (the
-items marked with \textbf{SERIES7} only need to be done for series7 families).
-
-\begin{enumerate}
-  \item Open Vivado in Tcl mode, and type the following into the console:
-  \begin{code}
-::tincr::create_xml_cell_library xc7a100tcsg324-3 mycellLibrary.xml
-  \end{code}
-  Replace ``xc7a100tcsg324-3'' with the part you want to generate and
-  ``mycellLibrary.xml'' with the location where you want to store the generated
-  cell library XML. This will generate most of what you need in the cell library
-  XML automatically.
-  \item \textbf{SERIES7}: Open the generated XML file in a text editor and
-  search for the ``CARRY4'' cell. Scroll down to the ``bels'' XML element within
-  the CARRY4 cell, and add the following lines to each pin that is named ``CI'':
-  
-  \begin{figure}[H]
-   \centering
-   \includegraphics[width=.9\columnwidth]{cellLibHandEdit.png}
-  \end{figure}
-  
-  You should have to insert this line in two places only.
-  \item Save your changes and exit the text editor
-  \item Copy the XML file to \textit{RapidSmithPath/device/family}
-  directory where ``family'' is replaced by the family of your part (such as
-  artix7), and ``RapidSmithPath'' is the location of your RapidSmith repository.
-  Once this is complete the new \cls{CellLibrary} should be ready to use. 
-\end{enumerate}
-
-\pgm{NOTE}: Parts in the same family can usually use the same
-\cls{CellLibrary}.

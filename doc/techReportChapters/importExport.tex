@@ -2,9 +2,9 @@
 % Section 8: Importing RSCPs and exporting TCPs
 %	This section contains a description of the following:
 %	- The contents of RapidSmith Checkpoints (RSCP)
-% 	- How to load a RSCP into RapidSmith2 
+% 	- How to load a RSCP into RS2 
 %	- The contents of Tincr Checkpoints (TCP)
-% 	- How to export a TCP from RapidSmith2 
+% 	- How to export a TCP from RS2 
 %	- Important information that is imported from RSCP and how they are
 % 		represented in RS2 (such as routethroughs) 	
 %	- Code samples for importing RSCPs and exporting TCPs
@@ -23,15 +23,15 @@ design. This section describes in detail  the following:
 \end{itemize}
 
 \subsection{RapidSmith Checkpoints}
-RapidSmith checkpoints (RSCP) are Tincr checkpoints generated in Vivado from the
-command \texttt{::tincr::write\-\_rscp}. These checkpoints are capable of
+RapidSmith Checkpoints (RSCP) are checkpoints generated in Vivado using Tincr
+from the command \texttt{::tincr::write\-\_rscp}. These checkpoints are capable of
 representing a Vivado design at any stage of implementation (post-synthesis,
-post-place, and post-route), and can be parsed and imported into RapidSmith. As
+post-place, and post-route), and can be parsed and imported into RS2. As
 we will see in \autoref{sec:tcp} below, the format of these checkpoints differ
 slightly than those of regular TCPs. This is because a great deal of additional
-information needs to be added to RapidSmith checkpoints in order to import a
+information needs to be added to RapidSmith Checkpoints in order to import a
 complete representation of a Vivado design. The remainder of this subsection
-describes each of the file types within a RapidSmith checkpoint, and what they
+describes each of the file types within a RapidSmith Checkpoint, and what they
 represent.
 
 \subsubsection{design.info}
@@ -44,7 +44,7 @@ information in the future.
 The \textit{netlist.edf} file within a RSCP is an EDIF netlist representing the
 logical portion of a design. It details all of the \cells, \nets,
 and \ports within a design, and is generated from Vivado using the Tcl
-command \texttt{write\_edif}. A RapidSmith \celldesign is created by parsing the
+command \texttt{write\_edif}. A RS2 \celldesign is created by parsing the
 EDIF file, and converting it into the appropriate RS2 data structures described
 in \autoref{sec:designDS}. Below is an example of a RSCP EDIF file.
 
@@ -164,11 +164,11 @@ set_property PACKAGE_PIN D18 [get_ports {Xin[7]}]
 
 \noindent
 As can be seen, a Vivado constraints file is essentially a list of Tcl commands
-to execute before generating a bitstream. When importing a RSCP into RapidSmith,
+to execute before generating a bitstream. When importing a RSCP into RS2,
 each constraint is parsed into a \cls{XdcConstraint} object and stored in the
 top-level \celldesign. Each \cls{XdcConstraint} has two fields, a String
 command and a String representing all command arguments. \autoref{code:xdc}
-demonstrates how to manipulate XDC constraints in RapidSmith. Future RS2 plans
+demonstrates how to manipulate XDC constraints in RS2. Future RS2 plans
 include creating a more intelligent way of handling XDC constraints. 
 
 \begin{lstlisting} [caption=How to manipulate XDC constraints in RS2,
@@ -193,7 +193,7 @@ macro cells in a Vivado design that (a) were not fully flattened, and (b) do not
 exist in the default Vivado cell library. Using the information in the XML file,
 a \cls{LibraryCell} can be created and added to the \cls{CellLibrary} so that
 the design can import correctly. More information about macro cells in
-RapidSmith can be found in \autoref{sec:macros}.
+RS2 can be found in \autoref{sec:macros}.
 
 \begin{lstlisting}[numbers=none]
 <?xml version="1.0" encoding="UTF-8"?>
@@ -230,24 +230,24 @@ RapidSmith can be found in \autoref{sec:macros}.
 
 
 \subsection{Tincr Checkpoints} \label{sec:tcp}
-Tincr checkpoints are very similar to RapidSmith checkpoints, but they can be
+Tincr Checkpoints are very similar to RapidSmith Checkpoints, but they can be
 used to import designs back into Vivado after they have been modified in
-RapidSmith. The main different between TCPs and RSCPs, is that the
+RS2. The main different between TCPs and RSCPs, is that the
 \textit{placement.rsc}, \textit{routing.rsc}, and \textit{constraints.rsc} files
 turn into \textit{placement.xdc}, \textit{routing.xdc}, and \textit{constraints.xdc}
 respectively. Vivado is able to parse the XDC files and apply physical
-information to the design. On design export, RapidSmith produces
+information to the design. On design export, RS2 produces
 a TCP that is compatible with Vivado. The file formats of the three XDC files
 will not be included in this documentation. If you are interested in their
 format, the best way to learn is to consult the Vivado user guide and generate a
-TCP from RapidSmith and view the individual files.
+TCP from RS2 and view the individual files.
 
 \subsection{Additional Information} \label{sec:additionalInfo}
 The reason RSCP and TCP checkpoints are distinguished, is that there are
 several design implementation aspects in Vivado that aren't explictly
-represented. In order to accurately represent a design in RapidSmith, they
+represented. In order to accurately represent a design in RS2, they
 must be included somehow. This section describes the parts of the design that
-aren't explicitly represented in Vivado, and how RapidSmith handles them.
+aren't explicitly represented in Vivado, and how RS2 handles them.
 \autoref{sec:importExportTcp} describes how to get a handle to the additional
 information after a checkpoint has been imported.
 
@@ -281,12 +281,12 @@ tools, \cls{BelRoutethrough}s give the user a more complete picture of what
 \bels are actually available. 
 	
 As described in \autoref{otherConns}, there is a \cls{Connection} object in
-RapidSmith from every input LUT pin to the LUTs output pin. These \bel
+RS2 from every input LUT pin to the LUTs output pin. These \bel
 routethrough connections, are actually just \cls{WireConnection}s with the
 \texttt{isRoute\-through()} method returning true. In order to use a LUT as a
-routethrough in RapidSmith, you simply have to include the corresponding
+routethrough in RS2, you simply have to include the corresponding
 \cls{WireConnection} within an INTRASITE \cls{RouteTree}. When a design is
-exported from RapidSmith, the routethrough \cls{WireConnection}s are
+exported from RS2, the routethrough \cls{WireConnection}s are
 automatically detected and converted to a passthrough LUT \cell. The netlist
 is rewired appropriately.
 
@@ -315,17 +315,17 @@ created, and attached to their corresponding \cells.
 
 \subsection{Importing RSCPs and Exporting TCPs} \label{sec:importExportTcp}
 After a Vivado design has been converted to a RSCP using the
-\texttt{::tincr::write\_rscp} command, it can be loaded into RapidSmith.
+\texttt{::tincr::write\_rscp} command, it can be loaded into RS2.
 \autoref{code:import} demonstrates the basix syntax of design
 import and export.
 
-\begin{lstlisting}[caption=How to import and export TCP files to and from RS2,
-label=code:import]
-// Loading a Tincr Checkpoint
-TincrCheckpoint tcp = VivadoInterface.loadTcp("pathToCheckpoint.tcp");
-CellDesign design = tcp.getDesign();
-Device device = tcp.getDevice();
-CellLibrary libCells = tcp.getLibCells();
+\begin{lstlisting}[caption=How to import and export checkpoint files to and from
+RS2, label=code:import]
+// Loading a RapidSmith Checkpoint
+VivadoCheckpoint vcp = VivadoInterface.loadRSCP("pathToCheckpoint.rscp");
+CellDesign design = vcp.getDesign();
+Device device = vcp.getDevice();
+CellLibrary libCells = vcp.getLibCells();
 
 // Insert CAD Tool Here
 
@@ -335,22 +335,22 @@ VivadoInterface.writeTCP("pathToStore.tcp", design, device, libCells);
 \end{lstlisting}
 
 \noindent
-While a design is being imported into RapidSmith, several useful data structures
+While a design is being imported into RS2, several useful data structures
 are built up. If you want to gain access to those data structures, you can pass
-an additional argument into the \texttt{VivadoInterface.loadTCP} method. This
+an additional argument into the \texttt{VivadoInterface.loadRSCP} method. This
 is shown in \autoref{code:import2}.
 
-\begin{lstlisting}[caption=Importing a TCP with additional information,
+\begin{lstlisting}[caption=Importing a RSCP with additional information,
 label=code:import2]
-// Loading a Tincr Checkpoint with additional info
-TincrCheckpoint tcp = VivadoInterface.loadTcp("PathToCheckpoint.tcp", true);
-Collection<BelRoutethrough> belRts = tcp.getRoutethroughObjects();
-Collection<Bel> staticSources = tcp.getStaticSourceBels();
-Map<BelPin, CellPin> belPinToCellPinMap = tcp.getBelPinToCellPinMap()
+// Loading a RapidSmith Checkpoint with additional info
+VivadoCheckpoint vcp = VivadoInterface.loadRSCP("PathToCheckpoint.rscp", true);
+Collection<BelRoutethrough> belRts = vcp.getRoutethroughObjects();
+Collection<Bel> staticSources = vcp.getStaticSourceBels();
+Map<BelPin, CellPin> belPinToCellPinMap = vcp.getBelPinToCellPinMap()
 \end{lstlisting}
 
 \noindent
-After a design is exported from RapidSmith, a Tincr Checkpoint (TCP) is
+After a design is exported from RS2, a Tincr Checkpoint (TCP) is
 produced. To import the TCP back into Vivado, simply open up Vivado in Tcl mode
 and use the following command:
 

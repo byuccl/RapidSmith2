@@ -1,4 +1,4 @@
-package design.tcpImport;
+package design.rscpImport;
 /*
  * Copyright (c) 2016 Brigham Young University
  *
@@ -53,7 +53,7 @@ import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.SiteType;
 import edu.byu.ece.rapidSmith.device.Wire;
-import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoDesignCheckpoint;
+import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.util.VivadoConsole;
 
@@ -89,8 +89,8 @@ public abstract class DesignVerificationTest {
 	/** Vivado process link */
 	private static VivadoConsole console;
 	/** Loaded TincrCheckpoint of the design under test*/
-	private static VivadoDesignCheckpoint tcp;
-	/** Flag used to determine if we need to load the TCP and DCP*/
+	private static VivadoCheckpoint vcp;
+	/** Flag used to determine if we need to load the RSCP and DCP*/
 	private static boolean initialized = false;
 	/** Name of the current checkpoint design under test*/
 	private static String testName ;
@@ -131,7 +131,7 @@ public abstract class DesignVerificationTest {
 		
 		resetTclDisplayLimit();		
 		console.close(true);
-		tcp = null;
+		vcp = null;
 		console = null;
 		deleteTemporaryFiles();
 	}
@@ -163,7 +163,7 @@ public abstract class DesignVerificationTest {
 	}
 	
 	/**
-	 * Initializes the test by loading the TCP into RapidSmith
+	 * Initializes the test by loading the RSCP into RapidSmith
 	 * and loading the DCP into Vivado when the test is first run. 
 	 */
 	@BeforeEach
@@ -174,7 +174,7 @@ public abstract class DesignVerificationTest {
 			String checkpointName = getCheckpointName();
 			testName = checkpointName;
 			familyName = familyName();
-			tcp = loadTCP(checkpointName + ".rscp", familyName);
+			vcp = loadRSCP(checkpointName + ".rscp", familyName);
 			
 			debugPrint("Loading DCP...");
 			console = loadDCP(checkpointName + ".dcp", familyName);
@@ -187,17 +187,17 @@ public abstract class DesignVerificationTest {
 	 * Loads a RSCP into RapidSmith for testing
 	 * 
 	 * @param rscpCheckpointFile checkpoint file name
-	 * @return Newly created {@link VivadoDesignCheckpoint} object
+	 * @return Newly created {@link VivadoCheckpoint} object
 	 */
-	private static VivadoDesignCheckpoint loadTCP(String rscpCheckpointFile, String familyName) throws JDOMException {
-		VivadoDesignCheckpoint tcp = null;
+	private static VivadoCheckpoint loadRSCP(String rscpCheckpointFile, String familyName) throws JDOMException {
+		VivadoCheckpoint vcp = null;
 		try {
-			tcp = VivadoInterface.loadRSCP(testDirectory.resolve("RSCP").resolve(familyName).resolve(rscpCheckpointFile).toString(), true);			
+			vcp = VivadoInterface.loadRSCP(testDirectory.resolve("RSCP").resolve(familyName).resolve(rscpCheckpointFile).toString(), true);			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		return tcp;
+		return vcp;
 	}
 	
 	/**
@@ -252,7 +252,7 @@ public abstract class DesignVerificationTest {
 	@DisplayName("VCC and GND Net Test")
 	public void staticNetTest() {
 		
-		CellNet vccNet = tcp.getDesign().getVccNet();
+		CellNet vccNet = vcp.getDesign().getVccNet();
 		
 		String command = "tincr::report_vcc_routing_info ";
 		List<String> result = sendVivadoCommand(command);
@@ -262,7 +262,7 @@ public abstract class DesignVerificationTest {
 		testStaticNetCellPins(vccNet, result.get(2), Integer.parseInt(result.get(1)));
 		testNetBelPins(vccNet, result.get(3));
 		
-		CellNet gndNet = tcp.getDesign().getGndNet();
+		CellNet gndNet = vcp.getDesign().getGndNet();
 		
 		command = "tincr::report_gnd_routing_info ";
 		result = sendVivadoCommand(command);
@@ -284,7 +284,7 @@ public abstract class DesignVerificationTest {
 	@Test
 	@DisplayName("Net connection test")
 	public void netTest() {
-		CellDesign design = tcp.getDesign();
+		CellDesign design = vcp.getDesign();
 		int netCount = design.getNets().size();
 		int count = 1;
 		
@@ -353,7 +353,7 @@ public abstract class DesignVerificationTest {
 	 */
 	private void testNetCellPins(CellNet net, String cellPinString) {
 		
-		CellDesign design = tcp.getDesign();
+		CellDesign design = vcp.getDesign();
 		String[] tclCellPins = cellPinString.split(" ");
 		
 		// Test the number of cell pins attached to the net matches Vivado
@@ -400,7 +400,7 @@ public abstract class DesignVerificationTest {
 	 */
 	private void testStaticNetCellPins(CellNet net, String cellPinString, int cellCount) {
 
-		CellDesign design = tcp.getDesign();
+		CellDesign design = vcp.getDesign();
 		String[] tclCellPins = cellPinString.split(" ");
 		
 		// Test the number of cell pins attached to the net matches Vivado
@@ -439,9 +439,9 @@ public abstract class DesignVerificationTest {
 	 */
 	private void testNetBelPins(CellNet net, String belPinString) {
 		
-		Device device = tcp.getDevice();
-		Map<BelPin, CellPin> pinMap = tcp.getBelPinToCellPinMap();
-		Set<Bel> routethroughSet = tcp.getBelRoutethroughs();
+		Device device = vcp.getDevice();
+		Map<BelPin, CellPin> pinMap = vcp.getBelPinToCellPinMap();
+		Set<Bel> routethroughSet = vcp.getBelRoutethroughs();
 		
 		Set<BelPin> connectedBelPins = net.getBelPins();
 				
@@ -486,7 +486,7 @@ public abstract class DesignVerificationTest {
 	@Test
 	@DisplayName("Cell Placement Test")
 	public void testCells() {
-		CellDesign design = tcp.getDesign();
+		CellDesign design = vcp.getDesign();
 		int max = design.getCells().size();
 		int count = 1;
 		
@@ -576,7 +576,7 @@ public abstract class DesignVerificationTest {
 	@DisplayName("Routethrough test")
 	public void routethroughTest() {
 		
-		for (BelRoutethrough rt : tcp.getRoutethroughObjects()) {
+		for (BelRoutethrough rt : vcp.getRoutethroughObjects()) {
 			String command = String.format("tincr::test_routethrough %s %s %s", 
 											rt.getBel().getFullName(), rt.getInputPin().getName(), rt.getOutputPin().getName());
 			
@@ -608,7 +608,7 @@ public abstract class DesignVerificationTest {
 	@DisplayName("Static Bel Test")
 	public void staticSourceTest() {
 		
-		for (Bel bel : tcp.getStaticSourceBels()) {
+		for (Bel bel : vcp.getStaticSourceBels()) {
 			String command = String.format("tincr::test_static_sources %s", bel.getFullName());
 			List<String> result = sendVivadoCommand(command);
 			
@@ -626,10 +626,10 @@ public abstract class DesignVerificationTest {
 	public void cellPropertyTest() {
 		
 		//TODO: Mark this function as don't count instructions for (i.e. don't create an new instance of Vivado for)?
-		int max = tcp.getDesign().getCells().size();
+		int max = vcp.getDesign().getCells().size();
 		int count = 1;
 		
-		for (Cell cell : tcp.getDesign().getCells()) {
+		for (Cell cell : vcp.getDesign().getCells()) {
 
 			debugPrint("Cell " + cell.getName() + " " + count++ + "/" + max);
 			
@@ -695,8 +695,8 @@ public abstract class DesignVerificationTest {
 	@DisplayName("Site Pip Test")
 	public void sitePipTest() {
 		
-		CellDesign design = tcp.getDesign();
-		Device device = tcp.getDevice();
+		CellDesign design = vcp.getDesign();
+		Device device = vcp.getDevice();
 
 		// Test to make sure the number of used sites is identical
 		String command = "tincr::report_used_site_count";

@@ -73,7 +73,7 @@ git clone https://github.com/byuccl/RapidSmith2
   \begin{code}
 	File->Open Projects From File System 
   \end{code}
-  and pointing it to your RapidSmith2 local repository. All Java source files
+  and pointing it to your RS2 local repository. All Java source files
   will be found under \dir{src/main/java}. \pgm{NOTE:} Your RS2 git repository
   should not be put inside your eclipse workspace. It is better to put it
   elsewhere, and then import it into your workspace.
@@ -104,7 +104,7 @@ git clone https://github.com/byuccl/RapidSmith2
 
 \subsubsection{Alternative Installation and Use}
 
-RapidSmith2 is also available as a Docker container. To painlessly set up a working RapidSmith2 environment, type:
+RS2 is also available as a Docker container. To painlessly set up a working RS2 environment, type:
 \vspace{-0.05in}
 \begin{code}
 docker run -it byuccl/rapidsmith2
@@ -231,7 +231,8 @@ either placed or routed prior to export.  You may choose to export it any time
 after it has been synthesized.
 
 Finally, note that a set of sample HDL designs are provided in the RS2
-distribution and which you could use for your learning.
+distribution (in \dir{exampleVivadoDesigns}) and which you could use for your
+learning.
 You can read about them as well as a script which implements a version of the
 above compilation steps in Section~\ref{sampledesigns} of this report.  Note
 that the compilation script described there expects a particular directory
@@ -246,17 +247,17 @@ As described in Section~\ref{examples} of this report (and
 Section~\ref{sec:importExportExample} in particular) a sample import/export program
 is provided in the RS2 distribution which illustrates how to import
 and export designs from RS2.  This program, when run, will read in a
-RapidSmith checkpoint (RSCP), walk the resulting data structures and
-ten prettyprint the design contents, and then write out the
-corresponding Tincr checkpoint.   
+RapidSmith Checkpoint (RSCP), walk the resulting data structures and
+then prettyprint the design contents, and then write out the
+corresponding Tincr Checkpoint.   
 
 You should examine the code for that
 program to understand its operation and the subroutine calls that can
 be used to do those steps.  The net result from running that program
-is to export a Tincr checkpoint, stored in a directory with a ``tcp'' extension.
+is to export a Tincr Checkpoint, stored in a directory with a ``tcp'' extension.
 
 \subsubsection{Importing a Tincr Checkpoint Back into Vivado}
-At this point you can import the resulting Tincr checkpoint back into Vivado. 
+At this point you can import the resulting Tincr Checkpoint back into Vivado. 
 Assuming the original RSCP was ``add.rscp'', after running the import/export
 example program  you will have a ``add.rscp.tcp'' directory.  After starting
 Vivado up in Tcl mode (``vivado -mode tcl'') you can execute the following

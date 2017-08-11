@@ -7,7 +7,7 @@ import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.creation.ExtendedDeviceInfo;
-import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoDesignCheckpoint;
+import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.util.DotFilePrinter;
 import edu.byu.ece.rapidSmith.util.RapidSmithDebug;
@@ -31,13 +31,13 @@ public class AStarRouterExample {
 				.resolve("test")
 				.resolve("resources")
 				.resolve("ImportTests")
-				.resolve("TCP")
-				.resolve("cordic.tcp").toString();
+				.resolve("RSCP")
+				.resolve("cordic.rscp").toString();
 		
 		System.out.println("Loading Device and Design...");
-		VivadoDesignCheckpoint tcp = VivadoInterface.loadRSCP(checkpoint);
-		CellDesign design = tcp.getDesign();
-		Device device = tcp.getDevice();
+		VivadoCheckpoint vcp = VivadoInterface.loadRSCP(checkpoint);
+		CellDesign design = vcp.getDesign();
+		Device device = vcp.getDevice();
 		
 		// loading reverse wire connections
 		ExtendedDeviceInfo.loadExtendedInfo(device);

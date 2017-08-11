@@ -1,8 +1,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Section 7: Routing in RapidSmith2
+% Section 7: Routing in RS2
 %	This section contains a description of the following:
 %	- Wires and connection types in RS2 (wire connections, routethroughs, etc.)
-%	- How to route nets in RapidSmith using RouteTrees
+%	- How to route nets in RS2 using RouteTrees
 %	- Three-part routing structure for nets.
 %	- Vivado ROUTE strings and intrasite routing.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -17,7 +17,7 @@ finding a list of physical wires that electrically connect the pins together.
 This section details how routing is done in RS2.
 
 \subsection{Wires and Wire Connections} \label{wireConnSection}
-Routing in RapidSmith is done using \cls{Wire} objects, which are described in
+Routing in RS2 is done using \cls{Wire} objects, which are described in
 \autoref{wireSection}. \cls{Wire}s are uniquely identified by their
 corresponding tile and wire name (i.e. tileName/wireName), and are connected
 through \cls{Connection} objects. There are two types of wire connections:
@@ -34,7 +34,7 @@ through \cls{Connection} objects. There are two types of wire connections:
   a different name in each tile. This is demonstrated in
   \autoref{fig:wireFigure}. The example wire shown in the figure spans 5
   different tiles, but has a different name in each. To save space, only the
-  source and sink wire segments are kept in RapidSmith data structures
+  source and sink wire segments are kept in RS2 data structures
   (i.e. \texttt{INT\_X1Y1/E2BEG4}, \texttt{INT\_X2Y1/E2MID4}, and
   \texttt{INT\_X3Y1/E2END4}). The source segment is connected to each sink
   segment through a non-PIP wire connection. It is also possible to have non-PIP
@@ -72,11 +72,11 @@ constructor, or (b) retrieved from a function call of another object (such as
 \texttt{SitePin::getExternalWire()}). \autoref{code:connections} demonstrates
 how to iterate over \cls{Connection} objects. To gain a better
 understanding of how to use \cls{Wire}s and \cls{Connection}s, see the
-\pgm{HandRouter} example in the RapidSmith repository.
+\pgm{HandRouter} example in the RS2 repository.
 
 \subsection{Other Types of Connections} \label{otherConns}
 Along with PIP and non-PIP wire connections, there are several other types of
-connections in RapidSmith. The source of the connection is always a \cls{Wire}
+connections in RS2. The source of the connection is always a \cls{Wire}
 object, but the sink object differs. A description of these connections is found
 below:
 
@@ -91,7 +91,7 @@ below:
   \item \pgm{Site Routethrough Connections}: Connects an input site \cls{Wire}
   to an output site \cls{Wire}. A \cls{Site} in Vivado can be configured to pass
   the signal on an input \cls{SitePin} directly to an output \cls{SitePin}.
-  These connections are represented as routethroughs in RapidSmith and can be
+  These connections are represented as routethroughs in RS2 and can be
   determined with the function call \texttt{conn.isRoutethrough()}.
   \pgm{NOTE}: Before using this type of connection when building a
   routing data structure, make sure the \cls{Site} is unused.
@@ -100,7 +100,7 @@ below:
   Vivado can also be configured as routethroughs. In this case, the signal on one of the
   input pins of the LUT is passed directly to the output pin of the LUT. A BEL
   routethrough connection can be used to configure a LUT as a routethrough in
-  RapidSmith.
+  RS2.
   \pgm{NOTE}: Before using this type of connection, make sure the LUT is
   unused (i.e. no cell is placed on it).
 \end{itemize}
@@ -109,9 +109,9 @@ below:
 When traversing through the device data structure, a generic \cls{Connection}
 object is usually used. This connection can refer to any of the connections
 described so far in this documentation. \autoref{code:connections} demonstrates
-how to iterate through different \cls{Connection} types in RapidSmith.
+how to iterate through different \cls{Connection} types in RS2.
 
-\begin{lstlisting}[caption=How to iterate over Connections in RapidSmith,
+\begin{lstlisting}[caption=How to iterate over Connections in RS2,
 label=code:connections] 
 // Get a handle to a wire
 Wire wire = sitePin.getExternalWire();
@@ -167,10 +167,10 @@ while (connIt.hasNext()) {
 \subsection{RouteTrees}
 
 \cls{Wire}s and \cls{WireConnection}s are the fundamental objects used to
-specify and explore routing in RapidSmith, but they need to be organized in
+specify and explore routing in RS2, but they need to be organized in
 a higher-level data structure to give meaning to the route of a \cls{CellNet}.
 In the original RapidSmith, creating this data structure was up to the user.
-RapidSmith 2 introduces the \cls{RouteTree}, which can be see in
+RS2 introduces the \cls{RouteTree}, which can be see in
 \autoref{fig:routeTreeDS}.
 
 \begin{figure}[H]
@@ -203,12 +203,12 @@ a graph, with a single ``starting'' node and several ``sink'' nodes. A
 \noindent
 A complete \cls{RouteTree} specifies how the source of a
 \cellnet is physically connected to all of its sinks. \autoref{fig:routeTree}
-shows an example of a complete \cls{RouteTree} in RapidSmith. 
+shows an example of a complete \cls{RouteTree} in RS2. 
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.65\columnwidth]{routeTree.eps}
-\caption{A visual representation of a RapidSmith2 RouteTree. Nodes represent
+\caption{A visual representation of a RS2 RouteTree. Nodes represent
 \cls{Wire}s, red edges represent \cls{PIP} wire connections, and black edges
 represent non-PIP wire connections. This specific RouteTree was created from
 the \pgm{AStarRouter} example.}
@@ -222,7 +222,7 @@ and the sink pins are connected to the wires ``CLBLM\_R\_X1Y97/CLBLM\-\_M\_A6''
 and ``CLBLM\-\_R\_X11Y97/CLBLM\_M\_AX''. Starting from the source, wires are
 traversed downward (via wire connections) until the target wires are reached.
 \autoref{code:routeTree} demonstrates the basic usage of \cls{RouteTree}s in
-RapidSmith. The \pgm{DesignAnalyzer}, \pgm{AStarRouter}, and \pgm{HandRouter}
+RS2. The \pgm{DesignAnalyzer}, \pgm{AStarRouter}, and \pgm{HandRouter}
 examples described in \autoref{examples} also demonstrate how to traverse and
 build a \cls{RouteTree}.
 
@@ -262,7 +262,7 @@ needs to be \pgm{converted to an equivalent RouteTree data structure} before
 exporting the design to Vivado.  
 
 \subsection{Three Part Routing}
-In RapidSmith 2, there are three sections to a routed  \cellnet. 
+In RS2, there are three sections to a routed  \cellnet. 
 
 \begin{enumerate}
   \item The portion of the net that starts at the source \belpin, and is routed
@@ -286,7 +286,7 @@ a routed \cellnet.
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\columnwidth]{threePartRouting.png}
-\caption{The three sections of a RapidSmith route.}
+\caption{The three sections of a RS2 route.}
 \label{fig:threePartRouting}
 \end{figure}
 
@@ -299,10 +299,10 @@ wires in the figure above (part 3, with a different \routeTree object for each
 \site). It is important to note that INTRASITE nets only have a source
 \routeTree because they are completely contained within a \site.
 \autoref{code:threePartRouting} demonstrates how to utilize three part routing
-in RapidSmith. When a design is imported into RapidSmith, the routing sections
+in RS2. When a design is imported into RS2, the routing sections
 of each \cellnet are created automatically.
 
-\begin{lstlisting}[caption=Three-part routing in RapidSmith,
+\begin{lstlisting}[caption=Three-part routing in RS2,
 label=code:threePartRouting]
 // Get a handle to a routed net in the design 
 CellNet net = design.getNet("myNet");
@@ -334,14 +334,14 @@ net.addSinkRouteTree(sitePin, createSinkRouteTree(sp));
 \end{lstlisting}
 
 \subsection{Routing in Vivado}
-The reason a three-part routing distinction is necessary in RapidSmith, is due
+The reason a three-part routing distinction is necessary in RS2, is due
 to how routing is represented in Vivado. Inside \site boundaries, a route is
 represented using \site \pips. A string of enabled \pips determines what pins
 are connected together within the \site. Between \site boundaries, a route is
 instead represented using wires. The wires are formatted into a Vivado ROUTE
 string, which uniquely specifies the intersite route for a net. The three-part
 routing representation makes this distinction explicit to the users of
-RapidSmith (it also makes import/export easier). When a design is exported from
+RS2 (it also makes import/export easier). When a design is exported from
 Vivado, the intrasite portions of a net are exported as \site \pips, and the
 intersite portion of the net is exported as wires.
 
@@ -356,9 +356,9 @@ IOI_OLOGIC0_D1 LIOI_OLOGIC0_OQ LIOI_O0 }  IMUX_L1 CLBLL_LL_A3 }
 
 \subsection{IntrasiteRouting}
 On design import, the \site \pip information extracted from Vivado is stored
-into RapidSmith data structures, and used to resconstruct the three-part
+into RS2 data structures, and used to resconstruct the three-part
 routing view. This gives the user two options when dealing with intrasite
-routing in RapidSmith: (1) use the three-part routing data structures, or (2)
+routing in RS2: (1) use the three-part routing data structures, or (2)
 use the set of enabled \site \pips that exist in each \site. It is up to user
 preference for which representation to use when writing a CAD tool, but in
 order to export a design back into Vivado the three-part routing data
@@ -372,8 +372,8 @@ intrasite routing} for a \site. We are working on improving the API for \site
 \begin{lstlisting}[caption=Configuring Site Pips,
 label=code:sitePips]
 // Get a handle to a Design and a Site
-CellDesign design = tcp.getDesign();
-Device device = tcp.getDevice();
+CellDesign design = vcp.getDesign();
+Device device = vcp.getDevice();
 Site site = device.getSite("SLICE_X5Y84");
 
 // Get a list of used site wires somehow (this is up to you)

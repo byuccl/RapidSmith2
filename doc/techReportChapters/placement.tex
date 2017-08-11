@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Section 6: Placement in RapidSmith2
+% Section 6: Placement in RS2
 %	This section contains a description of the following:
 %	- How to place cells onto BELs and map cell-pins to bel-pins in RS2
 %	- How to get a list of valid placement locations for a cell  
@@ -12,18 +12,18 @@ In the original RapidSmith, placement occurred at the \cls{Site} level. A
 collection of \cls{Cell}s were grouped together in what was called an
 \cls{Instance}, and the \cls{Instance} was assigned to a compatible site type.
 Where the individual \cls{Cell}s were actually placed within the \cls{Site}
-was a blackbox. Because RapidSmith 2 breaks up a \cls{Site} into its
+was a blackbox. Because RS2 breaks up a \cls{Site} into its
 individual components, \cls{Cell}s can now be placed directly onto
 physical \cls{BEL}s within a \cls{Site}. This gives Xilinx FPGA CAD developers
 finer grain control during the placement of a design, and allows sub-site
 algorithms (such as packing algorithms) to be explored. \autoref{code:place}
-demonstrates the basic steps to placing a \cls{Cell} in RapidSmith.
+demonstrates the basic steps to placing a \cls{Cell} in RS2.
 
-\begin{lstlisting} [caption=Steps for placing a Cell in RapidSmith,label=code:place]
+\begin{lstlisting} [caption=Steps for placing a Cell in RS2,label=code:place]
 // Load the device and design
-TincrCheckpoint tcp = VivadoInterface.loadTcp("myCheckpoint.tcp"); 
-Device device = tcp.getDevice();
-CellDesign design = tcp.getDesign();
+VivadoCheckpoint vcp = VivadoInterface.loadRSCP("myCheckpoint.rscp"); 
+Device device = vcp.getDevice();
+CellDesign design = vcp.getDesign();
 
 // Get a handle to a Cell and Bel. The cell is of type LUT2 
 Cell cell = design.getCell("MyCell"); 
@@ -47,7 +47,7 @@ pin3.mapToBelPin( possible.get(0) );
 \end{lstlisting}
 
 \noindent
-As the code listing shows, there are two steps to placing a RapidSmith
+As the code listing shows, there are two steps to placing a RS2
 \cell. The first is straightforward: get a handle to a \bel object,
 and use the method call \texttt{CellDesign.placeCell(Cell, Bel)} (line 11). This
 will map a logical \cell onto a physical \bel. Once a \bel has been
@@ -86,10 +86,10 @@ noticable exceptions to this rule.
   configured}. For example, on a RAMB36E1 \cell, the least-significant data
   input pins map to different physical \belpins when the width of the BRAM is
   set to 72. This is an important concept when performing netlist modifications
-  in RapidSmith. The function call \texttt{CellPin.getPossibleBelPins(Bel)} only
+  in RS2. The function call \texttt{CellPin.getPossibleBelPins(Bel)} only
   returns the pin mappings for the \pgm{default} \cell configuration. The
-  correct pin mappings are always used when a Tincr checkpoint is imported into
-  RapidSmith, but if new logic is being added to a design it is up to the
+  correct pin mappings are always used when a RapidSmith Checkpoint is imported
+  into RS2, but if new logic is being added to a design it is up to the
   user to determine the proper pin mappings. Adding support for
   automatically determining a \cells pin mappings based on a its
   configuration is currently being worked on, but is not yet ready. For now,
@@ -116,7 +116,7 @@ Some additional points about placement to be aware of include:
 
 \begin {itemize}
   \item VCC and GND \cells are not placed when implementing a design in Vivado.
-  This distinction is applied to RapidSmith 2 as well. Rather than placing VCC
+  This distinction is applied to RS2 as well. Rather than placing VCC
   or GND explictly, \cls{RouteTree}s that are sourced by switchbox TIEOFFs are
   used to express their placement implicitly (VCC/GND is ``placed'' on the
   TIEOFF).
@@ -125,7 +125,7 @@ Some additional points about placement to be aware of include:
   \pgm{CreateDesignExample} (described in \autoref{sec:createDesignExample})
   gives a good example of how to use this function. The reader is referred to
   the source code and Javadocs for more details.
-  \item If you plan on writing a placer in RapidSmith, there are several
+  \item If you plan on writing a placer in RS2, there are several
   placement rules for a given device. A few examples include (a) CARRY4 \cells
   that are connected through the carry chain need to placed vertically to one
   another so they can use the dedicated carry wires, and (b) A RAMB36E1 cell
@@ -136,6 +136,6 @@ Some additional points about placement to be aware of include:
   a sample simulated annealing placer for the Artix-7 part {\em
   xc7a100tcsg324} can be found in the package
   \pkg{edu.byu.ece.rapidSmith.examples.placerDemo}.
-  \item Macro cells in RapidSmith cannot be placed. The internal cells of a
+  \item Macro cells in RS2 cannot be placed. The internal cells of a
   macro should be placed instead.
 \end{itemize}
