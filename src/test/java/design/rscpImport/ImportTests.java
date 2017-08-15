@@ -85,7 +85,7 @@ public class ImportTests {
 	@Test
 	@DisplayName("Out-Of-Context AES128 Series7")
 	public void outOfContextTest() throws IOException {
-		VivadoInterface.loadTCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("ooc_aes128.rscp").toString());
+		VivadoInterface.loadRSCP(testDirectory.resolve("RSCP").resolve("artix7").resolve("ooc_aes128.rscp").toString());
 	}
 	
 	@Test
