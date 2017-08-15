@@ -8,9 +8,10 @@ The original BYU RapidSmith project began in 2010. Its goal was to develop
 a set of tools and APIs which would provide academics with an
 easy-to-use platform to implement experimental CAD ideas and algorithms on
 modern Xilinx FPGAs. It integrated with Xilinx's old design suite, ISE.
-RapidSmith 2 (abbreviated RapidSmith2 hereafter) represents a major addition to
-RapidSmith. Specifically, Vivado designs are now supported. Using RapidSmith2 you can
-write custom CAD tools which will: 
+RapidSmith2 represents a major addition to RapidSmith. Specifically, Vivado
+designs are now supported. Using RapidSmith2 you can write custom CAD tools
+which will:
+
 \begin{itemize}
   \item Export designs from Vivado
   \item Perform analyses on those designs
@@ -77,21 +78,6 @@ dealing with other fairly arcane details is made mostly transparent to the
 user. RapidSmith2 and Tincr provide a nice API into equivalent Vivado device and design
 data structures. All of this enables researchers to have more time to focus on what matters
 most: the research of new ideas and algorithms.
-
-\subsection{Which Xilinx Parts does RapidSmith2 Support?}
-As of the writing of this document, Artix 7 has been tested the most and is
-currently supported in all forms and applications.  In addition, an Ultrascale
-device file was created and demonstrated as a part of Brad White's MS work to
-show that it is possible. At some point, Ultrascale should be fully supported.
-\footnote{An XDL-based import/export capability has also been created and used
-with Virtex 6 devices as a part of Travis Haroldsen's PhD work but that path is
-not being released, documented, or supported.}
-
-As will be seen later, to generate additional device files for additional parts
-within a supported family is relatively straightforward and can be done by any
-user.  New families can also be supported but this
-requires a bit more work.  As time goes on the process will become simpler ---
-that is one of the goals for RapidSmith2 moving forward.
 
 \subsection{How is RapidSmith2 Different than VPR and VTR?}
 VPR (Versatile Place and Route) has been an FPGA research tool for several years

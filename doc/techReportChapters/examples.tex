@@ -5,6 +5,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \section{Example Programs} \label{examples}
+\graphicspath{{./techReportFigures/sec9_examples/}}
 
 A variety of example programs can be found in the
 \pkg{edu.byu.edu.rapidSmith.examples} package of the RapidSmith2 installation.
@@ -38,17 +39,18 @@ programs listed below.
 If you want to recompile the designs from scratch, the source code for each
 design has also been included in the same directory. The Tcl script called
 \pgm{compile.tcl} can be used for this purpose. Simply open Vivado in Tcl
-mode, and type the following commands to re-build one of the example designs. 
-                
-\vspace{-0.15in}  \begin{code}
-	Vivado\% cd <path to exampleVivadoDesigns directory>
-	Vivado\% compile_hdl_to_checkpoint_files add
-	Vivado\% close_project
-\end{code}
-This will synthesize, place, and route a design and, from that compiled
-design, generate the \dir{.rscp} directory and the \fil{.dcp} file. For example
-programs that only explore the architecture, opening the device browser in
-Vivado can also be helpful.
+mode, and type the Tcl commands shown in \autoref{lst:compilation} to re-compile
+and implement one of the example designs. This will synthesize, place, and
+route a design and, from that compiled design, generate the \dir{.rscp}
+directory and the \fil{.dcp} file. For example programs that only explore the
+architecture, opening the device browser in Vivado can also be helpful.
+                 
+\begin{lstlisting} [numbers=none,keywordstyle=\ttfamily, caption=Sample
+Tcl commands to run the Vivado compilation script, label=lst:compilation] 
+	Vivado% cd <path to exampleVivadoDesigns directory>
+	Vivado% compile_hdl_to_checkpoint_files add
+	Vivado% close_project
+\end{lstlisting}
 
 \subsection{\pgm{DeviceBrowser}}
 The DeviceBrowser is a GUI program located in the 
@@ -70,7 +72,7 @@ the minus(-) key to zoom out or the equals(=) key to zoom in.
 
 \begin{figure}[htb]
 \centering
-\includegraphics[width=0.8\columnwidth]{deviceBrowser2}
+\includegraphics[width=0.8\columnwidth]{deviceBrowser2.jpg}
 \caption{\pgm{DeviceBrowser} Screen Shot Showing Wire Connections}
 \label{fig:deviceBrowser2}
 \end{figure}

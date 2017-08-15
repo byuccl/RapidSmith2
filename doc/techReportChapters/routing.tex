@@ -8,6 +8,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \section{Routing} \label{sec:routing}
+\graphicspath{{./techReportFigures/sec7_routing/}}
+
 During placement, all cells of a design are mapped to BELs, and all
 cell pins are mapped to BEL pins. The next (and final) step of the
 FPGA implementation flow is to physically wire together the used BEL pins. This
@@ -20,14 +22,7 @@ This section details how routing algorithms can be implemented in RapidSmith2.
 Routing in RapidSmith2 is done using \texttt{Wire} objects, which are described
 in subsection \ref{wireSection}. \texttt{Wire}s are uniquely identified by
 their corresponding tile and wire name (i.e. ``tileName/wireName''), and are connected
-through \texttt{Connection} objects. There are two types of wire connections:
-
-\begin{figure}[b]
-\centering
-\includegraphics[width=0.8\columnwidth]{wireFigure}
-\caption{Multi-Tile Xilinx Wire}
-\label{fig:wireFigure}
-\end{figure}
+through \texttt{Connec\-tion} objects. There are two types of wire connections:
 
 \begin {enumerate}
   \item \textbf{PIP Connections}: Connect two different wires through a
@@ -48,6 +43,12 @@ through \texttt{Connection} objects. There are two types of wire connections:
   connections within a tile, but this is rare.
 \end{enumerate} 
 
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\columnwidth]{wireFigure}
+\caption{Multi-Tile Xilinx Wire}
+\label{fig:wireFigure}
+\end{figure}
 
 \subsection{Traversing Wire Objects}
 Traversing through wires in a device is straightforward. Given a handle to a
@@ -94,7 +95,7 @@ connections is found below:
   to an output site \texttt{Wire}. A \texttt{Site} in Vivado can be configured to pass
   the signal on an input pin directly to an output pin. These connections are
   represented as routethroughs in RapidSmith2 and can be determined with the
-  function call \texttt{Connection::isRoutethrough()}.
+  function call \texttt{Connection::isRoutethr\-ough()}.
   \textbf{NOTE}: Before using this type of connection when building a
   routing data structure, make sure the corresponding site is unused.
   
@@ -368,8 +369,8 @@ when you have modified the intrasite routing} for a site.
 \begin{lstlisting}[xleftmargin=1.5em, framexleftmargin=1.5em, caption=Code
 to transform a set of SiteWires into Site PIPs, label=code:sitePips]
   // Get a handle to a Design and a Site
-  CellDesign design = tcp.getDesign();
-  Device device = tcp.getDevice();
+  CellDesign design = vcp.getDesign();
+  Device device = vcp.getDevice();
   Site site = device.getSite("SLICE_X5Y84");
 
   // Get a list of used site wires somehow (this is up to you)

@@ -7,6 +7,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \section{Designs}
+\graphicspath{{./techReportFigures/sec5_designs/}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Xilinx Netlist Structure
@@ -101,7 +102,7 @@ JavaDocs, but important aspects of each class is included in the
 following subsections.
 
 
-\subsubsection{CellDesign}
+\subsubsection{CellDesign} \label{sec:cellDesignDS}
 As previously mentioned, the \texttt{CellDesign} class is the top-level netlist
 object in RapidSmith2. An instance of a \texttt{CellDesign} contains the
 following:
@@ -115,6 +116,10 @@ following:
   \item A list of XDC constraints imported from Vivado. See \autoref{sec:import}
   for more information about XDC constraints and how they are represented in
   RapidSmith2.
+  \item The design mode. Possible options include OUT\_OF\_CONTEXT and REGULAR.
+  OUT\_OF\_CONTEXT designs are those that have been implemented in Vivado
+  ``out-of-context'', meaning that the top-level ports are not placed or routed.
+  Most designs are implemented in REGULAR mode.
 \end{itemize}
 
 \noindent
@@ -458,7 +463,7 @@ property properties.update("IS_C_INVERTED", PropertyType.EDIF, "1'b1");
 
 \begin{itemize}
   \item In Vivado, the configurable properties on a cell can be determined by
-  using the Tcl command \texttt{[report\_property [get\_lib\_cells \$cell]]}.
+  using the Tcl command \texttt{[report\_prope\-rty [get\_lib\_cells \$cell]]}.
   All properties that start with ``CONFIG'' are configurable properties that
   can be modified.
   
@@ -512,7 +517,7 @@ challenging when developing routing algorithms in external tools. How will the
 algorithm know to route to VCC/GND BEL pins when they are not explicitly
 represented in the netlist?
 
-\begin{figure}[t!]
+\begin{figure}[h!]
   \centering
   \includegraphics[width=.6\columnwidth]{pseudoCellPin.png}
   \caption{An example of VCC routing to an unused BEL pin (A6)}
@@ -546,7 +551,7 @@ function calls to attach a PseudoPin to a Cell, label=lst:pseudoPin]
   pseudo.mapToBelPin(bp);
 \end{lstlisting}
 
-\subsubsection {LUT Routethroughs}
+\subsubsection {LUT Routethroughs} \label{sec:belRoutethroughs}
 Besides their use in implementing logic equations, LUT BELs can also be
 configured as PIPs in a fully-routed FPGA design (known as a routethrough). A
 LUT is marked as a routethrough when its configuration equation,
@@ -621,6 +626,28 @@ stored for each site on design import. The function call
 site PIPs at a given site location. After design import, it is the user's
 responsibility to update this data structure accordingly.
 
+\subsubsection{Site Properties}
+Some properties not only affect how a Cell is configured, but they can also
+affect how a Site is configured. For example, on SLICEL sites there exists a
+clock routing mux that chooses between a regular clock signal and an inverted
+signal (\autoref{fig:clkInv}). The output of this inverter is connected to all
+flip flops of the SLICEL, and decides whether \textit{all} flip flops are
+rising or falling-edge triggered. The clock that is selected is determined
+by the property “IS C INVERTED” \textbf{of the flip flops cells that have been
+placed onto the SLICEL}. The clock inverter is programmed automatically based on
+the cell properties. There are other such properties, but they will not be listed
+here. When creating designs in RapidSmith2, it is important to not place cells
+together that may have conflicting properties. RapidSmith2 does not perform any
+error checking, and so an error in Vivado will be thrown if you violate
+property restrictions.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=.8\columnwidth]{clkInv.png}
+  \caption{SLICEL clock inverter mux.}
+  \label{fig:clkInv}
+\end{figure}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 	The Cell Library
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -631,7 +658,7 @@ common library primitives used in a Xilinx netlist include LUT (LUT1,
 LUT2, etc) and Flip-Flop (FDRE, FDCE, etc.) cells. A detailed knowledge of the
 available library cells for a device is required to perform any useful netlist
 modification in external tools. To provide this information, \texttt{Tincr}
-defines the format for a \textbf{cell library XML}. A cell library contains the
+defines a \textbf{cell library XML}. A cell library contains the
 following information for each library cell that can target a specific device:
 
 \begin {itemize}
@@ -657,8 +684,8 @@ subsections detail important aspects of a cell library.
 \begin{lstlisting}[xleftmargin=1.5em, framexleftmargin=1.5em, caption=
 Loading a CellLibrary in RapidSmith2, label=code:cellLibrary] 
 // First way, load a Tincr Checkpoint
-TincrCheckpoint tcp = VivadoInterface.loadTcp("checkpoint.tcp");
-CellLibrary libCells1 = tcp.getLibCells();
+VivadoCheckpoint vcp = VivadoInterface.loadRSCP("checkpoint.rscp");
+CellLibrary libCells1 = vcp.getLibCells();
 
 // Second way, directly load the cell library from disk
 CellLibrary libCells2 = new CellLibrary(RSEnvironment.defaultEnv()
@@ -696,7 +723,7 @@ listed below to create a new cell library (the items marked with
   \end{figure}
   
   You should have to insert this line in two places only.
-  \item Save your changes and exit the text editor
+  \item \textbf{SERIES7}: Save your changes and exit the text editor
   \item Copy the XML file to \textit{RapidSmithPath/device/family}
   directory where ``family'' is replaced by the family of your part (such as
   artix7), and ``RapidSmithPath'' is the location of your RapidSmith repository.
@@ -712,9 +739,9 @@ if desired. This can be accomplished in two easy steps.
   of your macro that follows the format laid out below: 
 \end {enumerate}
 
-\begin{lstlisting}[language=XML, numbers=none, keywordstyle=, stringstyle=]
-<?xml version="1.0" encoding="UTF-8"?>
-<root>	
+\begin{lstlisting}[language=XML, numbers=none, keywordstyle=, stringstyle=,
+label=lst:macroXml, caption=Sample Macro XML for a CellLibrary] 
+<?xml version="1.0" encoding="UTF-8"?> <root>	
   <macros>    
 		<macro>
         <type>RAM128X1D</type>
@@ -788,6 +815,8 @@ if desired. This can be accomplished in two easy steps.
   \item Import the macro into the \cls{CellLibrary} using the API call shown in
   \autoref{code:macroImport}.
 
+\end{enumerate}
+
 \begin{lstlisting}[caption=Adding new macros to the Cell Library,
 label=code:macroImport] 
 // Get a handle to a CellLibrary
@@ -796,8 +825,6 @@ CellLibrary libCells = getCellLibrary();
 // Add the macros in an XML file.
 libCells.loadMacroXML(Paths.get("myMacro.xml"); 
 \end{lstlisting}
-
-\end{enumerate}
 
 \noindent
 Once this is complete, you can use your custom macro in a \cls{CellDesign} like

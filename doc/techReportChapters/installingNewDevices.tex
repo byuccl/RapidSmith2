@@ -5,27 +5,31 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \section{Installing New Device Files} \label{sec:installingNewDevices}
+\graphicspath{{./techReportFigures/sec10_deviceInstallation/}}
+
 The device files included with the RapidSmith2 installation (listed in
 \autoref{sec:supportedDevices}) have been well-tested, and are great starting
 points for new users. If you are new to RapidSmith2, it is \textit{strongly
 encouraged} to start with these existing device files. However, RapidSmith2
 also supports installing new devices for parts not listed in
 \autoref{sec:supportedDevices}. To create a new RapidSmith2 device
-file, three \texttt{Tincr} intermediate files are required:
+file, four \texttt{Tincr} intermediate files are required:
 
 \begin{enumerate}
   \item XDLRC
   \item Family Info XML
   \item Device Info XML
+  \item Cell Library XML
 \end{enumerate}
 
-\noindent The contents and format of these files are described in great detail
-in \autoref{sec:appendixXDLRC}, \autoref{sec:familyInfo}, and
-\autoref{sec:deviceInfo} respectively, and will not be described here. For those
-that are curious about what each file represents, refer to the listed
-appedices. The remainder of this section documents the required steps to
-transform the \texttt{Tincr} intermediate files into compact device files that
-can be loaded into RapidSmith2.
+\noindent The contents and format of these files are described in
+great detail in \autoref{sec:appendixXDLRC}, \autoref{sec:familyInfo},
+\autoref{sec:deviceInfo}, and section \ref{sec:cellLibraryinDesignSection}
+respectively, and will not be described here. For those that are curious about
+what each file represents, refer to the listed appedices. The remainder of this
+section documents the required steps to transform the \texttt{Tincr}
+intermediate files into compact device files that can be loaded into
+RapidSmith2.
 
 \subsection{Creating New Device Files for Supported Families}
 \label{sec:creatingNewSupportedDevices} 
@@ -89,9 +93,8 @@ created part as a command line argument. An example usage is shown in
 file (or whatever family your device is in) will already exist, but will be
 updated with new sites and tile types from the newly installed part.
 
-\item The final step is to create a \textit{cellLibrary.xml} file for the
-device. This file details all Xilinx primitives that can be used for
-implementing designs on the given device. \autoref{sec:cellLibraryGeneration}
+\item The final step is to create a \textit{cellLibrary.xml} file, which details
+all Xilinx primitives that can target the device. \autoref{sec:cellLibraryGeneration}
 demonstrates how to generate a new cell library. Copy the generated cell library
 to the corresponding family folder of the device and rename it to
 ``cellLibrary.xml.''
@@ -122,8 +125,8 @@ cellLibrary.xml familyInfo.xml |\textbf{xc7a100tcsg324\_db.dat}| |\textbf{xc7a10
 \end{lstlisting} 
 
 \subsection{Supporting New Device Families} \label{sec:newFamilies}
-Vivado supports implementing FPGA designs on devices for the following families
-(also called architectures):
+Vivado 2016.2 supports implementing FPGA designs on devices for the following
+families (also called architectures):
 
 \begin{multicols}{2}
 	\begin {itemize}
@@ -141,7 +144,11 @@ Vivado supports implementing FPGA designs on devices for the following families
 \noindent The name in parentheses is the Vivado Tcl name for the family. Bolded
 items are families that are currently supported in RapidSmith2 and
 \texttt{Tincr}. To add RapidSmith2 support for another Vivado family, follow the
-steps listed below.
+steps listed below. \textbf{NOTE: In general, you should not be adding support
+for a new family as a general user of RapidSmith2. Instead, create an issue at the
+RapidSmith2 GitHub repository and the maintainers of RapidSmith2 in the BYU CCL
+lab will add support. The following instructions are intended for BYU students
+only}.
 
 \begin {enumerate}
   \item Create the primitive definitions of the family using VSRT. The VSRT user

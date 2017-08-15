@@ -7,6 +7,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \section{Placement} \label{sec:placement}
+\graphicspath{{./techReportFigures/sec6_placement/}}
 
 In the original RapidSmith, placement occurred at the site level. A
 collection of cells were grouped together into an \textit{instance}, and the
@@ -21,9 +22,9 @@ placing cells in RapidSmith2.
 \begin{lstlisting} [xleftmargin=1.5em, framexleftmargin=1.5em, caption=Steps for
 placing a Cell in RapidSmith2,label=code:place]
   // Load the device and design
-  TincrCheckpoint tcp = VivadoInterface.loadTcp("myCheckpoint.tcp"); 
-  Device device = tcp.getDevice();
-  CellDesign design = tcp.getDesign();
+  VivadoCheckpoint vcp = VivadoInterface.loadRSCP("myCheckpoint.rscp"); 
+  Device device = vcp.getDevice();
+  CellDesign design = vcp.getDesign();
 
   // Get a handle to a Cell and Bel. The cell is of type LUT2 
   Cell cell = design.getCell("MyCell"); 

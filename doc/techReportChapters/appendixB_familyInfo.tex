@@ -7,6 +7,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \section{Family Info XML} \label{sec:familyInfo}
+\graphicspath{{./techReportFigures/appendixB/}}
 
 A \textit{familyInfo.xml} file contains useful information that is
 not present in the XDLRC files for a given family of devices. Specifically, it
@@ -129,7 +130,7 @@ connections are represented. External tools can use this information to
 build a more accurate device data structure. At the time of writing, BELs are
 considered routethrough candidates if they are of type ``LUT" or ``Flip-Flop"
 on a SLICE site. A more detailed discussion of routethroughs is presented in
-\autoref{sec:belRoutethroughs}.
+section \ref{sec:belRoutethroughs}.
 
 \begin{lstlisting}[numbers=none, keywordstyle=, stringstyle=,
 caption=Example Routethrough XML, label=lst:familyInfoRoutethrough]
@@ -174,7 +175,7 @@ caption=Example Site PIP Corrections, label=lst:pipCorrectionXml]
 \noindent RapidSmith2 decomposes a site PIP into its individual PIPs as shown in
 \autoref{fig:sitePipDecomposition}. This decomposition generally makes creating
 routing algorithms easier. In Vivado, site PIPs are determined with the Tcl
-command \texttt{[get\_site\_pips -of \$site]}. Polarity selectors are
+command \texttt{[get\_site\_pi\-ps -of \$site]}. Polarity selectors are
 distinguished from regular site PIPs by checking if the string name of the PIP
 ends with either ``INV'' or ``OPTINV''.
   
