@@ -8,10 +8,10 @@
 
 \subsection{Installation}
 
-RS2 is available on Github at:
+RapidSmith2 is available on Github at:
 {\color{blue}{\url{https://github.com/byuccl/RapidSmith2}}}.
-You can either build RS2 into .class and .jar files for use in any Java
-environment, or configure RS2 to work in an IDE (recommended).
+You can either build RapidSmith2 into .class and .jar files for use in any Java
+environment, or configure RapidSmith2 to work in an IDE (recommended).
 
 \subsubsection{Requirements for Installation and Use}
 \begin{itemize}
@@ -25,7 +25,7 @@ environment, or configure RS2 to work in an IDE (recommended).
 
 Tincr is a companion project
 ({\color{blue}{\url{https://github.com/byuccl/tincr}}}) which is used for
-importing/exporting designs between Vivado and RS2.  For getting started (running the example programs on the provided sample designs) you will not need it installed.
+importing/exporting designs between Vivado and RapidSmith2.  For getting started (running the example programs on the provided sample designs) you will not need it installed.
 Later, as you  actually start processing your own Vivado designs you will need
 to obtain and install it. There are additional dependencies beyond these
 required for installation, but they are either provided in the distribution
@@ -36,7 +36,7 @@ Tools.
 \subsubsection{Steps for Installation}
 
 \begin{enumerate}
-  \item Clone the RS2 repository at
+  \item Clone the RapidSmith2 repository at
   {\color{blue}{\url{https://github.com/byuccl/RapidSmith2}}}. If you are not
   familiar with GitHub, you will need to install Git on your computer, and run the
   following command in an open terminal: 
@@ -44,21 +44,21 @@ Tools.
 \begin{code}
 git clone https://github.com/byuccl/RapidSmith2
 \end{code} 
-  \noindent This will copy the RS2 repository into a local directory.
+  \noindent This will copy the RapidSmith2 repository into a local directory.
   \item Create a new environment variable called RAPIDSMITH\_PATH, and point it
-  to your local repository of RS2 that you setup in step (1). This is needed so
-  RS2 can find required device files and other items at runtime.
-  \item Build the  RS2 project. RS2 is managed using a gradle build system.
-  To build the project, navigate to your local repository of RS2 and execute one
+  to your local repository of RapidSmith2 that you setup in step (1). This is needed so
+  RapidSmith2 can find required device files and other items at runtime.
+  \item Build the  RapidSmith2 project. RapidSmith2 is managed using a gradle build system.
+  To build the project, navigate to your local repository of RapidSmith2 and execute one
   of the following scripts in a terminal:
   \begin{code}
 	gradlew build (unix)
 	gradlew.bat build (windows)
   \end{code}
   The build process could take a few minutes.
-  \item At this point, you have two choices: set up RS2 for use in an IDE, or
-  run RS2 from the command line. Both choices are detailed below.
-  \paragraph{Running from an IDE} The gradle scripts in RS2 currently support
+  \item At this point, you have two choices: set up RapidSmith2 for use in an IDE, or
+  run RapidSmith2 from the command line. Both choices are detailed below.
+  \paragraph{Running from an IDE} The gradle scripts in RapidSmith2 currently support
   setup for both Eclipse and IDEA Java IDEs. This section will detail how to
   setup the Eclipse environment, but similar steps can be taken for IDEA. If
   using Eclipse, it is best to use version Eclipse Neon or later. To create a
@@ -73,26 +73,26 @@ git clone https://github.com/byuccl/RapidSmith2
   \begin{code}
 	File->Open Projects From File System 
   \end{code}
-  and pointing it to your RS2 local repository. All Java source files
-  will be found under \dir{src/main/java}. \pgm{NOTE:} Your RS2 git repository
+  and pointing it to your RapidSmith2 local repository. All Java source files
+  will be found under \dir{src/main/java}. \pgm{NOTE:} Your RapidSmith2 git repository
   should not be put inside your eclipse workspace. It is better to put it
   elsewhere, and then import it into your workspace.
   \paragraph{Building on the Command Line} After step (3) in the installation
-  process, gradlew produces everything that you will need to run RS2 from the
+  process, gradlew produces everything that you will need to run RapidSmith2 from the
   command line. The following directories are created: 
   \begin{itemize}
-    \item \fil{build/classes/main}: This folder contains the RS2 class file
+    \item \fil{build/classes/main}: This folder contains the RapidSmith2 class file
     directory tree.
-    \item \fil{build/libs}: This folder contains a Jar file of the RS2 class
+    \item \fil{build/libs}: This folder contains a Jar file of the RapidSmith2 class
     files.
     \item \fil{build/distributions}: This folder has both .zip and .tar files
-    with contains all Jars needed to run RS2 from the command line. This
-    includes a full jar of the RS2 build alond with copies of dependency Jars
+    with contains all Jars needed to run RapidSmith2 from the command line. This
+    includes a full jar of the RapidSmith2 build alond with copies of dependency Jars
     (such as QT-Jambi).
   \end{itemize} 
   After adding the appropriate .class files or Jars to your \texttt{CLASSPATH},
-  you should be able to run RS2 tools from the command line. If you make any
-  changes to the RS2 code, you will have to rebuild before running the program
+  you should be able to run RapidSmith2 tools from the command line. If you make any
+  changes to the RapidSmith2 code, you will have to rebuild before running the program
   again (Step 3). \pgm{CAUTION:} An obvious thing to try is to mix and match
   developing in Eclipse but then running the resulting apps from the command
   line. Just be aware that Eclipse puts its compiled .class files in very
@@ -104,7 +104,7 @@ git clone https://github.com/byuccl/RapidSmith2
 
 \subsubsection{Alternative Installation and Use}
 
-RS2 is also available as a Docker container. To painlessly set up a working RS2 environment, type:
+RapidSmith2 is also available as a Docker container. To painlessly set up a working RapidSmith2 environment, type:
 \vspace{-0.05in}
 \begin{code}
 docker run -it byuccl/rapidsmith2
@@ -125,25 +125,25 @@ be done, but how to do so differs based on what OS X version you are running
 instructions for how to do so if you desire. \pgm{Hint}: you will likely have
 to edit some \fil{.plist} files.
 
-\subsubsection{Running RS2 Programs}
-Some points to keep in mind while configuring and running RS2 programs:
+\subsubsection{Running RapidSmith2 Programs}
+Some points to keep in mind while configuring and running RapidSmith2 programs:
 \begin{itemize}
-  \item The RS2 code base contains a number of assertions which may be helpful  
+  \item The RapidSmith2 code base contains a number of assertions which may be helpful  
   as you are developing code.  These are not enabled by default in Java.  To
   enable them, add \opt{-ea} as a VM argument.  This is highly recommended.
-  \item If you are running on a Mac, when running RS2 programs that use Qt  (any
+  \item If you are running on a Mac, when running RapidSmith2 programs that use Qt  (any
   of the built-in programs like \pgm{DeviceBrowser}) that are GUI-based, you
   will need to supply an extra JVM switch, \opt{-XstartOnFirstThread}.
-  \item A common error when running RS2 programs is failing to have your
+  \item A common error when running RapidSmith2 programs is failing to have your
   \env{RAPIDSMITH\_PATH} defined.  If this is the case when you try to execute a
   program, an \texttt{EnvironmentException} will be thrown telling you that you
   forgot to set the variable.
   \item If you are running on Windows, only a 32-bit QT Jar file is included in
-  the RS2 repository. This means that you will need to set your JRE to a 32-bit
+  the RapidSmith2 repository. This means that you will need to set your JRE to a 32-bit
   version when running the GUI programs. We are working on updating QT to the
   latest version, so this will no longer be an issue.
   \item For Linux command line usage, the \env{CLASSPATH} environment variable
-  must point to both the full (uncompressed) RS2 jar in the \dir{build/distributions}
+  must point to both the full (uncompressed) RapidSmith2 jar in the \dir{build/distributions}
   folder as well as all the jar files in the \dir{/lib} subdirectory. An example
   \env{CLASSPATH} could look like this:
   \vspace{-0.15in}  \begin{code}
@@ -159,7 +159,7 @@ java edu.byu.ece.rapidSmith.device.browser.DeviceBrowser
 \end{code} \vspace{0.1in}    
 
 \noindent This can be done either from within Eclipse or from the command line,
-depending on how you are running RS2 (if running under OS X be sure to provide the
+depending on how you are running RapidSmith2 (if running under OS X be sure to provide the
 \opt{-XstartOnFirstThread JVM argument}. If all goes well you should see a
 graphical representation showing the details of a physical FPGA device as shown
 in \autoref{fig:deviceBrowser}.  You may initially be zoomed far in and might
@@ -174,10 +174,10 @@ want to zoom out to see the entire chip layout.
 
 \subsection{Running Real Designs - An Overview}
 This section will lead you through running an entire design from Vivado through
-RS2 and back.  In this example you will fully synthesize and implement a
-complete design in Vivado and then move it into RS2.  However, later as you gain
+RapidSmith2 and back.  In this example you will fully synthesize and implement a
+complete design in Vivado and then move it into RapidSmith2.  However, later as you gain
 experience you may choose to only synthesize  designs before exporting
-them to RS2 or you may choose to export and work with Vivado Out-Of-Context
+them to RapidSmith2 or you may choose to export and work with Vivado Out-Of-Context
 (OOC) Checkpoints.
 
 The steps to be covered include:
@@ -186,17 +186,17 @@ The steps to be covered include:
   \item Synthesize, place and route a design in Vivado
   \item  Export the design from Vivado in the form of an RSCP (RapidSmith
   Checkpoint)
-  \item Import the RSCP  into RS2
+  \item Import the RSCP  into RapidSmith2
   \item Run some analysis on the design
-  \item Export the design from RS2 as a TCP (Tincr Checkpoint)
+  \item Export the design from RapidSmith2 as a TCP (Tincr Checkpoint)
   \item Import the TCP back into Vivado
 \end{enumerate}
 
 In a real CAD flow you would likely do something more interesting
 than the analysis in Step 4 above, but this overview is intended to help you
-through the Vivado-to-RS2-back-to process so you can get started.
+through the Vivado-to-RapidSmith2-back-to process so you can get started.
 
-Note: the entire flow requires the installation of Tincr as well as RS2 so if
+Note: the entire flow requires the installation of Tincr as well as RapidSmith2 so if
 you skipped the Tincr installation above, go and install it now.
 
 \subsubsection{Synthesize, Place, and Route a Design in Vivado and Then Export
@@ -208,7 +208,8 @@ First, start up Vivado in command line mode.  This can be done using the
 ``Vivado Tcl Shell'' program item or by executing ``vivado -mode tcl''.  Once
 the shell has started up, you may execute the following:
                 
-\begin{lstlisting}
+% Use keywordstyle=\ttfamily to disable keywords
+\begin{lstlisting} [numbers=none,keywordstyle=\ttfamily]
 	Vivado\% cd <path to directory containing your HDL files>
 	Vivado\% link_design -part xc7a100t-csg324-3
 	Vivado\% read_verilog [glob *.v]
@@ -230,7 +231,7 @@ in Vivado prior to export.  There is no requirement, however, that the design is
 either placed or routed prior to export.  You may choose to export it any time
 after it has been synthesized.
 
-Finally, note that a set of sample HDL designs are provided in the RS2
+Finally, note that a set of sample HDL designs are provided in the RapidSmith2
 distribution (in \dir{exampleVivadoDesigns}) and which you could use for your
 learning.
 You can read about them as well as a script which implements a version of the
@@ -239,14 +240,14 @@ that the compilation script described there expects a particular directory
 structure to hold your source files.  Otherwise, the script implements 
 essentially what is shown above.
 
-\subsubsection{Import the RSCP into RS2}
-Once you have a RSCP you are ready to create a Java program for RS2 that will be
-able to import that RSCP into RS2 so you can do something with it.
+\subsubsection{Import the RSCP into RapidSmith2}
+Once you have a RSCP you are ready to create a Java program for RapidSmith2 that will be
+able to import that RSCP into RapidSmith2 so you can do something with it.
 
 As described in Section~\ref{examples} of this report (and
 Section~\ref{sec:importExportExample} in particular) a sample import/export program
-is provided in the RS2 distribution which illustrates how to import
-and export designs from RS2.  This program, when run, will read in a
+is provided in the RapidSmith2 distribution which illustrates how to import
+and export designs from RapidSmith2.  This program, when run, will read in a
 RapidSmith Checkpoint (RSCP), walk the resulting data structures and
 then prettyprint the design contents, and then write out the
 corresponding Tincr Checkpoint.   

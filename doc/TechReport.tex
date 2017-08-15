@@ -29,6 +29,10 @@
 \setlength{\topmargin}{-0.25in}
 \setlength{\textwidth}{6.5in}
 
+%\setlength{\textfloatsep}{0.1cm}
+% add space between paragraphs
+%\setlength{\parskip}{0.5em}
+
 \pagestyle{fancy}
 \fancyhead[L]{}
 \fancyhead[R]{}
@@ -62,8 +66,6 @@
   \scantokens{#1\noexpand}%
   \endgroup
 }
-
-\renewcommand{\lstlistingname}{Code Sample}
 
 % Colors used for Java code
 \definecolor{dkgreen}{rgb}{0,0.6,0}
@@ -143,7 +145,8 @@
 \makeatother
 
 \makeindex
-\setcounter{tocdepth}{2}
+% show all sections (even subsections and subsubsections in the table of contents)
+\setcounter{tocdepth}{3}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %	Document Start
@@ -204,7 +207,12 @@ Technical Report and Documentation\\[0.1in]
 \input{techReportChapters/bitstreams.tex}
 \input{techReportChapters/license.tex}
 \input{techReportChapters/dependencies.tex}
+
+\appendix
 \input{techReportChapters/appendixA_Xdlrc.tex}
+\input{techReportChapters/appendixB_familyInfo.tex}
+\input{techReportChapters/appendixC_deviceInfo.tex}
+\input{techReportChapters/appendixD_RSCP.tex}
 
 \end{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

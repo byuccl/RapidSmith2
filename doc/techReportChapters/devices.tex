@@ -9,6 +9,9 @@
 \newpage
 \section{Devices}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 	Xilinx FPGA Architecture
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Xilinx FPGA Architecture Overview} \label{fpgaArch}
 This section is intended to give a brief introduction to Xilinx FPGA
 architecture and terminology. The terminology introduced here is consistent
@@ -18,219 +21,318 @@ As you read through this section, it may be helpful to open a sample device in V
 Device Browser. To do this, open a new command prompt and run Vivado in Tcl mode
 (``vivado -mode tcl''). Then, run the following commands in the Vivado prompt:
 
-\begin{verbatim}
+\begin{lstlisting} [numbers=none,keywordstyle=\ttfamily]
 Vivado% link_design -part xc7a100tcsg324-3 -quiet
 Vivado% start_gui
-\end{verbatim}
+\end{lstlisting}
 
 \noindent
-After these commands are run, a GUI view should pop up showing the components
-of an Artix7 FPGA part. Use this to explore the Xilinx device architecture if
-needed.
+Replace ``xc7a100tcsg324-3" with any Xilinx part you are interested in looking
+at. After these commands are run, a GUI view should pop up showing the
+components of an Artix7 FPGA part. Use this to explore the Xilinx device 
+architecture if needed.
 
-\subsubsection{Tiles}
-Conceptually, a Xilinx FPGA can be thought of as a two dimensional
-array of \cls{Tile}s. A \cls{Tile} is a template section within a FPGA that
-performs a specific function (i.e. implementing logic equations). Templates are
-then duplicated across the device (all copies are identical) and different
-\cls{Tile} types are wired together. As an example, \autoref{fig:tileExample}
-displays three types of template \cls{Tile}s in an Artix7 part.
+% Device Hierarchy
+\subsubsection{Device Hierarchy} \label{sec:deviceHierarchy}
+Xilinx FPGAs can be broken down into \texttt{series},
+\texttt{families}, and individual \texttt{parts}. At the highest level, a series
+defines a unique FPGA architecture. Vivado currently supports three different
+series: Series7, UltraScale, and UltraScale+. As shown in
+\autoref{tab:vivadoFamilies}, each series can be broken down into a list of
+families. These families all use the same series architecture, but are
+optimized for cost, power, performance, size, or another metric.
 
-\begin{figure}[H]
+\begin{table} [h!]
+\caption{Vivado Device Families (organized by series)}
+\label{tab:vivadoFamilies}
+\vspace{-.15in}
+\begin{center}
+\begin{tabu}{ |c|c|c|c| }
+\hline
+\textbf{Series7} & \textbf{UltraScale} & \textbf{UltraScale+} \\
+\hline
+\hline
+ Kintex & Kintex & Kintex \\
+ Virtex & Virtex & Virtex \\
+ Artix &  &  \\
+ Spartan &  &  \\
+ Zynq &  &  \\ 
+\hline
+\end{tabu}
+\end{center}
+\end{table}
+
+\begin{figure}[b!]
  \centering
- \includegraphics[width=0.7\columnwidth]{tiles}
- \caption{Highlighted example \cls{Tile}s in an Artix7 FPGA.}
+ \includegraphics[width=\columnwidth]{deviceHierarchy.png}
+ \caption{Xilinx Device Hierarchy}
+ \label{fig:deviceHierarchy}
+\end{figure}
+
+\noindent Families can further be broken down into one or more parts (actual
+FPGA devices). A Xilinx part has a variety of attributes including its number,
+package type, and speed-grade. Take the part ``xcku025-ffva1156-1-c'' as an
+example. This part is within the Kintex UltraScale family, uses a ``ffva1156''
+package type, and has a speed grade of ``1-c''. \autoref{fig:deviceHierarchy}
+shows the device hierarchy of a Xilinx part . The following subsections describe
+each internal component of a Xilinx FPGA as shown in the figure.
+
+% Tiles
+\subsubsection{Tiles}
+A Xilinx FPGA is organized into a two-dimensional array of \texttt{Tile}s. Each
+tile is a rectangular component of a device that performs a specific function
+such as implementing digital logic or storing BRAM memory. Tiles are stamped
+across a device  and wired together through the general routing fabric. All
+copies of a tile type are identical or nearly identical (they may have minor
+routing differences). \autoref{fig:tileExample} displays three types of tiles
+in an Artix7 device. The \textbf{VBRK} tile on the left is used for wiring
+signals between other tiles (these connections are not programmable). The 
+\textbf{INT\_L} tile on the right is a switchbox tile. These are
+reconfigurable routing tiles that allow a single wire to be routed to various
+locations within the FPGA. The \textbf{CLBLL} tile in the middle is used
+to implement combinational and sequential digital logic, and is the fundamental
+component of Xilinx FPGAs. Other tile types include DSP, BRAM, FIFO, and IOB.
+
+\begin{figure}[t!]
+ \centering
+ \includegraphics[width=\columnwidth]{tiles.png}
+ \caption{Artix7 Tiles}
  \label{fig:tileExample}
 \end{figure}
 
-\noindent
-The two \pgm{VBRK} \cls{Tile}s on the left are used for intermediate wiring.
-The two \pgm{INT\_L} \cls{Tile}s on the right are switchbox \cls{Tile}s.
-These are reconfigurable routing \cls{Tile}s that allow a single wire to go
-multiple different locations within the FPGA. The two \pgm{CLBLL} \cls{Tile}s
-in the middle are used to implement combinational and sequential digital logic.
-They are the basic building blocks of Xilinx FPGAs. Other \cls{Tile} types
-include DSP, BRAM, and IOB.
- 
-\subsubsection{Primitive Sites}
+% Sites
+\subsubsection{Sites}
+Tiles generally consist of one or more \texttt{Site} objects, which organize
+the hardware components of the tile into related groups. Specifically, sites are
+the part of a tile which perform the tile's ``useful'' function. The remainder
+of the tile is used to wire signals to and from its corresponding sites.
+\autoref{fig:site} shows an example site of type SLICEL within a Series7 CLBLL
+tile. As the figure shows, a site consists of three main components which are
+connected through wires:
 
-\begin{figure}[b!]
+\begin{figure}[p!]
 \centering
-   \begin{subfigure}[b!]{0.65\textwidth}
-   \includegraphics[width=1\linewidth]{site}
+   \begin{subfigure}[h!]{0.85\textwidth}
+   \includegraphics[width=\textwidth]{site.png}
    \caption{}
-   \label{fig:site1} 
+   \label{fig:site1}
 \end{subfigure}
 
-\begin{subfigure}[b!]{0.65\textwidth}
-   \includegraphics[width=1\linewidth]{subsite}
+\begin{subfigure}[h!]{0.85\textwidth}
+   \includegraphics[width=\textwidth]{subsite2.png}
    \caption{}
    \label{fig:site2}
 \end{subfigure}
 
-\caption{(a) A highlighted example of a SLICEL \cls{Site} in a CLBLL \cls{Tile}
-of an Artix7 FPGA. (b) The basic components of a \cls{Site} in a
-Xilinx FPGA.}
+\caption{Series7 SLICEL Site (a), and Highlighted Site Components (b)}
 \label{fig:site}
 \end{figure}
 
-Each \cls{Tile} can contain one or more \cls{Primitive Site}s (often shortened
-to \cls{Site}). As \autoref{fig:tileExample} shows, CLBLL \cls{Tile}s
-have two \cls{Site}s, INT\_L \cls{Tile}s have one \cls{Site}, and VBRK \cls{Tile}s
-have none. A \cls{Site} is the part within a \cls{Tile} that actually performs
-its ``useful'' function. The remainder of the \cls{Tile} is used to wire signals
-to/from its \cls{Site}s. \autoref{fig:site} shows a SLICEL, one of the
-\cls{Site}s within a CLBLL \cls{Tile}. As the figure shows, there are three main
-components to \cls{Site}s in Xilinx FPGAs:
-
 \begin{itemize}
-  \item \cls{Site} \cls{PIP}s: Reconfigurable routing PIPs used for intrasite
-  routing (also called routing muxes). In Vivado, \cls{Site} \cls{PIP}s are usually configured
-  automatically as cells in a design are being placed (based on cell properties
-  and placement location).
-  \item \cls{BEL}s: \pgm{B}asic \pgm{EL}ements are hardware components within
-  the \cls{Site} for implementing digital logic. For example, LUT \cls{BEL}s within a SLICEL
-  are used to implement logic equations, and Flip Flop \cls{BEL}s are used
-  as storage. In a synthesized netlist, design elements are mapped to physical
-  \cls{BEL}s during implementation.
-  \item \cls{Site Pin}s: \cls{Site} input and output. These pins are connected
-  to \cls{Wire}s of the parent \cls{Tile} and typically drive general
-  fabric.
+  \item \textbf{Site} \textbf{PIP}s: Also called routing muxes, these are
+  reconfigurable routing PIPs used to specify the internal routing of a site.
+  In Vivado, site PIPs are usually configured automatically as cells in a
+  design are placed (based on cell properties and placement locations).
+  
+  \item \textbf{BEL}s: \textbf{B}asic \textbf{EL}ements are hardware components
+  within a site for implementing digital logic. For example, look-up-tables
+  (LUT) within a SLICEL are used to implement logic equations, and flip-flops
+  (FF) are used as storage. In a synthesized netlist, design elements are
+  mapped to BELs during implementation.
+   
+  \item \textbf{Site Pin}s: These pins are connected to wires of the parent tile
+  and typically drive/receive signals from the general fabric.
 \end{itemize}
 
 \subsubsection{Wires and PIPs} \label{wireSection}
  
-FPGA components are connected together using metal \cls{Wire}s (called
-\cls{Node}s in Vivado). In order to make the FPGA reconfigurable,
-\cls{Wire}s are connected together through Programmable Interconnect Points
-(\cls{PIP}s). Individual \cls{PIP}s can be enabled or disabled as a design is
-being routed, and a string of enabled \cls{PIP}s uniquely identify the
-used \cls{Wire}s of a physical route. \cls{PIP}s are most commonly
-found in Switchbox \cls{Tile}s, and enable a single wire to be routed to many
-different locations in the FPGA. \autoref{fig:switchboxPIP} shows an
-example of a switchbox.
-
-\begin{figure}[H]
+\begin{figure}[t!]
 	\centering
-	\includegraphics[width=0.45\columnwidth]{pipExample}
-	\caption{An example of PIP wire connections in a device. The green wire
-	represents the source wire, and the red wires represent all possible sink
-	wires in the Switchbox. The highlighed white sections of the figure are PIP
-	connections.}
+	\includegraphics[width=0.65\columnwidth]{pipExample.pdf}
+	\caption{An example switchbox tile. The green wire represents a source wire,
+	and the red wires represent all possible sink wires in the switchbox. The
+	highlighed white sections of the figure are PIP connections.}
 	\label{fig:switchboxPIP}
 \end{figure} 
  
-\subsection{Device Data Structures} \label{devicesRS2}
-In the original RapidSmith, the \cls{Device} architecture stopped at the
-\cls{Site} level. A \cls{Site} was considered a black box who could be
-configured using string attributes, but the actual components were unknown.
-RS2 extends the \cls{Device} architecture to include all components
-\pgm{within} a \cls{Site} as well. \autoref{fig:deviceDataStructures}
-shows the new device data structure hierarchy, which can be found in the {\em
-edu.byu.ece.rapidSmith.device} package.
+FPGA components are connected together using metal \texttt{Wire}s (called
+\texttt{Node}s in Vivado). To make the FPGA reconfigurable,
+wires are connected through programmable interconnect points
+(PIPs). Individual PIPs can be enabled or disabled as a design is
+being routed, and a string of enabled PIPs uniquely identify the
+used wires of a physical route. PIPs are most commonly
+found in switchbox tiles, and enable a single wire to be
+routed to several locations on the chip. \autoref{fig:switchboxPIP}
+shows an example switchbox with its corresponding PIPs. The red wires
+represent all downhill nodes that the green wire can connect to through a PIP
+connection.
 
-\begin{figure}[H]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 	Device Data Structures
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\subsection{Device Data Structures} \label{devicesRS2}
+In the original RapidSmith, the device architecture stopped at the
+site level. A site was considered a black box who could be
+configured using string attributes, but the actual internal components were
+unknown. RapidSmith2 extends the device architecture to include all
+components \textbf{within} a site as well. \autoref{fig:deviceDataStructures}
+shows the new data structure hierarchy, which can be found in the package \emph{
+edu.byu.ece.rapidSmith.device}. The classes and interfaces within
+\emph{edu.byu.ece.rapid\-Smith.device} are named to reflect the terminology
+used by Xilinx. Many classes that exist in Vivado's Tcl interface have a direct map
+to a class in RapidSmith2 (such as a \texttt{Tile}). Because of this, most
+RapidSmith2 data structures represent a straightforward part of a Xilinx FPGA.
+The \texttt{DeviceBrowser} and \texttt{DeviceAnalyzer} example programs
+illustrate how to load and browse a device with \texttt{Tile} and \texttt{Site}
+data structures, and \autoref{lst:deviceCalls} shows basic device usage in
+RapidSmith2. The remainder of this section details important aspects of
+RapidSmith2 devices.
+
+% TODO: update this figure to include package pins
+\begin{figure}[t]
 	\centering
 	\includegraphics[width=1\columnwidth]{deviceDS.eps}
-	\caption{RS2 \cls{Device} data structure tree. Green arrows represent
-	inheritance, and black arrows represent association. Classes and Interfaces
-	bolded in blue are new to RS2.}
+	\caption{RapidSmith2 Device data structure tree. Green arrows
+	represent inheritance, and black arrows represent association. Classes and Interfaces
+	bolded in blue are new to RapidSmith 2.}
 	\label{fig:deviceDataStructures}
 \end{figure}
 
-\noindent
-The classes and interfaces within {\em edu.byu.ece.rapidSmith.device} are named
-to reflect the terminology used by Xilinx. Many classes that exist in Vivado's
-Tcl interface have a direct map to a class in RS2 (such as a \cls{Tile}).
-Because of this, most RS2 data structures represent a straightforward
-part of a Xilinx FPGA, The reader is referred to the documentation in the
-source code to learn more about each data structure. Also, The
-\pgm{DeviceBrowser} and \pgm{DeviceAnalyzer} programs described in 
-\autoref{examples} illustrate how to load and browse a device down to the
-\cls{Tile} and \cls{Site} levels.
+\begin{lstlisting}[xleftmargin=1.5em, framexleftmargin=1.5em, caption=Basic
+device function calls, label=lst:deviceCalls]
+  // Get a handle to a device 
+  Device device = Device.getInstance("xc7a100tcsg324-3");
+	
+  // Get device components by name
+  Tile tile = device.getTile("CLBLL_R_X27Y130");
+  Site site = tile.getSite("SLICE_X44Y130");
+  Bel bel = site.getBel("D6LUT");
+	
+  // Get all device components
+  device.getTiles();
+  tile.getSites();
+  site.getBels();
+\end{lstlisting}
 
 \subsubsection{Templates}
 As \autoref{fig:deviceDataStructures} shows, there are several template
-classes in RS2. Template classes are used to specify the configuration of
-certain structures only once, and then reuse the configuration across
-identical objects. The usefulness of templates is best shown with an example. In
-an Artix-7 {\em xc7a100tcsg324} part, there are 11,100 \cls{Site}s of type
-SLICEL. Each of these SLICELs have 215 \cls{BEL}s, \cls{Site} \cls{Pin}s, and
-\cls{Site} \cls{PIP}s combined. In order to save memory, RS2
-lazily creates these objects only when a SLICEL \cls{Site} is being used. The
-alternative would be to create each of the objects when a device is loaded.
-Template classes should \pgm{NOT} be used by the normal user. When creating
-algorithms using RS2's API, use the non-template version of classes.
+classes in RapidSmith2. Template classes are used to specify the configuration
+of a device structure only once, where the configuration can be reused
+across identical objects. The usefulness of templates is best shown with an
+example. In an Artix-7 \emph{xc7a100tcsg324} part, there are 11,100 sites of
+type SLICEL. Each of these SLICELs have 215 internal components (BELs, pins,
+and PIPs). To save memory, RapidSmith2 lazily creates site objects
+based on the template only when a handle to a SLICEL site is requested. The
+alternative would be to create each of the objects when a device is loaded, but
+this would require more memory. Template classes should generally not be
+used by the regular user. When creating algorithms using RapidSmith's API, use
+the non-template version of classes instead.
 
 \subsubsection{WireEnumerator} \label{wireEnum}
-Wires with the same name can occur several times throughout a Xilinx FPGA
-device. For example, the wire ``CLBLL\-\_L\_C2'' exists in every \cls{Tile} of
-type ``CLBLL\_L''. In order to make the device files small, each uniquely named \cls{Wire}
-is assigned an integer enumeration. This avoids moving strings around in
-memory which would be costly in terms of both space and comparison times.
-RS2 manages all uniquely named wires in an FPGA family with a
-\cls{WireEnumerator}. The \cls{WireEnumerator} class has methods that convert to
-and from the wire name and enumeration of a \cls{Wire}, and also stores other
-\cls{Wire} information such as direction and type. In previous versions of
-RapidSmith, the user had to use the \cls{WireEnumerator} extensively while
-building CAD tools. RS2 has changed this, largely abstracting the
-\cls{WireEnumerator} away in favor of more convenient methods in all classes and
-interfaces that deal with \cls{Wire}s. For example, the name or enumeration of a
-\cls{Wire} can now be obtained with the function calls {\em Wire.getWireName()}
-and {\em Wire.getWireEnum()} respectively. A handle to the
-\cls{WireEnumerator} still exists in the \cls{Device} class for those who
-want to use it, but this is not recommended. 
+Wires with the same name and function can occur several times throughout a
+Xilinx FPGA. For example, the wire \texttt{CLBLL\-\_L\_C2} exists in every tile
+of type \texttt{CLBLL\_L} in a Series7 device. To make RapidSmith2
+device files small, each uniquely named wire is assigned an integer enumeration
+and stored in a \texttt{WireEnumerator} class. The \texttt{WireEnum\-erator}
+has methods to convert an integer to the corresponding string wire name and
+vice versa.
+
+In previous versions of RapidSmith, the \texttt{WireEnumerator} was used
+extensively while building CAD tools. RapidSmith2 has changed this, largely
+abstracting the \texttt{WireEnumerator} away in favor of more convenient
+methods that return \texttt{Wire} objects which contain a wire's integer
+enumeration and name. For example, the name or enumeration of a wire can now be
+obtained with the function calls in the \texttt{Wire} interface
+\texttt{getWireName()} and \texttt{getWireEnum()} respectively. A handle to the
+\texttt{WireEnumerator} still exists in the \texttt{Device} class for those who
+want to use it, but this is not recommended.
+
+% TODO: add a code segment here showing the old way vs. new way?
 
 \subsubsection{TileWire and SiteWire} \label{wires}
-\cls{Wire}s in RS2 are uniquely identified not only by their name
-(or enumeration), but also by the \cls{Tile} or \cls{Site} in which they exist.
-RS2 introduces the \cls{TileWire} and \cls{SiteWire} classes to
-encapsulate this information for the user. Many functions in RS2 now
-return a \cls{TileWire} or \cls{SiteWire} (wrapped in a generic \cls{Wire}
-object) to the user instead of an integer wire enumeration.
+Wires in RapidSmith2 are uniquely identified not only by their name
+(or enumeration), but also by the tile or site in which they exist.
+RapidSmith2 introduces the \texttt{TileWire} and \texttt{SiteWire} classes to
+encapsulate this information for the user. Many functions in RapidSmith2 now
+return a \texttt{TileWire} or \texttt{SiteWire} object (wrapped in a generic
+\texttt{Wire}) instead of an integer wire enumeration. \texttt{Wire}s are
+connected through \texttt{Connection} objects as described in
+\autoref{sec:routing}.
 
-\subsubsection{Wire and Connection Interfaces}
-As \autoref{fig:deviceDataStructures} shows, there are two classes that
-inherit the \cls{Wire} interface (described in \autoref{wires}) and
-three classes that inherit the \cls{Connection} interface (described in 
-\autoref{otherConns}). In general, most methods in RS2 return the
-generic interface instead of the subclasses. When creating CAD tools in
-RS2, it is suggested that the user use these interfaces. Several of the
-examples referenced in \autoref{examples} demonstrate the use of these
-interfaces.
+\subsubsection{Package Pins}
 
-\subsection{Loading a Device} \label{sec:loadingDevice}
+Vivado maps all \textit{bonded} IOB sites to corresponding package pins.
+Top-level ports of a design can be mapped to these package pins to communicate
+with external components. A RapidSmith2 \texttt{Device} object represents Vivado
+package pins with \texttt{PackagePin} objects. Each \texttt{PackagePin} 
+contains (1) the name of the package pin (i.e. M17), (2) the PAD BEL of the
+package pin, and (3) a boolean flag to mark clock package pins. Clock
+package pins are those that can access the global clock routing structure of
+the FPGA for low skew signals. \autoref{lst:packagePins} shows some available
+package pin method calls.
 
-The code sample below demonstrates how to load a supported device in
-RS2.
-
-\begin{lstlisting}[caption=Loading a Device, label=code:loadDevice]
-Device device = RSEnvironment.defaultEnv().getDevice("xc7a100tcsg324");
-//or
-Device deviceReloaded = RSEnvironment.defaultEnv().getDevice("xc7a100tcsg324", true);
+\begin{lstlisting}[xleftmargin=1.5em, framexleftmargin=1.5em,caption=RapidSmith2
+package pin functions, label=lst:packagePins] 
+  // Get a list of all package pins 
+  device.getPackagePins();
+	
+  // Get a list of clock package pins
+  device.getClockPads();
+	
+  // Get an individual package pin based on the BEL
+  Bel bel = device.getSite("IOB_X0Y10").getBel("PAD");
+  PackagePin pin = device.getPackagePin(bel);
+	
+  // Package pin functions
+  pin.getName();
+  pin.getSite();
+  pin.getBel();
+  pin.isClockPad();	
 \end{lstlisting}
 
-\noindent The first function call will only load the device into memory if it
-has not yet been loaded. If it has been loaded, then the cached \texttt{Device}
-data structure will be returned. The second function call will reload the device from
-disk, creating a completely separate \texttt{Device} data structure. This is
-useful when implementing multi-threaded code that targets the same part.
-\textbf{NOTE:} When a Vivado design is loaded into RS2 via a RSCP, the
-corresponding device is also loaded.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 	Loading a Device
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Loading a Device} \label{sec:loadingDevice}
+\autoref{code:loadDevice} below demonstrates how to load a supported device
+into RapidSmith2.  The first function call will only load the device into memory
+if it has not yet been loaded. If it has been loaded, then the cached
+\texttt{Device} data structure will be returned. The second function call will
+reload the device from disk, creating a separate \texttt{Device} data
+structure. 
 
+\begin{lstlisting}[xleftmargin=1.5em, framexleftmargin=1.5em, caption=Loading a
+Device, label=code:loadDevice] 
+Device device = RSEnvironment.defaultEnv().getDevice("xc7a100tcsg324");
+//or
+Device reload = RSEnvironment.defaultEnv().getDevice("xc7a100tcsg324", true);
+\end{lstlisting}
+
+\noindent This is useful when implementing multi-threaded code that targets
+the same part. \textbf{NOTE:} When a Vivado design is loaded into RapidSmith2
+via a RSCP, the corresponding device is also loaded.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 	Supported Device Files
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Supported Device Files} \label{sec:supportedDevices}
-RS2 currently supports the following device families and parts.
+RapidSmith2 includes two device files on installation: (1) an Artix7
+\texttt{xc7a100tcsg324}, and (2) a Kintex UltraScale \texttt{xcku025-ffva1156}.
+These device files have been well tested and are a good starting point for new
+users looking to implement Vivado CAD algorithms. However, RapidSmith2 has
+general support for the following families:
 
-\begin {itemize}
-  \item Artix7 
-  	\begin{itemize}
-  	  \item xc7a100t-csg324-3
-  	\end{itemize}
-  \item Kintex Ultrascale (kintexu)
-    \begin{itemize}
-  	  \item xcku025-ffva1156 
-  	\end{itemize}
-\end{itemize}
+\begin{multicols}{2}
+	\begin{itemize}
+	  \item Artix7
+	  \item Virtex7
+	  \item Kintex7
+	  \item Zynq
+	  \item Kintex UltraScale
+	  \item Virtex UltraScale
+ 	\end{itemize}
+\end{multicols}
 
-\noindent Section \ref{sec:installingDeviceFiles} describes how to install new
-RS2 device files if you wish to add to this list. 
+\noindent Section \ref{sec:installingNewDevices} describes how to create new
+device files for these families and add them to RapidSmith2.
