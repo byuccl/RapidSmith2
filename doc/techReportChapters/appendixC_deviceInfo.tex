@@ -1,0 +1,52 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Appendix C: DeviceInfo XML Files
+%	This section provides a detailed description of Family Info files, and their
+%   syntax. Most users of RapidSmith2 don't need to know the syntax of family info
+%   files, but this information may be useful to new lab members working on the
+%   project.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{DeviceInfo Info XML} \label{sec:deviceInfo}
+A device info XML file contains additional information \textbf{specific to a
+device} that is not found in the corresponding XDLRC for the device. Currently,
+the device info file contains only a list of package pins for the device as
+shown in \autoref{lst:deviceInfoXml}. Each package pin definition has three
+attributes:
+
+\begin{enumerate}
+  \item \textbf{The name of the package pin}: Generally, package pin names are a
+  single letter followed by a two-digit number (i.e. M17). For those that have
+  written UCF or XDC constraints for a FPGA design targeting a Xilinx part, this
+  format should be familiar.
+  \item \textbf{The corresponding PAD BEL for the package pin}: Each
+  package pin maps to a specific BEL in the device. Both the name of the
+  BEL as well as its parent site is recorded in the form ``site/belname.''
+  \item \textbf{An optional ``is\_clock'' attribute}: Only a select number of
+  package pins in a device can access the global clock routing resources. These
+  package pins are explicitly marked in the device info file so external CAD
+  tools can use this information when placing clock ports (or other signals
+  that need access to global routing).
+\end{enumerate}
+
+\noindent Device info files can be generated with the \texttt{Tincr}
+command \texttt{[tincr::create\_xml\_device\-\_info]}. This command is fully
+automated, and requires no hand edits.
+
+\begin{lstlisting}[numbers=none, keywordstyle=, stringstyle=,
+caption=Example Device Info XML, label=lst:deviceInfoXml]
+  <device_info>
+      <partname>xcku025-ffva1156</partname>
+      <package_pins>
+          <package_pin>
+              <name>AK33</name>
+              <bel>IOB_X0Y155/PAD</bel>
+          </package_pin>
+          <package_pin>
+              <name>AJ29</name>
+              <bel>IOB_X0Y130/PAD</bel>
+              <is_clock/>
+          </package_pin>
+          ...
+      </package_pins>
+  </device_info>
+\end{lstlisting}
