@@ -178,6 +178,9 @@
     </site_type>
     <site_type>
       <name>IDELAYE2</name>
+      <compatible_types>
+        <compatible_type>IDELAYE2_FINEDELAY</compatible_type>
+      </compatible_types>
       <alternatives>
       </alternatives>
       <bels>
@@ -1889,6 +1892,14 @@
     </site_type>
     <site_type>
       <name>OPAD</name>
+      <compatible_types>
+        <compatible_type>IOB33S</compatible_type>
+        <compatible_type>IOB33M</compatible_type>
+		<compatible_type>IOB33</compatible_type>
+        <compatible_type>IOB18S</compatible_type>
+        <compatible_type>IOB18M</compatible_type>
+		<compatible_type>IOB18</compatible_type>
+      </compatible_types>
       <bels>
         <bel>
           <name>PAD</name>
@@ -2417,9 +2428,6 @@
     </site_type>
     <site_type>
       <name>IDELAYE2_FINEDELAY</name>
-      <compatible_types>
-        <compatible_type>IDELAYE2</compatible_type>
-      </compatible_types>
       <bels>
         <bel>
           <name>IDELAYE2_FINEDELAY</name>

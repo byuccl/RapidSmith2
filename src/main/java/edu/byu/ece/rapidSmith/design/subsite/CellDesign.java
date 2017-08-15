@@ -62,6 +62,8 @@ public class CellDesign extends AbstractDesign {
 	private CellNet gndNet;
 	/** List of Vivado constraints on the design **/
 	private List<XdcConstraint> vivadoConstraints;
+	/** For design imported from Vivado, this fields contains how Vivado implemented the design (regular or out-of-context)*/
+	private ImplementationMode mode;
 	
 	/**
 	 * Constructor which initializes all member data structures. Sets name and
@@ -92,8 +94,33 @@ public class CellDesign extends AbstractDesign {
 		placementMap = new HashMap<>();
 		netMap = new HashMap<>();
 		usedSitePipsMap = new HashMap<>();
+		mode = ImplementationMode.REGULAR;
 	}
 
+	/**
+	 * Sets the implementation mode of the design. There are currently two options
+	 * for the design mode: 
+	 * <ul>
+	 * <li> REGULAR
+	 * <li> OUT_OF_CONTEXT
+	 * </ul>
+	 * 
+	 * These match the possible implementation modes in Vivado. On RSCP import,
+	 * the implementation mode is set to match that of the Vivado design.
+	 * 
+	 * @param mode {@link ImplementationMode} to set the design
+	 */
+	public void setImplementationMode(ImplementationMode mode) {
+		this.mode = mode;
+	}
+	
+	/**
+	 * Returns the {@link ImplementationMode} of the design
+	 */
+	public ImplementationMode getImplementationMode() {
+		return this.mode;
+	}
+	
 	/**
 	 * Returns the properties of this design in a {@link PropertyList}.  Properties
 	 * may contain metadata about a design including user-defined metadata.

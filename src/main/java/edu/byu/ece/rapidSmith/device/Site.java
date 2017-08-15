@@ -685,7 +685,7 @@ public final class Site implements Serializable{
 	 * each possible type this site can take.
 	 * @param externalWireToPinNameMap the mapping of wires to pin names
 	 */
-	void setExternalWireToPinNameMap(
+	public void setExternalWireToPinNameMap(
 		Map<SiteType, Map<Integer, SitePinTemplate>> externalWireToPinNameMap) {
 		this.externalWireToPinNameMap = externalWireToPinNameMap;
 	}

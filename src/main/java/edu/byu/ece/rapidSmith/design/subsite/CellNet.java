@@ -530,13 +530,21 @@ public class CellNet implements Serializable {
 	public int sourceSitePinCount() {
 		return this.sourceSitePinList == null ? 0  : this.sourceSitePinList.size();
 	}
-		
+	
 	/**
 	 * Gets the {@link BelPin} where this net is sourced
 	 * @return {@link BelPin}
 	 */
 	public BelPin getSourceBelPin() {
 		return this.sourcePin.getMappedBelPin();
+	}
+	
+	/**
+	 * Returns {@code true} if the source cell pin the net has been placed and
+	 * mapped onto a BEL pin, {@code false} otherwise.
+	 */
+	public boolean isSourcePinMapped() {
+		return (sourcePin == null) ? false : sourcePin.isMapped();
 	}
 	
 	/**
@@ -724,6 +732,13 @@ public class CellNet implements Serializable {
 	}
 	
 	/**
+	 * Returns the number of intersite route trees connected to this net
+	 */
+	public int routeTreeCount() {
+		return intersiteRoutes == null ? 0 : intersiteRoutes.size();
+	}
+	
+	/**
 	 * @return <code>true</code> if this net has one intersite {@link RouteTree}
 	 * 		object connected to it. <code>false</code> otherwise.
 	 */
@@ -798,6 +813,7 @@ public class CellNet implements Serializable {
 			return Collections.emptyList();
 		}
 		
+		// TODO: use an EntrySet instead of a KeySet
 		return sitePinToRTMap.keySet().stream()
 									.filter(SitePin::isInput)
 									.map(sp -> sitePinToRTMap.get(sp))
@@ -899,7 +915,7 @@ public class CellNet implements Serializable {
 	
 	/**
 	 * Computes and stores the route status of the net. This function should be called to recompute the status
-	 * of the route if the routing structure has been modified and the . If the routing structure has not been modified,
+	 * of the route if the routing structure has been modified. If the routing structure has not been modified,
 	 * then {@link CellNet:getRouteStatus} should be used instead. Possible statuses include: <br>
 	 * <br>
 	 * 1.) <b>UNROUTED</b> - no sink cell pins have been routed <br>
@@ -909,17 +925,19 @@ public class CellNet implements Serializable {
 	 * The complexity of this method is O(n) where n is the number of pins connected to the net.
 	 * 
 	 * @return The current RouteStatus of the net
-	 */
+	 * */
 	public RouteStatus computeRouteStatus() {
+		int subtractCount = (isStaticNet() || isSourcePinMapped()) ? 1 : 0;
 		
-		int subtractCount = sourcePin.isMapped() ? 1 : 0;
-		
-		if (routedSinks == null || routedSinks.isEmpty()) {
+		// A net is considered unrouted if there are no routed sinks, and no route trees connected to it
+		if (routeTreeCount() == 0 && getRoutedSinks().isEmpty()) {
 			routeStatus = RouteStatus.UNROUTED;
 		}
-		else if (routedSinks.size() == pins.stream().filter(CellPin::isMapped).count() - subtractCount) {
+		// A net is considered fully routed in all sink cell pins have been routed to
+		else if (getRoutedSinks().size() == pins.size() - subtractCount) {
 			routeStatus = RouteStatus.FULLY_ROUTED;
 		}
+		// A net is otherwise considered partially routed
 		else {
 			routeStatus = RouteStatus.PARTIALLY_ROUTED;
 		}
