@@ -163,7 +163,7 @@ public class RSEnvironment {
 	 */
 	public Device getDevice(String partName, boolean forceReload) {
 		String canonicalName = PartNameTools.removeSpeedGrade(partName);
-
+		
 		Device device;
 		if (!forceReload && loadedDevices.containsKey(canonicalName)) {
 			device = loadedDevices.get(canonicalName).get();
@@ -172,14 +172,14 @@ public class RSEnvironment {
 		}
 
 		Path path = getDeviceFilePath(canonicalName);
-
+		
 		// throw an exception if the device cannot be found
 		if (path == null) {
 			throw new Exceptions.EnvironmentException("Cannot find device file for part: \"" + partName + "\".\n" +
 					"If the device files for the part exist, make sure your RapidSmithPath variable is properly set. \n"
 					+ "If the device files don't exist, view the RapidSmith2 Tech Report for instructions on how to generate a new device file for this part.");
 		}
-		
+
 		device = FileTools.loadDevice(path);
 		if (device == null)
 			return null;

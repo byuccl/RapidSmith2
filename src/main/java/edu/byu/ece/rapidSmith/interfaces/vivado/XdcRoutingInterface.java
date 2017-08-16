@@ -384,11 +384,10 @@ public class XdcRoutingInterface {
 				Wire startTileWire = new TileWire(tile, wireEnum);
 				RouteTree netRouteTree = recreateRoutingNetwork2(net, startTileWire, pipMap);
 				net.addIntersiteRouteTree(netRouteTree);
-				assert this.pipUsedInRoute;
+				//assert this.pipUsedInRoute;
 			}
 		}
-				
-		//assert net.sourceSitePinCount() > 0 || connectedToPort : "Net " + net.getName() + " should have a source site pin. ";
+
 		assert net.sourceSitePinCount() > 0 || implementationMode==ImplementationMode.OUT_OF_CONTEXT : 
 			"Net " + net.getName() + " should have a source site pin. ";
 		net.computeRouteStatus();
