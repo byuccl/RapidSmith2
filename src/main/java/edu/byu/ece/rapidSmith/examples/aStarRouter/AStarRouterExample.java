@@ -27,12 +27,8 @@ public class AStarRouterExample {
 	public static void main(String[] args) throws IOException {
 		// load the device and design
 		String checkpoint = RSEnvironment.defaultEnv().getEnvironmentPath()
-				.resolve("src")
-				.resolve("test")
-				.resolve("resources")
-				.resolve("ImportTests")
-				.resolve("RSCP")
-				.resolve("cordic.rscp").toString();
+				.resolve("exampleVivadoDesigns")
+				.resolve("cordicPlaced.rscp").toString();
 		
 		System.out.println("Loading Device and Design...");
 		VivadoCheckpoint vcp = VivadoInterface.loadRSCP(checkpoint);
