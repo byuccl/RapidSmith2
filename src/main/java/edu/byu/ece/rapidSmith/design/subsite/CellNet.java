@@ -340,7 +340,7 @@ public class CellNet implements Serializable {
 	 * @param pin the pin to remove
 	 */
 	public void disconnectFromPin(CellPin pin) {
-		
+
 		if (pin.isInternal()) {
 			throw new Exceptions.DesignAssemblyException("Cannot remove internal pin from net! Remove the external macro pin instead");
 		}
@@ -657,6 +657,8 @@ public class CellNet implements Serializable {
 	public void unroute() {
 		intersiteRoutes = null;
 		routedSinks = null;
+		belPinToSinkRTMap = null;
+		sitePinToRTMap = null;
 	}
 	
 	/**

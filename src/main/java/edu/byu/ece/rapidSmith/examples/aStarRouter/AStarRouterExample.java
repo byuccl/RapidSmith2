@@ -32,6 +32,7 @@ public class AStarRouterExample {
 				.resolve("resources")
 				.resolve("ImportTests")
 				.resolve("RSCP")
+				.resolve("artix7")
 				.resolve("cordic.rscp").toString();
 		
 		System.out.println("Loading Device and Design...");

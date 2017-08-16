@@ -30,7 +30,7 @@ import org.jdom2.JDOMException;
 import java.io.IOException;
 
 /**
- * A simple class to illustrate importing and exporting Tincr checkpoints.
+ * A simple class to illustrate importing and exporting RapidSmith checkpoints.
  * @author Brent Nelson
  */
 public class ImportExportExample {
