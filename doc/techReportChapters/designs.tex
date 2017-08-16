@@ -235,7 +235,6 @@ from one \texttt{Cell} to another. \autoref{lst:cellNet} shows the basic usage
 of \texttt{CellNet} objects in RapidSmith2, and the remainder of this section
 details other important aspects about \texttt{CellNet}s.
 
-\newpage
 \begin{lstlisting}[xleftmargin=1.5em, framexleftmargin=1.5em, caption=Basic
 CellNet functions, label=lst:cellNet] 
   // get a handle to a design
@@ -253,6 +252,14 @@ CellNet functions, label=lst:cellNet]
   net.connectToPin(cell2.getpin("a"));
 \end{lstlisting}
 
+  \begin{figure}[h]
+   \centering
+   \includegraphics[width=.49\columnwidth]{staticNetSources.png}
+   \caption{Example of a Vivado net with multiple sources. The highlighted
+   wires in white are all part of the same net.}
+   \label{fig:staticNetSources}
+  \end{figure}
+  
 \begin{itemize}
   \item \texttt{CellNet}s are routed using \texttt{RouteTree} data structures.
   RapidSmith2 routing is described in more detail in Section~\ref{sec:routing}.
@@ -260,14 +267,6 @@ CellNet functions, label=lst:cellNet]
   \item All \texttt{CellNet}s have a \texttt{NetType} enumeration. Possible values for
   \texttt{NetType} include VCC, GND, and WIRE. VCC is reserved for power nets, GND
   is reserved for ground nets, and WIRE represents all other nets in the design.
-  
-  \begin{figure}[t!]
-   \centering
-   \includegraphics[width=.49\columnwidth]{staticNetSources.png}
-   \caption{Example of a Vivado net with multiple sources. The highlighted
-   wires in white are all part of the same net.}
-   \label{fig:staticNetSources}
-  \end{figure}
   
   \item The suggested approach to working with static nets in RapidSmith2 is to
   have only one VCC and GND net in a \texttt{CellDesign}. In general, this

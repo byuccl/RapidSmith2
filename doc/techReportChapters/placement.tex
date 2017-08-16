@@ -66,14 +66,7 @@ one BEL pin, but there are two noticeable exceptions to this rule.
   all input BEL pins of the LUT and the user can decide which ones to
   use.
   
-  \begin{figure}[b!]
-	\centering
-	\includegraphics[width=1\columnwidth]{lutPins.png}
-	\caption{LUT Pin Permutation Example}
-	\label{fig:lutPins}
-  \end{figure}
-  
-  \item Logical-to-physical pin mappings can change \textbf{based on how a cell
+    \item Logical-to-physical pin mappings can change \textbf{based on how a cell
   is configured}. For example, on a RAMB36E1 cell some data input pins map to
   different physical BEL pins when the width of the BRAM is set to 72. This is
   an important concept when performing netlist modifications in RapidSmith2. The
@@ -87,7 +80,7 @@ one BEL pin, but there are two noticeable exceptions to this rule.
 \end{enumerate}
 
 \newpage
-\begin{lstlisting}[xleftmargin=1.5em, framexleftmargin=1.5em, language=tcl,
+  \begin{lstlisting}[xleftmargin=1.5em, framexleftmargin=1.5em, language=tcl,
 caption=Tcl script to print all logical-to-physical pin mappings of a
 cell,label=code:tclPinMap] 
   proc print_pin_mappings{cell} {
@@ -97,6 +90,13 @@ cell,label=code:tclPinMap]
   }
 \end{lstlisting}
  
+\begin{figure}[]
+	\centering
+	\includegraphics[width=1\columnwidth]{lutPins.png}
+	\caption{LUT Pin Permutation Example}
+	\label{fig:lutPins}
+  \end{figure}
+  
 \vspace{.2cm}
 \noindent
 Some additional notes about placement are given in the list below: 
