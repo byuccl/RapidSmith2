@@ -185,14 +185,15 @@ want to zoom out to see the entire chip layout.
 \end{figure}
 
 \subsection{Running Real Designs - An Overview}
-This section will lead you through running an entire design from Vivado through
-RapidSmith2 and back.  In this example you will fully synthesize and implement a
-complete design in Vivado and then move it into RapidSmith2.  However, later as you gain
-experience you may choose to only synthesize  designs before exporting
-them to RapidSmith2 or you may choose to export and work with Vivado Out-Of-Context
-(OOC) Checkpoints.
-
-The steps to be covered include:
+This section will lead you through the required steps to export an implemented 
+design from Vivado and load it into RapidSmith2. It will also demonstrate how to
+export a modified design from RapidSmith2 back into Vivado to complete
+implementation. Specifically, in this example you will fully synthesize, place,
+and route a simple Vivado FPGA design using Tcl commands, and then export it to
+RapidSmith2. As you gain more experience, you can choose to export designs from
+Vivado post-synthesis, post-place, or post-route. You can also choose to export
+and import designs that have been implemented ``out-of-context.'' The
+steps to be covered in this tutorial include:
 
 \begin{enumerate}
   \item Synthesize, place and route a design in Vivado
@@ -204,12 +205,11 @@ The steps to be covered include:
   \item Import the TCP back into Vivado
 \end{enumerate}
 
-In a real CAD flow you would likely do something more interesting
+\noindent In a real CAD flow you would likely do something more interesting
 than the analysis in Step 4 above, but this overview is intended to help you
-through the Vivado-to-RapidSmith2 and back process so you can get started.
-
-\textbf{Note}: the entire flow requires the installation of Tincr as well as
-RapidSmith2 so if you skipped the Tincr installation above, go and install it now.
+through the design flows as shown in \autoref{fig:UsageModels}. \textbf{Note}:
+the entire flow requires the installation of Tincr as well as RapidSmith2 so if
+you skipped the Tincr installation above, go and install it now.
 
 \subsubsection{Generating a RSCP}  
 The first step in manipulating a Vivado design in RapidSmith2 is to generate a
@@ -218,9 +218,10 @@ Vivado in ``Tcl mode'' (this can be done by using the ``Vivado Tcl Shell'' or
 executing ``vivado -mode tcl'' if Vivado is correctly set on your \texttt{PATH}
 ). Once the shell has started, execute the following Tcl commands
 for one of the directories in the \textit{exampleVivadoDesigns}
-folder of the repository:\footnote{You can choose to implement the design any
-way you feel most comfortable with. In this walkthrough we use Vivado's command
-prompt because it is fastest.}:
+folder of the repository (our suggestion is to use the
+\textit{cordic.rscp} design):\footnote{You can choose to implement the design
+any way you feel most comfortable with. In this walkthrough we use Vivado's
+command prompt because it is fastest.}:
                 
 % Use keywordstyle=\ttfamily to disable keywords
 \begin{lstlisting} [numbers=none,keywordstyle=\ttfamily]
