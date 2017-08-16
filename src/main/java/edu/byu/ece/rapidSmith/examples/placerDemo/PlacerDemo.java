@@ -38,7 +38,8 @@ import java.util.Arrays;
  * Simulated Annealing placer demo for FPL. The demo can be run in interactive mode (-I)
  * which will show placement updates at certain stages of the annealing (10% acceptance rate for example).
  * If the interactive mode is disabled, then the placer will run as usual. The placer does not support
- * designs with macro cells
+ * designs with macro cells. To test the placer, run the "cordicPlaced.rscp" found in the "exampleVivadoDesigns"
+ * directory.
  * <p>
  * [NOTE]: If you run the placer in interactive mode, the moves/second figure will be incorrect because <br>
  * the time spent looking at the checkpoints in Vivado will be included in the total runtime. TODO: fix this. 
