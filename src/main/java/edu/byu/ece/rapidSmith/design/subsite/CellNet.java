@@ -732,7 +732,7 @@ public class CellNet implements Serializable {
 	}
 	
 	/**
-	 * Returns the number of intersite route trees connected to this net
+	 * Returns the number of intersite route trees connected to this net.
 	 */
 	public int routeTreeCount() {
 		return intersiteRoutes == null ? 0 : intersiteRoutes.size();
@@ -813,7 +813,8 @@ public class CellNet implements Serializable {
 			return Collections.emptyList();
 		}
 		
-		// TODO: use an EntrySet instead of a KeySet
+		// TODO: use an EntrySet instead of a KeySet, this should speed up this operation
+		//      because we don't have to do a hash table look up for each site.
 		return sitePinToRTMap.keySet().stream()
 									.filter(SitePin::isInput)
 									.map(sp -> sitePinToRTMap.get(sp))
