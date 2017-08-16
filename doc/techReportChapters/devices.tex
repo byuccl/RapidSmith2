@@ -17,7 +17,7 @@
 This section is intended to give a brief introduction to Xilinx FPGA
 architecture and terminology. The terminology introduced here is consistent
 with the terminolgy used in the Vivado Design Suite. If you are already familiar
-with Xilinx FPGA devices, then you can skip to \autoref{devicesRS2}. 
+with Xilinx FPGA devices, then you can skip to Section~\ref{devicesRS2}. 
 As you read through this section, it may be helpful to open a sample device in Vivado's
 Device Browser. To do this, open a new command prompt and run Vivado in Tcl mode
 (``vivado -mode tcl''). Then, run the following commands in the Vivado prompt:
@@ -173,16 +173,16 @@ connection.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 \subsection{Device Data Structures} \label{devicesRS2}
 In the original RapidSmith, the device architecture stopped at the
-site level. A site was considered a black box who could be
-configured using string attributes, but the actual internal components were
-unknown. RapidSmith2 extends the device architecture to include all
+site level. A site was considered a black box which could be
+configured using string attributes, but its actual internal components were
+not represented. RapidSmith2 extends the device architecture to include all
 components \textbf{within} a site as well. \autoref{fig:deviceDataStructures}
 shows the new data structure hierarchy, which can be found in the package \emph{
 edu.byu.ece.rapidSmith.device}. The classes and interfaces within
 \emph{edu.byu.ece.rapid\-Smith.device} are named to reflect the terminology
-used by Xilinx. Many classes that exist in Vivado's Tcl interface have a direct map
-to a class in RapidSmith2 (such as a \texttt{Tile}). Because of this, most
-RapidSmith2 data structures represent a straightforward part of a Xilinx FPGA.
+used by Xilinx. Many classes that exist in Vivado's Tcl interface have a direct
+mapping to a class in RapidSmith2 (such as a \texttt{Tile}). Because of this,
+most RapidSmith2 data structures represent a straightforward part of a Xilinx FPGA.
 The \texttt{DeviceBrowser} and \texttt{DeviceAnalyzer} example programs
 illustrate how to load and browse a device with \texttt{Tile} and \texttt{Site}
 data structures, and \autoref{lst:deviceCalls} shows basic device usage in
@@ -239,9 +239,10 @@ has methods to convert an integer to the corresponding string wire name and
 vice versa.
 
 In previous versions of RapidSmith, the \texttt{WireEnumerator} was used
-extensively while building CAD tools. RapidSmith2 has changed this, largely
-abstracting the \texttt{WireEnumerator} away in favor of more convenient
-methods that return \texttt{Wire} objects which contain a wire's integer
+extensively while building CAD tools and so if you have used RapidSmith you
+will be familiar with it.
+However, RapidSmith2 has changed this, largely abstracting the
+\texttt{WireEnumerator} away in favor of more convenient methods that return \texttt{Wire} objects which contain a wire's integer
 enumeration and name. For example, the name or enumeration of a wire can now be
 obtained with the function calls in the \texttt{Wire} interface
 \texttt{getWireName()} and \texttt{getWireEnum()} respectively. A handle to the
@@ -258,7 +259,7 @@ encapsulate this information for the user. Many functions in RapidSmith2 now
 return a \texttt{TileWire} or \texttt{SiteWire} object (wrapped in a generic
 \texttt{Wire}) instead of an integer wire enumeration. \texttt{Wire}s are
 connected through \texttt{Connection} objects as described in
-\autoref{sec:routing}.
+Section~\ref{sec:routing}.
 
 \subsubsection{Package Pins}
 

@@ -27,8 +27,7 @@ the repository, and consist of 3 designs:
 \item \textbf{cordic.rscp}: synthesized and placed
 \item \textbf{count16.rscp}: synthesized, placed and routed
 \end{itemize} 
-There is a sample design to demonstrate each possible tool flow between Vivado
-and RapidSmith2. Equivalent Vivado checkpoints files (.dcp) are also included in
+Equivalent Vivado checkpoints files (.dcp) are also included in
 the same directory as \fil{add.dcp}, \fil{cordic.dcp}, and \fil{count16.dcp}
 files. To open these checkpoints in Vivado, you can either (a) double click on
 the .dcp file in a file explorer, or (b) use the command
@@ -48,6 +47,7 @@ architecture, opening the device browser in Vivado can also be helpful.
 \begin{lstlisting} [numbers=none,keywordstyle=\ttfamily, caption=Sample
 Tcl commands to run the Vivado compilation script, label=lst:compilation] 
 	Vivado% cd <path to exampleVivadoDesigns directory>
+	Vivado% source compile.tcl
 	Vivado% compile_hdl_to_checkpoint_files add
 	Vivado% close_project
 \end{lstlisting}

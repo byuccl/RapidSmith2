@@ -66,7 +66,7 @@ one BEL pin, but there are two noticeable exceptions to this rule.
   all input BEL pins of the LUT and the user can decide which ones to
   use.
   
-  \begin{figure}[t!]
+  \begin{figure}[b!]
 	\centering
 	\includegraphics[width=1\columnwidth]{lutPins.png}
 	\caption{LUT Pin Permutation Example}
@@ -80,7 +80,7 @@ one BEL pin, but there are two noticeable exceptions to this rule.
   function call \texttt{CellPin::get\-PossibleBelPins(Bel)} only returns the pin
   mappings for the \textbf{default} cell configuration. If new logic is being
   added to a design it is up to the user to determine the proper pin mappings. 
-  Users can determine the pin mappings of a configured cell by using the TCL
+  Users can determine the pin mappings of a configured cell by using the Tcl
   commands shown in \autoref{code:tclPinMap}. The correct pin mappings are
   always used when a RSCP is imported into RapidSmith2.
 
@@ -88,7 +88,7 @@ one BEL pin, but there are two noticeable exceptions to this rule.
 
 \newpage
 \begin{lstlisting}[xleftmargin=1.5em, framexleftmargin=1.5em, language=tcl,
-caption=TCL script to print all logical-to-physical pin mappings of a
+caption=Tcl script to print all logical-to-physical pin mappings of a
 cell,label=code:tclPinMap] 
   proc print_pin_mappings{cell} {
 	  foreach cell_pin [get_pins -of $cell] {

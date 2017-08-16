@@ -32,7 +32,7 @@ representations:
 post-synthesis, post-place, and post-route, enabling the design flows shown 
 \autoref{fig:vdiDesign}. The remainder of this chapter describes each external
 design representation, and the required Tcl commands to generate each.
-Section \ref{sec:vdiImport} introduces RSCPs and \autoref{sec:vdiExport} introduces
+Section \ref{sec:vdiImport} introduces RSCPs and Section~\ref{sec:vdiExport} introduces
 TCPs. Section \ref{sec:tclChallenges} lists the variety of Tcl challenges
 associated with using the Vivado Tcl interface to represent designs externally.
 Section \ref{sec:twoFormats} includes a discussion on why two different external
@@ -85,8 +85,8 @@ The \textit{design.info} file of a RSCP is reserved for additional information
 about a design that is not related to the design netlist or implementation. It
 currently only holds two pieces of information: (1) the part name that the
 design is implemented on, and (2) the checkpoint ``mode''. The part name is
-technically redundant, in that is also included in the EDIF netlist (described
-in the next subsection), but can be easier to parse than its EDIF equivalent. The
+technically redundant, in that it is also included in the EDIF netlist
+(described in the next subsection), but can be easier to parse than its EDIF equivalent. The
 checkpoint mode refers to the type of checkpoint that was exported from Vivado.
 If the Vivado design was implemented out-of-context, then the mode value will
 be \texttt{out\_of\_context}. Otherwise, the mode value will be
@@ -125,7 +125,7 @@ Sample EDIF, label=lst:edif]
         (contents
           (instance cout_OBUF (viewref netlist (cellref OBUF (lib hdi_primitives))))
           (instance cout_lUT (viewref netlist (cellref LUT3 (libref hdi_primitives))) 
-            (property INIT (string "8’hE8"))
+            (property INIT (string "8ï¿½hE8"))
           )
           ...	
 \end{lstlisting}
@@ -333,7 +333,7 @@ used in cases of routing congestion. Routethrough LUTs are not explicitly
 represented in a design netlist since there is no cell placed on the
 corresponding BEL, so they need to be included in the \textit{routing.rsc} of a
 RSCP. Otherwise, designs could not be fully represented in external tools.
-Figure \ref{fig:routethroughs2} shows two example routethrough LUTs in Vivado.
+\autoref{fig:routethroughs2} shows two example routethrough LUTs in Vivado.
 
 \begin{figure}[h]
   \centering
@@ -347,9 +347,9 @@ For the LUT on the left, the input pin \texttt{A6} is mapped directly to the
 output pin \texttt{O6}. The corresponding configuration equation for this BEL is 
 \texttt{CONFIG.EQN:O6=(A6)}. For the LUT on the right, the input pin \texttt{A1}
 is mapped directly to the output pin \texttt{O6}. However, the structure of the
-configuration equation for this LUT is slightly different. As figure
-\ref{fig:routethroughs2} shows, VCC is routed to the \texttt{A6} input pin. In
-this case, the configuration equation on the BEL is
+configuration equation for this LUT is slightly different. As 
+\autoref{fig:routethroughs2} shows, VCC is routed to the \texttt{A6} input pin.
+In this case, the configuration equation on the BEL is
 \texttt{CONFIG.EQN:O6=(A6+{\textasciitilde}A6)*((A4))}. Using Vivado's TCL
 interface, LUT routethroughs can be identified by matching their
 \texttt{CONFIG.EQN} property against the Tcl regular expression
@@ -469,7 +469,7 @@ together through the general routing fabric of the FPGA. At this point the net
 is considered fully routed. The physical structure of a fully routed net
 can be expressed three different ways in Vivado:  (1) the ROUTE property on the
 net, (2) the wires used in the net, or (3) the device PIPs used in the net. For
-reasons discussed in \autoref{sec:tclChallenges}, device PIPs are the best option
+reasons discussed in Section~\ref{sec:tclChallenges}, device PIPs are the best option
 for external tools. The \textit{routing.rsc} file uses the token \texttt{ROUTE}
 for specifying the PIPs of a routed net. Line 10 of \autoref{lst:routingRsc}
 shows an example \texttt{ROUTE} specification. The Tcl command
@@ -541,10 +541,10 @@ Each file in a TCP represents a specific aspect of a Vivado FPGA design, and is
 described in the following subsections as a review for the reader. The
 \textit{netlist.edf} and \textit{contraints.xdc} file will not be reviewed
 because they are identical to their RSCP counterparts presented in
-\autoref{sec:vdiImport}. The \texttt{Tincr} function used to parse TCPs,
+Section~\ref{sec:vdiImport}. The \texttt{Tincr} function used to parse TCPs,
 \texttt{[tincr::read\_tcp]}, has been updated in a variety of ways to support
 fully importing Vivado designs. These modifications, and the limitations of
-XDC, are described more in \autoref{sec:tclChallenges}
+XDC, are described more in Section~\ref{sec:tclChallenges}
 
 \subsubsection{Placement.xdc}
 \autoref{lst:placementXdc} shows an example \textit{placement.xdc} file within a
@@ -642,7 +642,7 @@ in future tool versions.
 
 \subsubsection{Ambiguous ROUTE Strings} \label{sec:routeStrings}
 
-As described in \autoref{sec:routingXdc}, the \texttt{ROUTE} property
+As described in Section~\ref{sec:routingXdc}, the \texttt{ROUTE} property
 on a net contains its physical routing structure. By default, Vivado uses
 relative wire names (no tile information) when building these \texttt{ROUTE}
 strings. This is problematic for external tools because it can lead to wire
@@ -673,7 +673,7 @@ PIPs to represent routing, and two different external formats are required.
  
 \subsubsection{Alternate Site Pins}
 
-As discussed in \autoref{sec:alternateSites}, the Vivado Tcl command
+As discussed in Section~\ref{sec:alternateSites}, the Vivado Tcl command
 \texttt{[get\_site\_pins -of \$site]} does not return the correct result for
 alternate sites on Series7 devices\footnote{UltraScale devices always return
 the correct result}. An example of this behavior is shown in
@@ -788,8 +788,8 @@ be placed first for distributed memory.
 
 \subsubsection{Macro Placement} \label{sec:macroPlacement}
 
-As described in \autoref{sec:macros} fully-flattened Vivado netlists may
-include macro primitives. Section \ref{sec:vdiImport} describes how macros
+As described in Section~\ref{sec:macros} fully-flattened Vivado netlists may
+include macro primitives. Section~\ref{sec:vdiImport} describes how macros
 are exported from Vivado in RSCP files. Importing macro primitives
 back into Vivado using TCP files, however, is a little more complicated. This
 is because internal cells to a macro cannot be placed with XDC Tcl commands
@@ -812,7 +812,7 @@ design netlist completely, but either solution is valid with VDI.
 
 \subsubsection{LUT Routethroughs} \label{sec:routethroughReplace}
 
-As described in \autoref{sec:routingRsc}, the \texttt{CONFIG.EQN} property on a
+As described in Section~\ref{sec:routingRsc}, the \texttt{CONFIG.EQN} property on a
 LUT BEL can be used to identity it as routethrough. On design export, all LUTs
 in a design whose configuration equation matches that of a routethrough are
 marked in the generated RSCP. It would stand to reason that when importing a
@@ -890,17 +890,17 @@ if {[llength $diff] > 0 } {
 So far this chapter has described in great detail RSCPs, TCPs, and the
 associated Vivado Tcl challenges with both. There is, however, one more
 question to consider: ``Why can't a single design format be used for external
-tools \textit{and} Vivado''? The purpose of this section is to give insight
-into four reasons why both RSCPs and TCPs are required with VDI. 
+tools \textit{and} Vivado''? Here are four reasons why both RSCPs and TCPs are
+required with VDI:
 
 \begin{enumerate}
   \item Some Vivado design representations cannot be used with
   external tools. This is best shown with Vivado \texttt{ROUTE} strings, which
   are used to represent the physical route of a net. Due to the ambiguities of
-  \texttt{ROUTE} strings as described in \autoref{sec:routeStrings}, they are
+  \texttt{ROUTE} strings as described in Section~\ref{sec:routeStrings}, they are
   not suitable for design export (PIPs must be used instead). However,
   \texttt{ROUTE} strings are required when importing a design back into Vivado
-  (\autoref{sec:routingXdc}). This indicates that a different format is needed
+  (Section~\ref{sec:routingXdc}). This indicates that a different format is needed
   for exporting and importing the physical structure of a net.
      
   \item When an external design is imported into Vivado, some physical

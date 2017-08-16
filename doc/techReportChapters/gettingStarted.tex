@@ -67,8 +67,8 @@ include QT Jambi and the BYU Edif Tools.
   \paragraph{Running from an IDE} The gradle scripts in RapidSmith2 currently support
   setup for both Eclipse and IDEA Java IDEs. This section will detail how to
   setup the Eclipse environment, but similar steps can be taken for IDEA. If
-  using Eclipse, it is best to use version Eclipse Neon or later. To create a
-  new eclipse project, execute one of the following in a terminal:
+  using Eclipse, you must use Eclipse version Neon or later. To
+  create a new eclipse project, execute one of the following in a terminal:
   
 \begin{lstlisting} [numbers=none,keywordstyle=\ttfamily]
 	gradlew antlr eclipse (unix)       
@@ -106,8 +106,8 @@ include QT Jambi and the BYU Edif Tools.
   again (Step 3). \pgm{CAUTION:} An obvious thing to try is to mix and match
   developing in Eclipse but then running the resulting apps from the command
   line. Just be aware that Eclipse puts its compiled .class files in very
-  different places than where the gradle build process puts its .class and
-  .jar files. Make sure you understand that before you try to combine these two
+  different places than where the command line gradle build process puts its
+  .class and .jar files. Make sure you understand that before you try to combine these two
   build/execution methods. Our suggested approach is to choose one or the
   other, but not both.
 \end{enumerate}
@@ -151,8 +151,7 @@ Some points to keep in mind while configuring and running RapidSmith2 programs:
   forgot to set the variable.
   \item If you are running on Windows, only a 32-bit QT Jar file is included in
   the RapidSmith2 repository. This means that you will need to set your JRE to a 32-bit
-  version when running the GUI programs. We are working on updating QT to the
-  latest version, so this will no longer be an issue.
+  version when running the GUI programs. 
   \item For Linux command line usage, the \env{CLASSPATH} environment variable
   must point to both the full (uncompressed) RapidSmith2 jar in the \dir{build/distributions}
   folder as well as all the jar files in the \dir{/lib} subdirectory. An example
@@ -228,11 +227,11 @@ command prompt because it is fastest.}:
 	Vivado% cd <path to directory containing your HDL files>
 	Vivado% link_design -part xc7a100t-csg324-3
 	Vivado% read_verilog [glob *.v]
-	Vivado% synth_design -top myTopLevelEntityName -flatten_hierarchy full 
+	Vivado% synth_design -top cordic -flatten_hierarchy full 
 	Vivado% place_design
 	Vivado% route_design
 	Vivado% package require tincr
-	Vivado% tincr::write_rscp myTopLevelEntityName
+	Vivado% tincr::write_rscp cordic
 	Vivado% close_project
 \end{lstlisting}
 Most of the above commands should be self-explanatory and can be adapted to
@@ -247,15 +246,14 @@ export. You may choose to export it any time after it has been synthesized.
 
 \subsubsection{Importing the RSCP into RapidSmith2}
 The RapidSmith2 repository comes with an \textbf{importExportExample} program as
-described in \autoref{sec:importExportExample}, that can be used to load a RSCP
+described in Section~\ref{sec:importExportExample}, that can be used to load a RSCP
 into RapidSmith2 data structures. The program can be found in the
 \textit{edu.byu.ece.rapidSmith.exa\-mples} package. It takes as input a RSCP,
 and then performs the following steps:
 
 \begin{enumerate}
   \item Converts the RSCP to a RapidSmith2 \texttt{CellDesign} netlist
-  (top-level netlist and is described in more detail in section
-  \ref{sec:cellDesignDS}).
+  (top-level netlist and is described in more detail in Section~\ref{sec:cellDesignDS}).
   
   \item Walks through the top-level \texttt{CellDesign} and prints the logical
   and physical information of the design (i.e. netlist structure, placement,
@@ -272,16 +270,16 @@ works. Once you feel comfortable with the example code, run the program on the
 RSCP that you generated in the previous step. 
 
 \subsubsection{Importing a TCP into Vivado}
-Assuming the original RSCP was named ``add.rscp'', the
+Assuming the original RSCP was named ``cordic.rscp'', the
 \textbf{importExportExample} program will produce a TCP called
-``add.rscp.tcp.'' After starting Vivado in Tcl mode (``vivado -mode tcl''),
+``cordic.rscp.tcp.'' After starting Vivado in Tcl mode (``vivado -mode tcl''),
 the generated TCP can be loaded back into Vivado by using the following set of
 Tcl/Tincr commands:
 
 \begin{lstlisting} [numbers=none,keywordstyle=\ttfamily]
-	Vivado% cd <path to directory containing your add.rscp.tcp directory>
+	Vivado% cd <path to directory containing your cordic.rscp.tcp directory>
 	Vivado% package require tincr
-	Vivado% tincr::read_tcp add.rscp.tcp
+	Vivado% tincr::read_tcp cordic.rscp.tcp
 	Vivado% start_gui
 \end{lstlisting}
 
@@ -292,7 +290,7 @@ converted to a RSCP. To save the imported design in Vivado's native checkpoint
 format (for later use) you can run the following command:
 
 \begin{lstlisting} [numbers=none,keywordstyle=\ttfamily]
-	Vivado% write_checkpoint -force add.dcp
+	Vivado% write_checkpoint -force cordic.dcp
 \end{lstlisting}
 
 \noindent To reload the saved design back into Vivado, use the following Tcl
@@ -300,7 +298,7 @@ commands:
 
 \begin{lstlisting} [numbers=none,keywordstyle=\ttfamily]
 	Vivado% link_design -part xc7a100t-csg324-3
-	Vivado% open_checkpoint add.dcp
+	Vivado% open_checkpoint cordic.dcp
 \end{lstlisting}
 
 As you may have noticed, the flow presented in this section is based on running

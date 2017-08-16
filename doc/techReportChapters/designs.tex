@@ -1,4 +1,4 @@
-;%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Section 5: Xilinx Designs
 %	This section contains a description of the following:
 %	- Vivado FPGA designs and netlists (with terminology)
@@ -24,7 +24,7 @@ can be found
 for Series7 devices and
 \href{http://www.xilinx.com/support/documentation/sw_manuals/xilinx2014_1/ug974-vivado-ultrascale-libraries.pdf}{\color{blue}{here}}
 for Ultrascale devices. The primitives of a Xilinx netlist are wired together to
-create a digital circuit capable of being implemented on a FPGA.
+create a digital circuit capable of being implemented on an FPGA.
 \autoref{fig:schematic} shows an example netlist for a 3-bit counter created in Vivado.
 
 \begin{figure}[h!]
@@ -59,13 +59,13 @@ cells include:
 Several other types of cells can be used, but the ones in the list above
 are the most common. Nets connect cells together. In
 other words, the output of one cell is wired to the input of another
-cell using a net. Ports are simply design input/output (IO). In terms of a FPGA
+cell using a net. Ports are simply design input/output (IO). In terms of an FPGA
 design, ports are mapped to specific peripheral pins of the FPGA
 for chip IO. It is important to note that a Xilinx netlist is purely logical.
 There is no physical information within the netlist (i.e. there is no information about
 where the cells have been placed, or how the nets have been routed). When
 exporting a design from Vivado, the Xilinx netlist representation is converted
-to an electronic design interchange format (EDIF).
+to an electronic design interchange format (EDIF) file.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % RapidSmith2 Netlist Data Structures
@@ -95,7 +95,7 @@ to Xilinx cells and RapidSmith2 \texttt{CellNet}s are equivalent to Xilinx nets.
 Each \texttt{Cell} has a template \texttt{LibraryCell}, which represents
 a Xilinx library primitive (i.e. a LUT). They also have a collection of
 connected \texttt{CellPin} objects. Placing and routing these logical design
-elements is described in \autoref{sec:placement} and \ref{sec:routing}
+elements is described in Section~\ref{sec:placement} and \ref{sec:routing}
 respectively. The best way to learn how to utilize the classes shown in
 \autoref{fig:designDS} is to generate and read through the
 JavaDocs, but important aspects of each class is included in the
@@ -113,7 +113,7 @@ following:
   \item Global GND and VCC nets
   \item Cell placement information (i.e. where each cell is placed)
   \item The used site PIPs of each site
-  \item A list of XDC constraints imported from Vivado. See \autoref{sec:import}
+  \item A list of XDC constraints imported from Vivado. See Section~\ref{sec:import}
   for more information about XDC constraints and how they are represented in
   RapidSmith2.
   \item The design mode. Possible options include OUT\_OF\_CONTEXT and REGULAR.
@@ -134,7 +134,7 @@ section details some important aspects of \texttt{Cell}s.
 \begin {itemize}
   \item A \texttt{Cell} always contains a reference to a backing
   \texttt{LibraryCell} object. A \texttt{LibraryCell} is equivalent to a Xilinx
-  primitive cell (described in \autoref{sec:xilinxNetlist}), and serves as a
+  primitive cell (described in Section~\ref{sec:xilinxNetlist}), and serves as a
   template for instantiated \texttt{Cell} objects. The template is used to save
   memory when creating several \texttt{Cell}s of the same type. Whenever a new
   \texttt{Cell} object is created, a corresponding \texttt{LibraryCell} must be
@@ -164,12 +164,13 @@ Stream<Cell> cells = design.getCellsOfType(libCells.get("FDRE"));
   
   \item The methods \texttt{Cell::getPins()},
   \texttt{Cell::getInputPins()}, and \texttt{Cell::getOutputPins()} can be used
-  to get a handle to the pins of a \texttt{Cell}. If more pins are
-  needed on a \texttt{Cell}, \texttt{PseudoCellPin} objects can be attached (see
-  \autoref{sec:pseudoCellPin}). 
+  to get a handle to the pins of a \texttt{Cell}. In certain special cases, more
+  pins must be added to a \texttt{Cell} object.  In these cases,
+  \texttt{PseudoCellPin} objects can be attached (see
+  Section~\ref{sec:pseudoCellPin} for details).
   
   \item \texttt{Cell}s can be placed onto \texttt{Bel} objects of the
-  current \texttt{Device}. See \autoref{sec:placement} for more information about
+  current \texttt{Device}. See Section~\ref{sec:placement} for more information about
   cell placement.
   
   \item Top-level \texttt{Port}s in Vivado (design input/output) are represented as
@@ -180,7 +181,7 @@ Stream<Cell> cells = design.getCellsOfType(libCells.get("FDRE"));
   actually a port.
   
   \item RapidSmith2 supports both Xilinx macro and leaf cells. More information
-  about these is given in \autoref{sec:xilinxNetlist}.
+  about these is given in Section~\ref{sec:xilinxNetlist}.
 \end{itemize}
 
 \subsubsection{CellPin} \label{sec:cellPin}
@@ -192,7 +193,7 @@ has an associated \texttt{CellPinType} and \texttt{PinDirection}.
 properties. The \texttt{CellPinType} can be used to find all \texttt{RESET}
 pins in a design, determine if a net is a clock net (it connects to pins of type
 \texttt{CLOCK}), and help with other useful functions. Cell pins of type
-\texttt{PSEUDO} are a special case, and described in \autoref{sec:pseudoCellPin}.
+\texttt{PSEUDO} are a special case, and described in Section~\ref{sec:pseudoCellPin}.
 The \texttt{PinDirection} field is typically used to filter a list of
 pins on a cell by their direction. It is especially useful for finding INOUT
 pins.
@@ -254,7 +255,7 @@ CellNet functions, label=lst:cellNet]
 
 \begin{itemize}
   \item \texttt{CellNet}s are routed using \texttt{RouteTree} data structures.
-  RapidSmith2 routing is described in more detail in \autoref{sec:routing}.
+  RapidSmith2 routing is described in more detail in Section~\ref{sec:routing}.
   
   \item All \texttt{CellNet}s have a \texttt{NetType} enumeration. Possible values for
   \texttt{NetType} include VCC, GND, and WIRE. VCC is reserved for power nets, GND
@@ -395,7 +396,7 @@ between macro cells and leaf cells.
 
 \subsubsection {PropertyList}
 
-\begin{figure}[b!]
+\begin{figure}[t]
  \centering
  \includegraphics[width=.5\columnwidth]{vivadoProperties.png}
  \caption{Properties of a Vivado FDCE Cell}
@@ -495,12 +496,13 @@ constraints if they need to use them in their CAD tool. The function
 currently attached to a design and \texttt{CellDesign::addVivadoConstraint()}
 can be used to add new constraints to a design.
 
-\subsection{Vivado Design Considerations / Advanced Topics}
+\subsection{Vivado Design Considerations --- Advanced Topics}
 The previous section detailed the most important aspects of a Vivado 
 netlist, and how they are represented in RapidSmith2. However, there are some
 subtle considerations for Vivado implemented designs that you need to
-understand in order to fully utilize RapidSmith2 as a CAD tool. These design
-aspects, and how RapidSmith2 chooses to handle them is described in the
+may eventually need to understand in order to fully utilize RapidSmith2 as a CAD
+tool.
+These design aspects, and how RapidSmith2 chooses to handle them is described in the
 following subsections.
 
 \subsubsection{Pseudo Cell Pins} \label{sec:pseudoCellPin}
@@ -561,7 +563,7 @@ a routethrough since it is the fastest, but pins A1-A5 can also be
 used in cases of routing congestion. Routethrough LUTs are not explicitly
 represented in a design netlist since there is no cell placed on the
 corresponding BEL. Figure \ref{fig:routethroughs} shows two example routethrough
-LUTs in Vivado. As described in \autoref{sec:routing}, routethroughs are
+LUTs in Vivado. As described in Section~\ref{sec:routing}, routethroughs are
 represented in RapidSmith2 with specific \texttt{Connection} objects, and can be
 used when routing a net.
 
@@ -623,8 +625,12 @@ enabled and connects the \texttt{05} pin of the \texttt{A5LUT} BEL to the
 connect site pins to BEL pins. In RapidSmith2, a list of used site PIPs is
 stored for each site on design import. The function call
 \texttt{CellDesign::getUsedSitePipsAtSite(Site)} can be used to obtain the used
-site PIPs at a given site location. After design import, it is the user's
-responsibility to update this data structure accordingly.
+site PIPs at a given site location. Note that if your CAD program changes 
+the cells placed in a site or the routing inside a site, it is your
+responsibility are changed, it is the user's responsibility to update this
+data structure accordingly.  For details see the functions
+\texttt{CellDesign::getUsedSitePipsAtSite(Site)} and 
+\texttt{CellDesign::setUsedSitePipsAtSite(Site, Set<Integer>)}.
 
 \subsubsection{Site Properties}
 Some properties not only affect how a Cell is configured, but they can also
@@ -633,7 +639,7 @@ clock routing mux that chooses between a regular clock signal and an inverted
 signal (\autoref{fig:clkInv}). The output of this inverter is connected to all
 flip flops of the SLICEL, and decides whether \textit{all} flip flops are
 rising or falling-edge triggered. The clock that is selected is determined
-by the property “IS C INVERTED” \textbf{of the flip flops cells that have been
+by the property ï¿½IS C INVERTEDï¿½ \textbf{of the flip flops cells that have been
 placed onto the SLICEL}. The clock inverter is programmed automatically based on
 the cell properties. There are other such properties, but they will not be listed
 here. When creating designs in RapidSmith2, it is important to not place cells
@@ -652,7 +658,7 @@ property restrictions.
 % 	The Cell Library
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The Cell Library} \label{sec:cellLibraryinDesignSection}
-As described in \autoref{sec:xilinxNetlist}, Xilinx netlists are composed of
+As described in Section~\ref{sec:xilinxNetlist}, Xilinx netlists are composed of
 cell objects which are instanced from backing library primitives. The most
 common library primitives used in a Xilinx netlist include LUT (LUT1,
 LUT2, etc) and Flip-Flop (FDRE, FDCE, etc.) cells. A detailed knowledge of the
@@ -676,9 +682,10 @@ RapidSmith2 parses the cell library XML file described above into a
 performing any type of netlist manipulation or addition. Currently, each \texttt{CellLibrary}
 corresponds to a specific Xilinx part. This means that for each device file in
 RapidSmith2, a new \texttt{CellLibrary} needs to be generated \footnote{This may
-change to be family-specific in the future, but usually, parts in the same
-family can use the same \texttt{CellLibrary}.}. \autoref{code:cellLibrary}
-shows two ways to load a \texttt{CellLibrary} in RapidSmith2. The following
+change to be family-specific in the future.  We have observed that, usually,
+parts in the same family can use the same \texttt{CellLibrary}.  But, for now
+we recommend generating a new one for each device you use}.
+\autoref{code:cellLibrary} shows two ways to load a \texttt{CellLibrary} in RapidSmith2. The following
 subsections detail important aspects of a cell library.
 
 \begin{lstlisting}[xleftmargin=1.5em, framexleftmargin=1.5em, caption=
@@ -736,7 +743,7 @@ if desired. This can be accomplished in two easy steps.
 
 \begin {enumerate}
   \item Create an XML specification
-  of your macro that follows the format laid out below: 
+  of your macro that follows the format laid out in \autoref{lst:macroXml}.
 \end {enumerate}
 
 \begin{lstlisting}[language=XML, numbers=none, keywordstyle=, stringstyle=,

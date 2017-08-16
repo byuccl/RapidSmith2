@@ -8,11 +8,11 @@
 \graphicspath{{./techReportFigures/sec10_deviceInstallation/}}
 
 The device files included with the RapidSmith2 installation (listed in
-\autoref{sec:supportedDevices}) have been well-tested, and are great starting
+Section~\ref{sec:supportedDevices}) have been well-tested, and are great starting
 points for new users. If you are new to RapidSmith2, it is \textit{strongly
 encouraged} to start with these existing device files. However, RapidSmith2
 also supports installing new devices for parts not listed in
-\autoref{sec:supportedDevices}. To create a new RapidSmith2 device
+Section~\ref{sec:supportedDevices}. To create a new RapidSmith2 device
 file, four \texttt{Tincr} intermediate files are required:
 
 \begin{enumerate}
@@ -23,10 +23,10 @@ file, four \texttt{Tincr} intermediate files are required:
 \end{enumerate}
 
 \noindent The contents and format of these files are described in
-great detail in \autoref{sec:appendixXDLRC}, \autoref{sec:familyInfo},
-\autoref{sec:deviceInfo}, and section \ref{sec:cellLibraryinDesignSection}
+great detail in Appendix~\ref{sec:appendixXDLRC}, Appendix~\ref{sec:familyInfo},
+Appendix~\ref{sec:deviceInfo}, and Section~\ref{sec:cellLibraryinDesignSection}
 respectively, and will not be described here. For those that are curious about
-what each file represents, refer to the listed appedices. The remainder of this
+what each file represents, refer to the listed appendices. The remainder of this
 section documents the required steps to transform the \texttt{Tincr}
 intermediate files into compact device files that can be loaded into
 RapidSmith2.
@@ -35,7 +35,7 @@ RapidSmith2.
 \label{sec:creatingNewSupportedDevices} 
 Section \ref{sec:supportedDevices} gives a list of currently supported
 families in RapidSmith2. If the device to install is \textbf{not} within a
-supported family, see \autoref{sec:newFamilies} for how to add support for a
+supported family, see Section~\ref{sec:newFamilies} for how to add support for a
 new family in RapidSmith2. Otherwise, a new device file can be added in five
 easy steps:
 
@@ -48,7 +48,9 @@ execute faster. This Tcl command can take a very long time to run (more than 24
 hours for very large devices), and so running the command on a remote machine is
 good practice. Be aware that these XDLRC files are massive, and 100 GB for the
 largest XDLRC files is not uncommon. Make sure there is enough space on the
-hard drive before generating the XDLRC for a device.
+hard drive before generating the XDLRC for a device.  NOTE: we have observed
+that on some machines the use of more than one process to generate the XDLRC
+file may hang.  If this happens, re-run using a ``-max\_processes'' of 1.  
 
 \end {enumerate}
 
@@ -61,7 +63,7 @@ hard drive before generating the XDLRC for a device.
 \item Run the \texttt{Tincr} command \texttt{[tincr::create\_xml\_device\_info]}
  to create a \textit{deviceInfo.xml} file for the part. Copy the generated
  \textit{deviceInfo.xml} file to the directory
- \textit{rapidSmithPath/devices/family}, where ``rapidSmithPath'' is the path to
+ \textit{RapidSmithPath/devices/family}, where ``RapidSmithPath'' is the path to
  your RapidSmith2 installation and ``family'' is the corresponding Vivado
  family name (i.e. artix7, kintex7, virtex7, zynq, kintexu, virtexu,
  kintexuplus, virtexuplus, etc.)..
@@ -94,7 +96,7 @@ file (or whatever family your device is in) will already exist, but will be
 updated with new sites and tile types from the newly installed part.
 
 \item The final step is to create a \textit{cellLibrary.xml} file, which details
-all Xilinx primitives that can target the device. \autoref{sec:cellLibraryGeneration}
+all Xilinx primitives that can target the device. Section~\ref{sec:cellLibraryGeneration}
 demonstrates how to generate a new cell library. Copy the generated cell library
 to the corresponding family folder of the device and rename it to
 ``cellLibrary.xml.''
@@ -147,8 +149,8 @@ items are families that are currently supported in RapidSmith2 and
 steps listed below. \textbf{NOTE: In general, you should not be adding support
 for a new family as a general user of RapidSmith2. Instead, create an issue at the
 RapidSmith2 GitHub repository and the maintainers of RapidSmith2 in the BYU CCL
-lab will add support. The following instructions are intended for BYU students
-only}.
+lab will work to add support. Thus, the following instructions are intended
+mainly for BYU researchers}.
 
 \begin {enumerate}
   \item Create the primitive definitions of the family using VSRT. The VSRT user
@@ -184,9 +186,10 @@ only}.
 
 \begin{enumerate}
 \setcounter{enumi}{3}    
-    \item Modify the generated family info with a few hand edits. The required hand
-    edits are broken down between Series7 and UltraScale devices in
-    \autoref{sec:series7HandEdits} and \autoref{sec:ultrascaleHandEdits}
+    \item Modify the generated family info with a few hand edits. The
+    current required hand edits are broken down between Series7 and UltraScale
+    devices in
+    Section~\ref{sec:series7HandEdits} and Section~\ref{sec:ultrascaleHandEdits}
     respectively.
 
 	\item Copy the generated \textit{familyInfo.xml} file to the directory
@@ -196,8 +199,8 @@ only}.
 	generated a family info for the artix7 part ``xc7a100tcsg324'', I would copy
 	the family info into the \textit{devices/artix7} directory.
 
-	\item Follow the steps laid out in \autoref{sec:creatingNewSupportedDevices} to
-	generate RapidSmith2 device files.
+	\item Follow the steps laid out in Section~\ref{sec:creatingNewSupportedDevices} to
+	generate RapidSmith2 device files for the devices desired.
 	    
 	\item Run the Family Builder in RapidSmith2 (an example usage is shown in
 	\autoref{lst:apdxAFamilyBuilder}). The Family Builder accepts one command line
@@ -208,9 +211,11 @@ only}.
 	which can be used to find site and tile types as shown in
 	\autoref{lst:apdxATypes}. Every family Java class includes a classifications
 	section with the header ``/* ------ CLASSIFICATIONS GO HERE ------ */''. Below
-	the header, tile and site classifications can be manually added to group
+	the header, tile and site classifications must be manually added to group
 	similar site types together. The classifications for Artix7 are shown in
-	\autoref{lst:apdxAClassifications} for reference.
+	\autoref{lst:apdxAClassifications} for reference.  These are the existing
+	classifications/categories for RapidSmith2 - what is needed is to identify the
+	site and tile types which should be placed into each classification category.
 	
 \end{enumerate}
 

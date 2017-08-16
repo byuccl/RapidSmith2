@@ -20,7 +20,7 @@ This section details how routing algorithms can be implemented in RapidSmith2.
 
 \subsection{Wires and Wire Connections} \label{wireConnSection}
 Routing in RapidSmith2 is done using \texttt{Wire} objects, which are described
-in subsection \ref{wireSection}. \texttt{Wire}s are uniquely identified by
+in Section~\ref{wireSection}. \texttt{Wire}s are uniquely identified by
 their corresponding tile and wire name (i.e. ``tileName/wireName''), and are connected
 through \texttt{Connec\-tion} objects. There are two types of wire connections:
 
@@ -258,7 +258,7 @@ When a design is imported from Vivado through a RSCP, the routing information
 is parsed and loaded into \texttt{Route\-Tree}s for each \texttt{CellNet}. On
 design export, the \texttt{RouteTree} for each \texttt{CellNet} is traversed
 and converted into a Vivado \texttt{ROUTE} string. Users can use custom data
-structures to route a design, but they needs to be \textbf{converted to an
+structures to route a design, but they need to be \textbf{converted to an
 equivalent RouteTree representation} before exporting the design to Vivado.  
 
 \subsection{Three Part Routing} \label{sec:threePartRouting}
@@ -273,7 +273,7 @@ In RapidSmith2, there are three sections to a routed \texttt{CellNet}:
   and is routed to several sink site pins. This part of the route is
   called the \textbf{intersite} route because it connects sites together. A
   typical router is responsible for routing this section of the
-  net\footnote{VCC and GND nets don't follow this pattern. The only difference
+  net\footnote{VCC and GND nets don't follow this pattern. The main difference
   for VCC and GND is that they can have multiple intersite nets.}.
   
   \item The portion of the net that starts at the sink site pins from part (2),

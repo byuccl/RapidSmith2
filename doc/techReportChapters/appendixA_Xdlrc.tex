@@ -14,7 +14,7 @@ in some way. If these don't apply to you, then go ahead and skip this section.
 XDLRC files are textual descriptions of Xilinx FPGA devices and can be very
 verbose (which is why they get so large). This section highlights the main parts
 of an XDLRC file with accompanying images. As you will see, much of the
-terminology is the same as \autoref{fpgaArch}.
+terminology is the same as Section~\ref{fpgaArch}.
 
 \bigbreak \noindent
 \begin{large}
@@ -30,7 +30,7 @@ terminology is the same as \autoref{fpgaArch}.
 
 \noindent
 A tile in an XDLRC file corresponds to the same thing as the \cls{Tile}
-described in \autoref{fpgaArch}. Each tile is declared with a ``(tile''
+described in Section~\ref{fpgaArch}. Each tile is declared with a ``(tile''
 directive as shown above followed by the unique row and column index of where
 the tile fits into the grid of tiles found on the FPGA. The tile declaration
 also contains a name followed by a type with the final number being the number
@@ -74,9 +74,9 @@ to denote connectivity. The connections are not programmable, but hard wired
 into the FPGA. Wire portions of the XDLRC file are included in the definition of
 every tile (even if the same tile type has already been printed), which has a
 big impact on the final size of XDLRC files. How RapidSmith2 handles wire
-duplication is described in \autoref{wireEnum}. The \cls{WireConnection}
+duplication is described in Section~\ref{wireEnum}. The \cls{WireConnection}
 objects that are created from this part of the XDLRC are described in
-\autoref{wireConnSection}.
+Section~\ref{wireConnSection}.
 
 \begin{figure}[t]
 	\centering
@@ -105,8 +105,8 @@ and repeats the tile name for reference. It specifies two wires by name that
 both exist in that same tile (``BEST\_LOGIC\_OUTS0'' and ``BYP\_INT\_B5'') and
 declares that the wire ``BEST\_LOGIC\_OUTS0'' can drive the wire
 ``BYP\-\_INT\_B5''. A collection of these PIPs in a net define how a net is
-routed and is consistent with saying that those PIPs are “turned on.”
-\autoref{wireConnSection} describes in detail how PIPs are represented in
+routed and is consistent with saying that those PIPs are ï¿½turned on.ï¿½
+Section~\ref{wireConnSection} describes in detail how PIPs are represented in
 RapidSmith2.
 
 \bigbreak \noindent
@@ -118,13 +118,6 @@ RapidSmith2.
 The Primitive Definition portion of an XDLRC file textually describes the
 components found within a \cls{Primitive} \cls{Site} (a SLICEL for example)
 and how they are connected. This includes: 
-
-\begin{figure}[b!]
-	\centering
-	\includegraphics[width=1\columnwidth]{xdlrcDef}
-	\caption{Primitive Def sections of XDLRC files}
-	\label{fig:xdlrcDef}
-\end{figure}
 
 \begin{itemize}
   \item BELs
@@ -141,4 +134,11 @@ be seen in \autoref{fig:xdlrcDef}. The sub-site data structures in RapidSmith2
 (\cls{Bels}, \cls{SiteWire}s, etc.) are built by parsing this section of the
 XDLRC file. For a more detailed description of primitive definitions, view the
 VSRT User Guide in the RapidSmith2 repository.
+
+\begin{figure}[t!]
+	\centering
+	\includegraphics[width=1\columnwidth]{xdlrcDef}
+	\caption{Primitive Def sections of XDLRC files}
+	\label{fig:xdlrcDef}
+\end{figure}
 

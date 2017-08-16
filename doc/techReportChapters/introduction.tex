@@ -71,10 +71,8 @@ In short, the ability to export designs out of Vivado, manipulate them with more
 powerful languages such as Java, and then import the design back into Vivado
 is a very useful capability.
 
-RapidSmith2 (in conjunction with Tincr which is described in \autoref{sec:tincr})
-abstracts this process into a few easy-to-use function calls. Generating FPGA
-part information, importing and exporting \pgm{all aspects} of a design, and
-dealing with other fairly arcane details is made mostly transparent to the
+RapidSmith2 (in conjunction with Tincr - see Section~\ref{sec:tincr}) abstracts
+this process into a few easy-to-use function calls. Generating FPGA part information, importing and exporting \pgm{all aspects} of a design, and dealing with other fairly arcane details is made mostly transparent to the
 user. RapidSmith2 and Tincr provide a nice API into equivalent Vivado device and design
 data structures. All of this enables researchers to have more time to focus on what matters
 most: the research of new ideas and algorithms.
@@ -99,3 +97,34 @@ memory. This helps reduce the time spent debugging, leaving more
 time for researchers to focus on the real research at hand.  Our experience over
 the past decade is that for student research projects, Java has greatly improved
 student productivity and led to far more stable CAD tools.
+
+\subsection{Using This TechReport and Getting Started}
+This technical report was written to serve two purposes.  The first is to
+provide information for new users to get started using RapidSmith2.  The second
+is that it also contains detailed reference information for both more advanced
+users as well as for those who maintain RapidSmith2.  
+
+If you are a new user we suggest you use this document in the following ways:
+
+\begin{enumerate}
+  \item Start by reading Sections 1-3 carefully.
+  \item Experiment with the use of the example programs discussed in
+  Section~\ref{examples}.  Then use those along with the example designs
+  provided in the \dir{exampleVivadoDesigns} directory of the RapidSmith2
+  repository.  Finally, move on to using your own designs.
+  In particular, focus on learning to export/import designs to/from Vivado and
+  how to use some the basic functions like the pretty printer and DOT file
+  generator.
+  \item Then, work your way through the tutorials in the file
+  \dir{doc/Exercises.pdf}.
+  \item Finally, begin working on your own projects.
+\end{enumerate}
+
+As you read through this technical report initially, note the advanced topics
+sections and skim or skip them entirely.  As you become more experienced and/or
+have a need, those advanced sections will provide important reference material
+for you to learn many of the important details associated with RapidSmith2.  As you
+become more experienced, don't neglect to generate and read the JavaDoc
+documentation for the actual source code.  Finally, the source code itself can
+be an important way of understanding parts of  RapidSmith2's features and
+functionality.

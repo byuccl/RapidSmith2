@@ -6,7 +6,7 @@
 
 \graphicspath{{./techReportFigures/sec2_background/}}
 
-RapidSmith2 is based on the original RapidSmith project written by Christopher
+RapidSmith2 is based on the original RapidSmith project created by Christopher
 Lavin as a part of his PhD work at BYU.  It was based on the Xilinx Design
 Language (XDL) which provides a human-readable file format equivalent to the
 Xilinx proprietary Netlist Circuit Description (NCD) of \textbf{ISE}.  With
@@ -61,16 +61,16 @@ addition to the Xilinx tool suite, but suffers some major drawbacks:
 \textit{extraction} tool, instead of a CAD framework itself. Vivado Tcl scripts
 can be used for this purpose.
 
-\subsection{Tincr}
+\subsection{Tincr} \label{sec:tincr}
 \texttt{Tincr} is a Tcl plugin to Vivado created by
-Brad White. It introduces two useful packages: \texttt{TincrCAD} and
-\texttt{TincrIO}. These packages augment Vivado's native Tcl interface with a
+Brad White as a part of this MS Thesis at BYU. It introduces two useful packages:
+\texttt{TincrCAD} and \texttt{TincrIO}. These packages augment Vivado's native Tcl interface with a
 set of high-level commands that (a) simplify a variety of Vivado tasks and (b)
 add additional functionality to the Tcl interface in the form of new Tcl
 commands. \texttt{TincrCAD} focuses on commands for implementing CAD tools
 directly in Vivado, and \texttt{TincrIO} focuses on commands for extracting
 device and design data from Vivado. \texttt{TincrIO} is especially important
-for RapidSmith2 because it demonstrated the plausibility of using
+for RapidSmith2 because it demonstrated the feasibility of using
 Tcl commands to manipulate Vivado designs outside of Vivado.
 
 \subsection{Vivado Design Interface}
@@ -78,7 +78,9 @@ Tcl commands to manipulate Vivado designs outside of Vivado.
 in external CAD tools, but it was far from complete and didn't represent several
 important aspects of Vivado designs. The \textbf{Vivado Design Interface} (VDI),
 a complete Vivado device and design extraction tool, was developed by Thomas
-Townsend based on the intial work by Brad White. VDI is included with
+Townsend as a part of his MS Thesis at BYU, and was based on the intial work by
+Brad White.
+VDI is included with
 \texttt{Tincr}, and is available at {\color{blue}
 \url{https://github.com/byuccl/tincr}}. It is a  significant contribution for
 two reasons in particular:
@@ -95,7 +97,7 @@ two reasons in particular:
 design suite which can be used with \textit{any} CAD tool or framework. It
 provides an XDL-alternative for designs implemented in Vivado. Devices are
 represented with a XDLRC file and a set of XML files. Designs are represented
-with RSCP and TCP checkpoint files. RapidSmith2 uses VDI to interface desigs
+with RSCP and TCP checkpoint files. RapidSmith2 uses VDI to interface designs
 with the Vivado tools suite.
 
 \begin{figure}[h!]
@@ -112,8 +114,9 @@ tools targeting Xilinx devices. Due to the format of XDL however, these CAD
 tools always operate at site boundaries. This makes it difficult to explore sub-site CAD
 algorithms that work explicitly with sub-site components (i.e. BELs, site PIPs,
 etc.) such as packers. Travis Haroldsen was interested in exploring packing
-algorithms for Virtex6 devices, and so created RapidSmith2. RapidSmith2 updated
-the internal data structures of RapidSmith to the BEL and cell-level, allowing
+algorithms for Virtex6 devices, and so began the creation of RapidSmith2 as a
+part of his PhD work at BYU.
+RapidSmith2 updated the internal data structures of RapidSmith to the BEL and cell-level, allowing
 algorithms to have finer grained control over sub-site placement and routing. 
 Because it was originally targeting the Virtex6 architecture, the initial
 version of RapidSmith2 took as input a XDL netlist, and \textbf{unpacks} the
@@ -145,21 +148,21 @@ They are listed here for those who are interested in learning more about RapidSm
 \texttt{Tincr}, and VDI.
 
 \begin{enumerate}
-  \item B. White. (2014) Tincr: Integrating custom cad tool frameworks with the
-  xilinx vivado design suite. [Online]. Available:
+  \item B. White. (2014) Tincr: Integrating Custom Cad Tool Frameworks With the
+  Xilinx Vivado Design Suite. [Online]. Available:
   http://scholarsarchive.byu.edu/etd/4338/ ix, 6, 92
   
   \item B. White and B. Nelson, “Tincr A Custom CAD Tool Framework for Vivado,”
   in ReConFigurable Computing and FPGAs (ReConFig), 2014 International
   Conference on. IEEE, Dec. 2014. 3, 12 
    
-  \item T. Haroldsen, B. Nelson, and B. Hutchings, “Rapidsmith 2: A framework
-  for bel-level cad exploration on xilinx fpgas,” in Proceedings of the 2015
+  \item T. Haroldsen, B. Nelson, and B. Hutchings, “Rapidsmith 2: A Framework
+  for BEL-Level CAD Exploration on Xilinx FPGAs,” in Proceedings of the 2015
   ACM/SIGDA International Symposium on Field-Programmable Gate Arrays. ACM,
   2015, pp. 66–69. 3, 17
   
-  \item  T. Haroldsen, B. Nelson, and B. Hutchings, “Packing a modern xilinx
-  fpga using rapidsmith,” in ReConFigurable Computing and FPGAs (ReConFig),
+  \item  T. Haroldsen, B. Nelson, and B. Hutchings, “Packing a Modern Xilinx
+  FPGA Using RapidSmith,” in ReConFigurable Computing and FPGAs (ReConFig),
   2016 International Conference on. IEEE, 2016, pp. 1–6. 17
   
   \item T. Townsend and B. Nelson, “Vivado Design Interface: An Export/Import

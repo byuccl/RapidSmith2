@@ -96,7 +96,7 @@ a RapidSmith2 \texttt{CellDesign}.
   Similarly, all static source BELs are recorded in a \texttt{List}.
   
   \item While recreating \textbf{fully-routed designs}, RapidSmith2 can
-  recognize the VCC/GND BEL pin issue described in \autoref{sec:pseudoCellPin}.
+  recognize the VCC/GND BEL pin issue described in Section~\ref{sec:pseudoCellPin}.
   As mentioned in that section, these BEL pins are not represented in the
   logical netlist. To support a more complete netlist view, the
   routing importer creates a new cell pin for each discovered VCC/GND BEL
@@ -107,9 +107,10 @@ a RapidSmith2 \texttt{CellDesign}.
   \item The INTERSITE route status of each net is computed during routing
   import. Possible values include \texttt{FULLY\_RO\-UTED} (all site pins are
   routed to), \texttt{PARTIALLY\_ROU\-TED} (some but not all site pins are
-  routed to), and \texttt{UNROU\-TED} (no site pins are routed to). After design
-  import, it is the user's responsibility to update the route status of the net
-  based on which cell pins have been routed to.
+  routed to), and \texttt{UNROU\-TED} (no site pins are routed to). If the
+  routing of a net is modified in a user-created CAD tool, it is the user's
+  responsibility to ensure that this route status is updated for the net
+  affected.
   
   \item RSCPs include how the design is implemented in Vivado (i.e. if the
   design has been implemented ``out-of-context''). After a RSCP has been
