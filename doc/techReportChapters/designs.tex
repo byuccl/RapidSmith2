@@ -638,8 +638,8 @@ clock routing mux that chooses between a regular clock signal and an inverted
 signal (\autoref{fig:clkInv}). The output of this inverter is connected to all
 flip flops of the SLICEL, and decides whether \textit{all} flip flops are
 rising or falling-edge triggered. The clock that is selected is determined
-by the property ``IS_C_INVERTED'' \textbf{of the flip flops cells that have been
-placed onto the SLICEL}. The clock inverter is programmed automatically based on
+by the property ``IS\_C\_INVERTED'' \textbf{of the flip flops cells that have
+been placed onto the SLICEL}. The clock inverter is programmed automatically based on
 the cell properties. There are other such properties, but they will not be listed
 here. When creating designs in RapidSmith2, it is important to not place cells
 together that may have conflicting properties. RapidSmith2 does not perform any
