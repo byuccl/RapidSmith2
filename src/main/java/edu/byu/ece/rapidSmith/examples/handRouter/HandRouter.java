@@ -57,7 +57,7 @@ public class HandRouter {
 			System.out.print("  >>>");
 							
 			if (in.hasNextInt()) {
-				followConnection(route, in.nextInt());
+				route = followConnection(route, in.nextInt());
 				continue;
 			}
 				

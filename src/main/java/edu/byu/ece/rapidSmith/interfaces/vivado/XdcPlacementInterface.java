@@ -352,7 +352,7 @@ public class XdcPlacementInterface {
 					if (cell.isLut()) { 
 						fileout.write("set_property LOCK_PINS { ");
 						for(CellPin cp: cell.getInputPins()) {
-							if (!cp.isPseudoPin()) {
+							if (!cp.isPseudoPin() && cp.getMappedBelPin() != null) {
 								fileout.write(String.format("%s:%s ", cp.getName(), cp.getMappedBelPin().getName()));
 							}
 						}

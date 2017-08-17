@@ -72,6 +72,9 @@ public class SimulatedAnnealingPlacer {
 		this.netToCostMap = new int[design.getNets().size()];
 		this.siteTypeMap = new HashMap<>();
 		this.buildSiteClusters();
+		
+		// unroute all intrasite nets to prevent LUT routethroughs from being inserted
+		design.getNets().forEach(CellNet::unroute);
 	}
 	
 	public void setVivadoOutputStream(BufferedWriter out, String checkpoint) {
@@ -394,8 +397,10 @@ public class SimulatedAnnealingPlacer {
 	
 	
 	//code to filter out unwanted sites for placement (we will ignore iob pads and bufgs
-	private boolean isPad(Site site){		
-		return site.getType().toString().startsWith("IOB");		
+	private boolean isPad(Site site){	
+		//System.out.println(site.getType());
+		return Artix7.IO_SITES.contains(site.getType());
+		//return site.getType().toString().startsWith("IOB");		
 	}
 	
 	private boolean isBUFG(Site site) {		
@@ -656,7 +661,7 @@ public class SimulatedAnnealingPlacer {
 		
 		try {
 			System.out.println("Updating vivado with current placement...");
-			XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, null);
+			XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device);
 			placementInterface.writePlacementXDC(placementXdc);
 			writeVivadoCommand("place_design -quiet -unplace\n");
 			writeVivadoCommand("read_xdc -quiet " + placementXdc + "\n");

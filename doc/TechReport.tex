@@ -29,6 +29,10 @@
 \setlength{\topmargin}{-0.25in}
 \setlength{\textwidth}{6.5in}
 
+%\setlength{\textfloatsep}{0.1cm}
+% add space between paragraphs
+%\setlength{\parskip}{0.5em}
+
 \pagestyle{fancy}
 \fancyhead[L]{}
 \fancyhead[R]{}
@@ -62,8 +66,6 @@
   \scantokens{#1\noexpand}%
   \endgroup
 }
-
-\renewcommand{\lstlistingname}{Code Sample}
 
 % Colors used for Java code
 \definecolor{dkgreen}{rgb}{0,0.6,0}
@@ -143,7 +145,8 @@
 \makeatother
 
 \makeindex
-\setcounter{tocdepth}{2}
+% show all sections (even subsections and subsubsections in the table of contents)
+\setcounter{tocdepth}{3}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %	Document Start
@@ -161,13 +164,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %	Title
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{{\bf \Huge \sc{RAPIDSMITH 2}}\\[0.1in]
+\title{{\bf \Huge \sc{RAPIDSMITH2}}\\[0.1in]
 A Library for Low-level Manipulation 
 of Vivado Designs at the Cell/BEL Level\\[0.3in]
 Technical Report and Documentation\\[0.1in]
 }
-\author{\Large Brent Nelson, Travis Haroldsen, Thomas Townsend\\[0.2in] \large NSF Center for High Performance Reconfigurable Computing (CHREC)
-\thanks{This work was supported in part by the I/UCRC program of the National
+\author{\Large Brent Nelson, Thomas Townsend, and Travis Haroldsen\\[0.2in]
+\large NSF Center for High Performance Reconfigurable Computing (CHREC) \thanks{This work was supported in part by the I/UCRC program of the National
  Science Foundation, grant numbers 0801876 and 1265957.}\\
 \large Department of Electrical and Computer Engineering  \\
 \large  Brigham Young University \\
@@ -204,7 +207,12 @@ Technical Report and Documentation\\[0.1in]
 \input{techReportChapters/bitstreams.tex}
 \input{techReportChapters/license.tex}
 \input{techReportChapters/dependencies.tex}
+
+\appendix
 \input{techReportChapters/appendixA_Xdlrc.tex}
+\input{techReportChapters/appendixB_familyInfo.tex}
+\input{techReportChapters/appendixC_deviceInfo.tex}
+\input{techReportChapters/appendixD_RSCP.tex}
 
 \end{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
