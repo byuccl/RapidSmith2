@@ -88,6 +88,33 @@ public class DesignAnalyzer {
 		}
 	}
 	
+	/**
+	 * Helper function for prettyPrintDesign(). 
+	 * Print out a formatted representation of a macro cell's internal cell.
+	 * @param c The internal cell to be pretty printed.
+	 */
+	private static void prettyPrintInternalCell(Cell c)
+	{
+		System.out.println("    " + c.getName() + " " + 
+				c.getLibCell().getName());
+		if (c.isPlaced())
+			// Print out its placement
+			System.out.println("      <<<Placed on: " + c.getBel() + ">>>");
+		else System.out.println("      <<<Unplaced>>>");
+		
+		// Print out the external pins
+		for (CellPin cp : c.getPins()) {
+			System.out.println("      Pin: " + cp.getName() + " " + 
+					cp.getDirection() + " " + 
+					(cp.getNet()!=null?cp.getNet().getName():"<unconnected>"));
+		}
+		// Print the properties for a given cell if there are any
+		// For now, properties are strings. 
+		for (Property p : c.getProperties()) {
+			String s = "      Property: " + p.toString();
+			System.out.println(s);
+		}		
+	}
 	
 	/**
 	 * Print out a formatted representation of a design to help visualize it.  Another way of visualizing designs is illustrated
@@ -96,30 +123,84 @@ public class DesignAnalyzer {
 	 */
 	public static void prettyPrintDesign(CellDesign design) {
 		// Print the cells
+		
 		for (Cell c : design.getCells()) {
 			System.out.println("\nCell: " + c.getName() + " " + 
 					c.getLibCell().getName());
-			if (c.isPlaced())
-				// Print out its placement
-				System.out.println("  <<<Placed on: " + c.getBel() + ">>>");
-			else System.out.println("  <<<Unplaced>>>");
-			// Print out the pins
-			for (CellPin cp : c.getPins()) {
-				System.out.println("  Pin: " + cp.getName() + " " + 
-						cp.getDirection() + " " + 
-						(cp.getNet()!=null?cp.getNet().getName():"<unconnected>"));
+			// Print macro cell info
+			if (c.isMacro())
+			{
+				System.out.println("  Macro (Parent) Cell");
+				
+				// Print out the pins
+				for (CellPin cp : c.getPins()) {
+					System.out.println("  Pin: " + cp.getName() + " " + 
+							cp.getDirection() + " " + 
+							(cp.getNet()!=null?cp.getNet().getName():"<unconnected>"));
+				}
+				// Print the properties for a given cell if there are any
+				// For now, properties are strings. 
+				for (Property p : c.getProperties()) {
+					String s = "  Property: " + p.toString();
+					System.out.println(s);
+				}		
+				
+				// Print out the names of the internal cells
+				Collection<Cell> internalCells = c.getInternalCells();
+				
+				if (internalCells != null && !internalCells.isEmpty())
+				{
+					System.out.println("  Internal Cells:");
+					for (Iterator<Cell> it = internalCells.iterator(); it.hasNext(); )
+					{
+						Cell internalCell = it.next();
+						prettyPrintInternalCell(internalCell);
+					}
+				}
+						
+				// Print out names of internal nets
+				Collection<CellNet> internalNets = c.getInternalNets();
+	
+				if (internalNets != null && !internalNets.isEmpty())
+				{
+					System.out.println("  Internal Nets:");
+					for (Iterator<CellNet> it = internalNets.iterator(); it.hasNext(); )
+					{
+						CellNet internalNet = it.next();
+						System.out.println("    " + internalNet.getName());
+					}
+				}
 			}
-			// Print the properties for a given cell if there are any
-			// For now, properties are strings. 
-			for (Property p : c.getProperties()) {
-				String s = "  Property: " + p.toString();
-				System.out.println(s);
+			else
+			{
+				// Leaf Cell
+				if (c.isPlaced())
+					// Print out its placement
+					System.out.println("  <<<Placed on: " + c.getBel() + ">>>");
+				else System.out.println("  <<<Unplaced>>>");
+				
+				// Print out the external pins
+				for (CellPin cp : c.getPins()) {
+					System.out.println("  Pin: " + cp.getName() + " " + 
+							cp.getDirection() + " " + 
+							(cp.getNet()!=null?cp.getNet().getName():"<unconnected>"));
+				}
+				// Print the properties for a given cell if there are any
+				// For now, properties are strings. 
+				for (Property p : c.getProperties()) {
+					String s = "  Property: " + p.toString();
+					System.out.println(s);
+				}		
 			}
 		}
 		
 		// Print the nets
 		for (CellNet n : design.getNets()) {
 			System.out.println("\nNet: " + n.getName());
+			
+			// Print if it is an internal net
+			if (n.isInternal())
+				System.out.println("Internal Net");
 
 			// Print the net's pins
 			// Source pin first
