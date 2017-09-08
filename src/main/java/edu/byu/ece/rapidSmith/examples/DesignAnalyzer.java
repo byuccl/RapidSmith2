@@ -200,7 +200,7 @@ public class DesignAnalyzer {
 			
 			// Print if it is an internal net
 			if (n.isInternal())
-				System.out.println("Internal Net");
+				System.out.println("  Internal Net");
 
 			// Print the net's pins
 			// Source pin first
@@ -237,9 +237,9 @@ public class DesignAnalyzer {
 				assert(n.getIntersiteRouteTreeList().size() <= 1);
 				String s = createRoutingString(n, n.getSourceRouteTree(), true, true);
 				if (Objects.equals(s, ""))
-					System.out.println("<<<Unrouted>>>");
+					System.out.println("  <<<Unrouted>>>");
 				else
-					System.out.println("Physical routing: { " + createRoutingString(n, n.getSourceRouteTree(), true, true) + " }"); 
+					System.out.println("  Physical routing: { " + createRoutingString(n, n.getSourceRouteTree(), true, true) + " }"); 
 			}
 		}
 	}		
