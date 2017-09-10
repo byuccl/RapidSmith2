@@ -1,0 +1,130 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Section 1: Introduction
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Introduction}
+\subsection{What is RapidSmith2?}
+The original BYU RapidSmith project began in 2010. Its goal was to develop
+a set of tools and APIs which would provide academics with an
+easy-to-use platform to implement experimental CAD ideas and algorithms on
+modern Xilinx FPGAs. It integrated with Xilinx's old design suite, ISE.
+RapidSmith2 represents a major addition to RapidSmith. Specifically, Vivado
+designs are now supported. Using RapidSmith2 you can write custom CAD tools
+which will:
+
+\begin{itemize}
+  \item Export designs from Vivado
+  \item Perform analyses on those designs
+  \item Make modifications to those designs
+  \item Import those designs back into Vivado for further processing or
+  bitstream generation
+\end{itemize}
+Futhermore, you need not start with a Vivado design --- 
+you can create a new design from scratch in RapidSmith2 and then import it into Vivado
+if desired.
+
+The other new major capability of RapidSmith2 is that it changes RapidSmith's design
+representation. Instead of using XDL's view of a design with Instances and
+Sites, RapidSmith2 uses Vivado's representation of design with Cells and BELs. This
+is a significant change as it exposes the actual design and device in a way
+that RapidSmith never did, opening up new CAD research opportunities which were
+difficult to perform using Rapidsmith.
+       
+\subsection{Who Should Use RapidSmith2?}
+RapidSmith2 is aimed at anyone desiring to do FPGA CAD research on real Xilinx devices
+available in Vivado. As such, users of RapidSmith2 should have some understanding of
+Xilinx FPGA architecture, the Vivado design suite, and the Tcl programming
+language. However, one goal of this documentation is to provide sufficient
+background and detail to help bring developers up to speed on the needed
+topics. RapidSmith2 is by no means a Xilinx Vivado replacement. It cannot be used
+without a valid and current license to a Vivado installation (RapidSmith2
+cannot generate bitstreams for example).
+
+\subsection{Why RapidSmith2?}
+The Xilinx-provided Tcl interface into Vivado is a great addition to the tool
+suite. It can be used to do a variety of useful things including scripting
+design flows, querying device and design data structures, and  modifying placed
+and routed designs. In theory, the Tcl interface provides all of the
+functionality needed in order to create any type of CAD tool as a plugin to the
+normal Vivado tool flow. However, there are a few issues in TCL that motivate
+the use of external CAD tool frameworks such as RapidSmith2. These include:
+\begin{itemize}
+  \item Tcl, being an interpreted language, is slow. It is far too slow to
+  implement complex algorithms such as PathFinder. Compiled and
+  managed runtime languages are a better option in terms of performance.
+  \item Tcl is hard to program in. TCL is not an object oriented language, and
+  so writing complex algorithms are difficult since Object-Oriented language
+  constructs do not exist. That being said, TCL is great for writing automation
+  scripts.
+  \item There are some memory issues in Vivado's Tcl interface. In our
+  experience, long-running scripts eventually cause the system to run out of
+  memory even if they are not doing anything interesting.
+  \item Vivado's TCL interface does not offer a complete device representation
+  (determined by Brad White's MS work). Most notably, a user cannot gain
+  access to sub-site wire objects through the Tcl interface. This limits the CAD
+  tools that can be created in Tcl, but this additional information can be added
+  to external tools with some manual work.
+\end{itemize}
+
+\noindent
+In short, the ability to export designs out of Vivado, manipulate them with more
+powerful languages such as Java, and then import the design back into Vivado
+is a very useful capability.
+
+RapidSmith2 (in conjunction with Tincr - see Section~\ref{sec:tincr}) abstracts
+this process into a few easy-to-use function calls. Generating FPGA part information, importing and exporting \pgm{all aspects} of a design, and dealing with other fairly arcane details is made mostly transparent to the
+user. RapidSmith2 and Tincr provide a nice API into equivalent Vivado device and design
+data structures. All of this enables researchers to have more time to focus on what matters
+most: the research of new ideas and algorithms.
+
+\subsection{How is RapidSmith2 Different than VPR and VTR?}
+VPR (Versatile Place and Route) has been an FPGA research tool for several years
+and has led to many publications on new FPGA CAD research. It has been a
+significant contribution to the FPGA research community and has grown to be a
+complete FPGA CAD flow for research-based FPGAs. The main difference between
+RapidSmith/RapidSmith2 and VPR is that the RapidSmith tools can target commercial Xilinx
+FPGAs, providing the ability to exit and re-enter the standard Xilinx flow at
+any point.  All features of commercial FPGAs which are accessible via XDL and
+Vivado's Tcl interface are available in RapidSmith and RapidSmith2. VPR is currently
+limited to FPGA features which can be described using VPR's architectural
+description facilities.
+
+\subsection{Why Java?}
+RapidSmith2 is written in Java. We have found Java to be an excellent rapid prototyping
+platform for FPGA CAD tools.  Java libraries are rich with useful data
+structures, and garbage collection eliminates the need to clean up objects in
+memory. This helps reduce the time spent debugging, leaving more
+time for researchers to focus on the real research at hand.  Our experience over
+the past decade is that for student research projects, Java has greatly improved
+student productivity and led to far more stable CAD tools.
+
+\subsection{Using This TechReport and Getting Started}
+This technical report was written to serve two purposes.  The first is to
+provide information for new users to get started using RapidSmith2.  The second
+is that it also contains detailed reference information for both more advanced
+users as well as for those who maintain RapidSmith2.  
+
+If you are a new user we suggest you use this document in the following ways:
+
+\begin{enumerate}
+  \item Start by reading Sections 1-3 carefully.
+  \item Experiment with the use of the example programs discussed in
+  Section~\ref{examples}.  Then use those along with the example designs
+  provided in the \dir{exampleVivadoDesigns} directory of the RapidSmith2
+  repository.  Finally, move on to using your own designs.
+  In particular, focus on learning to export/import designs to/from Vivado and
+  how to use some the basic functions like the pretty printer and DOT file
+  generator.
+  \item Then, work your way through the tutorials in the file
+  \dir{doc/Exercises.pdf}.
+  \item Finally, begin working on your own projects.
+\end{enumerate}
+
+As you read through this technical report initially, note the advanced topics
+sections and skim or skip them entirely.  As you become more experienced and/or
+have a need, those advanced sections will provide important reference material
+for you to learn many of the important details associated with RapidSmith2.  As you
+become more experienced, don't neglect to generate and read the JavaDoc
+documentation for the actual source code.  Finally, the source code itself can
+be an important way of understanding parts of  RapidSmith2's features and
+functionality.

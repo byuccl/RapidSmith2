@@ -19,7 +19,7 @@ proc compile_hdl_to_checkpoint_files {top} {
     puts "Closing any designs that are currently open..."
     puts ""
 
-    close_design -quiet
+    close_project -quiet
 
     puts "Continuing..."
     link_design -part xc7a100t-csg324-3
@@ -55,7 +55,7 @@ proc compile_hdl_to_checkpoint_files {top} {
     puts "Writing rscp"
     tincr::write_rscp $top
     puts "All done..."
-    close_design
+    close_project
 
     }
 

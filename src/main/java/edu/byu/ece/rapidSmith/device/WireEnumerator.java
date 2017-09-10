@@ -30,7 +30,9 @@ import java.util.Map;
  * Created by Travis Haroldsen on 11/15/14.
  */
 public class WireEnumerator implements Serializable {
-    /** Map of wire names to wire enumerations */
+    /** Serial number */
+	private static final long serialVersionUID = -8150297281225607863L;
+	/** Map of wire names to wire enumerations */
     private Map<String, Integer> wireMap;
     /** Names of each wire enumeration */
     private String[] wires;
@@ -168,7 +170,7 @@ public class WireEnumerator implements Serializable {
         private WireType[] wireTypes;
         private WireDirection[] wireDirections;
 
-        @SuppressWarnings("UnusedDeclaration")
+        @SuppressWarnings("unused")
         private WireEnumerator readResolve() {
             WireEnumerator we = new WireEnumerator();
             we.wires = wires;

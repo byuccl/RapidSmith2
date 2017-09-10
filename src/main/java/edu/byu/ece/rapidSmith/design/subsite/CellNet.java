@@ -68,8 +68,8 @@ public class CellNet implements Serializable {
 	private RouteStatus routeStatus;
 	
 	// Physical route information
-	/** SitePin source of the net (i.e. where the net leaves the site)*/
-	private SitePin sourceSitePin;
+	/** List of pins where the net leaves its source site*/ 
+	private List<SitePin> sourceSitePinList; 
 	/** Route Tree connecting to the source pin of the net*/
 	private RouteTree source;
 	/** List of intersite RouteTree objects for the net*/
@@ -265,9 +265,9 @@ public class CellNet implements Serializable {
 	private void connectToLeafPin(CellPin pin) {
 		Objects.requireNonNull(pin);
 		if (pins.contains(pin))
-			throw new Exceptions.DesignAssemblyException("Pin already exists in net.");
+			throw new Exceptions.DesignAssemblyException("Pin already exists in net: " + this.name + " " + pin.getFullName());
 		if (pin.getNet() != null)
-			throw new Exceptions.DesignAssemblyException("Pin already connected to net.");
+			throw new Exceptions.DesignAssemblyException("Pin " + pin.getFullName() + " already connected to net: " + pin.getNet().getName());
 		
 		pins.add(pin);
 		pin.setNet(this);
@@ -340,7 +340,7 @@ public class CellNet implements Serializable {
 	 * @param pin the pin to remove
 	 */
 	public void disconnectFromPin(CellPin pin) {
-		
+
 		if (pin.isInternal()) {
 			throw new Exceptions.DesignAssemblyException("Cannot remove internal pin from net! Remove the external macro pin instead");
 		}
@@ -475,24 +475,60 @@ public class CellNet implements Serializable {
 	/* **********************************
 	 * 	    Physical Route Functions
 	 * **********************************/
-	
+		
 	/**
-	 * Sets the {@link SitePin} source of the net. This is used to
-	 * set the source of a net when loading a Tincr Checkpoint. If you are
-	 * writing a intersite router, this will give you the site pin where the 
-	 * route needs to start.
-	 * @param sitePin {@link SitePin} 
+	 * Adds a {@link SitePin} source to the net. <b>NOTE</b>: Only two site pins can be marked
+	 * as sources for a net. An exception will be thrown if you try to add more.
+	 * 
+	 * @param sitePin
 	 */
-	public void setSourceSitePin(SitePin sitePin) {
-		this.sourceSitePin = sitePin;
+	public void addSourceSitePin(SitePin sitePin) {
+		if (this.sourceSitePinList == null) {
+			this.sourceSitePinList = new ArrayList<SitePin>(2);
+		}
+		
+		// Throw an exception if the net already has two source pins
+		if (this.sourceSitePinList.size() >= 2) {
+			throw new AssertionError("CellNets should have at most two source site pins, not more. If you think this is incorrect, create a new issue "
+					+ "at the RapidSmith2 github repository.");
+		}
+		
+		this.sourceSitePinList.add(sitePin); 
 	}
 	
 	/**
-	 * Gets the {@link SitePin} where this net is sourced.
-	 * @return {@link SitePin}
+	 * Removes the specified {@link SitePin} from the list of net site pin sources.
+	 *  
+	 * @param sitePin
+	 * @return {@code true} if the site pin was successfully removed as a source, {@code false} otherwise.
+	 * 		If the site pin was not a source pin for the net, {@code false} will be returned.
+	 */
+	public boolean removeSourceSitePin(SitePin sitePin) {
+		return this.sourceSitePinList == null ? false : this.sourceSitePinList.remove(sitePin); 
+	}
+	
+	/**
+	 * Returns an unmodifiable list of {@link SitePin} objects that are
+	 * sources for the net.
+	 */
+	public List<SitePin> getSourceSitePins() {
+		return this.sourceSitePinList == null ? Collections.emptyList() 
+					: Collections.unmodifiableList(this.sourceSitePinList);
+	}
+	
+	/**
+	 * Returns the first {@link SitePin} in the list of site pin sources. If you 
+	 * know the net has only onw site pin source, then use this function.
 	 */
 	public SitePin getSourceSitePin() {
-		return this.sourceSitePin;
+		return this.sourceSitePinList == null ? null : this.sourceSitePinList.get(0);
+	}
+	
+	/**
+	 * Returns the number of site pin sources on the net. 
+	 */
+	public int sourceSitePinCount() {
+		return this.sourceSitePinList == null ? 0  : this.sourceSitePinList.size();
 	}
 	
 	/**
@@ -501,6 +537,14 @@ public class CellNet implements Serializable {
 	 */
 	public BelPin getSourceBelPin() {
 		return this.sourcePin.getMappedBelPin();
+	}
+	
+	/**
+	 * Returns {@code true} if the source cell pin the net has been placed and
+	 * mapped onto a BEL pin, {@code false} otherwise.
+	 */
+	public boolean isSourcePinMapped() {
+		return (sourcePin == null) ? false : sourcePin.isMapped();
 	}
 	
 	/**
@@ -581,8 +625,8 @@ public class CellNet implements Serializable {
 	public void addRoutedSink(CellPin cellPin) {
 		
 		if (!pins.contains(cellPin)) {
-			throw new IllegalArgumentException("CellPin" + cellPin.getName() + " not attached to net. "
-					+ "Cannot be added to the routed sinks of the net!");
+			throw new IllegalArgumentException("CellPin " + cellPin.getFullName() + " not attached to net " + this.getName()
+					+ " Cannot be added to the routed sinks of the net!");
 		}
 		
 		if (cellPin.getDirection().equals(PinDirection.OUT)) {
@@ -613,6 +657,8 @@ public class CellNet implements Serializable {
 	public void unroute() {
 		intersiteRoutes = null;
 		routedSinks = null;
+		belPinToSinkRTMap = null;
+		sitePinToRTMap = null;
 	}
 	
 	/**
@@ -685,6 +731,13 @@ public class CellNet implements Serializable {
 			return Collections.emptyList();
 		}
 		return intersiteRoutes;
+	}
+	
+	/**
+	 * Returns the number of intersite route trees connected to this net.
+	 */
+	public int routeTreeCount() {
+		return intersiteRoutes == null ? 0 : intersiteRoutes.size();
 	}
 	
 	/**
@@ -762,6 +815,8 @@ public class CellNet implements Serializable {
 			return Collections.emptyList();
 		}
 		
+		// TODO: use an EntrySet instead of a KeySet, this should speed up this operation
+		//      because we don't have to do a hash table look up for each site.
 		return sitePinToRTMap.keySet().stream()
 									.filter(SitePin::isInput)
 									.map(sp -> sitePinToRTMap.get(sp))
@@ -863,7 +918,7 @@ public class CellNet implements Serializable {
 	
 	/**
 	 * Computes and stores the route status of the net. This function should be called to recompute the status
-	 * of the route if the routing structure has been modified and the . If the routing structure has not been modified,
+	 * of the route if the routing structure has been modified. If the routing structure has not been modified,
 	 * then {@link CellNet:getRouteStatus} should be used instead. Possible statuses include: <br>
 	 * <br>
 	 * 1.) <b>UNROUTED</b> - no sink cell pins have been routed <br>
@@ -873,17 +928,19 @@ public class CellNet implements Serializable {
 	 * The complexity of this method is O(n) where n is the number of pins connected to the net.
 	 * 
 	 * @return The current RouteStatus of the net
-	 */
+	 * */
 	public RouteStatus computeRouteStatus() {
+		int subtractCount = (isStaticNet() || isSourcePinMapped()) ? 1 : 0;
 		
-		int subtractCount = sourcePin.isMapped() ? 1 : 0;
-		
-		if (routedSinks == null || routedSinks.isEmpty()) {
+		// A net is considered unrouted if there are no routed sinks, and no route trees connected to it
+		if (routeTreeCount() == 0 && getRoutedSinks().isEmpty()) {
 			routeStatus = RouteStatus.UNROUTED;
 		}
-		else if (routedSinks.size() == pins.stream().filter(CellPin::isMapped).count() - subtractCount) {
+		// A net is considered fully routed in all sink cell pins have been routed to
+		else if (getRoutedSinks().size() == pins.size() - subtractCount) {
 			routeStatus = RouteStatus.FULLY_ROUTED;
 		}
+		// A net is otherwise considered partially routed
 		else {
 			routeStatus = RouteStatus.PARTIALLY_ROUTED;
 		}

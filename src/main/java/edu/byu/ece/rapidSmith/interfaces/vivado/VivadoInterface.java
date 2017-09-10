@@ -26,54 +26,55 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
 import edu.byu.ece.edif.core.EdifNameConflictException;
 import edu.byu.ece.edif.core.InvalidEdifNameException;
-import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
+import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
 /**
- * This class is used to interface Vivado and RapidSmith. <br>
- * It parses TINCR checkpoints and creates equivalent RapidSmith designs. <br>
- * It can also create TINCR checkpoints from existing RapidSmith designs.
- * 
- * @author Thomas Townsend
- *
+ * This class is used to interface Vivado and RapidSmith2. 
+ * It parses RSCP checkpoints and creates equivalent RapidSmith {@link CellDesign}s.
+ * It can also create TINCR checkpoints from existing RapidSmith {@link CellDesign}s.
  */
 public final class VivadoInterface {
 
 	private static final String CELL_LIBRARY_NAME = "cellLibrary.xml";
-
-	public static TincrCheckpoint loadTCP(String tcp) throws IOException {
-		return loadTCP(tcp, false);
+	
+	public static VivadoCheckpoint loadRSCP(String rscp) throws IOException {
+		return loadRSCP(rscp, false);
 	}
 	
 	/**
-	 * Parses a TINCR checkpoint, and creates an equivalent RapidSmith 2 design.
+	 * Parses a RSCP generated from Tincr, and creates an equivalent RapidSmith2 design.
 	 * 
-	 * @param tcp Path to the TINCR checkpoint to import
+	 * @param rscp Path to the RSCP to import
 	 * @throws InvalidEdifNameException 
 	 * @throws EdifNameConflictException 
 	 */
-	public static TincrCheckpoint loadTCP (String tcp, boolean storeAdditionalInfo) throws IOException {
+	public static VivadoCheckpoint loadRSCP (String rscp, boolean storeAdditionalInfo) throws IOException {
 	
-		if (tcp.endsWith("/") || tcp.endsWith("\\")) {
-			tcp = tcp.substring(0, tcp.length()-1);
-		}
+		Path rscpPath = Paths.get(rscp);
 		
-		// check to make sure the specified directory is a TINCR checkpoint
-		if (!tcp.endsWith(".tcp")) {
-			throw new AssertionError("Specified directory is not a TINCR checkpoint.");
+		if (!rscpPath.getFileName().toString().endsWith(".rscp")) {
+			throw new AssertionError("Specified directory is not a RSCP. The directory should end in \".rscp\"");
 		}
-			
+					
 		// load the device
-		String partName = DesignInfoInterface.parseInfoFile(Paths.get(tcp, "design.info").toString());
+		DesignInfoInterface designInfo = new DesignInfoInterface();
+		designInfo.parse(rscpPath);
+		String partName = designInfo.getPart();
+		ImplementationMode mode = designInfo.getMode();
+		if (partName == null) {
+			throw new Exceptions.ParseException("Part name for the design not found in the design.info file!");
+		}
 		
 		Device device = RSEnvironment.defaultEnv().getDevice(partName);
 		
@@ -87,38 +88,34 @@ public final class VivadoInterface {
 				.resolve(CELL_LIBRARY_NAME));
 		
 		// add additional macro cell specifications to the cell library before parsing the EDIF netlist
-		libCells.loadMacroXML(Paths.get(tcp, "macros.xml"));
+		libCells.loadMacroXML(rscpPath.resolve("macros.xml"));
 		
 		// create the RS2 netlist
-		String edifFile = Paths.get(tcp, "netlist.edf").toString();
-		CellDesign design;
-		try {
-			design = EdifInterface.parseEdif(edifFile, libCells);
-		} catch (edu.byu.ece.edif.util.parse.ParseException e) {
-			throw new ParseException(e);
-		}
+		String edifFile = rscpPath.resolve("netlist.edf").toString();
+		CellDesign design = EdifInterface.parseEdif(edifFile, libCells);
+		design.setImplementationMode(mode);
 		
 		// parse the constraints into RapidSmith
-		parseConstraintsXDC(design, Paths.get(tcp, "constraints.rsc").toString());
+		parseConstraintsXDC(design, rscpPath.resolve("constraints.xdc").toString());
 		
 		// re-create the placement and routing information
-		String placementFile = Paths.get(tcp, "placement.rsc").toString();
+		String placementFile = rscpPath.resolve("placement.rsc").toString();
 		XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device);
 		placementInterface.parsePlacementXDC(placementFile);
  
-		String routingFile = Paths.get(tcp, "routing.rsc").toString();
-		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap());
+		String routingFile = rscpPath.resolve("routing.rsc").toString();
+		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap(), mode);
 		routingInterface.parseRoutingXDC(routingFile);
 		
-		TincrCheckpoint tincrCheckpoint = new TincrCheckpoint(partName, design, device, libCells); 
+		VivadoCheckpoint vivadoCheckpoint = new VivadoCheckpoint(partName, design, device, libCells); 
 		
 		if (storeAdditionalInfo) {
-			tincrCheckpoint.setRoutethroughBels(routingInterface.getRoutethroughsBels());
-			tincrCheckpoint.setStaticSourceBels(routingInterface.getStaticSourceBels());
-			tincrCheckpoint.setBelPinToCellPinMap(placementInterface.getPinMap());
+			vivadoCheckpoint.setRoutethroughBels(routingInterface.getRoutethroughsBels());
+			vivadoCheckpoint.setStaticSourceBels(routingInterface.getStaticSourceBels());
+			vivadoCheckpoint.setBelPinToCellPinMap(placementInterface.getPinMap());
 		}
 		
-		return tincrCheckpoint;
+		return vivadoCheckpoint;
 	}
 	
 	/**
@@ -128,7 +125,7 @@ public final class VivadoInterface {
 	 * TODO: Update how we handle constraints files to make them easier to move
 	 * 
 	 * @param design {@link CellDesign}  
-	 * @param constraintPath File location of the constraints file. Typically tcpDirectory/constraints.rsc is the constraints file.
+	 * @param constraintPath File location of the constraints file. Typically rscpDirectory/constraints.rsc is the constraints file.
 	 */
 	private static void parseConstraintsXDC(CellDesign design, String constraintPath) {
 				
@@ -180,25 +177,19 @@ public final class VivadoInterface {
 		
 		// Write routing.xdc
 		String routingOut = Paths.get(tcpDirectory, "routing.xdc").toString();
-		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, null);
+		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, null, ImplementationMode.REGULAR);
 		routingInterface.writeRoutingXDC(routingOut, design);
 		
 		// Write EDIF netlist
 		String edifOut = Paths.get(tcpDirectory, "netlist.edf").toString();
-		
-		try {
-			EdifInterface.writeEdif(edifOut, design);
-		} 
-		catch (EdifNameConflictException | InvalidEdifNameException e) {
-			throw new AssertionError(e); 
-		}
+		EdifInterface.writeEdif(edifOut, design);
 
 		// write constraints.xdc
 		writeConstraintsXdc(design, Paths.get(tcpDirectory, "constraints.xdc").toString());
 		
 		// write design.info
 		String partInfoOut = Paths.get(tcpDirectory, "design.info").toString();
-		DesignInfoInterface.writeInfoFile(partInfoOut, device.getPartName());
+		DesignInfoInterface.writeInfoFile(partInfoOut, design.getPartName());
 	}
 	
 	/**

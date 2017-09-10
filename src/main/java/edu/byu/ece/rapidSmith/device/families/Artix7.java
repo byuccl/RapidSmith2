@@ -137,6 +137,15 @@ public final class Artix7 implements FamilyInfo {
     public Set<SiteType> ioSites() {
         return IO_SITES;
     }
+    
+    private static final HashSet<SiteType> _FIFO_SITES = new HashSet<>();
+
+    public static final Set<SiteType> FIFO_SITES = Collections.unmodifiableSet(_FIFO_SITES);
+
+    @Override
+    public Set<SiteType> fifoSites() {
+        return FIFO_SITES;
+    }
 
     public static final class TileTypes {
 
@@ -678,6 +687,12 @@ public final class Artix7 implements FamilyInfo {
         _BRAM_SITES.add(SiteTypes.RAMB36E1);
         _BRAM_SITES.add(SiteTypes.RAMBFIFO36E1);
 
+        _FIFO_SITES.add(SiteTypes.FIFO18E1);
+        _FIFO_SITES.add(SiteTypes.FIFO36E1);
+        _FIFO_SITES.add(SiteTypes.IN_FIFO);
+        _FIFO_SITES.add(SiteTypes.OUT_FIFO);
+        _FIFO_SITES.add(SiteTypes.RAMBFIFO36E1);
+        
         _DSP_SITES.add(SiteTypes.DSP48E1);
 
         _IO_SITES.add(SiteTypes.IOB33);

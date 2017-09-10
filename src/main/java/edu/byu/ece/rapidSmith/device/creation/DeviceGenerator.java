@@ -24,6 +24,7 @@ import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.primitiveDefs.*;
+import edu.byu.ece.rapidSmith.util.Exceptions;
 import edu.byu.ece.rapidSmith.util.HashPool;
 import edu.byu.ece.rapidSmith.util.PartNameTools;
 import org.jdom2.Document;
@@ -87,6 +88,8 @@ public final class DeviceGenerator {
 	private HashPool<Map<String, Integer>> externalWiresPool;
 	private HashPool<Map<SiteType, Map<String, Integer>>> externalWiresMapPool;
 	private HashPool<AlternativeTypes> alternativeTypesPool;
+	private Set<Integer> siteWireSourceSet;
+	private Set<Integer> siteWireSinkSet;
 
 	/**
 	 * Generates and returns the Device created from the XDLRC at the specified
@@ -152,10 +155,15 @@ public final class DeviceGenerator {
 		wireArrayPool = new HashPool<>();
 		tileWiresPool = new HashPool<>();
 
+		System.out.println("Parsing Device Info file");
+		if (parseDeviceInfo(device) == false) {
+			System.err.println("[Warning]: The device info file for the part " + device.getPartName() + " cannot be found.");
+		}
+				
 		makeWireCorrections(wcsToAdd, wcsToRemove);
 	
 		device.constructDependentResources();
-
+		
 		// free unneeded pools for garbage collection when done with
 		routeThroughPool = null;
 		tileSourcesPool = null;
@@ -177,7 +185,7 @@ public final class DeviceGenerator {
 		// Create a template for each primitive type
 		for (PrimitiveDef def : device.getPrimitiveDefs()) {
 			Element ptEl = getSiteTypeEl(def.getType());
-
+			
 			SiteTemplate template = new SiteTemplate();
 			template.setType(def.getType());
 			template.setBelTemplates(createBelTemplates(def, ptEl));
@@ -213,7 +221,7 @@ public final class DeviceGenerator {
 		for (PrimitiveElement el : def.getElements()) {
 			if (!el.isBel())
 				continue;
-
+			
 			BelId id = new BelId(def.getType(), el.getName());
 			// Set the BEL type as defined in the deviceinfo file
 			String belType = getTypeOfBel(el.getName(), ptElement);
@@ -298,7 +306,7 @@ public final class DeviceGenerator {
 			if (belEl.getChildText("name").equals(belName))
 				return belEl.getChildText("type");
 		}
-		assert false : "No type found for the specified BEL " + belName + ptElement.getChildText("name");
+		assert false : "No type found for the specified BEL " + belName + " " + ptElement.getChildText("name");
 		return null;
 	}
 
@@ -357,17 +365,28 @@ public final class DeviceGenerator {
 			
 			// bel has routethroughs
 			if (routethroughs != null) {
-				System.out.println(template.getType());
+				
 				for(Element routethrough : routethroughs.getChildren("routethrough")) {
 				
 					String inputPin = routethrough.getChildText("input");
 					String outputPin = routethrough.getChildText("output");
 					
-					Integer startEnum = we.getWireEnum(getIntrasiteWireName(template.getType(), belName, inputPin));
-					Integer endEnum = we.getWireEnum(getIntrasiteWireName(template.getType(), belName, outputPin));
+					String inputWireName = getIntrasiteWireName(template.getType(), belName, inputPin);
+					String outputWireName = getIntrasiteWireName(template.getType(), belName, outputPin);
+							
+					Integer startEnum = we.getWireEnum(inputWireName); 
+					Integer endEnum = we.getWireEnum(outputWireName);
 										
-					// check that the wire names actually exist
-					assert (startEnum != null && endEnum != null) : "Intrasite wirename not found";
+					// If the wire names for the routethrough do not exist, throw a parse exception telling the user 
+					if (startEnum == null) {
+						throw new Exceptions.ParseException(String.format("Cannot find intrasite wire \"%s\" for bel routethrough \"%s:%s:%s\". "
+								+ "Check the familyInfo.xml file for this routethrough and make sure the connections are correct.", 
+								inputWireName, template.getType(), inputPin, outputPin));
+					} else if (endEnum == null) {
+						throw new Exceptions.ParseException(String.format("Cannot find intrasite wire \"%s\" for bel routethrough \"%s:%s:%s\". "
+								+ "Check the familyInfo.xml file for this routethrough and make sure the connections are correct.", 
+								outputWireName, template.getType(), inputPin, outputPin));
+					}
 					
 					// add the routethrough to the routethrough map; 
 					Set<Integer> sinkWires = belRoutethroughMap.computeIfAbsent(startEnum, k -> new HashSet<>());
@@ -640,8 +659,9 @@ public final class DeviceGenerator {
 		Set<Integer> sourceWires = new HashSet<>();
 		for (Wire wire : tile.getWires()) {
 			int wireEnum = wire.getWireEnum();
-			if (we.getWireType(wireEnum) == WireType.SITE_SOURCE)
+			if (siteWireSourceSet.contains(wireEnum)) {
 				sourceWires.add(wireEnum);
+			}
 			for (WireConnection wc : tile.getWireConnections(wireEnum)) {
 				if (wc.isPIP()) {
 					sourceWires.add(wc.getWire());
@@ -655,8 +675,9 @@ public final class DeviceGenerator {
 	// the wire type check is easier and should be sufficient or the wire is the source of
 	// a PIP.
 	private boolean wireIsSink(Tile tile, Integer wire) {
-		if (we.getWireType(wire) == WireType.SITE_SINK)
+		if (siteWireSinkSet.contains(wire)) {
 			return true;
+		}
 		if (tile.getWireHashMap() == null || tile.getWireConnections(wire) == null)
 			return false;
 		for (WireConnection wc : tile.getWireConnections(wire)) {
@@ -724,6 +745,51 @@ public final class DeviceGenerator {
 		return "intrasite:" + type.name() + "/" + element + "." + pinName;
 	}
 
+	/**
+	 * Parses the device info XML file for the specified device, and adds the information
+	 * to the {@link Device} object that is being created. If no device info file can be found
+	 * for the part, then a warning is printed to the console.
+	 * 
+	 * TODO: parse the clock pads and add them to the device file
+	 * 
+	 * @param device Device object created from the XDLRC parser
+	 */
+	public static boolean parseDeviceInfo(Device device) {
+		Document deviceInfo = RSEnvironment.defaultEnv().loadDeviceInfo(device.getFamily(), device.getPartName());
+		
+		if (deviceInfo != null) {
+			createPackagePins(device, deviceInfo);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Creates a map from pad bel name -> corresponding package pin. This
+	 * information is needed when generating Tincr Checkpoints from
+	 * RS to be loaded into Vivado.
+	 * @param deviceInfo
+	 */
+	private static void createPackagePins(Device device, Document deviceInfo) {
+		Element pinMapRootEl = deviceInfo.getRootElement().getChild("package_pins");
+		
+		if (pinMapRootEl == null) {
+			throw new Exceptions.ParseException("No package pin information found in device info file: " + deviceInfo.getBaseURI() + ".\n"
+				+ "Either add the package pin mappings, or remove the device info file and regenerate.");
+		}
+		
+		// Add the package pins to the device
+		pinMapRootEl.getChildren("package_pin")
+			.stream()
+			.map(ppEl -> new PackagePin(ppEl.getChildText("name"), ppEl.getChildText("bel"), ppEl.getChild("is_clock") != null))
+			.forEach(packagePin -> device.addPackagePin(packagePin));
+			
+		if (device.getPackagePins().isEmpty()) {
+			throw new Exceptions.ParseException("No package pin information found in device info file: " + deviceInfo.getBaseURI() + ".\n"
+					+ "Either add the package pin mappings, or remove the device info file and regenerate.");
+		}
+	}
+	
 	private final class FamilyTypeListener extends XDLRCParserListener {
 		@Override
 		protected void enterXdlResourceReport(List<String> tokens) {
@@ -753,7 +819,7 @@ public final class DeviceGenerator {
 		@Override
 		protected void enterPinWire(List<String> tokens) {
 			String externalName = stripTrailingParenthesis(tokens.get(3));
-
+			
 			if (tokens.get(2).equals("input")) {
 				inpinSet.add(externalName);
 			} else {
@@ -793,35 +859,33 @@ public final class DeviceGenerator {
 
 		@Override
 		protected void exitXdlResourceReport(List<String> tokens) {
-			WireExpressions wireExp = new WireExpressions();
-
 			Map<String, Integer> wireMap = new HashMap<>((int) (wireSet.size() / 0.75 + 1));
 			String[] wires = new String[wireSet.size()];
-			WireType[] wireTypes = new WireType[wireSet.size()];
-			WireDirection[] wireDirections = new WireDirection[wireSet.size()];
-
+			
+			Set<Integer> sourceWireSetLocal = new HashSet<Integer> (outpinSet.size());
+			Set<Integer> sinkWireSetLocal = new HashSet<Integer> (inpinSet.size());
+						
 			int i = 0;
 			for (String wire : wireSet) {
 				wires[i] = wire;
 				wireMap.put(wire, i);
 
 				if (inpinSet.contains(wire)) {
-					wireTypes[i] = WireType.SITE_SINK;
-					wireDirections[i] = WireDirection.EXTERNAL;
-				} else if (outpinSet.contains(wire)) {
-					wireTypes[i] = WireType.SITE_SOURCE;
-					wireDirections[i] = WireDirection.EXTERNAL;
-				} else {
-					wireTypes[i] = wireExp.getWireType(wire);
-					wireDirections[i] = wireExp.getWireDirection(wire);
-				}
+					sinkWireSetLocal.add(i);
+				} 
+				if (outpinSet.contains(wire)) {
+					sourceWireSetLocal.add(i);
+				} 
+
 				i++;
 			}
 
 			we.setWireMap(wireMap);
 			we.setWires(wires);
-			we.setWireTypes(wireTypes);
-			we.setWireDirections(wireDirections);
+			
+			// create the global source and sinks wire set
+			siteWireSourceSet = sourceWireSetLocal;
+			siteWireSinkSet = sinkWireSetLocal;
 		}
 	}
 
@@ -919,9 +983,7 @@ public final class DeviceGenerator {
 		protected void enterWire(List<String> tokens) {
 			String wireName = tokens.get(1);
 			currTileWire = we.getWireEnum(wireName);
-			currTileWireIsSource =
-					we.getWireType(currTileWire) == WireType.SITE_SOURCE ||
-							pipSinks.contains(wireName);
+			currTileWireIsSource = siteWireSourceSet.contains(currTileWire) || pipSinks.contains(wireName);
 		}
 
 		@Override
@@ -933,7 +995,7 @@ public final class DeviceGenerator {
 		protected void enterConn(List<String> tokens) {
 			String currWireName = tokens.get(2).substring(0, tokens.get(2).length() - 1);
 			int currWire = we.getWireEnum(currWireName);
-			boolean currWireIsSiteSink = we.getWireType(currWire) == WireType.SITE_SINK;
+			boolean currWireIsSiteSink = siteWireSinkSet.contains(currWire);
 			boolean currWireIsPIPSource = pipSources.contains(currWireName);
 			boolean currWireIsSink = currWireIsSiteSink || currWireIsPIPSource;
 			if (currTileWireIsSource || currWireIsSink) {
@@ -1080,10 +1142,12 @@ public final class DeviceGenerator {
 			assert altEl != null;
 			Element pinmapsEl = altEl.getChild("pinmaps");
 			Element pinEl = null;
-			for (Element pinTmpEl : pinmapsEl.getChildren("pin")) {
-				if (pinTmpEl.getChildText("name").equals(sitePin)) {
-					pinEl = pinTmpEl;
-					break;
+			if (pinmapsEl != null) {
+				for (Element pinTmpEl : pinmapsEl.getChildren("pin")) {
+					if (pinTmpEl.getChildText("name").equals(sitePin)) {
+						pinEl = pinTmpEl;
+						break;
+					}
 				}
 			}
 			return pinEl;

@@ -154,7 +154,7 @@ public class LutRoutethroughInserter {
 				continue;
 			}
 			
-			if (current.getConnection().isRouteThrough()) {
+			if (current.getConnection().isRouteThrough()) {				
 				rtSource = current.getSourceTree().getConnectingBelPin();
 			}
 			else if (current.isLeaf()) {
