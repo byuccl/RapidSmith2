@@ -23,6 +23,7 @@ package edu.byu.ece.rapidSmith.util.luts
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DynamicTest.dynamicTest
+import org.junit.jupiter.api.function.Executable
 import java.lang.AssertionError
 import java.lang.IndexOutOfBoundsException
 import java.util.*

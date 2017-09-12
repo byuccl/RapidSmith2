@@ -30,7 +30,9 @@ import edu.byu.ece.rapidSmith.util.Exceptions;
 import java.util.*;
 
 /**
- *
+ * A tree describing a route in a design.  Each RouteTree object represents
+ * a node in the tree (with its associated wire in the device) and contains the
+ * sinks and connections to the sinks.
  */
 public final class RouteTree implements
 		Comparable<RouteTree>, Iterable<RouteTree> {
@@ -40,6 +42,10 @@ public final class RouteTree implements
 	private int cost; // for routers
 	private final Collection<RouteTree> sinkTrees = new ArrayList<>(1);
 
+	/**
+	 * Creates a new unsourced route tree.
+	 * @param wire the wire for the starting node in the new tree
+	 */
 	public RouteTree(Wire wire) {
 		this.wire = wire;
 	}
@@ -49,30 +55,44 @@ public final class RouteTree implements
 		this.connection = c;
 	}
 
+	/**
+	 * @return the wire connected to this node
+	 */
 	public Wire getWire() {
 		return wire;
 	}
 
+	@Deprecated
 	public int getCost() {
 		return cost;
 	}
 
+	@Deprecated
 	public void setCost(int cost) {
 		this.cost = cost;
 	}
 
+	/**
+	 * @return the connection connecting this node to its source
+	 */
 	public Connection getConnection() {
 		return connection;
 	}
 
-	public void setConnection(Connection connection) {
+	private void setConnection(Connection connection) {
 		this.connection = connection;
 	}
 
+	/**
+	 * @return the node sourcing this node in the tree
+	 */
 	public RouteTree getSourceTree() {
 		return sourceTree;
 	}
 
+	/**
+	 * @return the root node of the entire route tree
+	 */
 	public RouteTree getFirstSource() {
 		RouteTree parent = this;
 		while (parent.isSourced())
@@ -80,20 +100,26 @@ public final class RouteTree implements
 		return parent;
 	}
 
+	/**
+	 * @return true if this node is sourced, else false
+	 */
 	public boolean isSourced() {
 		return sourceTree != null;
 	}
 
-	public void setSourceTree(RouteTree sourceTree) {
+	private void setSourceTree(RouteTree sourceTree) {
 		this.sourceTree = sourceTree;
 	}
 
+	/**
+	 * @return all route trees sourced by this node
+	 */
 	public Collection<RouteTree> getSinkTrees() {
 		return sinkTrees;
 	}
 	
 	/**
-	 * Returns true if the RouteTree object is a leaf (i.e. it has no children). 
+	 * Returns true if this node is a leaf (i.e. it has no children).
 	 * For a fully routed net, a leaf tree should connect to either a SitePin
 	 * or BelPin.
 	 */
@@ -102,7 +128,7 @@ public final class RouteTree implements
 	}
 	
 	/**
-	 * Returns the SitePin connected to the wire of the RouteTree. If no SitePin
+	 * Returns the SitePin connected to the wire of this node. If no SitePin
 	 * object is connected, null is returned.
 	 */
 	public SitePin getConnectingSitePin() {
@@ -117,6 +143,12 @@ public final class RouteTree implements
 		return wire.getTerminal();
 	}
 
+	/**
+	 * Creates a new route tree for the sink wire of c and adds a connection between
+	 * this tree and the new tree.
+	 * @param c the connection to the new sink
+	 * @return the newly created tree based on the sinkwire of c
+	 */
 	public RouteTree addConnection(Connection c) {
 		RouteTree endTree = new RouteTree(c.getSinkWire(), c);
 		endTree.setSourceTree(this);
@@ -124,6 +156,12 @@ public final class RouteTree implements
 		return endTree;
 	}
 
+	/**
+	 * Connects this route tree to tree sink through connection c.
+	 * @param c the connection connecting these two trees
+	 * @param sink the sink route tree to connect to
+	 * @return sink
+	 */
 	public RouteTree addConnection(Connection c, RouteTree sink) {
 		if (sink.getSourceTree() != null)
 			throw new Exceptions.DesignAssemblyException("Sink tree already sourced");
@@ -136,6 +174,10 @@ public final class RouteTree implements
 		return sink;
 	}
 
+	/**
+	 * Removes the route tree connected to this tree through connect c.
+	 * @param c connection to a sink to remove
+	 */
 	public void removeConnection(Connection c) {
 		for (Iterator<RouteTree> it = sinkTrees.iterator(); it.hasNext(); ) {
 			RouteTree sink = it.next();
@@ -146,6 +188,9 @@ public final class RouteTree implements
 		}
 	}
 
+	/**
+	 * @return a list of all PIPs used in this route tree
+	 */
 	public List<PIP> getAllPips() {
 		return getFirstSource().getAllPips(new ArrayList<>());
 	}
@@ -159,6 +204,9 @@ public final class RouteTree implements
 		return pips;
 	}
 
+	/**
+	 * @return a deep copy of this tree beginning at this node
+	 */
 	public RouteTree deepCopy() {
 		RouteTree copy = new RouteTree(wire, connection);
 		sinkTrees.forEach(rt -> copy.sinkTrees.add(rt.deepCopy()));
@@ -171,12 +219,13 @@ public final class RouteTree implements
 		return Integer.compare(cost, o.cost);
 	}
 
-	public boolean prune(RouteTree terminal) {
-		Set<RouteTree> toPrune = new HashSet<>();
-		toPrune.add(terminal);
-		return prune(toPrune);
-	}
-	
+	/**
+	 * Prunes all nodes in the tree that are neither in the set of terminals nor
+	 * source a branch of the tree that ends in one of the terminals.
+	 * @param terminals the terminal nodes to keep
+	 * @return true if the node is either in terminals are sources a node in terminal,
+	 *   else false
+	 */
 	public boolean prune(Set<RouteTree> terminals) {
 		return pruneChildren(terminals);
 	}
@@ -185,12 +234,22 @@ public final class RouteTree implements
 		sinkTrees.removeIf(rt -> !rt.pruneChildren(terminals));
 		return !sinkTrees.isEmpty() || terminals.contains(this);
 	}
-	
+
+	/**
+	 * Iterates over all trees in this route tree starting from this node.  Nodes
+	 * in this tree before this node are not traversed.  This iterator provides no
+	 * guarantee on the order of traversal, only that all nodes will be visited.
+	 */
 	@Override
 	public Iterator<RouteTree> iterator() {
 		return prefixIterator();
 	}
 
+	/**
+	 * Iterates over all trees in this route tree starting from this node in a
+	 * prefix order, ie. parent nodes are guaranteed to be visited prior to the
+	 * children.  Nodes in the tree prior to this node are not traversed.
+	 */
 	public Iterator<RouteTree> prefixIterator() {
 		return new PrefixIterator();
 	}
@@ -220,8 +279,11 @@ public final class RouteTree implements
 
 	// Uses identity equals
 
+	/**
+	 * Hash is based on the wire of this node.
+	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(connection);
+		return Objects.hash(wire);
 	}
 }
