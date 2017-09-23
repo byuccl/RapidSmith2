@@ -34,6 +34,11 @@ import java.io.IOException;
  * @author Brent Nelson
  */
 public class ImportExportExample {
+	private static String checkpointIn = null;
+	private static String checkpointOut = null;
+	private static CellDesign design = null;
+	private static Device device = null;
+	private static CellLibrary libCells = null;
 	
 	/**
 	 * @param args
@@ -45,28 +50,70 @@ public class ImportExportExample {
 			System.exit(1);
 		}
 		
-		String checkpointIn = args[0];
-		String checkpointOut = args[0] + ".tcp";
-
 		System.out.println("Starting ImportExportExample...\n");
-
+        ImportExportExample ex = new ImportExportExample(args[0], args[0] + ".tcp");	
+		ex.importExportDesign();
+		
+		System.out.println("\nDone...");
+	}
+	
+	//TODO: Add default constructor?
+	
+	/**
+	 * Constructor for ImportExportExample
+	 * @param checkpointIn path to the RSCP checkpoint
+	 * @param checkpointOut path to the TCP checkpoint
+	 */
+	public ImportExportExample(String checkpointIn, String checkpointOut)
+	{
+		ImportExportExample.checkpointIn = checkpointIn;
+		ImportExportExample.checkpointOut = checkpointOut;
+	}
+	
+	/**
+	 * Imports, manipulates, and exports the design.
+	 * @throws IOException
+	 */
+	public void importExportDesign() throws IOException
+	{
+		importDesign();
+		manipulateDesign();
+		exportDesign();
+	}
+	
+	/**
+	 * Loads in a TINCR checkpoint and gets pieces out to use in manipulating the design.
+	 * @throws IOException
+	 */
+	private void importDesign() throws IOException
+	{
 		// Load in in a TINCR checkpoint
 		System.out.println("Loading Design...");
 		VivadoCheckpoint vcp = VivadoInterface.loadRSCP(checkpointIn);
 		
 		// Get the pieces out of the checkpoint for use in manipulating it
-		CellDesign design = vcp.getDesign();
-		Device device= vcp.getDevice();
-		CellLibrary libCells = vcp.getLibCells();
-		
-		// Do some manipulations, in this case just print out the design
+		ImportExportExample.design = vcp.getDesign();
+		ImportExportExample.device= vcp.getDevice();
+		ImportExportExample.libCells = vcp.getLibCells();
+	}
+	
+	/**
+	 * Do some manipulations to the design. In this case, just prints out the design.
+	 */
+	private void manipulateDesign()
+	{
 		System.out.println("\nPrinting out the design...");
 		DesignAnalyzer.prettyPrintDesign(design);
-		
-		// Write out TINCR Checkpoint
+	}
+	
+	/**
+	 * Writes out the TINCR checkpoint.
+	 * @throws IOException
+	 */
+	private void exportDesign() throws IOException
+	{
 		System.out.println("Exporting Modified Design...");
 		VivadoInterface.writeTCP(checkpointOut, design, device, libCells);
-		
-		System.out.println("\nDone...");
 	}
+	
 }
