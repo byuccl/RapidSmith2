@@ -57,8 +57,6 @@ public class ImportExportExample {
 		System.out.println("\nDone...");
 	}
 	
-	//TODO: Add default constructor?
-	
 	/**
 	 * Constructor for ImportExportExample
 	 * @param checkpointIn path to the RSCP checkpoint

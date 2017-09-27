@@ -53,7 +53,7 @@ public class ImportExportExampleTest {
      */
     @BeforeAll
     public static void initializeTest() {
-        // Get a checkpoint to use. No others are needed to test the example program functionality.
+    	// Get a checkpoint to use. No others are needed to test the example program functionality.
     	String count16 = testDirectory.resolve("RSCP").resolve("artix7").resolve("count16.rscp").toString();
     	
     	// Get an ImportExportExample to use.
