@@ -47,35 +47,35 @@ public class ImportExportExampleTest {
 			.resolve("resources")
 			.resolve("ImportTests");
 	private final static PrintStream stdout = System.out;
-	
-    /**
-     * Initializes the ImportExportExample test.
-     */
-    @BeforeAll
-    public static void initializeTest() {
-    	// Get a checkpoint to use. No others are needed to test the example program functionality.
-    	String count16 = testDirectory.resolve("RSCP").resolve("artix7").resolve("count16.rscp").toString();
-    	
-    	// Get an ImportExportExample to use.
-        example = new ImportExportExample(count16, count16 + ".tcp");
-        
-        // Change the standard output stream so ImportExportExample doesn't print anything
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        PrintStream tempOutput = new PrintStream(bos, true);
-        System.setOut(tempOutput);
-    }
-	
-    /**
-     * Cleans up after the ImportExportExample test.
-     */
-    @AfterAll
-    public static void cleanupTest() {
-    	System.setOut(stdout);
-    }
-    
+
 	/**
-	 * Tests that the example program runs to completion without any exceptions occurring. 
-	 * @throws IOException 
+	 * Initializes the ImportExportExample test.
+	 */
+	@BeforeAll
+	public static void initializeTest() {
+		// Get a checkpoint to use. No others are needed to test the example program functionality.
+		String count16 = testDirectory.resolve("RSCP").resolve("artix7").resolve("count16.rscp").toString();
+
+		// Get an ImportExportExample to use.
+		example = new ImportExportExample(count16, count16 + ".tcp");
+
+		// Change the standard output stream so ImportExportExample doesn't print anything
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		PrintStream tempOutput = new PrintStream(bos, true);
+		System.setOut(tempOutput);
+	}
+
+	/**
+	 * Cleans up after the ImportExportExample test.
+	 */
+	@AfterAll
+	public static void cleanupTest() {
+		System.setOut(stdout);
+	}
+
+	/**
+	 * Tests that the example program runs to completion without any exceptions occurring.
+	 * @throws IOException
 	 */
 	@Test
 	@DisplayName("Run to completion Test")

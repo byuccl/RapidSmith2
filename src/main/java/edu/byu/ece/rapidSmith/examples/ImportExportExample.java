@@ -39,7 +39,7 @@ public class ImportExportExample {
 	private static CellDesign design = null;
 	private static Device device = null;
 	private static CellLibrary libCells = null;
-	
+
 	/**
 	 * @param args
 	 * @throws IOException
@@ -49,14 +49,14 @@ public class ImportExportExample {
 			System.err.println("Usage: ImportExportExample rscpCheckpointDirectoryName");
 			System.exit(1);
 		}
-		
+
 		System.out.println("Starting ImportExportExample...\n");
-        ImportExportExample ex = new ImportExportExample(args[0], args[0] + ".tcp");	
+		ImportExportExample ex = new ImportExportExample(args[0], args[0] + ".tcp");	
 		ex.importExportDesign();
-		
+
 		System.out.println("\nDone...");
 	}
-	
+
 	/**
 	 * Constructor for ImportExportExample
 	 * @param checkpointIn path to the RSCP checkpoint
@@ -67,7 +67,7 @@ public class ImportExportExample {
 		ImportExportExample.checkpointIn = checkpointIn;
 		ImportExportExample.checkpointOut = checkpointOut;
 	}
-	
+
 	/**
 	 * Imports, manipulates, and exports the design.
 	 * @throws IOException
@@ -78,7 +78,7 @@ public class ImportExportExample {
 		manipulateDesign();
 		exportDesign();
 	}
-	
+
 	/**
 	 * Loads in a TINCR checkpoint and gets pieces out to use in manipulating the design.
 	 * @throws IOException
@@ -88,13 +88,13 @@ public class ImportExportExample {
 		// Load in in a TINCR checkpoint
 		System.out.println("Loading Design...");
 		VivadoCheckpoint vcp = VivadoInterface.loadRSCP(checkpointIn);
-		
+
 		// Get the pieces out of the checkpoint for use in manipulating it
 		ImportExportExample.design = vcp.getDesign();
 		ImportExportExample.device= vcp.getDevice();
 		ImportExportExample.libCells = vcp.getLibCells();
 	}
-	
+
 	/**
 	 * Do some manipulations to the design. In this case, just prints out the design.
 	 */
@@ -103,7 +103,7 @@ public class ImportExportExample {
 		System.out.println("\nPrinting out the design...");
 		DesignAnalyzer.prettyPrintDesign(design);
 	}
-	
+
 	/**
 	 * Writes out the TINCR checkpoint.
 	 * @throws IOException
@@ -113,5 +113,5 @@ public class ImportExportExample {
 		System.out.println("Exporting Modified Design...");
 		VivadoInterface.writeTCP(checkpointOut, design, device, libCells);
 	}
-	
+
 }
