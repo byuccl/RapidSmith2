@@ -46,7 +46,7 @@ public class ImportExportExample {
 		}
 		
 		String checkpointIn = args[0];
-		String checkpointOut = args[0] + ".tcp";
+		String checkpointOut = checkpointIn.substring(0, checkpointIn.length() - 4) + "tcp";
 
 		System.out.println("Starting ImportExportExample...\n");
 

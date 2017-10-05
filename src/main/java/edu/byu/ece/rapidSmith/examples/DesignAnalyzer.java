@@ -52,7 +52,7 @@ public class DesignAnalyzer {
 		
 		// Load a TINCR checkpoint
 		System.out.println("Loading Design...");
-		VivadoCheckpoint vcp = VivadoInterface.loadRSCP(args[0] + ".rscp");
+		VivadoCheckpoint vcp = VivadoInterface.loadRSCP(args[0]);
 		CellDesign design = vcp.getDesign();
 		
 		// Print out a representation of the design 
@@ -60,7 +60,7 @@ public class DesignAnalyzer {
 		
 		System.out.println();
 		
-		// Print out some summary statistics onthe design
+		// Print out some summary statistics on the design
 		summarizeDesign(design);      
 		
 		printCellBelMappings(design);
