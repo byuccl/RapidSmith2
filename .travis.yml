@@ -1,14 +1,9 @@
 language: java
-services:
-  - docker
 jdk:
   - oraclejdk8
 env:
   matrix:
     - RAPIDSMITH_PATH="/home/travis/build/byuccl/RapidSmith2"
-  global:
-    - secure: Kj7+18SHYdbbKTVWC0jpRIFbHveVs1Xb+SNhLtl6nfRvh04pzUfyUiQSNMtGesLLwKjSEOTE8BcVxpZAL+Yd/yvWhy6b6lTmfq54uE+8rIodymEvdNXvCDqsxftByTI2qiFrm63mcxNEc+2IqXngMBCeVdqX1QZu0H6SxqzcLD5Ru6kOb3ZhaZg3X6krO8tVFHb7LR3FRlsPzNkdUcWaeAk/nsIm3KunQ0rHviHLAX/S6aUyA2KRz28dUA4Dah6TnonA84AqmJLvOXcddtT7trHgIjQsMTDT8IIIrS3tRJxyMRbOUwQJn/ueKPjB3NjfAcEJ2wdcyAo8h4tJ48CCE9jwabjDUsKAqsAvaicoDgAJymLVlBw0OxMK/dRK4/IYVxFEdJ3OSmUcz1aWQAmvb2pfvGgDrfGA+FoP5orwR3JUYcuDUHjP0S9IY/Bi40ZaaSdfi7yPO0o8fRyygl4hCpfs5/QBZ9U1UHDnQsG8uFbjebzYtpl2eM+RBfyLPxxWv8kKf4MebMuND1I2qAssJTPOVs8LpXn7XKajG6LSJKK9kcDo7mAO6wLdlr/QjeC+BbPYbTDAyB++dPnzmXcYF0CiruYWxxfGHHAoqT9swgZpszpEC0F/Dl/rPkmqdScb5jAS9x1Z+c7yf+Vle2an+hmVy4qc1X0X4G3wHxCCMSA=
-    - secure: KuRE317btx1Yp7V4a2o6L5EhT4FLVIfUcuADCWF+nURdWtdnSyhsJQDwvW/2J/Ontg96LgXGezU3lDKQJqdg4FwhWzFsONdDB0w9IFrQEjSwzFHbLklKjeA/RnoLbE4gbjfUlfzL5NmaTBQptp8/J7+cO47xlgAHamrysq5HkSBrPqj9lyTS2l7wI7fu5qdKF86sYOf8sOdf18CX4QwtdSFZjHrih5eAXTHqqIGCxmRtjvzp8iY4v6WHsb2a9jApxolnF7aPLrZjk7LRS3+cPmkEJKMyAoDIAvMzfXuhPeUA9fa2CMW5j9q0bBaRUe54XEW1sAl9timQxqpy/g1tsExNOCdi2rMIsg4WxisTbfhiZVp5yjeVV6FXTgOm2pFw+xj4BH8JbG+prAmMTDRDUfL7BWOfTY+alPPssmuy/GciYbvl77dtKaiiw+1QQuTsoPv9f96ziZEpMQnamvP4vZ3IGYlInQz/4KPS9Hh6lyBTlvEp6g2G5bQme357GmxYMHGUHB8hFMjuVyqE+1TGFh0pIaCEB/WBDSaisvu1Ya821fwYp9XOPicSfaW0/XW6phhHotIzFayHbgAMqxoNsPDDJ3xLnid6cB2KxTPaUL8Tj7l6siertuwxzS1cq8lw5Vlcm+rhO5DO978mw9z1xgETe8rHiJDqkijPi+n6qEM=
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -19,9 +14,3 @@ cache:
 install:
   - echo "skip 'assemble' step"
 script: ./gradlew build --continue
-after_success:
-  - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-    docker build -t byuccl/rapidsmith2:latest .;
-    docker login -u="$DOCKER_USER" -p="$DOCKER_PASSWORD";
-    docker push byuccl/rapidsmith2;
-    fi
