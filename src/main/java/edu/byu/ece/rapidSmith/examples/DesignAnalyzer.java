@@ -196,7 +196,7 @@ public class DesignAnalyzer {
 		if (rt == null)  return s;
 
 		// A RouteTree object contains a collection of RouteTree objects which represent the downstream segments making up the route.
-		// If this collection has more than element, it represents that the physical wire brances at this point.
+		// If this collection has more than element, it represents that the physical wire branches at this point.
 		Collection<RouteTree> sinkTrees = rt.getSinkTrees();
 		
 		// Always print first wire at the head of a net's RouteTree. The format is "tileName/wireName".
@@ -212,10 +212,12 @@ public class DesignAnalyzer {
 		else  
 			s += "(" + rt.getWire().getWireName() + ")";
 
-		// Now, let's look downstream and see where to go and what to print
-		// If it is a leaf cell then let's print the site or bel pin attached.  In the case of a site pin, continue following it.
-		if (rt.isLeaf())	 {
+		// Now, let's look downstream and see where to go and what to print.
+		// If it is a leaf cell, it either (1) has a site pin attached, (2) has a BEL pin attached, or (3) simply ends. 
+		// Wires that end like this are called "used stubs" in Vivado's GUI.
+		if (rt.isLeaf()) {
 			SitePin sp = rt.getConnectingSitePin();
+			BelPin bp = rt.getConnectingBelPin();
 			if (sp != null) {
 				if (inside) 
 					// Follow the route out of the site into the general routing fabric 
@@ -224,11 +226,14 @@ public class DesignAnalyzer {
 					// Follow the route from the general routing fabric and into a site
 					s += " SitePin{" + sp + "} <<leaving general routing fabric, entering site>> " + createRoutingString(n, n.getSinkRouteTree(sp), true, inside);
 			}
-			// If not a site pin, see if it is a BEL pin (it should be).  Print the BEL pin.
+			// If not a site pin, see if it is a BEL pin  
+			else if (bp != null) {
+				// Print the BEL pin attached.
+				return s + " " + bp;			
+			}
 			else {
-				BelPin bp = rt.getConnectingBelPin();
-				assert (bp != null);
-				return s + " " + bp;
+				// It is an "used stub". Print the wire name.
+				return s;
 			}
 		}
 
