@@ -282,6 +282,7 @@ public class DesignAnalyzer {
 		
 		if (c.isMacro()) System.out.println("  *Macro (Parent) Cell*");
 		else {
+			if (c.isInternal()) System.out.println("  *Internal Cell*");
 			if (c.isPlaced())
 				// Print out its placement
 				System.out.println("  <<<Placed on: " + c.getBel() + ">>>");
