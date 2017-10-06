@@ -96,3 +96,10 @@ junitPlatform {
 //    logManager 'org.apache.logging.log4j.jul.LogManager'
 }
 
+// Enable Java Assertions (AssertionError)
+afterEvaluate {
+    def junitPlatformTestTask = tasks.getByName('junitPlatformTest')
+
+    junitPlatformTestTask.enableAssertions true
+}
+

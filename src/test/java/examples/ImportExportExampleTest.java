@@ -22,7 +22,11 @@ package examples;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -50,15 +54,17 @@ public class ImportExportExampleTest {
 
 	/**
 	 * Initializes the ImportExportExample test.
+	 * @throws IOException 
 	 */
 	@BeforeAll
-	public static void initializeTest() {
+	public static void initializeTest() throws IOException {
 		// Get a checkpoint to use. No others are needed to test the example program functionality.
-		String count16 = testDirectory.resolve("RSCP").resolve("artix7").resolve("count16.rscp").toString();
-
+		String checkpointIn = testDirectory.resolve("RSCP").resolve("artix7").resolve("count16.rscp").toString();
+		String checkpointOut = testDirectory.resolve("tmp.tcp").toString();
+		
 		// Get an ImportExportExample to use.
-		example = new ImportExportExample(count16, count16 + ".tcp");
-
+		example = new ImportExportExample(checkpointIn, checkpointOut);
+		
 		// Change the standard output stream so ImportExportExample doesn't print anything
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		PrintStream tempOutput = new PrintStream(bos, true);
@@ -69,7 +75,11 @@ public class ImportExportExampleTest {
 	 * Cleans up after the ImportExportExample test.
 	 */
 	@AfterAll
-	public static void cleanupTest() {
+	public static void cleanupTest() {		
+		// Delete the generated TCP
+		deleteTemporaryFiles();
+		
+		// Change standard output stream back to stdout
 		System.setOut(stdout);
 	}
 
@@ -78,8 +88,33 @@ public class ImportExportExampleTest {
 	 * @throws IOException
 	 */
 	@Test
-	@DisplayName("Run to completion Test")
+	@DisplayName("ImportExportExample Run Test")
 	public void runToCompletion() throws IOException  {
 		example.importExportDesign();
+	}
+	
+	/**
+	 * Deletes the exported TCP directory.
+	 */
+	private static void deleteTemporaryFiles() {
+		try {
+			// delete directory with output TCP
+			Files.walkFileTree(testDirectory.resolve("tmp.tcp"), new SimpleFileVisitor<Path>() {
+			   @Override
+			   public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+			       Files.delete(file);
+			       return FileVisitResult.CONTINUE;
+			   }
+	
+			   @Override
+			   public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+			       Files.delete(dir);
+			       return FileVisitResult.CONTINUE;
+			   }
+			});
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
