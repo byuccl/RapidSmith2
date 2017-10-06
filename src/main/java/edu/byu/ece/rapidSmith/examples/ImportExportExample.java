@@ -49,9 +49,11 @@ public class ImportExportExample {
 			System.err.println("Usage: ImportExportExample rscpCheckpointDirectoryName");
 			System.exit(1);
 		}
+		String checkpointIn = args[0];
+		String checkpointOut = checkpointIn.substring(0, checkpointIn.length() - 4) + "tcp";
 
 		System.out.println("Starting ImportExportExample...\n");
-		ImportExportExample ex = new ImportExportExample(args[0], args[0] + ".tcp");	
+		ImportExportExample ex = new ImportExportExample(checkpointIn, checkpointOut);	
 		ex.importExportDesign();
 
 		System.out.println("\nDone...");
