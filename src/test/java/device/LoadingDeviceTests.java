@@ -49,7 +49,7 @@ public class LoadingDeviceTests {
 				 + "If the device files for the part exist, make sure your RapidSmithPath variable is properly set. \n"
 				+ "If the device files don't exist, view the RapidSmith2 Tech Report for instructions on how to generate a new device file for this part.";
 		
-		Throwable exception = expectThrows(Exceptions.EnvironmentException.class, () -> RSEnvironment.defaultEnv().getDevice("unknownPartName"));
+		Throwable exception = assertThrows(Exceptions.EnvironmentException.class, () -> RSEnvironment.defaultEnv().getDevice("unknownPartName"));
 		assertEquals(expectedExceptionMessage, exception.getMessage(), "Wrong exception message thrown! " + exception.getMessage());
 	}
 	
@@ -65,7 +65,7 @@ public class LoadingDeviceTests {
 				 + "If the device files for the part exist, make sure your RapidSmithPath variable is properly set. \n"
 				+ "If the device files don't exist, view the RapidSmith2 Tech Report for instructions on how to generate a new device file for this part.";
 		
-		Throwable exception = expectThrows(Exceptions.EnvironmentException.class, () -> RSEnvironment.defaultEnv().getDevice("xc7a75tftg256-3"));
+		Throwable exception = assertThrows(Exceptions.EnvironmentException.class, () -> RSEnvironment.defaultEnv().getDevice("xc7a75tftg256-3"));
 		assertEquals(expectedExceptionMessage, exception.getMessage(), "Wrong exception message thrown! " + exception.getMessage());
 	}
 }

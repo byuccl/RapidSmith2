@@ -43,6 +43,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -169,7 +170,7 @@ public class RoutethroughInserterTest {
 			
 			BelPin terminal = tree.getConnectingBelPin();
 			if (terminal != null && sink.equals(terminal)) {
-				start.prune(tree);
+				start.prune(Collections.singleton(tree));
 				break;
 			}
 			

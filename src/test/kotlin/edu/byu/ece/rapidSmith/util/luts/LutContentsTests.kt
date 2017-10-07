@@ -22,6 +22,7 @@ package edu.byu.ece.rapidSmith.util.luts
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.function.Executable
 
 private val NPE = NullPointerException::class.java
 private val IAE = IllegalArgumentException::class.java

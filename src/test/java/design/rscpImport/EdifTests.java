@@ -41,7 +41,7 @@ public class EdifTests {
 	@DisplayName("Parse Exception")
 	public void exceptionTest() throws IOException {
 		//String expectedMessage = "java.io.FileNotFoundException: bogusEdifFile.edf (The system cannot find the file specified)";
-		expectThrows(Exceptions.ParseException.class, () -> EdifInterface.parseEdif("bogusEdifFile.edf", null));
+		assertThrows(Exceptions.ParseException.class, () -> EdifInterface.parseEdif("bogusEdifFile.edf", null));
 		//assertEquals(expectedMessage, exception.getMessage(), "Wrong exception message thrown.");
 	}
 }
