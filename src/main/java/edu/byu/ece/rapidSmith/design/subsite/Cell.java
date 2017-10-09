@@ -373,6 +373,16 @@ public class Cell {
 		return pin;
 	}
 	
+	public boolean removePseudoPins() {
+		List<String> pseudoPins = getPseudoPins().stream()
+			.map(CellPin::getName)
+			.collect(Collectors.toList());
+
+		pseudoPins.forEach(pinMap::remove);
+		this.pseudoPins = null;
+		return pseudoPins.size() > 0;
+	}
+
 	/**
 	 * Gets all pseudo pins currently attached to this cell
 	 * 
@@ -469,6 +479,13 @@ public class Cell {
 		return pinMap.values().stream()
 				.filter(CellPin::isInpin)
 				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Clears the cell pin -> bel pin mappings of all pins on this cell.
+	 */
+	public void clearPinMappings() {
+		getPins().forEach(CellPin::clearPinMappings);
 	}
 
 	/**

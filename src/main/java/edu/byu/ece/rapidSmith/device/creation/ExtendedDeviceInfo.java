@@ -166,25 +166,15 @@ public class ExtendedDeviceInfo implements Serializable {
 		return wireHashMap;
 	}
 
+	/**
+	 * @deprecated See @link{{@link Device#loadExtendedInfo()}}
+	 * @param device the device to load info for
+	 */
 	public static void loadExtendedInfo(Device device) {
-		Path partFolderPath = getExtendedInfoPath(device);
-		ExtendedDeviceInfo info;
-		try {
-			info = loadCompressedFile(partFolderPath);
-		} catch (IOException e) {
-			throw new RuntimeException("Failed to load");
-		}
-		for (Tile tile : device.getTileMap().values()) {
-			tile.setReverseWireConnections(info.reversedWireHashMap.get(tile.getName()));
+		device.loadExtendedInfo();
 		}
 
-		for (SiteType type : info.reversedSubsiteRouting.keySet()) {
-			SiteTemplate template = device.getSiteTemplate(type);
-			template.setReverseWireConnections(info.reversedSubsiteRouting.get(type));
-		}
-	}
-
-	private static Path getExtendedInfoPath(Device device) {
+	public static Path getExtendedInfoPath(Device device) {
 		RSEnvironment env = RSEnvironment.defaultEnv();
 		Path partFolderPath = env.getPartFolderPath(device.getFamily());
 		partFolderPath = partFolderPath.resolve(device.getPartName() + "_info.dat");
@@ -197,11 +187,21 @@ public class ExtendedDeviceInfo implements Serializable {
 		try {
 			hos = FileTools.getCompactReader(path);
 			info = (ExtendedDeviceInfo) hos.readObject();
+		} catch (Exception e) {
+			throw new IOException(e);
 		} finally {
 			if (hos != null) {
 				hos.close();
 			}
 		}
 		return info;
+	}
+
+	public Map<String, WireHashMap> getReversedWireMap() {
+		return reversedWireHashMap;
+	}
+
+	public Map<SiteType, WireHashMap> getReversedSubsiteRouting() {
+		return reversedSubsiteRouting;
 	}
 }
