@@ -74,7 +74,7 @@ public class SimulatedAnnealingPlacer {
 		this.buildSiteClusters();
 		
 		// unroute all intrasite nets to prevent LUT routethroughs from being inserted
-		design.getNets().forEach(CellNet::unroute);
+		design.getNets().forEach(CellNet::unrouteFull);
 	}
 	
 	public void setVivadoOutputStream(BufferedWriter out, String checkpoint) {
