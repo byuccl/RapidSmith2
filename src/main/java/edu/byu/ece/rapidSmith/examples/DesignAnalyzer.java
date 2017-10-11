@@ -88,7 +88,6 @@ public class DesignAnalyzer {
 		}
 	}
 	
-	
 	/**
 	 * Print out a formatted representation of a design to help visualize it.  Another way of visualizing designs is illustrated
 	 * in the DotFilePrinterDemo program in the examples2 directory.  
@@ -97,29 +96,43 @@ public class DesignAnalyzer {
 	public static void prettyPrintDesign(CellDesign design) {
 		// Print the cells
 		for (Cell c : design.getCells()) {
-			System.out.println("\nCell: " + c.getName() + " " + 
-					c.getLibCell().getName());
-			if (c.isPlaced())
-				// Print out its placement
-				System.out.println("  <<<Placed on: " + c.getBel() + ">>>");
-			else System.out.println("  <<<Unplaced>>>");
-			// Print out the pins
-			for (CellPin cp : c.getPins()) {
-				System.out.println("  Pin: " + cp.getName() + " " + 
-						cp.getDirection() + " " + 
-						(cp.getNet()!=null?cp.getNet().getName():"<unconnected>"));
-			}
-			// Print the properties for a given cell if there are any
-			// For now, properties are strings. 
-			for (Property p : c.getProperties()) {
-				String s = "  Property: " + p.toString();
-				System.out.println(s);
+			prettyPrintCell(c);
+
+			if (c.isMacro())
+			{						
+				// Print out names of internal nets
+				Collection<CellNet> internalNets = c.getInternalNets();
+	
+				if (internalNets != null && !internalNets.isEmpty())
+				{
+					for (Iterator<CellNet> it = internalNets.iterator(); it.hasNext(); )
+					{
+						CellNet internalNet = it.next();
+						System.out.println("  Internal Net: " + internalNet.getName());
+					}
+				}
+				
+				// Print out the internal cells
+				Collection<Cell> internalCells = c.getInternalCells();
+				
+				if (internalCells != null && !internalCells.isEmpty())
+				{
+					for (Iterator<Cell> it = internalCells.iterator(); it.hasNext(); )
+					{
+						Cell internalCell = it.next();
+						prettyPrintCell(internalCell);
+					}
+				}
 			}
 		}
 		
 		// Print the nets
 		for (CellNet n : design.getNets()) {
 			System.out.println("\nNet: " + n.getName());
+			
+			// Print if it is an internal net
+			if (n.isInternal())
+				System.out.println("  *Internal Net*");
 
 			// Print the net's pins
 			// Source pin first
@@ -156,9 +169,9 @@ public class DesignAnalyzer {
 				assert(n.getIntersiteRouteTreeList().size() <= 1);
 				String s = createRoutingString(n, n.getSourceRouteTree(), true, true);
 				if (Objects.equals(s, ""))
-					System.out.println("<<<Unrouted>>>");
+					System.out.println("  <<<Unrouted>>>");
 				else
-					System.out.println("Physical routing: { " + createRoutingString(n, n.getSourceRouteTree(), true, true) + " }"); 
+					System.out.println("  Physical routing: { " + createRoutingString(n, n.getSourceRouteTree(), true, true) + " }"); 
 			}
 		}
 	}		
@@ -256,6 +269,38 @@ public class DesignAnalyzer {
 				numrouted++;
 		System.out.println("The design has: " + design.getNets().size() + " nets, "  + numrouted + " of them are routed.");
 		
+	}
+	
+	/**
+	 * Print out a formatted representation of a cell. Placement is not printed for macro cells.
+	 * @param c The internal cell to be pretty printed.
+	 */
+	public static void prettyPrintCell(Cell c)
+	{
+		System.out.println("\nCell: " + c.getName() + " " + 
+					c.getLibCell().getName());
+		
+		if (c.isMacro()) System.out.println("  *Macro (Parent) Cell*");
+		else {
+			if (c.isInternal()) System.out.println("  *Internal Cell*");
+			if (c.isPlaced())
+				// Print out its placement
+				System.out.println("  <<<Placed on: " + c.getBel() + ">>>");
+			else System.out.println("  <<<Unplaced>>>");
+		}
+
+		// Print out the external pins
+		for (CellPin cp : c.getPins()) {
+			System.out.println("  Pin: " + cp.getName() + " " + 
+					cp.getDirection() + " " + 
+					(cp.getNet()!=null?cp.getNet().getName():"<unconnected>"));
+		}
+		// Print the properties for a given cell if there are any
+		// For now, properties are strings. 
+		for (Property p : c.getProperties()) {
+			String s = "  Property: " + p.toString();
+			System.out.println(s);
+		}		
 	}
 	
 }
