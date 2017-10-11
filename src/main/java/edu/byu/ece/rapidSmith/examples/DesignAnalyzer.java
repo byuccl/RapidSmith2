@@ -80,6 +80,10 @@ public class DesignAnalyzer {
 			if (++i > 20)
 				break;
 			System.out.println("  Cell #" + i + " = " + c.toString());
+			if (c.isMacro()) { 
+				System.out.println("    Cell is macro");
+				continue;
+			}
 			if (c.getPossibleAnchors().size() == 0)
 				System.out.println("    This cell cannot be placed.");
 			for (BelId b : c.getPossibleAnchors()) {
