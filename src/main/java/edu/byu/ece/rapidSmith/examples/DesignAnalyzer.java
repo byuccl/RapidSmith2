@@ -100,10 +100,13 @@ public class DesignAnalyzer {
 	public static void prettyPrintDesign(CellDesign design) {
 		// Print the cells
 		for (Cell c : design.getCells()) {
-			prettyPrintCell(c);
-
 			if (c.isMacro())
-			{						
+			{				
+				// Mark the start of a macro cell section
+				System.out.println("\n====================================================");
+				
+				prettyPrintCell(c);
+				
 				// Print out names of internal nets
 				Collection<CellNet> internalNets = c.getInternalNets();
 	
@@ -126,8 +129,11 @@ public class DesignAnalyzer {
 						Cell internalCell = it.next();
 						prettyPrintCell(internalCell);
 					}
+					// Mark the end of a macro cell section
+					System.out.println("====================================================");
 				}
 			}
+			else prettyPrintCell(c);
 		}
 		
 		// Print the nets
@@ -281,13 +287,22 @@ public class DesignAnalyzer {
 	 */
 	public static void prettyPrintCell(Cell c)
 	{
-		System.out.println("\nCell: " + c.getName() + " " + 
+		if (c.isMacro()) {
+			System.out.println("*Macro (Parent) Cell*");
+			System.out.println("Cell: " + c.getName() + " " + 
 					c.getLibCell().getName());
-		
-		if (c.isMacro()) System.out.println("  *Macro (Parent) Cell*");
+		}
 		else {
-			if (c.isInternal()) System.out.println("  *Internal Cell*");
-			if (c.isPlaced())
+			if (c.isInternal()) {
+				System.out.println("\n*Internal Cell*");
+				System.out.println("Cell: " + c.getName() + " " + 
+						c.getLibCell().getName());
+			}
+			else {
+				System.out.println("\nCell: " + c.getName() + " " + 
+						c.getLibCell().getName());
+			}
+			if (c.isPlaced()) 
 				// Print out its placement
 				System.out.println("  <<<Placed on: " + c.getBel() + ">>>");
 			else System.out.println("  <<<Unplaced>>>");
@@ -304,7 +319,7 @@ public class DesignAnalyzer {
 		for (Property p : c.getProperties()) {
 			String s = "  Property: " + p.toString();
 			System.out.println(s);
-		}		
+		}
 	}
 	
 }
