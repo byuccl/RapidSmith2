@@ -17,7 +17,6 @@
  * RapidSmith Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
  * also get a copy of the license at <http://www.gnu.org/licenses/>.
  */
-
 package edu.byu.ece.rapidSmith.device.families;
 
 import edu.byu.ece.rapidSmith.device.FamilyType;
@@ -690,46 +689,36 @@ public final class Kintexu implements FamilyInfo {
 
     /* ------ AUTO-GENERATED --- DO NOT EDIT ABOVE ------ */
     static {
-    /* ------ CLASSIFICATIONS GO HERE ------ */
-    	
-    	/* ***********************
+        /* ------ CLASSIFICATIONS GO HERE ------ */
+        /* ***********************
     	 * 		Tile Types
     	 * ***********************/
         _CLB_TILES.add(TileTypes.CLE_M);
         _CLB_TILES.add(TileTypes.CLE_M_R);
         _CLB_TILES.add(TileTypes.CLEL_L);
         _CLB_TILES.add(TileTypes.CLEL_R);
-        
         _SWITCHBOX_TILES.add(TileTypes.INT);
-
         _BRAM_TILES.add(TileTypes.BRAM);
-        
         _DSP_TILES.add(TileTypes.DSP);
-	
         _IO_TILES.add(TileTypes.HPIO_L);
         _IO_TILES.add(TileTypes.HRIO_L);
         _IO_TILES.add(TileTypes.AMS);
         _IO_TILES.add(TileTypes.GTH_R);
-          	
-    	/* ***********************
+        /* ***********************
     	 * 		Site Types
     	 * ***********************/
-    	_SLICE_SITES.add(SiteTypes.SLICEL);
+        _SLICE_SITES.add(SiteTypes.SLICEL);
         _SLICE_SITES.add(SiteTypes.SLICEM);
-
         _BRAM_SITES.add(SiteTypes.RAMB180);
         _BRAM_SITES.add(SiteTypes.RAMB181);
         _BRAM_SITES.add(SiteTypes.RAMB36);
         _BRAM_SITES.add(SiteTypes.RAMBFIFO18);
         _BRAM_SITES.add(SiteTypes.RAMBFIFO36);
-
         _FIFO_SITES.add(SiteTypes.FIFO18_0);
         _FIFO_SITES.add(SiteTypes.FIFO36);
         _FIFO_SITES.add(SiteTypes.RAMBFIFO18);
         _FIFO_SITES.add(SiteTypes.RAMBFIFO36);
-        
         _DSP_SITES.add(SiteTypes.DSP48E2);
-
         _IO_SITES.add(SiteTypes.HPIOB);
         _IO_SITES.add(SiteTypes.HRIO);
         _IO_SITES.add(SiteTypes.SYSMONE1);
