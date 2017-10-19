@@ -23,6 +23,7 @@ package edu.byu.ece.rapidSmith.device;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -292,7 +293,11 @@ public class Tile implements Serializable {
 	 * @return Collection of TileWire objects.
 	 */
 	public Collection<Wire> getWires() {
-		return wireConnections.keySet().stream().map(w -> new TileWire(this, w)).collect(Collectors.toCollection(ArrayList::new));
+		Stream<Integer> allWires = wireConnections.keySet().stream();
+		return allWires
+			.distinct()
+			.map(w -> new TileWire(this, w))
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	/**

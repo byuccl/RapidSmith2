@@ -20,10 +20,13 @@
 package edu.byu.ece.rapidSmith.device;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
+import edu.byu.ece.rapidSmith.device.creation.ExtendedDeviceInfo;
 import edu.byu.ece.rapidSmith.util.HashPool;
 import edu.byu.ece.rapidSmith.primitiveDefs.PrimitiveDefList;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -48,6 +51,7 @@ public class Device implements Serializable {
 	//========================================================================//
 	// Class Members
 	//========================================================================//
+	private boolean extendedInfoLoaded = false;
 	/** The Xilinx part name of the device (ie. xc4vfx12ff668, omits the speed grade) */
 	private String partName;
 	/** The Xilinx family of this part */
@@ -95,6 +99,14 @@ public class Device implements Serializable {
 		return RSEnvironment.defaultEnv().getDevice(partName);
 	}
 
+	public static Device getInstance(String partName, boolean loadExtendedInfo) {
+		Device device = getInstance(partName);
+		if (loadExtendedInfo && !device.hasExtendedInfo()) {
+			device.loadExtendedInfo();
+		}
+		return device;
+	}
+
 	//========================================================================//
 	// Getter and Setter Methods
 	//========================================================================//
@@ -139,6 +151,31 @@ public class Device implements Serializable {
 		this.family = family;
 	}
 	
+	public boolean hasExtendedInfo() {
+		return extendedInfoLoaded;
+	}
+
+	public boolean loadExtendedInfo() {
+		Path partFolderPath = ExtendedDeviceInfo.getExtendedInfoPath(this);
+		ExtendedDeviceInfo info;
+		try {
+			info = ExtendedDeviceInfo.loadCompressedFile(partFolderPath);
+		} catch (IOException e) {
+			return false;
+		}
+		for (Tile tile : getTileMap().values()) {
+			tile.setReverseWireConnections(info.getReversedWireMap().get(tile.getName()));
+		}
+
+		for (SiteType type : info.getReversedSubsiteRouting().keySet()) {
+			SiteTemplate template = getSiteTemplate(type);
+			template.setReverseWireConnections(info.getReversedSubsiteRouting().get(type));
+		}
+
+		extendedInfoLoaded = true;
+		return true;
+	}
+
 	/**
 	 * Returns the number of rows of tiles in this device.
 	 *

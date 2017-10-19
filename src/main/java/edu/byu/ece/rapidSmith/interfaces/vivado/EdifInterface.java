@@ -462,7 +462,7 @@ public final class EdifInterface {
 	private static void transferSinkPins(CellNet oldNet, CellNet newNet) {
 		Collection<CellPin> sinkPins = oldNet.getSinkPins();
 		oldNet.detachNet();
-		oldNet.unroute();
+		oldNet.unrouteFull();
 		newNet.connectToPins(sinkPins);
 	}
 	

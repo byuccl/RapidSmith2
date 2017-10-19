@@ -299,4 +299,14 @@ public class WireHashMap implements Serializable {
 
 		return repl;
 	}
+
+	public static WireHashMap EMPTY_WIRE_HASHMAP;
+
+	static {
+		EMPTY_WIRE_HASHMAP = new WireHashMap();
+		EMPTY_WIRE_HASHMAP.size = 0;
+		EMPTY_WIRE_HASHMAP.keys = new int[1];
+		EMPTY_WIRE_HASHMAP.keys[0] = -1;
+		EMPTY_WIRE_HASHMAP.values = new WireConnection[0][0];
+	}
 }

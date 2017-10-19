@@ -484,7 +484,7 @@ public class CellNet implements Serializable {
 	 */
 	public void addSourceSitePin(SitePin sitePin) {
 		if (this.sourceSitePinList == null) {
-			this.sourceSitePinList = new ArrayList<SitePin>(2);
+			this.sourceSitePinList = new ArrayList<>(2);
 		}
 		
 		// Throw an exception if the net already has two source pins
@@ -654,11 +654,20 @@ public class CellNet implements Serializable {
 	 * This removes all PIPs from this net, causing it to be in an unrouted state.
 	 * PIPs from placed relatively-routed molecules are preserved.
 	 */
-	public void unroute() {
+	public void unrouteFull() {
 		intersiteRoutes = null;
-		routedSinks = null;
+		sourceSitePinList = null;
+		source = null;
 		belPinToSinkRTMap = null;
 		sitePinToRTMap = null;
+		routedSinks = null;
+		isIntrasite = false;
+		routeStatus = RouteStatus.UNROUTED;
+	}
+
+	public void unrouteIntersite() {
+		intersiteRoutes = null;
+		computeRouteStatus();
 	}
 	
 	/**
@@ -781,7 +790,7 @@ public class CellNet implements Serializable {
 	 * This RouteTree contains wires INSIDE the Site, and will connect to
 	 * several BelPin sinks within the Site of the SitePin.
 	 * 
-	 * @param belPin Input (sink) SitePin
+	 * @param sitePin Input (sink) SitePin
 	 * @return
 	 */
 	public RouteTree getSinkRouteTree(SitePin sitePin) {
@@ -843,7 +852,7 @@ public class CellNet implements Serializable {
 	
 	/**
 	 * Returns all RouteTrees of this net that are connected to the specified CellPin.
-	 * If the CellPin only maps to one BelPin, use {@link #getSinkRouteTree(CellPin, CellNet) }
+	 * If the CellPin only maps to one BelPin, use {@link #getSinkRouteTrees(CellPin)}  }
 	 * instead.
 	 * 
 	 * @param cellPin sink CellPin
