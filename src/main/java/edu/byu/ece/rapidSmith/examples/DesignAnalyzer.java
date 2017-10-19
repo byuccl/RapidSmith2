@@ -32,6 +32,7 @@ import edu.byu.ece.rapidSmith.design.subsite.CellPin;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 import edu.byu.ece.rapidSmith.device.BelPin;
+import edu.byu.ece.rapidSmith.device.PIP;
 import edu.byu.ece.rapidSmith.device.BelId;
 import edu.byu.ece.rapidSmith.device.SitePin;
 import org.jdom2.JDOMException;
@@ -175,13 +176,13 @@ public class DesignAnalyzer {
 				System.out.println("Vcc and GND nets have multiple intersite route trees, each with a single source.");
 			}
 			else {
-				// Regular nets should have only a single route tree
-				assert(n.getIntersiteRouteTreeList().size() <= 1);
-				String s = createRoutingString(n, n.getSourceRouteTree(), true, true);
+				if (n.getIntersiteRouteTreeList().size() > 1)
+					System.out.println("  Note: net \"" + n.getName() + "\" has " + n.getIntersiteRouteTreeList().size() + " intersite route trees.");
+				String s = createRoutingString("   ", n, n.getSourceRouteTree(), true, true);
 				if (Objects.equals(s, ""))
 					System.out.println("  <<<Unrouted>>>");
 				else
-					System.out.println("  Physical routing: { " + createRoutingString(n, n.getSourceRouteTree(), true, true) + " }"); 
+					System.out.println("  Physical routing: \n   (" + createRoutingString("   ", n, n.getSourceRouteTree(), true, true) + "\n   )"); 
 			}
 		}
 	}		
@@ -200,7 +201,7 @@ public class DesignAnalyzer {
 	 * @return A string representing the physical route.  It is similar in many ways to XIlinx Directed Routing strings but have been enhanced 
 	 * to show where the route enters and exits sites as well as a description of the sink pins where it terminates.
 	 */
-	public static String createRoutingString(CellNet n, RouteTree rt, boolean head, boolean inside) {
+	public static String createRoutingString(String indnt, CellNet n, RouteTree rt, boolean head, boolean inside) {
 		String s="";
 
 		if (rt == null)  return s;
@@ -211,56 +212,89 @@ public class DesignAnalyzer {
 		
 		// Always print first wire at the head of a net's RouteTree. The format is "tileName/wireName".
 		if (head)
-			s = rt.getWire().getFullWireName();
+			s = "<head>" + rt.getWire().getFullWireName();
+		
 
 		// The connection member of the RouteTree object describes the connection between this RouteTree and its predecessor.
 		// The connection may be a programmable connection (PIP or route-through) or it may be a non-programmable connection.  
 		// Look upstream and, if it was a programmable connection, include it.
 		else if (rt.getConnection().isPip() || rt.getConnection().isRouteThrough())
 			s = " " + rt.getWire().getFullWireName();
-		// It is a non-programmable connection - append it in parens.
+		// It is a non-programmable connection - append it with marker.
 		else  
-			s += "(" + rt.getWire().getWireName() + ")";
+			s += "=" + rt.getWire().getWireName();
 
 		// Now, let's look downstream and see where to go and what to print.
-		// If it is a leaf cell, it either (1) has a site pin attached, (2) has a BEL pin attached, or (3) simply ends. 
-		// Wires that end like this are called "used stubs" in Vivado's GUI.
+		// If it is a leaf cell, it either: 
+		//     (1) has a site pin attached, 
+		//     (2) has a BEL pin attached, or 
+		//     (3) simply ends. Wires that end like this are called "used stubs" in Vivado's GUI.  They don't go anywhere.
 		if (rt.isLeaf()) {
 			SitePin sp = rt.getConnectingSitePin();
 			BelPin bp = rt.getConnectingBelPin();
 			if (sp != null) {
-				if (inside) 
-					// Follow the route out of the site into the general routing fabric 
-					s += " SitePin{" + sp + "} <<entering general routing fabric>> " + createRoutingString(n, n.getIntersiteRouteTree(), true, !inside);
-				else
-					// Follow the route from the general routing fabric and into a site
-					s += " SitePin{" + sp + "} <<leaving general routing fabric, entering site>> " + createRoutingString(n, n.getSinkRouteTree(sp), true, inside);
+				// If we are at a site pin then what we do differs depending on whether we are inside the site (and leaving) or outside the site (and entering). 
+				if (inside) {  
+					// Inside site, so look for correct intersite route tree to leave on
+					for (RouteTree rt1 : n.getIntersiteRouteTreeList()) 
+						if (sp.getExternalWire().equals(rt1.getWire())) 
+							return s + " SitePin{" + sp + "} <<entering general routing fabric>> " + createRoutingString(indnt, n, rt1, true, !inside);
+					////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					// An explanation on the above code is in order.
+					// This explanation only applies to regular nets (VCC and GND nets have their own special rules).
+					// When tracing from inside a Site out into the intersite routing, there are multiple cases to consider:
+					// Case 1. A net connects to a single SitePin, the net has a single intersite route tree
+					//    + Straightforward - n.getIntersiteRouteTree() will give the first (and only) RouteTree to follow.
+					// Case 2. A net connects to multiple SitePin's, the net has multiple intersite route trees
+					//    + In this case, all we have ever seen is that the corresponding route trees reconverge immediately
+					//      through a site PIP (reconvergent fanout).
+					//    + Also in this case, we have only observed this happening when a signal leaves both the COUT and DMUX site pins.
+					//    + In this case you can follow either both RouteTrees (and get redundant paths printed out) or just one.
+					// Case 3. A net connects to multiple SitePin's, but the net has only a single intersite route tree
+					//    + One of the SitePin's connects to the wire at head of an intersite route tree and the other doesn't.
+					//    + In this case as in #1 above, just follow the single intersite route tree
+					// Case 4. We have not yet observed this last case: net connects to single SitePin, net has multiple intersite route trees.
+					//    + This doesn't make sense.
+					//
+					// The above code will handle case 1 and 2 just fine by searching - it will find the corresponding RouteTree for each SitePin hit.  
+					// For case 3 it will find a RouteTree for one of the SitePin's but not the other (and fall out the bottom of the for-loop).	
+					// This last case (3b) is handled below.
+					////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					
+					// Case 3b: If we get here, net connects to a SitePin but there is no corresponding RouteTree... 
+					return s + " SitePin{" + sp + "} <<<<Connects to no corresponding RouteTree outside site>>>> ";
+				}
+				else 
+					// Outside site, so just follow the route from the general routing fabric and into a site
+					return s + " SitePin{" + sp + "} <<Leaving general routing fabric, entering site>> " + createRoutingString(indnt, n, n.getSinkRouteTree(sp), true, inside);
 			}
 			// If not a site pin, see if it is a BEL pin  
 			else if (bp != null) {
-				// Print the BEL pin attached.
-				return s + " " + bp;			
+				// Print the attached BEL pin.
+				return s + " " + bp;
 			}
 			else {
-				// It is an "used stub". Print the wire name.
-				return s;
+				// It must be a "used stub".
+				return s + " <stub> ";
 			}
-		}
+		}  // End of rt.isLeaf() block
 
-		// Otherwise, if it is not a leaf route tree, then iterate across its sink trees and print them
-		for (Iterator<RouteTree> it = sinkTrees.iterator(); it.hasNext(); ) {
-			RouteTree sink = it.next();
+		else {
+			// Otherwise, if it is not a leaf route tree, then iterate across its sink trees and add them
+			for (Iterator<RouteTree> it = sinkTrees.iterator(); it.hasNext(); ) {
+				RouteTree sink = it.next();
 
-			// If there is only one sink tree then this is just the next wire segment in the route (not a branch).  
-			// Don't enclose this in {}'s, just list it as the next wire segment. 
-			if (sinkTrees.size() == 1) 
-				s += createRoutingString(n, sink, false, inside);
-			// Otherwise, this is a branch of the wire, so enclose it in { }'s to mark that it represents a branch in the wire.
-			else {
-				s += " {" + createRoutingString(n, sink, false, inside) + " }";
+				// If there is only one sink tree then this is just the next wire segment in the route (not a branch).  
+				// Don't enclose this in ()'s, just list it as the next wire segment. 
+				if (sinkTrees.size() == 1) 
+					s += createRoutingString(indnt, n, sink, false, inside);
+				// Otherwise, this is a branch of the wire, so enclose it in ( )'s to mark that it represents a branch in the wire.
+				else {
+					s += "\n" + indnt + "   (" + createRoutingString(indnt + "   ", n, sink, false, inside) + "\n" + indnt + "   )";
+				}
 			}
+			return s;
 		}
-		return s;
 	}
 
 	public static void summarizeDesign(CellDesign design) {
