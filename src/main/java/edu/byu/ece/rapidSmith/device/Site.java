@@ -78,6 +78,7 @@ public final class Site implements Serializable{
 	/**
 	 * Sets the name of this site (ex: SLICE_X5Y7).
 	 * Also infers the XY coordinates for this site based on the name.
+	 * @see #setNameOnly() to set the name of the site without inferring XY coordinates.
 	 * @param name the name to set.
 	 */
 	public void setName(String name){
@@ -96,6 +97,16 @@ public final class Site implements Serializable{
 		chIndex = name.lastIndexOf('X');
 		this.instanceX = Integer.parseInt(name.substring(chIndex + 1, end));
 	}
+	
+	/**
+	 * Sets the name of this site (ex: SLICE_X5Y7).
+	 * @see #setName() to set the name of the site and infer the XY coordinates for the site based on the name.
+	 * @param name the name to set.
+	 */
+	public void setNameOnly(String name){
+		this.name = name;
+	}
+
 
 	/**
 	 * Returns the index of this site in it tile's Site list.
@@ -307,7 +318,7 @@ public final class Site implements Serializable{
 
 	/**
 	 * Returns SiteTypes that are compatible with the default site type.
-	 * Compatible types are different that possible types.  These are types
+	 * Compatible types are different that possible types. These are types
 	 * that the site type cannot be changed to, but instances of the type be
 	 * placed on them.
 	 *
