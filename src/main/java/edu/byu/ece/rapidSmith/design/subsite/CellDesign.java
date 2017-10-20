@@ -213,7 +213,7 @@ public class CellDesign extends AbstractDesign {
 	/**
 	 * Returns a stream of {@link Cell} objects of the specified type. 
 	 * 
-	 * @param libCellType Name of the {@link LibraryCell} to filter by
+	 * @param libraryCell Name of the {@link LibraryCell} to filter by
 	 */
 	public Stream<Cell> getCellsOfType(LibraryCell libraryCell) {
 		Objects.requireNonNull(libraryCell, "LibraryCell parameter cannot be null");
@@ -473,7 +473,7 @@ public class CellDesign extends AbstractDesign {
 	private void disconnectNet_impl(CellNet net) {
 		List<CellPin> pins = new ArrayList<>(net.getPins());
 		pins.forEach(net::disconnectFromPin);
-		net.unroute();
+		net.unrouteFull();
 	}
 
 	/**
@@ -674,7 +674,17 @@ public class CellDesign extends AbstractDesign {
 	 */
 	@Deprecated
 	public void unrouteDesign() {
-		getNets().forEach(CellNet::unroute);
+		getNets().forEach(CellNet::unrouteIntersite);
+	}
+
+	/**
+	 * Unroutes the INTERSITE portions of all nets currently in the design.
+	 * This function is currently not recommended for use. Further testing is needed.
+	 */
+	@Deprecated
+	public void unrouteDesignFull() {
+		getNets().forEach(CellNet::unrouteFull);
+		getCells().forEach(Cell::clearPinMappings);
 	}
 	
 	/**
