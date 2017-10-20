@@ -107,7 +107,6 @@ public final class Site implements Serializable{
 		this.name = name;
 	}
 
-
 	/**
 	 * Returns the index of this site in it tile's Site list.
 	 * @return this site's index
