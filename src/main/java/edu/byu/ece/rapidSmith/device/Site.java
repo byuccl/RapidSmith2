@@ -77,33 +77,9 @@ public final class Site implements Serializable{
 	
 	/**
 	 * Sets the name of this site (ex: SLICE_X5Y7).
-	 * Also infers the XY coordinates for this site based on the name.
-	 * @see #setNameOnly() to set the name of the site without inferring XY coordinates.
 	 * @param name the name to set.
 	 */
 	public void setName(String name){
-		this.name = name;
-
-		// Populate the X and Y coordinates based on name
-		if (!name.contains("_X"))
-			return;
-
-		// Populate the X and Y coordinates based on name
-		int end = name.length();
-		int chIndex = name.lastIndexOf('Y');
-		this.instanceY = Integer.parseInt(name.substring(chIndex + 1, end));
-
-		end = chIndex;
-		chIndex = name.lastIndexOf('X');
-		this.instanceX = Integer.parseInt(name.substring(chIndex + 1, end));
-	}
-	
-	/**
-	 * Sets the name of this site (ex: SLICE_X5Y7).
-	 * @see #setName() to set the name of the site and infer the XY coordinates for the site based on the name.
-	 * @param name the name to set.
-	 */
-	public void setNameOnly(String name){
 		this.name = name;
 	}
 
@@ -157,6 +133,25 @@ public final class Site implements Serializable{
 	 */
 	public int getInstanceY(){
 		return instanceY;
+	}
+	
+	/**
+	 * Sets the XY coordinates for this site based on the name.
+	 * @param name the name of the site to infer and set the XY coordinates of.
+	 */
+	public void setXYCoordinates(String name) {
+		// Populate the X and Y coordinates based on name
+		if (!name.contains("_X"))
+			return;
+
+		// Populate the X and Y coordinates based on name
+		int end = name.length();
+		int chIndex = name.lastIndexOf('Y');
+		this.instanceY = Integer.parseInt(name.substring(chIndex + 1, end));
+
+		end = chIndex;
+		chIndex = name.lastIndexOf('X');
+		this.instanceX = Integer.parseInt(name.substring(chIndex + 1, end));
 	}
 
 	/**

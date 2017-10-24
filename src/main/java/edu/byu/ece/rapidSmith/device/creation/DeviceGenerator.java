@@ -923,6 +923,7 @@ public final class DeviceGenerator {
 			Site site = new Site();
 			site.setTile(currTile);
 			site.setName(tokens.get(1));
+			site.setXYCoordinates(tokens.get(1));
 			site.setIndex(tileSites.size());
 			site.setBondedType(BondedType.valueOf(tokens.get(3).toUpperCase()));
 
