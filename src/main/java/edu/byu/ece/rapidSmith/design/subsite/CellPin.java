@@ -97,10 +97,11 @@ public abstract class CellPin implements Serializable {
 	}
 
 	/**
-	 * 
+	 * Returns true if this pin is an internal pin in a macro.  This includes any
+	 * pin that is on an internal cell with the exception of added pseudo pins.
 	 */
 	public boolean isInternal() {
-		return cell.isInternal(); 
+		return cell.isInternal() && !isPseudoPin();
 	}
 	
 	/**

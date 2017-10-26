@@ -19,6 +19,7 @@
  */
 package design.assembly;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,6 +28,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import edu.byu.ece.rapidSmith.device.PinDirection;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,7 +37,6 @@ import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 import static org.junit.jupiter.api.Assertions.*;
 
-import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
@@ -51,11 +53,6 @@ public class MacroTests {
 	
 	private static CellLibrary libCells;
 	private static Cell testMacro;
-	private static final Path resourceDir = RSEnvironment.defaultEnv()
-														.getEnvironmentPath()
-														.resolve("src")
-														.resolve("test")
-														.resolve("resources");
 	/**
 	 * Initializes the macro tests by loading a CellLibrary, and creating a 
 	 * new macro cell of type "RAM128X1D." This is the cell in the macro
@@ -64,7 +61,9 @@ public class MacroTests {
 	@BeforeAll
 	public static void initializeTest() {
 		try {
-			libCells = new CellLibrary(resourceDir.resolve("cellLibraryTest.xml"));
+			InputStream cellLibraryStream = MacroTests.class
+				.getResourceAsStream("cellLibraryTest.xml");
+			libCells = new CellLibrary(cellLibraryStream);
 			testMacro = new Cell("ram", libCells.get("RAM128X1D"));
 		} catch (IOException e) {
 			fail("Cannot find cell library XML in test directory. Setup is incorrect.");
@@ -80,8 +79,10 @@ public class MacroTests {
 	public void externalAdditionTest() throws IOException {
 		
 		int cellCountBefore = libCells.size();
-		
-		libCells.loadMacroXML(resourceDir.resolve("macrosTest.xml"));
+
+		InputStream macroFile = MacroTests.class
+			.getResourceAsStream("macrosTest.xml");
+		libCells.loadMacroXML(macroFile);
 		
 		int cellCountAfter = libCells.size();
 		
@@ -335,7 +336,9 @@ public class MacroTests {
 	@Test
 	@DisplayName("Internal Net Type Test")
 	public void internalNetTypeTest() throws IOException {
-		libCells.loadMacroXML(resourceDir.resolve("seanMacroTest.xml"));
+		InputStream macroFile = MacroTests.class
+			.getResourceAsStream("seanMacroTest.xml");
+		libCells.loadMacroXML(macroFile);
 		
 		CellDesign design = new CellDesign();
 		Cell testCell = design.addCell(new Cell("test", libCells.get("counter")));
@@ -354,5 +357,31 @@ public class MacroTests {
 		testCell.getInternalNets().stream()
 			.filter(net -> !net.getName().equals("test/<const1>") && !net.getName().equals("test/<const0>"))
 			.forEach(net -> assertEquals(NetType.WIRE, net.getType(), "Internal type for net " + net.getName() + " is not correct!"));
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	@DisplayName("Remove pseudo pin on internal cell from net")
+	void removeInternalPseudoPin() throws IOException {
+		InputStream macroFile = MacroTests.class
+			.getResourceAsStream("ramMacros.xml");
+		libCells.loadMacroXML(macroFile);
+
+		CellDesign design = new CellDesign();
+		design.addCell(new Cell("test", libCells.get("RAM32X1D")));
+		Cell internalCell = design.getCell("test/DP");
+		CellNet vccNet = design.addNet(new CellNet("global_logic1", NetType.VCC));
+
+		// add a pseudo pin to the cell and connect it to the net
+		CellPin pin = internalCell.attachPseudoPin("A6-PSEUDOPIN", PinDirection.IN);
+		vccNet.connectToPin(pin);
+		Assumptions.assumeTrue(pin.getNet() == vccNet);
+
+		// try to remove it
+		vccNet.disconnectFromPin(pin);
+		assertFalse(pin.isConnectedToNet());
+		assertFalse(vccNet.getPins().contains(pin));
 	}
 }
