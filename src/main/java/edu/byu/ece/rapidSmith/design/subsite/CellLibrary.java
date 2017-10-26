@@ -31,6 +31,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -70,7 +71,25 @@ public class CellLibrary implements Iterable<LibraryCell> {
 			throw new Exceptions.ParseException(e);
 		}
 	}
-	
+
+	/**
+	 * Creates a new cell library object, and populates it with the
+	 * XML cell library contents found in istream.
+	 *
+	 * @param istream {@link InputStream} containing the library XML contents.
+	 * @throws IOException
+	 */
+	public CellLibrary(InputStream istream) throws IOException {
+		this.library = new HashMap<>();
+
+		try {
+			loadFromStream(istream);
+		} catch (JDOMException e) {
+			// wrap the JDOMException in a generic parse exception
+			throw new Exceptions.ParseException(e);
+		}
+	}
+
 	/**
 	 * Parses an XML file which represents MACRO cell objects, creates corresponding
 	 * {@link LibraryMacro} library cells in RapidSmith, and adds them the current
@@ -87,12 +106,34 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		} catch (JDOMException e) {
 			throw new Exceptions.ParseException(e);
 		}
-		
-		// Load all macro library cells into the cell library 
+		loadMacros(doc);
+	}
+
+	/**
+	 * Parses an XML stream which represents MACRO cell objects, creates corresponding
+	 * {@link LibraryMacro} library cells in RapidSmith, and adds them the current
+	 * cell library. This function can be used to augment the default {@link CellLibrary}
+	 * with additional cells.
+	 *
+	 * @param macroXmlStream {@link InputStream} to the XML file
+	 */
+	public void loadMacroXML(InputStream macroXmlStream) throws IOException {
+		SAXBuilder builder = new SAXBuilder();
+		Document doc;
+		try {
+			doc = builder.build(macroXmlStream);
+		} catch (JDOMException e) {
+			throw new Exceptions.ParseException(e);
+		}
+		loadMacros(doc);
+	}
+
+	private void loadMacros(Document doc) {
+		// Load all macro library cells into the cell library
 		Element macrosEl = doc.getRootElement().getChild("macros");
-		
-		List<Element> childrenMacros = macrosEl.getChildren("macro"); 
-		
+
+		List<Element> childrenMacros = macrosEl.getChildren("macro");
+
 		if (childrenMacros != null) {
 			for (Element macroEl : childrenMacros) {
 				loadMacroFromXml(macroEl);
@@ -102,12 +143,20 @@ public class CellLibrary implements Iterable<LibraryCell> {
 
 	private void loadFromFile(Path filePath) throws IOException, JDOMException {
 		SAXBuilder builder = new SAXBuilder();
-		Document doc;
-		doc = builder.build(filePath.toFile());
+		Document doc = builder.build(filePath.toFile());
+		loadFromDoc(doc);
+	}
 
+	private void loadFromStream(InputStream is) throws JDOMException, IOException {
+		SAXBuilder builder = new SAXBuilder();
+		Document doc = builder.build(is);
+		loadFromDoc(doc);
+	}
+
+	private void loadFromDoc(Document doc) {
 		// get the family of the cell library.
 		readFamilyType(doc.getRootElement().getChild("family"));
-		
+
 		Element cellsEl = doc.getRootElement().getChild("cells");
 		Map<SiteType, Map<String, SiteProperty>> sitePropertiesMap = new HashMap<>();
 		// first load the leaf cells
@@ -116,9 +165,9 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		}
 		// then load the macro cells if any exist
 		Element macrosEl = doc.getRootElement().getChild("macros");
-		
+
 		if (macrosEl != null) {
-		List<Element> childrenMacros = macrosEl.getChildren("macro"); 
+			List<Element> childrenMacros = macrosEl.getChildren("macro");
 			if (childrenMacros != null) {
 				for (Element macroEl : childrenMacros) {
 					loadMacroFromXml(macroEl);
@@ -126,7 +175,7 @@ public class CellLibrary implements Iterable<LibraryCell> {
 			}
 		}
 	}
-	
+
 	/**
 	 * Reads the "family" tag from the cellLibrary.xml file and stores its value.
 	 * This tag is necessary to get handles to the proper site type later on in the parsing

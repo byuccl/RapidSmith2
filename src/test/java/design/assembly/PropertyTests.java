@@ -34,6 +34,7 @@ import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
+import edu.byu.ece.rapidSmith.design.subsite.PropertyList;
 import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
 
 import java.io.IOException;
@@ -68,7 +69,7 @@ public class PropertyTests {
 	@BeforeAll
 	public static void initializeTest() {
 		try {
-			libCells = new CellLibrary(resourceDir.resolve("cellLibraryTest.xml"));
+			libCells = new CellLibrary(resourceDir.resolve("design/assembly/cellLibraryTest.xml"));
 		} catch (IOException e) {
 			fail("Cannot find cell library XML in test directory. Setup is incorrect.");
 		}
