@@ -1151,19 +1151,21 @@ public class XdcRoutingInterface {
 			Tile t = currentRoute.getWire().getTile();
 			routeString = routeString.concat(t.getName() + "/" + currentRoute.getWire().getWireName() + " ");
 						
-			ArrayList<RouteTree> children = (ArrayList<RouteTree>) currentRoute.getSinkTrees();
+			// children may be changed in the following loop, so make a copy
+			ArrayList<RouteTree> children = new ArrayList<RouteTree>(currentRoute.getSinkTrees());
 			
 			if (children.size() == 0)
 				break;
 			
 			ArrayList<RouteTree> trueChildren = new ArrayList<>();
-			for(RouteTree child: children) {
+			for (int i = 0; i < children.size(); i++) {
+				RouteTree child = children.get(i);
 				Connection c = child.getConnection();
 				if (c.isPip() || c.isRouteThrough()) {
 					trueChildren.add(child);
 				}
 				else { // if its a regular wire connection and we don't want to add this to the route tree					
-					trueChildren.addAll(child.getSinkTrees());
+					children.addAll(child.getSinkTrees());
 				}
 			}
 			
