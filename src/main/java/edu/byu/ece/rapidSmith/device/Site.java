@@ -21,6 +21,8 @@ package edu.byu.ece.rapidSmith.device;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -139,19 +141,21 @@ public final class Site implements Serializable{
 	 * Sets the XY coordinates for this site based on the name.
 	 * @param name the name of the site to infer and set the XY coordinates of.
 	 */
-	public void setXYCoordinates(String name) {
-		// Populate the X and Y coordinates based on name
-		if (!name.contains("_X"))
-			return;
+	public boolean parseCoordinatesFromName(String name) {
+		// reset the values
+		this.instanceX = -1;
+		this.instanceY = -1;
+
+		// match the values
+		Pattern re = Pattern.compile(".+_X(\\d+)Y(\\d+)");
+		Matcher matcher = re.matcher(name);
+		if (!matcher.matches())
+			return false;
 
 		// Populate the X and Y coordinates based on name
-		int end = name.length();
-		int chIndex = name.lastIndexOf('Y');
-		this.instanceY = Integer.parseInt(name.substring(chIndex + 1, end));
-
-		end = chIndex;
-		chIndex = name.lastIndexOf('X');
-		this.instanceX = Integer.parseInt(name.substring(chIndex + 1, end));
+		this.instanceX = Integer.parseInt(matcher.group(1));
+		this.instanceY = Integer.parseInt(matcher.group(2));
+		return true;
 	}
 
 	/**
