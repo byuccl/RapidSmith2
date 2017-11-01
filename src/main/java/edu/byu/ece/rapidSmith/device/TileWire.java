@@ -115,7 +115,7 @@ public class TileWire implements Wire, Serializable {
 	}
 
 	/**
-	 * Returns all connections into primitive sites this wire drives.
+	 * Returns the connection into a primitive site that this wire drives.
 	 */
 	@Override
 	public SitePin getConnectedPin() {
@@ -177,7 +177,7 @@ public class TileWire implements Wire, Serializable {
 	}
 
 	/**
-	 * Returns all site pin connections driving this wire.
+	 * Returns the site pin connection driving this wire.
 	 */
 	@Override
 	public SitePin getReverseConnectedPin() {
