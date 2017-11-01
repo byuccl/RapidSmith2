@@ -17,4 +17,4 @@ RapidSmith2 (and previously RapidSmith) have been used in a variety of settings 
 
 For the full documentation, see the [TechReport](docs/TechReport/TechReport.pdf).
 
-**NOTE**: The current release of RS2 is an alpha release. Significant changes to the code are still being made, and so expect frequent code updates. RS2 and its functionality is still being tested, so please report any bugs you find. Designs must be fully flattened in Vivado using the synthesis option "flatten_design -full" before they can be imported into RapidSmith. 
+**NOTE**: RS2 and its functionality is still being tested, so please report any bugs you find. Designs must be fully flattened in Vivado using the synthesis option "flatten_design -full" before they can be imported into RapidSmith. 
