@@ -35,10 +35,16 @@ or opens a pull request, and it is configured in .travis.yml
 Whenever a collaborator pushes a branch, github notifies Travis-CI which will
 then start up a build slave to pull and test that branch. Once Travis-CI has
 tested the branch, it will report back to github whether or not the build was a
-success. The same process also occurs for pull requests. The results of each
-test can be seen as either a green checkmark or a red X on the [branch
-page](https://github.com/byuccl/RapidSmith2/branches), the [pull request
-page](https://github.com/byuccl/RapidSmith2/pulls), or the [Travis-CI
+success. The results of each test can be seen as either a green checkmark or a
+red X on the [branch page](https://github.com/byuccl/RapidSmith2/branches).
+
+Pull Requests are also tested by Travis-CI. Testing a Pull Request is very
+similar to testing a branch. The major difference is that the user's branch
+isn't tested directly; instead, the merged result of the Pull Request is tested.
+The status of your Pull Request tests are displayed on the [pull request
+page](https://github.com/byuccl/RapidSmith2/pulls).
+
+You can view the complete status of Travis-CI builds on the the [Travis-CI
 RapidSmith2 page](https://travis-ci.org/byuccl/RapidSmith2). Additionally, the
 README.md in the root of the repository contains a badge that indicates the
 health of the master branch tests.
