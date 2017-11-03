@@ -57,7 +57,7 @@ public class DesignAnalyzer {
 		CellDesign design = vcp.getDesign();
 		
 		// Print out a representation of the design 
-		prettyPrintDesign(design);
+		prettyPrintDesign(design, true);
 		
 		System.out.println();
 		
@@ -99,6 +99,16 @@ public class DesignAnalyzer {
 	 * @param design The design to be pretty printed.
 	 */
 	public static void prettyPrintDesign(CellDesign design) {
+		prettyPrintDesign(design, false);
+	}
+	
+	/**
+	 * Print out a formatted representation of a design to help visualize it.  Another way of visualizing designs is illustrated
+	 * in the DotFilePrinterDemo program in the examples2 directory.  
+	 * @param design The design to be pretty printed.
+	 * @param Flag to control printing of detailed cellBelPinMappings 
+	 */
+	public static void prettyPrintDesign(CellDesign design, boolean cellBelPinMappings) {
 		// Print the cells
 		for (Cell c : design.getCells()) {
 			if (c.isMacro())
@@ -106,7 +116,7 @@ public class DesignAnalyzer {
 				// Mark the start of a macro cell section
 				System.out.println("\n====================================================");
 				
-				prettyPrintCell(c);
+				prettyPrintCell(c, cellBelPinMappings);
 				
 				// Print out names of internal nets
 				Collection<CellNet> internalNets = c.getInternalNets();
@@ -128,13 +138,13 @@ public class DesignAnalyzer {
 					for (Iterator<Cell> it = internalCells.iterator(); it.hasNext(); )
 					{
 						Cell internalCell = it.next();
-						prettyPrintCell(internalCell);
+						prettyPrintCell(internalCell, cellBelPinMappings);
 					}
 					// Mark the end of a macro cell section
 					System.out.println("====================================================");
 				}
 			}
-			else prettyPrintCell(c);
+			else prettyPrintCell(c, cellBelPinMappings);
 		}
 		
 		// Print the nets
@@ -318,8 +328,9 @@ public class DesignAnalyzer {
 	/**
 	 * Print out a formatted representation of a cell. Placement is not printed for macro cells.
 	 * @param c The internal cell to be pretty printed.
+	 * @param cellBelPinMappings Controls whether cell pin to bel pin mappings are printed
 	 */
-	public static void prettyPrintCell(Cell c)
+	public static void prettyPrintCell(Cell c, boolean cellBelPinMappings)
 	{
 		if (c.isMacro()) {
 			System.out.println("*Macro (Parent) Cell*");
@@ -347,6 +358,21 @@ public class DesignAnalyzer {
 			System.out.println("  Pin: " + cp.getName() + " " + 
 					cp.getDirection() + " " + 
 					(cp.getNet()!=null?cp.getNet().getName():"<unconnected>"));
+			if (!c.isMacro()) {
+				if (cellBelPinMappings) {
+					List<BelPin> bps = cp.getPossibleBelPins();
+					if (bps != null) {
+						for (BelPin bp2 : bps) {
+							System.out.println("    Candidate BelPin Mapping = " + bp2);
+						}
+					}
+					if (c.isPlaced()) {
+						for (BelPin bp1 : cp.getMappedBelPins()) {
+							System.out.println("      Actual BelPinMapping = " + bp1);
+						}
+					}
+				}
+			}
 		}
 		// Print the properties for a given cell if there are any
 		// For now, properties are strings. 
