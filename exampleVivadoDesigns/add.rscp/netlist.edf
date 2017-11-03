@@ -4,7 +4,7 @@
   (keywordmap (keywordlevel 0))
 (status
  (written
-  (timeStamp 2017 08 02 21 09 06)
+  (timeStamp 2017 11 02 19 19 51)
   (program "Vivado" (version "2016.2"))
   (comment "Built on 'Thu Jun  2 16:32:40 MDT 2016'")
   (comment "Built by 'xbuild'")
@@ -13,20 +13,6 @@
   (Library hdi_primitives
     (edifLevel 0)
     (technology (numberDefinition ))
-   (cell GND (celltype GENERIC)
-     (view netlist (viewtype NETLIST)
-       (interface 
-        (port G (direction OUTPUT))
-       )
-     )
-   )
-   (cell VCC (celltype GENERIC)
-     (view netlist (viewtype NETLIST)
-       (interface 
-        (port P (direction OUTPUT))
-       )
-     )
-   )
    (cell IBUF (celltype GENERIC)
      (view netlist (viewtype NETLIST)
        (interface 
@@ -53,15 +39,6 @@
        )
      )
    )
-   (cell OBUFT (celltype GENERIC)
-     (view netlist (viewtype NETLIST)
-       (interface 
-        (port O (direction OUTPUT))
-        (port I (direction INPUT))
-        (port T (direction INPUT))
-       )
-     )
-   )
    (cell INV (celltype GENERIC)
      (view netlist (viewtype NETLIST)
        (interface
@@ -84,25 +61,18 @@
         (port s (direction OUTPUT))
        )
        (contents
-         (instance GND (viewref netlist (cellref GND (libraryref hdi_primitives))))
-         (instance VCC (viewref netlist (cellref VCC (libraryref hdi_primitives))))
          (instance a_IBUF_inst (viewref netlist (cellref IBUF (libraryref hdi_primitives))))
          (instance b_IBUF_inst (viewref netlist (cellref IBUF (libraryref hdi_primitives))))
          (instance cin_IBUF_inst (viewref netlist (cellref IBUF (libraryref hdi_primitives))))
          (instance cout_OBUF_inst (viewref netlist (cellref OBUF (libraryref hdi_primitives))))
          (instance cout_OBUF_inst_i_1 (viewref netlist (cellref LUT3 (libraryref hdi_primitives)))
            (property INIT (string "8'hE8"))
+           (property SOFT_HLUTNM (string "soft_lutpair0"))
          )
-         (instance s_OBUF_inst (viewref netlist (cellref OBUFT (libraryref hdi_primitives))))
-         (net (rename &_const0_ "<const0>") (joined
-          (portref G (instanceref GND))
-          (portref I (instanceref s_OBUF_inst))
-          )
-         )
-         (net (rename &_const1_ "<const1>") (joined
-          (portref P (instanceref VCC))
-          (portref T (instanceref s_OBUF_inst))
-          )
+         (instance s_OBUF_inst (viewref netlist (cellref OBUF (libraryref hdi_primitives))))
+         (instance s_OBUF_inst_i_1 (viewref netlist (cellref LUT3 (libraryref hdi_primitives)))
+           (property INIT (string "8'h96"))
+           (property SOFT_HLUTNM (string "soft_lutpair0"))
          )
          (net a (joined
           (portref I (instanceref a_IBUF_inst))
@@ -110,6 +80,7 @@
           )
          )
          (net a_IBUF (joined
+          (portref I1 (instanceref s_OBUF_inst_i_1))
           (portref I2 (instanceref cout_OBUF_inst_i_1))
           (portref O (instanceref a_IBUF_inst))
           )
@@ -121,6 +92,7 @@
          )
          (net b_IBUF (joined
           (portref I1 (instanceref cout_OBUF_inst_i_1))
+          (portref I2 (instanceref s_OBUF_inst_i_1))
           (portref O (instanceref b_IBUF_inst))
           )
          )
@@ -131,6 +103,7 @@
          )
          (net cin_IBUF (joined
           (portref I0 (instanceref cout_OBUF_inst_i_1))
+          (portref I0 (instanceref s_OBUF_inst_i_1))
           (portref O (instanceref cin_IBUF_inst))
           )
          )
@@ -149,9 +122,14 @@
           (portref s)
           )
          )
+         (net s_OBUF (joined
+          (portref I (instanceref s_OBUF_inst))
+          (portref O (instanceref s_OBUF_inst_i_1))
+          )
+         )
        )
 
-           (property ECO_CHECKSUM (string "dc5e464b"))
+           (property ECO_CHECKSUM (string "67f89a3e"))
      )
    )
   )
