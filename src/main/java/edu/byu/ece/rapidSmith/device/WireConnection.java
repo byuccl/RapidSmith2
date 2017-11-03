@@ -59,13 +59,13 @@ public class WireConnection implements Serializable, Comparable<WireConnection>{
 	}
 
 	/**
-	 * @param wire the wire to set
+	 * @param wire the destination wire to set
 	 */
 	public void setWire(int wire) {
 		this.wire = wire;
 	}
 	/**
-	 * @return the wire
+	 * @return the destination wire
 	 */
 	public int getWire() {
 		return wire;
