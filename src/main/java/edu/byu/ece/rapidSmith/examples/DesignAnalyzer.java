@@ -359,14 +359,15 @@ public class DesignAnalyzer {
 					cp.getDirection() + " " + 
 					(cp.getNet()!=null?cp.getNet().getName():"<unconnected>"));
 			if (!c.isMacro()) {
-				if (cellBelPinMappings) {
-					List<BelPin> bps = cp.getPossibleBelPins();
-					if (bps != null) {
-						for (BelPin bp2 : bps) {
-							System.out.println("    Candidate BelPin Mapping = " + bp2);
+				if (c.isPlaced()) {
+					if (cellBelPinMappings) {
+						List<BelPin> bps = cp.getPossibleBelPins();
+						if (bps != null) {
+							for (BelPin bp2 : bps) {
+								System.out.println("    Candidate BelPin Mapping = " + bp2);
+							}
 						}
-					}
-					if (c.isPlaced()) {
+
 						for (BelPin bp1 : cp.getMappedBelPins()) {
 							System.out.println("      Actual BelPinMapping = " + bp1);
 						}
