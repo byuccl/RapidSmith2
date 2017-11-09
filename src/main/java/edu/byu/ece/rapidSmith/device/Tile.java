@@ -398,9 +398,10 @@ public class Tile implements Serializable {
 	}
 	
 	/**
-	 * 
-	 * @param direction
-	 * @return
+	 * Returns the neighboring tile in the specified direction of this tile.
+	 *
+	 * @param direction the direction to search
+	 * @return the adjacent tile
 	 */
 	public Tile getAdjacentTile(TileDirection direction) {
 		switch(direction) 
