@@ -230,11 +230,6 @@ public class Cell {
 		return bel != null;
 	}
 
-	public final List<Cell> getSubcells() {
-		// TODO get the subcells once we have support
-		return Collections.emptyList();
-	}
-
 	/**
 	 * Returns the BEL this cell is placed at in the design.
 	 *
