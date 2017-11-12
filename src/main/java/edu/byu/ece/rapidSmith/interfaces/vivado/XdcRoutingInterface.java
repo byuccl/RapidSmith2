@@ -254,7 +254,6 @@ public class XdcRoutingInterface {
 	 * where space separated elements are different elements in the array
 	 */
 	private void processIntrasiteRoute(String[] toks) {
-		
 		CellNet net = tryGetCellNet(toks[1]);		
 		
 		if (net.getSourcePin() == null) {
@@ -263,6 +262,11 @@ public class XdcRoutingInterface {
 		
 		CellPin sourceCellPin = tryGetNetSource(net);
 		BelPin sourceBelPin = tryGetMappedBelPin(sourceCellPin);
+		
+		// There may be no source Bel Pin if the design was implemented out-of-context.
+		if (sourceBelPin == null) {
+			return;
+		}
 				
 		Site site = sourceBelPin.getBel().getSite();
 		createIntrasiteRoute(net, sourceBelPin, true, design.getUsedSitePipsAtSite(site));
@@ -1060,7 +1064,11 @@ public class XdcRoutingInterface {
 		
 		int mapCount = cellPin.getMappedBelPinCount(); 
 		
-		if (mapCount != 1) {
+		// Some out of context designs will not have cells, so there will be no mapped BelPin.
+		if (mapCount != 1 && implementationMode == ImplementationMode.OUT_OF_CONTEXT) {
+			return null;
+		}
+		else if (mapCount != 1) {
 			throw new ParseException(String.format("Cell pin source \"%s\" should map to exactly one BelPin, but maps to %d\n"
 												+ "On %d of %s", cellPin.getName(), mapCount, currentLineNumber, currentFile));
 		}
