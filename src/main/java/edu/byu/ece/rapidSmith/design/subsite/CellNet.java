@@ -78,6 +78,15 @@ public class CellNet implements Serializable {
 	private Map<BelPin, RouteTree> belPinToSinkRTMap;
 	/** Maps a connecting SitePin of the net, to the RouteTree connected to the SitePin*/
 	private Map<SitePin, RouteTree> sitePinToRTMap;
+	
+	//speed up isClkNet call
+	private boolean isClkNet;
+	private boolean clkNetStatusSet = false;
+	
+	//speed up source pin call
+	private boolean isMultiSourcedNet;
+	private boolean multiSourceStatusSet = false;
+	private Set<CellPin> sourcePins;
 
 	/**
 	 * Creates a new net with the given name.
@@ -97,6 +106,11 @@ public class CellNet implements Serializable {
 	private void init() {
 		this.pins = new HashSet<>();
 		this.isInternal = false;
+		this.isClkNet = false;
+		this.clkNetStatusSet = false;
+		this.isMultiSourcedNet = false;
+		this.multiSourceStatusSet = false;
+		sourcePins = new HashSet<CellPin>();
 	}
 
 	/**
@@ -218,9 +232,10 @@ public class CellNet implements Serializable {
 	 * @return all of the pins that source the net
 	 */
 	public List<CellPin> getAllSourcePins() {
-		return getPins().stream()
-				.filter(CellPin::isOutpin)
-				.collect(Collectors.toList());
+		return sourcePins.stream().collect(Collectors.toList());
+		//return getPins().stream()
+		//		.filter(CellPin::isOutpin)
+		//		.collect(Collectors.toList());
 	}
 
 	/**
@@ -230,7 +245,13 @@ public class CellNet implements Serializable {
 	 * @return true if this net contains multiple source pins.
 	 */
 	public boolean isMultiSourced() {
-		return getAllSourcePins().size() > 1;
+		
+		if(!this.multiSourceStatusSet){
+			this.isMultiSourcedNet = getAllSourcePins().size() > 1;
+			this.multiSourceStatusSet = true;
+		}
+		
+		return this.isMultiSourcedNet;
 	}
 
 	/**
@@ -271,6 +292,10 @@ public class CellNet implements Serializable {
 		
 		pins.add(pin);
 		pin.setNet(this);
+		
+		if(pin.isOutpin()){
+			sourcePins.add(pin);
+		}
 
 		if (sourcePin == null && pin.isOutpin()) {
 			sourcePin = pin;
@@ -362,6 +387,10 @@ public class CellNet implements Serializable {
 		if (!used)
 			throw new Exceptions.DesignAssemblyException("Pin not found in net");
 
+		if(pin.isOutpin()){
+			sourcePins.remove(pin);
+		}
+		
 		if (sourcePin == pin) {
 			sourcePin = null;
 			List<CellPin> sourcePins = getAllSourcePins();
@@ -398,13 +427,19 @@ public class CellNet implements Serializable {
 	 */
 	public boolean isClkNet() {
 		
+		if(this.clkNetStatusSet){
+			return this.isClkNet;
+		}
+		
 		for (CellPin p : this.pins) {
 			if (p.getType() == CellPinType.CLOCK) {
-				return true;
+				this.isClkNet = true;
 			}
 		}
 		
-		return false;
+		this.clkNetStatusSet = true;
+		
+		return this.isClkNet;
 	}
 	
 	/**
@@ -475,7 +510,7 @@ public class CellNet implements Serializable {
 	/* **********************************
 	 * 	    Physical Route Functions
 	 * **********************************/
-		
+	
 	/**
 	 * Adds a {@link SitePin} source to the net. <b>NOTE</b>: Only two site pins can be marked
 	 * as sources for a net. An exception will be thrown if you try to add more.
@@ -484,9 +519,9 @@ public class CellNet implements Serializable {
 	 */
 	public void addSourceSitePin(SitePin sitePin) {
 		if (this.sourceSitePinList == null) {
-			this.sourceSitePinList = new ArrayList<>(2);
-		}
-		
+			this.sourceSitePinList = new ArrayList<SitePin>(2);
+	}
+	
 		// Throw an exception if the net already has two source pins
 		if (this.sourceSitePinList.size() >= 2) {
 			throw new AssertionError("CellNets should have at most two source site pins, not more. If you think this is incorrect, create a new issue "
@@ -505,6 +540,10 @@ public class CellNet implements Serializable {
 	 */
 	public boolean removeSourceSitePin(SitePin sitePin) {
 		return this.sourceSitePinList == null ? false : this.sourceSitePinList.remove(sitePin); 
+	}
+	
+	public void removeAllSourceSitePins(){
+		this.sourceSitePinList = null;
 	}
 	
 	/**
@@ -941,6 +980,11 @@ public class CellNet implements Serializable {
 	public RouteStatus computeRouteStatus() {
 		int subtractCount = (isStaticNet() || isSourcePinMapped()) ? 1 : 0;
 		
+
+		if(sourcePin == null){
+			routeStatus = RouteStatus.FULLY_ROUTED;
+			return routeStatus;
+		}
 		// A net is considered unrouted if there are no routed sinks, and no route trees connected to it
 		if (routeTreeCount() == 0 && getRoutedSinks().isEmpty()) {
 			routeStatus = RouteStatus.UNROUTED;

@@ -31,6 +31,7 @@ import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelId;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.PinDirection;
+import edu.byu.ece.rapidSmith.device.SitePin;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
 /**
@@ -186,6 +187,22 @@ public abstract class CellPin implements Serializable {
 		
 		if (belPinMappingSet == null) {
 			belPinMappingSet = new HashSet<>();
+		}
+		
+		//User added code
+		if(this.getNet() != null){
+			if(this.getNet().getAllSourcePins().size() == 1){ //if this is the only source pin
+				if(this.getNet().getSourcePin().equals(this)){ //if this is the net's source pin
+					//remap the SitePin
+					if(this.getNet().getSourceSitePin() != null){ //if there existed source site pin
+						if(!this.getCell().getSite().equals(this.getNet().getSourceSitePin().getSite())){ //and the site has changed (e.g. this cell is on a new site)
+							SitePin toAdd = this.getCell().getSite().getSitePin(this.getNet().getSourceSitePin().getName());
+							this.getNet().removeAllSourceSitePins(); //set to "same" site pin on the new site
+							this.getNet().addSourceSitePin(toAdd);
+						}
+					}
+				}
+			}
 		}
 		
 		return belPinMappingSet.add(pin);

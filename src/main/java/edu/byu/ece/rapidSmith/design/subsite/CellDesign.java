@@ -64,6 +64,8 @@ public class CellDesign extends AbstractDesign {
 	private List<XdcConstraint> vivadoConstraints;
 	/** For design imported from Vivado, this fields contains how Vivado implemented the design (regular or out-of-context)*/
 	private ImplementationMode mode;
+	/** Map of used PIPs to their Input Values in a Site **/
+	private Map<Site, Map<String, String>> pipInValues;
 	
 	/**
 	 * Constructor which initializes all member data structures. Sets name and
@@ -95,6 +97,7 @@ public class CellDesign extends AbstractDesign {
 		netMap = new HashMap<>();
 		usedSitePipsMap = new HashMap<>();
 		mode = ImplementationMode.REGULAR;
+		pipInValues = new HashMap<>();
 	}
 
 	/**
@@ -716,7 +719,7 @@ public class CellDesign extends AbstractDesign {
 	public void setUsedSitePipsAtSite(Site ps, Set<Integer> usedWires) {
 		this.usedSitePipsMap.put(ps, usedWires);
 	}
-
+	
 	/**
 	 * Returns the used wires (as enumerations), of the specified {@link Site}
 	 * 
@@ -724,6 +727,31 @@ public class CellDesign extends AbstractDesign {
 	 */
 	public  Set<Integer> getUsedSitePipsAtSite(Site ps) {
 		return this.usedSitePipsMap.getOrDefault(ps, Collections.emptySet());
+	}
+	
+	/**
+	 * Add a mapping of used PIPs to their input route in a site. 
+	 * @param ps {@link Site} to route
+	 * @param pipInVals Map of used PIPs to its input wire
+	 */
+	public void addPIPInputValsAtSite(Site ps, Map<String, String> pipInVals){
+		this.pipInValues.put(ps, pipInVals);
+	}
+	
+	/**
+	 * Returns a mapping of used PIPs to their input route
+	 * @param ps {@link Site} object
+	 */
+	public Map<String, String> getPIPInputValsAtSite(Site ps){
+		return this.pipInValues.getOrDefault(ps, null);
+	}
+	
+	public void setPipInValues(Map<Site, Map<String, String>> newVals){
+		this.pipInValues = newVals;
+	}
+	
+	public Map<Site, Map<String, String>> getPipInValues(){
+		return this.pipInValues;
 	}
 
 	/**

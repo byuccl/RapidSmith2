@@ -69,6 +69,9 @@ public final class RouteTree implements
 
 	@Deprecated
 	public void setCost(int cost) {
+		if(cost < 0){
+			cost = Integer.MAX_VALUE;
+		}
 		this.cost = cost;
 	}
 
@@ -285,5 +288,15 @@ public final class RouteTree implements
 	@Override
 	public int hashCode() {
 		return Objects.hash(wire);
+	}
+	
+	public String toRouteString(){
+		StringBuilder toReturn = new StringBuilder();
+		toReturn.append(this.getWire().getFullWireName()+"\n");
+		int iterationNum = 0;
+		for(RouteTree sink : this.getSinkTrees()){
+			toReturn.append(sink.toRouteString());
+		}
+		return toReturn.toString();
 	}
 }

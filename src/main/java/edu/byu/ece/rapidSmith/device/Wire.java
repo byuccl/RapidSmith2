@@ -40,6 +40,8 @@ public interface Wire extends Serializable {
 	 * Return connection linking this wire to other wires in the same hierarchy.
 	 */
 	Collection<Connection> getWireConnections();
+	
+	WireConnection[] getWireConnectionsArray();
 
 	/**
 	 * Returns connection linking this wire to another wire in a different
@@ -76,6 +78,8 @@ public interface Wire extends Serializable {
 	 * Returns connection linking this wire to its drivers in the same hierarchy.
 	 */
 	Collection<Connection> getReverseWireConnections();
+	
+	WireConnection[] getReverseWireConnectionsArray();
 
 	/**
 	 * Returns the connected site pins for each possible type of the connected site.

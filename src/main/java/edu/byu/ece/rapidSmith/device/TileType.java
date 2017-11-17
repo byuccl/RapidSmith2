@@ -80,6 +80,10 @@ public final class TileType implements Comparable<TileType>, Serializable {
 	public String toString() {
 		return family.name() + "." + name;
 	}
+	
+	public String getName() {
+		return name;
+	}
 
 	/**
 	 * Returns the constant of this type with the specified name. The string must match
