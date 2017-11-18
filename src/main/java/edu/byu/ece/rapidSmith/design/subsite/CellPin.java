@@ -189,16 +189,22 @@ public abstract class CellPin implements Serializable {
 			belPinMappingSet = new HashSet<>();
 		}
 		
-		//User added code
-		if(this.getNet() != null){
-			if(this.getNet().getAllSourcePins().size() == 1){ //if this is the only source pin
-				if(this.getNet().getSourcePin().equals(this)){ //if this is the net's source pin
-					//remap the SitePin
-					if(this.getNet().getSourceSitePin() != null){ //if there existed source site pin
-						if(!this.getCell().getSite().equals(this.getNet().getSourceSitePin().getSite())){ //and the site has changed (e.g. this cell is on a new site)
-							SitePin toAdd = this.getCell().getSite().getSitePin(this.getNet().getSourceSitePin().getName());
-							this.getNet().removeAllSourceSitePins(); //set to "same" site pin on the new site
-							this.getNet().addSourceSitePin(toAdd);
+		// Workaround to make the source site pin update when unplacing and unrouting a design:
+		CellNet net = this.getNet();
+		if(net != null){
+			// If this is the only source pin
+			if(net.getAllSourcePins().size() == 1){ 
+				// If this is the net's source pin
+				if(net.getSourcePin().equals(this)){ 
+					// If there existed source site pin
+					SitePin sourceSitePin = net.getSourceSitePin();
+					if(sourceSitePin != null){ 
+						// And if the site has changed (e.g. this cell is on a new site)
+						if(!this.getCell().getSite().equals(sourceSitePin.getSite())){
+							// Remap the source SitePin
+							SitePin toAdd = this.getCell().getSite().getSitePin(sourceSitePin.getName());
+							net.removeAllSourceSitePins(); // Set to "same" site pin on the new site
+							net.addSourceSitePin(toAdd);
 						}
 					}
 				}

@@ -719,7 +719,7 @@ public class CellDesign extends AbstractDesign {
 	public void setUsedSitePipsAtSite(Site ps, Set<Integer> usedWires) {
 		this.usedSitePipsMap.put(ps, usedWires);
 	}
-	
+
 	/**
 	 * Returns the used wires (as enumerations), of the specified {@link Site}
 	 * 

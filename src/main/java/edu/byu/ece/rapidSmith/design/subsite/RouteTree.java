@@ -280,8 +280,6 @@ public final class RouteTree implements
 		}
 	}
 
-	// Uses identity equals
-
 	/**
 	 * Hash is based on the wire of this node.
 	 */

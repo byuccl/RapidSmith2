@@ -81,6 +81,10 @@ public final class TileType implements Comparable<TileType>, Serializable {
 		return family.name() + "." + name;
 	}
 	
+	/**
+	 * Returns the name of the tile type.
+	 * @return the name of the tile type.
+	 */
 	public String getName() {
 		return name;
 	}

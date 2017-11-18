@@ -490,11 +490,11 @@ public class CellNet implements Serializable {
 	public boolean isStaticNet() {
 		return type == NetType.VCC || type == NetType.GND;
 	}
-	
+
 	/* **********************************
 	 * 	    Physical Route Functions
 	 * **********************************/
-	
+
 	/**
 	 * Adds a {@link SitePin} source to the net. <b>NOTE</b>: Only two site pins can be marked
 	 * as sources for a net. An exception will be thrown if you try to add more.
@@ -526,6 +526,9 @@ public class CellNet implements Serializable {
 		return this.sourceSitePinList == null ? false : this.sourceSitePinList.remove(sitePin); 
 	}
 	
+	/**
+	 * Removes all source site pins from the net. 
+	 */
 	public void removeAllSourceSitePins(){
 		this.sourceSitePinList = null;
 	}
