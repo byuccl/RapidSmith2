@@ -20,8 +20,6 @@
 package device;
 
 import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,7 +39,6 @@ import edu.byu.ece.rapidSmith.device.creation.DeviceGenerator;
 /**
  * Tests a variety of package pin methods for a device
  */
-@RunWith(JUnitPlatform.class)
 public class PackagePinTests {
 
 	private static final Path resourceDir = RSEnvironment.defaultEnv()

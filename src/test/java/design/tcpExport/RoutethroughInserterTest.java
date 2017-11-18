@@ -22,8 +22,6 @@ package design.tcpExport;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.NetType;
@@ -51,7 +49,6 @@ import java.util.Queue;
  * Tests the {@link LutRoutethroughInserter} to verify that LUT routethroughs
  * are correctly created on design export. 
  */
-@RunWith(JUnitPlatform.class)
 public class RoutethroughInserterTest {
 	
 	// Objects needed for the test 

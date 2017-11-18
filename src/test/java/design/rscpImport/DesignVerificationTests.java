@@ -19,16 +19,13 @@ package design.rscpImport;
  * also get a copy of the license at <http://www.gnu.org/licenses/>.
  */
 
-import org.junit.runner.RunWith;
 import org.junit.jupiter.api.Tag;
-import org.junit.platform.runner.JUnitPlatform;
 
 /**
  * This class holds RSCP import tests.
  */
 public class DesignVerificationTests {
 	
-	@RunWith(JUnitPlatform.class)
 	@Tag("slow")
 	public static class SuperCounterTest extends DesignVerificationTest {
 		@Override
@@ -42,7 +39,6 @@ public class DesignVerificationTests {
 		}
 	}
 	
-	@RunWith(JUnitPlatform.class)
 	@Tag("slow")
 	public static class count16Test extends DesignVerificationTest {
 		@Override
@@ -56,7 +52,6 @@ public class DesignVerificationTests {
 		}
 	}
 	
-	@RunWith(JUnitPlatform.class)
 	@Tag("slow")
 	public static class cordicTest extends DesignVerificationTest {
 		@Override
