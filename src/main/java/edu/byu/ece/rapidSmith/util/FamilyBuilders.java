@@ -134,7 +134,6 @@ public class FamilyBuilders {
 
 		addTilesClass(clazz);
 		addSitesClass(clazz);
-		BlockStmt blockStmt = clazz.addStaticInitializer();
 
 		BlockStmt userStatements = clazz.addStaticInitializer();
 		Node staticBlock = userStatements.getParentNode().get();

@@ -27,7 +27,6 @@ import java.util.List;
  *  XDLRC parse element, the parser will call the associated listener method of
  *  each registered listener.
  */
-@SuppressWarnings("UnusedParameters")
 public abstract class XDLRCParserListener {
 	protected void enterXdlResourceReport(List<String> tokens) { }
 	protected void exitXdlResourceReport(List<String> tokens) { }

@@ -37,7 +37,6 @@ public class WidgetMaker {
 		treeWidget.setHeaderLabel(header);
 		
 		HashMap<FamilyType, QTreeWidgetItem> familyItems = new HashMap<>();
-		HashMap<String, QTreeWidgetItem> subFamilyItems = new HashMap<>();
 
 		RSEnvironment env = RSEnvironment.defaultEnv();
 		for(String partName : env.getAvailableParts()){
