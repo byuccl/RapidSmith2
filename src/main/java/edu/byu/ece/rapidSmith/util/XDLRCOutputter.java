@@ -795,7 +795,7 @@ public class XDLRCOutputter {
 		@Override
 		public int compare(Connection o1, Connection o2) {
 			return Comparator.comparing((Connection o) -> o.getSinkWire().getTile().getName())
-					.thenComparing(o -> o.getSinkWire().getWireName())
+					.thenComparing(o -> o.getSinkWire().getName())
 					.compare(o1, o2);
 		}
 	}
