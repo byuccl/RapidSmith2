@@ -409,7 +409,7 @@ public class XDLWriter {
 		netPips.sort(new PIPComparator());
 		for (PIP pip : netPips)
 			out.append(ind + "pip " + pip.getTile().getName() + " " +
-					pip.getStartWire().getWireName() + " -> " + pip.getEndWire().getWireName() + " ," + nl);
+					pip.getStartWire().getName() + " -> " + pip.getEndWire().getName() + " ," + nl);
 	}
 
 	// Comparators for XDL ordering
@@ -429,9 +429,9 @@ public class XDLWriter {
 		public int compare(PIP t1, PIP t2) {
 			int cmp = t1.getTile().getName().compareTo(t2.getTile().getName());
 			if (cmp != 0) return cmp;
-			cmp = t1.getStartWire().getWireName().compareTo(t2.getStartWire().getWireName());
+			cmp = t1.getStartWire().getName().compareTo(t2.getStartWire().getName());
 			if (cmp != 0) return cmp;
-			return t1.getEndWire().getWireName().compareTo(t2.getEndWire().getWireName());
+			return t1.getEndWire().getName().compareTo(t2.getEndWire().getName());
 		}
 	}
 }

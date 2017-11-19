@@ -58,7 +58,7 @@ public final class RapidSmithDebug {
 	 */
 	private static void printRouteTree(RouteTree rt, int level) {
 		Wire w = rt.getWire();
-		System.out.print(w.getTile() + "/" + w.getWireName());
+		System.out.print(w.getTile() + "/" + w.getName());
 		
 		if (w.getConnectedPin() != null) {
 			System.out.print(" (SitePin)");
@@ -114,7 +114,7 @@ public final class RapidSmithDebug {
 
 			for (RouteTree routeTree : rt.getFirstSource()) {
 				Wire w = routeTree.getWire();
-				cmd += w.getTile().getName() + "/" + w.getWireName() + " ";
+				cmd += w.getTile().getName() + "/" + w.getName() + " ";
 			}
 		}
 		cmd += "}]";

@@ -103,20 +103,20 @@ public class DeviceDiffer {
 //		Map<String, PIPRouteThrough> unseenRouteThroughs =
 //				new HashMap<>(deviceTest.getRouteThroughMap().size());
 //		for (WireConnection wc : deviceTest.getRouteThroughMap().keySet()) {
-//			unseenRouteThroughs.put(weTest.getWireName(wc.getWire()),
+//			unseenRouteThroughs.put(weTest.getName(wc.getWire()),
 //					deviceTest.getRouteThrough(wc));
 //		}
 //		for (WireConnection goldWc : deviceGold.getRouteThroughMap().keySet()) {
 //			PIPRouteThrough testRT = unseenRouteThroughs.remove(
-//					weGold.getWireName(goldWc.getWire()));
+//					weGold.getName(goldWc.getWire()));
 //			if (testRT == null) {
-//				differences.add("routethrough", weGold.getWireName(goldWc.getWire()),
+//				differences.add("routethrough", weGold.getName(goldWc.getWire()),
 //						"none");
 //				continue;
 //			}
 //
 //			if (deviceGold.getRouteThrough(goldWc).getType() != testRT.getType()) {
-//				differences.down("routethrough", weGold.getWireName(goldWc.getWire()));
+//				differences.down("routethrough", weGold.getName(goldWc.getWire()));
 //				differences.add("type", "" + deviceGold.getRouteThrough(goldWc).getType(),
 //						"" + testRT.getType());
 //				differences.up();
@@ -221,12 +221,12 @@ public class DeviceDiffer {
 		Set<String> sources = new HashSet<>();
 		if (test.getSources() != null) {
 			for (Wire source : test.getSources()) {
-				sources.add(source.getWireName());
+				sources.add(source.getName());
 			}
 		}
 		if (gold.getSources() != null) {
 			for (Wire source : gold.getSources()) {
-				String sourceName = source.getWireName();
+				String sourceName = source.getName();
 				if (!sources.remove(sourceName)) {
 					differences.add("source", sourceName, "none");
 				}
@@ -241,12 +241,12 @@ public class DeviceDiffer {
 		Set<String> sinks = new HashSet<>();
 		if (test.getSinks() != null) {
 			sinks.addAll(test.getSinks().stream()
-					.map(Wire::getWireName)
+					.map(Wire::getName)
 					.collect(Collectors.toList()));
 		}
 		if (gold.getSinks() != null) {
 			for (Wire sink : gold.getSinks()) {
-				String sinkName = sink.getWireName();
+				String sinkName = sink.getName();
 				if (!sinks.remove(sinkName)) {
 					differences.add("sinkPin", sinkName, "none");
 				}
@@ -274,8 +274,8 @@ public class DeviceDiffer {
 //			if (!unseenPins.remove(pinName)) {
 //				differences.add("pin", pinName, "none");
 //			} else {
-//				String goldPinWireName = weGold.getWireName(gold.getPins().get(pinName));
-//				String testPinWireName = weTest.getWireName(test.getPins().get(pinName));
+//				String goldPinWireName = weGold.getName(gold.getPins().get(pinName));
+//				String testPinWireName = weTest.getName(test.getPins().get(pinName));
 //				if (!goldPinWireName.equals(testPinWireName)) {
 //					differences.down("pin", pinName);
 //					differences.add("pinWire", goldPinWireName, testPinWireName);

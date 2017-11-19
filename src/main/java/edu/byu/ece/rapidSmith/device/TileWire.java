@@ -58,13 +58,13 @@ public class TileWire implements Wire, Serializable {
 	}
 
 	@Override
-	public String getWireName() {
+	public String getName() {
 		return tile.getDevice().getWireEnumerator().getWireName(wire);
 	}
 
 	@Override
-	public String getFullWireName() {
-		return getTile().getName() + "/" + getWireName();
+	public String getFullName() {
+		return getTile().getName() + "/" + getName();
 	}
 	
 	/**

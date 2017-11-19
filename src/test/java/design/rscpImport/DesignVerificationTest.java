@@ -336,7 +336,7 @@ public abstract class DesignVerificationTest {
 			RouteTree next = rtIterator.next();
 			Wire nextWire = next.getWire();
 			
-			String fullWireName = nextWire.getTile().getName() + "/" + nextWire.getWireName();
+			String fullWireName = nextWire.getTile().getName() + "/" + nextWire.getName();
 			
 			assertTrue(wiresInNet.contains(fullWireName), 
 					String.format("Routing import failure: \nWire \"%s\" does not exist in net \"%s\"\n", fullWireName, net.getName()));

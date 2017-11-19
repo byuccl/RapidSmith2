@@ -32,7 +32,6 @@ import edu.byu.ece.rapidSmith.design.subsite.CellPin;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.PIP;
 import edu.byu.ece.rapidSmith.device.BelId;
 import edu.byu.ece.rapidSmith.device.SitePin;
 import org.jdom2.JDOMException;
@@ -222,17 +221,17 @@ public class DesignAnalyzer {
 		
 		// Always print first wire at the head of a net's RouteTree. The format is "tileName/wireName".
 		if (head)
-			s = "<head>" + rt.getWire().getFullWireName();
+			s = "<head>" + rt.getWire().getFullName();
 		
 
 		// The connection member of the RouteTree object describes the connection between this RouteTree and its predecessor.
 		// The connection may be a programmable connection (PIP or route-through) or it may be a non-programmable connection.  
 		// Look upstream and, if it was a programmable connection, include it.
 		else if (rt.getConnection().isPip() || rt.getConnection().isRouteThrough())
-			s = " " + rt.getWire().getFullWireName();
+			s = " " + rt.getWire().getFullName();
 		// It is a non-programmable connection - append it with marker.
 		else  
-			s += "=" + rt.getWire().getWireName();
+			s += "=" + rt.getWire().getName();
 
 		// Now, let's look downstream and see where to go and what to print.
 		// If it is a leaf cell, it either: 

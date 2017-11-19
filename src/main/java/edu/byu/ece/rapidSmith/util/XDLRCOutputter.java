@@ -227,7 +227,7 @@ public class XDLRCOutputter {
 
 		if (writeWires) {
 			List<String> wireNames = tile.getWires().stream()
-					.map(Wire::getWireName)
+					.map(Wire::getName)
 					.collect(Collectors.toCollection(ArrayList<String>::new));
 			if (forceOrdering)
 				Collections.sort(wireNames);
@@ -254,7 +254,7 @@ public class XDLRCOutputter {
 						Wire sinkWire = c.getSinkWire();
 						out.append(ind + ind + ind + "(conn ");
 						out.append(sinkWire.getTile() + " ");
-						out.append(sinkWire.getWireName() + ")" + nl);
+						out.append(sinkWire.getName() + ")" + nl);
 					}
 					out.append(ind + ind + ")" + nl);
 				}
@@ -277,7 +277,7 @@ public class XDLRCOutputter {
 					out.append(tile.getName() + " ");
 					out.append(wireName + " ");
 					out.append(isBidirectionalPip(sourceWire, c.getSinkWire()) ? "=- " : "-> ");
-					out.append(c.getSinkWire().getWireName());
+					out.append(c.getSinkWire().getName());
 
 					PIPRouteThrough rt = tile.getDevice().getRouteThrough(sourceWire, c.getSinkWire());
 					if (rt != null) {

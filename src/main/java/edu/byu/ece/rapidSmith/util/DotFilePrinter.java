@@ -308,7 +308,7 @@ public class DotFilePrinter {
 		while (!rtQueue.isEmpty()) {
 			RouteTree tmp = rtQueue.poll();
 			
-			builder.append(String.format(" %d [label=\"%s\"]\n", nodeIds.get(tmp), tmp.getWire().getFullWireName()));
+			builder.append(String.format(" %d [label=\"%s\"]\n", nodeIds.get(tmp), tmp.getWire().getFullName()));
 			
 			// only print edges if the route tree has any
 			if (!tmp.isLeaf()) {

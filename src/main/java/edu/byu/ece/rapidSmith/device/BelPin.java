@@ -127,7 +127,7 @@ public final class BelPin implements Serializable {
 		Site site = bel.getSite();
 		SiteType siteType = getBel().getId().getSiteType();
 		return template.getSitePins().stream()
-				.map(sitePinName -> site.getSitePin(siteType, sitePinName))
+				.map(sitePinName -> site.getPin(siteType, sitePinName))
 				.collect(Collectors.toSet());
 	}
 

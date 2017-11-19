@@ -346,7 +346,7 @@ public class XdcRoutingInterface {
 		
 		// Using the pip map, recreate each route as a RouteTree object
 		List<SitePin> pinsToRemove = new ArrayList<SitePin>(); 
-		//System.out.println(net.getSourceSitePins().size() + " " + net.getSourceSitePin().getName() + " " + net.getSourceSitePin().getExternalWire().getFullWireName());
+		//System.out.println(net.getSourceSitePins().size() + " " + net.getSourceSitePin().getName() + " " + net.getSourceSitePin().getExternalWire().getFullName());
 		for (SitePin sitePin : net.getSourceSitePins()) {
 			RouteTree netRouteTree = recreateRoutingNetwork2(net, sitePin.getExternalWire(), pipMap);
 			
@@ -435,7 +435,7 @@ public class XdcRoutingInterface {
 				}
 				
 				if (conn.isPip()) { 
-					if (pipMap.getOrDefault(sourceWire.getFullWireName(), emptySet).contains(sinkWire.getFullWireName())) {
+					if (pipMap.getOrDefault(sourceWire.getFullName(), emptySet).contains(sinkWire.getFullName())) {
 						this.pipUsedInRoute = true;
 						connectionCount++;
 						RouteTree sinkTree = routeTree.addConnection(conn);
@@ -604,7 +604,7 @@ public class XdcRoutingInterface {
 				continue;
 			}
 			
-			assert (connList.size() == 1) : "Site Pip wires should have exactly one connection " + sw.getWireName() + " " + connList.size() ;
+			assert (connList.size() == 1) : "Site Pip wires should have exactly one connection " + sw.getName() + " " + connList.size() ;
 			
 			Connection conn = connList.iterator().next();
 			
@@ -979,7 +979,7 @@ public class XdcRoutingInterface {
 	 */
 	private SitePin tryGetSitePin(Site site, String pinName) {
 		
-		SitePin pin = site.getSitePin(pinName);
+		SitePin pin = site.getPin(pinName);
 		
 		if (pin == null) {
 			throw new ParseException(String.format("SitePin: \"%s/%s\" does not exist in the current device\n"
@@ -1149,7 +1149,7 @@ public class XdcRoutingInterface {
 			
 		while ( true ) {
 			Tile t = currentRoute.getWire().getTile();
-			routeString = routeString.concat(t.getName() + "/" + currentRoute.getWire().getWireName() + " ");
+			routeString = routeString.concat(t.getName() + "/" + currentRoute.getWire().getName() + " ");
 						
 			// children may be changed in the following loop, so make a copy
 			ArrayList<RouteTree> children = new ArrayList<RouteTree>(currentRoute.getSinkTrees());
