@@ -23,8 +23,6 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 import static org.junit.jupiter.api.Assertions.*;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
@@ -34,7 +32,6 @@ import edu.byu.ece.rapidSmith.util.Exceptions;
  * 
  *
  */
-@RunWith(JUnitPlatform.class)
 public class LoadingDeviceTests {
 
 	/**

@@ -21,8 +21,6 @@ package design.rscpImport;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 
 import edu.byu.ece.rapidSmith.interfaces.vivado.EdifInterface;
 import edu.byu.ece.rapidSmith.util.Exceptions;
@@ -34,14 +32,11 @@ import java.io.IOException;
 /**
  * This class is used to test the {@link EdifInterface}. Add tests as necessary.
  */
-@RunWith(JUnitPlatform.class)
 public class EdifTests {
 
 	@Test
 	@DisplayName("Parse Exception")
 	public void exceptionTest() throws IOException {
-		//String expectedMessage = "java.io.FileNotFoundException: bogusEdifFile.edf (The system cannot find the file specified)";
 		assertThrows(Exceptions.ParseException.class, () -> EdifInterface.parseEdif("bogusEdifFile.edf", null));
-		//assertEquals(expectedMessage, exception.getMessage(), "Wrong exception message thrown.");
 	}
 }

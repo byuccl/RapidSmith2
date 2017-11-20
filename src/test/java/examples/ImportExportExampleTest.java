@@ -32,8 +32,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.examples.ImportExportExample;
@@ -42,7 +40,6 @@ import edu.byu.ece.rapidSmith.examples.ImportExportExample;
  * jUnit test for the ImportExportExample class in RapidSmith2
  * @author Dallon Glick
  */
-@RunWith(JUnitPlatform.class)
 public class ImportExportExampleTest {
 	private static ImportExportExample example;
 	private static final Path testDirectory = RSEnvironment.defaultEnv().getEnvironmentPath()

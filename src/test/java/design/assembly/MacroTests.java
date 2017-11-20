@@ -20,7 +20,6 @@
 package design.assembly;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -33,8 +32,6 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 import static org.junit.jupiter.api.Assertions.*;
 
 import edu.byu.ece.rapidSmith.design.NetType;
@@ -48,7 +45,6 @@ import edu.byu.ece.rapidSmith.design.subsite.CellPinType;
 /**
  *	Tests macro cell functionality in RapidSmith
  */
-@RunWith(JUnitPlatform.class)
 public class MacroTests {
 	
 	private static CellLibrary libCells;

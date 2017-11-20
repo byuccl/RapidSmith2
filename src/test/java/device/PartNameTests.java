@@ -21,8 +21,6 @@ package device;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 
 import edu.byu.ece.rapidSmith.util.PartNameTools;
 
@@ -36,7 +34,6 @@ import java.util.List;
  * come in a variety of formats, and these tests verify that all formats
  * can be handled.
  */
-@RunWith(JUnitPlatform.class)
 public class PartNameTests {
 
 	/**

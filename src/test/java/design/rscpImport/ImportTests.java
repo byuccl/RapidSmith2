@@ -5,8 +5,6 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
@@ -22,7 +20,6 @@ import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
  * repository. Add a new test to this directory for each test benchmark that is added
  * to the src/test/resources folder. 
  */
-@RunWith(JUnitPlatform.class)
 public class ImportTests {
 	private static final Path testDirectory = RSEnvironment.defaultEnv().getEnvironmentPath()
 			.resolve("src")
