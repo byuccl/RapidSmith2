@@ -589,6 +589,9 @@ public class XdcRoutingInterface {
 		HashSet<Integer> usedSitePips = new HashSet<>();
 		
 		String namePrefix = "intrasite:" + site.getType().name() + "/";
+
+		//create hashmap that shows pip used to input val
+		HashMap<String, String> pipToInputVal = new HashMap<String, String>();
 		
 		// Iterate over the list of used site pips, and store them in the site
 		for(int i = 2; i < toks.length; i++) {
@@ -615,9 +618,14 @@ public class XdcRoutingInterface {
 			usedSitePips.add(wireEnum); 	
 			usedSitePips.add(conn.getSinkWire().getWireEnum());
 			// tryGetWireEnum(pipWireName.split("\\.")[0] + ".OUT")
+			String[] vals = toks[i].split(":");
+			assert vals.length == 2;
+			pipToInputVal.put(vals[0], vals[1]);
 		}
 		
 		design.setUsedSitePipsAtSite(site, usedSitePips);
+		design.addPIPInputValsAtSite(site, pipToInputVal);
+		
 	}
 	
 	/**

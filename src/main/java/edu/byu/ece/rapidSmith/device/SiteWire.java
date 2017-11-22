@@ -110,6 +110,10 @@ public class SiteWire implements Wire, Serializable {
 				.map(wc -> new SiteWireConnection(this, wc))
 				.collect(Collectors.toList());
 	}
+	
+	public WireConnection[] getWireConnectionsArray() {
+		return site.getWireConnections(siteType, wire);
+	}
 
 	@Override
 	public Collection<Connection> getPinConnections() {
@@ -159,6 +163,10 @@ public class SiteWire implements Wire, Serializable {
 		return Arrays.stream(wireConnections)
 				.map(wc -> new ReverseSiteWireConnection(this, wc))
 				.collect(Collectors.toList());
+	}
+	
+	public WireConnection[] getReverseWireConnectionsArray() {
+		return site.getReverseConnections(siteType, wire);
 	}
 
 	@Override

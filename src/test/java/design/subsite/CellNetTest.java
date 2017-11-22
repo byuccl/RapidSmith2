@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * unit test for the CellNet class in RapidSmith2
  * @author Mark Crossen
  */
-class CellNetTests {
+class CellNetTest {
 
     // The cell library is needed to create different types of pins. These pins are found by creating various Cells.
     private static CellLibrary cell_library;
@@ -62,7 +62,7 @@ class CellNetTests {
     }
 
     /**
-     * Test if a Net carries a clock signal by connecting and siconnecting a clock pin.
+     * Test if a Net carries a clock signal by connecting and disconnecting a clock pin.
      */
     @Test
     @DisplayName("test cellNet 'isClkNet' method")

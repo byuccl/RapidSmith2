@@ -69,6 +69,9 @@ public final class RouteTree implements
 
 	@Deprecated
 	public void setCost(int cost) {
+		if(cost < 0){
+			cost = Integer.MAX_VALUE;
+		}
 		this.cost = cost;
 	}
 
@@ -277,13 +280,20 @@ public final class RouteTree implements
 		}
 	}
 
-	// Uses identity equals
-
 	/**
 	 * Hash is based on the wire of this node.
 	 */
 	@Override
 	public int hashCode() {
 		return Objects.hash(wire);
+	}
+	
+	public String toRouteString(){
+		StringBuilder toReturn = new StringBuilder();
+		toReturn.append(this.getWire().getFullWireName()+"\n");
+		for(RouteTree sink : this.getSinkTrees()){
+			toReturn.append(sink.toRouteString());
+		}
+		return toReturn.toString();
 	}
 }

@@ -26,8 +26,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.junit.platform.runner.JUnitPlatform;
 import static org.junit.jupiter.api.Assertions.*;
 import edu.byu.ece.rapidSmith.util.DotFilePrinter;
 import edu.byu.ece.rapidSmith.RSEnvironment;
@@ -45,7 +43,6 @@ import edu.byu.ece.rapidSmith.design.NetType;
  * tests overview of design creation in RapidSmith2
  * @author Mark Crossen
  */
-@RunWith(JUnitPlatform.class)
 public class OverviewTest {
 
     private static CellLibrary libCells;

@@ -106,6 +106,20 @@ public final class PIP implements Serializable {
 				(endWire.equals(other.startWire) && startWire.equals(other.endWire));
 	}
 
+	public String getName() {
+		StringBuilder name = new StringBuilder();
+		name.append(startWire.getTile().getName()+"/"+startWire.getTile().getType().getName()+".");
+		name.append(startWire.getWireName());
+		if(startWire.getTile().getType().getName().contains("CLB")){
+			name.append("->");
+		}
+		else{
+			name.append("->>");
+		}
+		name.append(endWire.getWireName());
+		return name.toString();
+	}
+	
 	/**
 	 * Creates a string representation of this PIP using the WireEnumerator
 	 * class.

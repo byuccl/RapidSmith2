@@ -22,8 +22,6 @@ package design.assembly;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 import static org.junit.jupiter.api.Assertions.*;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
@@ -49,7 +47,6 @@ import java.util.Set;
 /**
  * This class holds unit tests for {@link PropertyList} objects.
  */
-@RunWith(JUnitPlatform.class)
 public class PropertyTests {
 
 	/** CellLibrary object used for testing*/
