@@ -31,6 +31,7 @@ import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelId;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.PinDirection;
+import edu.byu.ece.rapidSmith.device.SitePin;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
 /**
@@ -186,6 +187,28 @@ public abstract class CellPin implements Serializable {
 		
 		if (belPinMappingSet == null) {
 			belPinMappingSet = new HashSet<>();
+		}
+		
+		// Workaround to make the source site pin update when unplacing and unrouting a design:
+		CellNet net = this.getNet();
+		if(net != null){
+			// If this is the only source pin
+			if(net.getAllSourcePins().size() == 1){ 
+				// If this is the net's source pin
+				if(net.getSourcePin().equals(this)){ 
+					// If there existed source site pin
+					SitePin sourceSitePin = net.getSourceSitePin();
+					if(sourceSitePin != null){ 
+						// And if the site has changed (e.g. this cell is on a new site)
+						if(!this.getCell().getSite().equals(sourceSitePin.getSite())){
+							// Remap the source SitePin
+							SitePin toAdd = this.getCell().getSite().getSitePin(sourceSitePin.getName());
+							net.removeAllSourceSitePins(); // Set to "same" site pin on the new site
+							net.addSourceSitePin(toAdd);
+						}
+					}
+				}
+			}
 		}
 		
 		return belPinMappingSet.add(pin);

@@ -93,6 +93,10 @@ public class TileWire implements Wire, Serializable {
 				.map(wc -> new TileWireConnection(this, wc))
 				.collect(Collectors.toList());
 	}
+	
+	public WireConnection[] getWireConnectionsArray(){
+		return tile.getWireConnections(wire);
+	}
 
 	@Override
 	public Collection<SitePin> getAllConnectedPins() {
@@ -155,6 +159,10 @@ public class TileWire implements Wire, Serializable {
 		return Arrays.stream(wireConnections)
 				.map(wc -> new ReverseTileWireConnection(this, wc))
 				.collect(Collectors.toList());
+	}
+	
+	public WireConnection[] getReverseWireConnectionsArray() {
+		return tile.getReverseConnections(wire);
 	}
 
 	@Override

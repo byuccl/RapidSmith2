@@ -131,7 +131,6 @@ public class TileScene extends QGraphicsScene{
 	 * @param hideTiles hide the tiles?
 	 * @param drawSites draw the primtives?
 	 */
-	@SuppressWarnings("unchecked")
 	public void initializeScene(boolean hideTiles, boolean drawSites){
 		this.clear();
 		prevX = 0;
