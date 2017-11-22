@@ -35,6 +35,18 @@ public interface Wire extends Serializable {
 	String getFullName();
 	Tile getTile();
 	Site getSite();
+	
+	/**
+	 * @deprecated Use {@link #getName} instead.
+	 */
+	@Deprecated
+	String getWireName();
+	
+	/**
+	 * @deprecated Use {@link #getFullName} instead.
+	 */
+	@Deprecated
+	String getFullWireName();
 
 	/**
 	 * Return connection linking this wire to other wires in the same hierarchy.
