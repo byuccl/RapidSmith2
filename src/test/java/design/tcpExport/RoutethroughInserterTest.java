@@ -165,7 +165,7 @@ public class RoutethroughInserterTest {
 		while (!rtQueue.isEmpty()) {
 			RouteTree tree = rtQueue.poll();
 			
-			BelPin terminal = tree.getConnectingBelPin();
+			BelPin terminal = tree.getConnectedBelPin();
 			if (terminal != null && sink.equals(terminal)) {
 				start.prune(Collections.singleton(tree));
 				break;

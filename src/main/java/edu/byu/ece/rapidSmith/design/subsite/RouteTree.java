@@ -133,16 +133,34 @@ public final class RouteTree implements
 	/**
 	 * Returns the SitePin connected to the wire of this node. If no SitePin
 	 * object is connected, null is returned.
+	 * @deprecated Use {@link #getConnectedSitePin()} instead
 	 */
 	public SitePin getConnectingSitePin() {
+		return getConnectedSitePin();
+	}
+
+	/**
+	 * Returns the SitePin connected to the wire of this node. If no SitePin
+	 * object is connected, null is returned.
+	 */
+	public SitePin getConnectedSitePin() {
 		return wire.getConnectedPin();
 	}
 	
 	/**
 	 * Returns the BelPin connected to the wire of the RouteTree. If no BelPin
 	 * object is connected, null is returned.
+	 * @deprecated Use {@link #getConnectedBelPin()} instead
 	 */
 	public BelPin getConnectingBelPin() {
+		return getConnectedBelPin();
+	}
+
+	/**
+	 * Returns the BelPin connected to the wire of the RouteTree. If no BelPin
+	 * object is connected, null is returned.
+	 */
+	public BelPin getConnectedBelPin() {
 		return wire.getTerminal();
 	}
 
@@ -251,7 +269,7 @@ public final class RouteTree implements
 	/**
 	 * Iterates over all trees in this route tree starting from this node in a
 	 * prefix order, ie. parent nodes are guaranteed to be visited prior to the
-	 * children.  Nodes in the tree prior to this node are not traversed.
+	 * children. Nodes in the tree prior to this node are not traversed.
 	 */
 	public Iterator<RouteTree> prefixIterator() {
 		return new PrefixIterator();

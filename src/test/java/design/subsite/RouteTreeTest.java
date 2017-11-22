@@ -75,7 +75,6 @@ class RouteTreeTest {
 	private static SiteTemplate makeSiteTemplate(SiteType dummySiteType) {
 		SiteTemplate dummySiteTemplate = new SiteTemplate();
 		dummySiteTemplate.setType(dummySiteType);
-//		dummySiteTemplate.setInternalSiteWireMap();
 
 		HashMap<String, SitePinTemplate> sinks = new HashMap<>();
 		SitePinTemplate dummySink = new SitePinTemplate("DUMMY_SINK", dummySiteType);
@@ -143,7 +142,7 @@ class RouteTreeTest {
 		e2pinMap.put(4, dummySinkTemplate);
 		e2pinMap.put(5, dummySourceTemplate);
 		e2pMap.put(dummySiteType, e2pinMap);
-		dummySite.setExternalWireToPinNameMap(e2pMap);
+		dummySite.setExternalWireToPinMap(e2pMap);
 	}
 
 	/**
@@ -302,14 +301,14 @@ class RouteTreeTest {
 		Site site = device.getTile(0).getSite(0);
 		SitePin pin = site.getSinkPin("DUMMY_SITE_PIN");
 		RouteTree t = leaf.addConnection(newDummyConnection(leaf.getWire(), 4, false));
-		assertEquals(pin, t.getConnectingSitePin());
+		assertEquals(pin, t.getConnectedSitePin());
 	}
 
 	@Test
 	@DisplayName("getConnectingSitePin is unidirectional")
 	void testGetConnectingSitePin2() {
 		RouteTree t = leaf.addConnection(newDummyConnection(leaf.getWire(), 5, false));
-		assertNull(t.getConnectingSitePin());
+		assertNull(t.getConnectedSitePin());
 	}
 
 	@Test
