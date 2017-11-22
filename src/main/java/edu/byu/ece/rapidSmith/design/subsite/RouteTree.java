@@ -290,7 +290,7 @@ public final class RouteTree implements
 	
 	public String toRouteString(){
 		StringBuilder toReturn = new StringBuilder();
-		toReturn.append(this.getWire().getFullWireName()+"\n");
+		toReturn.append(this.getWire().getFullName()+"\n");
 		for(RouteTree sink : this.getSinkTrees()){
 			toReturn.append(sink.toRouteString());
 		}
