@@ -588,11 +588,34 @@ public final class Site implements Serializable{
 	 * Creates and returns the pin on this site with the specified name.
 	 * @param pinName the name of the pin to create
 	 * @return the pin on this site with the specified name
+	 * @deprecated Use {@link #getPin(String pinName)} instead.
+	 */
+	@Deprecated
+	public SitePin getSitePin(String pinName) {
+		return getPin(pinName);
+	}
+	
+	/**
+	 * Creates and returns the pin on this site with the specified name.
+	 * @param pinName the name of the pin to create
+	 * @return the pin on this site with the specified name
 	 */
 	public SitePin getPin(String pinName) {
 		return getPin(getTemplate(), pinName);
 	}
 
+	/**
+	 * Creates and returns the pin on this site when configured as type with the
+	 * specified name.
+	 * @param pinName the name of the pin to create
+	 * @return the pin on this site with the specified name
+	 * @deprecated Use {@link #getPin(SiteType type, String pinName)} instead.
+	 */
+	@Deprecated
+	public SitePin getSitePin(SiteType type, String pinName) {
+		return getPin(type, pinName);
+	}
+	
 	/**
 	 * Creates and returns the pin on this site when configured as type with the
 	 * specified name.

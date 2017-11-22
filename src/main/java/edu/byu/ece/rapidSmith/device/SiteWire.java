@@ -72,6 +72,24 @@ public class SiteWire implements Wire, Serializable {
 		return wire;
 	}
 
+	/**
+	 * @deprecated Use {@link #getName} instead.
+	 */
+	@Override
+	@Deprecated
+	public String getWireName() {
+		return getName();
+	}
+	
+	/**
+	 * @deprecated Use {@link #getFullName} instead.
+	 */
+	@Override
+	@Deprecated
+	public String getFullWireName() {
+		return getFullName();
+	}
+	
 	@Override
 	public String getName() {
 		return getTile().getDevice().getWireEnumerator().getWireName(wire);
