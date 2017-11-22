@@ -296,8 +296,8 @@ class RouteTreeTest {
 	}
 
 	@Test
-	@DisplayName("test getConnectingSitePin method")
-	void testGetConnectingSitePin() {
+	@DisplayName("test getConnectedSitePin method")
+	void testGetConnectedSitePin() {
 		Site site = device.getTile(0).getSite(0);
 		SitePin pin = site.getSinkPin("DUMMY_SITE_PIN");
 		RouteTree t = leaf.addConnection(newDummyConnection(leaf.getWire(), 4, false));
@@ -305,8 +305,8 @@ class RouteTreeTest {
 	}
 
 	@Test
-	@DisplayName("getConnectingSitePin is unidirectional")
-	void testGetConnectingSitePin2() {
+	@DisplayName("getConnectedSitePin is unidirectional")
+	void testGetConnectedSitePin2() {
 		RouteTree t = leaf.addConnection(newDummyConnection(leaf.getWire(), 5, false));
 		assertNull(t.getConnectedSitePin());
 	}
