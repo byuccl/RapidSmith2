@@ -239,8 +239,8 @@ public class DesignAnalyzer {
 		//     (2) has a BEL pin attached, or 
 		//     (3) simply ends. Wires that end like this are called "used stubs" in Vivado's GUI.  They don't go anywhere.
 		if (rt.isLeaf()) {
-			SitePin sp = rt.getConnectingSitePin();
-			BelPin bp = rt.getConnectingBelPin();
+			SitePin sp = rt.getConnectedSitePin();
+			BelPin bp = rt.getConnectedBelPin();
 			if (sp != null) {
 				// If we are at a site pin then what we do differs depending on whether we are inside the site (and leaving) or outside the site (and entering). 
 				if (inside) {  

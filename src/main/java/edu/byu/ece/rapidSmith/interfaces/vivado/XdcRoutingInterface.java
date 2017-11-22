@@ -453,7 +453,7 @@ public class XdcRoutingInterface {
 			
 			// check to see if the current route tree object is connected to a valid sink site pin 
 			// the connection count is used to filter out routethrough site pins
-			SitePin sinkSitePin = routeTree.getConnectingSitePin();
+			SitePin sinkSitePin = routeTree.getConnectedSitePin();
 			
 			if (sinkSitePin != null && connectionCount == 0 && processSitePinSink(net, sinkSitePin)) {
 				terminals.add(routeTree);

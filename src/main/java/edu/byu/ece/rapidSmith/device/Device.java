@@ -705,7 +705,7 @@ public class Device implements Serializable {
 					}
 					extConns.put(siteType, sitePinMapPool.add(typeExternalConnections));
 				}
-				site.setExternalWireToPinNameMap(extConnPool.add(extConns));
+				site.setExternalWireToPinMap(extConnPool.add(extConns));
 			}
 
 			tile.setWireSites(wireSitesPool.add(wireSites));

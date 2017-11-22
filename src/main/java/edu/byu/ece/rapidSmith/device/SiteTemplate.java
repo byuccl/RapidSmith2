@@ -45,7 +45,7 @@ public final class SiteTemplate implements Serializable {
 	// Map of pin names to pin templates for the sink pins
 	private Map<String, SitePinTemplate> sinks;
 	// Map of site wires to the pin templates the wires connect to
-	private transient Map<Integer, SitePinTemplate> internalSiteWireMap;
+	private transient Map<Integer, SitePinTemplate> internalWireToSitePinMap;
 	// Map of the site wires to the bel pin templates the wire connect to
 	private transient Map<Integer, BelPinTemplate> belPins;
 	// Map of XDL attributes that should be created for each PIP
@@ -110,8 +110,16 @@ public final class SiteTemplate implements Serializable {
 		this.sinks = sinks;
 	}
 
+	/**
+	 * @deprecated Use {@link #getInternalWireToSitePinMap} instead.
+	 */
+	@Deprecated
 	public Map<Integer, SitePinTemplate> getInternalSiteWireMap() {
-		return internalSiteWireMap;
+		return getInternalWireToSitePinMap();
+	}
+	
+	public Map<Integer, SitePinTemplate> getInternalWireToSitePinMap() {
+		return internalWireToSitePinMap;
 	}
 
 	public Map<Integer, BelPinTemplate> getBelPins() {
@@ -122,8 +130,16 @@ public final class SiteTemplate implements Serializable {
 		this.belPins = belPins;
 	}
 
-	public void setInternalSiteWireMap(Map<Integer, SitePinTemplate> internalSiteWireMap) {
-		this.internalSiteWireMap = internalSiteWireMap;
+	/**
+	 * @deprecated Use {@link #setInternalWireToSitePinMap} instead.
+	 */
+	@Deprecated
+	public void setInternalSiteWireMap(Map<Integer, SitePinTemplate> internalWireToSitePinMap) {
+		setInternalWireToSitePinMap(internalWireToSitePinMap);
+	}
+	
+	public void setInternalWireToSitePinMap(Map<Integer, SitePinTemplate> internalWireToSitePinMap) {
+		this.internalWireToSitePinMap = internalWireToSitePinMap;
 	}
 
 	public Map<Integer, Map<Integer, XdlAttribute>> getPipAttributes() {
@@ -165,12 +181,12 @@ public final class SiteTemplate implements Serializable {
 	void constructDependentResources() {
 		// Create the internal site wire map by grabbing the internal wires
 		// for both the source and sink pins
-		internalSiteWireMap = new HashMap<>();
+		internalWireToSitePinMap = new HashMap<>();
 		for (SitePinTemplate sitePin : sources.values()) {
-			internalSiteWireMap.put(sitePin.getInternalWire(), sitePin);
+			internalWireToSitePinMap.put(sitePin.getInternalWire(), sitePin);
 		}
 		for (SitePinTemplate sitePin : sinks.values()) {
-			internalSiteWireMap.put(sitePin.getInternalWire(), sitePin);
+			internalWireToSitePinMap.put(sitePin.getInternalWire(), sitePin);
 		}
 
 		// Create the wire to bel pin maps by inferringthe information from the

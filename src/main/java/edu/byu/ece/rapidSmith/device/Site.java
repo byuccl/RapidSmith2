@@ -57,7 +57,7 @@ public final class Site implements Serializable{
 	 * Map of the site pin each wire connecting to the site connects to for each
 	 * site type this site can be represented as.
 	 */
-	private Map<SiteType, Map<Integer, SitePinTemplate>> externalWireToPinNameMap;
+	private Map<SiteType, Map<Integer, SitePinTemplate>> externalWireToPinMap;
 
 	/**
 	 * Constructor unnamed, tileless site.
@@ -620,7 +620,7 @@ public final class Site implements Serializable{
 	 *   null if the wire connects to no pins on this site
 	 */
 	SitePin getSitePinOfExternalWire(SiteType type, int wire) {
-		SitePinTemplate pinTemplate = externalWireToPinNameMap.get(type).get(wire);
+		SitePinTemplate pinTemplate = externalWireToPinMap.get(type).get(wire);
 		if (pinTemplate == null)
 			return null;
 		int externalWire = getExternalWire(type, pinTemplate.getName());
@@ -636,8 +636,8 @@ public final class Site implements Serializable{
 	 */
 	SitePin getSitePinOfInternalWire(SiteType type, int wire) {
 		SiteTemplate template = getTemplate(type);
-		Map<Integer, SitePinTemplate> internalSiteWireMap = template.getInternalSiteWireMap();
-		SitePinTemplate pinTemplate = internalSiteWireMap.get(wire);
+		Map<Integer, SitePinTemplate> internalWireToSitePinMap = template.getInternalWireToSitePinMap();
+		SitePinTemplate pinTemplate = internalWireToSitePinMap.get(wire);
 		if (pinTemplate == null)
 			return null;
 		int externalWire = getExternalWire(template.getType(), pinTemplate.getName());
@@ -685,18 +685,38 @@ public final class Site implements Serializable{
 		return externalWires;
 	}
 
+	/**
+	 * @deprecated Use {@link #getExternalWireToPinMap()} instead.
+	 */
+	@Deprecated
 	public Map<SiteType, Map<Integer, SitePinTemplate>> getExternalWireToPinNameMap() {
-		return externalWireToPinNameMap;
+		return getExternalWireToPinMap();
+	}
+	
+	public Map<SiteType, Map<Integer, SitePinTemplate>> getExternalWireToPinMap() {
+		return externalWireToPinMap;
+	}
+	
+	/**
+	 * Sets the mapping of wires to the names of the pins the wires connect to for
+	 * each possible type this site can take.
+	 * @param externalWireToPinMap the mapping of wires to pin names
+	 * @deprecated Use {@link #setExternalWireToPinMap} instead.
+	 */
+	@Deprecated
+	public void setExternalWireToPinNameMap(
+		Map<SiteType, Map<Integer, SitePinTemplate>> externalWireToPinMap) {
+		setExternalWireToPinMap(externalWireToPinMap);
 	}
 
 	/**
 	 * Sets the mapping of wires to the names of the pins the wires connect to for
 	 * each possible type this site can take.
-	 * @param externalWireToPinNameMap the mapping of wires to pin names
+	 * @param externalWireToPinMap the mapping of wires to pin names
 	 */
-	public void setExternalWireToPinNameMap(
-		Map<SiteType, Map<Integer, SitePinTemplate>> externalWireToPinNameMap) {
-		this.externalWireToPinNameMap = externalWireToPinNameMap;
+	public void setExternalWireToPinMap(
+		Map<SiteType, Map<Integer, SitePinTemplate>> externalWireToPinMap) {
+		this.externalWireToPinMap = externalWireToPinMap;
 	}
 
 	// Site compatibility

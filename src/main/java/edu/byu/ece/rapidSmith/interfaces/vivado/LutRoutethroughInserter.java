@@ -155,10 +155,10 @@ public class LutRoutethroughInserter {
 			}
 			
 			if (current.getConnection().isRouteThrough()) {				
-				rtSource = current.getSourceTree().getConnectingBelPin();
+				rtSource = current.getSourceTree().getConnectedBelPin();
 			}
 			else if (current.isLeaf()) {
-				BelPin bp = current.getConnectingBelPin();
+				BelPin bp = current.getConnectedBelPin();
 				
 				// add all sinks that are not connected to LUTs
 				if (!bp.getBel().getName().endsWith("LUT")) {
