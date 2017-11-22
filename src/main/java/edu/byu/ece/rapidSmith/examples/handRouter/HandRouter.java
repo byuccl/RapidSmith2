@@ -169,12 +169,12 @@ public class HandRouter {
 	 * @param wire {@link Wire} object to print the connections for
 	 */
 	private void printDownhillConnections ( Wire wire ) {
-		System.out.println("All connections for wire: " + wire.getFullWireName());
+		System.out.println("All connections for wire: " + wire.getFullName());
 		int i = 1;
 		
 		for (Connection conn : wire.getWireConnections()) {
 			Wire sinkWire = conn.getSinkWire();
-			System.out.println(String.format(String.format("  %d.) %s %s", i, sinkWire.getFullWireName(), conn.isPip() ?"(PIP)" : "")));
+			System.out.println(String.format(String.format("  %d.) %s %s", i, sinkWire.getFullName(), conn.isPip() ?"(PIP)" : "")));
 			i++;
 		}
 	}

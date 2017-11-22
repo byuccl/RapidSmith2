@@ -589,8 +589,8 @@ public final class Site implements Serializable{
 	 * @param pinName the name of the pin to create
 	 * @return the pin on this site with the specified name
 	 */
-	public SitePin getSitePin(String pinName) {
-		return getSitePin(getTemplate(), pinName);
+	public SitePin getPin(String pinName) {
+		return getPin(getTemplate(), pinName);
 	}
 
 	/**
@@ -599,11 +599,11 @@ public final class Site implements Serializable{
 	 * @param pinName the name of the pin to create
 	 * @return the pin on this site with the specified name
 	 */
-	public SitePin getSitePin(SiteType type, String pinName) {
-		return getSitePin(getTemplate(type), pinName);
+	public SitePin getPin(SiteType type, String pinName) {
+		return getPin(getTemplate(type), pinName);
 	}
 
-	private SitePin getSitePin(SiteTemplate template, String pinName) {
+	private SitePin getPin(SiteTemplate template, String pinName) {
 		SitePinTemplate pinTemplate = template.getSinks().get(pinName);
 		if (pinTemplate == null)
 			pinTemplate = template.getSources().get(pinName);

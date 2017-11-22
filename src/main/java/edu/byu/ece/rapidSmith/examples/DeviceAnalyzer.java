@@ -49,7 +49,7 @@ public class DeviceAnalyzer {
 	
 	private static void printWire(Wire w) {
 		Tile t = w.getTile();
-		msg("Wire " + w.getFullWireName() + " has " + w.getWireConnections().size() + " connections."); 
+		msg("Wire " + w.getFullName() + " has " + w.getWireConnections().size() + " connections.");
 
 		/*
 		 * A wire has a number of connections to other wires. 
@@ -74,10 +74,10 @@ public class DeviceAnalyzer {
 			if (c.getSinkWire().getTile() != t) {	 
 				int xoff = c.getSinkWire().getTile().getColumn() - t.getColumn() ;	 
 				int yoff = c.getSinkWire().getTile().getRow() - t.getRow() ;	 
-				s = c.getSinkWire().getTile().toString() + "/" + c.getSinkWire().getWireName() + " [" + yoff + "," + xoff + "]";	 
+				s = c.getSinkWire().getTile().toString() + "/" + c.getSinkWire().getName() + " [" + yoff + "," + xoff + "]";
 			}	
 			else	 
-				s = c.getSinkWire().getWireName();	 
+				s = c.getSinkWire().getName();
 			if (c.isPip())	
 				msg("  [PIP] " + s);	 
 			else

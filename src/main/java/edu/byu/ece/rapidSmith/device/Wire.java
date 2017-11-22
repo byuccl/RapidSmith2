@@ -31,8 +31,8 @@ import java.util.Collection;
  */
 public interface Wire extends Serializable {
 	int getWireEnum();
-	String getWireName();
-	String getFullWireName();
+	String getName();
+	String getFullName();
 	Tile getTile();
 	Site getSite();
 

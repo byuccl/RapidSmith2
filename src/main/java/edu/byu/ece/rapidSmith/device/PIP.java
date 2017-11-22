@@ -127,7 +127,7 @@ public final class PIP implements Serializable {
 	 * @return An XDL-compatible string of this PIP
 	 */
 	public String toString() {
-		return "pip " + startWire.getTile().getName() + " " + startWire.getWireName() +
-				" -> " + endWire.getWireName();
+		return "pip " + startWire.getTile().getName() + " " + startWire.getName() +
+				" -> " + endWire.getName();
 	}
 }
