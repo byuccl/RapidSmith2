@@ -78,10 +78,6 @@ public final class DeviceGenerator {
 	private HashPool<WireArray> wireArrayPool;
 	/** Keeps track of all PIPRouteThrough objects */
 	private HashPool<PIPRouteThrough> routeThroughPool;
-	/** Keeps Track of all unique Sinks that exist in Tiles */
-	private HashPool<UnorderedIntArray> tileSinksPool;
-	/** Keeps Track of all unique Sources Lists that exist in Tiles */
-	private HashPool<UnorderedIntArray> tileSourcesPool;
 	/** Keeps Track of all unique Wire Lists that exist in Tiles */
 	private HashPool<WireHashMap> tileWiresPool;
 
@@ -108,8 +104,6 @@ public final class DeviceGenerator {
 		this.wirePool = new HashPool<>();
 		this.wireArrayPool = new HashPool<>();
 		this.routeThroughPool = new HashPool<>();
-		this.tileSinksPool = new HashPool<>();
-		this.tileSourcesPool = new HashPool<>();
 		this.tileWiresPool = new HashPool<>();
 		this.externalWiresPool = new HashPool<>();
 		this.externalWiresMapPool = new HashPool<>();
@@ -166,8 +160,6 @@ public final class DeviceGenerator {
 		
 		// free unneeded pools for garbage collection when done with
 		routeThroughPool = null;
-		tileSourcesPool = null;
-		tileSinksPool = null;
 
 		System.out.println("Finishing device creation process");
 
@@ -1038,7 +1030,6 @@ public final class DeviceGenerator {
 	}
 
 	private final class SourceAndSinkListener extends XDLRCParserListener {
-		private Tile currTile;
 		private Site currSite;
 		private Set<Integer> tileSources;
 		private Set<Integer> tileSinks;
@@ -1048,7 +1039,6 @@ public final class DeviceGenerator {
 		protected void enterTile(List<String> tokens) {
 			int row = Integer.parseInt(tokens.get(1));
 			int col = Integer.parseInt(tokens.get(2));
-			currTile = device.getTile(row, col);
 
 			tileSources = new TreeSet<>();
 			tileSinks = new TreeSet<>();
@@ -1056,12 +1046,8 @@ public final class DeviceGenerator {
 
 		@Override
 		protected void exitTile(List<String> tokens) {
-			currTile.setSources(tileSourcesPool.add(new UnorderedIntArray(tileSources)).array());
-			currTile.setSinks(tileSinksPool.add(new UnorderedIntArray(tileSinks)).array());
-
 			tileSources = null;
 			tileSinks = null;
-			currTile = null;
 		}
 
 		@Override

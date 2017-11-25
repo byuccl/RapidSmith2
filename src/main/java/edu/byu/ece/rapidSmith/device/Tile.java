@@ -58,10 +58,7 @@ public class Tile implements Serializable {
 	private WireHashMap wireConnections;
 
 	private WireHashMap reverseWireConnections;
-	/** Reference to this tile's device object */
-	private int[] sinks;
-	/** This is a list of the sources within the tile (generally in the sites) */
-	private int[] sources;
+
 	/**
 	 * Map of the wires to the index of the site the wire connects to.  This is
 	 * needed since it is the job of the site to create the site pin, but we need
@@ -74,10 +71,7 @@ public class Tile implements Serializable {
 	 * data structures.
 	 */
 	public Tile() {
-		sinks = null;
-		sources = null;
 		wireConnections = null;
-		sinks = null;
 		dev = null;
 	}
 
@@ -424,19 +418,13 @@ public class Tile implements Serializable {
 	 * for this tile.
 	 */
 	public List<Wire> getSinks() {
-		return Arrays.stream(sinks)
-				.mapToObj(w -> new TileWire(this, w))
-				.collect(Collectors.toList());
-	}
+		if (getSites() == null)
+			return Collections.emptyList();
 
-	/**
-	 * This is used to populate the tile sinks and should probably not be called
-	 * during normal usage.
-	 *
-	 * @param sinks The new sinks to set for this tile.
-	 */
-	public void setSinks(int[] sinks) {
-		this.sinks = sinks;
+		return Arrays.stream(getSites())
+			.flatMap(s -> s.getSinkPins().stream())
+			.map(SitePin::getExternalWire)
+			.collect(Collectors.toList());
 	}
 
 	/**
@@ -446,19 +434,13 @@ public class Tile implements Serializable {
 	 * @return The source wires found in this tile.
 	 */
 	public List<Wire> getSources() {
-		return Arrays.stream(sources)
-				.mapToObj(w -> new TileWire(this, w))
-				.collect(Collectors.toList());
-	}
+		if (getSites() == null)
+			return Collections.emptyList();
 
-	/**
-	 * This is used to populate the tile sources and should probably not be called
-	 * during normal usage.
-	 *
-	 * @param sources The new sources to set for this tile.
-	 */
-	public void setSources(int[] sources) {
-		this.sources = sources;
+		return Arrays.stream(getSites())
+			.flatMap(s -> s.getSourcePins().stream())
+			.map(SitePin::getExternalWire)
+			.collect(Collectors.toList());
 	}
 
 	/**
@@ -549,8 +531,6 @@ public class Tile implements Serializable {
 			}
 			tile.wireConnections = wireConnections;
 			tile.reverseWireConnections = reverseConnections;
-			tile.sinks = sinks;
-			tile.sources = sources;
 
 			return tile;
 		}
@@ -564,8 +544,8 @@ public class Tile implements Serializable {
 		repl.sites = sites;
 		repl.wireConnections = wireConnections;
 		repl.reverseConnections = reverseWireConnections;
-		repl.sinks = sinks;
-		repl.sources = sources;
+		repl.sinks = null;
+		repl.sources = null;
 
 		return repl;
 	}
