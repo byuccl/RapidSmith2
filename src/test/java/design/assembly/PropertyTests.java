@@ -19,35 +19,25 @@
  */
 package design.assembly;
 
+import edu.byu.ece.rapidSmith.RSEnvironment;
+import edu.byu.ece.rapidSmith.design.NetType;
+import edu.byu.ece.rapidSmith.design.subsite.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-
-import edu.byu.ece.rapidSmith.RSEnvironment;
-import edu.byu.ece.rapidSmith.design.NetType;
-import edu.byu.ece.rapidSmith.design.subsite.Cell;
-import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
-import edu.byu.ece.rapidSmith.design.subsite.CellNet;
-import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
-import edu.byu.ece.rapidSmith.design.subsite.Property;
-import edu.byu.ece.rapidSmith.design.subsite.PropertyList;
-import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
+import org.junit.jupiter.api.function.Executable;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.StreamSupport;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * This class holds unit tests for {@link PropertyList} objects.
  */
-public class PropertyTests {
+class PropertyTests {
 
 	/** CellLibrary object used for testing*/
 	private static CellLibrary libCells;
@@ -64,7 +54,7 @@ public class PropertyTests {
 	 * properties will be tested.  
 	 */
 	@BeforeAll
-	public static void initializeTest() {
+	static void initializeTest() {
 		try {
 			libCells = new CellLibrary(resourceDir.resolve("design/assembly/cellLibraryTest.xml"));
 		} catch (IOException e) {
@@ -77,7 +67,7 @@ public class PropertyTests {
 	 */
 	@Test
 	@DisplayName("Update Property Test")
-	public void updatePropertyTest() {
+	void updatePropertyTest() {
 		Cell cell = new Cell("testFF", libCells.get("LUT3"));
 		
 		// the cell should be created with one initial property
@@ -106,15 +96,27 @@ public class PropertyTests {
 	 */
 	@Test
 	@DisplayName("Remove Property Test")
-	public void removePropertyTest() {
+	void removeDefaultPropertyTest() {
 		Cell cell = new Cell("testFF", libCells.get("FDRE"));
 				
 		// try to remove each default cell property ... they cannot be removed
-		for (Property prop : cell.getProperties()) {
-			cell.getProperties().remove(prop.getKey());
-			assertTrue(cell.getProperties().has(prop.getKey()), "Default property removed from PropertyList." );
-		}
-		
+		assertAll(
+			StreamSupport.stream(cell.getProperties().spliterator(), false)
+				.map( prop -> (Executable) () -> assertThrows(
+					UnsupportedOperationException.class,
+					() -> cell.getProperties().remove(prop.getKey()))
+				)
+		);
+	}
+
+	/**
+	 * Tests the {@link PropertyList#remove} method.
+	 */
+	@Test
+	@DisplayName("Remove Property Test")
+	void addAndRemovePropertyTest() {
+		Cell cell = new Cell("testFF", libCells.get("FDRE"));
+
 		// add a property, remove it, and verify that it was removed correctly
 		int originalPropertyCount = cell.getProperties().size();
 		cell.getProperties().update("TEST_PROP", PropertyType.EDIF, "TEST_VALUE");
@@ -123,31 +125,20 @@ public class PropertyTests {
 		assertFalse(cell.getProperties().has("TEST_PROP"), "Test property not removed from cell");
 		assertEquals(originalPropertyCount, cell.getProperties().size(), "Cell property list size has changed.");
 	}
-	
+
+
 	/**
-	 * Verifies that when a new object with properties is created, 
+	 * Verifies that when a new object with properties is created,
 	 * its default properties are set correctly. Objects in RapidSmith
 	 * that have properties include:
-	 * <ul>
-	 *  <li>{@link Cell}</li>
-	 *  <li>{@link CellNet}</li>
-	 *  <li>{@link CellDesign}</li>
-	 * </ul>
-	 */
-	@Test
-	@DisplayName("Default Property Test")
-	public void defaultPropertyTest() {
-		testCellDefaultProperties();
-		testCellNetDefaultProperties();
-		testCellDesignDefaultProperties();
-	}
-	
-	/*
+	 * <p/>
 	 * Creates a new cell of type FDRE, and verifies that its
-	 * default properties match the expected properties in 
+	 * default properties match the expected properties in
 	 * the cellLibrary.xml file.
 	 */
-	private void testCellDefaultProperties() {
+	@Test
+	@DisplayName("Default Cell Property Test")
+	void testCellDefaultProperties() {
 		Map<String, String> defaultPropertiesGolden = new HashMap<>();
 		defaultPropertiesGolden.put("INIT", "1'b0");
 		defaultPropertiesGolden.put("IS_C_INVERTED", "1'b0");
@@ -183,19 +174,31 @@ public class PropertyTests {
 		assertNotNull(cell.getProperties().get("IS_R_INVERTED"), "IS_R_INVERTED property on FDRE cell no correctly returned");
 	}
 	
-	/*
+	/**
+	 * Verifies that when a new object with properties is created,
+	 * its default properties are set correctly. Objects in RapidSmith
+	 * that have properties include:
+	 * <p/>
 	 * Creates a new CellNet object, and verifies that no default properties exist
 	 */
-	private void testCellNetDefaultProperties(){
+	@Test
+	@DisplayName("Default Net Property Test")
+	void testCellNetDefaultProperties(){
 		// Verify that 
 		CellNet net = new CellNet("TestNet", NetType.WIRE);
 		assertEquals(0, net.getProperties().size(), "Newly constructed CellNet objects should NOT have default properties");
 	}
 	
-	/*
+	/**
+	 * Verifies that when a new object with properties is created,
+	 * its default properties are set correctly. Objects in RapidSmith
+	 * that have properties include:
+	 * <p/>
 	 * Creates a new CellDesign object, and verifies that no default properties exist
 	 */
-	private void testCellDesignDefaultProperties(){
+	@Test
+	@DisplayName("Default Design Property Test")
+	void testCellDesignDefaultProperties(){
 		// Verify that 
 		CellDesign design = new CellDesign();
 		assertEquals(0, design.getProperties().size(), "Newly constructed CellDesign objects should NOT have default properties");
@@ -208,11 +211,11 @@ public class PropertyTests {
 	 */
 	@Test
 	@DisplayName("Library Cell Property Test")
-	public void libraryCellPropertyTest() {
+	void libraryCellPropertyTest() {
 		
 		Map<String, Set<String>> propertyMapGolden = new HashMap<>();
 		
-		propertyMapGolden.put("FARSRC", new HashSet<String>(Arrays.asList("EFAR", "FAR")));
+		propertyMapGolden.put("FARSRC", new HashSet<>(Arrays.asList("EFAR", "FAR")));
 		propertyMapGolden.put("FRAME_RBT_IN_FILENAME", Collections.emptySet());
 		
 		LibraryCell libCell = libCells.get("FRAME_ECCE2");

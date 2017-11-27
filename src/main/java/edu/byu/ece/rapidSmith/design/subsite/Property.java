@@ -24,15 +24,26 @@ package edu.byu.ece.rapidSmith.design.subsite;
  * A property containing a key/value pair.  A property type can be specified
  * to indicate the source and use of the property.
  */
-public class Property {
+public final class Property {
 	private final String key;
 	private PropertyType type;
 	private Object value;
+	private boolean readOnly;
+	private boolean defaultProperty;
 
 	public Property(String key, PropertyType type, Object value) {
 		this.key = key;
 		this.type = type;
 		this.value = value;
+		this.readOnly = false;
+	}
+
+	Property(String key, PropertyType type, Object value, boolean readOnly, boolean defaultProperty) {
+		this.key = key;
+		this.type = type;
+		this.value = value;
+		this.readOnly = readOnly;
+		this.defaultProperty = defaultProperty;
 	}
 
 	public String getKey() {
@@ -45,14 +56,6 @@ public class Property {
 	 */
 	public PropertyType getType() {
 		return type;
-	}
-
-	/**
-	 * Sets the property type.  The stype indicates the source of the property
-	 * and its use.
-	 */
-	public void setType(PropertyType type) {
-		this.type = type;
 	}
 
 	/**
@@ -94,14 +97,32 @@ public class Property {
 	 * Sets the value of the property
 	 */
 	public void setValue(Object value) {
+		if (isReadOnly())
+			throw new UnsupportedOperationException("Cannot update read only properties");
 		this.value = value;
+	}
+
+	/**
+	 * Returns true if this property is non-modifiable.
+	 * <p/> Note, read only properties may return mutable objects with the
+	 * {@link #getValue()} method.
+	 */
+	public boolean isReadOnly() {
+		return readOnly;
+	}
+
+	/**
+	 * Returns true if this is a property defined by a library cell.
+	 */
+	public boolean isDefaultProperty() {
+		return defaultProperty;
 	}
 
 	/**
 	 * Returns a new copy of this property with the same key/type/value.
 	 */
-	public Property deepCopy() {
-		return new Property(key, type, value);
+	public Property copy() {
+		return new Property(key, type, value, readOnly, defaultProperty);
 	}
 
 	@Override

@@ -256,7 +256,7 @@ public class CellLibrary implements Iterable<LibraryCell> {
 				String[] values = valueString.isEmpty() ? new String[0] : valueString.split(", ");
 				
 				// add the configuration to the library cell
-				libCell.addDefaultProperty(new Property(name, PropertyType.EDIF, deflt));						
+				libCell.addDefaultProperty(new Property(name, PropertyType.EDIF, deflt, isReadonly, true));
 				libCell.addConfigurableProperty(new LibraryCellProperty(name, type, values, isReadonly));
 			}
 		}
