@@ -21,7 +21,6 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * This class represents an objects that can have properties.
@@ -29,36 +28,36 @@ import java.util.stream.Stream;
 public final class PropertyList implements Iterable<Property> {
 	/** Properties in the property list */
 	private Map<String, Property> properties;
-	/** Map of default properties */
-	private final Map<String, Property> defaultProperties;
 
 	PropertyList() {
 		properties = null;
-		defaultProperties = null; 
 	}
 	
 	PropertyList(Map<String, Property> defaultProperties) {
-		this.defaultProperties = defaultProperties;
+		properties = null;
+		if (defaultProperties != null && !defaultProperties.isEmpty()) {
+			// Default load factor is .75, ie size * 1.33
+			properties = new HashMap<>((int) (defaultProperties.size() * 1.34));
+
+			for (Property p : defaultProperties.values()) {
+				if (p.isReadOnly()) {
+					properties.put(p.getKey(), p);
+				} else {
+					Property local = new Property(
+						p.getKey(), p.getType(), p.getValue(), p.isReadOnly(), true);
+					properties.put(p.getKey(), local);
+				}
+			}
+		}
 	}
 	
 	private void initPropertiesMap() {
-		properties = new HashMap<>(4);
+		if (properties == null)
+			properties = new HashMap<>(4);
 	}
 	
 	public int size() {
-		
-		if (properties == null) {
-			return (defaultProperties==null) ? 0 : defaultProperties.size();
-		}
-		
-		if (defaultProperties == null) {
-			return properties.size();
-		}
-		
-		int propCount = properties.size(); 
-		propCount += defaultProperties.keySet().stream().filter(key -> !properties.containsKey(key)).count();
-		
-		return propCount;
+		return properties == null ? 0 : properties.size();
 	}
 
 	/**
@@ -84,16 +83,22 @@ public final class PropertyList implements Iterable<Property> {
 	 */
 	public Property get(String propertyKey) {
 		Objects.requireNonNull(propertyKey);
-		Property userProp = getUserProperty(propertyKey);
-		return userProp != null ? userProp : getDefaultProperty(propertyKey);	
-	}
-	
-	private Property getUserProperty(String propertyKey) {
 		return (properties == null) ? null : properties.get(propertyKey) ;
 	}
-	
-	private Property getDefaultProperty(String propertyKey) {
-		return (defaultProperties == null) ? null : defaultProperties.get(propertyKey) ;
+
+	/**
+	 * Adds the specified property to the list.  If a property with the same key,
+	 * already exists, this method will throw an error.  This method can be used to
+	 * add read only properties to the list.
+	 * @param property the {@link Property} to add
+	 */
+	public void add(Property property) {
+		Objects.requireNonNull(property);
+		String key = property.getKey();
+		if (has(key))
+			throw new IllegalArgumentException("Property " + key + " already in list");
+		initPropertiesMap();
+		properties.put(key, property);
 	}
 
 	/**
@@ -101,6 +106,10 @@ public final class PropertyList implements Iterable<Property> {
 	 * of this cell.
 	 *
 	 * @param properties the properties to add or update
+	 * @throws UnsupportedOperationException if any of the properties affect read only
+	 *   properties with the same key. This method will exit upon the first detected error
+	 *   leaving no guarantee as to which properties in the collection were successfully
+	 *   added.
 	 */
 	public void updateAll(Collection<Property> properties) {
 		Objects.requireNonNull(properties);
@@ -112,42 +121,61 @@ public final class PropertyList implements Iterable<Property> {
 	 * Updates or adds the property to this cell.
 	 *
 	 * @param property the property to add or update
+	 * @throws UnsupportedOperationException if the current property with the same key is read only
 	 */
 	public void update(Property property) {
 		Objects.requireNonNull(property);
 
-		if (this.properties == null)
-			initPropertiesMap();
-		this.properties.put(property.getKey(), property);
+		String key = property.getKey();
+		Property old = get(key);
+		if (old != null && old.isReadOnly())
+			throw new UnsupportedOperationException("Cannot update read only property");
+
+		initPropertiesMap();
+		if (!property.isReadOnly())
+			property = property.copy();
+		this.properties.put(key, property);
 	}
 
 	/**
 	 * Updates the value of the property <i>propertyKey</i> in this cell or creates and
 	 * adds the property if it is not already present.
+	 * <p/> As with {@link #update(Property)}, this method will throw an exception if the
+	 * user tries to update a read only property.
 	 *
 	 * @param propertyKey the name of the property
 	 * @param type the new type of the property
 	 * @param value the value to set the property to
+	 * @throws UnsupportedOperationException if the current property with the key is read only
 	 */
 	public void update(String propertyKey, PropertyType type, Object value) {
 		Objects.requireNonNull(propertyKey);
 		Objects.requireNonNull(type);
 		Objects.requireNonNull(value);
 
-		update(new Property(propertyKey, type, value));
+		update(new Property(propertyKey, type, value, false, false));
 	}
 
 	/**
-	 * Removes the property <i>propertyKey</i>.  Returns the removed property.
+	 * Removes the property <i>propertyKey</i> and returns the removed property.
+	 * <p/> Removing default properties is not allowed with this method and will through
+	 * an exception.  However, this method can be used to remove read only properties and
+	 * will be needed if the user wishes to update a read only property.
 	 *
 	 * @param propertyKey the name of the property to remove
 	 * @return the removed property. null if the property doesn't exist
+	 * @throws UnsupportedOperationException if the current property with the key is read only
 	 */
 	public Property remove(String propertyKey) {
 		Objects.requireNonNull(propertyKey);
 
-		if (properties == null)
+		Property property = get(propertyKey);
+		if (property == null)
 			return null;
+
+		if (property.isDefaultProperty())
+			throw new UnsupportedOperationException("Cannot remove default properties");
+
 		return properties.remove(propertyKey);
 	}
 
@@ -237,22 +265,8 @@ public final class PropertyList implements Iterable<Property> {
 		
 	@Override
 	public Iterator<Property> iterator() {
-		
-		// If no properties have been set by the user, return the default property list
-		if (properties == null) {
-			return defaultProperties == null ? Collections.emptyIterator() : defaultProperties.values().iterator(); 
-		}
-		
-		// If the default properties are null, then just return the user property list
-		if (defaultProperties == null) {
-			return properties.values().iterator();
-		}
-		
-		// otherwise, create an iterator that includes the user property list
-		// concatenated with default properties that are NOT defined in the user list
-		Stream<Property> propStream = properties.values().stream();
-		Stream<Property> defaultStream = defaultProperties.values().stream().filter(p -> !properties.containsKey(p.getKey()));
-		
-		return Stream.concat(propStream, defaultStream).iterator();
+		if (properties == null)
+			return Collections.emptyIterator();
+		return properties.values().iterator();
 	}
 }

@@ -571,18 +571,17 @@ public class Cell {
 
 		Cell cellCopy = cellFactory.apply(name, libCell);
 		cellCopy.setBonded(getBonded());
-		getProperties().forEach(p ->
-				cellCopy.properties.update(copyAttribute(getLibCell(), libCell, p))
-		);
+//		getProperties().forEach(p ->
+//				cellCopy.properties.update(copyAttribute(getLibCell(), libCell, p))
+//		);
 		return cellCopy;
 	}
 
-	private Property copyAttribute(LibraryCell oldType, LibraryCell newType, Property orig) {
-		if (!oldType.equals(newType) && orig.getKey().equals(oldType.getName())) {
-			return new Property(newType.getName(), orig.getType(), orig.getValue());
-		} else {
-			return orig.deepCopy();
-		}
+	private Property copyAttribute(Property orig) {
+		if (orig.isReadOnly())
+			return orig;
+		else
+			return orig.copy();
 	}
 
 	@Override
