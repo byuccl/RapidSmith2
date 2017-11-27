@@ -1,6 +1,6 @@
 # RapidSmith2 [![Build Status](https://travis-ci.org/byuccl/RapidSmith2.svg?branch=master)](https://travis-ci.org/byuccl/RapidSmith2)
 
-![RapidSmith2 Logo](/docs/TechReport/logo1.pdf)
+![RapidSmith2 Logo](/docs/TechReport/Icon1.pdf)
 
 RapidSmith2, the Vivado successor to [RapidSmith](http://rapidsmith.sourceforge.net) is a research-based, open source FPGA CAD tool written in Java for modern Xilinx FPGAs. Its objective is to serve as a rapid prototyping platform for research ideas and algorithms relating to low level FPGA CAD tools.  Specifically, it allows users to manipulate Xilinx designs outside the standard Xilinx-provided CAD tool flow.
 
@@ -20,3 +20,4 @@ RapidSmith2 (and previously RapidSmith) have been used in a variety of settings 
 For the full documentation, see the [TechReport](docs/TechReport/TechReport.pdf).
 
 **NOTE**: The current release of RS2 is an alpha release. Significant changes to the code are still being made, and so expect frequent code updates. RS2 and its functionality is still being tested, so please report any bugs you find. Designs must be fully flattened in Vivado using the synthesis option "flatten_design -full" before they can be imported into RapidSmith. 
+
