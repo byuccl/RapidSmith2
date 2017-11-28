@@ -109,14 +109,14 @@ public final class PIP implements Serializable {
 	public String getName() {
 		StringBuilder name = new StringBuilder();
 		name.append(startWire.getTile().getName()+"/"+startWire.getTile().getType().getName()+".");
-		name.append(startWire.getWireName());
+		name.append(startWire.getName());
 		if(startWire.getTile().getType().getName().contains("CLB")){
 			name.append("->");
 		}
 		else{
 			name.append("->>");
 		}
-		name.append(endWire.getWireName());
+		name.append(endWire.getName());
 		return name.toString();
 	}
 	

@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
+import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
 import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
 import edu.byu.ece.rapidSmith.device.Bel;
@@ -361,7 +362,33 @@ public class XdcPlacementInterface {
 					}
 				}
 			}
+			
+			// Write the partition pin locations
+			
+			
+			if (design.getImplementationMode().equals(ImplementationMode.OUT_OF_CONTEXT))
+			{
+				System.out.println("OOC Mode");
+				// Try to get all hierachical ports
+				
+				for (Cell cell : design.getCells())
+				{
+					if (cell.isPort())
+					{
+						System.out.println("Port: " + cell.getName());
+						//design.removeCell(cell);
+					}
+				
+				}
+				//fileout.write("set_property HD.PARTPIN_LOCS { ");
+
+			}
+			
+			
 		}
+		
+		
+		
 	}
 
 	/*
