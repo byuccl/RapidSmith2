@@ -363,32 +363,28 @@ public class XdcPlacementInterface {
 				}
 			}
 			
-			// Write the partition pin locations
-			
-			
-			if (design.getImplementationMode().equals(ImplementationMode.OUT_OF_CONTEXT))
+			// If OOC mode, write the partition pin location properties
+			if (design.getImplementationMode() == ImplementationMode.OUT_OF_CONTEXT)
 			{
-				System.out.println("OOC Mode");
-				// Try to get all hierachical ports
+				// Iterate through the ooc port map to construct the properties
+				Map<String, String> oocPortMap = design.getOocPortMap();
 				
-				for (Cell cell : design.getCells())
-				{
-					if (cell.isPort())
-					{
-						System.out.println("Port: " + cell.getName());
-						//design.removeCell(cell);
-					}
-				
-				}
-				//fileout.write("set_property HD.PARTPIN_LOCS { ");
+				if (oocPortMap != null) {
+					for (Map.Entry<String, String> entry : oocPortMap.entrySet()) {
+						fileout.write("set_property HD.PARTPIN_LOCS {");
+					
+						// Write the tile the partition pin is located in
+						String[] toks = entry.getValue().split("/");
+						String tileName = toks[0];
+						fileout.write(tileName);
 
-			}
-			
-			
+						// Write the corresponding port name
+						fileout.write("} [get_ports ");
+						fileout.write(entry.getKey() + "]\n");
+					}
+				}
+			}	
 		}
-		
-		
-		
 	}
 
 	/*

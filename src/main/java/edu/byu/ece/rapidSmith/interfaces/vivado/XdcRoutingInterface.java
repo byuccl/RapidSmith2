@@ -70,6 +70,21 @@ public class XdcRoutingInterface {
 	private Map<Bel, BelRoutethrough> belRoutethroughMap;
 	private Pattern pipNamePattern;
 	private Map<String, String> oocPortMap;
+	
+	/**
+	 * @return the oocPortMap
+	 */
+	public Map<String, String> getOocPortMap() {
+		return oocPortMap;
+	}
+
+	/**
+	 * @param oocPortMap the oocPortMap to set
+	 */
+	public void setOocPortMap(Map<String, String> oocPortMap) {
+		this.oocPortMap = oocPortMap;
+	}
+
 	private ImplementationMode implementationMode;
 	private boolean pipUsedInRoute = false;
 	
