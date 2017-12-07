@@ -160,7 +160,10 @@ public class DesignAnalyzer {
 
 			// Then the sink pins
 			for (CellPin cp : n.getSinkPins()) {
-				System.out.println("  Pin:  " + cp.getCell().getName() + "." + cp.getName());
+				System.out.print("  Cell Pin:  " + cp.getCell().getName() + "." + cp.getName());
+				for (BelPin bp1 : cp.getMappedBelPins())
+					System.out.print(", mapped to BEL Pin: " + bp1);
+				System.out.println();
 			}
 			
             // Print the net's route tree(s) if they exist
@@ -178,20 +181,35 @@ public class DesignAnalyzer {
 			// demonstrating how to trace out a net's physical route.
 			
 			// VCC and GND nets are different from regular nets in that regular nets have a single which is the root of the
-			// route tree while VCC and GND nets are a forest of route trees.  For this demo only do signal nets.
+			// route tree while VCC and GND nets are a forest of route trees.  Additionally, VCC and GND wires originate in switchboxes while signal wires originate elsewhere 
 			if (n.isVCCNet() || n.isGNDNet()) {
-				System.out.println("Vcc or GND net, not printing out its route trees.");  
+//				System.out.println("Vcc or GND net, not printing out its route trees.");  
 				System.out.println("Since VCC and GND drivers (tieoffs) are not placed anywhere, these have no source route trees, they just have intersite sink route trees.");
 				System.out.println("Vcc and GND nets have multiple intersite route trees, each with a single source.");
+				int cnt = 0;
+				for (RouteTree rt : n.getIntersiteRouteTreeList()) {
+					String s = createRoutingString("    ", n, rt, true, false);
+					if (Objects.equals(s, ""))
+						System.out.println("  <<<Unrouted>>>");
+					else
+						System.out.println("  Physical routing #" + cnt + ": \n   (" + s + "\n   )");
+					cnt++;
+				}
 			}
 			else {
-				if (n.getIntersiteRouteTreeList().size() > 1)
+				if (n.getIntersiteRouteTreeList().size() > 1) {
 					System.out.println("  Note: net \"" + n.getName() + "\" has " + n.getIntersiteRouteTreeList().size() + " intersite route trees.");
-				String s = createRoutingString("   ", n, n.getSourceRouteTree(), true, true);
-				if (Objects.equals(s, ""))
-					System.out.println("  <<<Unrouted>>>");
-				else
-					System.out.println("  Physical routing: \n   (" + createRoutingString("   ", n, n.getSourceRouteTree(), true, true) + "\n   )"); 
+					System.out.println("      For signal (non-VCC and non-GND nets), this is usually observed when the net leaves the SLICE on both CO and some other pin.");
+					System.out.println("      In the cases we have seen, the 2 paths reconverge after PIP or two.");
+					System.out.println("      The printout below is only for the first of these intersite route trees.");
+				}
+				else {
+					String s = createRoutingString("   ", n, n.getSourceRouteTree(), true, true);
+					if (Objects.equals(s, ""))
+						System.out.println("  <<<Unrouted>>>");
+					else
+						System.out.println("  Physical routing: \n   (" + createRoutingString("   ", n, n.getSourceRouteTree(), true, true) + "\n   )");
+				}
 			}
 		}
 	}		
@@ -263,14 +281,14 @@ public class DesignAnalyzer {
 					//    + One of the SitePin's connects to the wire at head of an intersite route tree and the other doesn't.
 					//    + In this case as in #1 above, just follow the single intersite route tree
 					// Case 4. We have not yet observed this last case: net connects to single SitePin, net has multiple intersite route trees.
-					//    + This doesn't make sense.
+					//    + This does happen.  Excluding VCC and GND, it is happening with CYINIT pins on CY4's.
 					//
 					// The above code will handle case 1 and 2 just fine by searching - it will find the corresponding RouteTree for each SitePin hit.  
 					// For case 3 it will find a RouteTree for one of the SitePin's but not the other (and fall out the bottom of the for-loop).	
-					// This last case (3b) is handled below.
+					// This last case (4) is handled below.
 					////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					
-					// Case 3b: If we get here, net connects to a SitePin but there is no corresponding RouteTree... 
+					// Case 4: If we get here, net connects to a SitePin but there is no corresponding RouteTree... 
 					return s + " SitePin{" + sp + "} <<<<Connects to no corresponding RouteTree outside site>>>> ";
 				}
 				else 
