@@ -397,4 +397,8 @@ public abstract class CellPin implements Serializable {
 	 * @return 
 	 */
 	public abstract CellPin getExternalPin();
+
+	public void setMacroPinToGlobalNet(CellNet n) {
+		setNet(n);
+	}
 }

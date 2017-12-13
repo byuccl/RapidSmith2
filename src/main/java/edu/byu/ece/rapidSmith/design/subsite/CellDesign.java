@@ -22,6 +22,7 @@ package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.design.AbstractDesign;
 import edu.byu.ece.rapidSmith.device.Bel;
+import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 import edu.byu.ece.rapidSmith.interfaces.vivado.XdcConstraint;
@@ -776,36 +777,82 @@ public class CellDesign extends AbstractDesign {
 	
 	/**
 	 * Creates and returns a deep copy of the current CellDesign.
+	 * Travis' version
 	 */
 	public CellDesign deepCopy() {
-		CellDesign designCopy = new CellDesign();
-		designCopy.setName(getName());
-		designCopy.setPartName(getPartName());
+		CellDesign copyDesign = new CellDesign();
 
+		// copy the design meta data
+		copyDesign.setName(getName());
+		copyDesign.setPartName(getPartName());
+		getVivadoConstraints().forEach(c -> copyDesign.addVivadoConstraint(
+			new XdcConstraint(c.getCommandName(), c.getOptions())));
+		copyDesign.setImplementationMode(getImplementationMode());
+
+		// copy the cells
+		getCells().stream().map(Cell::deepCopy).forEach(copyDesign::addCell);
+		// copy the nets
+		getNets().stream()
+			// ignore pseudo nets, they were included with their parent cell
+			.filter(net -> !net.isInternal())
+			.map(CellNet::deepCopy)
+			.forEach(copyDesign::addNet);
+
+		for (CellNet nx : copyDesign.getNets())
+			System.out.println("   NET: " + nx.getName() + " " + nx.routeTreeCount());
+		
 		for (Cell cell : getCells()) {
-			Cell cellCopy = cell.deepCopy();
-			designCopy.addCell(cellCopy);
-			if (cell.isPlaced()) {
-				designCopy.placeCell(cellCopy, cell.getBel());
-				for (CellPin cellPin : cell.getPins()) {
-					if (cellPin.getMappedBelPinCount() > 0) {
-						CellPin copyPin = cellCopy.getPin(cellPin.getName());
-						cellPin.getMappedBelPins().forEach(copyPin::mapToBelPin);
-					}
+			Cell copyCell = copyDesign.getCell(cell.getName());
+
+			// connect all of the cell pins to nets
+			// internal pseudo pins will be handled later
+			for (CellPin pin : cell.getPins()) {
+				CellPin copyPin = copyCell.getPin(pin.getName());
+				if (pin.isConnectedToNet()) {
+					CellNet copyNet = copyDesign.getNet(pin.getNet().getName());
+					assert(copyNet != null) : "Pin: " + pin.getName() + " is not connected to net in design.  It is connected to: " + pin.getNet().getName();
+					System.out.println("Connecting: " + copyNet.getName() + " " + copyPin.getName() + " " + copyNet.getSourcePin());
+					copyNet.connectToPin(copyPin);
+				}
+
+				if (pin.getMappedBelPinCount() > 0) {
+					pin.getMappedBelPins().forEach(copyPin::mapToBelPin);
 				}
 			}
-		}
 
-		for (CellNet net : getNets()) {
-			CellNet netCopy = net.deepCopy();
-			designCopy.addNet(netCopy);
-			for (CellPin cellPin : net.getPins()) {
-				Cell cellCopy = designCopy.getCell(cellPin.getCell().getName());
-				CellPin copyPin = cellCopy.getPin(cellPin.getName());
-				netCopy.connectToPin(copyPin);
+			// place the copied cell
+			if (cell.isPlaced()) {
+				copyDesign.placeCell(copyCell, cell.getBel());
 			}
 		}
 
-		return designCopy;
+		// now connect the pseudo pins and correct any poorly built netlists
+		getLeafCells().filter(Cell::isInternal).forEach(cell -> {
+			Cell copyCell = copyDesign.getCell(cell.getName());
+
+			for (CellPin pin : cell.getPins()) {
+				CellPin copyPin = copyCell.getPin(pin.getName());
+				if (pin.getNet() == null) {
+					if (copyPin.getNet() != null) {
+						copyPin.getNet().disconnectFromPin(copyPin);
+					}
+				} else if (copyPin.getNet() == null) {
+					CellNet copyNet = copyDesign.getNet(pin.getNet().getName());
+					copyNet.connectToPin(copyPin);
+				} else if (!pin.getNet().getName().equals(copyPin.getNet().getName())) {
+					copyPin.getNet().disconnectFromPin(copyPin);
+					CellNet copyNet = copyDesign.getNet(pin.getNet().getName());
+					copyNet.connectToPin(copyPin);
+				}
+
+				if (pin.getMappedBelPinCount() > 0) {
+					pin.getMappedBelPins().forEach(copyPin::mapToBelPin);
+				}
+			}
+		});
+
+		// TODO routing
+
+		return copyDesign;
 	}
 }

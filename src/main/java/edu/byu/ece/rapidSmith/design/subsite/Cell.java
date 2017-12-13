@@ -569,7 +569,14 @@ public class Cell {
 		else
 			libCell = getLibCell();
 
+		// Call the constructor to get a new cell
 		Cell cellCopy = cellFactory.apply(name, libCell);
+		
+		// Make copies of and attach existing pseudo-pins
+		for (CellPin pcp : this.getPseudoPins()) {
+			cellCopy.attachPseudoPin(pcp.getName(), pcp.getDirection());
+		}
+		
 		cellCopy.setBonded(getBonded());
 		getProperties().forEach(p ->
 				cellCopy.properties.update(copyAttribute(getLibCell(), libCell, p))

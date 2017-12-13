@@ -204,6 +204,7 @@ public class DesignAnalyzer {
 					System.out.println("      The printout below is only for the first of these intersite route trees.");
 				}
 				else {
+					System.out.println(";;;; " + n.getIntersiteRouteTreeList().size() + " :::: " + n.getSourceRouteTree());
 					String s = createRoutingString("   ", n, n.getSourceRouteTree(), true, true);
 					if (Objects.equals(s, ""))
 						System.out.println("  <<<Unrouted>>>");
@@ -364,7 +365,7 @@ public class DesignAnalyzer {
 				System.out.println("\nCell: " + c.getName() + " " + 
 						c.getLibCell().getName());
 			}
-			if (c.isPlaced()) 
+			if (false && c.isPlaced()) 
 				// Print out its placement
 				System.out.println("  <<<Placed on: " + c.getBel() + ">>>");
 			else System.out.println("  <<<Unplaced>>>");
@@ -396,7 +397,7 @@ public class DesignAnalyzer {
 		// For now, properties are strings. 
 		for (Property p : c.getProperties()) {
 			String s = "  Property: " + p.toString();
-			System.out.println(s);
+//			System.out.println(s);
 		}
 	}
 	
