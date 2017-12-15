@@ -798,6 +798,7 @@ public class CellDesign extends AbstractDesign {
 		
 		// copy the cells
 		getCells().stream().map(Cell::deepCopy).forEach(copyDesign::addCell);
+
 		// copy the nets
 		getNets().stream()
 			// ignore pseudo nets, they were included with their parent cell
@@ -805,9 +806,6 @@ public class CellDesign extends AbstractDesign {
 			.map(CellNet::deepCopy)
 			.forEach(copyDesign::addNet);
 
-		//for (CellNet nx : copyDesign.getNets())
-			//System.out.println("   NET: " + nx.getName() + " " + nx.routeTreeCount());
-		
 		for (Cell cell : getCells()) {
 			Cell copyCell = copyDesign.getCell(cell.getName());
 

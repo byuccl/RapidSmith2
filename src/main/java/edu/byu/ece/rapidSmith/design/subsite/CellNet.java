@@ -1011,7 +1011,7 @@ public class CellNet implements Serializable {
 		//WORKING:(none in new) getDesign().setComp(getRoutedSinks(), newn.getRoutedSinks(), name);
 		
 		//WORKING:
-		// Added copy in deepCopy(), fixed add.rscp but simon.rscp still broken
+		// Added copy in deepCopya(), fixed add.rscp but simon.rscp still broken
 		//assert(this.isIntrasite() == newn.isIntrasite()) : name + " " + this.isIntrasite() + " " + newn.isIntrasite();
 		
 		assert(this.isInternal== newn.isInternal) : name;
@@ -1025,9 +1025,8 @@ public class CellNet implements Serializable {
 		//getDesign().listComp(this.getSourceSitePins(), newn.getSourceSitePins(), name);
 
 		if (this.getSourceRouteTree() == null) assert(newn.getSourceRouteTree() == null) : name;
-		
 		//WORKING
-		// add.rscp has a problem with b_IBUF
+		// this next line fails - sourceRouteTree is null in the new net
 		//else if (newn.getSourceRouteTree() == null) assert(this.getSourceRouteTree() == null) : name;
 		else this.getSourceRouteTree().compare(newn.getSourceRouteTree());
 		
