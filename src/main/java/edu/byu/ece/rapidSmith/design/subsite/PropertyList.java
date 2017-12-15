@@ -255,4 +255,13 @@ public final class PropertyList implements Iterable<Property> {
 		
 		return Stream.concat(propStream, defaultStream).iterator();
 	}
+
+  public void compare(PropertyList newprop, CellDesign des) {
+	  //WORKING
+	  // new has none
+	  //des.mapComp(properties, newprop.properties, "");
+	  des.mapComp(defaultProperties, newprop.defaultProperties, "");
+  }
+
+
 }

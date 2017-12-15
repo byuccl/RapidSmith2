@@ -43,6 +43,8 @@ public class DesignAnalyzer {
 	public static final String CANONICAL_PART_NAME = "xc7a100tcsg324";
 	public static final String CELL_LIBRARY = "cellLibrary.xml";
 	
+	public static void msg(String s) { System.out.println(s); }
+	
 	public static void main(String[] args) throws IOException, JDOMException {
 		
 		if (args.length < 1) {
@@ -66,6 +68,17 @@ public class DesignAnalyzer {
 		printCellBelMappings(design);
 
 		System.out.println("Done...");
+/*		
+		for (Cell c : design.getCells())
+			msg("Cell: " + c.getName());
+		for (Cell c : design.getCells()) {
+			if (c.isMacro())
+				for (Cell cc : c.getInternalCells())
+					msg("  Internal: " + cc.getName());
+					
+		}
+*/					
+		
 	}
 
 	// Print out the first few cells and the list of Bels they can be placed onto

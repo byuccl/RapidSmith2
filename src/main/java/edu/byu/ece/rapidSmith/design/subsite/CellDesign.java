@@ -28,6 +28,7 @@ import edu.byu.ece.rapidSmith.util.Exceptions;
 import edu.byu.ece.rapidSmith.interfaces.vivado.XdcConstraint;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 /**
@@ -789,6 +790,12 @@ public class CellDesign extends AbstractDesign {
 			new XdcConstraint(c.getCommandName(), c.getOptions())));
 		copyDesign.setImplementationMode(getImplementationMode());
 
+		// Is simple copy legal?
+		copyDesign.usedSitePipsMap = this.usedSitePipsMap;  
+		// Is simple copy legal?
+		copyDesign.pipInValues= this.pipInValues;  
+		
+		
 		// copy the cells
 		getCells().stream().map(Cell::deepCopy).forEach(copyDesign::addCell);
 		// copy the nets
@@ -798,8 +805,8 @@ public class CellDesign extends AbstractDesign {
 			.map(CellNet::deepCopy)
 			.forEach(copyDesign::addNet);
 
-		for (CellNet nx : copyDesign.getNets())
-			System.out.println("   NET: " + nx.getName() + " " + nx.routeTreeCount());
+		//for (CellNet nx : copyDesign.getNets())
+			//System.out.println("   NET: " + nx.getName() + " " + nx.routeTreeCount());
 		
 		for (Cell cell : getCells()) {
 			Cell copyCell = copyDesign.getCell(cell.getName());
@@ -811,7 +818,7 @@ public class CellDesign extends AbstractDesign {
 				if (pin.isConnectedToNet()) {
 					CellNet copyNet = copyDesign.getNet(pin.getNet().getName());
 					assert(copyNet != null) : "Pin: " + pin.getName() + " is not connected to net in design.  It is connected to: " + pin.getNet().getName();
-					System.out.println("Connecting: " + copyNet.getName() + " " + copyPin.getName() + " " + copyNet.getSourcePin());
+					//System.out.println("Connecting: " + copyNet.getName() + " " + copyPin.getName() + " " + copyNet.getSourcePin());
 					copyNet.connectToPin(copyPin);
 				}
 
@@ -821,11 +828,23 @@ public class CellDesign extends AbstractDesign {
 			}
 
 			// place the copied cell
-			if (cell.isPlaced()) {
+			if (cell.isMacro()) {
+				for (Cell ic : cell.getInternalCells()) {
+					if (!ic.isPlaced())
+						continue;
+					Cell cic = copyDesign.getCell(ic.getName());
+					assert(cic != null);
+					copyDesign.placeCell(cic, ic.getBel());
+				}
+			}
+			else if (cell.isPlaced()) {
 				copyDesign.placeCell(copyCell, cell.getBel());
 			}
+
 		}
 
+	
+		
 		// now connect the pseudo pins and correct any poorly built netlists
 		getLeafCells().filter(Cell::isInternal).forEach(cell -> {
 			Cell copyCell = copyDesign.getCell(cell.getName());
@@ -855,4 +874,75 @@ public class CellDesign extends AbstractDesign {
 
 		return copyDesign;
 	}
-}
+
+	public void mapComp(Map c, Map newc, String name) {
+		if (c == null) assert(newc == null) : name + " <<" + c + ">> <<" + newc + ">>";
+		else if (newc == null) assert(c == null) : name + " <<" + c + ">> <<" + newc + ">>";
+		else assert (c.size() == newc.size()) : name + " " + c.size() + " " + newc.size();
+	}
+	public void setComp(Set c, Set newc, String name) {
+		if (c == null) assert(newc == null) : name + " <<" + c + ">> <<" + newc + ">>";
+		else if (newc == null) assert(c == null) : name + " <<" + c + ">> <<" + newc + ">>";
+		else assert (c.size() == newc.size()) : name + " " + c.size() + " " + newc.size();
+	}
+	public void listComp(List c, List newc, String name) {
+		if (c == null) assert(newc == null) : name + " <<" + c + ">> <<" + newc + ">>";
+		else if (newc == null) assert(c == null) : name + " <<" + c + ">> <<" + newc + ">>";
+		else assert (c.size() == newc.size()) : name + " " + c.size() + " " + newc.size();
+	}
+	public void collComp(Collection c, Collection newc, String name) {
+		if (c == null) assert(newc == null) : name + " <<" + c + ">> <<" + newc + ">>";
+		else if (newc == null) assert(c == null) : name + " <<" + c + ">> <<" + newc + ">>";
+		else assert (c.size() == newc.size()) : name + " " + c.size() + " " + newc.size();
+	}
+
+	public void compare(CellDesign newdes) {
+		System.out.println("   Comparing Design");
+
+		mapComp(cellMap, newdes.cellMap, this.name);
+
+		mapComp(internalCellMap, newdes.internalCellMap, this.name);
+
+		//FIXED: macro internal cells were not being placed
+		mapComp(placementMap, newdes.placementMap, this.name);
+
+		mapComp(netMap, newdes.netMap, this.name);
+
+		properties.compare(newdes.properties, newdes);
+
+		//FIXED:needed copying over
+		mapComp(usedSitePipsMap, newdes.usedSitePipsMap, this.name);
+		
+		assert (vccNet != null);
+		vccNet.compare(newdes.getVccNet());
+		assert (gndNet != null);
+		gndNet.compare(newdes.getGndNet());
+
+		listComp(getVivadoConstraints(), newdes.getVivadoConstraints(), this.name);
+
+		assert (getImplementationMode() == newdes.getImplementationMode());
+		
+		//FIXED: needed copying over
+		mapComp(pipInValues, newdes.pipInValues, this.name);
+		
+		System.out.println("   Comparing Cells");
+		for (Cell c : getCells()) {
+			Cell newcell = newdes.getCell(c.getName());
+			assert (newcell != null) : "Cell " + name + " not found in new design.";
+			c.compare(newcell);
+		}
+
+		System.out.println("   Comparing Nets");
+		for (CellNet n : getNets()) {
+			CellNet newnet = newdes.getNet(n.getName());
+			assert (newnet != null) : "Net " + name + " not found in new design.";
+			n.compare(newnet);
+		}
+	}
+
+	public boolean containsCell(Cell newc) {
+		return (this.getCell(newc.getName()) != null);
+	}
+
+
+  }

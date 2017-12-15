@@ -578,6 +578,7 @@ public class Cell {
 		}
 		
 		cellCopy.setBonded(getBonded());
+//		TODO - fix to handle read-only ones
 		getProperties().forEach(p ->
 				cellCopy.properties.update(copyAttribute(getLibCell(), libCell, p))
 		);
@@ -600,5 +601,20 @@ public class Cell {
 	@Override
 	public String toString() {
 		return "Cell{" + getName() + " " + (isPlaced() ? "@" + getBel().getFullName() : "") + "}";
+	}
+	public void compare(Cell newc) {
+		assert (name.equals(newc.getName())) : name;
+		assert (getDesign().getName().equals(newc.getDesign().getName())) : name;
+		assert (getLibCell() == newc.getLibCell()) : name;
+		assert (this.getBonded() == newc.getBonded()) : name;
+		assert (this.getBel() == newc.getBel()) : name;
+		properties.compare(newc.getProperties(), getDesign());
+		design.mapComp(pinMap, newc.pinMap, this.name);
+		design.setComp(this.getPseudoPins(), newc.getPseudoPins(), this.name);
+		if (parent == null) assert (newc.getParent() == null) : name;
+		else if (newc.getParent() == null) assert (parent == null) : name;
+		else assert (newc.getDesign().containsCell(newc)) : name;
+		design.mapComp(internalCells, newc.internalCells, this.name);
+		design.mapComp(internalNets, newc.internalNets, this.name);
 	}
 }

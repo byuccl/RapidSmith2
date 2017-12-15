@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Brigham Young University
+ * Copyright (c) 2016 Brigham Young University	// 
  *
  * This file is part of the BYU RapidSmith Tools.
  *
@@ -467,6 +467,7 @@ public class CellNet implements Serializable {
 		CellNet copy = new CellNet(getName(), getType());
 		if (intersiteRoutes != null)
 			intersiteRoutes.forEach(rt -> copy.addIntersiteRouteTree(rt.deepCopy()));
+		copy.setIsIntrasite(this.isIntrasite());
 		return copy;
 	}
 
@@ -987,4 +988,67 @@ public class CellNet implements Serializable {
 		
 		return routeStatus;
 	}
+	public void compare(CellNet newn) {
+		assert (getName().equals(newn.getName())) : name;
+
+		assert (this.getType()== newn.getType()) : name;
+
+		assert (getDesign().getName().equals(newn.getDesign().getName())) : name;
+
+		getDesign().collComp(getPins(), newn.getPins(), name);
+
+		assert(getSourcePin() != null) : name;
+
+		assert(newn.getSourcePin() != null) : name;
+		
+		assert (getSourcePin().getName().equals(newn.getSourcePin().getName())) : name;
+		
+		// Make sure source pin on new net is from a cell in new design
+		assert(newn.getDesign().containsCell(newn.getSourcePin().getCell())) : name;
+
+		getProperties().compare(newn.getProperties(), newn.getDesign());
+		
+		//WORKING:(none in new) getDesign().setComp(getRoutedSinks(), newn.getRoutedSinks(), name);
+		
+		//WORKING:
+		// Added copy in deepCopy(), fixed add.rscp but simon.rscp still broken
+		//assert(this.isIntrasite() == newn.isIntrasite()) : name + " " + this.isIntrasite() + " " + newn.isIntrasite();
+		
+		assert(this.isInternal== newn.isInternal) : name;
+		
+		//WORKING:
+		// Not set in newn
+		//assert(this.routeStatus == newn.routeStatus) : name + " " + this.routeStatus + " " + newn.routeStatus;
+		
+		//WORKING:
+		// None in newn
+		//getDesign().listComp(this.getSourceSitePins(), newn.getSourceSitePins(), name);
+
+		if (this.getSourceRouteTree() == null) assert(newn.getSourceRouteTree() == null) : name;
+		
+		//WORKING
+		// add.rscp has a problem with b_IBUF
+		//else if (newn.getSourceRouteTree() == null) assert(this.getSourceRouteTree() == null) : name;
+		else this.getSourceRouteTree().compare(newn.getSourceRouteTree());
+		
+		assert(this.getIntersiteRouteTreeList().size() == newn.getIntersiteRouteTreeList().size()) : name;
+		for (int i=0;i<this.getIntersiteRouteTreeList().size();i++)
+			this.getIntersiteRouteTreeList().get(i).compare(newn.getIntersiteRouteTreeList().get(i));
+		
+		//WORKING
+		// add.rscp: newn has none
+		//getDesign().mapComp(this.getBelPinRouteTrees(), newn.getBelPinRouteTrees(), name);
+		
+		//WORKING
+		// add.rscp: newn has none
+		//getDesign().mapComp(this.getSitePinRouteTrees(), newn.getSitePinRouteTrees(), name);
+		
+		assert(this.isMultiSourced() == newn.isMultiSourced()) : name;
+		
+		assert(this.multiSourceStatusSet == newn.multiSourceStatusSet) : name;
+		
+		getDesign().listComp(this.getAllSourcePins(), newn.getAllSourcePins(), name);
+		
+	}
+
 }

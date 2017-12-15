@@ -314,4 +314,11 @@ public final class RouteTree implements
 		}
 		return toReturn.toString();
 	}
+
+	public void compare(RouteTree routeTree) {
+		// TODO Auto-generated method stub
+		//WORKING: how to compare?
+		
+	}
+
 }
