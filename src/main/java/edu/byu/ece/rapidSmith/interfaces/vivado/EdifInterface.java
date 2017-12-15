@@ -457,6 +457,16 @@ public final class EdifInterface {
 		design.addNet(globalVCCNet);
 		design.addCell(globalGND);
 		design.addNet(globalGNDNet);
+		
+		// For macro pins tied to <const0> or <const1>, make them point to the appropriate global static net
+		for (Cell c : design.getCells())
+			for (CellPin cp : c.getPins()) {
+				if (cp.getNet()!= null && cp.getNet().getName().equals("<const0>"))
+					cp.setMacroPinToGlobalNet(globalGNDNet);
+				else if (cp.getNet()!= null && cp.getNet().getName().equals("<const1>"))
+					cp.setMacroPinToGlobalNet(globalVCCNet);
+			}
+
 	}
 	
 	private static void transferSinkPins(CellNet oldNet, CellNet newNet) {
