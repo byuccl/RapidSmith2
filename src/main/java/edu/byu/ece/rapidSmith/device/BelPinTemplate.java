@@ -21,10 +21,7 @@
 package edu.byu.ece.rapidSmith.device;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  *  Template that backs BelPin objects.  A template exists for every
@@ -38,8 +35,6 @@ public final class BelPinTemplate implements Serializable {
 	// BEL id for the pins this template backs
 	private BelId id;
 	private PinDirection direction;
-	// Names of the site pins that drive or are driven by the BEL pins
-	private Set<String> sitePins;
 	// Wire the BEL pin connects to
 	private int wire;
 
@@ -70,18 +65,6 @@ public final class BelPinTemplate implements Serializable {
 
 	public void setDirection(PinDirection direction) {
 		this.direction = direction;
-	}
-
-	public Set<String> getSitePins() {
-		if (sitePins == null)
-			return Collections.emptySet();
-		return sitePins;
-	}
-
-	public void addSitePin(String sitePin) {
-		if (sitePins == null)
-			sitePins = new TreeSet<>();
-		sitePins.add(sitePin);
 	}
 
 	public int getWire() {
