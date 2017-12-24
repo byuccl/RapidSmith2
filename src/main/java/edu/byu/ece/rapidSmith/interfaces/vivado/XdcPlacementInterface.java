@@ -111,8 +111,7 @@ public class XdcPlacementInterface {
 		Cell cell = tryGetCell(toks[1]);
 		Site site = tryGetSite(toks[2]);
 		
-		// TODO: add a check to see that the sitetype is a valid option for the site
-		String siteType = toks[3]; 
+		String siteType = toks[3];
 		site.setType(SiteType.valueOf(device.getFamily(), siteType));
 		
 		Bel bel = tryGetBel(site, toks[4]);
