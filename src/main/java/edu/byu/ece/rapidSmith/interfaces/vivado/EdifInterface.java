@@ -458,14 +458,17 @@ public final class EdifInterface {
 		design.addCell(globalGND);
 		design.addNet(globalGNDNet);
 		
-		// For macro pins tied to <const0> or <const1>, make them point to the appropriate global static net
-		for (Cell c : design.getCells())
+		// For macro pins tied to power or ground, make them point to the appropriate global static net
+		for (Cell c : design.getCells()) {
 			for (CellPin cp : c.getPins()) {
-				if (cp.getNet()!= null && cp.getNet().getName().equals("<const0>"))
-					cp.setMacroPinToGlobalNet(globalGNDNet);
-				else if (cp.getNet()!= null && cp.getNet().getName().equals("<const1>"))
-					cp.setMacroPinToGlobalNet(globalVCCNet);
+				if (cp.getNet()!= null) {
+					if (cp.getNet() != globalGNDNet && cp.getNet().getType() == NetType.GND) 
+						cp.setMacroPinToGlobalNet(globalGNDNet);
+					else if (cp.getNet() != globalVCCNet && cp.getNet().getType() == NetType.VCC) 
+						cp.setMacroPinToGlobalNet(globalVCCNet);
+				}
 			}
+		}
 
 	}
 	
