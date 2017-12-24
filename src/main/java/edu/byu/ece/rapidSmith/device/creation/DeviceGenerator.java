@@ -266,20 +266,14 @@ public final class DeviceGenerator {
 		// follow each connection from the element
 		for (PrimitiveConnection c : element.getConnections()) {
 			PrimitiveElement destElement;
-			String destPin;
 
 			// This connection goes the opposite of the way we want to search
 			if (forward != c.isForwardConnection())
 				continue;
 
 			destElement = def.getElement(c.getElement1());
-			destPin = c.getPin1();
 
-			if (destElement.isBel()) {
-				// We've reached a BEL.  Add the site pin to the BEL pin.
-				BelPinTemplate pin = templates.get(destElement.getName()).getPinTemplate(destPin);
-				pin.addSitePin(sitePin);
-			} else if (destElement.isMux()) {
+			if (destElement.isMux()) {
 				// This is a routing mux.  Follow it.
 				findAndSetSitePins(templates, def, forward, sitePin, destElement);
 			}
