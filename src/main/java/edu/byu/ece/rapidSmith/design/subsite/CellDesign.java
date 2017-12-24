@@ -591,7 +591,18 @@ public class CellDesign extends AbstractDesign {
 	 * @param bel the BEL where the cell is to be placed
 	 */
 	public void placeCell(Cell cell, Bel bel) {
-		placeCell(cell, bel);
+		Objects.requireNonNull(cell);
+		Objects.requireNonNull(bel);
+		if (cell.getDesign() != this)
+			throw new Exceptions.DesignAssemblyException("Cannot place cell not in the design.");
+		if (cell.isPlaced())
+			throw new Exceptions.DesignAssemblyException("Cell is already placed. Cannot re-place cell: " + cell.getName());
+		if (cell.isMacro())
+			throw new Exceptions.DesignAssemblyException("Cannot place macro cell. Can only place internal cells to the macro.");
+		if (isBelUsed(bel))
+			throw new Exceptions.DesignAssemblyException("Cell already placed at location.");
+
+		_placeCell(cell, bel);
 	}
 
 	/**

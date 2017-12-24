@@ -121,7 +121,7 @@ public class CreateDesignExample {
 		// 2. Find a BEL within that site to place the cell onto (you find the right BEL types for this by querying the Cell)
 		//    Get a set of BelId objects which describe the site type/belname pairs where this cell could be placed.
 		//    This will consist of pairs like: SLICEL/A6LUT or SLICEM/D6LUT
-		List<BelId> anchors = invcell.getPossibleAnchors();
+		List<BelId> anchors = invcell.getPossibleLocations();
 		//    Pull the actual site types out of these BelId objects and collect them into a sorted list without duplicates 
 		//    (the resulting list should contain just SLICEL and SLICEM)
 		List<SiteType> anchorsitetypes = anchors.stream()
@@ -135,7 +135,7 @@ public class CreateDesignExample {
 		slice = device.getAllSitesOfType(sitetype).get(0);
 		// Place the invcell on a suitable LUT (the first one found that is suitable)
 		// Get a list of the ones which have the primitive site type matching above (which will be SLICEL or SLICEM)
-		anchors = invcell.getPossibleAnchors().stream()
+		anchors = invcell.getPossibleLocations().stream()
 				.filter(t -> t.getSiteType() == sitetype)
 				.collect(Collectors.toList());
 		// Place the cell on the bel of the first one
@@ -145,7 +145,7 @@ public class CreateDesignExample {
 		// NOTE: in general it would be good to ensure the LUT and FF in are in corresponding BELS (an ALUT with an AFF, a BLUT with a BFF and so on) 
 		//       to ensure good packing and routability.
 		// But, in this case it doesn't really matter, the design will be routable.
-		anchors = ffcell.getPossibleAnchors().stream()
+		anchors = ffcell.getPossibleLocations().stream()
 				.filter(t -> t.getSiteType() == sitetype)
 				.collect(Collectors.toList());
 		design.placeCell(ffcell, slice.getBel(anchors.get(0).getName()));

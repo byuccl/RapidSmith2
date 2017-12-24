@@ -20,10 +20,8 @@
 
 package edu.byu.ece.rapidSmith.design.subsite;
 
-import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelId;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -133,11 +131,6 @@ public class SimpleLibraryCell extends LibraryCell {
 	 */
 	public void setPossibleBels(List<BelId> possibleBels) {
 		this.compatibleBels = possibleBels;
-	}
-
-	@Override
-	public List<Bel> getRequiredBels(Bel anchor) {
-		return Collections.singletonList(anchor);
 	}
 
 	@Override

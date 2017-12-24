@@ -229,14 +229,7 @@ public abstract class LibraryCell implements Serializable {
 	 * for a library macro
 	 */
 	abstract public List<BelId> getPossibleAnchors();
-	/**
-	 * For macro cells, returns a list of required bel object that are
-	 * needed to place the macro. This functionality is currently unimplemented
-	 * and should not be used.
-	 * @param anchor Anchor {@link Bel} for the macro
-	 */
-	abstract public List<Bel> getRequiredBels(Bel anchor);
-	
+
 	/**
 	 * Returns a list of site properties that are shared across a {@link Bel} Type.
 	 * For example, all Flip Flop Bels in a Site, must all be either rising edge or
