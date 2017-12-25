@@ -6,7 +6,6 @@ import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.creation.ExtendedDeviceInfo;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.util.DotFilePrinter;
@@ -36,7 +35,7 @@ public class AStarRouterExample {
 		Device device = vcp.getDevice();
 		
 		// loading reverse wire connections
-		ExtendedDeviceInfo.loadExtendedInfo(device);
+		device.loadExtendedInfo();
 		
 		// Routing net
 		System.out.println("Routing Net...");

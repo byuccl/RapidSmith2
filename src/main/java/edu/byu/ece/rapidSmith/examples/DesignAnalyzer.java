@@ -105,7 +105,7 @@ public class DesignAnalyzer {
 	 * Print out a formatted representation of a design to help visualize it.  Another way of visualizing designs is illustrated
 	 * in the DotFilePrinterDemo program in the examples2 directory.  
 	 * @param design The design to be pretty printed.
-	 * @param Flag to control printing of detailed cellBelPinMappings 
+	 * @param cellBelPinMappings to control printing of detailed cellBelPinMappings
 	 */
 	public static void prettyPrintDesign(CellDesign design, boolean cellBelPinMappings) {
 		// Print the cells
@@ -217,7 +217,7 @@ public class DesignAnalyzer {
 
 		// A RouteTree object contains a collection of RouteTree objects which represent the downstream segments making up the route.
 		// If this collection has more than element, it represents that the physical wire branches at this point.
-		Collection<RouteTree> sinkTrees = rt.getSinkTrees();
+		Collection<RouteTree> sinkTrees = rt.getChildren();
 		
 		// Always print first wire at the head of a net's RouteTree. The format is "tileName/wireName".
 		if (head)

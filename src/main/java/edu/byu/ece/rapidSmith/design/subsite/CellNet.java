@@ -817,7 +817,6 @@ public class CellNet implements Serializable {
 	 * several BelPin sinks within the Site of the SitePin.
 	 * 
 	 * @param sitePin Input (sink) SitePin
-	 * @return
 	 */
 	public RouteTree getSinkRouteTree(SitePin sitePin) {
 				
@@ -878,7 +877,7 @@ public class CellNet implements Serializable {
 	
 	/**
 	 * Returns all RouteTrees of this net that are connected to the specified CellPin.
-	 * If the CellPin only maps to one BelPin, use {@link #getSinkRouteTrees(CellPin)}  }
+	 * If the CellPin only maps to one BelPin, use {@link #getSinkRouteTree(CellPin)}
 	 * instead.
 	 * 
 	 * @param cellPin sink CellPin

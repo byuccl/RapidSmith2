@@ -21,7 +21,7 @@ public class HandRouter {
 	/**
 	 * Constructor
 	 */
-	public HandRouter () {
+	HandRouter() {
 		this.haveSaved = false;
 		this.restoreCount = 0;
 	}
@@ -90,8 +90,8 @@ public class HandRouter {
 	 * Returns to the previous {@link RouteTree} connection. If the current RouteTree object is the
 	 * source of the route, nothing happens. 
 	 * 
-	 * @param current
-	 * @return 
+	 * @param current the current {@code RouteTree} node.
+	 * @return {@code current}
 	 */
 	private RouteTree goBackwards(RouteTree current) {
 		
@@ -101,8 +101,8 @@ public class HandRouter {
 				restoreCount--;
 			}
 			
-			RouteTree source = current.getSourceTree();
-			source.removeConnection(current.getConnection());
+			RouteTree source = current.getParent();
+			source.disconnect(current);
 			return source; 
 		} 
 		
@@ -121,16 +121,16 @@ public class HandRouter {
 	
 	/**
 	 * Restores a users saved checkpoint
-	 * @param current
-	 * @return
+	 * @param current the current route tree node
+	 * @return {@code current}
 	 */
 	private RouteTree restoreCheckpoint(RouteTree current) {
 		
 		System.out.println("Restoring Saved Route.");
 		
 		while (restoreCount > 0) {
-			RouteTree parent = current.getSourceTree();
-			parent.removeConnection(current.getConnection());
+			RouteTree parent = current.getParent();
+			parent.disconnect(current);
 			current = parent;
 			restoreCount--;
 		}
@@ -159,7 +159,7 @@ public class HandRouter {
 			restoreCount++;
 		}
 		
-		return current.addConnection(connections.get(connectionNum - 1));
+		return current.connect(connections.get(connectionNum - 1));
 	}
 	
 	/**
@@ -174,7 +174,7 @@ public class HandRouter {
 		
 		for (Connection conn : wire.getWireConnections()) {
 			Wire sinkWire = conn.getSinkWire();
-			System.out.println(String.format(String.format("  %d.) %s %s", i, sinkWire.getFullName(), conn.isPip() ?"(PIP)" : "")));
+			System.out.println(String.format("  %d.) %s %s", i, sinkWire.getFullName(), conn.isPip() ?"(PIP)" : ""));
 			i++;
 		}
 	}
