@@ -1,1 +1,6 @@
-*.rb linguist-language=Java
+*.rsc linguist-language=RapidSmithCheckpoint
+*.tcp linguist-language=TclCheckpoint
+*.dcp linguist-language=DesignCheckpoint
+*.dat linguist-language=SerializedDevice
+
+docs/* linguist-documentation
