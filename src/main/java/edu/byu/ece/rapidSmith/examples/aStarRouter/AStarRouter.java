@@ -21,8 +21,8 @@ import edu.byu.ece.rapidSmith.device.*;
  */
 public class AStarRouter {
 	
-	private final Comparator<CostTree> routeTreeComparator;
-	private PriorityQueue<CostTree> priorityQueue;
+	private final Comparator<RouteTreeWithCost> routeTreeComparator;
+	private PriorityQueue<RouteTreeWithCost> priorityQueue;
 	private Map<RouteTree, Set<Wire>> usedConnectionMap;
 	private Tile targetTile;
 	private Tile startTile;
@@ -50,10 +50,10 @@ public class AStarRouter {
 	 * @param net {@link CellNet} to route
 	 * @return The routed net in a {@link RouteTree} data structure
 	 */
-	public CostTree routeNet(CellNet net) {
+	public RouteTreeWithCost routeNet(CellNet net) {
 		
 		// Initialize the route
-		CostTree start = initializeRoute(net);
+		RouteTreeWithCost start = initializeRoute(net);
 		Set<RouteTree> terminals = new HashSet<>();
 		
 		// Find the pins that need to be routed for the net
@@ -74,7 +74,7 @@ public class AStarRouter {
 			while (!routeFound) {
 				
 				// Grab the lowest cost route from the queue
-				CostTree current = priorityQueue.poll();
+				RouteTreeWithCost current = priorityQueue.poll();
 				
 				// Get a set of sink wires from the current RouteTree that already exist in the queue
 				// we don't need to add them again
@@ -87,7 +87,7 @@ public class AStarRouter {
 					
 					// Solution has been found
 					if (sinkWire.equals(targetWire)) {
-						CostTree sinkTree = current.connect(connection);
+						RouteTreeWithCost sinkTree = current.connect(connection);
 						sinkTree = finializeRoute(sinkTree);
 						terminals.add(sinkTree);
 						routeFound = true;
@@ -96,7 +96,7 @@ public class AStarRouter {
 					
 					// Only create and add a new RouteTree object if it doesn't already exist in the queue
 					if (!existingBranches.contains(sinkWire)) {
-						CostTree sinkTree = current.connect(connection);
+						RouteTreeWithCost sinkTree = current.connect(connection);
 						sinkTree.setCost(current.getCost() + 1);
 						priorityQueue.add(sinkTree);
 						existingBranches.add(sinkWire);
@@ -117,9 +117,9 @@ public class AStarRouter {
 	 * Creates an initial {@link RouteTree} object for the specified {@link CellNet}.
 	 * This is the beginning of the physical route. 
 	 */
-	private CostTree initializeRoute(CellNet net) {
+	private RouteTreeWithCost initializeRoute(CellNet net) {
 		Wire startWire = net.getSourceSitePin().getExternalWire();
-		CostTree start = new CostTree(startWire);
+		RouteTreeWithCost start = new RouteTreeWithCost(startWire);
 		startTile = startWire.getTile();
 		usedConnectionMap.clear();
 		return start;
@@ -128,7 +128,7 @@ public class AStarRouter {
 	/**
 	 * Update the costs of the RouteTrees in the priority queue for the new target wire
 	 */
-	private void resortPriorityQueue (CostTree start) {
+	private void resortPriorityQueue (RouteTreeWithCost start) {
 		
 		// if the queue has not been created, create it, otherwise create a new queue double the size
 		priorityQueue = (priorityQueue == null) ? 
@@ -136,7 +136,7 @@ public class AStarRouter {
 			new PriorityQueue<>(priorityQueue.size()*2, routeTreeComparator);
 		
 		// add the RouteTree objects to the new queue so costs will be updated
-		Iterable<CostTree> typed = start.typedIterator();
+		Iterable<RouteTreeWithCost> typed = start.typedIterator();
 		typed.forEach(rt -> priorityQueue.add(rt));
 	}
 	
@@ -172,7 +172,7 @@ public class AStarRouter {
 	 * @param route {@link RouteTree} representing the target wire that has been routed to
 	 * @return the final {@link RouteTree}, which connects to a {@link SitePin}
 	 */
-	private CostTree finializeRoute(CostTree route) {
+	private RouteTreeWithCost finializeRoute(RouteTreeWithCost route) {
 		
 		while (route.getWire().getConnectedPin() == null) {
 			assert (route.getWire().getWireConnections().size() == 1);
@@ -207,16 +207,16 @@ public class AStarRouter {
 		return sinkWire;
 	}
 
-	private static class CostTree extends RouteTree {
+	private static class RouteTreeWithCost extends RouteTree {
 		private int cost = 0;
 
-		public CostTree(Wire wire) {
+		public RouteTreeWithCost(Wire wire) {
 			super(wire);
 		}
 
 		@Override
 		protected RouteTree newInstance(Wire wire) {
-			return new CostTree(wire);
+			return new RouteTreeWithCost(wire);
 		}
 
 		public int getCost() {
