@@ -659,7 +659,7 @@ public class Device implements Serializable {
 	 */
 	private void setSiteTypes() {
 		for (Site site : sites.values()) {
-			site.setType(site.getPossibleTypes()[0]);
+			site.setTypeUnchecked(site.getPossibleTypes()[0]);
 		}
 	}
 

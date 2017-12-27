@@ -19,6 +19,8 @@
  */
 package edu.byu.ece.rapidSmith.device;
 
+import edu.byu.ece.rapidSmith.util.Exceptions;
+
 import java.io.Serializable;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -168,14 +170,23 @@ public final class Site implements Serializable{
 
 	/**
 	 * Updates the type of this site to the specified type.
-	 * Does not perform any validation, so this site can mistakenly be given a
-	 * type that is not in its possible types set.
-	 * <p>
+	 * <p/>
 	 * This method obtains the site template from its device, therefore, the
 	 * site must already exist in a tile which exists in a device.
 	 * @param type the new type for this site
 	 */
 	public void setType(SiteType type) {
+		if (!Arrays.asList(getPossibleTypes()).contains(type))
+			throw new IllegalArgumentException("Invalid type: site=" + name + ", type=" + type);
+		template = getTile().getDevice().getSiteTemplate(type);
+	}
+
+	/**
+	 * Same as {@link #setType(SiteType)} except does not validate that the type is a
+	 * legal type.
+	 * @param type the new type for this site
+	 */
+	public void setTypeUnchecked(SiteType type) {
 		template = getTile().getDevice().getSiteTemplate(type);
 	}
 
