@@ -31,35 +31,8 @@ public class HandRouterExample {
 		HandRouter hr = new HandRouter();
 			
 		// Create a new TileWire object to be the starting wire of the route
-		Wire startWire = new TileWire(device.getTile("CLBLL_L_X16Y152"), we.getWireEnum("CLBLL_L_C"));
-		
-		Wire sinkWire0 = new TileWire(device.getTile("CLBLL_L_X16Y152"), we.getWireEnum("CLBLL_LOGIC_OUTS10"));
-		Wire sinkWire1 = new TileWire(device.getTile("CLBLL_L_X16Y152"), we.getWireEnum("CLBLL_L_CMUX"));
+		Wire startWire = new TileWire(device.getTile("INT_R_X27Y90"), we.getWireEnum("WW4BEG0"));
 
-		// CLBLL_L_X16Y152/CLBLL_LOGIC_OUTS10 is used
-		// CLBLL_L_X16Y152/CLBLL_L_CMUX is unavailable
-		PIP usedPip = new PIP(startWire, sinkWire0);
-		Tile tile = device.getTile("CLBLL_L_X16Y152");
-		if (tile.hasPIP(usedPip))
-		{
-			System.out.println("Has PIP!");
-			// Now mark the PIP as used.
-			tile.setUsedPIP(usedPip);
-			
-		}
-		
-		PIP unavailablePip = new PIP(startWire, sinkWire1);
-		if (tile.hasPIP(unavailablePip))
-		{
-			System.out.println("Has PIP!");
-			// Now mark the PIP as unavailable.
-			tile.setUnavailablePIP(unavailablePip);
-		}
-
-		
-//		Integer startWire = we.getWireEnum(tokens.get(2));
-//		device.getTile("CLBLL_L_X16Y152").removeConnection(src, dest);
-		
 		// Run the hand router, which returns a RapidSmith RouteTree object
 		RouteTree route = hr.route(startWire);
 		

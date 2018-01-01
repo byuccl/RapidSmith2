@@ -375,43 +375,99 @@ public class Tile implements Serializable {
 		return hasConnection(pip.getStartWire().getWireEnum(), pip.getEndWire().getWireEnum());
 	}
 	
-	public void setUsedPIP(PIP pip) {
-		int startWire = pip.getStartWire().getWireEnum();
-		int endWire = pip.getEndWire().getWireEnum();
+	private void updateReverseWireConns() {
 		
-		WireConnection[] wireConns = wireConnections.get(startWire);
-		if (wireConns != null && wireConns.length >= 0) {
-			for (WireConnection wc : wireConns) {
-				if (wc.getWire() == endWire && wc.isPIP()) {
-//					System.out.println("Set a wire connection as used");
-					wc.setUsed(true);
-					//return true;
-				}
-				else
-				{
-					// Set other PIPs using the same startWire to unavailable
-					if (wc.isPIP()) {
-						wc.setUnavailable(true);
-					}
-				}
-			}
-		}
 		
-		// Set other PIPs using the same sinkWire to unavailable
-		WireConnection[] reverseWireConns = reverseWireConnections.get(endWire);
-		if (wireConns != null && wireConns.length >= 0) {
-			for (WireConnection wc : wireConns) {
-				if (wc.getWire() != startWire && wc.isPIP()) {
-					// mark as unavailable
-				}
-			}
-		}
 		
-		// TODO: Make sure PIP exists before calling this method.
-		// otherwise, the other connections will still be set to unavailable.
-		// PIP does not exist in tile!
-		// Throw an exception.
 
+	}
+	
+	public void setUsedPIP(PIP pip) {
+		
+		if (!hasPIP(pip)) {
+			// TODO: throw an exception
+			System.out.println("This PIP does not exist in the tile!");
+			return;
+		}	
+		
+		int pipStartWire = pip.getStartWire().getWireEnum();
+		int pipEndWire = pip.getEndWire().getWireEnum();
+		
+		// Set other PIPs using this endWire as their startWire to unavailable
+		WireConnection[] wireConns = wireConnections.get(pipEndWire);
+		if (wireConns != null && wireConns.length >= 0) {
+			for (WireConnection wc : wireConns) {
+				if (wc.isPIP()) {
+					wc.setUnavailable(true);
+				}
+			}
+		}	
+		
+		// Set other PIPs using this startWire as their endWire to unavailable
+		for (Integer startWire : wireConnections.keySet()) {
+			wireConns = wireConnections.get(startWire);
+			
+			for (WireConnection wc : wireConns) {
+				if (wc.getWire() == pipStartWire && wc.isPIP()) {
+					wc.setUnavailable(true);
+				}
+			}
+		}
+		
+		// Set the used PIP to used and set other PIPs using this startWire 
+		// as their startWire to unavailable
+		wireConns = wireConnections.get(pipStartWire);
+		if (wireConns != null && wireConns.length >= 0) {
+			for (WireConnection wc : wireConns) {
+				if (wc.isPIP()) {
+					if (wc.getWire() == pipEndWire) {
+						wc.setUsed(true);
+						wc.setUnavailable(false);
+					}
+					else
+						wc.setUnavailable(true);
+				}
+			}
+		}
+		
+		// Update reverse wire connections
+		
+		// Set other PIPs using this endWire as their startWire to unavailable
+		WireConnection[] reverseWireConns = reverseWireConnections.get(pipEndWire);
+		if (reverseWireConns != null && reverseWireConns.length >= 0) {
+			for (WireConnection wc : reverseWireConns) {
+				if (wc.isPIP()) {
+					wc.setUnavailable(true);
+				}
+			}
+		}	
+		
+		// Set other PIPs using this startWire as their endWire to unavailable
+		for (Integer startWire : reverseWireConnections.keySet()) {
+			reverseWireConns = reverseWireConnections.get(startWire);
+			
+			for (WireConnection wc : reverseWireConns) {
+				if (wc.getWire() == pipStartWire && wc.isPIP()) {
+					wc.setUnavailable(true);
+				}
+			}
+		}
+		
+		// Set the used PIP to used and set other PIPs using this startWire 
+		// as their startWire to unavailable
+		reverseWireConns = reverseWireConnections.get(pipStartWire);		
+		if (reverseWireConns != null && reverseWireConns.length >= 0) {
+			for (WireConnection wc : reverseWireConns) {
+				if (wc.isPIP()) {
+					if (wc.getWire() == pipEndWire) {
+						wc.setUsed(true);
+						wc.setUnavailable(false);
+					}
+					else
+						wc.setUnavailable(true);
+				}
+			}
+		}	
 	}
 	
 	public void setUnavailablePIP(PIP pip) {
