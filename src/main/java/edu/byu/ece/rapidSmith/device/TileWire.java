@@ -103,6 +103,7 @@ public class TileWire implements Wire, Serializable {
 	 */
 	@Override
 	public Collection<Connection> getWireConnections() {	
+		System.out.println("Tile Wire");
 		WireConnection[] wireConnections = tile.getWireConnections(wire);
 		if (wireConnections == null)
 			return Collections.emptyList();

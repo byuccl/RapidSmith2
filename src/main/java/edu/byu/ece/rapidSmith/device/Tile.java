@@ -281,6 +281,25 @@ public class Tile implements Serializable {
 			this.wireConnections.put(src, tmp);
 		}
 	}
+	
+	/**
+	 * This method removes a key/value pair from the wires HashMap.
+	 *
+	 * @param src  The wire (or key) of the HashMap to add.
+	 * @param dest The actual wire to add to the value or Wire[] in the HashMap.
+	 */
+//	public void removeConnection(int src, WireConnection dest) {
+//		WireConnection[] currentConnections = this.wireConnections.get(src);
+//		WireConnection[] tmp = new WireConnection[currentConnections.length + 1];
+//		int i;
+//		for (i = 0; i < currentConnections.length; i++) {
+//			tmp[i] = currentConnections[i];
+//		}
+//		tmp[i] = dest;
+//		Arrays.sort(tmp);
+//		this.wireConnections.put(src, tmp);
+//		
+//	}
 
 	/**
 	 * Create Collection of TileWire objects for each wire in the tile.
@@ -354,6 +373,64 @@ public class Tile implements Serializable {
 	 */
 	public boolean hasPIP(PIP pip) {
 		return hasConnection(pip.getStartWire().getWireEnum(), pip.getEndWire().getWireEnum());
+	}
+	
+	public void setUsedPIP(PIP pip) {
+		int startWire = pip.getStartWire().getWireEnum();
+		int endWire = pip.getEndWire().getWireEnum();
+		
+		WireConnection[] wireConns = wireConnections.get(startWire);
+		if (wireConns != null && wireConns.length >= 0) {
+			for (WireConnection wc : wireConns) {
+				if (wc.getWire() == endWire && wc.isPIP()) {
+//					System.out.println("Set a wire connection as used");
+					wc.setUsed(true);
+					//return true;
+				}
+				else
+				{
+					// Set other PIPs using the same startWire to unavailable
+					if (wc.isPIP()) {
+						wc.setUnavailable(true);
+					}
+				}
+			}
+		}
+		
+		// Set other PIPs using the same sinkWire to unavailable
+		WireConnection[] reverseWireConns = reverseWireConnections.get(endWire);
+		if (wireConns != null && wireConns.length >= 0) {
+			for (WireConnection wc : wireConns) {
+				if (wc.getWire() != startWire && wc.isPIP()) {
+					// mark as unavailable
+				}
+			}
+		}
+		
+		// TODO: Make sure PIP exists before calling this method.
+		// otherwise, the other connections will still be set to unavailable.
+		// PIP does not exist in tile!
+		// Throw an exception.
+
+	}
+	
+	public void setUnavailablePIP(PIP pip) {
+		int startWire = pip.getStartWire().getWireEnum();
+		int endWire = pip.getEndWire().getWireEnum();
+		
+		WireConnection[] wireConns = wireConnections.get(startWire);
+		if (wireConns != null && wireConns.length >= 0) {
+			for (WireConnection wc : wireConns) {
+				if (wc.getWire() == endWire && wc.isPIP()) {
+//					System.out.println("Set a wire connection as unavailable");
+					wc.setUnavailable(true);
+					//return true;
+				}
+			}
+		}
+		// PIP does not exist in tile!
+		// Throw an exception.
+
 	}
 
 	private boolean hasConnection(int startWire, int endWire) {

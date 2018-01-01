@@ -174,7 +174,19 @@ public class HandRouter {
 		
 		for (Connection conn : wire.getWireConnections()) {
 			Wire sinkWire = conn.getSinkWire();
-			System.out.println(String.format(String.format("  %d.) %s %s", i, sinkWire.getFullName(), conn.isPip() ?"(PIP)" : "")));
+			String pipStr = "";
+			if (conn.isPip())
+			{
+				// Say what kind of connection it is
+					if (conn.isUsed())
+						pipStr = "(PIP - Used)";
+					else if (conn.isUnavailable())
+						pipStr = "(PIP - Unavailable)";
+					else
+						pipStr = "(PIP)";
+			}
+			
+			System.out.println(String.format(String.format("  %d.) %s %s", i, sinkWire.getFullName(), pipStr)));
 			i++;
 		}
 	}
