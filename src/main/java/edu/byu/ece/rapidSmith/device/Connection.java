@@ -61,10 +61,10 @@ public abstract class Connection implements Serializable {
 			return wc.isUsed();
 		}
 		
-		@Override
-		public boolean isUnavailable() {
-			return wc.isUnavailable();
-		}
+//		@Override
+//		public boolean isUnavailable() {
+//			return wc.isUnavailable();
+//		}
 		
 		@Override
 		public boolean isPip() {
@@ -147,10 +147,10 @@ public abstract class Connection implements Serializable {
 			return wc.isUsed();
 		}
 		
-		@Override
-		public boolean isUnavailable() {
-			return wc.isUnavailable();
-		}
+//		@Override
+//		public boolean isUnavailable() {
+//			return wc.isUnavailable();
+//		}
 
 		@Override
 		public boolean isPip() {
@@ -235,10 +235,10 @@ public abstract class Connection implements Serializable {
 			return wc.isUsed();
 		}
 		
-		@Override
-		public boolean isUnavailable() {
-			return wc.isUnavailable();
-		}
+//		@Override
+//		public boolean isUnavailable() {
+//			return wc.isUnavailable();
+//		}
 
 		@Override
 		public boolean isPip() {
@@ -328,10 +328,10 @@ public abstract class Connection implements Serializable {
 			return wc.isUsed();
 		}
 		
-		@Override
-		public boolean isUnavailable() {
-			return wc.isUnavailable();
-		}
+//		@Override
+//		public boolean isUnavailable() {
+//			return wc.isUnavailable();
+//		}
 		
 		@Override
 		public boolean isPip() {
@@ -467,11 +467,11 @@ public abstract class Connection implements Serializable {
 			return false;
 		}
 
-		@Override
-		public boolean isUnavailable() {
-			// TODO Auto-generated method stub
-			return false;
-		}
+//		@Override
+//		public boolean isUnavailable() {
+//			// TODO Auto-generated method stub
+//			return false;
+//		}
 	}
 
 	@Deprecated
@@ -552,11 +552,11 @@ public abstract class Connection implements Serializable {
 			return false;
 		}
 
-		@Override
-		public boolean isUnavailable() {
-			// TODO Auto-generated method stub
-			return false;
-		}
+//		@Override
+//		public boolean isUnavailable() {
+//			// TODO Auto-generated method stub
+//			return false;
+//		}
 	}
 
 	@Deprecated
@@ -637,11 +637,11 @@ public abstract class Connection implements Serializable {
 			return false;
 		}
 
-		@Override
-		public boolean isUnavailable() {
-			// TODO Auto-generated method stub
-			return false;
-		}
+//		@Override
+//		public boolean isUnavailable() {
+//			// TODO Auto-generated method stub
+//			return false;
+//		}
 	}
 
 	public abstract Wire getSourceWire();
@@ -653,7 +653,7 @@ public abstract class Connection implements Serializable {
 	
 	public abstract boolean isUsed();
 	
-	public abstract boolean isUnavailable();
+//	public abstract boolean isUnavailable();
 
 	public abstract boolean isPip();
 
