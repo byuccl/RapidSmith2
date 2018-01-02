@@ -357,6 +357,7 @@ public class Tile implements Serializable {
 	}
 	
 	public void setUsedPIP(PIP pip, Boolean remove) {
+		System.out.println("\n*** Set a PIP to used ***\n");
 		
 		if (!hasPIP(pip)) {
 			// TODO: throw an exception
@@ -371,9 +372,13 @@ public class Tile implements Serializable {
 		WireConnection[] wireConns = wireConnections.get(pipEndWire);
 		if (wireConns != null && wireConns.length >= 0) {
 			for (WireConnection wc : wireConns) {
-				if (wc.isPIP()) {				
+				if (wc.isPIP()) {	
 					
-					wc.setUnavailable(true);
+					if (remove) {
+						wireConnections.remove(pipEndWire, wc);
+					}
+					else
+						wc.setUnavailable(true);
 				}
 			}
 		}	
@@ -400,20 +405,21 @@ public class Tile implements Serializable {
 		// as their startWire to unavailable
 		wireConns = wireConnections.get(pipStartWire);
 		if (wireConns != null && wireConns.length >= 0) {
-			for (WireConnection wc : wireConns) {
-				if (wc.isPIP()) {
-					
-					if (remove) {
-						// Remove all PIP connections for the start wire.
-						wireConnections.remove(pipStartWire);
-					}
-					else {
+			if (remove) {
+				// Remove all PIP connections for the start wire.
+				wireConnections.remove(pipStartWire);
+			}
+			else {
+				for (WireConnection wc : wireConns) {
+					if (wc.isPIP()) {
 						if (wc.getWire() == pipEndWire) {
 							wc.setUsed(true);
 							wc.setUnavailable(false);
 						}
-						else
-							wc.setUnavailable(true);
+						else {
+	
+								wc.setUnavailable(true);
+						}
 					}
 				}
 			}
@@ -426,18 +432,41 @@ public class Tile implements Serializable {
 		if (reverseWireConns != null && reverseWireConns.length >= 0) {
 			for (WireConnection wc : reverseWireConns) {
 				if (wc.isPIP()) {
-					wc.setUnavailable(true);
+					
+					if (remove) {
+						System.out.println("Reverse remove");
+						reverseWireConnections.remove(pipEndWire, wc);
+					}
+					else			
+						wc.setUnavailable(true);
 				}
 			}
 		}	
 		
 		// Set other PIPs using this startWire as their endWire to unavailable
 		for (Integer startWire : reverseWireConnections.keySet()) {
-			reverseWireConns = reverseWireConnections.get(startWire);
 			
-			for (WireConnection wc : reverseWireConns) {
-				if (wc.getWire() == pipStartWire && wc.isPIP()) {
-					wc.setUnavailable(true);
+			if (startWire != pipEndWire) {  // have already processed all pipEndWire reverse connections
+			
+				reverseWireConns = reverseWireConnections.get(startWire);
+				
+				for (WireConnection wc : reverseWireConns) {
+					if (wc == null) {
+						System.out.println("wc is null!");
+						System.out.println("key: "+ startWire);
+						System.out.println("pipStartWire " + pipStartWire);
+						System.out.println("pipEndWire " + pipEndWire);
+	
+					}
+					if (wc.getWire() == pipStartWire && wc.isPIP()) {
+						
+						if (remove) {
+							System.out.println("Trouble remove");
+							reverseWireConnections.remove(startWire, wc);
+						}
+						else
+							wc.setUnavailable(true);
+					}
 				}
 			}
 		}
@@ -452,8 +481,14 @@ public class Tile implements Serializable {
 						wc.setUsed(true);
 						wc.setUnavailable(false);
 					}
-					else
-						wc.setUnavailable(true);
+					else {
+						if (remove) {
+							reverseWireConnections.remove(pipStartWire, wc);
+						}
+						else
+							wc.setUnavailable(true);
+
+					}
 				}
 			}
 		}	

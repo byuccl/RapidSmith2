@@ -26,10 +26,12 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 /**
- * DO NOT USE THIS CLASS!  This class was specially developed for the Device 
- * wire connections hash map.  It is specifically optimized for that purpose.
- * Created on: Mar 18, 2011
+ * DO NOT USE THIS CLASS! This class was specially developed for the Device wire
+ * connections hash map. It is specifically optimized for that purpose. Created
+ * on: Mar 18, 2011
  */
 public class WireHashMap implements Serializable {
 	/**
@@ -38,9 +40,8 @@ public class WireHashMap implements Serializable {
 	private static final int DEFAULT_INITIAL_CAPACITY = 16;
 
 	/**
-	 * The maximum capacity, used if a higher value is implicitly specified
-	 * by either of the constructors with arguments.
-	 * MUST be a power of two <= 1<<30.
+	 * The maximum capacity, used if a higher value is implicitly specified by
+	 * either of the constructors with arguments. MUST be a power of two <= 1<<30.
 	 */
 	private static final int MAXIMUM_CAPACITY = 1 << 30;
 
@@ -54,12 +55,12 @@ public class WireHashMap implements Serializable {
 	 * The keys table. Length MUST Always be a power of two.
 	 */
 	private int[] keys;
-	
+
 	/**
 	 * The corresponding values table.
 	 */
 	public WireConnection[][] values;
-	
+
 	/**
 	 * The number of key-value mappings contained in this map.
 	 */
@@ -67,7 +68,7 @@ public class WireHashMap implements Serializable {
 
 	// These variables are used to track the whether the caches are up to date.
 	// A cache is up to date if it is equivalent to the wireHashMapModification
-	// value.  Any put operation updates the wireHashMapModification value
+	// value. Any put operation updates the wireHashMapModification value
 	private transient int wireHashMapModification = 0;
 	private transient int keySetCacheModification = -1; // initialize as out of date
 	private transient int valuesCacheModification = -1; // initialize as out of date
@@ -79,6 +80,7 @@ public class WireHashMap implements Serializable {
 
 	/**
 	 * The next size value at which to resize (capacity * load factor).
+	 * 
 	 * @serial
 	 */
 	private int threshold;
@@ -92,14 +94,17 @@ public class WireHashMap implements Serializable {
 
 	private Integer hash;
 
-	/** This map requires an initial capacity.  This map will not grow.
-	 * @param capacity the set capacity for this hash map
-	 * @param loadFactor the load factor for this hash map before growing
+	/**
+	 * This map requires an initial capacity. This map will not grow.
+	 * 
+	 * @param capacity
+	 *            the set capacity for this hash map
+	 * @param loadFactor
+	 *            the load factor for this hash map before growing
 	 */
-	private WireHashMap(int capacity, float loadFactor){
+	private WireHashMap(int capacity, float loadFactor) {
 		if (capacity < 0)
-			throw new IllegalArgumentException("Illegal initial capacity: " +
-											   capacity);
+			throw new IllegalArgumentException("Illegal initial capacity: " + capacity);
 		if (capacity > MAXIMUM_CAPACITY)
 			capacity = MAXIMUM_CAPACITY;
 
@@ -107,10 +112,10 @@ public class WireHashMap implements Serializable {
 		int finalCapacity = 4;
 		while (finalCapacity < capacity)
 			finalCapacity <<= 1;
-		
+
 		this.loadFactor = loadFactor;
-		threshold = (int)(finalCapacity * loadFactor);
-		
+		threshold = (int) (finalCapacity * loadFactor);
+
 		keys = new int[finalCapacity];
 		Arrays.fill(keys, -1);
 		values = new WireConnection[finalCapacity][];
@@ -121,7 +126,7 @@ public class WireHashMap implements Serializable {
 		this.loadFactor = loadFactor;
 	}
 
-	public WireHashMap(){
+	public WireHashMap() {
 		this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR);
 	}
 
@@ -134,69 +139,74 @@ public class WireHashMap implements Serializable {
 		return size;
 	}
 
-
 	public boolean isEmpty() {
 		return size == 0;
 	}
 
 	private int indexFor(int key) {
-		int i = key & (keys.length-1);
-		while(keys[i] != key && keys[i] != -1){
-			i+=3;
-			if(i >= keys.length) i=i&3;
+		int i = key & (keys.length - 1);
+		while (keys[i] != key && keys[i] != -1) {
+			i += 3;
+			if (i >= keys.length)
+				i = i & 3;
 		}
 		return i;
 	}
-	
-	public WireConnection[] get(int key){
+
+	public WireConnection[] get(int key) {
 		int i = indexFor(key);
 		if (keys[i] == -1 || keys[i] == 0)
 			return null;
 		return values[i];
-	} 
+	}
 
-	public void put(int key, WireConnection[] value){
+	public void put(int key, WireConnection[] value) {
 		int i = indexFor(key);
-		if(keys[i] == -1)
+		if (keys[i] == -1)
 			size++;
 		keys[i] = key;
 		values[i] = value;
 		wireHashMapModification++;
 
-		if(size > threshold){
+		if (size > threshold) {
 			grow();
 		}
 	}
-	
+
 	/**
 	 * Removes the mapping for the specified key from the map.
+	 * 
 	 * @param key
 	 */
-	public void remove(int key) {	
+	public void remove(int key) {
+		System.out.println("Remove all of key " + key);
 		int i = indexFor(key);
-		if(keys[i] == -1) {
+		if (keys[i] == -1) {
 			// key does not exist
 			// TODO: Throw an exception
 			return;
 		}
-		
+
 		keys[i] = 0; // not -1 because the map doesn't need to grow to add this key again
-		
+
 		// Remove the values?
 		// TODO: This probably isn't the best way to do this
-		for (WireConnection wireConn : values[i]) {
-			wireConn = null;
+		for (int j = 0; j < values[i].length; j++) {
+			values[i][j] = null;
 			size--;
 		}
 		wireHashMapModification++;
 	}
-	
+
 	/**
 	 * Removes a WireConnection from the value array for the specified key.
 	 * @param key
 	 * @param value
 	 */
 	public void remove(int key, WireConnection value) {
+		System.out.println("Remove key, val " + key + ", " + value.toString());
+		
+		
 		int i = indexFor(key);
 		if(keys[i] == -1) {
 			// key does not exist
@@ -204,38 +214,30 @@ public class WireHashMap implements Serializable {
 			return;
 		}
 		
-		// TODO: Make more efficient with the cache?
-		// TODO: Truly remove it...
 		// Find the value and remove it from the map
-		for (int j = 0; j < values[i].length; j++) {
-			System.out.println("Length: " + values[i].length);
-			if (values[i][j] != null) {
-				if (values[i][j].equals(value))
-					values[i][j] = null;		
-			}
-		}
+		values[i] = ArrayUtils.removeElement(values[i], value);
 
 		size--;
 		wireHashMapModification++;
 	}
 
-	private void grow(){
-		int newCapacity = keys.length*2;
-		threshold = (int)(newCapacity * loadFactor);
+	private void grow() {
+		int newCapacity = keys.length * 2;
+		threshold = (int) (newCapacity * loadFactor);
 		int[] oldKeys = keys;
 		WireConnection[][] oldValues = values;
 		keys = new int[newCapacity];
 		Arrays.fill(keys, -1);
 		values = new WireConnection[newCapacity][];
 		size = 0;
-		for(int i=0; i < oldKeys.length; i++){
-			if(oldKeys[i] != -1){
+		for (int i = 0; i < oldKeys.length; i++) {
+			if (oldKeys[i] != -1) {
 				put(oldKeys[i], oldValues[i]);
 			}
 		}
 	}
-	
-	public Set<Integer> keySet(){
+
+	public Set<Integer> keySet() {
 		// check if the cached keySets are current
 		Set<Integer> keySet = keySetCache == null ? null : keySetCache.get();
 		if (keySet != null && keySetCacheModification == wireHashMapModification)
@@ -251,8 +253,8 @@ public class WireHashMap implements Serializable {
 		keySetCache = new SoftReference<>(keySet);
 		return keySet;
 	}
-	
-	public ArrayList<WireConnection[]> values(){
+
+	public ArrayList<WireConnection[]> values() {
 		// check if the cached values are current;
 		ArrayList<WireConnection[]> valuesList = valuesCache == null ? null : valuesCache.get();
 		if (valuesList != null && valuesCacheModification == wireHashMapModification)
@@ -262,7 +264,7 @@ public class WireHashMap implements Serializable {
 		// build the values cache
 		valuesList = new ArrayList<>(size);
 		for (int i = 0; i < keys.length; i++) {
-			if(keys[i] != -1)
+			if (keys[i] != -1)
 				valuesList.add(values[i]);
 		}
 		valuesCache = new SoftReference<>(valuesList);
