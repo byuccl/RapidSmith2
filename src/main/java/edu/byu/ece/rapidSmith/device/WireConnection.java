@@ -45,7 +45,7 @@ public class WireConnection implements Serializable, Comparable<WireConnection>{
 	private boolean isPIP;
 	
 	private boolean used;
-	private boolean unavailable;
+//	private boolean unavailable;
 
 	public WireConnection(){
 		this.wire = -1;
@@ -156,19 +156,19 @@ public class WireConnection implements Serializable, Comparable<WireConnection>{
 		return we.getWireName(this.wire) +"("+ this.rowOffset +","+ this.columnOffset +","+ this.isPIP + ")";
 	}
 
-	/**
-	 * @return the unavailable
-	 */
-	public boolean isUnavailable() {
-		return unavailable;
-	}
+//	/**
+//	 * @return the unavailable
+//	 */
+//	public boolean isUnavailable() {
+//		return unavailable;
+//	}
 
-	/**
-	 * @param unavailable the unavailable to set
-	 */
-	public void setUnavailable(boolean unavailable) {
-		this.unavailable = unavailable;
-	}
+//	/**
+//	 * @param unavailable the unavailable to set
+//	 */
+//	public void setUnavailable(boolean unavailable) {
+//		this.unavailable = unavailable;
+//	}
 
 	/**
 	 * @return the used

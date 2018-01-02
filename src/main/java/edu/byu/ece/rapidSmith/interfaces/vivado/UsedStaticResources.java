@@ -23,13 +23,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
-import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.byu.ece.rapidSmith.design.subsite.BelRoutethrough;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.PIP;
 import edu.byu.ece.rapidSmith.device.Tile;
@@ -49,11 +46,8 @@ public class UsedStaticResources {
 	private final Device device;
 	private final CellDesign design;
 	private final WireEnumerator wireEnumerator;
-	private int currentLineNumber;
-	private String currentFile;
 	private Pattern pipNamePattern;
 
-	
 	/**
 	 * Creates a new XdcRoutingInterface object.
 	 * 
@@ -64,7 +58,6 @@ public class UsedStaticResources {
 		this.device = device;
 		this.wireEnumerator = device.getWireEnumerator();
 		this.design = design;
-		this.currentLineNumber = 0;
 		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)"); 
 	}
 	
@@ -75,8 +68,6 @@ public class UsedStaticResources {
 	 * @throws IOException
 	 */
 	public void parseResourcesRSC(String resourcesFile) throws IOException {
-		
-		currentFile = resourcesFile;
 		// Regex used to split lines via whitespace
 		Pattern whitespacePattern = Pattern.compile("\\s+");
 		
@@ -85,28 +76,19 @@ public class UsedStaticResources {
 		
 			String line;
 			while ((line = br.readLine()) != null) {
-				this.currentLineNumber = br.getLineNumber();
 				String[] toks = whitespacePattern.split(line);
 	
-				// TODO: I know the order these things appear in the file, so I probably don't need a big switch statement
-				// SITE_PIPS -> STATIC_SOURCES -> LUT_RTS -> INTRASITE/INTERSITE/ROUTE
-				// Update this if there is a performance issue, but it should be fine
 				switch (toks[0]) {
 					case "USED_PIPS" : 
 						processUsedPips(toks);
 						break;
 					case "VCC_SOURCES" : 
-						// processStaticSources(toks, true);
-						break;
 					case "GND_SOURCES" : 
-						// processStaticSources(toks, false);
-						break;
 					case "LUT_RTS" : 
-						// processLutRoutethroughs(toks); 
-						break;
-					case "SITE_RTS": 
-						// processSiteRoutethroughs
-						break; 
+					case "SITE_RTS":
+						// Used static sources, LUT Routethroughs, & Site Routethroughs
+						// aren't expected to be found within a PR region.
+						throw new ParseException("Unexpected Token: " + toks[0]);
 					default : 
 						throw new ParseException("Unrecognized Token: " + toks[0]);
 				}
@@ -114,20 +96,13 @@ public class UsedStaticResources {
 		}
 	}
 	
-	
 	/**
+	 * Processes an array of used PIP tokens and marks used PIP wire connections as used.
 	 * 
-	 * 
-	 * @param toks List of used PIP tokens in the form: <br>
+	 * @param toks a String array of used PIP tokens in the form: <br>
 	 * {@code LUT_RTS tile0.tileType/sourceWire0->>sinkWire0 tile1.tileType/sourceWire1->sinkWire1 ...}
 	 */
-	private void processUsedPips(String[] toks) {
-		System.out.println("processUsedPips");
-	
-		
-		// Build a map from PIP names (tokens) to the names of the source and sink wires
-		
-		// 1. Mark the corresponding wire connections as used
+	private void processUsedPips(String[] toks) {		
 		
 		for (int i = 1; i < toks.length; i++ ) {			
 			Matcher m = pipNamePattern.matcher(toks[i]);
@@ -140,11 +115,10 @@ public class UsedStaticResources {
 				Tile tile = device.getTile(tileName);
 				Wire startWire = new TileWire(tile, wireEnumerator.getWireEnum(source));
 				Wire sinkWire = new TileWire(tile, wireEnumerator.getWireEnum(sink));
+		
 				PIP pip = new PIP(startWire, sinkWire);
-				
-				// Mark the PIP as used 
-				// (and mark other PIPs using the same start or sink wire to unavailable)
-				tile.setUsedPIP(pip, true);					
+				tile.setUsedPIP(pip, false); // Mark the PIP as used 
+	 				
 			}
 			else {
 				throw new ParseException("Invalid Pip String configuration: " + toks[i]);
@@ -152,5 +126,4 @@ public class UsedStaticResources {
 		}	
 	}
 
-	
 }

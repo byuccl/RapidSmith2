@@ -187,14 +187,12 @@ public class WireHashMap implements Serializable {
 			return;
 		}
 
-		keys[i] = 0; // not -1 because the map doesn't need to grow to add this key again
-
-		// Remove the values?
-		// TODO: This probably isn't the best way to do this
-		for (int j = 0; j < values[i].length; j++) {
-			values[i][j] = null;
-			size--;
-		}
+		// Remove the values and key
+		int valueLength = values[i].length;
+		values = ArrayUtils.removeElement(values, values[i]);
+		size -= valueLength;
+		keys[i] = -1;
+		
 		wireHashMapModification++;
 	}
 
@@ -203,10 +201,7 @@ public class WireHashMap implements Serializable {
 	 * @param key
 	 * @param value
 	 */
-	public void remove(int key, WireConnection value) {
-		System.out.println("Remove key, val " + key + ", " + value.toString());
-		
-		
+	public void remove(int key, WireConnection value) {		
 		int i = indexFor(key);
 		if(keys[i] == -1) {
 			// key does not exist
@@ -216,7 +211,6 @@ public class WireHashMap implements Serializable {
 		
 		// Find the value and remove it from the map
 		values[i] = ArrayUtils.removeElement(values[i], value);
-
 		size--;
 		wireHashMapModification++;
 	}
