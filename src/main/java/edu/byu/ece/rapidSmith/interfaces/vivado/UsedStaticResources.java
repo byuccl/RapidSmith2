@@ -144,7 +144,7 @@ public class UsedStaticResources {
 				
 				// Mark the PIP as used 
 				// (and mark other PIPs using the same start or sink wire to unavailable)
-				tile.setUsedPIP(pip);					
+				tile.setUsedPIP(pip, true);					
 			}
 			else {
 				throw new ParseException("Invalid Pip String configuration: " + toks[i]);

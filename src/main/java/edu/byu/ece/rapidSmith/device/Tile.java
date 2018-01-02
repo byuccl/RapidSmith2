@@ -283,25 +283,6 @@ public class Tile implements Serializable {
 	}
 	
 	/**
-	 * This method removes a key/value pair from the wires HashMap.
-	 *
-	 * @param src  The wire (or key) of the HashMap to add.
-	 * @param dest The actual wire to add to the value or Wire[] in the HashMap.
-	 */
-//	public void removeConnection(int src, WireConnection dest) {
-//		WireConnection[] currentConnections = this.wireConnections.get(src);
-//		WireConnection[] tmp = new WireConnection[currentConnections.length + 1];
-//		int i;
-//		for (i = 0; i < currentConnections.length; i++) {
-//			tmp[i] = currentConnections[i];
-//		}
-//		tmp[i] = dest;
-//		Arrays.sort(tmp);
-//		this.wireConnections.put(src, tmp);
-//		
-//	}
-
-	/**
 	 * Create Collection of TileWire objects for each wire in the tile.
 	 * @return Collection of TileWire objects.
 	 */
@@ -375,14 +356,7 @@ public class Tile implements Serializable {
 		return hasConnection(pip.getStartWire().getWireEnum(), pip.getEndWire().getWireEnum());
 	}
 	
-	private void updateReverseWireConns() {
-		
-		
-		
-
-	}
-	
-	public void setUsedPIP(PIP pip) {
+	public void setUsedPIP(PIP pip, Boolean remove) {
 		
 		if (!hasPIP(pip)) {
 			// TODO: throw an exception
@@ -397,7 +371,8 @@ public class Tile implements Serializable {
 		WireConnection[] wireConns = wireConnections.get(pipEndWire);
 		if (wireConns != null && wireConns.length >= 0) {
 			for (WireConnection wc : wireConns) {
-				if (wc.isPIP()) {
+				if (wc.isPIP()) {				
+					
 					wc.setUnavailable(true);
 				}
 			}
@@ -407,9 +382,16 @@ public class Tile implements Serializable {
 		for (Integer startWire : wireConnections.keySet()) {
 			wireConns = wireConnections.get(startWire);
 			
-			for (WireConnection wc : wireConns) {
-				if (wc.getWire() == pipStartWire && wc.isPIP()) {
-					wc.setUnavailable(true);
+			if (wireConns != null && wireConns.length >= 0) {
+				for (WireConnection wc : wireConns) {
+					if (wc.getWire() == pipStartWire && wc.isPIP()) {
+						
+						if (remove) {
+							wireConnections.remove(startWire, wc);
+						}
+						else
+							wc.setUnavailable(true);
+					}
 				}
 			}
 		}
@@ -420,12 +402,19 @@ public class Tile implements Serializable {
 		if (wireConns != null && wireConns.length >= 0) {
 			for (WireConnection wc : wireConns) {
 				if (wc.isPIP()) {
-					if (wc.getWire() == pipEndWire) {
-						wc.setUsed(true);
-						wc.setUnavailable(false);
+					
+					if (remove) {
+						// Remove all PIP connections for the start wire.
+						wireConnections.remove(pipStartWire);
 					}
-					else
-						wc.setUnavailable(true);
+					else {
+						if (wc.getWire() == pipEndWire) {
+							wc.setUsed(true);
+							wc.setUnavailable(false);
+						}
+						else
+							wc.setUnavailable(true);
+					}
 				}
 			}
 		}
@@ -478,15 +467,10 @@ public class Tile implements Serializable {
 		if (wireConns != null && wireConns.length >= 0) {
 			for (WireConnection wc : wireConns) {
 				if (wc.getWire() == endWire && wc.isPIP()) {
-//					System.out.println("Set a wire connection as unavailable");
 					wc.setUnavailable(true);
-					//return true;
 				}
 			}
 		}
-		// PIP does not exist in tile!
-		// Throw an exception.
-
 	}
 
 	private boolean hasConnection(int startWire, int endWire) {

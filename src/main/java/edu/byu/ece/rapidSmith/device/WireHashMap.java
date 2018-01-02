@@ -150,7 +150,7 @@ public class WireHashMap implements Serializable {
 	
 	public WireConnection[] get(int key){
 		int i = indexFor(key);
-		if (keys[i] == -1)
+		if (keys[i] == -1 || keys[i] == 0)
 			return null;
 		return values[i];
 	} 
@@ -166,6 +166,57 @@ public class WireHashMap implements Serializable {
 		if(size > threshold){
 			grow();
 		}
+	}
+	
+	/**
+	 * Removes the mapping for the specified key from the map.
+	 * @param key
+	 */
+	public void remove(int key) {	
+		int i = indexFor(key);
+		if(keys[i] == -1) {
+			// key does not exist
+			// TODO: Throw an exception
+			return;
+		}
+		
+		keys[i] = 0; // not -1 because the map doesn't need to grow to add this key again
+		
+		// Remove the values?
+		// TODO: This probably isn't the best way to do this
+		for (WireConnection wireConn : values[i]) {
+			wireConn = null;
+			size--;
+		}
+		wireHashMapModification++;
+	}
+	
+	/**
+	 * Removes a WireConnection from the value array for the specified key.
+	 * @param key
+	 * @param value
+	 */
+	public void remove(int key, WireConnection value) {
+		int i = indexFor(key);
+		if(keys[i] == -1) {
+			// key does not exist
+			// TODO: Throw an exception
+			return;
+		}
+		
+		// TODO: Make more efficient with the cache?
+		// TODO: Truly remove it...
+		// Find the value and remove it from the map
+		for (int j = 0; j < values[i].length; j++) {
+			System.out.println("Length: " + values[i].length);
+			if (values[i][j] != null) {
+				if (values[i][j].equals(value))
+					values[i][j] = null;		
+			}
+		}
+
+		size--;
+		wireHashMapModification++;
 	}
 
 	private void grow(){
