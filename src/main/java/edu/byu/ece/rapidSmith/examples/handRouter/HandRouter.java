@@ -180,8 +180,8 @@ public class HandRouter {
 				// Say what kind of connection it is
 					if (conn.isUsed())
 						pipStr = "(PIP - Used)";
-					else if (conn.isUnavailable())
-						pipStr = "(PIP - Unavailable)";
+//					else if (conn.isUnavailable())
+//						pipStr = "(PIP - Unavailable)";
 					else
 						pipStr = "(PIP)";
 			}
