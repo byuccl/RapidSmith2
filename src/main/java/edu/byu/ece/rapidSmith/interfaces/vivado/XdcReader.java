@@ -29,9 +29,9 @@ public class XdcReader {
 
 		String line = null;
 		while ((line = reader.readLine()) != null) {
-			XdcConstraint constraint = parseLine(line);
-			if (constraint != null)
-				constraints.add(constraint);
+			ArrayList<XdcConstraint> lineConstraints = parseLine(line);
+			if (lineConstraints != null)
+				constraints.addAll(lineConstraints);
 		}
 
 		reader.close();
@@ -57,9 +57,41 @@ public class XdcReader {
 		for (XdcConstraint constraint : constraints) {
 			design.addVivadoConstraint(constraint);
 		}
+		System.out.println("Added " + constraints.size() + " constraints to design");
 	}
 
-	static private XdcConstraint parseLine(String line) throws IOException {
+	// If the line includes "dict", there is a dictionary of multiple properties
+	// on an object with a single set property command.
+	// Example 1: set_property -dict "name1 value1 ... nameN valueN" [get_ports {portName}]
+	// Example 2: set_property -dict {name1 value1 ... nameN valueN} [get_ports {portName}]
+	// TODO: Make more robust
+	static private ArrayList<String> splitLineProperties(String line) {
+		
+		int prefixEndIndex = line.lastIndexOf("-dict") + 5;
+		int suffixBeginIndex = line.lastIndexOf("[get_ports");
+		String suffix = line.substring(suffixBeginIndex, line.length());
+		String prefix = line.substring(0, line.lastIndexOf("-dict"));
+		
+		// Split up the individual properties
+		String properties = line.substring(prefixEndIndex, suffixBeginIndex);
+		properties = properties.trim();
+		
+		ArrayList<String> splitConstraints = new ArrayList<>();
+		String[] splitProps = properties.split("\\s+");
+		
+		for (int i = 1; i < splitProps.length - 1; i+=2)
+		{
+			splitConstraints.add(prefix + splitProps[i] + " " + splitProps[i+1] + " " + suffix);
+		}
+
+	
+		return splitConstraints;
+	}
+
+	
+	static private ArrayList<XdcConstraint> parseLine(String line) throws IOException {
+		ArrayList<XdcConstraint> constraints = new ArrayList<>();
+		
 		line = line.trim();
 		
 		if (line.equals(""))
@@ -68,7 +100,32 @@ public class XdcReader {
 		if (line.matches("\\s*#.*"))
 			return null;
 		
-		XdcConstraint constraint = new XdcConstraint(line, "");
-		return constraint;
+		// Remove same line comments
+		int commentIndex = line.indexOf("#");
+		line = (commentIndex != -1) ? line.substring(0, commentIndex) : line;
+		line = line.trim();
+		
+		// Remove braces from [get_ports ... ] suffix
+		// TODO: Make more robust
+		String suffix = line.substring(line.lastIndexOf("[get_ports"), line.length());
+		suffix = suffix.replaceAll("[{}]", "");
+		line = line.substring(0, line.lastIndexOf("[get_ports") - 1) + " " + suffix;
+
+		
+		if (line.matches("(.*)(-dict)(.*)")) {
+			// Split up the properties into individual constraints for ease
+			ArrayList<String> splitLines = splitLineProperties(line);
+			
+			for (String splitLine : splitLines) {
+				XdcConstraint constraint = new XdcConstraint(splitLine, "");
+				constraints.add(constraint);
+			}			
+		}
+		else {
+			XdcConstraint constraint = new XdcConstraint(line, "");
+			constraints.add(constraint);
+		}		
+		
+		return constraints;
 	}
 }

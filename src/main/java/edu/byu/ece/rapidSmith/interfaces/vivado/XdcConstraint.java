@@ -108,5 +108,10 @@ public final class XdcConstraint {
 		public String getNetName() {
 			return netName;
 		}
+		
+		@Override
+		public String toString(){
+			return command + " " + options + " " + pinName + " " + netName;
+		}
 	}
 }
