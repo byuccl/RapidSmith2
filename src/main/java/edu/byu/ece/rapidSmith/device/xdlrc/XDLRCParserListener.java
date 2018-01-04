@@ -18,7 +18,7 @@
  * also get a copy of the license at <http://www.gnu.org/licenses/>.
  */
 
-package edu.byu.ece.rapidSmith.device.creation;
+package edu.byu.ece.rapidSmith.device.xdlrc;
 
 import java.util.List;
 

@@ -18,9 +18,9 @@
  * also get a copy of the license at <http://www.gnu.org/licenses/>.
  */
 
-package edu.byu.ece.rapidSmith.device.creation;
+package edu.byu.ece.rapidSmith.device.xdlrc;
 
-import edu.byu.ece.rapidSmith.device.creation.XDLRCParserListener.*;
+import edu.byu.ece.rapidSmith.device.xdlrc.XDLRCParserListener.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
