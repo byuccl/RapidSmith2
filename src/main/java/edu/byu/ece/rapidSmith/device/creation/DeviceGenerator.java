@@ -754,7 +754,6 @@ public final class DeviceGenerator {
 	 * Creates a map from pad bel name -> corresponding package pin. This
 	 * information is needed when generating Tincr Checkpoints from
 	 * RS to be loaded into Vivado.
-	 * @param deviceInfo
 	 */
 	private static void createPackagePins(Device device, Document deviceInfo) {
 		Element pinMapRootEl = deviceInfo.getRootElement().getChild("package_pins");
@@ -778,8 +777,8 @@ public final class DeviceGenerator {
 	
 	private final class FamilyTypeListener extends XDLRCParserListener {
 		@Override
-		protected void enterXdlResourceReport(List<String> tokens) {
-			FamilyType family = FamilyType.valueOf(tokens.get(3).toUpperCase());
+		protected void enterXdlResourceReport(pl_XdlResourceReport tokens) {
+			FamilyType family = FamilyType.valueOf(tokens.family.toUpperCase());
 			try {
 				familyInfo = RSEnvironment.defaultEnv().loadFamilyInfo(family);
 			} catch (IOException|JDOMException e) {
@@ -803,10 +802,10 @@ public final class DeviceGenerator {
 		 * Tracks special site pin wires.
 		 */
 		@Override
-		protected void enterPinWire(List<String> tokens) {
-			String externalName = stripTrailingParenthesis(tokens.get(3));
+		protected void enterPinWire(pl_PinWire tokens) {
+			String externalName = tokens.external_wire;
 			
-			if (tokens.get(2).equals("input")) {
+			if (tokens.direction.equals("input")) {
 				inpinSet.add(externalName);
 			} else {
 				outpinSet.add(externalName);
@@ -814,42 +813,42 @@ public final class DeviceGenerator {
 		}
 
 		@Override
-		protected void enterWire(List<String> tokens) {
-			String wireName = stripTrailingParenthesis(tokens.get(1));
+		protected void enterWire(pl_Wire tokens) {
+			String wireName = tokens.name;
 			wireSet.add(wireName);
 		}
 
 		@Override
-		protected void enterPip(List<String> tokens) {
-			pipSources.add(tokens.get(2));
+		protected void enterPip(pl_Pip tokens) {
+			pipSources.add(tokens.start_wire);
 
-			String wireName = stripTrailingParenthesis(tokens.get(4));
+			String wireName = tokens.end_wire;
 			pipSinks.add(wireName);
 		}
 
 		@Override
-		protected void enterPrimitiveDef(List<String> tokens) {
-			currType = SiteType.valueOf(device.getFamily(), tokens.get(1));
+		protected void enterPrimitiveDef(pl_PrimitiveDef tokens) {
+			currType = SiteType.valueOf(device.getFamily(), tokens.name);
 		}
 
 		@Override
-		protected void enterElement(List<String> tokens) {
-			currElement = tokens.get(1);
+		protected void enterElement(pl_Element tokens) {
+			currElement = tokens.name;
 		}
 
 		@Override
-		protected void enterElementPin(List<String> tokens) {
-			String wireName = getIntrasiteWireName(currType, currElement, tokens.get(1));
+		protected void enterElementPin(pl_ElementPin tokens) {
+			String wireName = getIntrasiteWireName(currType, currElement, tokens.name);
 			wireSet.add(wireName);
 		}
 
 		@Override
-		protected void exitXdlResourceReport(List<String> tokens) {
+		protected void exitXdlResourceReport(pl_XdlResourceReport tokens) {
 			Map<String, Integer> wireMap = new HashMap<>((int) (wireSet.size() / 0.75 + 1));
 			String[] wires = new String[wireSet.size()];
 			
-			Set<Integer> sourceWireSetLocal = new HashSet<Integer> (outpinSet.size());
-			Set<Integer> sinkWireSetLocal = new HashSet<Integer> (inpinSet.size());
+			Set<Integer> sourceWireSetLocal = new HashSet<> (outpinSet.size());
+			Set<Integer> sinkWireSetLocal = new HashSet<> (inpinSet.size());
 						
 			int i = 0;
 			for (String wire : wireSet) {
@@ -881,40 +880,40 @@ public final class DeviceGenerator {
 		private Tile currTile;
 
 		@Override
-		protected void enterXdlResourceReport(List<String> tokens) {
-			device.setPartName(PartNameTools.removeSpeedGrade(tokens.get(2)));
+		protected void enterXdlResourceReport(pl_XdlResourceReport tokens) {
+			device.setPartName(PartNameTools.removeSpeedGrade(tokens.part));
 		}
 
 		@Override
-		protected void enterTiles(List<String> tokens) {
-			int rows = Integer.parseInt(tokens.get(1));
-			int columns = Integer.parseInt(tokens.get(2));
+		protected void enterTiles(pl_Tiles tokens) {
+			int rows = tokens.rows;
+			int columns = tokens.columns;
 
 			device.createTileArray(rows, columns);
 		}
 
 		@Override
-		protected void enterTile(List<String> tokens) {
-			int row = Integer.parseInt(tokens.get(1));
-			int col = Integer.parseInt(tokens.get(2));
+		protected void enterTile(pl_Tile tokens) {
+			int row = tokens.row;
+			int col = tokens.column;
 			currTile = device.getTile(row, col);
-			currTile.setName(tokens.get(3));
-			currTile.setType(TileType.valueOf(device.getFamily(), tokens.get(4)));
+			currTile.setName(tokens.name);
+			currTile.setType(TileType.valueOf(device.getFamily(), tokens.type));
 
 			tileSites = new ArrayList<>();
 		}
 
 		@Override
-		protected void enterPrimitiveSite(List<String> tokens) {
+		protected void enterPrimitiveSite(pl_PrimitiveSite tokens) {
 			Site site = new Site();
 			site.setTile(currTile);
-			site.setName(tokens.get(1));
-			site.parseCoordinatesFromName(tokens.get(1));
+			site.setName(tokens.name);
+			site.parseCoordinatesFromName(tokens.name);
 			site.setIndex(tileSites.size());
-			site.setBondedType(BondedType.valueOf(tokens.get(3).toUpperCase()));
+			site.setBondedType(BondedType.valueOf(tokens.bonded.toUpperCase()));
 
 			List<SiteType> alternatives = new ArrayList<>();
-			SiteType type = SiteType.valueOf(device.getFamily(), tokens.get(2));
+			SiteType type = SiteType.valueOf(device.getFamily(), tokens.type);
 			alternatives.add(type);
 
 			Element ptEl = getSiteTypeEl(type);
@@ -934,7 +933,7 @@ public final class DeviceGenerator {
 		}
 
 		@Override
-		protected void exitTile(List<String> tokens) {
+		protected void exitTile(pl_Tile tokens) {
 			// Create an array of sites (more compact than ArrayList)
 			if (tileSites.size() > 0) {
 				currTile.setSites(tileSites.toArray(
@@ -950,43 +949,46 @@ public final class DeviceGenerator {
 
 	private final class WireConnectionGeneratorListener extends XDLRCParserListener {
 		private Tile currTile;
-		private int currTileWire;
+		private Integer currTileWire;
 		private boolean currTileWireIsSource;
+		private Integer pipStartWire;
+		private Integer pipEndWire;
 
 		@Override
-		protected void enterTile(List<String> tokens) {
-			int row = Integer.parseInt(tokens.get(1));
-			int col = Integer.parseInt(tokens.get(2));
+		protected void enterTile(pl_Tile tokens) {
+			int row = tokens.row;
+			int col = tokens.column;
 			currTile = device.getTile(row, col);
 			currTile.setWireHashMap(new WireHashMap());
 		}
 
 		@Override
-		protected void exitTile(List<String> tokens) {
+		protected void exitTile(pl_Tile tokens) {
 			removeDuplicateTileResources(currTile);
+			currTile = null;
 		}
 
 		@Override
-		protected void enterWire(List<String> tokens) {
-			String wireName = tokens.get(1);
+		protected void enterWire(pl_Wire tokens) {
+			String wireName = tokens.name;
 			currTileWire = we.getWireEnum(wireName);
 			currTileWireIsSource = siteWireSourceSet.contains(currTileWire) || pipSinks.contains(wireName);
 		}
 
 		@Override
-		protected void exitWire(List<String> tokens) {
-			currTileWire = -1;
+		protected void exitWire(pl_Wire tokens) {
+			currTileWire = null;
 		}
 
 		@Override
-		protected void enterConn(List<String> tokens) {
-			String currWireName = tokens.get(2).substring(0, tokens.get(2).length() - 1);
+		protected void enterConn(pl_Conn tokens) {
+			String currWireName = tokens.name;
 			int currWire = we.getWireEnum(currWireName);
 			boolean currWireIsSiteSink = siteWireSinkSet.contains(currWire);
 			boolean currWireIsPIPSource = pipSources.contains(currWireName);
 			boolean currWireIsSink = currWireIsSiteSink || currWireIsPIPSource;
 			if (currTileWireIsSource || currWireIsSink) {
-				Tile t = device.getTile(tokens.get(1));
+				Tile t = device.getTile(tokens.tile);
 				WireConnection wc = new WireConnection(currWire,
 						currTile.getRow() - t.getRow(),
 						currTile.getColumn() - t.getColumn(),
@@ -996,30 +998,33 @@ public final class DeviceGenerator {
 		}
 
 		@Override
-		protected void enterPip(List<String> tokens) {
-			String endWireName;
-			WireConnection wc;
-
-			Integer startWire = we.getWireEnum(tokens.get(2));
-			if (tokens.get(4).endsWith(")")) { // regular pip
-				endWireName = tokens.get(4).substring(0, tokens.get(4).length() - 1);
-				wc = wirePool.add(new WireConnection(we.getWireEnum(endWireName), 0, 0, true));
-			} else { // route-through PIP
-				endWireName = tokens.get(4);
-				Integer endWireEnum = we.getWireEnum(endWireName);
-				wc = wirePool.add(new WireConnection(endWireEnum, 0, 0, true));
-				String typeName = tokens.get(6).substring(0, tokens.get(6).length() - 2);
-				SiteType type = SiteType.valueOf(device.getFamily(), typeName);
-
-				String[] parts = tokens.get(5).split("-");
-				String inPin = parts[1];
-				String outPin = parts[2];
-
-				PIPRouteThrough currRouteThrough = new PIPRouteThrough(type, inPin, outPin);
-				currRouteThrough = routeThroughPool.add(currRouteThrough);
-				device.addRouteThrough(startWire, endWireEnum, currRouteThrough);
-			}
+		protected void enterPip(pl_Pip tokens) {
+			Integer startWire = we.getWireEnum(tokens.start_wire);
+			Integer endWire = we.getWireEnum(tokens.end_wire);
+			WireConnection wc = wirePool.add(new WireConnection(endWire, 0, 0, true));
 			currTile.addConnection(startWire, wc);
+
+			pipStartWire = startWire;
+			pipEndWire = endWire;
+		}
+
+		@Override
+		protected void exitPip(pl_Pip tokens) {
+			pipStartWire = null;
+			pipEndWire = null;
+		}
+
+		@Override
+		protected void enterRoutethrough(pl_Routethrough tokens) {
+			SiteType type = SiteType.valueOf(device.getFamily(), tokens.site_type);
+
+			String[] parts = tokens.pins.split("-");
+			String inPin = parts[1];
+			String outPin = parts[2];
+
+			PIPRouteThrough currRouteThrough = new PIPRouteThrough(type, inPin, outPin);
+			currRouteThrough = routeThroughPool.add(currRouteThrough);
+			device.addRouteThrough(pipStartWire, pipEndWire, currRouteThrough);
 		}
 	}
 
@@ -1030,43 +1035,40 @@ public final class DeviceGenerator {
 		private Map<String, Integer> externalPinWires;
 
 		@Override
-		protected void enterTile(List<String> tokens) {
-			int row = Integer.parseInt(tokens.get(1));
-			int col = Integer.parseInt(tokens.get(2));
-
+		protected void enterTile(pl_Tile tokens) {
 			tileSources = new TreeSet<>();
 			tileSinks = new TreeSet<>();
 		}
 
 		@Override
-		protected void exitTile(List<String> tokens) {
+		protected void exitTile(pl_Tile tokens) {
 			tileSources = null;
 			tileSinks = null;
 		}
 
 		@Override
-		protected void enterPrimitiveSite(List<String> tokens) {
-			currSite = device.getSite(tokens.get(1));
+		protected void enterPrimitiveSite(pl_PrimitiveSite tokens) {
+			currSite = device.getSite(tokens.name);
 			externalPinWires = new HashMap<>();
 		}
 
 		@Override
-		protected void enterPinWire(List<String> tokens) {
-			String name = tokens.get(1);
+		protected void enterPinWire(pl_PinWire tokens) {
+			String name = tokens.name;
 			PinDirection direction =
-					tokens.get(2).equals("input") ? PinDirection.IN : PinDirection.OUT;
-			String externalWireName = stripTrailingParenthesis(tokens.get(3));
-			externalPinWires.put(name, we.getWireEnum(externalWireName));
+				tokens.direction.equals("input") ? PinDirection.IN : PinDirection.OUT;
+			Integer externalWire = we.getWireEnum(tokens.external_wire);
+			externalPinWires.put(name, externalWire);
 
 			if (direction == PinDirection.IN) {
-				tileSinks.add(we.getWireEnum(externalWireName));
+				tileSinks.add(externalWire);
 			} else {
-				tileSources.add(we.getWireEnum(externalWireName));
+				tileSources.add(externalWire);
 			}
 		}
 
 		@Override
-		protected void exitPrimitiveSite(List<String> tokens) {
+		protected void exitPrimitiveSite(pl_PrimitiveSite tokens) {
 			Map<SiteType, Map<String, Integer>> externalPinWiresMap =
 					new HashMap<>();
 			externalPinWiresMap.put(currSite.getPossibleTypes()[0], externalWiresPool.add(externalPinWires));
@@ -1148,43 +1150,43 @@ public final class DeviceGenerator {
 		}
 
 		@Override
-		protected void enterPrimitiveDef(List<String> tokens) {
+		protected void enterPrimitiveDef(pl_PrimitiveDef tokens) {
 			currDef = new PrimitiveDef();
-			String name = tokens.get(1).toUpperCase();
+			String name = tokens.name.toUpperCase();
 			currDef.setType(SiteType.valueOf(device.getFamily(), name));
 
-			pins = new ArrayList<>(Integer.parseInt(tokens.get(2)));
-			elements = new ArrayList<>(Integer.parseInt(tokens.get(3)));
+			pins = new ArrayList<>(tokens.pin_count);
+			elements = new ArrayList<>(tokens.element_count);
 
 			currDef.setPins(pins);
 			currDef.setElements(elements);
 		}
 
 		@Override
-		protected void exitPrimitiveDef(List<String> tokens) {
+		protected void exitPrimitiveDef(pl_PrimitiveDef tokens) {
 			currDef.setPins(pins);
 			currDef.setElements(elements);
 			defs.add(currDef);
 		}
 
 		@Override
-		protected void enterPin(List<String> tokens) {
+		protected void enterPin(pl_Pin tokens) {
 			PrimitiveDefPin p = new PrimitiveDefPin();
-			p.setExternalName(tokens.get(1));
-			p.setInternalName(tokens.get(2));
-			p.setDirection(tokens.get(3).startsWith("output") ? PinDirection.OUT : PinDirection.IN);
+			p.setExternalName(tokens.external_name);
+			p.setInternalName(tokens.internal_name);
+			p.setDirection(tokens.direction.startsWith("output") ? PinDirection.OUT : PinDirection.IN);
 			pins.add(p);
 		}
 
 		@Override
-		protected void enterElement(List<String> tokens) {
+		protected void enterElement(pl_Element tokens) {
 			currElement = new PrimitiveElement();
-			currElement.setName(tokens.get(1));
-			currElement.setBel(tokens.size() >= 5 && tokens.get(3).equals("#") && tokens.get(4).equals("BEL"));
+			currElement.setName(tokens.name);
+			currElement.setBel(tokens.isBel);
 		}
 
 		@Override
-		protected void exitElement(List<String> tokens) {
+		protected void exitElement(pl_Element tokens) {
 			// Determine the element type
 			if (!currElement.isBel()) {
 				if (currElement.getCfgOptions() != null && !currElement.getPins().isEmpty())
@@ -1200,29 +1202,29 @@ public final class DeviceGenerator {
 		}
 
 		@Override
-		protected void enterElementPin(List<String> tokens) {
+		protected void enterElementPin(pl_ElementPin tokens) {
 			PrimitiveDefPin elementPin = new PrimitiveDefPin();
-			elementPin.setExternalName(tokens.get(1));
-			elementPin.setInternalName(tokens.get(1));
-			elementPin.setDirection(tokens.get(2).startsWith("output") ? PinDirection.OUT : PinDirection.IN);
+			elementPin.setExternalName(tokens.name);
+			elementPin.setInternalName(tokens.name);
+			elementPin.setDirection(tokens.direction.startsWith("output") ? PinDirection.OUT : PinDirection.IN);
 			currElement.addPin(elementPin);
 		}
 
 		@Override
-		protected void enterElementCfg(List<String> tokens) {
-			for(int k = 1; k < tokens.size(); k++){
-				currElement.addCfgOption(tokens.get(k).replace(")", ""));
+		protected void enterElementCfg(pl_ElementCfg tokens) {
+			for(String cfg : tokens.cfgs){
+				currElement.addCfgOption(cfg);
 			}
 		}
 
 		@Override
-		protected void enterElementConn(List<String> tokens) {
+		protected void enterElementConn(pl_ElementConn tokens) {
 			PrimitiveConnection c = new PrimitiveConnection();
-			c.setElement0(tokens.get(1));
-			c.setPin0(tokens.get(2));
-			c.setForwardConnection(tokens.get(3).equals("==>"));
-			c.setElement1(tokens.get(4));
-			c.setPin1(tokens.get(5).substring(0, tokens.get(5).length() - 1));
+			c.setElement0(tokens.element0);
+			c.setPin0(tokens.pin0);
+			c.setForwardConnection(tokens.direction.equals("==>"));
+			c.setElement1(tokens.element1);
+			c.setPin1(tokens.pin1);
 			currElement.addConnection(c);
 		}
 	}

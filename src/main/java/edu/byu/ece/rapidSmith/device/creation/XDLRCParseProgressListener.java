@@ -20,8 +20,6 @@
 
 package edu.byu.ece.rapidSmith.device.creation;
 
-import java.util.List;
-
 /**
  *  Convenience class to report the current progress of ongoing parsing.
  */
@@ -36,7 +34,7 @@ public class XDLRCParseProgressListener extends XDLRCParserListener {
 	}
 
 	@Override
-	protected void enterXdlResourceReport(List<String> tokens) {
+	protected void enterXdlResourceReport(pl_XdlResourceReport tokens) {
 		this.totalTiles = 0;
 		this.tilesParsed = 0;
 	}
@@ -45,18 +43,18 @@ public class XDLRCParseProgressListener extends XDLRCParserListener {
 	 * Just print a line.
 	 */
 	@Override
-	protected void exitXdlResourceReport(List<String> tokens) {
+	protected void exitXdlResourceReport(pl_XdlResourceReport tokens) {
 		System.out.println();
 	}
 
 	@Override
-	protected void enterTiles(List<String> tokens) {
-		totalTiles = Integer.parseInt(tokens.get(1)) * Integer.parseInt(tokens.get(2));
+	protected void enterTiles(pl_Tiles tokens) {
+		totalTiles = tokens.rows * tokens.columns;
 		System.out.println(String.format("Parsing tile %6d of %6d tiles.", tilesParsed, totalTiles));
 	}
 
 	@Override
-	protected void enterTile(List<String> tokens) {
+	protected void enterTile(pl_Tile tokens) {
 		// print out a heartbeat to the console every 10,000 tiles
 		if (++tilesParsed % 10000 == 0) {
 			System.out.println(String.format("Parsing tile %6d of %6d tiles.", tilesParsed, totalTiles));
