@@ -118,11 +118,11 @@ public abstract class XDLRCParserListener {
 	}
 
 	public static final class pl_PinWire {
-		public final String name;
-		public final String direction;
-		public final String external_wire;
+		public String name;
+		public String direction;
+		public String external_wire;
 
-		public pl_PinWire(List<String> tokens) {
+		public void set(List<String> tokens) {
 			this.name = tokens.get(1);
 			this.direction = tokens.get(2);
 			this.external_wire = tokens.get(3);
@@ -130,20 +130,20 @@ public abstract class XDLRCParserListener {
 	}
 
 	public static final class pl_Wire {
-		public final String name;
-		public final String connections_count;
+		public String name;
+		public String connections_count;
 
-		public pl_Wire(List<String> tokens) {
+		public void set(List<String> tokens) {
 			this.name = tokens.get(1);
 			this.connections_count = tokens.get(2);
 		}
 	}
 
 	public static final class pl_Conn {
-		public final String tile;
-		public final String name;
+		public String tile;
+		public String name;
 
-		public pl_Conn(List<String> tokens) {
+		public void set(List<String> tokens) {
 			this.tile = tokens.get(1);
 			this.name = tokens.get(2);
 		}
@@ -167,12 +167,12 @@ public abstract class XDLRCParserListener {
 	}
 
 	public static final class pl_Pip {
-		public final String tile;
-		public final String start_wire;
-		public final String direction;
-		public final String end_wire;
+		public String tile;
+		public String start_wire;
+		public String direction;
+		public String end_wire;
 
-		public pl_Pip(List<String> tokens) {
+		public void set(List<String> tokens) {
 			this.tile = tokens.get(1);
 			this.start_wire = tokens.get(2);
 			this.direction = tokens.get(3);

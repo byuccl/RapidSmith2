@@ -47,6 +47,11 @@ public class XDLRCParser {
 	// Tokens detected on the line
 	private List<String> tokens;
 
+	private XDLRCParserListener.pl_Conn pl_conn = new XDLRCParserListener.pl_Conn();
+	private XDLRCParserListener.pl_Pip pl_pip = new XDLRCParserListener.pl_Pip();
+	private XDLRCParserListener.pl_Wire pl_wire = new XDLRCParserListener.pl_Wire();
+	private XDLRCParserListener.pl_PinWire pl_pinwire = new XDLRCParserListener.pl_PinWire();
+
 	/**
 	 * Creates a new XDLRC parser.
 	 */
@@ -144,7 +149,8 @@ public class XDLRCParser {
 					break;
 				// (pip <tile> <start_wire> <direction> <end_wire> <rt_name> <rt_site>
 				case "(pip" :
-					pl_Pip pipTokens = new pl_Pip(tokens);
+					pl_Pip pipTokens = pl_pip;
+					pipTokens.set(tokens);
 					listeners.forEach(listener -> listener.enterPip(pipTokens));
 
 					if (tokens.size() > 6) {
@@ -180,7 +186,8 @@ public class XDLRCParser {
 			switch (tokens.get(0)) {
 				// (pinwire <name> <direction> <external_wire>
 				case "(pinwire" :
-					pl_PinWire pwTokens = new pl_PinWire(tokens);
+					pl_PinWire pwTokens = pl_pinwire;
+					pwTokens.set(tokens);
 					listeners.forEach(listener -> listener.enterPinWire(pwTokens));
 					listeners.forEach(listener -> listener.exitPinWire(pwTokens));
 					break;
@@ -193,7 +200,8 @@ public class XDLRCParser {
 	}
 
 	private void parseWire() throws IOException {
-		pl_Wire wireTokens = new pl_Wire(tokens);
+		pl_Wire wireTokens = pl_wire;
+		wireTokens.set(tokens);
 		listeners.forEach(listener -> listener.enterWire(wireTokens));
 
 		if (tokens.get(tokens.size()-1).equals(")")) {
@@ -205,7 +213,8 @@ public class XDLRCParser {
 			switch (tokens.get(0)) {
 				// (conn <tile> <name>
 				case "(conn" :
-					pl_Conn connTokens = new pl_Conn(tokens);
+					pl_Conn connTokens = pl_conn;
+					connTokens.set(tokens);
 					listeners.forEach(listener -> listener.enterConn(connTokens));
 					listeners.forEach(listener -> listener.exitConn(connTokens));
 					break;
