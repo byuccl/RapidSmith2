@@ -206,7 +206,7 @@ public class CompressedXDLRCReader {
 		pl_Element el = new pl_Element();
 		el.name = cdef.strings.get(cel.name);
 		el.isBel = cel.isBel;
-		el.conn_count = (cel.conns != null) ? cel.conns.size() : 0;
+		el.pin_count = (cel.pins != null) ? cel.pins.size() : 0;
 		listeners.forEach(it -> it.enterElement(el));
 
 		if (cel.pins != null)

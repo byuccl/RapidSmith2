@@ -117,7 +117,7 @@ public class XDLRCRegurgitatorListener extends XDLRCParserListener {
 
 	@Override
 	protected void enterElement(pl_Element tokens) {
-		System.out.printf("\t\t(element %s %d", tokens.name, tokens.conn_count);
+		System.out.printf("\t\t(element %s %d", tokens.name, tokens.pin_count);
 		if (tokens.isBel)
 			System.out.print(" # BEL");
 		System.out.println();
