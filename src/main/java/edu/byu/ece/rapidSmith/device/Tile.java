@@ -259,30 +259,6 @@ public class Tile implements Serializable {
 	}
 
 	/**
-	 * This method adds a key/value pair to the wires HashMap.
-	 *
-	 * @param src  The wire (or key) of the HashMap to add.
-	 * @param dest The actual wire to add to the value or Wire[] in the HashMap.
-	 */
-	public void addConnection(int src, WireConnection dest) {
-		// Add the wire if it doesn't already exist
-		if (this.wireConnections.get(src) == null) {
-			WireConnection[] tmp = {dest};
-			this.wireConnections.put(src, tmp);
-		} else {
-			WireConnection[] currentConnections = this.wireConnections.get(src);
-			WireConnection[] tmp = new WireConnection[currentConnections.length + 1];
-			int i;
-			for (i = 0; i < currentConnections.length; i++) {
-				tmp[i] = currentConnections[i];
-			}
-			tmp[i] = dest;
-			Arrays.sort(tmp);
-			this.wireConnections.put(src, tmp);
-		}
-	}
-
-	/**
 	 * Create Collection of TileWire objects for each wire in the tile.
 	 * @return Collection of TileWire objects.
 	 */
@@ -514,8 +490,6 @@ public class Tile implements Serializable {
 		private Site[] sites;
 		private WireHashMap wireConnections;
 		private WireHashMap reverseConnections;
-		private int[] sinks;
-		private int[] sources;
 
 		@SuppressWarnings("unused")
 		private Tile readResolve() {
@@ -544,8 +518,6 @@ public class Tile implements Serializable {
 		repl.sites = sites;
 		repl.wireConnections = wireConnections;
 		repl.reverseConnections = reverseWireConnections;
-		repl.sinks = null;
-		repl.sources = null;
 
 		return repl;
 	}

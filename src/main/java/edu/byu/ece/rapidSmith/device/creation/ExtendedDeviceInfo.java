@@ -40,28 +40,16 @@ import java.util.concurrent.TimeUnit;
  */
 public class ExtendedDeviceInfo implements Serializable {
 	private static final long serialVersionUID = -459840872618980717L;
-	private transient ExecutorService threadPool;
 
 	private transient final HashPool<WireConnection> connPool = new HashPool<>();
 	private transient final HashPool<WireArray> connArrayPool = new HashPool<>();
-	private transient final HashPool<WireHashMap> whmPool = new HashPool<>();
 
-	private Map<String, WireHashMap> reversedWireHashMap = new HashMap<>(); // tile names to wirehashmap
 	private Map<SiteType, WireHashMap> reversedSubsiteRouting = new HashMap<>();
 
 	public void buildExtendedInfo(Device device) {
 		System.out.println("started at " + new Date());
-		reverseWireHashMap(device);
 		reverseSubsiteWires(device);
 		System.out.println("reversed done at " + new Date());
-		threadPool = Executors.newFixedThreadPool(8);
-		threadPool.shutdown();
-		try {
-			threadPool.awaitTermination(2, TimeUnit.DAYS);
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
-		System.out.println("driving done at " + new Date());
 
 		storeValuesIntoStructure(device);
 		Path partFolderPath = getExtendedInfoPath(device);
@@ -86,54 +74,9 @@ public class ExtendedDeviceInfo implements Serializable {
 	}
 
 	private void storeValuesIntoStructure(Device device) {
-		for (Tile tile : device.getTileMap().values()) {
-			reversedWireHashMap.put(tile.getName(), tile.getReverseWireHashMap());
-		}
 		for (SiteTemplate template : device.getSiteTemplates().values()) {
 			reversedSubsiteRouting.put(template.getType(), template.getReversedWireHashMap());
 		}
-	}
-
-	private void reverseWireHashMap(Device device) {
-		threadPool = Executors.newFixedThreadPool(8);
-		for (Tile tile : device.getTiles()) {
-			threadPool.execute(() -> getReverseMapForTile(device, tile));
-		}
-		threadPool.shutdown();
-		try {
-			threadPool.awaitTermination(2, TimeUnit.DAYS);
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
-		threadPool = null;
-	}
-
-	private void getReverseMapForTile(Device device, Tile tile) {
-		Map<Integer, List<WireConnection>> reverseMap = new HashMap<>();
-		for (Tile srcTile : device.getTiles()) {
-			for (Wire srcWire : srcTile.getWires()) {
-				int srcEnum = srcWire.getWireEnum();
-				for (WireConnection c : srcTile.getWireConnections(srcEnum)) {
-					if (c.getTile(srcTile) == tile) {
-						WireConnection reverse = new WireConnection(
-								srcEnum, -c.getRowOffset(),
-								-c.getColumnOffset(), c.isPIP());
-						WireConnection pooled = connPool.add(reverse);
-						reverseMap.computeIfAbsent(c.getWire(), k -> new ArrayList<>())
-								.add(pooled);
-					}
-				}
-			}
-		}
-
-		WireHashMap wireHashMap = new WireHashMap();
-		for (Map.Entry<Integer, List<WireConnection>> e : reverseMap.entrySet()) {
-			List<WireConnection> v = e.getValue();
-			WireArray wireArray = new WireArray(v.toArray(new WireConnection[v.size()]));
-			wireHashMap.put(e.getKey(), connArrayPool.add(wireArray).array);
-		}
-
-		tile.setReverseWireConnections(whmPool.add(wireHashMap));
 	}
 
 	private void reverseSubsiteWires(Device device) {
@@ -150,17 +93,15 @@ public class ExtendedDeviceInfo implements Serializable {
 				WireConnection reverse = new WireConnection(
 						srcWire, -c.getRowOffset(),
 						-c.getColumnOffset(), c.isPIP());
-				WireConnection pooled = connPool.add(reverse);
 				reverseMap.computeIfAbsent(c.getWire(), k -> new ArrayList<>())
-						.add(pooled);
+						.add(reverse);
 			}
 		}
 
 		WireHashMap wireHashMap = new WireHashMap();
 		for (Map.Entry<Integer, List<WireConnection>> e : reverseMap.entrySet()) {
 			List<WireConnection> v = e.getValue();
-			WireArray wireArray = new WireArray(v.toArray(new WireConnection[v.size()]));
-			wireHashMap.put(e.getKey(), connArrayPool.add(wireArray).array);
+			wireHashMap.put(e.getKey(), v.toArray(new WireConnection[v.size()]));
 		}
 
 		return wireHashMap;
@@ -195,10 +136,6 @@ public class ExtendedDeviceInfo implements Serializable {
 			}
 		}
 		return info;
-	}
-
-	public Map<String, WireHashMap> getReversedWireMap() {
-		return reversedWireHashMap;
 	}
 
 	public Map<SiteType, WireHashMap> getReversedSubsiteRouting() {

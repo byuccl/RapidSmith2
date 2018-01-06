@@ -163,9 +163,6 @@ public class Device implements Serializable {
 		} catch (IOException e) {
 			return false;
 		}
-		for (Tile tile : getTileMap().values()) {
-			tile.setReverseWireConnections(info.getReversedWireMap().get(tile.getName()));
-		}
 
 		for (SiteType type : info.getReversedSubsiteRouting().keySet()) {
 			SiteTemplate template = getSiteTemplate(type);
