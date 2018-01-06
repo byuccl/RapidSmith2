@@ -304,7 +304,7 @@ public class XDLRCCompressor {
 		protected void enterElementPin(pl_ElementPin tokens) {
 			CompressedElementPin pin = new CompressedElementPin();
 			pin.name = currDefStrings.add2(tokens.name);
-			pin.direction = currDefStrings.add2(tokens.direction);
+			pin.direction = CompressedXDLRC.getDirectionValue(tokens.direction);
 			currElement.pins.add(pin);
 		}
 
