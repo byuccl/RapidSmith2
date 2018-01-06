@@ -66,11 +66,11 @@ public abstract class XDLRCParserListener {
 	protected void exitSummary(pl_Summary tokens) { }
 
 	public static final class pl_XdlResourceReport {
-		public final String version;
-		public final String part;
-		public final String family;
+		public String version;
+		public String part;
+		public String family;
 
-		public pl_XdlResourceReport(List<String> tokens) {
+		public void set(List<String> tokens) {
 			this.version = tokens.get(1);
 			this.part = tokens.get(2);
 			this.family = tokens.get(3);
@@ -78,23 +78,23 @@ public abstract class XDLRCParserListener {
 	}
 
 	public static final class pl_Tiles {
-		public final int rows;
-		public final int columns;
+		public int rows;
+		public int columns;
 
-		public pl_Tiles(List<String> tokens) {
+		public void set(List<String> tokens) {
 			this.rows = Integer.parseInt(tokens.get(1));
 			this.columns = Integer.parseInt(tokens.get(2));
 		}
 	}
 
 	public static final class pl_Tile {
-		public final int row;
-		public final int column;
-		public final String name;
-		public final String type;
-		public final int site_count;
+		public int row;
+		public int column;
+		public String name;
+		public String type;
+		public int site_count;
 
-		public pl_Tile(List<String> tokens) {
+		public void set(List<String> tokens) {
 			this.row = Integer.parseInt(tokens.get(1));
 			this.column = Integer.parseInt(tokens.get(2));
 			this.name = tokens.get(3);
@@ -104,12 +104,12 @@ public abstract class XDLRCParserListener {
 	}
 
 	public static final class pl_PrimitiveSite {
-		public final String name;
-		public final String type;
-		public final String bonded;
-		public final int pinwire_count;
+		public String name;
+		public String type;
+		public String bonded;
+		public int pinwire_count;
 
-		public pl_PrimitiveSite(List<String> tokens) {
+		public void set(List<String> tokens) {
 			this.name = tokens.get(1);
 			this.type = tokens.get(2);
 			this.bonded = tokens.get(3);
@@ -131,33 +131,33 @@ public abstract class XDLRCParserListener {
 
 	public static final class pl_Wire {
 		public String name;
-		public String connections_count;
+		public int connections_count;
 
 		public void set(List<String> tokens) {
 			this.name = tokens.get(1);
-			this.connections_count = tokens.get(2);
+			this.connections_count = Integer.parseInt(tokens.get(2));
 		}
 	}
 
 	public static final class pl_Conn {
 		public String tile;
-		public String name;
+		public String wire;
 
 		public void set(List<String> tokens) {
 			this.tile = tokens.get(1);
-			this.name = tokens.get(2);
+			this.wire = tokens.get(2);
 		}
 	}
 
 	public static final class pl_TileSummary {
 		// (tile_summary <name> <type> <pin_count> <wire_count> <pip_count>
-		public final String name;
-		public final String type;
-		public final int pin_count;
-		public final int wire_count;
-		public final int pip_count;
+		public String name;
+		public String type;
+		public int pin_count;
+		public int wire_count;
+		public int pip_count;
 
-		public pl_TileSummary(List<String> tokens) {
+		public void set(List<String> tokens) {
 			this.name = tokens.get(1);
 			this.type = tokens.get(2);
 			this.pin_count = Integer.parseInt(tokens.get(3));
@@ -169,41 +169,41 @@ public abstract class XDLRCParserListener {
 	public static final class pl_Pip {
 		public String tile;
 		public String start_wire;
-		public String direction;
+		public String type;
 		public String end_wire;
 
 		public void set(List<String> tokens) {
 			this.tile = tokens.get(1);
 			this.start_wire = tokens.get(2);
-			this.direction = tokens.get(3);
+			this.type = tokens.get(3);
 			this.end_wire = tokens.get(4);
 		}
 	}
 
 	public static final class pl_Routethrough {
-		public final String pins;
-		public final String site_type;
+		public String pins;
+		public String site_type;
 
-		public pl_Routethrough(List<String> tokens) {
+		public void set(List<String> tokens) {
 			this.pins = tokens.get(5);
 			this.site_type = tokens.get(6);
 		}
 	}
 
 	public static final class pl_PrimitiveDefs {
-		public final int num_defs;
+		public int num_defs;
 
-		public pl_PrimitiveDefs(List<String> tokens) {
+		public void set(List<String> tokens) {
 			this.num_defs = Integer.parseInt(tokens.get(1));
 		}
 	}
 
 	public static final class pl_PrimitiveDef {
-		public final String name;
-		public final int pin_count;
-		public final int element_count;
+		public String name;
+		public int pin_count;
+		public int element_count;
 
-		public pl_PrimitiveDef(List<String> tokens) {
+		public void set(List<String> tokens) {
 			this.name = tokens.get(1);
 			this.pin_count = Integer.parseInt(tokens.get(2));
 			this.element_count = Integer.parseInt(tokens.get(3));
@@ -211,11 +211,11 @@ public abstract class XDLRCParserListener {
 	}
 
 	public static final class pl_Pin {
-		public final String external_name;
-		public final String internal_name;
-		public final String direction;
+		public String external_name;
+		public String internal_name;
+		public String direction;
 
-		public pl_Pin(List<String> tokens) {
+		public void set(List<String> tokens) {
 			this.external_name = tokens.get(1);
 			this.internal_name = tokens.get(2);
 			this.direction = tokens.get(3);
@@ -223,11 +223,11 @@ public abstract class XDLRCParserListener {
 	}
 
 	public static final class pl_Element {
-		public final String name;
-		public final int conn_count;
-		public final boolean isBel;
+		public String name;
+		public int conn_count;
+		public boolean isBel;
 
-		public pl_Element(List<String> tokens) {
+		public void set(List<String> tokens) {
 			this.name = tokens.get(1);
 			this.conn_count = Integer.parseInt(tokens.get(2));
 
@@ -236,23 +236,23 @@ public abstract class XDLRCParserListener {
 	}
 
 	public static final class pl_ElementPin {
-		public final String name;
-		public final String direction;
+		public String name;
+		public String direction;
 
-		public pl_ElementPin(List<String> tokens) {
+		public void set(List<String> tokens) {
 			this.name = tokens.get(1);
 			this.direction = tokens.get(2);
 		}
 	}
 
 	public static final class pl_ElementConn {
-		public final String element0;
-		public final String pin0;
-		public final String direction;
-		public final String element1;
-		public final String pin1;
+		public String element0;
+		public String pin0;
+		public String direction;
+		public String element1;
+		public String pin1;
 
-		public pl_ElementConn(List<String> tokens) {
+		public void set(List<String> tokens) {
 			this.element0 = tokens.get(1);
 			this.pin0 = tokens.get(2);
 			this.direction = tokens.get(3);
@@ -262,17 +262,17 @@ public abstract class XDLRCParserListener {
 	}
 
 	public static final class pl_ElementCfg {
-		public final List<String> cfgs;
+		public List<String> cfgs;
 
-		public pl_ElementCfg(List<String> tokens) {
+		public void set(List<String> tokens) {
 			this.cfgs = tokens.subList(1, tokens.size());
 		}
 	}
 
 	public static final class pl_Summary {
-		public final List<String> stats;
+		public List<String> stats;
 
-		public pl_Summary(List<String> tokens) {
+		public void set(List<String> tokens) {
 			stats = tokens.subList(1, tokens.size());
 		}
 	}

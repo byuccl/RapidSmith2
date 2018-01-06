@@ -985,7 +985,7 @@ public final class DeviceGenerator {
 
 		@Override
 		protected void enterConn(pl_Conn tokens) {
-			String currWireName = tokens.name;
+			String currWireName = tokens.wire;
 			int currWire = we.getWireEnum(currWireName);
 			boolean currWireIsSiteSink = siteWireSinkSet.contains(currWire);
 			boolean currWireIsPIPSource = pipSources.contains(currWireName);
