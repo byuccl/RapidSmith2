@@ -49,6 +49,10 @@ public class CompressedXDLRCReader {
 	public void parse(Path xdlrcFilePath) throws IOException {
 		Hessian2Input compactReader = FileTools.getCompactReader(xdlrcFilePath);
 		CompressedXDLRC cxdlrc = (CompressedXDLRC) compactReader.readObject();
+		traverse(cxdlrc);
+	}
+
+	public void traverse(CompressedXDLRC cxdlrc) throws IOException {
 		pl_XdlResourceReport xdlrr = new pl_XdlResourceReport();
 		xdlrr.family = cxdlrc.family;
 		xdlrr.part = cxdlrc.part;

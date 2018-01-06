@@ -30,21 +30,21 @@ import java.util.Objects;
  *	TODO: In the future it would be nice if this could be integrated with TINCR and Vivado,
  *			and call the TINCR code to create an XDLRC, but for now just hand in the path
  */
-public class UserProvidedXDLRCRetriever implements XDLRCRetriever {
-	private final Path xdlrcFile;
+public class UserProvidedCXDLRCRetriever implements XDLRCRetriever {
+	private final Path cxdlrcFile;
 
-	public UserProvidedXDLRCRetriever(Path xdlrcFile) {
-		Objects.requireNonNull(xdlrcFile);
-		this.xdlrcFile = xdlrcFile;
+	public UserProvidedCXDLRCRetriever(Path cxdlrcFile) {
+		Objects.requireNonNull(cxdlrcFile);
+		this.cxdlrcFile = cxdlrcFile;
 	}
 
 	@Override
 	public XDLRCSource getXDLRCSource() throws DeviceCreationException {
 		//if the file doesn't exist, then throw an error and
-		if (!Files.isRegularFile(xdlrcFile)) {
-			throw new DeviceCreationException("XDLRC file " + xdlrcFile + " does not exist.");
+		if (!Files.isRegularFile(cxdlrcFile)) {
+			throw new DeviceCreationException("XDLRC file " + cxdlrcFile + " does not exist.");
 		}
-		return new XDLRCSource.XDLRCFileSource(xdlrcFile);
+		return new XDLRCSource.CompressedXDLRCSource(cxdlrcFile);
 	}
 
 	@Override

@@ -21,9 +21,9 @@ package edu.byu.ece.rapidSmith.device.creation;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.device.xdlrc.XDLRCSource;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 /**
  * This class provides the base class for generating a new device and its
@@ -52,11 +52,11 @@ public class DeviceFilesCreator {
 	public void createDevice() throws IOException, DeviceCreationException {
 		// Create XDLRC File if it already hasn't been created
 		System.out.println("Retrieving XDLRC file");
-		Path xdlrcFilePath = xdlrcRetriever.getXDLRCFile();
+		XDLRCSource source = xdlrcRetriever.getXDLRCSource();
 
 		// Initialize Parser
 		DeviceGenerator generator = new DeviceGenerator();
-		Device device = generator.generate(xdlrcFilePath);
+		Device device = generator.generate(source);
 
 		// Write the Device to File
 		System.out.println("Writing device to compact file");
@@ -69,7 +69,7 @@ public class DeviceFilesCreator {
 
 		// Delete XDLRC file
 		System.out.println("Cleaning up XDLRC file.");
-		xdlrcRetriever.cleanupXDLRCFile();
+		xdlrcRetriever.cleanup();
 
 		// Building extended device info
 		System.out.println("Building extended info.");
