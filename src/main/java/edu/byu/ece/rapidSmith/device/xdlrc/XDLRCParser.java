@@ -109,7 +109,8 @@ public class XDLRCParser {
 				// (summary x=y ...
 				case "(summary" :
 					pl_Summary summaryTokens = new pl_Summary();
-					summaryTokens.stats = tokens.subList(1, tokens.size());
+					// remove the start and trailing parens
+					summaryTokens.stats = tokens.subList(1, tokens.size() - 1);
 					listeners.forEach(listener -> listener.enterSummary(summaryTokens));
 					listeners.forEach(listener -> listener.exitSummary(summaryTokens));
 
@@ -303,7 +304,7 @@ public class XDLRCParser {
 	private void parseElement() throws IOException {
 		pl_Element elementTokens = new pl_Element();
 		elementTokens.name = tokens.get(1);
-		elementTokens.conn_count = Integer.parseInt(tokens.get(2));
+		elementTokens.pin_count = Integer.parseInt(tokens.get(2));
 		elementTokens.isBel = tokens.size() >= 5 && tokens.get(3).equals("#") && tokens.get(4).equals("BEL");
 
 		listeners.forEach(listener -> listener.enterElement(elementTokens));
@@ -319,7 +320,8 @@ public class XDLRCParser {
 					break;
 				case "(cfg" :
 					pl_ElementCfg cfgTokens = new pl_ElementCfg();
-					cfgTokens.cfgs = tokens.subList(1, tokens.size());
+					// remove the start and trailing parens
+					cfgTokens.cfgs = tokens.subList(1, tokens.size() - 1);
 					listeners.forEach(listener -> listener.enterElementCfg(cfgTokens));
 					listeners.forEach(listener -> listener.exitElementCfg(cfgTokens));
 					break;
