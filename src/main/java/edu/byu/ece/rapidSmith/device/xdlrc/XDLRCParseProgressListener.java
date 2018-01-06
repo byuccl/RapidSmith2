@@ -55,8 +55,8 @@ public class XDLRCParseProgressListener extends XDLRCParserListener {
 
 	@Override
 	protected void enterTile(pl_Tile tokens) {
-		// print out a heartbeat to the console every 10,000 tiles
-		if (++tilesParsed % 10000 == 0) {
+		// print out a heartbeat to the console every 1000 tiles
+		if (++tilesParsed % 1000 == 0) {
 			System.out.println(String.format("Parsing tile %6d of %6d tiles.", tilesParsed, totalTiles));
 		}
 	}

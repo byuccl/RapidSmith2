@@ -147,8 +147,10 @@ public class XDLRCParser {
 					pl_Pip pipTokens = new pl_Pip(tokens);
 					listeners.forEach(listener -> listener.enterPip(pipTokens));
 
-					if (tokens.size() > 5) {
-						tokens.set(6, stripTrailingParen(tokens.get(6)));
+					if (tokens.size() > 6) {
+						String lastValue = tokens.get(6);
+						tokens.set(6, lastValue.substring(0, lastValue.length()-1));
+						tokens.add(")");
 						pl_Routethrough rtTokens = new pl_Routethrough(tokens);
 						listeners.forEach(listener -> listener.enterRoutethrough(rtTokens));
 						listeners.forEach(listener -> listener.exitRoutethrough(rtTokens));
@@ -194,7 +196,7 @@ public class XDLRCParser {
 		pl_Wire wireTokens = new pl_Wire(tokens);
 		listeners.forEach(listener -> listener.enterWire(wireTokens));
 
-		if (tokens.get(tokens.size()-1).endsWith(")")) {
+		if (tokens.get(tokens.size()-1).equals(")")) {
 			listeners.forEach(listener -> listener.exitWire(wireTokens));
 			return;
 		}
@@ -326,7 +328,7 @@ public class XDLRCParser {
 		// Continue while there are more unread characters on the line
 		while (line.length() > startIndex) {
 			// find the next space character.  Three outcomes
-			// 1. wrod found ending at end of line -- add word to the list
+			// 1. word found ending at end of line -- add word to the list
 			// 2. word found ending in space -- add the word to the list
 			// 3. next space is next character -- strip the space character
 			endIndex = line.indexOf(" ", startIndex);
@@ -341,16 +343,17 @@ public class XDLRCParser {
 		}
 
 		// strip any trailing parenthesis
-		int lastIndex = parts.size() - 1;
-		parts.set(lastIndex, stripTrailingParen(parts.get(lastIndex)));
+		stripTrailingParen(parts);
 
 		return parts;
 	}
 
-	private static String stripTrailingParen(String string) {
-		if (string.endsWith(")")) {
-			return string.substring(0, string.length()-1);
+	private static void stripTrailingParen(List<String> tokens) {
+		int lastIndex = tokens.size() - 1;
+		String lastValue = tokens.get(lastIndex);
+		if (lastValue.length() > 1 && lastValue.endsWith(")")) {
+			tokens.set(lastIndex, lastValue.substring(0, lastValue.length()-1));
+			tokens.add(")");
 		}
-		return string;
 	}
 }
