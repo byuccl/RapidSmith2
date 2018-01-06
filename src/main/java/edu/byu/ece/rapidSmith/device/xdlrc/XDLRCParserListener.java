@@ -146,7 +146,7 @@ public abstract class XDLRCParserListener {
 
 	public static final class pl_Element {
 		public String name;
-		public int conn_count;
+		public int pin_count;
 		public boolean isBel;
 	}
 
