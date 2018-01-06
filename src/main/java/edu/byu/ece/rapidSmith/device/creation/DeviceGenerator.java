@@ -21,7 +21,6 @@
 package edu.byu.ece.rapidSmith.device.creation;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
-import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.device.xdlrc.XDLRCParseProgressListener;
 import edu.byu.ece.rapidSmith.device.xdlrc.XDLRCParser;
@@ -193,11 +192,9 @@ public final class DeviceGenerator {
 
 			Element compatTypesEl = ptEl.getChild("compatible_types");
 			if (compatTypesEl != null) {
-				List<SiteType> compatibleTypes = compatTypesEl.getChildren("compatible_type").stream()
-						.map(compatTypeEl -> SiteType.valueOf(family, compatTypeEl.getText()))
-						.collect(Collectors.toList());
-				template.setCompatibleTypes(compatibleTypes.toArray(
-						new SiteType[compatibleTypes.size()]));
+				template.setCompatibleTypes(compatTypesEl.getChildren("compatible_type").stream()
+					.map(it -> SiteType.valueOf(family, it.getText()))
+					.toArray(SiteType[]::new));
 			}
 
 			siteTemplates.put(def.getType(), template);
@@ -251,7 +248,7 @@ public final class DeviceGenerator {
 		for (PrimitiveDefPin pin : def.getPins()) {
 			PrimitiveElement el = def.getElement(pin.getInternalName());
 			boolean forward = !pin.isOutput(); // traverse forward or backward?
-			findAndSetSitePins(templates, def, forward, pin.getExternalName(), el);
+			findAndSetSitePins(def, forward, el);
 		}
 
 		return templates;
@@ -260,15 +257,12 @@ public final class DeviceGenerator {
 	/**
 	 * Recursively traverses through the elements to find all BEL pins reachable from the site pin.
 	 *
-	 * @param templates the BEL templates in the primitive type
 	 * @param def       the primitive def for the current type
 	 * @param forward   traverse forward or backward (forward for site sinks and
 	 *                  backward for site sources)
-	 * @param sitePin   Site pin we're searching from
 	 * @param element   The current element we're looking at
 	 */
-	private void findAndSetSitePins(Map<String, BelTemplate> templates, PrimitiveDef def,
-	                                boolean forward, String sitePin, PrimitiveElement element) {
+	private void findAndSetSitePins(PrimitiveDef def, boolean forward, PrimitiveElement element) {
 
 		// follow each connection from the element
 		for (PrimitiveConnection c : element.getConnections()) {
@@ -282,7 +276,7 @@ public final class DeviceGenerator {
 
 			if (destElement.isMux()) {
 				// This is a routing mux.  Follow it.
-				findAndSetSitePins(templates, def, forward, sitePin, destElement);
+				findAndSetSitePins(def, forward, destElement);
 			}
 		}
 	}
