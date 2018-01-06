@@ -20,6 +20,7 @@
 package edu.byu.ece.rapidSmith.device.creation;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
+import edu.byu.ece.rapidSmith.device.xdlrc.XDLRCSource;
 import edu.byu.ece.rapidSmith.util.RunXilinxTools;
 
 import java.io.IOException;
@@ -44,17 +45,17 @@ public class ISE_XDLRCRetriever implements XDLRCRetriever {
 
 	// Gets the path to the XDLRC file located in the RapidSmith device location.
 	// If the file already exists, mark it as such so it is not later deleted.
-	public Path getXDLRCFile() throws DeviceCreationException {
+	public XDLRCSource getXDLRCSource() throws DeviceCreationException {
 		if (Files.isRegularFile(xdlrcFile))
-			return xdlrcFile;
+			return new XDLRCSource.XDLRCFileSource(xdlrcFile);
 		if(!RunXilinxTools.generateFullXDLRCFile(part, xdlrcFile.toString())){
 			throw new DeviceCreationException("Failed generating part " + part + ".");
 		}
 		removeWhenDone = true;
-		return xdlrcFile;
+		return new XDLRCSource.XDLRCFileSource(xdlrcFile);
 	}
 
-	public void cleanupXDLRCFile() throws IOException {
+	public void cleanup() throws IOException {
 		// Only delete if the files we generated
 		if (removeWhenDone) {
 			Files.deleteIfExists(xdlrcFile);

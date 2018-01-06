@@ -25,6 +25,7 @@ import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.device.xdlrc.XDLRCParseProgressListener;
 import edu.byu.ece.rapidSmith.device.xdlrc.XDLRCParser;
 import edu.byu.ece.rapidSmith.device.xdlrc.XDLRCParserListener;
+import edu.byu.ece.rapidSmith.device.xdlrc.XDLRCSource;
 import edu.byu.ece.rapidSmith.primitiveDefs.*;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 import edu.byu.ece.rapidSmith.util.HashPool;
@@ -91,13 +92,13 @@ public final class DeviceGenerator {
 
 	/**
 	 * Generates and returns the Device created from the XDLRC at the specified
-	 * path.
+	 * source.
 	 *
-	 * @param xdlrcPath path to the XDLRC file for the device
+	 * @param xdlrcSource the XDLRC source containing the device description
 	 * @return the generated Device representation
 	 */
-	public Device generate(Path xdlrcPath) throws IOException {
-		System.out.println("Generating device for file " + xdlrcPath.getFileName());
+	public Device generate(XDLRCSource xdlrcSource) throws IOException {
+		System.out.println("Generating device for file " + xdlrcSource.getFilePath());
 
 		this.device = new Device();
 		this.we = new WireEnumerator();
@@ -114,33 +115,32 @@ public final class DeviceGenerator {
 		// Requires a two part iteration, the first to obtain the tiles and sites,
 		// and the second to gather the wires.  Two parses are required since the
 		// wires need to know the source and sink tiles.
-		XDLRCParser parser = new XDLRCParser();
 		System.out.println("Starting first pass");
-		parser.registerListener(new FamilyTypeListener());
-		parser.registerListener(new WireEnumeratorListener());
-		parser.registerListener(new TileAndSiteGeneratorListener());
-		parser.registerListener(new PrimitiveDefsListener());
-		parser.registerListener(new XDLRCParseProgressListener());
+		xdlrcSource.registerListener(new FamilyTypeListener());
+		xdlrcSource.registerListener(new WireEnumeratorListener());
+		xdlrcSource.registerListener(new TileAndSiteGeneratorListener());
+		xdlrcSource.registerListener(new PrimitiveDefsListener());
+		xdlrcSource.registerListener(new XDLRCParseProgressListener());
 		try {
-			parser.parse(xdlrcPath);
+			xdlrcSource.parse();
 		} catch (IOException e) {
-			throw new IOException("Error handling file " + xdlrcPath, e);
+			throw new IOException("Error handling file " + xdlrcSource.getFilePath(), e);
 		}
-		parser.clearListeners();
+		xdlrcSource.clearListeners();
 
 		device.constructTileMap();
 		PrimitiveDefsCorrector.makeCorrections(device.getPrimitiveDefs(), familyInfo);
 		device.setSiteTemplates(createSiteTemplates());
 
 		System.out.println("Starting second pass");
-		parser.registerListener(new WireConnectionGeneratorListener());
-		parser.registerListener(new ReverseWireConnectionGeneratorListener());
-		parser.registerListener(new SourceAndSinkListener());
-		parser.registerListener(new XDLRCParseProgressListener());
+		xdlrcSource.registerListener(new WireConnectionGeneratorListener());
+		xdlrcSource.registerListener(new ReverseWireConnectionGeneratorListener());
+		xdlrcSource.registerListener(new SourceAndSinkListener());
+		xdlrcSource.registerListener(new XDLRCParseProgressListener());
 		try {
-			parser.parse(xdlrcPath);
+			xdlrcSource.parse();
 		} catch (IOException e) {
-			throw new IOException("Error handling file " + xdlrcPath, e);
+			throw new IOException("Error handling file " + xdlrcSource.getFilePath(), e);
 		}
 
 		Map<Tile, Map<Integer, Set<WireConnection>>> wcsToAdd = getWCsToAdd(true);
