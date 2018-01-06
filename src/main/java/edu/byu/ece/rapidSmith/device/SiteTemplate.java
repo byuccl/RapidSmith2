@@ -48,8 +48,6 @@ public final class SiteTemplate implements Serializable {
 	private transient Map<Integer, SitePinTemplate> internalWireToSitePinMap;
 	// Map of the site wires to the bel pin templates the wire connect to
 	private transient Map<Integer, BelPinTemplate> belPins;
-	// Map of XDL attributes that should be created for each PIP
-	private Map<Integer, Map<Integer, XdlAttribute>> pipAttributes;
 	// Map containing the bel routethrough information of the site
 	private Map<Integer, Set<Integer>> belRoutethroughMap;
 
@@ -142,19 +140,6 @@ public final class SiteTemplate implements Serializable {
 		this.internalWireToSitePinMap = internalWireToSitePinMap;
 	}
 
-	public Map<Integer, Map<Integer, XdlAttribute>> getPipAttributes() {
-		return pipAttributes;
-	}
-
-	public XdlAttribute getPipAttribute(PIP pip) {
-		return pipAttributes.get(pip.getStartWire().getWireEnum())
-				.get(pip.getEndWire().getWireEnum());
-	}
-
-	public void setPipAttributes(Map<Integer, Map<Integer, XdlAttribute>> pipAttributes) {
-		this.pipAttributes = pipAttributes;
-	}
-
 	public void setBelRoutethroughs(Map<Integer, Set<Integer>> belRoutethroughs) {
 		this.belRoutethroughMap = belRoutethroughs;
 	}
@@ -211,7 +196,7 @@ public final class SiteTemplate implements Serializable {
 		return null;
 	}
 
-	public void setReverseWireConnections(WireHashMap reverseWireConnections) {
+	public void setReverseRouting(WireHashMap reverseWireConnections) {
 		this.reverseWireConnections = reverseWireConnections;
 	}
 
@@ -261,7 +246,6 @@ public final class SiteTemplate implements Serializable {
 					template.sinks.put(pin.getName(), pin);
 				}
 			}
-			template.pipAttributes = pipAttributes;
 			template.belRoutethroughMap = belRoutethroughMap;
 
 			return template;
@@ -277,7 +261,6 @@ public final class SiteTemplate implements Serializable {
 		repl.reverseWireConnections = reverseWireConnections; 
 		repl.sources = sources.values();
 		repl.sinks = sinks.values();
-		repl.pipAttributes = pipAttributes;
 		repl.belRoutethroughMap = belRoutethroughMap;
 
 		return repl;

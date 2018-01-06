@@ -310,10 +310,8 @@ public final class DeviceGenerator {
 	 * @param template the template for the current type
 	 */
 	private void createAndSetIntrasiteRouting(PrimitiveDef def, SiteTemplate template, Element siteElement) {
-		WireHashMap wireMap = new WireHashMap();
-		// Stores the attributes associated with the subsite PIPs for converting
-		// back to XDL
-		Map<Integer, Map<Integer, XdlAttribute>> muxes = new HashMap<>();
+		WireHashMap forwardWireMap = new WireHashMap();
+		WireHashMap reverseWireMap = new WireHashMap();
 
 		/*
 		    We build the routing structure by find all of the wire sources and
@@ -324,20 +322,20 @@ public final class DeviceGenerator {
 		for (PrimitiveElement el : def.getElements()) {
 			String elName = el.getName();
 			if (el.isPin() && !def.getPin(elName).isOutput()) { // input site pin
-				addWireConnectionsForElement(def, el, wireMap);
+				addWireConnectionsForElement(def, el, forwardWireMap, reverseWireMap);
 			} else if (el.isBel()) {
-				addWireConnectionsForElement(def, el, wireMap);
+				addWireConnectionsForElement(def, el, forwardWireMap, reverseWireMap);
 			} else if (el.isMux()) {
-				addWireConnectionsForElement(def, el, wireMap);
-				createAndAddMuxPips(def, el, wireMap, muxes);
+				addWireConnectionsForElement(def, el, forwardWireMap, reverseWireMap);
+				createAndAddMuxPips(def, el, forwardWireMap, reverseWireMap);
 			}
 		}
 		
-		Map<Integer, Set<Integer>> belRoutethroughMap = createBelRoutethroughs(template, siteElement, wireMap); 
+		Map<Integer, Set<Integer>> belRoutethroughMap = createBelRoutethroughs(template, siteElement, forwardWireMap);
 		
 		template.setBelRoutethroughs(belRoutethroughMap); 
-		template.setRouting(wireMap);
-		template.setPipAttributes(muxes);
+		template.setRouting(forwardWireMap);
+		template.setReverseRouting(reverseWireMap);
 	}
 
 	/**
@@ -412,46 +410,50 @@ public final class DeviceGenerator {
 	 * Creates a PIP wire connection from each input of the mux to the output.
 	 * Additionally creates the attribute that would represent this connection
 	 * in XDL and adds it to the muxes structure.
-	 *
-	 * @param def     the primitive def for the current type
-	 * @param el      the mux element from the primitive def
-	 * @param wireMap the map of wire connections for the site template
-	 * @param muxes   the connection to attribute map for the site template
 	 */
-	private void createAndAddMuxPips(PrimitiveDef def, PrimitiveElement el,
-	                                 WireHashMap wireMap, Map<Integer, Map<Integer, XdlAttribute>> muxes) {
+	private void createAndAddMuxPips(
+		PrimitiveDef def, PrimitiveElement el,
+		WireHashMap forwardWireMap, WireHashMap reverserWireMap
+	) {
 		String elName = el.getName();
 		String sinkName = getIntrasiteWireName(def.getType(), elName, getOutputPin(el));
 		Integer sinkWire = we.getWireEnum(sinkName);
-		WireConnection[] wcs = {new WireConnection(sinkWire, 0, 0, true)};
-		for (PrimitiveDefPin pin : el.getPins()) {
-			if (pin.isOutput())
-				continue;
-			String srcName = getIntrasiteWireName(def.getType(), elName, pin.getInternalName());
-			int srcWire = we.getWireEnum(srcName);
-			wireMap.put(srcWire, wcs);
+		WireConnection sinkWc = new WireConnection(sinkWire, 0, 0, true);
+		WireConnection[] wcs = {wirePool.add(sinkWc)};
 
-			XdlAttribute attr = new XdlAttribute(elName, "", pin.getInternalName());
-			Map<Integer, XdlAttribute> sinkMap = muxes.computeIfAbsent(srcWire, k -> new HashMap<>());
-			sinkMap.put(sinkWire, attr);
+		ArrayList<WireConnection> sourceConns = new ArrayList<>();
+		for (PrimitiveDefPin pin : el.getPins()) {
+			if (!pin.isOutput()) {
+				String srcName = getIntrasiteWireName(def.getType(), elName, pin.getInternalName());
+				Integer srcWire = we.getWireEnum(srcName);
+				forwardWireMap.put(srcWire, wcs);
+
+				WireConnection sourceConn = new WireConnection(srcWire, 0, 0, true);
+				sourceConns.add(wirePool.add(sourceConn));
+			}
 		}
+		WireConnection[] sourceArray = sourceConns.toArray(new WireConnection[sourceConns.size()]);
+		reverserWireMap.put(sinkWire, sourceArray);
 	}
 
 	/**
-	 * Gets the wire connections for this element and adds them to the wire map
-	 *
-	 * @param def     the primitive def for the current type
-	 * @param el      the current element from the primitive def
-	 * @param wireMap the map of wire connections for the site template
+	 * Gets the wire connections for this element and adds them to the wire maps
 	 */
 	private void addWireConnectionsForElement(
-			PrimitiveDef def, PrimitiveElement el, WireHashMap wireMap) {
-		Map<Integer, List<WireConnection>> wcsMap;
-		wcsMap = getWireConnectionsForElement(def, el);
+			PrimitiveDef def, PrimitiveElement el, WireHashMap forwardWireMap, WireHashMap reverseWireMap
+	) {
+		Map<Integer, List<WireConnection>> wcsMap = getWireConnectionsForElement(def, el, true);
 		for (Map.Entry<Integer, List<WireConnection>> entry : wcsMap.entrySet()) {
 			List<WireConnection> wcsList = entry.getValue();
 			WireConnection[] wcs = wcsList.toArray(new WireConnection[wcsList.size()]);
-			wireMap.put(entry.getKey(), wcs);
+			forwardWireMap.put(entry.getKey(), wcs);
+		}
+
+		Map<Integer, List<WireConnection>> rwcsMap = getWireConnectionsForElement(def, el, false);
+		for (Map.Entry<Integer, List<WireConnection>> entry : rwcsMap.entrySet()) {
+			List<WireConnection> wcsList = entry.getValue();
+			WireConnection[] wcs = wcsList.toArray(new WireConnection[wcsList.size()]);
+			reverseWireMap.put(entry.getKey(), wcs);
 		}
 	}
 
@@ -463,17 +465,24 @@ public final class DeviceGenerator {
 	 * @return all of the wire connection coming from the element
 	 */
 	private Map<Integer, List<WireConnection>> getWireConnectionsForElement(
-			PrimitiveDef def, PrimitiveElement el) {
+			PrimitiveDef def, PrimitiveElement el, boolean forward
+	) {
 		Map<Integer, List<WireConnection>> wcsMap = new HashMap<>();
 		for (PrimitiveConnection conn : el.getConnections()) {
 			// Only handle connections this element sources
-			if (!conn.isForwardConnection())
-				continue;
-
-			Integer source = getPinSource(def, conn);
-			Integer sink = getPinSink(def, conn);
-			List<WireConnection> wcs = wcsMap.computeIfAbsent(source, k -> new ArrayList<>());
-			wcs.add(new WireConnection(sink, 0, 0, false));
+			if (forward && conn.isForwardConnection()){
+				Integer source = getPinSource(def, conn);
+				Integer sink = getPinSink(def, conn);
+				List<WireConnection> wcs = wcsMap.computeIfAbsent(source, k -> new ArrayList<>());
+				WireConnection wc = new WireConnection(sink, 0, 0, false);
+				wcs.add(wirePool.add(wc));
+			} else if (!forward && !conn.isForwardConnection()) {
+				Integer source = getPinSource(def, conn);
+				Integer sink = getPinSink(def, conn);
+				List<WireConnection> wcs = wcsMap.computeIfAbsent(sink, k -> new ArrayList<>());
+				WireConnection wc = new WireConnection(source, 0, 0, false);
+				wcs.add(wirePool.add(wc));
+			}
 		}
 		return wcsMap;
 	}

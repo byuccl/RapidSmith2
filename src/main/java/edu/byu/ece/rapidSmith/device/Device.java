@@ -20,7 +20,6 @@
 package edu.byu.ece.rapidSmith.device;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
-import edu.byu.ece.rapidSmith.device.creation.ExtendedDeviceInfo;
 import edu.byu.ece.rapidSmith.util.HashPool;
 import edu.byu.ece.rapidSmith.primitiveDefs.PrimitiveDefList;
 
@@ -51,7 +50,6 @@ public class Device implements Serializable {
 	//========================================================================//
 	// Class Members
 	//========================================================================//
-	private boolean extendedInfoLoaded = false;
 	/** The Xilinx part name of the device (ie. xc4vfx12ff668, omits the speed grade) */
 	private String partName;
 	/** The Xilinx family of this part */
@@ -150,26 +148,15 @@ public class Device implements Serializable {
 	public void setFamily(FamilyType family) {
 		this.family = family;
 	}
-	
+
+	@Deprecated
 	public boolean hasExtendedInfo() {
-		return extendedInfoLoaded;
+		return true;
 	}
 
+	@Deprecated
 	public boolean loadExtendedInfo() {
-		Path partFolderPath = ExtendedDeviceInfo.getExtendedInfoPath(this);
-		ExtendedDeviceInfo info;
-		try {
-			info = ExtendedDeviceInfo.loadCompressedFile(partFolderPath);
-		} catch (IOException e) {
-			return false;
-		}
-
-		for (SiteType type : info.getReversedSubsiteRouting().keySet()) {
-			SiteTemplate template = getSiteTemplate(type);
-			template.setReverseWireConnections(info.getReversedSubsiteRouting().get(type));
-		}
-
-		extendedInfoLoaded = true;
+		// all info has been moved into the device.  Does nothing now
 		return true;
 	}
 
