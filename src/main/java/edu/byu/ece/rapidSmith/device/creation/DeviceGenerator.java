@@ -23,7 +23,6 @@ package edu.byu.ece.rapidSmith.device.creation;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.device.xdlrc.XDLRCParseProgressListener;
-import edu.byu.ece.rapidSmith.device.xdlrc.XDLRCParser;
 import edu.byu.ece.rapidSmith.device.xdlrc.XDLRCParserListener;
 import edu.byu.ece.rapidSmith.device.xdlrc.XDLRCSource;
 import edu.byu.ece.rapidSmith.primitiveDefs.*;
@@ -35,7 +34,6 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -551,10 +549,16 @@ public final class DeviceGenerator {
 				continue;
 
 			Map<Integer, Set<WireConnection>> tileWCsToAdd = new HashMap<>();
+			Set<Integer> tileSources = getSourceWiresOfTile(whm, forward);
+
 			// Traverse all non-PIP wire connections starting at this source wire.  If any
 			// such wire connections lead to a sink wire that is not already a connection of
 			// the source wire, mark it to be added as a connection
 			for (int wireEnum : whm.keySet()) {
+				// don't add any connections for unsourced wires
+				if (!tileSources.contains(wireEnum))
+					continue;
+
 				Set<WireConnection> wcToAdd = new HashSet<>();
 				Set<WireConnection> checkedConnections = new HashSet<>();
 				Queue<WireConnection> connectionsToFollow = new LinkedList<>();
