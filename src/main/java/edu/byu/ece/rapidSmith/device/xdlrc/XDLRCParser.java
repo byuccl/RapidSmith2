@@ -71,7 +71,9 @@ public class XDLRCParser {
 			// (xdl_resource_report <version> <part> <family>
 			findMatch("(xdl_resource_report");
 			pl_XdlResourceReport xdlReportTokens = new pl_XdlResourceReport();
-			xdlReportTokens.set(tokens);
+			xdlReportTokens.version = tokens.get(1);
+			xdlReportTokens.part = tokens.get(2);
+			xdlReportTokens.family = tokens.get(3);
 			listeners.forEach(listener -> listener.enterXdlResourceReport(xdlReportTokens));
 			parseXdlResourceReport();
 			listeners.forEach(listener -> listener.exitXdlResourceReport(xdlReportTokens));
@@ -107,7 +109,7 @@ public class XDLRCParser {
 				// (summary x=y ...
 				case "(summary" :
 					pl_Summary summaryTokens = new pl_Summary();
-					summaryTokens.set(tokens);
+					summaryTokens.stats = tokens.subList(1, tokens.size());
 					listeners.forEach(listener -> listener.enterSummary(summaryTokens));
 					listeners.forEach(listener -> listener.exitSummary(summaryTokens));
 
@@ -120,7 +122,8 @@ public class XDLRCParser {
 
 	private void parseTiles() throws IOException {
 		pl_Tiles tilesTokens = new pl_Tiles();
-		tilesTokens.set(tokens);
+		tilesTokens.rows = Integer.parseInt(tokens.get(1));
+		tilesTokens.columns = Integer.parseInt(tokens.get(2));
 		listeners.forEach(listener -> listener.enterTiles(tilesTokens));
 
 		while (readLine()) {
@@ -139,7 +142,11 @@ public class XDLRCParser {
 
 	private void parseTile() throws IOException {
 		pl_Tile tileTokens = new pl_Tile();
-		tileTokens.set(tokens);
+		tileTokens.row = Integer.parseInt(tokens.get(1));
+		tileTokens.column = Integer.parseInt(tokens.get(2));
+		tileTokens.name = tokens.get(3);
+		tileTokens.type = tokens.get(4);
+		tileTokens.site_count = Integer.parseInt(tokens.get(5));
 		listeners.forEach(listener -> listener.enterTile(tileTokens));
 
 		while (readLine()) {
@@ -155,14 +162,18 @@ public class XDLRCParser {
 				// (pip <tile> <start_wire> <direction> <end_wire> <rt_name> <rt_site>
 				case "(pip" :
 					pl_Pip pipTokens = pl_pip;
-					pipTokens.set(tokens);
+					pipTokens.tile = tokens.get(1);
+					pipTokens.start_wire = tokens.get(2);
+					pipTokens.type = tokens.get(3);
+					pipTokens.end_wire = tokens.get(4);
 					listeners.forEach(listener -> listener.enterPip(pipTokens));
 
 					if (tokens.size() > 6) {
 						String lastValue = tokens.get(6);
 						tokens.set(6, lastValue.substring(0, lastValue.length()-1));
 						tokens.add(")");
-						rtTokens.set(tokens);
+						rtTokens.pins = tokens.get(5);
+						rtTokens.site_type = tokens.get(6);
 						listeners.forEach(listener -> listener.enterRoutethrough(rtTokens));
 						listeners.forEach(listener -> listener.exitRoutethrough(rtTokens));
 					}
@@ -172,7 +183,11 @@ public class XDLRCParser {
 				// (tile_summary <name> <type> <pin_count> <wire_count> <pip_count>
 				case "(tile_summary" :
 					pl_TileSummary tsTokens = new pl_TileSummary();
-					tsTokens.set(tokens);
+					tsTokens.name = tokens.get(1);
+					tsTokens.type = tokens.get(2);
+					tsTokens.pin_count = Integer.parseInt(tokens.get(3));
+					tsTokens.wire_count = Integer.parseInt(tokens.get(4));
+					tsTokens.pip_count = Integer.parseInt(tokens.get(5));
 					listeners.forEach(listener -> listener.enterTileSummary(tsTokens));
 					listeners.forEach(listener -> listener.exitTileSummary(tsTokens));
 					break;
@@ -186,7 +201,10 @@ public class XDLRCParser {
 
 	private void parsePrimitiveSite() throws IOException {
 		pl_PrimitiveSite siteTokens = new pl_PrimitiveSite();
-		siteTokens.set(tokens);
+		siteTokens.name = tokens.get(1);
+		siteTokens.type = tokens.get(2);
+		siteTokens.bonded = tokens.get(3);
+		siteTokens.pinwire_count = Integer.parseInt(tokens.get(4));
 		listeners.forEach(listener -> listener.enterPrimitiveSite(siteTokens));
 
 		while(readLine()) {
@@ -194,7 +212,9 @@ public class XDLRCParser {
 				// (pinwire <name> <direction> <external_wire>
 				case "(pinwire" :
 					pl_PinWire pwTokens = pl_pinwire;
-					pwTokens.set(tokens);
+					pwTokens.name = tokens.get(1);
+					pwTokens.direction = tokens.get(2);
+					pwTokens.external_wire = tokens.get(3);
 					listeners.forEach(listener -> listener.enterPinWire(pwTokens));
 					listeners.forEach(listener -> listener.exitPinWire(pwTokens));
 					break;
@@ -208,7 +228,8 @@ public class XDLRCParser {
 
 	private void parseWire() throws IOException {
 		pl_Wire wireTokens = pl_wire;
-		wireTokens.set(tokens);
+		pl_wire.name = tokens.get(1);
+		pl_wire.connections_count = Integer.parseInt(tokens.get(2));
 		listeners.forEach(listener -> listener.enterWire(wireTokens));
 
 		if (tokens.get(tokens.size()-1).equals(")")) {
@@ -221,7 +242,8 @@ public class XDLRCParser {
 				// (conn <tile> <name>
 				case "(conn" :
 					pl_Conn connTokens = pl_conn;
-					connTokens.set(tokens);
+					connTokens.tile = tokens.get(1);
+					connTokens.wire = tokens.get(2);
 					listeners.forEach(listener -> listener.enterConn(connTokens));
 					listeners.forEach(listener -> listener.exitConn(connTokens));
 					break;
@@ -234,9 +256,9 @@ public class XDLRCParser {
 	}
 
 	private void parsePrimitiveDefs() throws IOException {
-		pl_PrimitiveDefs primitiveDefsTokens = new pl_PrimitiveDefs();
-		primitiveDefsTokens.set(tokens);
-		listeners.forEach(listener -> listener.enterPrimitiveDefs(primitiveDefsTokens));
+		pl_PrimitiveDefs pdTokens = new pl_PrimitiveDefs();
+		pdTokens.num_defs = Integer.parseInt(tokens.get(1));
+		listeners.forEach(listener -> listener.enterPrimitiveDefs(pdTokens));
 
 		while (readLine()) {
 			switch (tokens.get(0)) {
@@ -244,22 +266,26 @@ public class XDLRCParser {
 					parsePrimitiveDef();
 					break;
 				case ")" :
-					listeners.forEach(listener -> listener.exitPrimitiveDefs(primitiveDefsTokens));
+					listeners.forEach(listener -> listener.exitPrimitiveDefs(pdTokens));
 					return;
 			}
 		}
 	}
 
 	private void parsePrimitiveDef() throws IOException {
-		pl_PrimitiveDef primitiveDefTokens = new pl_PrimitiveDef();
-		primitiveDefTokens.set(tokens);
-		listeners.forEach(listener -> listener.enterPrimitiveDef(primitiveDefTokens));
+		pl_PrimitiveDef pdTokens = new pl_PrimitiveDef();
+		pdTokens.name = tokens.get(1);
+		pdTokens.pin_count = Integer.parseInt(tokens.get(2));
+		pdTokens.element_count = Integer.parseInt(tokens.get(3));
+		listeners.forEach(listener -> listener.enterPrimitiveDef(pdTokens));
 
 		while (readLine()) {
 			switch (tokens.get(0)) {
 				case "(pin" :
 					pl_Pin pinTokens = new pl_Pin();
-					pinTokens.set(tokens);
+					pinTokens.external_name = tokens.get(1);
+					pinTokens.internal_name = tokens.get(2);
+					pinTokens.direction = tokens.get(3);
 					listeners.forEach(listener -> listener.enterPin(pinTokens));
 					listeners.forEach(listener -> listener.exitPin(pinTokens));
 					break;
@@ -267,7 +293,7 @@ public class XDLRCParser {
 					parseElement();
 					break;
 				case ")" :
-					listeners.forEach(listener -> listener.exitPrimitiveDef(primitiveDefTokens));
+					listeners.forEach(listener -> listener.exitPrimitiveDef(pdTokens));
 					return;
 			}
 		}
@@ -276,26 +302,34 @@ public class XDLRCParser {
 
 	private void parseElement() throws IOException {
 		pl_Element elementTokens = new pl_Element();
-		elementTokens.set(tokens);
+		elementTokens.name = tokens.get(1);
+		elementTokens.conn_count = Integer.parseInt(tokens.get(2));
+		elementTokens.isBel = tokens.size() >= 5 && tokens.get(3).equals("#") && tokens.get(4).equals("BEL");
+
 		listeners.forEach(listener -> listener.enterElement(elementTokens));
 
 		while (readLine()) {
 			switch (tokens.get(0)) {
 				case "(pin" :
 					pl_ElementPin pinTokens = new pl_ElementPin();
-					pinTokens.set(tokens);
+					pinTokens.name = tokens.get(1);
+					pinTokens.direction = tokens.get(2);
 					listeners.forEach(listener -> listener.enterElementPin(pinTokens));
 					listeners.forEach(listener -> listener.exitElementPin(pinTokens));
 					break;
 				case "(cfg" :
 					pl_ElementCfg cfgTokens = new pl_ElementCfg();
-					cfgTokens.set(tokens);
+					cfgTokens.cfgs = tokens.subList(1, tokens.size());
 					listeners.forEach(listener -> listener.enterElementCfg(cfgTokens));
 					listeners.forEach(listener -> listener.exitElementCfg(cfgTokens));
 					break;
 				case "(conn" :
 					pl_ElementConn connTokens = new pl_ElementConn();
-					connTokens.set(tokens);
+					connTokens.element0 = tokens.get(1);
+					connTokens.pin0 = tokens.get(2);
+					connTokens.direction = tokens.get(3);
+					connTokens.element1 = tokens.get(4);
+					connTokens.pin1 = tokens.get(5);
 					listeners.forEach(listener -> listener.enterElementConn(connTokens));
 					listeners.forEach(listener -> listener.exitElementConn(connTokens));
 					break;
