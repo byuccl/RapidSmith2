@@ -24,6 +24,21 @@ class ReverseWireConnectionsTest {
 					assertEquals(sinkConn.isPip, sinkSource.isPip)
 				}
 			}
+
+			for (sink in tile.wires) {
+				for (sourceConn in sink.reverseWireConnections) {
+					val source = sourceConn.sinkWire
+
+					val conns = source.wireConnections
+					val sourceSinks = conns.filter { it.sinkWire == sink }
+
+					assert(sourceSinks.size < 2) { "Multiple reverse connections found $source -> $sink" }
+					assert(sourceSinks.isNotEmpty()) { "No reverse connections found $source -> $sink" }
+
+					val sourceSink = sourceSinks[0]
+					assertEquals(sourceConn.isPip, sourceSink.isPip)
+				}
+			}
 		}
 	}
 
@@ -44,6 +59,20 @@ class ReverseWireConnectionsTest {
 
 						val sinkSource = sinkSources[0]
 						assertEquals(sinkConn.isPip, sinkSource.isPip)
+					}
+				}
+				for (sink in site.wires) {
+					for (sourceConn in sink.reverseWireConnections) {
+						val source = sourceConn.sinkWire
+
+						val conns = source.wireConnections
+						val sourceSinks = conns.filter { it.sinkWire == sink }
+
+						assert(sourceSinks.size < 2) { "Multiple reverse connections found $source -> $sink" }
+						assert(sourceSinks.isNotEmpty()) { "No reverse connections found $source -> $sink" }
+
+						val sourceSink = sourceSinks[0]
+						assertEquals(sourceConn.isPip, sourceSink.isPip)
 					}
 				}
 			}
