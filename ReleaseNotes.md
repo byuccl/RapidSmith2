@@ -1,3 +1,15 @@
+## Release v2.0.0
+
+### Major Changes:
+* Removed BelPin::getSitePins methods. (#260, #319)
+
+### Minor Changes:
+* Updated Site::setType to check the allowed site types and throw an error if the types don't match. Also added Site::setTypeUnchecked to forgo the check and avoid potential slowdown. (#321)
+
+### Patches / Bug Fixes:
+* After merging static nets in the edif import process, macro pins now point to the corresponding global VCC or global GND net. (#317, #320)
+* Fixed Github project language stats to report RapidSmith2 as a Java-based project. (#324)
+
 ## Release v1.0.0
 
 This is the first GA (General Availability) release of RapidSmith2 and the API can now be considered stable. 
