@@ -841,6 +841,8 @@ public final class Site implements Serializable{
 		repl.possibleTypes = possibleTypes;
 		repl.externalWires = externalWires;
 		repl.bondedType = bondedType;
+		repl.instanceX = instanceX;
+		repl.instanceY = instanceY;
 		return repl;
 	}
 }
