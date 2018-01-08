@@ -19,8 +19,6 @@
  */
 package edu.byu.ece.rapidSmith.device;
 
-import edu.byu.ece.rapidSmith.util.Exceptions;
-
 import java.io.Serializable;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -816,6 +814,8 @@ public final class Site implements Serializable{
 		private SiteType[] possibleTypes;
 		private Map<SiteType, Map<String, Integer>> externalWires;
 		private BondedType bondedType;
+		private int instanceX;
+		private int instanceY;
 
 		@SuppressWarnings("unused")
 		private Site readResolve() {
@@ -824,6 +824,12 @@ public final class Site implements Serializable{
 			site.possibleTypes = possibleTypes;
 			site.externalWires = externalWires;
 			site.bondedType = bondedType;
+			
+			if (instanceX != 0 || instanceY != 0 || !site.parseCoordinatesFromName(name)) { 
+				site.instanceX = (instanceX != 0) ? instanceX : -1; 
+				site.instanceY = (instanceX != 0) ? instanceX : -1; 
+			}
+			
 			return site;
 		}
 	}
