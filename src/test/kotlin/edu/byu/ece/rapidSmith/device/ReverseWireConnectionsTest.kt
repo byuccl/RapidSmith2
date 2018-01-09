@@ -8,7 +8,8 @@ import org.junit.Test
  */
 class ReverseWireConnectionsTest {
 	@Test fun testV6TileWires() {
-		val device = Device.getInstance("xc6vlx75tff484");
+//		val device = Device.getInstance("xc6vlx75tff484");
+		val device = Device.getInstance("xc7a100tcsg324");
 		for (tile in device.tileMap.values) {
 			for (source in tile.wires) {
 				for (sinkConn in source.wireConnections) {
@@ -43,7 +44,8 @@ class ReverseWireConnectionsTest {
 	}
 
 	@Test fun testV6SiteWires() {
-		val device = Device.getInstance("xc6vlx75tff484");
+//		val device = Device.getInstance("xc6vlx75tff484");
+		val device = Device.getInstance("xc7a100tcsg324");
 		for (site in device.sites.values) {
 			for (type in site.possibleTypes) {
 				site.type = type
