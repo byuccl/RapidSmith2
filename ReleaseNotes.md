@@ -1,10 +1,8 @@
-## Release v2.0.0
-
-### Major Changes:
-* Removed BelPin::getSitePins methods. (#260, #319)
+## Release v1.1.0
 
 ### Minor Changes:
 * Updated Site::setType to check the allowed site types and throw an error if the types don't match. Also added Site::setTypeUnchecked to forgo the check and avoid potential slowdown. (#321)
+* Removed BelPin::getSitePins methods. (#260, #319)
 
 ### Patches / Bug Fixes:
 * After merging static nets in the edif import process, macro pins now point to the corresponding global VCC or global GND net. (#317, #320)
