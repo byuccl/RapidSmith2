@@ -20,8 +20,6 @@
 
 package edu.byu.ece.rapidSmith.device;
 
-import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
-
 import java.io.Serializable;
 import java.util.*;
 
@@ -39,7 +37,7 @@ public final class SiteTemplate implements Serializable {
 	private SiteType[] compatibleTypes;
 	// The intrasite routing graph structure
 	private WireHashMap routing;
-	private WireHashMap reverseWireConnections;
+	private WireHashMap reverseRouting;
 	// Map of pin names to pin templates for the source pins
 	private Map<String, SitePinTemplate> sources;
 	// Map of pin names to pin templates for the sink pins
@@ -197,28 +195,27 @@ public final class SiteTemplate implements Serializable {
 	}
 
 	public void setReverseRouting(WireHashMap reverseWireConnections) {
-		this.reverseWireConnections = reverseWireConnections;
+		this.reverseRouting = reverseWireConnections;
 	}
 
 	public WireConnection[] getReverseWireConnections(int wire) {
-		return reverseWireConnections.get(wire);
+		return reverseRouting.get(wire);
 	}
 
-	public WireHashMap getReversedWireHashMap() {
-		return reverseWireConnections;
+	public WireHashMap getReversedRouting() {
+		return reverseRouting;
 	}
 
 	// for hessian compression
 	private static class SiteTemplateReplace implements Serializable  {
-		private static final long serialVersionUID = 4409516349602480310L;
+		private static final long serialVersionUID = -1220446291416506054L;
 		private SiteType type;
 		private Collection<BelTemplate> belTemplates;
 		private SiteType[] compatibleTypes;
 		private WireHashMap routing;
-		private WireHashMap reverseWireConnections;
+		private WireHashMap reverseRouting;
 		private Collection<SitePinTemplate> sources;
 		private Collection<SitePinTemplate> sinks;
-		private Map<Integer, Map<Integer, XdlAttribute>> pipAttributes;
 		private Map<Integer, Set<Integer>> belRoutethroughMap;
 
 		public Object readResolve() {
@@ -232,7 +229,7 @@ public final class SiteTemplate implements Serializable {
 			}
 			template.compatibleTypes = compatibleTypes;
 			template.routing = routing;
-			template.reverseWireConnections = reverseWireConnections;
+			template.reverseRouting = reverseRouting;
 			if (sources != null) {
 				template.sources = new HashMap<>();
 				for (SitePinTemplate pin : sources) {
@@ -258,7 +255,7 @@ public final class SiteTemplate implements Serializable {
 		repl.belTemplates = belTemplates.values();
 		repl.compatibleTypes = compatibleTypes;
 		repl.routing = routing;
-		repl.reverseWireConnections = reverseWireConnections; 
+		repl.reverseRouting = reverseRouting;
 		repl.sources = sources.values();
 		repl.sinks = sinks.values();
 		repl.belRoutethroughMap = belRoutethroughMap;

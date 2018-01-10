@@ -37,7 +37,7 @@ import java.util.stream.Stream;
  */
 public class Tile implements Serializable {
 	/** Unique Serialization ID */
-	private static final long serialVersionUID = 4859877066322216633L;
+	private static final long serialVersionUID = -4200781031171608914L;
 	private Device dev;
 	/** XDL Name of the tile */
 	private String name;
@@ -484,7 +484,7 @@ public class Tile implements Serializable {
 	}
 
 	private static class TileReplace implements Serializable {
-		private static final long serialVersionUID = 8084308269914591921L;
+		private static final long serialVersionUID = -3588973393824445640L;
 		private String name;
 		private TileType type;
 		private Site[] sites;

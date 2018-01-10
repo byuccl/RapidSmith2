@@ -42,10 +42,10 @@ public class Device implements Serializable {
 	// Versions
 	//========================================================================//
 	/** This is the current device file version (saved in file to ensure proper compatibility) */
-	public static final String LATEST_DEVICE_FILE_VERSION = "1.0";
+	public static final String LATEST_DEVICE_FILE_VERSION = "1.1";
 	/** The current release of the tools */
 	public static final String rapidSmithVersion = "2.0.0";
-	private static final long serialVersionUID = 3980157455165403758L;
+	private static final long serialVersionUID = -5032202328911688776L;
 
 	//========================================================================//
 	// Class Members
@@ -708,7 +708,7 @@ public class Device implements Serializable {
 	   For Hessian compression.  Avoids writing duplicate data.
 	 */
 	protected static class DeviceReplace implements Serializable {
-		private static final long serialVersionUID = 945509107696820354L;
+		private static final long serialVersionUID = -3274492099960921694L;
 		private String version;
 		private String partName;
 		private FamilyType family;
