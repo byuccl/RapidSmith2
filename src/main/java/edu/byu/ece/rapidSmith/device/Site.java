@@ -123,7 +123,7 @@ public final class Site implements Serializable{
 	 * @return the X integer value of the site name or -1 if this instance is
 	 * not placed or does not have X/Y coordinates in the site name
 	 */
-	public int getInstanceX(){
+	public Integer getInstanceX(){
 		return instanceX;
 	}
 
@@ -133,7 +133,7 @@ public final class Site implements Serializable{
 	 * @return The Y integer value of the site name or -1 if this instance is
 	 * not placed or does not have X/Y coordinates in the site name
 	 */
-	public int getInstanceY(){
+	public Integer getInstanceY(){
 		return instanceY;
 	}
 	

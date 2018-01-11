@@ -24,8 +24,8 @@ class SiteNameTests {
 		val site = Site()
 		val ret = site.parseCoordinatesFromName("SLICEX5Y201")
 		assertFalse(ret)
-		assertEquals(-1, site.instanceX)
-		assertEquals(-1, site.instanceY)
+		assertNull(site.instanceX)
+		assertNull(site.instanceY)
 	}
 
 	@Test
@@ -34,8 +34,8 @@ class SiteNameTests {
 		val site = Site()
 		val ret = site.parseCoordinatesFromName("SLICE_Y201")
 		assertFalse(ret)
-		assertEquals(-1, site.instanceX)
-		assertEquals(-1, site.instanceY)
+		assertNull(site.instanceX)
+		assertNull(site.instanceY)
 	}
 
 	@Test
@@ -44,8 +44,8 @@ class SiteNameTests {
 		val site = Site()
 		val ret = site.parseCoordinatesFromName("SLICE_X201")
 		assertFalse(ret)
-		assertEquals(-1, site.instanceX)
-		assertEquals(-1, site.instanceY)
+		assertNull(site.instanceX)
+		assertNull(site.instanceY)
 	}
 
 	@Test
@@ -54,8 +54,8 @@ class SiteNameTests {
 		val site = Site()
 		val ret = site.parseCoordinatesFromName("SLICE_XY201")
 		assertFalse(ret)
-		assertEquals(-1, site.instanceX)
-		assertEquals(-1, site.instanceY)
+		assertNull(site.instanceX)
+		assertNull(site.instanceY)
 	}
 
 	@Test
@@ -64,7 +64,7 @@ class SiteNameTests {
 		val site = Site()
 		val ret = site.parseCoordinatesFromName("SLICE_X201Y")
 		assertFalse(ret)
-		assertEquals(-1, site.instanceX)
-		assertEquals(-1, site.instanceY)
+		assertNull(site.instanceX)
+		assertNull(site.instanceY)
 	}
 }
