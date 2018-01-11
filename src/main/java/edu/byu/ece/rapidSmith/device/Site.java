@@ -65,8 +65,8 @@ public final class Site implements Serializable{
 	public Site(){
 		name = null;
 		tile = null;
-		instanceX = null;
-		instanceY = null;
+		instanceX = -1;
+		instanceY = -1;
 	}
 	
 	/**
@@ -123,7 +123,7 @@ public final class Site implements Serializable{
 	 * @return the X integer value of the site name or -1 if this instance is
 	 * not placed or does not have X/Y coordinates in the site name
 	 */
-	public Integer getInstanceX(){
+	public int getInstanceX(){
 		return instanceX;
 	}
 
@@ -133,7 +133,7 @@ public final class Site implements Serializable{
 	 * @return The Y integer value of the site name or -1 if this instance is
 	 * not placed or does not have X/Y coordinates in the site name
 	 */
-	public Integer getInstanceY(){
+	public int getInstanceY(){
 		return instanceY;
 	}
 	
@@ -143,8 +143,8 @@ public final class Site implements Serializable{
 	 */
 	public boolean parseCoordinatesFromName(String name) {
 		// reset the values
-		this.instanceX = null;
-		this.instanceY = null;
+		this.instanceX = -1;
+		this.instanceY = -1;
 
 		// match the values
 		Pattern re = Pattern.compile(".+_X(\\d+)Y(\\d+)");

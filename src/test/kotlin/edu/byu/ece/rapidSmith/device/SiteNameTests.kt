@@ -1,13 +1,28 @@
 package edu.byu.ece.rapidSmith.device
 
+import edu.byu.ece.rapidSmith.RSEnvironment
+import edu.byu.ece.rapidSmith.util.Exceptions
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import java.io.IOException
 
 /**
  * Tests for parsing the XY coordinates from a site name.
  */
 class SiteNameTests {
+
+	@Test
+	@DisplayName("Site coordinates are deserialized correctly")
+	@Throws(IOException::class)
+	fun deserializeNames() {
+		// Test that Artix device site coordinates match those expected by the name
+		val dev = RSEnvironment.defaultEnv().getDevice("xc7a100tcsg324")
+		val xySite = dev.getSite("SLICE_X31Y102")
+		assertEquals(31, xySite.instanceX)
+		assertEquals(102, xySite.instanceY)
+	}
+
 	@Test
 	@DisplayName("parseCoordinatesFromName parses indices from site name")
 	fun simpleWorking() {
@@ -24,8 +39,8 @@ class SiteNameTests {
 		val site = Site()
 		val ret = site.parseCoordinatesFromName("SLICEX5Y201")
 		assertFalse(ret)
-		assertNull(site.instanceX)
-		assertNull(site.instanceY)
+		assertEquals(-1, site.instanceX)
+		assertEquals(-1, site.instanceY)
 	}
 
 	@Test
@@ -34,8 +49,8 @@ class SiteNameTests {
 		val site = Site()
 		val ret = site.parseCoordinatesFromName("SLICE_Y201")
 		assertFalse(ret)
-		assertNull(site.instanceX)
-		assertNull(site.instanceY)
+		assertEquals(-1, site.instanceX)
+		assertEquals(-1, site.instanceY)
 	}
 
 	@Test
@@ -44,8 +59,8 @@ class SiteNameTests {
 		val site = Site()
 		val ret = site.parseCoordinatesFromName("SLICE_X201")
 		assertFalse(ret)
-		assertNull(site.instanceX)
-		assertNull(site.instanceY)
+		assertEquals(-1, site.instanceX)
+		assertEquals(-1, site.instanceY)
 	}
 
 	@Test
@@ -54,8 +69,8 @@ class SiteNameTests {
 		val site = Site()
 		val ret = site.parseCoordinatesFromName("SLICE_XY201")
 		assertFalse(ret)
-		assertNull(site.instanceX)
-		assertNull(site.instanceY)
+		assertEquals(-1, site.instanceX)
+		assertEquals(-1, site.instanceY)
 	}
 
 	@Test
@@ -64,7 +79,7 @@ class SiteNameTests {
 		val site = Site()
 		val ret = site.parseCoordinatesFromName("SLICE_X201Y")
 		assertFalse(ret)
-		assertNull(site.instanceX)
-		assertNull(site.instanceY)
+		assertEquals(-1, site.instanceX)
+		assertEquals(-1, site.instanceY)
 	}
 }
