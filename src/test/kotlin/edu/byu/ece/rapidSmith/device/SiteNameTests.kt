@@ -1,11 +1,9 @@
 package edu.byu.ece.rapidSmith.device
 
 import edu.byu.ece.rapidSmith.RSEnvironment
-import edu.byu.ece.rapidSmith.util.Exceptions
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import java.io.IOException
 
 /**
  * Tests for parsing the XY coordinates from a site name.
@@ -14,7 +12,6 @@ class SiteNameTests {
 
 	@Test
 	@DisplayName("Site coordinates are deserialized correctly")
-	@Throws(IOException::class)
 	fun deserializeNames() {
 		// Test that Artix device site coordinates match those expected by the name
 		val dev = RSEnvironment.defaultEnv().getDevice("xc7a100tcsg324")
