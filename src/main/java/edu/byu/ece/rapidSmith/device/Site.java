@@ -19,8 +19,6 @@
  */
 package edu.byu.ece.rapidSmith.device;
 
-import edu.byu.ece.rapidSmith.util.Exceptions;
-
 import java.io.Serializable;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -41,9 +39,9 @@ public final class Site implements Serializable{
 	/** The tile where this site resides */
 	private Tile tile;
 	/** The X coordinate of the instance (ex: SLICE_X#Y5) */
-	private int instanceX;
+	private Integer instanceX;
 	/** The Y coordinate of the instance (ex: SLICE_X5Y#) */
-	private int instanceY;
+	private Integer instanceY;
 	/** The bondedness of the site */
 	private BondedType bondedType;
 	/** Stores the template of the type that has been assigned to this site. */
@@ -816,6 +814,8 @@ public final class Site implements Serializable{
 		private SiteType[] possibleTypes;
 		private Map<SiteType, Map<String, Integer>> externalWires;
 		private BondedType bondedType;
+		private Integer instanceX;
+		private Integer instanceY;
 
 		@SuppressWarnings("unused")
 		private Site readResolve() {
@@ -824,6 +824,12 @@ public final class Site implements Serializable{
 			site.possibleTypes = possibleTypes;
 			site.externalWires = externalWires;
 			site.bondedType = bondedType;
+			
+			if (instanceX != null || instanceY != null || !site.parseCoordinatesFromName(name)) {
+				site.instanceX = (instanceX != null) ? instanceX : -1;
+				site.instanceY = (instanceY != null) ? instanceY : -1;
+			}
+			
 			return site;
 		}
 	}
@@ -835,6 +841,8 @@ public final class Site implements Serializable{
 		repl.possibleTypes = possibleTypes;
 		repl.externalWires = externalWires;
 		repl.bondedType = bondedType;
+		repl.instanceX = instanceX;
+		repl.instanceY = instanceY;
 		return repl;
 	}
 }

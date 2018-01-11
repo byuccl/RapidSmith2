@@ -1,5 +1,6 @@
 package edu.byu.ece.rapidSmith.device
 
+import edu.byu.ece.rapidSmith.RSEnvironment
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -8,6 +9,17 @@ import org.junit.jupiter.api.Test
  * Tests for parsing the XY coordinates from a site name.
  */
 class SiteNameTests {
+
+	@Test
+	@DisplayName("Site coordinates are deserialized correctly")
+	fun deserializeNames() {
+		// Test that Artix device site coordinates match those expected by the name
+		val dev = RSEnvironment.defaultEnv().getDevice("xc7a100tcsg324")
+		val xySite = dev.getSite("SLICE_X31Y102")
+		assertEquals(31, xySite.instanceX)
+		assertEquals(102, xySite.instanceY)
+	}
+
 	@Test
 	@DisplayName("parseCoordinatesFromName parses indices from site name")
 	fun simpleWorking() {
