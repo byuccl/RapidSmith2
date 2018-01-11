@@ -39,9 +39,9 @@ public final class Site implements Serializable{
 	/** The tile where this site resides */
 	private Tile tile;
 	/** The X coordinate of the instance (ex: SLICE_X#Y5) */
-	private int instanceX;
+	private Integer instanceX;
 	/** The Y coordinate of the instance (ex: SLICE_X5Y#) */
-	private int instanceY;
+	private Integer instanceY;
 	/** The bondedness of the site */
 	private BondedType bondedType;
 	/** Stores the template of the type that has been assigned to this site. */
@@ -65,8 +65,8 @@ public final class Site implements Serializable{
 	public Site(){
 		name = null;
 		tile = null;
-		instanceX = -1;
-		instanceY = -1;
+		instanceX = null;
+		instanceY = null;
 	}
 	
 	/**
@@ -143,8 +143,8 @@ public final class Site implements Serializable{
 	 */
 	public boolean parseCoordinatesFromName(String name) {
 		// reset the values
-		this.instanceX = -1;
-		this.instanceY = -1;
+		this.instanceX = null;
+		this.instanceY = null;
 
 		// match the values
 		Pattern re = Pattern.compile(".+_X(\\d+)Y(\\d+)");
@@ -814,8 +814,8 @@ public final class Site implements Serializable{
 		private SiteType[] possibleTypes;
 		private Map<SiteType, Map<String, Integer>> externalWires;
 		private BondedType bondedType;
-		private int instanceX;
-		private int instanceY;
+		private Integer instanceX;
+		private Integer instanceY;
 
 		@SuppressWarnings("unused")
 		private Site readResolve() {
@@ -825,9 +825,9 @@ public final class Site implements Serializable{
 			site.externalWires = externalWires;
 			site.bondedType = bondedType;
 			
-			if (instanceX != 0 || instanceY != 0 || !site.parseCoordinatesFromName(name)) { 
-				site.instanceX = (instanceX != 0) ? instanceX : -1; 
-				site.instanceY = (instanceX != 0) ? instanceX : -1; 
+			if (instanceX != null || instanceY != null || !site.parseCoordinatesFromName(name)) {
+				site.instanceX = (instanceX != null) ? instanceX : -1;
+				site.instanceY = (instanceY != null) ? instanceY : -1;
 			}
 			
 			return site;
