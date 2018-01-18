@@ -85,11 +85,18 @@ public class Installer {
 
 			XDLRCRetriever retriever;
 			switch (options.getString("generate")) {
-				case "file":
+				case "file": {
 					Path xdlrcFile = Paths.get(part);
 					retriever = new UserProvidedXDLRCRetriever(xdlrcFile);
 					System.out.println("Creating device from file " + part);
 					break;
+				}
+				case "compressed": {
+					Path cxdlrcFile = Paths.get(part);
+					retriever = new UserProvidedCXDLRCRetriever(cxdlrcFile);
+					System.out.println("Creating device from file " + part);
+					break;
+				}
 				case "ise":
 					retriever = new ISE_XDLRCRetriever(part);
 					System.out.println("Creating device for " + part);
@@ -123,7 +130,7 @@ public class Installer {
 				.defaultHelp(true)
 				.description("Adds support to RapidSmith for a device.");
 		parser.addArgument("--generate")
-				.choices("file", "ise")
+				.choices("file", "compressed", "ise")
 				.setDefault("file")
 				.help("Generate the XDLRC part");
 		parser.addArgument("--ignore_disclaimer")
