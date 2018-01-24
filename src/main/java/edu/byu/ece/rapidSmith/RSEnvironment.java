@@ -51,6 +51,7 @@ public class RSEnvironment {
 	public static final String DEVICE_FILE_SUFFIX = "_db.dat";
 	/** Name of extended family information */
 	public static final String FAMILY_INFO_FILENAME = "familyInfo.xml";
+	public static final String PIN_MAPPINGS_FILENAME = "pinMappings.xml";
 	/** The default environment */
 	private static RSEnvironment defaultEnv;
 
@@ -200,7 +201,20 @@ public class RSEnvironment {
 		SAXBuilder builder = new SAXBuilder();
 		return builder.build(path.toFile());
 	}
-	
+
+	/**
+	 * Loads the family info file for the specified family.  The family info file contains
+	 * additional information not found in the XDLRC for creating device files.
+	 *
+	 * @param family family to get the family info file for
+	 * @return the family info xml document
+	 */
+	public Document loadPinMappings(FamilyType family) throws JDOMException, IOException {
+		Path path = getPartFolderPath(family).resolve(PIN_MAPPINGS_FILENAME);
+		SAXBuilder builder = new SAXBuilder();
+		return builder.build(path.toFile());
+	}
+
 	/**
 	 * Loads the device info file for the specified partname and family. The device info file
 	 * contains additional information about a specific device not found in the XDLRC file
