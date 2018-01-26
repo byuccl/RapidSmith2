@@ -21,7 +21,7 @@
 package edu.byu.ece.rapidSmith.examples;
 
 import java.io.IOException;
-import java.nio.file.Path;
+import java.io.OutputStream;
 import java.util.*;
 
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoCheckpoint;
@@ -29,263 +29,106 @@ import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
-import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
-import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.FamilyType;
-import edu.byu.ece.rapidSmith.device.BelId;
-import edu.byu.ece.rapidSmith.device.SitePin;
 
 import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 public class BramAnalyzer {
+	static String[] designNames = {
+/*			"ram_sdp_0_0",
+			"ram_sdp_1_1",
+			"ram_sdp_2_2",
+			"ram_sdp_4_4",
+			"ram_sdp_9_9",
+			"ram_sdp_18_18",
+			"ram_sdp_36_36",
+			"ram_tdp_0_0",
+			"ram_tdp_1_1",
+			"ram_tdp_2_2",
+			"ram_tdp_4_4",
+			"ram_tdp_9_9",
+			"ram_tdp_18_18",
+			"ram_tdp_36_36",
+*/			"fifo1", "fifo2", "fifo3"
+	};
 	
 	    // part name and cell library  
-	public static final String PART_NAME = "xc7a100tcsg324";
-	public static final String CANONICAL_PART_NAME = "xc7a100tcsg324";
-	public static final String CELL_LIBRARY = "cellLibrary.xml";
+	static private Document pinMappings;
+	static private Document pinMapProperties;
 	
 	public static void main(String[] args) throws IOException, JDOMException {
-		
-		if (args.length < 1) {
-			System.err.println("Usage: DesignAnalyzer tincrCheckpointName");
-			System.exit(1);
-		}
-		
+
 		// Load a TINCR checkpoint
-		System.out.println("Loading Design...");
-		VivadoCheckpoint vcp = VivadoInterface.loadRSCP(args[0]);
-		CellDesign design = vcp.getDesign();
-		
-		// Print out some summary statistics on the design
-		summarizeDesign(design);      
-
-		System.out.println();
-
-		// Print out a representation of the design 
-		prettyPrintDesign(design, true);
-		
-		Document doc = RSEnvironment.defaultEnv().loadPinMappings(design.getFamily());
-		
-		//printCellBelMappings(design);
-
-		System.out.println("Done...");
+		//System.out.println("Loading Design...");
+		for (String designName : designNames) {
+			VivadoCheckpoint vcp = VivadoInterface.loadRSCP(designName + ".rscp");
+			new BramAnalyzer(vcp.getDesign());
+		}
+		//printPinMappings(pinMappings, System.out);
+		System.out.println("\nDone...");
 	}
+	
+	public BramAnalyzer(CellDesign design) throws IOException, JDOMException {
+		
+		pinMappings = RSEnvironment.defaultEnv().loadPinMappings(design.getFamily());
+		pinMapProperties= RSEnvironment.defaultEnv().loadPinMapProperties(design.getFamily());
+		
+		// Build pin mappings
+		Element newMapping = buildPinMappings(design, true, design.getName());
+		
+		//printPinMappings(newMapping, System.out);
 
-	// Print out the first few cells and the list of Bels they can be placed onto
-	public static void printCellBelMappings(CellDesign design) {
-		System.out.println("\nSome Cell/Bel Mappings:");
-		int i=0;
-		Set<String> cells = new HashSet<>();
-		for (Cell c : design.getCells()) {
-			if (cells.contains(c.getLibCell().getName()))
-				continue;
-			cells.add(c.getLibCell().getName());
-			if (++i > 20)
-				break;
-			System.out.println("  Cell #" + i + " = " + c.toString());
-			if (c.isMacro()) { 
-				System.out.println("    Cell is macro");
-				continue;
+		// Compute hashes and add them
+		//printPinMappings(newMapping, System.out);
+		for (Element e : newMapping.getChildren()) {
+			String hash = buildHash(e);
+			e.setAttribute("hash", hash);
+		
+			// See if this mapping is already present
+			if (!isDuplicateMapping(hash)) {
+				System.out.println(design.getName() + " pin mappings: not duplicate, adding");
+				pinMappings.getRootElement().addContent(e.clone());
+				RSEnvironment.defaultEnv().savePinMappings(design.getFamily(), pinMappings);
 			}
-			if (c.getPossibleAnchors().size() == 0)
-				System.out.println("    This cell cannot be placed.");
-			for (BelId b : c.getPossibleAnchors()) {
-				System.out.println("    Can be placed onto sites of type " + b.getSiteType() + " on Bels of type " + b.getName());
-			}
+			else
+				System.out.println(design.getName() + " pin mappings: duplicate, ignoring...");
 		}
 	}
-	
-	/**
-	 * Print out a formatted representation of a design to help visualize it.  Another way of visualizing designs is illustrated
-	 * in the DotFilePrinterDemo program in the examples2 directory.  
-	 * @param design The design to be pretty printed.
-	 */
-	public static void prettyPrintDesign(CellDesign design) {
-		prettyPrintDesign(design, false);
-	}
-	
-	/**
-	 * Print out a formatted representation of a design to help visualize it.  Another way of visualizing designs is illustrated
-	 * in the DotFilePrinterDemo program in the examples2 directory.  
-	 * @param design The design to be pretty printed.
-	 * @param Flag to control printing of detailed cellBelPinMappings 
-	 */
-	public static void prettyPrintDesign(CellDesign design, boolean cellBelPinMappings) {
+
+	public Element buildPinMappings(CellDesign design, boolean cellBelPinMappings, String designName) {
+		Element cells = new Element("cells");
 		// Print the cells
 		for (Cell c : design.getCells()) {
-			if (c.getType().startsWith("RAMB"))
-				prettyPrintCell(c, cellBelPinMappings);
+			if (c.getType().startsWith("RAMB") || c.getType().startsWith("FIFO")) {
+				Element e = buildPinMappingForCell(c, cellBelPinMappings, designName);
+				cells.addContent(e);
+			}
 		}
+		return cells;
 	}		
 		
-
-	// 
-	/**
-	 * Given a pointer to the head of a RouteTree, format up a string to represent it.
-	   This works for either intra-site routes as well as inter-site routes
-	 * @param n The net being traversed
-	 * @param rt The RouteTree object we are currently at in the physical route.
-	 * @param head An indication if we are just starting a wire so we can be sure to print out that segment. 
-	 * @param inside An indication of whether we are inside a site or outside.  Physical wires start inside sites and go until they hit site pins, 
-	 * at which point they enter the global routing fabric.  They eventually hit site pins again at which point they re-enter sites.  They then
-	 * continue until they hit BEL pins, which are the sink pins of the physical route.
-	 * @return A string representing the physical route.  It is similar in many ways to XIlinx Directed Routing strings but have been enhanced 
-	 * to show where the route enters and exits sites as well as a description of the sink pins where it terminates.
-	 */
-	public static String createRoutingString(String indnt, CellNet n, RouteTree rt, boolean head, boolean inside) {
-		String s="";
-
-		if (rt == null)  return s;
-
-		// A RouteTree object contains a collection of RouteTree objects which represent the downstream segments making up the route.
-		// If this collection has more than element, it represents that the physical wire branches at this point.
-		Collection<RouteTree> sinkTrees = rt.getSinkTrees();
-		
-		// Always print first wire at the head of a net's RouteTree. The format is "tileName/wireName".
-		if (head)
-			s = "<head>" + rt.getWire().getFullName();
-		
-
-		// The connection member of the RouteTree object describes the connection between this RouteTree and its predecessor.
-		// The connection may be a programmable connection (PIP or route-through) or it may be a non-programmable connection.  
-		// Look upstream and, if it was a programmable connection, include it.
-		else if (rt.getConnection().isPip() || rt.getConnection().isRouteThrough())
-			s = " " + rt.getWire().getFullName();
-		// It is a non-programmable connection - append it with marker.
-		else  
-			s += "=" + rt.getWire().getName();
-
-		// Now, let's look downstream and see where to go and what to print.
-		// If it is a leaf cell, it either: 
-		//     (1) has a site pin attached, 
-		//     (2) has a BEL pin attached, or 
-		//     (3) simply ends. Wires that end like this are called "used stubs" in Vivado's GUI.  They don't go anywhere.
-		if (rt.isLeaf()) {
-			SitePin sp = rt.getConnectedSitePin();
-			BelPin bp = rt.getConnectedBelPin();
-			if (sp != null) {
-				// If we are at a site pin then what we do differs depending on whether we are inside the site (and leaving) or outside the site (and entering). 
-				if (inside) {  
-					// Inside site, so look for correct intersite route tree to leave on
-					for (RouteTree rt1 : n.getIntersiteRouteTreeList()) 
-						if (sp.getExternalWire().equals(rt1.getWire())) 
-							return s + " SitePin{" + sp + "} <<entering general routing fabric>> " + createRoutingString(indnt, n, rt1, true, !inside);
-					////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-					// An explanation on the above code is in order.
-					// This explanation only applies to regular nets (VCC and GND nets have their own special rules).
-					// When tracing from inside a Site out into the intersite routing, there are multiple cases to consider:
-					// Case 1. A net connects to a single SitePin, the net has a single intersite route tree
-					//    + Straightforward - n.getIntersiteRouteTree() will give the first (and only) RouteTree to follow.
-					// Case 2. A net connects to multiple SitePin's, the net has multiple intersite route trees
-					//    + In this case, all we have ever seen is that the corresponding route trees reconverge immediately
-					//      through a site PIP (reconvergent fanout).
-					//    + Also in this case, we have only observed this happening when a signal leaves both the COUT and DMUX site pins.
-					//    + In this case you can follow either both RouteTrees (and get redundant paths printed out) or just one.
-					// Case 3. A net connects to multiple SitePin's, but the net has only a single intersite route tree
-					//    + One of the SitePin's connects to the wire at head of an intersite route tree and the other doesn't.
-					//    + In this case as in #1 above, just follow the single intersite route tree
-					// Case 4. We have not yet observed this last case: net connects to single SitePin, net has multiple intersite route trees.
-					//    + This doesn't make sense.
-					//
-					// The above code will handle case 1 and 2 just fine by searching - it will find the corresponding RouteTree for each SitePin hit.  
-					// For case 3 it will find a RouteTree for one of the SitePin's but not the other (and fall out the bottom of the for-loop).	
-					// This last case (3b) is handled below.
-					////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-					
-					// Case 3b: If we get here, net connects to a SitePin but there is no corresponding RouteTree... 
-					return s + " SitePin{" + sp + "} <<<<Connects to no corresponding RouteTree outside site>>>> ";
-				}
-				else 
-					// Outside site, so just follow the route from the general routing fabric and into a site
-					return s + " SitePin{" + sp + "} <<Leaving general routing fabric, entering site>> " + createRoutingString(indnt, n, n.getSinkRouteTree(sp), true, inside);
-			}
-			// If not a site pin, see if it is a BEL pin  
-			else if (bp != null) {
-				// Print the attached BEL pin.
-				return s + " " + bp;
-			}
-			else {
-				// It must be a "used stub".
-				return s + " <stub> ";
-			}
-		}  // End of rt.isLeaf() block
-
-		else {
-			// Otherwise, if it is not a leaf route tree, then iterate across its sink trees and add them
-			for (Iterator<RouteTree> it = sinkTrees.iterator(); it.hasNext(); ) {
-				RouteTree sink = it.next();
-
-				// If there is only one sink tree then this is just the next wire segment in the route (not a branch).  
-				// Don't enclose this in ()'s, just list it as the next wire segment. 
-				if (sinkTrees.size() == 1) 
-					s += createRoutingString(indnt, n, sink, false, inside);
-				// Otherwise, this is a branch of the wire, so enclose it in ( )'s to mark that it represents a branch in the wire.
-				else {
-					s += "\n" + indnt + "   (" + createRoutingString(indnt + "   ", n, sink, false, inside) + "\n" + indnt + "   )";
-				}
-			}
-			return s;
-		}
-	}
-
-	public static void summarizeDesign(CellDesign design) {
-
-		System.out.println("Design Summary:");
-		int numplaced = 0;
-		for (Cell c : design.getCells())
-			if (c.getBel() != null)
-				numplaced++;
-		
-		System.out.println("The design has: " + design.getCells().size() + " cells, " + numplaced + " of them are placed.");
-		
-		int numrouted= 0;
-		for (CellNet n: design.getNets())
-			if (n.getIntersiteRouteTreeList()!= null)
-				numrouted++;
-		System.out.println("The design has: " + design.getNets().size() + " nets, "  + numrouted + " of them are routed.");
-		
-	}
-	
-	/**
-	 * Print out a formatted representation of a cell. Placement is not printed for macro cells.
-	 * @param c The internal cell to be pretty printed.
-	 * @param cellBelPinMappings Controls whether cell pin to bel pin mappings are printed
-	 */
-	public static void prettyPrintCell(Cell c, boolean cellBelPinMappings)
+	public Element buildPinMappingForCell(Cell c, boolean cellBelPinMappings, String designName)
 	{
-		if (c.isMacro()) {
-			System.out.println("*Macro (Parent) Cell*");
-			System.out.println("Cell: " + c.getName() + " " + 
-					c.getLibCell().getName());
-		}
+		if (!c.isPlaced()) 
+			return null;
 		else {
-			if (c.isInternal()) {
-				System.out.println("\n*Internal Cell*");
-				System.out.println("Cell: " + c.getName() + " " + 
-						c.getLibCell().getName());
-			}
-			else {
-				System.out.println("\nCell: " + c.getName() + " " + 
-						c.getLibCell().getName());
-			}
-			if (c.isPlaced()) 
-				// Print out its placement
-				System.out.println("  <<<Placed on: " + c.getBel() + ">>>");
-			else System.out.println("  <<<Unplaced>>>");
-		}
-
-		System.out.println();
-		System.out.println();
-		
-		if (c.isPlaced()) {
-			System.out.println("<cell> ");
-			System.out.println("  <type>" + c.getType() + "</type>");
-			System.out.println("  <bel>" + c.getBel().getName() + "</bel>");
+			Element e_c = new Element("cell");
+			e_c.setAttribute("type", c.getType());
+			e_c.setAttribute("bel", c.getBel().getName());
+			e_c.setAttribute("design", designName);
+			e_c.setAttribute("instance", c.getName());
+			
+			Element e_properties = new Element("properties");
+			e_c.addContent(e_properties);
+			Element e_pins= new Element("pins");
+			e_c.addContent(e_pins);
+			
 
 			List<Property> props = new ArrayList<Property>();
 			for (Property p : c.getProperties()) 
@@ -295,38 +138,103 @@ public class BramAnalyzer {
 			for (Property p : props) {
 				String k = p.getKey();
 				Object v = p.getValue();
-				if (!v.equals(c.getLibCell().getDefaultValue(p))) {
-					System.out.println("  <property>");
-					System.out.println("    <key>" + k + "</key>");
-					System.out.println("    <val>" + v + "</val>");
-					System.out.println("  </property>");
+//				if (!v.equals(c.getLibCell().getDefaultValue(p))) {
+				if (isPinMapProperty(k)) {
+					Element e_p = new Element("property");
+					e_p.setAttribute("key", k.toString());
+					e_p.setAttribute("val", v.toString());
+					e_properties.addContent(e_p);
 				}
 			}
+			e_properties.sortChildren(new SortProperties());
 
 			for (CellPin cp : c.getPins()) {
 				if (!c.isMacro()) {
 					if (c.isPlaced()) {
 						if (cellBelPinMappings) {
 							for (BelPin bp1 : cp.getMappedBelPins()) {
-								System.out.println("    <pin>");
-								System.out.println("      <cellPin>" + cp.getName() + "</cellPin>");
-								System.out.println("      <belPin>" + bp1.getName() + "</belPin>");
-								System.out.println("    </pin>");
+								Element e_pin = new Element("pin");
+								e_pin.setAttribute("cellPin", cp.getName());
+								e_pin.setAttribute("belPin", bp1.getName());
+								e_pins.addContent(e_pin);
 							}
 						}
 					}
 				}
 			}
-			System.out.println("</cell> ");
+			e_pins.sortChildren(new SortPins());
+			return e_c;
 		}
-		else System.out.println("UNPLACED");
 	}
 
+	public boolean isDuplicateMapping(String hash) {
+		Element root = pinMappings.getRootElement();
+		for (Element p : root.getChildren("cell"))
+			if (p.getAttributeValue("hash").equals(hash))
+				return true;
+		return false;
+	}
+	
+	public String buildHash(Element newMapping) {
+		String hash = newMapping.getAttributeValue("type") + " " + newMapping.getAttributeValue("bel") + " ";
+
+		// Build list of properties which contribute to the hash
+		List<String> props = new ArrayList<String>();
+		for (Element c : pinMapProperties.getRootElement().getChildren("cell")) {
+			if (c.getAttributeValue("type").equals(newMapping.getAttributeValue("type")) && 
+					c.getAttributeValue("bel").equals(newMapping.getAttributeValue("bel"))) {
+				for (Element p : c.getChildren("prop"))
+					props.add(p.getAttributeValue("key"));
+			}
+		}
+		
+		// Now, using that list, build hash
+		for (String s : props) {
+			for (Element p : newMapping.getChild("properties").getChildren()) {
+				if (p.getAttributeValue("key").equals(s))
+					hash += p.getAttributeValue("val") + " ";
+			}
+		}
+		return hash;
+	}
+	
+	public static void printPinMappings(Document d, OutputStream os) {
+		printPinMappings(d.getRootElement(), os);
+	}
+	
+	public static void printPinMappings(Element e, OutputStream os) {
+				XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+		try {
+			xout.output(e, os);
+			os.close();
+		} catch (IOException err) {
+			// TODO Auto-generated catch block
+			err.printStackTrace();
+		}
+	}
+	
+	public boolean isPinMapProperty(String key) {
+		Element root = pinMapProperties.getRootElement();
+		for (Element c : root.getChildren("cell")) {
+			for (Element prop : c.getChildren("prop")) {
+				if (key.equals(prop.getAttributeValue("key"))) 
+					return true;
+			}
+		}
+		return false;
+	}
+	
 }
 
-// Other ideas:
-// - Get all connected nets from a cell
-// - How to handle pseudo cell pins?
-//   + They don't have a backing library cell pin
-// - Example of attaching a pseudo pin
-
+class SortProperties implements Comparator<Element> {
+    public int compare(Element e1, Element e2) {
+    	return e1.getAttributeValue("key").compareTo(e2.getAttributeValue("key"));
+    }
+}
+class SortPins implements Comparator<Element> {
+    public int compare(Element e1, Element e2) {
+    	int r = e1.getAttributeValue("cellPin").compareTo(e2.getAttributeValue("cellPin"));
+    	if (r != 0) return r;
+    	return e1.getAttributeValue("belPin").compareTo(e2.getAttributeValue("belPin"));
+    }
+}
