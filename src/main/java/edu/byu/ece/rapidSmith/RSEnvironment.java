@@ -56,6 +56,7 @@ public class RSEnvironment {
 	/** Name of extended family information */
 	public static final String FAMILY_INFO_FILENAME = "familyInfo.xml";
 	public static final String PIN_MAPPINGS_FILENAME = "pinMappings.xml";
+	public static final String NEW_PIN_MAPPINGS_FILENAME = "newMapping.xml";
 	public static final String PIN_MAP_PROPERTIES_FILENAME = "pinMapProperties.xml";
 	/** The default environment */
 	private static RSEnvironment defaultEnv;
@@ -215,6 +216,12 @@ public class RSEnvironment {
 	 */
 	public Document loadPinMappings(FamilyType family) throws JDOMException, IOException {
 		Path path = getPartFolderPath(family).resolve(PIN_MAPPINGS_FILENAME);
+		SAXBuilder builder = new SAXBuilder();
+		return builder.build(path.toFile());
+	}
+
+	public Document loadNewPinMapping(FamilyType family) throws JDOMException, IOException {
+		Path path = getPartFolderPath(family).resolve("pinMappings").resolve(NEW_PIN_MAPPINGS_FILENAME);
 		SAXBuilder builder = new SAXBuilder();
 		return builder.build(path.toFile());
 	}
@@ -407,4 +414,5 @@ public class RSEnvironment {
 		String canonicalName = PartNameTools.removeSpeedGrade(partName);
 		return supportedParts.get(canonicalName);
 	}
+
 }

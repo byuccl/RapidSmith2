@@ -20,6 +20,8 @@
 
 package edu.byu.ece.rapidSmith.examples;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
@@ -198,8 +200,16 @@ public class BramAnalyzer {
 		return hash;
 	}
 	
-	public static void printPinMappings(Document d, OutputStream os) {
-		printPinMappings(d.getRootElement(), os);
+	public static void printPinMappings(Element e, String fileName) {
+		OutputStream os = null;
+		try {
+			os = new FileOutputStream(fileName);
+			printPinMappings(e, os);
+			os.close();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 	
 	public static void printPinMappings(Element e, OutputStream os) {
