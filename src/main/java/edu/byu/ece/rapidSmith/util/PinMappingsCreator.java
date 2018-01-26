@@ -1,15 +1,9 @@
 package edu.byu.ece.rapidSmith.util;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Manages dynamic pin mappings.  It turns out that, for some cells,
@@ -23,9 +17,9 @@ import java.util.concurrent.TimeoutException;
 public class PinMappingsCreator {
 	
   private List<String> doCmd(VivadoConsole vc, String cmd, boolean verbose) {
-	  if (verbose) 
-		  System.out.println("Running command: " + cmd);
-	  return vc.runCommand(cmd);
+    if (verbose) 
+      System.out.println("Running command: " + cmd);
+    return vc.runCommand(cmd);
   }
 
 
@@ -40,6 +34,7 @@ public class PinMappingsCreator {
    * The associated main() routine in this class shows how to call it.
    * 
    * @param dir The directory to run in
+   * @param partname The name of the part to map the design to
    * @param libcellname The name of the library cell which is to be placed and analyzed
    * @param belname The name of the bel it is to be placed on
    * @param outfilename The name of the output file for the XML
@@ -48,37 +43,40 @@ public class PinMappingsCreator {
    * @return A list of strings representing the results from the Vivado console
    */
   public List<String> createPinMappings(
-                                        String dir, 
+                                        String dir,
+                                        String partname,
                                         String libcellname, 
-		  String belname, 
-		  String outfilename, 
-		  String properties, 
-		  boolean verbose
-		  ) throws IOException {
+                                        String belname, 
+                                        String outfilename, 
+                                        String properties, 
+                                        boolean verbose
+                                        ) throws IOException {
 
-	  BufferedWriter out = new BufferedWriter(new FileWriter("setup.tcl"));
-	  out.write("set config_dict [dict create " + properties + "]\n");
-	  out.write("set libcellname " + libcellname + "\n");
-	  out.write("set belname " + belname + "\n");
-	  out.write("set filename " + outfilename + "\n");
-	  out.write("source create_nondefault_pin_mappings.tcl\n");
-	  out.close();
-	  VivadoConsole vc = new VivadoConsole(dir);
-	  return doCmd(vc, "source setup.tcl", verbose);
+    BufferedWriter out = new BufferedWriter(new FileWriter("setup.tcl"));
+    out.write("set config_dict [dict create " + properties + "]\n");
+    out.write("set partname " + partname + "\n");
+    out.write("set libcellname " + libcellname + "\n");
+    out.write("set belname " + belname + "\n");
+    out.write("set filename " + outfilename + "\n");
+    out.write("source create_nondefault_pin_mappings.tcl\n");
+    out.close();
+    VivadoConsole vc = new VivadoConsole(dir);
+    return doCmd(vc, "source setup.tcl", verbose);
   }
 
-public static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws IOException {
     //vc.setTimeout(180000L);  // For long timeouts (3 seconds)
-	System.out.println("Starting...");
+    System.out.println("Starting...");
     String properties = "WRITE_WIDTH_A 4 READ_WIDTH_A 4 WRITE_WIDTH_B 18 READ_WIDTH_B 18 RAM_MODE SDP";
 
     PinMappingsCreator pmc = new PinMappingsCreator();
     List<String> ret = pmc.createPinMappings("C:\\git\\RapidSmith2\\devices\\artix7\\pinMappings",
-                                   "RAMB18E1", "RAMB18E1", "newMappings.xml",
-                                   properties, false
-                                   );
+                                             "xc7a100tcsg324",
+                                             "RAMB18E1", "RAMB18E1", "newMappings.xml",
+                                             properties, false
+                                             );
     for (String s : ret)
-    	System.out.println(s);
+      System.out.println(s);
     System.out.println("All done...");
   }
 

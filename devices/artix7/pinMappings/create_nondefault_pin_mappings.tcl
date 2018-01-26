@@ -1,6 +1,6 @@
 
 close_project -quiet
-link_design -part xc7a100tcsg324
+link_design -part $part
 
 set libcell [get_lib_cells $libcellname]
 set cell [create_cell -reference $libcell "tmpcell"]
@@ -21,5 +21,4 @@ set pin_mappings [tincr::cells::create_nondefault_pin_mappings $cell $bel $confi
 #}
 
 # Write the pin mappings to an xml file
-set pinMappingFileName "newPinMappings.xml"
-tincr::cells::write_nondefault_pin_mappings $cell $bel $pin_mappings $config_dict $pinMappingFileName
+tincr::cells::write_nondefault_pin_mappings $cell $bel $pin_mappings $config_dict $filename
