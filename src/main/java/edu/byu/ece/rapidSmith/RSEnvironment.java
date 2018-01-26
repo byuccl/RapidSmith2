@@ -244,14 +244,6 @@ public class RSEnvironment {
 	 */
 	public Document loadPinMapProperties(FamilyType family) throws JDOMException, IOException {
 		Path path = getPartFolderPath(family).resolve(PIN_MAP_PROPERTIES_FILENAME);
-		File tmp = new File(path.toString());
-		if (!tmp.exists()) { 
-			System.out.println("Pin map properties file doesn't exist, creating: " + path.toString());
-			FileWriter out = new FileWriter(path.toString());
-			out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<cells>\n</cells>\n");
-			out.close();
-		}
-			
 		SAXBuilder builder = new SAXBuilder();
 		return builder.build(path.toFile());
 	}

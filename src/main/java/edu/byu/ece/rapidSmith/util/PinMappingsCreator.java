@@ -19,6 +19,7 @@ import org.jdom2.output.XMLOutputter;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
+import edu.byu.ece.rapidSmith.design.subsite.Property;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 
@@ -113,6 +114,17 @@ public class PinMappingsCreator {
 		return hash;
 	}
 	
+	public Element findPinMapProperty(String cell, String bel) {
+		// Build list of properties which contribute to the hash
+		for (Element c : pinMapProperties.getChildren("cell")) {
+			if (c.getAttributeValue("type").equals(cell) && 
+					c.getAttributeValue("bel").equals(bel)) {
+				return c;
+			}
+		}
+		return null;
+	}
+	
 	public boolean isPinMapProperty(String key) {
 		for (Element c : pinMapProperties.getChildren("cell")) {
 			for (Element prop : c.getChildren("prop")) {
@@ -151,13 +163,16 @@ public class PinMappingsCreator {
 		  return newPinMapping.getRootElement().getChild("cell");
   }
   
-  public void addNewPinMapping() {
+  public void addNewPinMapping(boolean write) {
 	Element newPinMapping = loadNewPinMapping();
 	if (newPinMapping == null) 
 		return;
 	if (!isDuplicatePinMapping(newPinMapping)) {
-		pinMappings.addContent(newPinMapping);
+		Element clone = newPinMapping.clone();
+		pinMappings.addContent(clone);
 	}
+	if (write)
+		savePinMappings();
   }
   
   public Element loadPinMappings() {
@@ -245,7 +260,7 @@ public class PinMappingsCreator {
     	List<String> ret = pmc.createPinMappings(dirName, partName, libcellname, belname, properties, false);
     	for (String s : ret)
     		System.out.println(s);
-    	pmc.addNewPinMapping();
+    	pmc.addNewPinMapping(true);
     }
     else { // Design was specified, compute hash and see if it is a duplicate
     	System.out.println("Loading design: " + args[0] + ".rscp");
@@ -265,14 +280,30 @@ public class PinMappingsCreator {
     		System.out.println("No RAMB or FIFO cells found in design, exiting.");
     	}
     	else {
-    		System.out.println("Cell: " + cell.getName() + " " + cell.getType());
+    		String[] tmp = cell.getBel().getFullName().split("/");
+    		String bel = tmp[tmp.length-1];
+
+    		System.out.println("Cell: " + cell.getName() + " " + cell.getType() + " Bel: " + bel);
     		PinMappingsCreator pmc = new PinMappingsCreator(des);
     		String hash = pmc.buildHash(cell);
     		if (!pmc.isDuplicatePinMapping(hash)) {
-    			List<String> ret = pmc.createPinMappings(dirName, partName, libcellname, belname, properties, false);
-    			for (String s : ret)
-    				System.out.println(s);
-    			pmc.addNewPinMapping();
+    			System.out.println("Generating mappings for cell: " + cell.getName() + " " + cell.getType());
+    			Element pmp = pmc.findPinMapProperty(cell.getType(), bel);
+    			if(pmp == null) {
+    				System.out.println("Cannot find pin map property for " + cell.getType() + " " + bel + ", exiting...");
+    			}
+    			else {
+    				String prop = "";
+    				for (Element p : pmp.getChildren("prop")) {
+    					String s = p.getAttributeValue("key");
+    					prop += s + " " + cell.getProperties().getValue(s).toString() + " ";
+    				}
+    				System.out.println(prop);
+    				List<String> ret = pmc.createPinMappings(dirName, des.getPartName(), cell.getType(), bel, prop, true);
+    				for (String s : ret)
+    					System.out.println(s);
+    				pmc.addNewPinMapping(true);
+    			}
     		}
     	}
     }
