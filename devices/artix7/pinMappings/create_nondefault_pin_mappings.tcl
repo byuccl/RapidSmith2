@@ -1,6 +1,5 @@
 
-close_project -quiet
-link_design -part $part
+link_design -part $partname
 
 set libcell [get_lib_cells $libcellname]
 set cell [create_cell -reference $libcell "tmpcell"]
