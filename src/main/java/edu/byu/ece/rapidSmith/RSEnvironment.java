@@ -32,7 +32,10 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.ref.SoftReference;
@@ -216,6 +219,13 @@ public class RSEnvironment {
 	 */
 	public Document loadPinMappings(FamilyType family) throws JDOMException, IOException {
 		Path path = getPartFolderPath(family).resolve(PIN_MAPPINGS_FILENAME);
+		File tmp = new File(path.toString());
+		if (!tmp.exists()) {
+			System.out.println("Pin mappings file doesn't exist, creating: " + path.toString());
+			FileWriter out = new FileWriter(path.toString());
+			out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<cells>\n</cells>\n");
+			out.close();
+		}
 		SAXBuilder builder = new SAXBuilder();
 		return builder.build(path.toFile());
 	}
@@ -234,6 +244,14 @@ public class RSEnvironment {
 	 */
 	public Document loadPinMapProperties(FamilyType family) throws JDOMException, IOException {
 		Path path = getPartFolderPath(family).resolve(PIN_MAP_PROPERTIES_FILENAME);
+		File tmp = new File(path.toString());
+		if (!tmp.exists()) { 
+			System.out.println("Pin map properties file doesn't exist, creating: " + path.toString());
+			FileWriter out = new FileWriter(path.toString());
+			out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<cells>\n</cells>\n");
+			out.close();
+		}
+			
 		SAXBuilder builder = new SAXBuilder();
 		return builder.build(path.toFile());
 	}
