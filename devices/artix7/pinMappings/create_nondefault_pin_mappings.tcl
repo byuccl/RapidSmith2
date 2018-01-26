@@ -1,11 +1,10 @@
-package require tincr
 
 close_project -quiet
 link_design -part xc7a100tcsg324
 
-set libcell [get_lib_cells RAMB18E1]
+set libcell [get_lib_cells $libcellname]
 set cell [create_cell -reference $libcell "tmpcell"]
-set bel [lindex [get_bels *RAMB18E1] 0]
+set bel [lindex [get_bels *$belname] 0]
 
 # Create dictionary of changes to apply
 set config_dict [dict create]
@@ -24,7 +23,3 @@ set pin_mappings [tincr::cells::create_nondefault_pin_mappings $cell $bel $confi
 # Write the pin mappings to an xml file
 set pinMappingFileName "newPinMappings.xml"
 tincr::cells::write_nondefault_pin_mappings $cell $bel $pin_mappings $config_dict $pinMappingFileName
-
-
-
-
