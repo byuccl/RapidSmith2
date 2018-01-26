@@ -29,8 +29,12 @@ import edu.byu.ece.rapidSmith.util.Exceptions.EnvironmentException;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.ref.SoftReference;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -51,6 +55,8 @@ public class RSEnvironment {
 	public static final String DEVICE_FILE_SUFFIX = "_db.dat";
 	/** Name of extended family information */
 	public static final String FAMILY_INFO_FILENAME = "familyInfo.xml";
+	public static final String PIN_MAPPINGS_FILENAME = "pinMappings.xml";
+	public static final String PIN_MAP_PROPERTIES_FILENAME = "pinMapProperties.xml";
 	/** The default environment */
 	private static RSEnvironment defaultEnv;
 
@@ -200,7 +206,44 @@ public class RSEnvironment {
 		SAXBuilder builder = new SAXBuilder();
 		return builder.build(path.toFile());
 	}
-	
+
+	/**
+	 * Loads the pin mappings file for the specified family.  
+	 *
+	 * @param family family to get the family info file for
+	 * @return the family info xml document
+	 */
+	public Document loadPinMappings(FamilyType family) throws JDOMException, IOException {
+		Path path = getPartFolderPath(family).resolve(PIN_MAPPINGS_FILENAME);
+		SAXBuilder builder = new SAXBuilder();
+		return builder.build(path.toFile());
+	}
+
+	/**
+	 * Loads the list of properties which affect pin mappings for the specified family.  
+	 *
+	 * @param family family to get the family info file for
+	 * @return the family info xml document
+	 */
+	public Document loadPinMapProperties(FamilyType family) throws JDOMException, IOException {
+		Path path = getPartFolderPath(family).resolve(PIN_MAP_PROPERTIES_FILENAME);
+		SAXBuilder builder = new SAXBuilder();
+		return builder.build(path.toFile());
+	}
+
+	public void savePinMappings(FamilyType family, Document doc) throws JDOMException, IOException {
+		Path path = getPartFolderPath(family).resolve(PIN_MAPPINGS_FILENAME);
+		OutputStream os = new FileOutputStream(path.toString());
+		XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+		try {
+			xout.output(doc, os);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		os.close();
+	}
+
 	/**
 	 * Loads the device info file for the specified partname and family. The device info file
 	 * contains additional information about a specific device not found in the XDLRC file
