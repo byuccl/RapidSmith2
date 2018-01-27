@@ -234,6 +234,12 @@ public class BramAnalyzer {
 		return false;
 	}
 	
+	void sortLists() {
+		ArrayList<String> cities = new ArrayList<>(Arrays.asList("London", "Tokyo", "New York"));
+		System.out.println(cities);
+		Collections.sort(cities);
+		System.out.println(cities);
+	}
 }
 
 class SortProperties implements Comparator<Element> {

@@ -37,6 +37,19 @@ public class PinMappingsCreator {
 	private Element pinMappings;
 	private Element pinMapProperties;
 
+
+	public CellDesign getDesign() {
+		return design;
+	}
+	
+	public Element getPinMappings() {
+		return pinMappings;
+	}
+	
+	public Element getPinMapProperties() {
+		return pinMapProperties;
+	}
+	
 	public PinMappingsCreator(CellDesign design) {
 		this.design = design;
 		this.pinMappings = loadPinMappings();
@@ -310,6 +323,7 @@ public class PinMappingsCreator {
 
     System.out.println("All done...");
   }
+
 
 }
 
