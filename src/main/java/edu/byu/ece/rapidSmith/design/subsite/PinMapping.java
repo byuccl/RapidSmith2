@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -88,14 +89,12 @@ public class PinMapping {
 		return s;
 	}
 	
-	public boolean equalHashes(PinMapping pm) {
-		return hash.equals(pm.getHash());
+	public boolean equalHashes(PinMapping newPinMap) {
+		return hash.equals(newPinMap.getHash());
 	}
 
-	public boolean equalPins(PinMapping m1) {
-		String s1 = pinsToString(null);
-		String s2 = m1.pinsToString(null);
-		return (s1.equals(s2)); 
+	public boolean equalPins(PinMapping newPinMap) {
+		return (pins.equals(newPinMap.getPins()));
 	}
 	
 
@@ -118,13 +117,13 @@ public class PinMapping {
     		System.out.println("newPinMapping IS a duplicate");
     		// All of the above was done with jdom Element data structures.
     		// Now, convert these to PinMapping objects
-    		PinMapping pm1 = new PinMapping(npm);
-    		PinMapping pm2 = new PinMapping(dup);
+    		PinMapping pmnew = new PinMapping(npm);
+    		PinMapping pmdup = new PinMapping(dup);
     		// Now ask if the new objects have equalHashes and equal pin mappings
     		// By hand modifying the newMapping.xml file you can test that the equalPins() 
     		// routine works and is not dependent on things being in a sorted order
-    		System.out.println("Are the hashes equal? " + pm1.equalHashes(pm2));
-    		System.out.println("Are the actual pin mappings equal? " + pm1.equalPins(pm2));
+    		System.out.println("Are the hashes equal? " + pmdup.equalHashes(pmnew));
+    		System.out.println("Are the actual pin mappings equal? " + pmdup.equalPins(pmnew));
     	}
 	}
 
