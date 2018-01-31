@@ -323,7 +323,10 @@ public class PinMapping {
 	private static List<String> doCmd(VivadoConsole vc, String cmd, boolean verbose) {
 		if (verbose) 
 			System.out.println("Running command: " + cmd);
-		return vc.runCommand(cmd);
+		List<String> ret = vc.runCommand(cmd);
+		if (verbose)
+			System.out.println(ret);
+		return ret;
 	}
 
 	public static List<String> createPinMappings(
@@ -353,9 +356,9 @@ public class PinMapping {
 		out.write("set filename newMapping.xml" + "\n");
 		out.write("source create_nondefault_pin_mappings.tcl\n");
 		out.close();
-		//VivadoConsole vc = new VivadoConsole(path.toString());
-		//List<String> results = doCmd(vc, "source setup.tcl", verbose);
-		List<String> results = null;
+		VivadoConsole vc = new VivadoConsole(path.toString());
+		List<String> results = doCmd(vc, "source setup.tcl", verbose);
+		//List<String> results = null;
 		
 		// If all goes well the file newMapping.xml will be created in the pinMappings subdirectory of the architecture directory
 		// Now, let's load it in and add it to the cache
