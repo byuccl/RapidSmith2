@@ -1,6 +1,7 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -143,34 +144,27 @@ public class PinMapping {
 		return pins;
 	}
 
-	public static void printPinMappings(Element e, OutputStream os) {
+	public static void printPinMappings(Element e, OutputStream os) throws IOException {
 		XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-try {
-	xout.output(e, os);
-	os.close();
-} catch (IOException err) {
-	// TODO Auto-generated catch block
-	err.printStackTrace();
-}
-}
-	public static void printPinMappings(Element e, String fileName) {
+		xout.output(e, os);
+	}
+	
+	public static void printPinMappings(Element e, String fileName) throws IOException {
 		OutputStream os;
-		try {
-			os = new FileOutputStream(fileName);
-			printPinMappings(e, os);
-			os.close();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		os = new FileOutputStream(fileName);
+		printPinMappings(e, os);
+		os.close();
 	}
 
 	public static PinMapping createPinMappingFromPath(Path path) throws JDOMException, IOException {
 		SAXBuilder builder = new SAXBuilder();
 		Document d = builder.build(path.toFile());
 		Element e = d.getRootElement().getChild("cell");
-		printPinMappings(e, System.out);
-		return new PinMapping(e);
+		//System.out.println("creatingx");
+		//printPinMappings(e, System.out);
+		PinMapping pm = new PinMapping(e);
+		//System.out.println("New Pin Mapping:"+ pm);
+		return pm;	
 	}
 	
 	public PinMapping(Element e) {
@@ -178,7 +172,7 @@ try {
 			cellname = e.getAttributeValue("type");
 			belname= e.getAttributeValue("bel");
 			hash= e.getAttributeValue("hash");
-			System.out.println("1: " + cellname + " " + belname + " " + hash);
+			//System.out.println("1: " + cellname + " " + belname + " " + hash);
 			
 			props = new HashMap<String, String>();
 			for (Element p : e.getChild("properties").getChildren("property"))
@@ -230,15 +224,23 @@ try {
 		return (pins.equals(newPinMap.getPins()));
 	}
 
-	private static Element buildDOMPinMappings(Map<String, PinMapping> pinmappings) {
+	private static Element buildDOMPinMappings(Map<String, PinMapping> pinmappings) throws IOException {
+		//System.out.println("Pinmappings: ");
+		//System.out.println(pinmappings);
+		//System.out.println("X");
 		Element root = new Element("cells");
 		for (Map.Entry<String, PinMapping> entry : pinmappings.entrySet()) { 
+			//System.out.println("Z" + entry.getKey() + ":::" + entry.getValue());
 			PinMapping pm = entry.getValue();
+			//System.out.println("PM is:" + pm.getCellname() + "-" + pm.getBelname() + "-" + pm.getHash());
+			//System.out.println(pm);
 			Element e_c = new Element("cell");
+			root.addContent(e_c);
 			e_c.setAttribute("type", pm.getCellname());
 			e_c.setAttribute("bel", pm.getBelname());
 			e_c.setAttribute("hash", pm.getHash());
-
+			
+			
 			Element e_properties = new Element("properties");
 			e_c.addContent(e_properties);
 			Element e_pins= new Element("pins");
@@ -267,7 +269,6 @@ try {
 			}
 			e_pins.sortChildren(new SortPins());
 		}
-		printPinMappings(root, System.out);
 		return root;
 		
 	}
@@ -352,16 +353,27 @@ try {
 		out.write("set filename newMapping.xml" + "\n");
 		out.write("source create_nondefault_pin_mappings.tcl\n");
 		out.close();
-		VivadoConsole vc = new VivadoConsole(path.toString());
+		//VivadoConsole vc = new VivadoConsole(path.toString());
 		//List<String> results = doCmd(vc, "source setup.tcl", verbose);
 		List<String> results = null;
 		
 		// If all goes well the file newMapping.xml will be created in the pinMappings subdirectory of the architecture directory
 		// Now, let's load it in and add it to the cache
+		//System.out.println("FUll pin mappings:");
+		//System.out.println(pinMappings);
 		PinMapping pm = createPinMappingFromPath(path.resolve("newMapping.xml"));
+		
 		Map<String, PinMapping> pms = pinMappings.get(family);
+		//System.out.println("Here are pin mappings:");
+		//System.out.println(pms);
+		
 		pms.put(pm.getHash(), pm);
+		//System.out.println("After put:");
+		//System.out.println(pms);
+		//System.out.println("x");
+		pinMappings.put(family,  pms);
 		savePinMappings(family, pms);
+		//System.out.println("Returning");
 		return results;
   }
 	public static void main(String[] args) throws IOException, JDOMException {
