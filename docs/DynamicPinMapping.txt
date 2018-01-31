@@ -92,9 +92,11 @@ The following are the steps required:
 
 1. Load the pinMappings.xml file that should be in the same directory for
 a technology as the cellLibrary.xml file.  That can be done by calling
-the static loadPinMappings() method in the PinMappings.  This will load the
-cache so you can query it for your particular cell.  Each entry in the
-cache contains the following:
+the static loadPinMappings() method in the
+edu.byu.ece.rapidSmith.design.subsite.PinMapping class.  This will
+load the cache so you can query it for your particular cell. 
+
+Each entry in the cache contains the following:
   a. The cell type for the entry
   b. The bel type for the entry
   c. A hash consisting of the cell type, bel type, and property values
@@ -106,11 +108,12 @@ cache contains the following:
 
 2. You should then query the data structure loaded in the step above
 to find the appropriate pin mapping.  This can be done by calling the
-findPinMapping() routine in the PinMapping class.  To do so, this  will compute a hash
-for the cell of interest being placed onto a particular bel type
-(taking into account the cell's property values that affect the pin
-mappings).  This hash is then compared against the hash values in the
-pinMappings data structure loaded above to find the matching entry.
+findPinMappingForCell() routine in the PinMapping class.  To do so,
+this will compute a hash for the cell of interest being placed onto a
+particular bel type (taking into account the cell's property values
+that affect the pin mappings).  This hash is then compared against the
+hash values in the pinMappings data structure loaded above to find the
+matching entry.
 
 3. You can now access the returned pin mappings to determine how a
 given cellPin maps to zero or more belPins.

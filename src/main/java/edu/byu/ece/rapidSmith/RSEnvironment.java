@@ -27,6 +27,7 @@ import edu.byu.ece.rapidSmith.util.PartNameTools;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 import edu.byu.ece.rapidSmith.util.Exceptions.EnvironmentException;
 import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
@@ -248,12 +249,12 @@ public class RSEnvironment {
 		return builder.build(path.toFile());
 	}
 
-	public void savePinMappings(FamilyType family, Document doc) throws JDOMException, IOException {
+	public void savePinMappings(FamilyType family, Element element) throws JDOMException, IOException {
 		Path path = getPartFolderPath(family).resolve(PIN_MAPPINGS_FILENAME);
 		OutputStream os = new FileOutputStream(path.toString());
 		XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
 		try {
-			xout.output(doc, os);
+			xout.output(element, os);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
