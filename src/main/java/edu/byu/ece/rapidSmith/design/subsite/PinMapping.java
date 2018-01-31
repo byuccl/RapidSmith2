@@ -1,8 +1,10 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +21,8 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.AbstractDesign;
@@ -139,10 +143,33 @@ public class PinMapping {
 		return pins;
 	}
 
+	public static void printPinMappings(Element e, OutputStream os) {
+		XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+try {
+	xout.output(e, os);
+	os.close();
+} catch (IOException err) {
+	// TODO Auto-generated catch block
+	err.printStackTrace();
+}
+}
+	public static void printPinMappings(Element e, String fileName) {
+		OutputStream os;
+		try {
+			os = new FileOutputStream(fileName);
+			printPinMappings(e, os);
+			os.close();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+
 	public static PinMapping createPinMappingFromPath(Path path) throws JDOMException, IOException {
 		SAXBuilder builder = new SAXBuilder();
 		Document d = builder.build(path.toFile());
-		Element e = d.getRootElement();
+		Element e = d.getRootElement().getChild("cell");
+		printPinMappings(e, System.out);
 		return new PinMapping(e);
 	}
 	
@@ -151,7 +178,7 @@ public class PinMapping {
 			cellname = e.getAttributeValue("type");
 			belname= e.getAttributeValue("bel");
 			hash= e.getAttributeValue("hash");
-			//System.out.println("1: " + cellname + " " + belname + " " + hash);
+			System.out.println("1: " + cellname + " " + belname + " " + hash);
 			
 			props = new HashMap<String, String>();
 			for (Element p : e.getChild("properties").getChildren("property"))
@@ -231,8 +258,8 @@ public class PinMapping {
 			for (Map.Entry<String, List<String>> pentry : pm.getPins().entrySet()) {
 				String cp= pentry.getKey();
 				List<String> bps = pentry.getValue();
-				Element tmp = new Element("pin");
 				for (String s : bps) {
+					Element tmp = new Element("pin");
 					tmp.setAttribute("cellPin", cp);
 					tmp.setAttribute("belPin", s);
 					e_pins.addContent(tmp);
@@ -240,7 +267,9 @@ public class PinMapping {
 			}
 			e_pins.sortChildren(new SortPins());
 		}
+		printPinMappings(root, System.out);
 		return root;
+		
 	}
 
 	/**
@@ -310,13 +339,13 @@ public class PinMapping {
 		String belname = tmp[tmp.length-1];
 		String partialhash = cell.getType() + " " + belname;
 		List<String> props = getPinMapProperties(family).get(partialhash);
-		if (props == null) {
-			System.out.println("ERROR: combination of cell and bel not found in pinMapProperties.xml file in directory " + path);
-			return null;
+		String propstring = "";
+		for (String p : props) {
+			propstring += p + " " + cell.getProperties().getValue(p) + " ";
 		}
 		
 		BufferedWriter out = new BufferedWriter(new FileWriter(path.resolve("setup.tcl").toString()));
-		out.write("set config_dict [dict create " + props + "]\n");
+		out.write("set config_dict [dict create " + propstring + "]\n");
 		out.write("set partname " + partname + "\n");
 		out.write("set libcellname " + cell.getType()+ "\n");
 		out.write("set belname " + belname + "\n");
@@ -324,7 +353,8 @@ public class PinMapping {
 		out.write("source create_nondefault_pin_mappings.tcl\n");
 		out.close();
 		VivadoConsole vc = new VivadoConsole(path.toString());
-		List<String> results = doCmd(vc, "source setup.tcl", verbose);
+		//List<String> results = doCmd(vc, "source setup.tcl", verbose);
+		List<String> results = null;
 		
 		// If all goes well the file newMapping.xml will be created in the pinMappings subdirectory of the architecture directory
 		// Now, let's load it in and add it to the cache
