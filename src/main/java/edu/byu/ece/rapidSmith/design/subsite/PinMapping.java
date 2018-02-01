@@ -40,10 +40,11 @@ public class PinMapping {
 
    // These variable are per object
 	private String cellName;
-	private String belName;
-	private String hash;
-	private Map<String, String> props; 
-	private Map<String, List<String>> pins; 
+	private String belName = null;
+	private String hash = null;
+	private String duplic = null;
+	private Map<String, String> props = null; 
+	private Map<String, List<String>> pins = null; 
 
 	public String getCellName() {
 		return cellName;
@@ -54,13 +55,29 @@ public class PinMapping {
 	public String getHash() {
 		return hash;
 	}
+	public String getDuplic() {
+		return duplic;
+	}
 	public Map<String, String> getProps() {
 		return props;
 	}
-	public Map<String, List<String>> getPins() {
-		return pins;
+	public boolean hasDuplic() {
+		return (duplic != null);
 	}
 
+	public Map<String, List<String>> getPins() {
+		if (hasDuplic()) {
+			String key = getDuplic();
+			if (pinMappings == null) {
+				System.out.println("ERROR: must first load pinMappings before calling getPins()");
+				return null;
+			}
+			else 
+				return pinMappings.get(key).getPins();
+		}
+		else
+			return pins;
+	}
 	private static Map<String, List<String>> getPinMapProperties(FamilyType family) {
 		if (pinMapProperties == null)
 			pinMapProperties = loadPinMapProperties(family);
@@ -144,19 +161,27 @@ public class PinMapping {
 			for (Element p : e.getChild("properties").getChildren("property"))
 				props.put(p.getAttributeValue("key"), p.getAttributeValue("val"));
 			
-			pins = new HashMap<String, List<String>>();
-			Element ps = e.getChild("pins");
-			for (Element pp : ps.getChildren("pin")) {
-				String cp = pp.getAttributeValue("cellPin"); 
-				String bp = pp.getAttributeValue("belPin");
-				List<String> bps = null;
-				if (pins.get(cp) == null) 
-					bps = new ArrayList<String>();
-				else
-					bps = pins.get(cp);
-				bps.add(bp);
-				Collections.sort(bps);
-				pins.put(cp, bps);
+			Element dup = e.getChild("duplic");
+			if (dup != null) {
+				duplic = dup.getAttributeValue("hash");
+				System.out.println("Found dup: " + duplic); 
+				pins = null;	
+			}
+			else {
+				pins = new HashMap<String, List<String>>();
+				Element ps = e.getChild("pins");
+				for (Element pp : ps.getChildren("pin")) {
+					String cp = pp.getAttributeValue("cellPin"); 
+					String bp = pp.getAttributeValue("belPin");
+					List<String> bps = null;
+					if (pins.get(cp) == null) 
+						bps = new ArrayList<String>();
+					else
+						bps = pins.get(cp);
+					bps.add(bp);
+					Collections.sort(bps);
+					pins.put(cp, bps);
+				}
 			}
 		}
 		else
@@ -169,14 +194,6 @@ public class PinMapping {
 		return s;
 	}
 	
-	private boolean equalHashes(PinMapping newPinMap) {
-		return hash.equals(newPinMap.getHash());
-	}
-
-	private boolean equalPins(PinMapping newPinMap) {
-		return (pins.equals(newPinMap.getPins()));
-	}
-
 	private static Element buildDOMPinMappings(Map<String, PinMapping> pinmappings) throws IOException {
 		Element root = new Element("cells");
 		for (Map.Entry<String, PinMapping> entry : pinmappings.entrySet()) { 
@@ -187,13 +204,8 @@ public class PinMapping {
 			e_c.setAttribute("bel", pm.getBelName());
 			e_c.setAttribute("hash", pm.getHash());
 			
-			
 			Element e_properties = new Element("properties");
 			e_c.addContent(e_properties);
-			Element e_pins= new Element("pins");
-			e_c.addContent(e_pins);
-			
-
 			for (Map.Entry<String, String> pentry : pm.getProps().entrySet()) {
 				String key = pentry.getKey();
 				String val = pentry.getValue();
@@ -204,20 +216,29 @@ public class PinMapping {
 			}
 			e_properties.sortChildren(new SortProperties());
 
-			for (Map.Entry<String, List<String>> pentry : pm.getPins().entrySet()) {
-				String cp= pentry.getKey();
-				List<String> bps = pentry.getValue();
-				for (String s : bps) {
-					Element tmp = new Element("pin");
-					tmp.setAttribute("cellPin", cp);
-					tmp.setAttribute("belPin", s);
-					e_pins.addContent(tmp);
-				}
+			if (pm.hasDuplic()) {
+				Element e_dup = new Element("duplic");
+				e_c.addContent(e_dup);
+				e_dup.setAttribute("hash", pm.getDuplic());
 			}
-			e_pins.sortChildren(new SortPins());
+			else {	
+				Element e_pins= new Element("pins");
+				e_c.addContent(e_pins);
+
+				for (Map.Entry<String, List<String>> pentry : pm.getPins().entrySet()) {
+					String cp= pentry.getKey();
+					List<String> bps = pentry.getValue();
+					for (String s : bps) {
+						Element tmp = new Element("pin");
+						tmp.setAttribute("cellPin", cp);
+						tmp.setAttribute("belPin", s);
+						e_pins.addContent(tmp);
+					}
+				}
+				e_pins.sortChildren(new SortPins());
+			}
 		}
 		return root;
-		
 	}
 
 	private static void savePinMappings(FamilyType family, Map<String, PinMapping> pinmappings) {
@@ -287,9 +308,9 @@ public class PinMapping {
 		out.write("set filename newMapping.xml" + "\n");
 		out.write("source create_nondefault_pin_mappings.tcl\n");
 		out.close();
-		VivadoConsole vc = new VivadoConsole(path.toString());
-		List<String> results = doCmd(vc, "source setup.tcl", verbose);
-		//List<String> results = null;
+		//VivadoConsole vc = new VivadoConsole(path.toString());
+		//List<String> results = doCmd(vc, "source setup.tcl", verbose);
+		List<String> results = null;
 		
 		// If all goes well the file newMapping.xml will be created in the pinMappings subdirectory of the device architecture directory
 		// Now, let's load it in and add it to the cache
@@ -297,6 +318,18 @@ public class PinMapping {
 		
 		// Get the pinsmappings from the cache for this family
 		Map<String, PinMapping> pms = getPinMappings(family);
+		
+		// See if the pinmappings are a duplicate of another already in the cache
+		// If so, point them to the other entry using the duplic member
+		// Note: at this point pm.hasDuplic() == false
+		for (Map.Entry<String, PinMapping> entry : pms.entrySet()) {
+			String hash = entry.getKey();
+			PinMapping pm2 = entry.getValue();
+			if (pm.getPins().equals(pm2.getPins())) {
+				pm.pins = null;
+				pm.duplic = hash;
+			}
+		}
 		
 		// Add the new mapping to the mappings for this family
 		pms.put(pm.getHash(), pm);
@@ -311,8 +344,13 @@ public class PinMapping {
 		s += "Properties:\n";
 		for (Map.Entry<String, String> entry : props.entrySet()) 
 			s += "  " + entry.getKey() + ":" + entry.getValue() + "\n";
-		s += "Pins:\n";
-		s = pinsToString(s);
+		if (hasDuplic()) {
+			s += "Duplic: " + getDuplic();
+		}
+		else {
+			s += "Pins:\n";
+			s = pinsToString(s);
+		}
 		return s;
 	}
 	
@@ -364,10 +402,14 @@ public class PinMapping {
     						true);
 					
 				}
-				else
-					for (Map.Entry<String, List<String>> pentry : pm.getPins().entrySet()) {
+				else {
+					// See if this entry has its own unique pin mappings.
+					if (pm.hasDuplic())   
+						System.out.println("  Pins are duplicate of: " + pm.getDuplic() + "\n  They are:");
+					// Regardless, getPins() will get the right ones
+					for (Map.Entry<String, List<String>> pentry : pm.getPins().entrySet()) 
 						System.out.println("  " + pentry.getKey() + " -> " + pentry.getValue());
-					}
+				}
 			}
 		}
 		System.out.println("Done...");
