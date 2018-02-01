@@ -1,0 +1,739 @@
+/*
+
+Vivado v2016.2 (64-bit)
+SW Build 1577090 on Thu Jun  2 16:32:40 MDT 2016
+Process ID: 13200
+
+Current time: 	1/31/18 7:19:40 PM MST
+Time zone: 	Mountain Standard Time (America/Denver)
+
+OS: Windows 10
+Version: 10.0
+Architecture: amd64
+Available processors (cores): 8
+
+Screen size: 1680x1050
+Screen resolution (DPI): 96
+Available screens: 2
+Default font: family=Tahoma,name=Tahoma,style=plain,size=11
+
+Java version: 	1.8.0_66 64-bit
+Java home: 	C:/Xilinx/Vivado/2016.2/tps/win64/jre
+
+User name: 	Dallon
+User home directory: C:/Users/Dallon
+User working directory: C:/git/RapidSmith2/exampleVivadoDesigns
+User country: 	US
+User language: 	en
+User locale: 	en_US
+
+RDI Base root directory: C:/Xilinx/Vivado
+RDI Data directory: C:/Xilinx/Vivado/2016.2/data
+RDI Bin directory: C:/Xilinx/Vivado/2016.2/bin
+
+Vivado preferences path: C:/Users/Dallon/AppData/Roaming/Xilinx/Vivado/2016.2/vivado.ini
+Vivado layouts directory: C:/Users/Dallon/AppData/Roaming/Xilinx/Vivado/2016.2/layouts
+
+GUI allocated memory:	157 MB
+GUI max memory:		3,052 MB
+Engine allocated memory: 839 MB
+
+*/
+
+// TclEventType: START_GUI
+// [GUI Memory]: 17 MB (+15415kb) [00:00:06]
+// [Engine Memory]: 637 MB (+516983kb) [00:00:06]
+// [GUI Memory]: 32 MB (+14468kb) [00:00:06]
+// [GUI Memory]: 47 MB (+14376kb) [00:00:06]
+// [Engine Memory]: 672 MB (+2964kb) [00:00:06]
+// Xgd.load filename: C:/Xilinx/Vivado/2016.2/data/parts/xilinx/artix7/devint/artix7/xc7a100t/xc7a100t.xgd; ZipEntry: xc7a100t_detail.xgd elapsed time: 0.6s
+// TclEventType: HFED_INIT_ROUTE_STORAGE_COMPLETED
+// RouteApi::loadEngineXgd elapsed time: 1s
+// [Engine Memory]: 768 MB (+65307kb) [00:00:07]
+// [Engine Memory]: 820 MB (+14034kb) [00:00:18]
+// [GUI Memory]: 50 MB (+320kb) [00:00:18]
+// Device: addNotify
+// [GUI Memory]: 55 MB (+3086kb) [00:00:19]
+// [GUI Memory]: 71 MB (+13695kb) [00:00:19]
+// [GUI Memory]: 76 MB (+1306kb) [00:00:20]
+// Tcl Message: Vivado% Vivado% 
+// Tcl Message: pwd 
+// Tcl Message: C:/Users/Dallon/AppData/Roaming/Xilinx/Vivado Vivado% 
+// Tcl Message: cd 
+// Tcl Message: Vivado% 
+// Tcl Message: pwd 
+// Tcl Message: C:/Users/Dallon Vivado% 
+// Tcl Message: cd ../../git/RapidSmith2 
+// Tcl Message: Vivado% 
+// Tcl Message: cd exampleVivadoDesigns 
+// Tcl Message: Vivado% 
+// Tcl Message: pwd 
+// Tcl Message: C:/git/RapidSmith2/exampleVivadoDesigns Vivado% 
+// Tcl Message: tincr::read_tcp regfilePlaced_routed.tcp 
+// Tcl Message: Parsing device information file... Reading netlist and constraint files... 
+// Tcl Message: Design linked successfully. (10.302441 seconds) Unlocking the design... Design importation complete. (12.328927 seconds) Vivado% 
+// Tcl Message: start_gui 
+// Tcl Message: Netlist and constraints added successfully. (2.026486 seconds) Linking design (this may take awhile)... 
+// Device view-level: 0.0
+// HMemoryUtils.trashcanNow. Engine heap size: 859 MB. GUI used memory: 59 MB. Current time: 1/31/18 7:19:43 PM MST
+// [Engine Memory]: 867 MB (+6206kb) [00:00:30]
+// RouteApi::initDelayMediator elapsed time: 16.7s
+// [Engine Memory]: 1,197 MB (+300168kb) [00:00:39]
+// HMemoryUtils.trashcanNow. Engine heap size: 1,197 MB. GUI used memory: 57 MB. Current time: 1/31/18 7:19:58 PM MST
+expandTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Leaf Cells (109)]", 2); // ba:bm (JViewport:JComponent, cv:JFrame)
+// PAPropertyPanels.initPanels (Rb_OBUF[0]_inst (OBUF)) elapsed time: 1s
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Leaf Cells (109), Rb_OBUF[0]_inst (OBUF)]", 41, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+// HMemoryUtils.trashcanNow. Engine heap size: 1,226 MB. GUI used memory: 59 MB. Current time: 1/31/18 7:20:58 PM MST
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Leaf Cells (109), registers_reg_r1_0_7_0_5/RAMB_D1 (RAMD32)]", 60, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+selectTab(RDIResource.PropertiesView_TABBED_PANE, (HResource) null, "Properties", 1); // g:JideTabbedPane (JPanel:JComponent, cv:JFrame)
+// Device view-level: 0.2
+// HMemoryUtils.trashcanNow. Engine heap size: 1,228 MB. GUI used memory: 60 MB. Current time: 1/31/18 7:21:13 PM MST
+// Device view-level: 0.9
+// Device view-level: 1.1
+// Device view-level: 1.3
+// Device view-level: 1.1
+// Device view-level: 0.9
+// HMemoryUtils.trashcanNow. Engine heap size: 1,240 MB. GUI used memory: 70 MB. Current time: 1/31/18 7:21:14 PM MST
+// Device view-level: 0.7
+// [GUI Memory]: 81 MB (+959kb) [00:01:58]
+// [GUI Memory]: 85 MB (+117kb) [00:01:58]
+// Device view-level: 0.9
+// HMemoryUtils.trashcanNow. Engine heap size: 1,242 MB. GUI used memory: 63 MB. Current time: 1/31/18 7:21:16 PM MST
+// Device view-level: 1.1
+// HMemoryUtils.trashcanNow. Engine heap size: 1,243 MB. GUI used memory: 62 MB. Current time: 1/31/18 7:21:16 PM MST
+// Device view-level: 0.9
+// Device view-level: 0.7
+// Device view-level: 0.9
+// Device view-level: 1.1
+// HMemoryUtils.trashcanNow. Engine heap size: 1,245 MB. GUI used memory: 88 MB. Current time: 1/31/18 7:21:17 PM MST
+// Device view-level: 1.3
+// HMemoryUtils.trashcanNow. Engine heap size: 1,245 MB. GUI used memory: 63 MB. Current time: 1/31/18 7:21:18 PM MST
+// Device view-level: 1.5
+// [GUI Memory]: 91 MB (+1564kb) [00:02:03]
+// HMemoryUtils.trashcanNow. Engine heap size: 1,247 MB. GUI used memory: 63 MB. Current time: 1/31/18 7:21:20 PM MST
+// Device view-level: 1.8
+// Device view-level: 2.0
+// HMemoryUtils.trashcanNow. Engine heap size: 1,249 MB. GUI used memory: 64 MB. Current time: 1/31/18 7:21:21 PM MST
+// Device view-level: 2.2
+// Elapsed time: 20 seconds
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 222939, 4121963); // A:a (JViewport:JComponent, cv:JFrame)
+// Device select: 'I/O Bank - I/O Bank 14'
+selectView(PAResourceOtoP.PAViews_DEVICE, "Device", 1245, 23019, 852, 557); // L:z (TdiGroup:JideTabbedPane, cv:JFrame)
+// PAPropertyPanels.initPanels (I/O Bank 14) elapsed time: 0.2s
+// [GUI Memory]: 97 MB (+2304kb) [00:02:08]
+// Device view-level: 2.4
+// Device view-level: 2.7
+// HMemoryUtils.trashcanNow. Engine heap size: 1,249 MB. GUI used memory: 66 MB. Current time: 1/31/18 7:21:26 PM MST
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 220055, 4141322); // A:a (JViewport:JComponent, cv:JFrame)
+// Device select: 'Net - din_IBUF[0]'
+selectView(PAResourceOtoP.PAViews_DEVICE, "Device", 2765, 52036, 852, 557); // L:z (TdiGroup:JideTabbedPane, cv:JFrame)
+// PAPropertyPanels.initPanels (din_IBUF[0]) elapsed time: 0.2s
+// [Engine Memory]: 1,257 MB (+819kb) [00:02:13]
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120), din_IBUF, din_IBUF[1]]", 5, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+// [GUI Memory]: 103 MB (+1150kb) [00:02:18]
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120), din_IBUF, din_IBUF[0]]", 4, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+// [GUI Memory]: 109 MB (+1073kb) [00:02:19]
+// HMemoryUtils.trashcanNow. Engine heap size: 1,258 MB. GUI used memory: 110 MB. Current time: 1/31/18 7:21:35 PM MST
+selectTab(RDIResource.PropertiesView_TABBED_PANE, (HResource) null, "Nodes", 6); // g:JideTabbedPane (JPanel:JComponent, cv:JFrame)
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120), din_IBUF, din_IBUF[1]]", 5, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120), din_IBUF, din_IBUF[0]]", 4, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120), din_IBUF, din_IBUF[1]]", 5, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120), din_IBUF, din_IBUF[0]]", 4, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120), din_IBUF, din_IBUF[1]]", 5, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+// HMemoryUtils.trashcanNow. Engine heap size: 1,258 MB. GUI used memory: 73 MB. Current time: 1/31/18 7:21:45 PM MST
+selectMenu(PAResourceItoN.MainMenuMgr_FILE, "File"); // V:JideMenu (CommandMenuBar:CommandBar, cv:JFrame)
+selectMenu(PAResourceItoN.MainMenuMgr_OPEN_RECENT_PROJECT, "Open Recent Project"); // ab:JMenu (JPopupMenu:JComponent, cv:JFrame)
+selectMenu(PAResourceItoN.MainMenuMgr_OPEN_RECENT_CHECKPOINT, "Open Recent Checkpoint"); // ab:JMenu (JPopupMenu:JComponent, cv:JFrame)
+selectMenu(PAResourceItoN.MainMenuMgr_OPEN_RECENT_CHECKPOINT, "Open Recent Checkpoint"); // ab:JMenu (JPopupMenu:JComponent, cv:JFrame)
+selectMenuItem(PAResourceItoN.MainMenuMgr_OPEN_RECENT_CHECKPOINT, "C:/git/RapidSmith2/exampleVivadoDesigns/regfile.dcp"); // af:JMenuItem (JPopupMenu:JComponent, cv:JFrame)
+dismissMenu(PAResourceItoN.MainMenuMgr_FILE, "File"); // V:JideMenu (CommandMenuBar:CommandBar, cv:JFrame)
+selectButton("PAResourceOtoP.OpenCheckpoint_WOULD_YOU_LIKE_TO_CLOSE_CURRENTLY_No", "No"); // BasicOptionPaneUI$ButtonFactory:JButton (JPanel:JComponent, T:JDialog)
+// TclEventType: FILE_SET_NEW
+// TclEventType: RUN_ADD
+// TclEventType: RUN_CURRENT
+// TclEventType: PROJECT_NEW
+// bL:g (cv:JFrame):  Open Checkpoint : addNotify
+// Tcl Message: open_checkpoint C:/git/RapidSmith2/exampleVivadoDesigns/regfile.dcp 
+// Tcl Message: Command: open_checkpoint C:/git/RapidSmith2/exampleVivadoDesigns/regfile.dcp  Starting open_checkpoint Task  Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.068 . Memory (MB): peak = 1422.816 ; gain = 0.000 
+// Tcl Message: INFO: [IP_Flow 19-234] Refreshing IP repositories INFO: [IP_Flow 19-1704] No user IP repositories specified 
+// TclEventType: PROJECT_NEW
+// Tcl Message: INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'C:/Xilinx/Vivado/2016.2/data/ip'. 
+// [Engine Memory]: 1,350 MB (+31309kb) [00:02:49]
+// TclEventType: FLOORPLAN_MODIFY
+// TclEventType: DESIGN_NEW
+// HMemoryUtils.trashcanNow. Engine heap size: 1,389 MB. GUI used memory: 75 MB. Current time: 1/31/18 7:22:06 PM MST
+// TclEventType: DESIGN_NEW
+// [Engine Memory]: 1,430 MB (+13163kb) [00:02:50]
+// Device: addNotify
+// TclEventType: HFED_INIT_ROUTE_STORAGE_COMPLETED
+// TclEventType: CURR_DESIGN_SET
+// TclEventType: PROJ_DESIGN_MODE_SET
+// Tcl Message: INFO: [Netlist 29-17] Analyzing 33 Unisim elements for replacement INFO: [Netlist 29-28] Unisim Transformation completed in 1 CPU seconds INFO: [Project 1-479] Netlist was created with Vivado 2016.2 INFO: [Project 1-570] Preparing netlist for logic optimization 
+// Tcl Message: Reading XDEF placement. Reading placer database... Reading XDEF routing. 
+// Tcl Message: Read XDEF File: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.045 . Memory (MB): peak = 1547.395 ; gain = 0.000 
+// Tcl Message: Restored from archive | CPU: 0.000000 secs | Memory: 0.000000 MB | 
+// Tcl Message: Finished XDEF File Restore: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.045 . Memory (MB): peak = 1547.395 ; gain = 0.000 
+// Tcl Message: INFO: [Project 1-111] Unisim Transformation Summary:   A total of 6 instances were transformed.   RAM32M => RAM32M (RAMS32, RAMS32, RAMD32, RAMD32, RAMD32, RAMD32, RAMD32, RAMD32): 6 instances  
+// TclEventType: HFED_INIT_ROUTE_STORAGE_COMPLETED
+// RouteApi::loadEngineXgd elapsed time: 1.3s
+// TclEventType: PROJ_DESIGN_MODE_SET
+// TclEventType: DESIGN_MODE_CHANGE
+// Device view-level: 0.0
+// Tcl Message: INFO: [Project 1-604] Checkpoint was created with Vivado v2016.2 (64-bit) build 1577090 
+// Tcl Message: open_checkpoint: Time (s): cpu = 00:00:16 ; elapsed = 00:00:07 . Memory (MB): peak = 1633.059 ; gain = 210.242 
+// Project name: project_regfile; location: C:/git/RapidSmith2/exampleVivadoDesigns; part: xc7a100tcsg324-3
+dismissDialog("Open Checkpoint"); // bL:g (cv:JFrame)
+// Device view-level: 0.0
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, -1712874, 2318008); // A:a (JViewport:JComponent, cv:JFrame)
+// Device view-level: 0.2
+// Device view-level: 0.5
+// [GUI Memory]: 124 MB (+9371kb) [00:02:57]
+// HMemoryUtils.trashcanNow. Engine heap size: 1,473 MB. GUI used memory: 124 MB. Current time: 1/31/18 7:22:14 PM MST
+// Device view-level: 0.7
+// Device view-level: 0.9
+// Device view-level: 1.1
+// HMemoryUtils.trashcanNow. Engine heap size: 1,493 MB. GUI used memory: 96 MB. Current time: 1/31/18 7:22:18 PM MST
+expandTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120)]", 1); // ba:bm (JViewport:JComponent, cv:JFrame)
+expandTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120), din_IBUF]", 3); // ba:bm (JViewport:JComponent, cv:JFrame)
+// PAPropertyPanels.initPanels (din_IBUF[0]) elapsed time: 0.7s
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120), din_IBUF, din_IBUF[0]]", 4, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+// Device view-level: 1.4
+// Device view-level: 1.6
+// Device view-level: 1.8
+// HMemoryUtils.trashcanNow. Engine heap size: 1,493 MB. GUI used memory: 86 MB. Current time: 1/31/18 7:22:28 PM MST
+// Device view-level: 2.0
+// Device view-level: 2.2
+// Device view-level: 2.5
+// Elapsed time: 21 seconds
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120), din_IBUF, din_IBUF[1]]", 5, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120), din_IBUF, din_IBUF[0]]", 4, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+// HMemoryUtils.trashcanNow. Engine heap size: 1,493 MB. GUI used memory: 108 MB. Current time: 1/31/18 7:22:49 PM MST
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 227217, 4125246); // A:a (JViewport:JComponent, cv:JFrame)
+// Device select: 'I/O Bank - I/O Bank 14'
+selectView(PAResourceOtoP.PAViews_DEVICE, "Device", 2855, 51834, 852, 557); // L:z (TdiGroup:JideTabbedPane, cv:JFrame)
+// Tcl Message: current_project {New Project} 
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 227536, 4125246); // A:a (JViewport:JComponent, cv:JFrame)
+// Device select: 'I/O Bank - I/O Bank 14'
+selectView(PAResourceOtoP.PAViews_DEVICE, "Device", 2859, 51834, 852, 557); // L:z (TdiGroup:JideTabbedPane, cv:JFrame)
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120), din_IBUF, din_IBUF[1]]", 5, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120), din_IBUF, din_IBUF[0]]", 4, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+// Device view-level: 2.4
+// HMemoryUtils.trashcanNow. Engine heap size: 1,495 MB. GUI used memory: 89 MB. Current time: 1/31/18 7:22:55 PM MST
+// Device view-level: 2.0
+// HMemoryUtils.trashcanNow. Engine heap size: 1,495 MB. GUI used memory: 112 MB. Current time: 1/31/18 7:22:56 PM MST
+// Device view-level: 1.8
+// HMemoryUtils.trashcanNow. Engine heap size: 1,495 MB. GUI used memory: 89 MB. Current time: 1/31/18 7:22:58 PM MST
+// Device view-level: 1.3
+// HMemoryUtils.trashcanNow. Engine heap size: 1,495 MB. GUI used memory: 88 MB. Current time: 1/31/18 7:22:58 PM MST
+// Device view-level: 1.5
+// Device view-level: 1.8
+// Device view-level: 2.2
+// Device view-level: 2.4
+// Device view-level: 2.7
+// HMemoryUtils.trashcanNow. Engine heap size: 1,495 MB. GUI used memory: 90 MB. Current time: 1/31/18 7:23:00 PM MST
+// Device view-level: 2.9
+// Device view-level: 3.1
+// Device view-level: 3.3
+// [GUI Memory]: 130 MB (+122kb) [00:03:45]
+// Device view-level: 3.5
+// Device view-level: 3.8
+// HMemoryUtils.trashcanNow. Engine heap size: 1,496 MB. GUI used memory: 98 MB. Current time: 1/31/18 7:23:02 PM MST
+// Device view-level: 4.0
+// Device view-level: 4.2
+// Device view-level: 4.4
+// Device view-level: 4.6
+// HMemoryUtils.trashcanNow. Engine heap size: 1,496 MB. GUI used memory: 100 MB. Current time: 1/31/18 7:23:03 PM MST
+// [GUI Memory]: 138 MB (+906kb) [00:03:49]
+// Device view-level: 4.9
+// Device view-level: 4.6
+// [GUI Memory]: 145 MB (+467kb) [00:03:51]
+// [Engine Memory]: 1,505 MB (+3984kb) [00:03:53]
+// [GUI Memory]: 153 MB (+255kb) [00:03:54]
+// Elapsed time: 19 seconds
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120), din_IBUF, din_IBUF[1]]", 5, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120), din_IBUF, din_IBUF[0]]", 4, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+// Device view-level: 2.2
+// Device view-level: 2.0
+// Device view-level: 1.6
+// Device view-level: 1.4
+// [GUI Memory]: 162 MB (+1753kb) [00:04:00]
+// Device view-level: 1.1
+// HMemoryUtils.trashcanNow. Engine heap size: 1,526 MB. GUI used memory: 115 MB. Current time: 1/31/18 7:23:17 PM MST
+// Device view-level: 1.4
+// Device view-level: 1.6
+// HMemoryUtils.trashcanNow. Engine heap size: 1,526 MB. GUI used memory: 93 MB. Current time: 1/31/18 7:23:18 PM MST
+// Device view-level: 1.8
+// Device view-level: 2.0
+// Device view-level: 2.2
+// Device view-level: 2.5
+// Device view-level: 2.7
+// HMemoryUtils.trashcanNow. Engine heap size: 1,527 MB. GUI used memory: 93 MB. Current time: 1/31/18 7:23:22 PM MST
+// HMemoryUtils.trashcanNow. Engine heap size: 1,530 MB. GUI used memory: 95 MB. Current time: 1/31/18 7:23:22 PM MST
+// Device view-level: 4.4
+// Device view-level: 4.2
+// HMemoryUtils.trashcanNow. Engine heap size: 1,530 MB. GUI used memory: 94 MB. Current time: 1/31/18 7:23:23 PM MST
+// Device view-level: 3.8
+// Device view-level: 3.5
+// Device view-level: 3.3
+// Device view-level: 3.1
+// Device view-level: 2.9
+// HMemoryUtils.trashcanNow. Engine heap size: 1,536 MB. GUI used memory: 97 MB. Current time: 1/31/18 7:23:24 PM MST
+// Device view-level: 2.4
+// Device view-level: 2.7
+// Device view-level: 2.9
+// Device view-level: 3.1
+// Device view-level: 3.3
+// HMemoryUtils.trashcanNow. Engine heap size: 1,536 MB. GUI used memory: 102 MB. Current time: 1/31/18 7:23:25 PM MST
+// Device view-level: 3.5
+// Device view-level: 3.8
+// Device view-level: 3.5
+// Device view-level: 3.3
+// Device view-level: 3.1
+// HMemoryUtils.trashcanNow. Engine heap size: 1,536 MB. GUI used memory: 100 MB. Current time: 1/31/18 7:23:28 PM MST
+// Device view-level: 2.9
+// Device view-level: 2.7
+// Device view-level: 2.4
+// Device view-level: 2.2
+// Device view-level: 2.9
+// Device view-level: 3.1
+// Device view-level: 3.3
+// Device view-level: 3.6
+// HMemoryUtils.trashcanNow. Engine heap size: 1,536 MB. GUI used memory: 101 MB. Current time: 1/31/18 7:23:31 PM MST
+// Device view-level: 3.8
+// Device view-level: 4.0
+// Device view-level: 4.2
+// Device view-level: 4.5
+// Device view-level: 4.7
+// HMemoryUtils.trashcanNow. Engine heap size: 1,536 MB. GUI used memory: 137 MB. Current time: 1/31/18 7:23:32 PM MST
+// Device view-level: 4.9
+// Device view-level: 5.1
+// HMemoryUtils.trashcanNow. Engine heap size: 1,536 MB. GUI used memory: 112 MB. Current time: 1/31/18 7:23:33 PM MST
+// Device view-level: 2.4
+// Device view-level: 2.7
+// Device view-level: 2.9
+// Device view-level: 3.1
+// HMemoryUtils.trashcanNow. Engine heap size: 1,536 MB. GUI used memory: 103 MB. Current time: 1/31/18 7:23:35 PM MST
+// Device view-level: 3.3
+// Device view-level: 3.5
+// Device view-level: 3.8
+// Device view-level: 4.0
+// Device view-level: 4.2
+// HMemoryUtils.trashcanNow. Engine heap size: 1,536 MB. GUI used memory: 103 MB. Current time: 1/31/18 7:23:39 PM MST
+// Device view-level: 4.4
+// Device view-level: 4.6
+// Device view-level: 4.9
+// Device view-level: 5.1
+// Device view-level: 4.9
+// HMemoryUtils.trashcanNow. Engine heap size: 1,536 MB. GUI used memory: 139 MB. Current time: 1/31/18 7:23:43 PM MST
+// HMemoryUtils.trashcanNow. Engine heap size: 1,536 MB. GUI used memory: 156 MB. Current time: 1/31/18 7:23:50 PM MST
+// [GUI Memory]: 170 MB (+69kb) [00:04:37]
+// [GUI Memory]: 179 MB (+708kb) [00:04:38]
+// HMemoryUtils.trashcanNow. Engine heap size: 1,552 MB. GUI used memory: 133 MB. Current time: 1/31/18 7:23:55 PM MST
+// Device view-level: 4.9
+// Device view-level: 4.7
+// Device view-level: 4.5
+// Device view-level: 4.7
+// HMemoryUtils.trashcanNow. Engine heap size: 1,555 MB. GUI used memory: 102 MB. Current time: 1/31/18 7:23:56 PM MST
+// Device view-level: 4.6
+// Device view-level: 4.4
+// Device view-level: 4.2
+// Device view-level: 4.0
+// Device view-level: 3.8
+// HMemoryUtils.trashcanNow. Engine heap size: 1,558 MB. GUI used memory: 113 MB. Current time: 1/31/18 7:24:05 PM MST
+// Device view-level: 3.5
+// Device view-level: 3.3
+// Device view-level: 3.5
+// Device view-level: 3.3
+// Device view-level: 3.5
+// HMemoryUtils.trashcanNow. Engine heap size: 1,562 MB. GUI used memory: 93 MB. Current time: 1/31/18 7:24:07 PM MST
+// Device view-level: 3.8
+// Device view-level: 4.0
+// Device view-level: 4.2
+// Device view-level: 4.0
+// Device view-level: 3.8
+// HMemoryUtils.trashcanNow. Engine heap size: 1,562 MB. GUI used memory: 92 MB. Current time: 1/31/18 7:24:08 PM MST
+// Device view-level: 3.1
+// Device view-level: 2.9
+// Device view-level: 2.7
+// Device view-level: 2.4
+// Device view-level: 2.2
+// HMemoryUtils.trashcanNow. Engine heap size: 1,562 MB. GUI used memory: 92 MB. Current time: 1/31/18 7:24:09 PM MST
+// Device view-level: 2.0
+// Device view-level: 1.8
+// Device view-level: 1.5
+// Device view-level: 1.3
+// Device view-level: 1.1
+// HMemoryUtils.trashcanNow. Engine heap size: 1,562 MB. GUI used memory: 91 MB. Current time: 1/31/18 7:24:10 PM MST
+// Device view-level: 0.9
+// HMemoryUtils.trashcanNow. Engine heap size: 1,562 MB. GUI used memory: 100 MB. Current time: 1/31/18 7:24:12 PM MST
+// Device view-level: 1.1
+// Device view-level: 1.3
+// Device view-level: 1.5
+// Device view-level: 1.8
+// HMemoryUtils.trashcanNow. Engine heap size: 1,562 MB. GUI used memory: 94 MB. Current time: 1/31/18 7:24:13 PM MST
+// Device view-level: 2.0
+// Device view-level: 2.2
+// Device view-level: 2.4
+// HMemoryUtils.trashcanNow. Engine heap size: 1,562 MB. GUI used memory: 93 MB. Current time: 1/31/18 7:24:14 PM MST
+// Device view-level: 2.7
+// Elapsed time: 62 seconds
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 217985, 4117759); // A:a (JViewport:JComponent, cv:JFrame)
+// Device select: 'Net - din_IBUF[1]'
+selectView(PAResourceOtoP.PAViews_DEVICE, "Device", 2739, 51740, 852, 557); // L:z (TdiGroup:JideTabbedPane, cv:JFrame)
+// Device view-level: 2.4
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120), din_IBUF, din_IBUF[1]]", 5, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+// Tcl Message: current_project project_regfile 
+// Device view-level: 4.5
+// Device view-level: 4.2
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120), din_IBUF, din_IBUF[1]]", 5, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120), din_IBUF, din_IBUF[2]]", 6, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+// Tcl Message: current_project {New Project} 
+selectTree(PAResourceItoN.NetlistTreeView_NETLIST_TREE, "[regfile, Nets (120), din_IBUF, din_IBUF[1]]", 5, false); // ba:bm (JViewport:JComponent, cv:JFrame)
+// Device view-level: 2.2
+// Device view-level: 2.0
+// HMemoryUtils.trashcanNow. Engine heap size: 1,568 MB. GUI used memory: 94 MB. Current time: 1/31/18 7:24:28 PM MST
+// Device view-level: 1.8
+selectTab(RDIResource.PropertiesView_TABBED_PANE, (HResource) null, "Cell Pins", 5); // g:JideTabbedPane (JPanel:JComponent, cv:JFrame)
+selectTab(RDIResource.PropertiesView_TABBED_PANE, (HResource) null, "Properties", 1); // g:JideTabbedPane (JPanel:JComponent, cv:JFrame)
+selectTab(RDIResource.PropertiesView_TABBED_PANE, (HResource) null, "Properties", 1); // g:JideTabbedPane (JPanel:JComponent, cv:JFrame)
+// PAPropertyPanels.initTclPropertiesPanel elapsed time: 2.6s
+// Elapsed time: 16 seconds
+selectTab(RDIResource.PropertiesView_TABBED_PANE, (HResource) null, "Cell Pins", 5); // g:JideTabbedPane (JPanel:JComponent, cv:JFrame)
+selectTable(PAResourceItoN.InstTermTablePanel_INSTTERM_PINS_TABLE, "O ; Output ; OUT ; din_IBUF[1]_inst ;  ; true", 2, "din_IBUF[1]_inst", 3); // d:v (JViewport:JComponent, cv:JFrame)
+selectTable(PAResourceItoN.InstTermTablePanel_INSTTERM_PINS_TABLE, "I ; Input ;  ; registers_reg_r1_0_7_0_5/RAMA_D1 ;  ; false", 0, "Input", 1); // d:v (JViewport:JComponent, cv:JFrame)
+selectTable(PAResourceItoN.InstTermTablePanel_INSTTERM_PINS_TABLE, "I ; Input ;  ; registers_reg_r1_0_7_0_5/RAMA_D1 ;  ; false", 0, "Input", 1, false, false, false, true, false); // d:v (JViewport:JComponent, cv:JFrame) - Popup Trigger
+selectMenu(PAResourceQtoS.SelectMenu_HIGHLIGHT, "Highlight"); // ab:JMenu (am:JPopupMenu, cv:JFrame)
+selectMenuItem(RDIResourceCommand.RDICommands_PROPERTIES, "Cell Pin Properties..."); // af:JMenuItem (am:JPopupMenu, cv:JFrame)
+// Run Command: RDIResourceCommand.RDICommands_PROPERTIES
+// PAPropertyPanels.initPanels (I) elapsed time: 0.2s
+selectTab(RDIResource.PropertiesView_TABBED_PANE, (HResource) null, "Properties", 1); // g:JideTabbedPane (JPanel:JComponent, cv:JFrame)
+selectTab(RDIResource.PropertiesView_TABBED_PANE, (HResource) null, "General", 0); // g:JideTabbedPane (JPanel:JComponent, cv:JFrame)
+// Device view-level: 2.0
+// HMemoryUtils.trashcanNow. Engine heap size: 1,571 MB. GUI used memory: 101 MB. Current time: 1/31/18 7:26:14 PM MST
+// Device view-level: 2.2
+// Device view-level: 2.4
+// Device view-level: 2.7
+// Device view-level: 2.9
+// Device view-level: 2.7
+// HMemoryUtils.trashcanNow. Engine heap size: 1,571 MB. GUI used memory: 97 MB. Current time: 1/31/18 7:26:19 PM MST
+// Device view-level: 2.4
+// Device view-level: 2.2
+// Elapsed time: 260 seconds
+selectMenu(PAResourceItoN.MainMenuMgr_FILE, "File"); // V:JideMenu (CommandMenuBar:CommandBar, cv:JFrame)
+selectMenu(PAResourceItoN.MainMenuMgr_OPEN_RECENT_PROJECT, "Open Recent Project"); // ab:JMenu (JPopupMenu:JComponent, cv:JFrame)
+selectMenu(PAResourceItoN.MainMenuMgr_OPEN_RECENT_CHECKPOINT, "Open Recent Checkpoint"); // ab:JMenu (JPopupMenu:JComponent, cv:JFrame)
+selectMenu(PAResourceItoN.MainMenuMgr_OPEN_RECENT_CHECKPOINT, "Open Recent Checkpoint"); // ab:JMenu (JPopupMenu:JComponent, cv:JFrame)
+selectMenu(PAResourceItoN.MainMenuMgr_OPEN_RECENT_CHECKPOINT, "Open Recent Checkpoint"); // ab:JMenu (JPopupMenu:JComponent, cv:JFrame)
+selectMenu(PAResourceItoN.MainMenuMgr_OPEN_RECENT_CHECKPOINT, "Open Recent Checkpoint"); // ab:JMenu (JPopupMenu:JComponent, cv:JFrame)
+selectMenu(PAResourceItoN.MainMenuMgr_OPEN_RECENT_CHECKPOINT, "Open Recent Checkpoint"); // ab:JMenu (JPopupMenu:JComponent, cv:JFrame)
+selectMenu(PAResourceItoN.MainMenuMgr_OPEN_RECENT_CHECKPOINT, "Open Recent Checkpoint"); // ab:JMenu (JPopupMenu:JComponent, cv:JFrame)
+selectMenu(PAResourceItoN.MainMenuMgr_OPEN_RECENT_FILE, "Open Recent File"); // ab:JMenu (JPopupMenu:JComponent, cv:JFrame)
+selectMenu(PAResourceItoN.MainMenuMgr_OPEN_RECENT_CHECKPOINT, "Open Recent Checkpoint"); // ab:JMenu (JPopupMenu:JComponent, cv:JFrame)
+selectMenu(PAResourceItoN.MainMenuMgr_OPEN_RECENT_CHECKPOINT, "Open Recent Checkpoint"); // ab:JMenu (JPopupMenu:JComponent, cv:JFrame)
+selectMenu(PAResourceItoN.MainMenuMgr_OPEN_RECENT_CHECKPOINT, "Open Recent Checkpoint"); // ab:JMenu (JPopupMenu:JComponent, cv:JFrame)
+selectMenu(PAResourceItoN.MainMenuMgr_OPEN_RECENT_CHECKPOINT, "Open Recent Checkpoint"); // ab:JMenu (JPopupMenu:JComponent, cv:JFrame)
+selectMenuItem(PAResourceCommand.PACommandNames_WRITE_CHECKPOINT, "Write Checkpoint..."); // af:JMenuItem (JPopupMenu:JComponent, cv:JFrame)
+dismissMenu(PAResourceItoN.MainMenuMgr_FILE, "File"); // V:JideMenu (CommandMenuBar:CommandBar, cv:JFrame)
+// Run Command: PAResourceCommand.PACommandNames_WRITE_CHECKPOINT
+// l:x (cv:JFrame): Write Checkpoint: addNotify
+// Elapsed time: 13 seconds
+setText(PAResourceTtoZ.WriteCheckpoint_CHOOSE_CHECKPOINT_FILE, "C:/git/RapidSmith2/exampleVivadoDesigns/regfilePlaced_rs2_oldDevFiledcp.dcp", true); // aq:ao (ap:JPanel, l:x)
+selectButton(RDIResource.BaseDialog_OK, "OK"); // a:JButton (JPanel:JComponent, l:x)
+// 'k' command handler elapsed time: 13 seconds
+dismissDialog("Write Checkpoint"); // l:x (cv:JFrame)
+// Tcl Message: write_checkpoint C:/git/RapidSmith2/exampleVivadoDesigns/regfilePlaced_rs2_oldDevFiledcp.dcp -force 
+// Tcl Message: Writing placer database... Writing XDEF routing. Writing XDEF routing logical nets. Writing XDEF routing special nets. 
+// Tcl Message: Write XDEF Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.090 . Memory (MB): peak = 1692.441 ; gain = 0.000 
+// Tcl Command: 'rdi::info_commands {s*}'
+// TclEventType: DESIGN_STALE
+// TclEventType: FILE_SET_CHANGE
+// TclEventType: DESIGN_STALE
+// TclEventType: FILE_SET_CHANGE
+// Tcl Command: 'rdi::info_commands {stop*}'
+// Tcl Command: 'rdi::info_commands {stop*}'
+// Tcl Command: 'rdi::info_commands {stop_*}'
+// Tcl Command: 'rdi::info_commands {stop_gu*}'
+// Elapsed time: 46 seconds
+setText(RDIResource.CommandsInput_TYPE_TCL_COMMAND_HERE, "stop_gui", true); // ap:ao (R:ak, cv:JFrame)
+// Tcl Command: 'stop_gui'
+// Tcl Command: 'stop_gui'
+// TclEventType: STOP_GUI
+// HMemoryUtils.trashcanNow. Engine heap size: 1,571 MB. GUI used memory: 87 MB. Current time: 1/31/18 7:30:34 PM MST
+// Engine heap size: 1,571 MB. GUI used memory: 92 MB. Current time: 1/31/18 7:30:34 PM MST
+// Engine heap size: 1,571 MB. GUI used memory: 92 MB. Current time: 1/31/18 7:30:34 PM MST
+// TclEventType: STOP_PROGRESS_DIALOG
+// Tcl Message: stop_gui 
+// TclEventType: PROJECT_CLOSE
+// TclEventType: DESIGN_CLOSE
+// TclEventType: DESIGN_STALE
+// TclEventType: FILE_SET_CHANGE
+// TclEventType: FILE_SET_NEW
+// TclEventType: FILE_SET_CHANGE
+// TclEventType: READ_XDC_FILE_START
+// TclEventType: READ_XDC_FILE_END
+// TclEventType: READ_XDC_FILE_START
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: LOC_CONSTRAINT_REMOVE
+// TclEventType: LOC_CONSTRAINT_ADD
+// TclEventType: READ_XDC_FILE_END
+// TclEventType: READ_XDC_FILE_START
+// TclEventType: READ_XDC_FILE_END
+// TclEventType: FLOORPLAN_MODIFY
+// TclEventType: DESIGN_NEW
+// TclEventType: CURR_DESIGN_SET
+// TclEventType: START_GUI
+// HMemoryUtils.trashcanNow. Engine heap size: 1,571 MB. GUI used memory: 44 MB. Current time: 1/31/18 7:31:16 PM MST
+// [Engine Memory]: 1,599 MB (+18988kb) [00:12:01]
+// HMemoryUtils.trashcanNow. Engine heap size: 1,599 MB. GUI used memory: 59 MB. Current time: 1/31/18 7:31:17 PM MST
+// Xgd.load filename: C:/Xilinx/Vivado/2016.2/data/parts/xilinx/artix7/devint/artix7/xc7a100t/xc7a100t.xgd; ZipEntry: xc7a100t_detail.xgd elapsed time: 1s
+// TclEventType: HFED_INIT_ROUTE_STORAGE_COMPLETED
+// RouteApi::loadEngineXgd elapsed time: 1.1s
+// TclEventType: HFED_INIT_ROUTE_STORAGE_COMPLETED
+// RouteApi::loadEngineXgd elapsed time: 1.1s
+// Device: addNotify
+// Tcl Message: ****** Webtalk v2016.2 (64-bit)   **** SW Build 1577090 on Thu Jun  2 16:32:40 MDT 2016   **** IP Build 1577682 on Fri Jun  3 12:00:54 MDT 2016     ** Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.  source C:/git/RapidSmith2/exampleVivadoDesigns/.Xil/Vivado-13200-CB461-EE09960/webtalk/labtool_webtalk.tcl -notrace INFO: [Common 17-206] Exiting Webtalk at Wed Jan 31 19:31:09 2018... 
+// Tcl Message: Vivado% 
+// Tcl Message: tincr::read_tcp regfilePlaced_routed.tcp 
+// Tcl Message: Parsing device information file... Reading netlist and constraint files... Netlist and constraints added successfully. (0.001890 seconds) Linking design (this may take awhile)... 
+// Tcl Message: Design linked successfully. (1.643685 seconds) Unlocking the design... Design importation complete. (1.645575 seconds) Vivado% 
+// Tcl Message: start_gui 
+// Device view-level: 0.0
+// Elapsed time: 50 seconds
+selectTab(PAResourceOtoP.PlanAheadTab_TABBED_PANE, (HResource) null, "design_1", 1); // ao:g (JPanel:JComponent, cv:JFrame)
+// Device: addNotify
+// Device view-level: 0.0
+// Device view-level: 0.0
+// Device view-level: 0.0
+// Device view-level: 0.0
+// Device view-level: 0.0
+// HMemoryUtils.trashcanNow. Engine heap size: 1,633 MB. GUI used memory: 87 MB. Current time: 1/31/18 7:31:34 PM MST
+// Device view-level: 0.2
+// Device view-level: 0.4
+// Device view-level: 0.7
+// Device view-level: 0.4
+// HMemoryUtils.trashcanNow. Engine heap size: 1,633 MB. GUI used memory: 87 MB. Current time: 1/31/18 7:31:38 PM MST
+// Elapsed time: 17 seconds
+selectTab(PAResourceOtoP.PlanAheadTab_TABBED_PANE, (HResource) null, "design_1", 1); // ao:g (JPanel:JComponent, cv:JFrame)
+// Device view-level: 0.2
+// HMemoryUtils.trashcanNow. Engine heap size: 1,633 MB. GUI used memory: 88 MB. Current time: 1/31/18 7:31:42 PM MST
+// Device view-level: 0.4
+// Device view-level: 0.7
+// HMemoryUtils.trashcanNow. Engine heap size: 1,633 MB. GUI used memory: 87 MB. Current time: 1/31/18 7:31:44 PM MST
+// Device view-level: 0.9
+// Device view-level: 1.1
+// Device view-level: 1.3
+// HMemoryUtils.trashcanNow. Engine heap size: 1,633 MB. GUI used memory: 87 MB. Current time: 1/31/18 7:31:45 PM MST
+// Device view-level: 1.5
+// Device view-level: 1.8
+// Device view-level: 2.0
+// HMemoryUtils.trashcanNow. Engine heap size: 1,633 MB. GUI used memory: 87 MB. Current time: 1/31/18 7:31:46 PM MST
+// HMemoryUtils.trashcanNow. Engine heap size: 1,633 MB. GUI used memory: 119 MB. Current time: 1/31/18 7:31:47 PM MST
+// Device view-level: 2.2
+// Device view-level: 2.4
+// Device view-level: 2.7
+// Device view-level: 2.9
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 218206, 4117754); // A:a (JViewport:JComponent, cv:JFrame)
+// Device select: 'Net - din_IBUF[1]'
+selectView(PAResourceOtoP.PAViews_DEVICE, "Device", 3920, 73974, 852, 531); // L:z (TdiGroup:JideTabbedPane, cv:JFrame)
+// PAPropertyPanels.initPanels (din_IBUF[1]) elapsed time: 0.7s
+// HMemoryUtils.trashcanNow. Engine heap size: 1,633 MB. GUI used memory: 132 MB. Current time: 1/31/18 7:31:57 PM MST
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 217204, 4143304); // A:a (JViewport:JComponent, cv:JFrame)
+// Device select: 'Net - din_IBUF[0]'
+selectView(PAResourceOtoP.PAViews_DEVICE, "Device", 3902, 74433, 852, 531); // L:z (TdiGroup:JideTabbedPane, cv:JFrame)
+// HMemoryUtils.trashcanNow. Engine heap size: 1,633 MB. GUI used memory: 119 MB. Current time: 1/31/18 7:31:59 PM MST
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 218206, 4117754); // A:a (JViewport:JComponent, cv:JFrame)
+// Device select: 'Net - din_IBUF[1]'
+selectView(PAResourceOtoP.PAViews_DEVICE, "Device", 3920, 73974, 852, 531); // L:z (TdiGroup:JideTabbedPane, cv:JFrame)
+// HMemoryUtils.trashcanNow. Engine heap size: 1,633 MB. GUI used memory: 91 MB. Current time: 1/31/18 7:32:04 PM MST
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 217093, 4143359); // A:a (JViewport:JComponent, cv:JFrame)
+// Device select: 'Net - din_IBUF[0]'
+selectView(PAResourceOtoP.PAViews_DEVICE, "Device", 3900, 74434, 852, 531); // L:z (TdiGroup:JideTabbedPane, cv:JFrame)
+// Elapsed time: 11 seconds
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 217872, 4117809); // A:a (JViewport:JComponent, cv:JFrame)
+// Device select: 'Net - din_IBUF[1]'
+selectView(PAResourceOtoP.PAViews_DEVICE, "Device", 3914, 73975, 852, 531); // L:z (TdiGroup:JideTabbedPane, cv:JFrame)
+// HMemoryUtils.trashcanNow. Engine heap size: 1,633 MB. GUI used memory: 123 MB. Current time: 1/31/18 7:32:25 PM MST
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 217149, 4143415); // A:a (JViewport:JComponent, cv:JFrame)
+// Device select: 'Net - din_IBUF[0]'
+selectView(PAResourceOtoP.PAViews_DEVICE, "Device", 3901, 74435, 852, 531); // L:z (TdiGroup:JideTabbedPane, cv:JFrame)
+// HMemoryUtils.trashcanNow. Engine heap size: 1,633 MB. GUI used memory: 90 MB. Current time: 1/31/18 7:32:28 PM MST
+selectGraphicalView(PAResourceOtoP.PAViews_DEVICE, 216982, 4117698); // A:a (JViewport:JComponent, cv:JFrame)
+// Device select: 'Net - din_IBUF[1]'
+selectView(PAResourceOtoP.PAViews_DEVICE, "Device", 3898, 73973, 852, 531); // L:z (TdiGroup:JideTabbedPane, cv:JFrame)
+// HMemoryUtils.trashcanNow. Engine heap size: 1,633 MB. GUI used memory: 107 MB. Current time: 1/31/18 7:32:29 PM MST

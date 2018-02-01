@@ -1,0 +1,13 @@
+#-----------------------------------------------------------
+# Webtalk v2016.2 (64-bit)
+# SW Build 1577090 on Thu Jun  2 16:32:40 MDT 2016
+# IP Build 1577682 on Fri Jun  3 12:00:54 MDT 2016
+# Start of session at: Wed Jan 31 19:31:08 2018
+# Process ID: 10544
+# Current directory: C:/git/RapidSmith2/exampleVivadoDesigns
+# Command line: wbtcv.exe -mode batch -source C:/git/RapidSmith2/exampleVivadoDesigns/.Xil/Vivado-13200-CB461-EE09960/webtalk/labtool_webtalk.tcl -notrace
+# Log file: C:/git/RapidSmith2/exampleVivadoDesigns/webtalk.log
+# Journal file: C:/git/RapidSmith2/exampleVivadoDesigns\webtalk.jou
+#-----------------------------------------------------------
+source C:/git/RapidSmith2/exampleVivadoDesigns/.Xil/Vivado-13200-CB461-EE09960/webtalk/labtool_webtalk.tcl -notrace
+INFO: [Common 17-206] Exiting Webtalk at Wed Jan 31 19:31:09 2018...

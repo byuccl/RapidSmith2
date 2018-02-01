@@ -79,6 +79,10 @@ public class CellNet implements Serializable {
 	/** Maps a connecting SitePin of the net, to the RouteTree connected to the SitePin*/
 	private Map<SitePin, RouteTree> sitePinToRTMap;
 	
+	//speed up isClkNet call
+	private boolean isClkNet;
+	private boolean clkNetStatusSet = false;
+	
 	//speed up source pin call
 	private boolean isMultiSourcedNet;
 	private boolean multiSourceStatusSet = false;
@@ -102,9 +106,11 @@ public class CellNet implements Serializable {
 	private void init() {
 		this.pins = new HashSet<>();
 		this.isInternal = false;
+		this.isClkNet = false;
+		this.clkNetStatusSet = false;
 		this.isMultiSourcedNet = false;
 		this.multiSourceStatusSet = false;
-		sourcePins = new HashSet<CellPin>();
+		this.sourcePins = new HashSet<CellPin>();
 	}
 
 	/**
@@ -226,7 +232,10 @@ public class CellNet implements Serializable {
 	 * @return all of the pins that source the net
 	 */
 	public List<CellPin> getAllSourcePins() {
-		return sourcePins.stream().collect(Collectors.toList());
+		//return sourcePins.stream().collect(Collectors.toList());
+		return getPins().stream()
+				.filter(CellPin::isOutpin)
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -417,13 +426,20 @@ public class CellNet implements Serializable {
 	 * @return {@code true} if this net is a clock net
 	 */
 	public boolean isClkNet() {
+		
+		if(this.clkNetStatusSet){
+			return this.isClkNet;
+		}
+		
 		for (CellPin p : this.pins) {
 			if (p.getType() == CellPinType.CLOCK) {
-				return true;
+				this.isClkNet = true;
 			}
 		}
 		
-		return false;
+		this.clkNetStatusSet = true;
+		
+		return this.isClkNet;
 	}
 	
 	/**

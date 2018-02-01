@@ -40,6 +40,7 @@ public class SiteWire implements Wire, Serializable {
 	private final Site site;
 	private final SiteType siteType;
 	private final int wire;
+	private PathFinderCost pfc;
 
 	public SiteWire(Site site, int wire) {
 		this.site = site;
@@ -231,5 +232,13 @@ public class SiteWire implements Wire, Serializable {
 	@Override
 	public String toString() {
 		return site.getName() + " " + site.getTile().getDevice().getWireEnumerator().getWireName(wire);
+	}
+
+	public PathFinderCost getPathFinderCost(){
+		return PathFinderCost.createOrGetPFCOfWire(this, 0);
+	}
+
+	public PathFinderCost getPathFinderCost(boolean isPip){
+		return PathFinderCost.createOrGetPFCOfWire(this, 0, isPip);
 	}
 }

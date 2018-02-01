@@ -122,4 +122,9 @@ public interface Wire extends Serializable {
 	 * Returns the sources (BelPins) which drive this wire.
 	 */
 	BelPin getSource();
+
+	PathFinderCost getPathFinderCost();
+
+	PathFinderCost getPathFinderCost(boolean isPip);
 }
+

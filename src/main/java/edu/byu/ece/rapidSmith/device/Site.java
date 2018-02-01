@@ -558,8 +558,13 @@ public final class Site implements Serializable{
 		Map<String, SitePinTemplate> sinkTemplates = template.getSinks();
 		List<SitePin> pins = new ArrayList<>(sinkTemplates.size());
 		for (SitePinTemplate pinTemplate : sinkTemplates.values()) {
-			int externalWire = getExternalWire(template.getType(), pinTemplate.getName());
-			pins.add(new SitePin(this, pinTemplate, externalWire));
+			try{
+				int externalWire = getExternalWire(template.getType(), pinTemplate.getName());
+				pins.add(new SitePin(this, pinTemplate, externalWire));
+			}
+			catch(NullPointerException e){
+				continue;
+			}
 		}
 		return pins;
 	}
