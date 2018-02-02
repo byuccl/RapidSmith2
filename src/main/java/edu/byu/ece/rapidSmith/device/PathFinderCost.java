@@ -27,7 +27,7 @@ public class PathFinderCost{
 			delay = d;
 			history = 0;
 			usedPrev = 1;
-			this.wire = wire.getFullWireName();
+			this.wire = wire.getFullName();
 			tmpCost = 1;
 			this.pipFactor = 0;
 			if(this.wire.contains("LV")){
@@ -42,7 +42,7 @@ public class PathFinderCost{
 			delay = d;
 			history = 0;
 			usedPrev = 1;
-			this.wire = wire.getFullWireName();
+			this.wire = wire.getFullName();
 			tmpCost = 1;
 			this.pipFactor = 0;
 			if(this.wire.contains("LV")){
