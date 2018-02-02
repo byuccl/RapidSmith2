@@ -323,6 +323,7 @@ public class XdcPlacementInterface {
 				Cell cell = cellIt.next();
 				Site site = cell.getSite();
 				Bel bel = cell.getBel();
+				System.out.println("> " + cell);
 				String cellname = cell.getName();
 				
 				// ports need a package pin reference, and aren't placed in Vivado
@@ -377,14 +378,17 @@ public class XdcPlacementInterface {
 		
 		// cell bins
 		ArrayList<Cell> sorted = new ArrayList<>(design.getCells().size());		
-		ArrayList<Cell> lutCellsH = new ArrayList<>();
-		ArrayList<Cell> lutCellsD = new ArrayList<>();
-		ArrayList<Cell> lutCellsABC = new ArrayList<>();
+		ArrayList<Cell> lutCellsH5 = new ArrayList<>();
+		ArrayList<Cell> lutCellsD5 = new ArrayList<>();
+		ArrayList<Cell> lutCellsABC5 = new ArrayList<>();
+		ArrayList<Cell> lutCellsH6 = new ArrayList<>();
+		ArrayList<Cell> lutCellsD6 = new ArrayList<>();
+		ArrayList<Cell> lutCellsABC6 = new ArrayList<>();
 		ArrayList<Cell> carryCells = new ArrayList<>();
 		ArrayList<Cell> ffCells = new ArrayList<>();
 		ArrayList<Cell> ff5Cells = new ArrayList<>();
 		ArrayList<Cell> muxCells = new ArrayList<>();
-		
+
 		// traverse the cells and drop them in the correct bin
 		Iterator<Cell> cellIt = design.getLeafCells().iterator();
 		
@@ -399,15 +403,32 @@ public class XdcPlacementInterface {
 			String libCellName = cell.getLibCell().getName();
 			String belName = cell.getBel().getName();
 			
-			if (belName.endsWith("LUT")) {
+			if (belName.endsWith("6LUT")) {
 				if (belName.contains("H")) {
-					lutCellsH.add(cell);
+					System.out.println("H6: " + belName);
+					lutCellsH6.add(cell);
 				}
 				else if (belName.contains("D")) {
-					lutCellsD.add(cell);
+					System.out.println("D6: " + belName);
+					lutCellsD6.add(cell);
 				}
 				else {
-					lutCellsABC.add(cell);
+					System.out.println("ABC6: " + belName);
+					lutCellsABC6.add(cell);
+				}
+			}
+			else if (belName.endsWith("5LUT")) {
+				if (belName.contains("H")) {
+					System.out.println("H5: " + belName);
+					lutCellsH5.add(cell);
+				}
+				else if (belName.contains("D")) {
+					System.out.println("D5: " + belName);
+					lutCellsD5.add(cell);
+				}
+				else {
+					System.out.println("ABC5: " + belName);
+					lutCellsABC5.add(cell);
 				}
 			}
 			else if (libCellName.startsWith("CARRY")) {
@@ -426,12 +447,15 @@ public class XdcPlacementInterface {
 				sorted.add(cell);
 			}
 		}
-				
+
 		// append all other cells in the correct order
 		return Stream.of(sorted.stream(),
-				lutCellsH.stream(),
-				lutCellsD.stream(), 
-				lutCellsABC.stream(), 
+				lutCellsH5.stream(),
+				lutCellsD5.stream(), 
+				lutCellsABC5.stream(), 
+				lutCellsH6.stream(),
+				lutCellsD6.stream(), 
+				lutCellsABC6.stream(), 
 				ffCells.stream(), 
 				carryCells.stream(),
 				muxCells.stream(),
