@@ -739,7 +739,7 @@ public class XdcRoutingInterface {
 	 * @param usedSiteWires Set of used pips within the site
 	 */
 	private void createIntrasiteRoute(CellNet net, BelPin pin, boolean isContained, Set<Integer> usedSiteWires) {
-	
+
 		IntrasiteRoute route = new IntrasiteRouteBelPinSource(net, pin, isContained);
 		buildIntrasiteRoute(route, usedSiteWires);
 		
