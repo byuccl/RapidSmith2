@@ -323,7 +323,7 @@ public class XdcPlacementInterface {
 				Cell cell = cellIt.next();
 				Site site = cell.getSite();
 				Bel bel = cell.getBel();
-				System.out.println("> " + cell);
+
 				String cellname = cell.getName();
 				
 				// ports need a package pin reference, and aren't placed in Vivado
@@ -405,29 +405,23 @@ public class XdcPlacementInterface {
 			
 			if (belName.endsWith("6LUT")) {
 				if (belName.contains("H")) {
-					System.out.println("H6: " + belName);
 					lutCellsH6.add(cell);
 				}
 				else if (belName.contains("D")) {
-					System.out.println("D6: " + belName);
 					lutCellsD6.add(cell);
 				}
 				else {
-					System.out.println("ABC6: " + belName);
 					lutCellsABC6.add(cell);
 				}
 			}
 			else if (belName.endsWith("5LUT")) {
 				if (belName.contains("H")) {
-					System.out.println("H5: " + belName);
 					lutCellsH5.add(cell);
 				}
 				else if (belName.contains("D")) {
-					System.out.println("D5: " + belName);
 					lutCellsD5.add(cell);
 				}
 				else {
-					System.out.println("ABC5: " + belName);
 					lutCellsABC5.add(cell);
 				}
 			}
