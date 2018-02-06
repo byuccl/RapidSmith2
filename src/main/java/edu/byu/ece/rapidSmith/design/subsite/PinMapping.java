@@ -250,7 +250,7 @@ public class PinMapping {
 	  }
 	}
 	
-	private static String buildHashForCell(Cell cell, String belName) {
+	public static String buildHashForCell(Cell cell, String belName) {
 		FamilyType family = cell.getDesign().getFamily();
 		getPinMappings(family);
 		getPinMapProperties(family);
@@ -276,8 +276,8 @@ public class PinMapping {
 	/**
 	 * Run Vivado using the VivadoConsole to place a cell onto a bel and then record the pin mappings.  
 	 * The resulting pinmappings will be placed into a file such as: "$RAPIDSMITH_PATH/devices/artix7/pinMappings/newMapping.xml"
-	 * @param cell The cell to be placed
-	 * @param belName The bel the cell is to be placed on
+	 * @param cell The {@link Cell} to be placed
+	 * @param belName The name of the bel the cell is to be placed on
 	 * @param verbose Whether to echo the commands being executed in Vivado and the results
 	 * @return The results from running Vivado
 	 * @throws IOException
@@ -356,7 +356,7 @@ public class PinMapping {
 	
 	/**
 	 * Given a cell and a bel type to place it onto, retrieve the pin mappings for this (if it exists)
-	 * @param cell The cell of interest
+	 * @param cell The {@link Cell} of interest
 	 * @param bel The name of the bel for it to be placed on
 	 * @return A map of pin mappings for this potential placement
 	 */
@@ -367,52 +367,6 @@ public class PinMapping {
 		PinMapping pm = getPinMappings(family).get(hash); 
 		if (pm == null) return null;
 		return pm;
-	}
-	
-	public static void main(String[] args) throws IOException, JDOMException {
-		if (args.length < 1) {
-			System.err.println("Usage: PinMapping tincrCheckpointName");
-			System.exit(1);
-		}
-		
-		// Load a TINCR checkpoint.  Then, find any RAMB* or FIFO* cells in it.  
-		// For each of these consult the pin mappings cache and, if they exist, 
-		// print out the mappings associated with the cell. 
-		System.out.println("Loading design " + args[0] + "...");
-		VivadoCheckpoint vcp = VivadoInterface.loadRSCP(args[0]);
-		CellDesign design = vcp.getDesign();
-		for (Cell c : design.getCells()) {
-			if (c.getType().startsWith("RAMB") || c.getType().startsWith("FIFO")) {
-				// The limitation of following lines of code is that this cell is 
-				// already placed and so we know the bel.  In reality, you will 
-				// usually be asking the question regarding a potential cell placement 
-				// onto a  bel. 
-				PinMapping pm = findPinMappingForCell(
-						c, 
-						c.getBel().getName());
-				System.out.println("Pin mappings for placing cell: " + c + " onto bel: " + c.getBel() + " =");
-				System.out.println("  Hash for this is: " + buildHashForCell(c, c.getBel().getName()));
-				if (pm == null) {
-					System.out.println("    None found.  Will now generate it and add to pin mappings cache.");
-					System.out.println("    This will require this program to run Vivado (should be on your path).");
-					System.out.println("    Once it is done, re-run this program and it should be found in the cache.");
-    				createPinMappings( 
-    						c, 
-    						c.getBel().getName(), 
-    						true);
-					
-				}
-				else {
-					// See if this entry has its own unique pin mappings.
-					if (pm.hasDuplic())   
-						System.out.println("  Pins are duplicate of: " + pm.getDuplic() + "\n  They are:");
-					// Regardless, getPins() will get the right ones
-					for (Map.Entry<String, List<String>> pentry : pm.getPins().entrySet()) 
-						System.out.println("  " + pentry.getKey() + " -> " + pentry.getValue());
-				}
-			}
-		}
-		System.out.println("Done...");
 	}
 }
 
