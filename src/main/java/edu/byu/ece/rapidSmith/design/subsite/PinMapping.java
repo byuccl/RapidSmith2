@@ -359,14 +359,17 @@ public class PinMapping {
 		BufferedWriter out = new BufferedWriter(new FileWriter(path.resolve("setup.tcl").toString()));
 		out.write("set config_dict [dict create " + propstring + "]\n");
 		out.write("set partname " + partname + "\n");
-		out.write("set libcellName " + cell.getType()+ "\n");
-		out.write("set belName " + belName + "\n");
+		out.write("set libcellname " + cell.getType()+ "\n");
+		out.write("set belname " + belName + "\n");
 		out.write("set filename newMapping.xml" + "\n");
 		out.write("source create_nondefault_pin_mappings.tcl\n");
 		out.close();
 		VivadoConsole vc = new VivadoConsole(path.toString());
 		List<String> results = doCmd(vc, "source setup.tcl", verbose);
 		//List<String> results = null;
+		if (verbose)
+			for (String s : results)
+				System.out.println(s);
 		
 		// If all goes well the file newMapping.xml will be created in the pinMappings subdirectory of the device architecture directory
 		// Now, let' load it in and add it to the cache

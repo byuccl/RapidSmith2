@@ -7,16 +7,6 @@
       <property key="WRITE_WIDTH_A" val="9" />
       <property key="WRITE_WIDTH_B" val="0" />
     </properties>
-    <duplic hash="xRAMB18E1 RAMB18E1 TDP 9 0 9 0" />
-  </cell>
-  <cell type="RAMB18E1" bel="RAMB18E1" hash="xRAMB18E1 RAMB18E1 TDP 9 0 9 0">
-    <properties>
-      <property key="RAM_MODE" val="TDP" />
-      <property key="READ_WIDTH_A" val="9" />
-      <property key="READ_WIDTH_B" val="0" />
-      <property key="WRITE_WIDTH_A" val="9" />
-      <property key="WRITE_WIDTH_B" val="0" />
-    </properties>
     <pins>
       <pin cellPin="ADDRARDADDR[0]" belPin="ADDRARDADDR0" />
       <pin cellPin="ADDRARDADDR[10]" belPin="ADDRARDADDR10" />

@@ -36,12 +36,11 @@ public class CreateDynamicPinMappings {
 						c, 
 						c.getBel().getName());
 				System.out.println("Pin mappings for placing cell: " + c + " onto bel: " + c.getBel() + " =");
-				System.out.println("  Hash for this is: " + PinMapping.buildHashForCell(c, c.getBel().getName()));
 				if (pm == null) {
 					System.out.println("    None found.  Will now generate it and add to pin mappings cache.");
 					System.out.println("    This will require this program to run Vivado (should be on your path).");
 					System.out.println("    Once it is done, re-run this program and it should be found in the cache.");
-    				PinMapping.createPinMappings( 
+    				List<String> res = PinMapping.createPinMappings( 
     						c, 
     						c.getBel().getName(), 
     						true);
