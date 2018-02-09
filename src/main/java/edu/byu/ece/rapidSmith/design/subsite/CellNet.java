@@ -64,6 +64,7 @@ public class CellNet implements Serializable {
 	private boolean isIntrasite;
 	/** Set to true if the net is an internal macro net*/
 	private boolean isInternal;
+
 	/** Route status of the net*/
 	private RouteStatus routeStatus;
 	
@@ -1002,5 +1003,13 @@ public class CellNet implements Serializable {
 		}
 		
 		return routeStatus;
+	}
+
+	/**
+	 * Not for normal use.
+	 * @param routeStatus
+	 */
+	public void setRouteStatus(RouteStatus routeStatus) {
+		this.routeStatus = routeStatus;
 	}
 }

@@ -196,7 +196,7 @@ public abstract class CellPin implements Serializable {
 					//remap the SitePin
 					if(this.getNet().getSourceSitePin() != null){ //if there existed source site pin
 						if(!this.getCell().getSite().equals(this.getNet().getSourceSitePin().getSite())){ //and the site has changed (e.g. this cell is on a new site)
-							SitePin toAdd = this.getCell().getSite().getSitePin(this.getNet().getSourceSitePin().getName());
+							SitePin toAdd = this.getCell().getSite().getPin(this.getNet().getSourceSitePin().getName());
 							this.getNet().removeAllSourceSitePins(); //set to "same" site pin on the new site
 							this.getNet().addSourceSitePin(toAdd);
 						}

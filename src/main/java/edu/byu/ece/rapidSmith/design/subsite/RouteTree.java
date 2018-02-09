@@ -244,7 +244,7 @@ public final class RouteTree implements
 	 * Prunes all nodes in the tree that are neither in the set of terminals nor
 	 * source a branch of the tree that ends in one of the terminals.
 	 * @param terminals the terminal nodes to keep
-	 * @return true if the node is either in terminals are sources a node in terminal,
+	 * @return true if the node is either in terminals or sources a node in terminal,
 	 *   else false
 	 */
 	public boolean prune(Set<RouteTree> terminals) {
@@ -308,7 +308,7 @@ public final class RouteTree implements
 	
 	public String toRouteString(){
 		StringBuilder toReturn = new StringBuilder();
-		toReturn.append(this.getWire().getFullWireName()+"\n");
+		toReturn.append(this.getWire().getFullName()+"\n");
 		int iterationNum = 0;
 		toReturn.append(this.getWire().getFullName()+"\n");
 		for(RouteTree sink : this.getSinkTrees()){
