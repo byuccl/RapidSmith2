@@ -106,6 +106,7 @@ public final class VivadoInterface {
 		String routingFile = rscpPath.resolve("routing.rsc").toString();
 		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap(), mode);
 		routingInterface.parseRoutingXDC(routingFile);
+		design.setOocPortMap(routingInterface.getOocPortMap());
 		
 		VivadoCheckpoint vivadoCheckpoint = new VivadoCheckpoint(partName, design, device, libCells); 
 		
