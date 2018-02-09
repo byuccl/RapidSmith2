@@ -27,18 +27,10 @@ import edu.byu.ece.rapidSmith.util.PartNameTools;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 import edu.byu.ece.rapidSmith.util.Exceptions.EnvironmentException;
 import org.jdom2.Document;
-import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.ref.SoftReference;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -59,9 +51,6 @@ public class RSEnvironment {
 	public static final String DEVICE_FILE_SUFFIX = "_db.dat";
 	/** Name of extended family information */
 	public static final String FAMILY_INFO_FILENAME = "familyInfo.xml";
-	public static final String PIN_MAPPINGS_FILENAME = "pinMappings.xml";
-	public static final String NEW_PIN_MAPPINGS_FILENAME = "newMapping.xml";
-	public static final String PIN_MAP_PROPERTIES_FILENAME = "pinMapProperties.xml";
 	/** The default environment */
 	private static RSEnvironment defaultEnv;
 
@@ -212,55 +201,6 @@ public class RSEnvironment {
 		return builder.build(path.toFile());
 	}
 
-	/**
-	 * Loads the pin mappings file for the specified family.  
-	 *
-	 * @param family family to get the family info file for
-	 * @return the family info xml document
-	 */
-	public Document loadPinMappings(FamilyType family) throws JDOMException, IOException {
-		Path path = getPartFolderPath(family).resolve(PIN_MAPPINGS_FILENAME);
-		File tmp = new File(path.toString());
-		if (!tmp.exists()) {
-			System.out.println("Pin mappings file doesn't exist, creating: " + path.toString());
-			FileWriter out = new FileWriter(path.toString());
-			out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<cells>\n</cells>\n");
-			out.close();
-		}
-		SAXBuilder builder = new SAXBuilder();
-		return builder.build(path.toFile());
-	}
-
-	public Document loadNewPinMapping(FamilyType family) throws JDOMException, IOException {
-		Path path = getPartFolderPath(family).resolve("pinMappings").resolve(NEW_PIN_MAPPINGS_FILENAME);
-		SAXBuilder builder = new SAXBuilder();
-		return builder.build(path.toFile());
-	}
-
-	/**
-	 * Loads the list of properties which affect pin mappings for the specified family.  
-	 *
-	 * @param family family to get the family info file for
-	 * @return the family info xml document
-	 */
-	public Document loadPinMapProperties(FamilyType family) throws JDOMException, IOException {
-		Path path = getPartFolderPath(family).resolve(PIN_MAP_PROPERTIES_FILENAME);
-		SAXBuilder builder = new SAXBuilder();
-		return builder.build(path.toFile());
-	}
-
-	public void savePinMappings(FamilyType family, Element element) throws JDOMException, IOException {
-		Path path = getPartFolderPath(family).resolve(PIN_MAPPINGS_FILENAME);
-		OutputStream os = new FileOutputStream(path.toString());
-		XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-		try {
-			xout.output(element, os);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		os.close();
-	}
 
 	/**
 	 * Loads the device info file for the specified partname and family. The device info file

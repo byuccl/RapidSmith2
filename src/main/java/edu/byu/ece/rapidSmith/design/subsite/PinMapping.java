@@ -1,6 +1,7 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -23,8 +24,6 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
 import edu.byu.ece.rapidSmith.device.FamilyType;
-import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoCheckpoint;
-import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.util.VivadoConsole;
 
 /**
@@ -34,11 +33,15 @@ import edu.byu.ece.rapidSmith.util.VivadoConsole;
  */
 public class PinMapping {
 	
+	public static final String PIN_MAPPINGS_FILENAME = "pinMappings.xml";
+	public static final String NEW_PIN_MAPPINGS_FILENAME = "newMapping.xml";
+	public static final String PIN_MAP_PROPERTIES_FILENAME = "pinMapProperties.xml";
+
 	// These are static to ensure they will load from disk only once through the public get functions 
 	private static Map<String, PinMapping> pinMappings = null;
 	private static Map<String, List<String>> pinMapProperties= null;
 
-   // These variable are per object
+   // These variables are per object
 	private String cellName;
 	private String belName = null;
 	private String hash = null;
@@ -65,6 +68,10 @@ public class PinMapping {
 		return (duplic != null);
 	}
 
+	/**
+	 * Get the pins of this mapping
+	 * @return The pins for this mapping
+	 */
 	public Map<String, List<String>> getPins() {
 		if (hasDuplic()) {
 			String key = getDuplic();
@@ -78,22 +85,39 @@ public class PinMapping {
 		else
 			return pins;
 	}
+
+	// Load the pin map properties from disk if needed.  Then return them.
 	private static Map<String, List<String>> getPinMapProperties(FamilyType family) {
 		if (pinMapProperties == null)
 			pinMapProperties = loadPinMapProperties(family);
 		return pinMapProperties;
 	}
 	
+	// Load the pin mappings from disk if needed.  Then return them.
 	private static Map<String, PinMapping> getPinMappings(FamilyType family) {
 		if (pinMappings== null)
 			pinMappings = loadPinMappings(family);
 		return pinMappings;
 	}
 
-	private static Map<String, PinMapping> loadPinMappings(FamilyType family) {
+	/**
+	 * Load the pinmappings for a family from disk.
+	 * @param family The name of the family
+	 * @return A map of the pin mappings
+	 */
+	public static Map<String, PinMapping> loadPinMappings(FamilyType family) {
 		  Element pm = null;
-	  	try {	
-			pm = RSEnvironment.defaultEnv().loadPinMappings(family).getRootElement();
+	  	try {
+	  		Path path = RSEnvironment.defaultEnv().getPartFolderPath(family).resolve(PIN_MAPPINGS_FILENAME);
+	  		File tmp = new File(path.toString());
+	  		if (!tmp.exists()) {
+	  			System.out.println("Pin mappings file doesn't exist, creating: " + path.toString());
+	  			FileWriter out = new FileWriter(path.toString());
+	  			out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<cells>\n</cells>\n");
+	  			out.close();
+	  		}
+	  		SAXBuilder builder = new SAXBuilder();
+			pm = builder.build(path.toFile()).getRootElement();
 		} catch (JDOMException | IOException e) {
 		// 	TODO Auto-generated catch block
 			e.printStackTrace();
@@ -108,10 +132,18 @@ public class PinMapping {
 	  	}
   	}
   
-   private static Map<String, List<String>> loadPinMapProperties(FamilyType family) {
+	/**
+	 * Load the pinmap properties for a family from disk.  This file tells, for a given cell/bel combo, which properties "matter" - 
+	 * that is, which properties affect the pin mappings.
+	 * @param family The name of the family
+	 * @return A map of the pin map properties.
+	 */
+   public static Map<String, List<String>> loadPinMapProperties(FamilyType family) {
 	   Element pm = null;
 	   try {	
-		   pm = RSEnvironment.defaultEnv().loadPinMapProperties(family).getRootElement();
+		   Path path = RSEnvironment.defaultEnv().getPartFolderPath(family).resolve(PIN_MAP_PROPERTIES_FILENAME);
+		   SAXBuilder builder = new SAXBuilder();
+		   pm = builder.build(path.toFile()).getRootElement();
 	   } catch (JDOMException | IOException e) {
 		   // 	TODO Auto-generated catch block
 		   e.printStackTrace();
@@ -131,10 +163,13 @@ public class PinMapping {
 	   }
    }
 
+   // Useful for debugging the JDOM representation but otherwise not used
    private static void printPinMappings(Element e, OutputStream os) throws IOException {
 		XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
 		xout.output(e, os);
 	}
+   
+   // Useful for debugging the JDOM representation but otherwise not used
 	private static void printPinMappings(Element e, String fileName) throws IOException {
 		OutputStream os;
 		os = new FileOutputStream(fileName);
@@ -142,7 +177,12 @@ public class PinMapping {
 		os.close();
 	}
 
-	private static PinMapping loadNewPinMapping(FamilyType family) throws JDOMException, IOException {
+	/**
+	 * Load pin mappings for a single cell/bel combo from disk.  To be used to combined with the overall cache.
+	 * @param family The family for the part.  Needed to determine the directory to place the file into.
+	 * @return The pin mappings loaded from disk.
+	 */
+	public static PinMapping loadNewPinMapping(FamilyType family) throws JDOMException, IOException {
 		Path path = RSEnvironment.defaultEnv().getPartFolderPath(family).resolve("pinMappings").resolve("newMapping.xml");		
 		SAXBuilder builder = new SAXBuilder();
 		Document d = builder.build(path.toFile());
@@ -188,12 +228,14 @@ public class PinMapping {
 			System.out.println("WARNING: cannot construct new PinMapping object with NULL parameter.");
 	}
 	
+	// Convert the list of pins to a string.  Useful for debugging/visualization.
 	private String pinsToString(String s) {
 		for (Map.Entry<String, List<String>> entry : pins.entrySet()) 
 			s += "  " + entry.getKey() + ":" + entry.getValue().toString() + "\n";
 		return s;
 	}
 	
+	// Convert the pinmappings data structure to a JDOM representation which can be written to disk
 	private static Element buildDOMPinMappings(Map<String, PinMapping> pinmappings) throws IOException {
 		Element root = new Element("cells");
 		for (Map.Entry<String, PinMapping> entry : pinmappings.entrySet()) { 
@@ -241,16 +283,29 @@ public class PinMapping {
 		return root;
 	}
 
-	private static void savePinMappings(FamilyType family, Map<String, PinMapping> pinmappings) {
+	/**
+	 * Save the specified pin mappings to disk.
+	 * @param family The family for the part.  Needed to determine the directory to place the file into.
+	 * @param pinmappings The pin mappings to be saved.
+	 */
+	public static void savePinMappings(FamilyType family, Map<String, PinMapping> pinmappings) {
 	  try {
-		  RSEnvironment.defaultEnv().savePinMappings(family, buildDOMPinMappings(pinmappings));
-	  } catch (JDOMException | IOException e) {
+		  Element e = buildDOMPinMappings(pinmappings);
+		  Path path = RSEnvironment.defaultEnv().getPartFolderPath(family).resolve(PIN_MAPPINGS_FILENAME);
+		  OutputStream os = new FileOutputStream(path.toString());
+		  XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+		  xout.output(e, os);
+		  os.close();
+	  } catch (IOException e) {
 		  // TODO Auto-generated catch block
 		  e.printStackTrace();
 	  }
 	}
 	
-	public static String buildHashForCell(Cell cell, String belName) {
+	// Create a hash string for a cell and the name of a bel it is to be placed onto.
+	// The cell is a handle to a real cell with its properties set as desired.
+	// The belName is not a full bel name but rather the name of the type, as in RAMB18E1.
+	private static String buildHashForCell(Cell cell, String belName) {
 		FamilyType family = cell.getDesign().getFamily();
 		getPinMappings(family);
 		getPinMapProperties(family);
@@ -264,6 +319,7 @@ public class PinMapping {
 		return hash;
 	}
 	
+	// Run a command through the VivadoConsole.  
 	private static List<String> doCmd(VivadoConsole vc, String cmd, boolean verbose) {
 		if (verbose) 
 			System.out.println("Running command: " + cmd);
@@ -308,12 +364,12 @@ public class PinMapping {
 		out.write("set filename newMapping.xml" + "\n");
 		out.write("source create_nondefault_pin_mappings.tcl\n");
 		out.close();
-		//VivadoConsole vc = new VivadoConsole(path.toString());
-		//List<String> results = doCmd(vc, "source setup.tcl", verbose);
-		List<String> results = null;
+		VivadoConsole vc = new VivadoConsole(path.toString());
+		List<String> results = doCmd(vc, "source setup.tcl", verbose);
+		//List<String> results = null;
 		
 		// If all goes well the file newMapping.xml will be created in the pinMappings subdirectory of the device architecture directory
-		// Now, let's load it in and add it to the cache
+		// Now, let' load it in and add it to the cache
 		PinMapping pm = loadNewPinMapping(family);
 		
 		// Get the pinsmappings from the cache for this family
@@ -362,19 +418,23 @@ public class PinMapping {
 	 */
 	public static PinMapping findPinMappingForCell(Cell cell, String bel) {
 		FamilyType family = cell.getDesign().getFamily();
-		getPinMapProperties(cell.getDesign().getFamily());
+		getPinMapProperties(family);
 		String hash = buildHashForCell(cell, bel);
 		PinMapping pm = getPinMappings(family).get(hash); 
 		if (pm == null) return null;
 		return pm;
 	}
+	
 }
 
+// Helper class for the sorting required above
 class SortProperties implements Comparator<Element> {
     public int compare(Element e1, Element e2) {
     	return e1.getAttributeValue("key").compareTo(e2.getAttributeValue("key"));
     }
 }
+
+// Helper class for the sorting required above
 class SortPins implements Comparator<Element> {
     public int compare(Element e1, Element e2) {
     	int r = e1.getAttributeValue("cellPin").compareTo(e2.getAttributeValue("cellPin"));
