@@ -8,10 +8,11 @@ file for a given technology.  However, there are times when the pin
 mappings will change.  Specifically, this happens for some cells when
 their properties are changed.  That is, the mappings will be static
 until the cell properties are changed and then the pin mappings may
-change.  This happens most commonly with RAMB and FIFO primitives
-which have configurable width/depth combinations.  When these
-properties are changed, the use of write enable pins on those cells
-sometimes changes, causing the cellPin to belPin mappings to change.
+change.  We have only observed this with memory (RAMB and FIFO)
+primitives, which have configurable width/depth combinations.  When
+their properties are changed, the use of write enable pins on those
+cells sometimes changes, causing the cellPin to belPin mappings to
+change.
 
 This short document will describe the RS2 facilities for dealing with
 these dynamic pin mappings.
@@ -20,12 +21,12 @@ DEFAULT PARAMETERS AND PIN MAPPINGS
 -----------------------------------
 
 As a part of the generation process for the cellLibrary.xml file,
-Tincr determines, for each library cell, all the bels that cell can be
-placed on as well as how the cellPins map to the belPins on those
-bels.  It does this by simply creating an instance of a library cell,
-placing it on every bel type in the device, and noting whether that
-was successful.  If so, it then records the cellPin -> belPin mappings
-Vivado used and records those in the cellLibrary.xml file.  
+Tincr determines, for each library cell, all the bel types that cell
+can be placed on as well as how the cellPins map to the belPins on
+those bels.  It does this by simply creating an instance of a library
+cell, placing it on every bel type in the device, and noting whether
+that was successful.  If so, it then records the cellPin -> belPin
+mappings Vivado used and records those in the cellLibrary.xml file.
 
 It is IMPORTANT to note that these pin mappings are associated with
 the DEFAULT cell properties and apply only to a certain cell/bel
@@ -36,6 +37,9 @@ change the cell's properties or change the bel the cell was placed on.
 
 You can access these mappings in the getPossibleBelPins() method in
 the edu.byu.ece.rapidSmith.design.subsite.LibraryPin class.
+
+NOTE: it is possible that a single cell pin will map to 0, 1 or >1 bel
+pins, depending on the cell/bel combination.
 
 The following use cases outline all the instances where you need not
 even worry about dynamic pin mappings:
@@ -67,7 +71,7 @@ and are changing the cell's properties, then
   - You may need to use the pin mappings cache
 
 Case 2: If you are working with a synthesized-only design from Vivado
-or from Yosys (and therefore must pack the design first)
+or from Yosys (and therefore must pack the design first):
   - You will need to use the pin mappings cache
 
 Thus, as can be seen, only Case 1.5, 1.7, and 1.8 and Case 2 requires you to
@@ -90,30 +94,10 @@ IF YOU NEED TO USE DYNAMIC PIN MAPPINGS
 
 The following are the steps required:
 
-1. Load the pinMappings.xml file that should be in the same directory for
-a technology as the cellLibrary.xml file.  That can be done by calling
-the static loadPinMappings() method in the
-edu.byu.ece.rapidSmith.design.subsite.PinMapping class.  This will
-load the cache so you can query it for your particular cell. 
-
-Each entry in the cache contains the following:
-  a. The cell type for the entry
-  b. The bel type for the entry
-  c. A hash consisting of the cell type, bel type, and property values
-  which contribute to the dynamic pin mappings.
-  d. A map of cellPins and how they map to belPins.  Note, in this
-  map a single cellPin may map to no belPins, one belPin, or
-  multiple belPins. Thus, each entry in the map contains the cellPin
-  name as the key and then a java.util.List of belPin names.
-
-2. You should then query the data structure loaded in the step above
-to find the appropriate pin mapping.  This can be done by calling the
-findPinMappingForCell() routine in the PinMapping class.  To do so,
-this will compute a hash for the cell of interest being placed onto a
-particular bel type (taking into account the cell's property values
-that affect the pin mappings).  This hash is then compared against the
-hash values in the pinMappings data structure loaded above to find the
-matching entry.
+1. You can call the findPinMappingForCell() routine from the PinMapping
+class.  This will load the pinmappings cache from disk and then search
+it to see if a mapping for your cell/bel combination is in the cache.
+If so, it will return it.
 
 3. You can now access the returned pin mappings to determine how a
 given cellPin maps to zero or more belPins.
@@ -122,7 +106,7 @@ IF YOU NEED A PIN MAPPING AND IT ISN'T IN THE CACHE
 
 If your query in step 2 above returns null yet you know you are
 dealing with a cell which requires a pinmapping, you can call
-createPinMappings() in the PinMappingsCreator class (in the util
+createPinMappings() in the PinMapping class (in the design.subsite
 package).  This will start up Vivado using the VivadoConsole class,
 configure the cell with the specified properties, place it on the
 specified bel, and then record the pin mappings as a new mappings
@@ -132,14 +116,15 @@ You can then load those new pin mappings and add them to the
 pinMappings.xml file cache, for use moving forward.
 
 For the above to work, you must have Vivado installed and on your
-system's PATH so that RS2 can call it and retrieve the data.  The
-main() routine in the PinMappings class gives an example of how to do
-this pin mapping creation for either a cache entry you want to create
-out of thin air or for a cache entry you want to create for a specific
-cell you have in a design.
+system's PATH so that RS2 can call it and retrieve the data.
+
+There is an example program in the edu.byu.ece.rapidSmith.examples package
+which gives an example of how to do
+this pin mapping creation. The program is called
+CreateDynamicPinMappings.  
 
 It is anticipated that the cache will grow initially as designs
-uncover new { property, cell/bel" combinations but eventually the need
+uncover new { property, cell/bel} combinations but eventually the need
 to run Vivado to find new ones will diminish.
 
 HOW TO APPLY PIN MAPPINGS
