@@ -21,10 +21,7 @@
 package edu.byu.ece.rapidSmith.device;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  *  Class representing a pin on a BEL.
@@ -105,50 +102,6 @@ public final class BelPin implements Serializable {
 	public boolean isInput() {
 		PinDirection direction = getDirection();
 		return direction == PinDirection.IN || direction == PinDirection.INOUT;
-	}
-
-	/**
-	 * Returns the site pins that either drive or are driven by this pin.
-	 * <p>
-	 * This method is especially helpful in determining which site pins a router
-	 * should target to reach this BEL pin.  A set is returned since some BEL pins
-	 * are reachable from multiple site pins.
-	 * <p>
-	 * The collection and the site pin objects are built upon each invocation of
-	 * this method
-	 *
-	 * @return set of the site pins that either driver or are driven by this pin
-	 * @see #getSitePinNames()
-	 */
-	public Set<SitePin> getSitePins() {
-		if (template.getSitePins() == null)
-			return Collections.emptySet();
-
-		Site site = bel.getSite();
-		SiteType siteType = getBel().getId().getSiteType();
-		return template.getSitePins().stream()
-				.map(sitePinName -> site.getPin(siteType, sitePinName))
-				.collect(Collectors.toSet());
-	}
-
-	/**
-	 * Returns the names of the site pins that either drive or are driven by this
-	 * pin.
-	 * <p>
-	 * This method is especially helpful in determining which site pins a router
-	 * should target to reach this BEL pin.  A set is returned since some BEL pins
-	 * are reachable from multiple site pins.
-	 * <p>
-	 * Unlike {@link #getSitePins()}, this method does not build any new objects.
-	 *
-	 * @return set of the site pins that either driver or are driven by this pin
-	 * @see #getSitePins()
-	 */
-	public Set<String> getSitePinNames() {
-		Set<String> sitePins = template.getSitePins();
-		if (sitePins == null)
-			return Collections.emptySet();
-		return sitePins;
 	}
 
 	@Override

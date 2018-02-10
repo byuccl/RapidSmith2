@@ -200,7 +200,8 @@ public class RSEnvironment {
 		SAXBuilder builder = new SAXBuilder();
 		return builder.build(path.toFile());
 	}
-	
+
+
 	/**
 	 * Loads the device info file for the specified partname and family. The device info file
 	 * contains additional information about a specific device not found in the XDLRC file
@@ -364,4 +365,5 @@ public class RSEnvironment {
 		String canonicalName = PartNameTools.removeSpeedGrade(partName);
 		return supportedParts.get(canonicalName);
 	}
+
 }
