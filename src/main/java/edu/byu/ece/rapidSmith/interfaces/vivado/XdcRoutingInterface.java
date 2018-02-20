@@ -498,7 +498,7 @@ public class XdcRoutingInterface {
 	 * to mark sink cell pins as routed, and add pseudo pins
 	 * to the design is necessary (for VCC and GND nets only)
 	 * 
-	 * @param net {@link CellNet} the is currently being routed
+	 * @param net {@link CellNet} that is currently being routed
 	 * @param sinkSitePin {@link SitePin} that the net routing has reached
 	 * @return {@code true} is connected to the net AND being used, {@code false} otherwise.
 	 * 	
