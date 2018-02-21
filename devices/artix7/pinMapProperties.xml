@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cells>
+  <cell type="RAMB36E1" bel="RAMB36E1">
+    <prop key="RAM_MODE" />
+    <prop key="READ_WIDTH_A" />
+    <prop key="READ_WIDTH_B" />
+    <prop key="WRITE_WIDTH_A" />
+    <prop key="WRITE_WIDTH_B" />
+  </cell>
   <cell type="RAMB18E1" bel="RAMB18E1">
     <prop key="RAM_MODE" />
     <prop key="READ_WIDTH_A" />
@@ -8,6 +15,10 @@
     <prop key="WRITE_WIDTH_B" />
   </cell>
   <cell type="FIFO18E1" bel="FIFO18E1">
+    <prop key="DATA_WIDTH" />
+    <prop key="FIFO_MODE" />
+  </cell>
+  <cell type="FIFO36E1" bel="FIFO36E1">
     <prop key="DATA_WIDTH" />
     <prop key="FIFO_MODE" />
   </cell>

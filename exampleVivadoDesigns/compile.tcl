@@ -15,7 +15,7 @@ proc dcp2tcp {top} {
 # design in case you want to do further work with them.
 # IMPORTANTLY: it assumes that the top level module has the same
 # name as the directory where all the source files are located.
-proc compile_hdl_to_checkpoint_files {top} {
+proc compile {top} {
     puts "Closing any designs that are currently open..."
     puts ""
 
@@ -40,11 +40,11 @@ proc compile_hdl_to_checkpoint_files {top} {
     puts "Synthesizing design..."
     synth_design -top $top -flatten_hierarchy full 
     
-    puts "Placing Design..."
-    place_design
+#    puts "Placing Design..."
+#    place_design
     
     puts "Routing Design..."
-    route_design
+#    route_design
 
     #	remove files
 #    file delete {*}[glob *.log]
