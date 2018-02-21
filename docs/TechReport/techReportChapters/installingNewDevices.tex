@@ -110,20 +110,17 @@ java edu.byu.ece.rapidSmith.util.FamilyBuilders xc7a100tcsg324
 
 \vspace{.3cm}
 
-\noindent Once the device installer is done executing, the compact devices files
-are stored in the corresponding family directory of the RapidSmith2 ``devices''
-folder. For example, the device files generated from the example part
-\textit{xc7a100tcsg324-3} are stored in the ``artix7'' sub-directory.
-\autoref{lst:apdxADeviceFiles} shows the two device files that are created
-after the device installer is run. The file ending in ``\_db.dat'' contains the
-serialized \texttt{Device} data structures for RapidSmith2. The file ending in
-``\_info.dat'' contains additional serialized data (such as reverse wire
-connections) that can be optionally loaded with the device.
+\noindent Once the device installer is done executing, the compact devices file
+is stored in the corresponding family directory of the RapidSmith2 ``devices''
+folder. For example, the device file generated from the example part
+\textit{xc7a100tcsg324-3} is stored in the ``artix7'' sub-directory.
+\autoref{lst:apdxADeviceFiles} shows the device file that is created
+after the device installer is run. 
 
-\begin{lstlisting}[numbers=none, caption=Generated RapidSmith2 device files,
+\begin{lstlisting}[numbers=none, caption=Generated RapidSmith2 device file,
 label=lst:apdxADeviceFiles] 
 [ttown523@CB461-EE09968:artix7] ls
-cellLibrary.xml familyInfo.xml |\textbf{xc7a100tcsg324\_db.dat}| |\textbf{xc7a100tcsg324\_info.dat}|
+cellLibrary.xml familyInfo.xml |\textbf{xc7a100tcsg324\_db.dat}| 
 \end{lstlisting} 
 
 \subsection{Supporting New Device Families} \label{sec:newFamilies}
