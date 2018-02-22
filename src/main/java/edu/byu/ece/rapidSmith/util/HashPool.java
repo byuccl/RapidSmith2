@@ -19,10 +19,7 @@
  */
 package edu.byu.ece.rapidSmith.util;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * This class is a special data structure used for Xilinx FPGA devices to help reduce memory footprint
@@ -37,21 +34,56 @@ public class HashPool<E> implements Iterable<E> {
 	private final ArrayList<E> enumeration;
 
 	public HashPool() {
-		map = new HashMap<>(512, 0.4f);
+		map = new HashMap<>();
 		enumeration = new ArrayList<>();
 	}
 
+	public HashPool(int initialSize) {
+		map = new HashMap<>((int) (1.34 * initialSize));
+		enumeration = new ArrayList<>(initialSize);
+	}
+
 	/**
-	 * Adds the object to the pool if an identical copy doesn't already exist.
-	 * @param obj The object to be added
-	 * @return The unique object contained in the HashPool
+	 * Adds an object to the pool.
+	 * <p/>
+	 * If the object is distinct from all others in the pool, the object will be
+	 * added and the value is returned.  If a similar object already exists
+	 * in the pool, this object is not added and the similar object is returned
+	 * instead.
+	 *
+	 * @param obj the object to add
+	 * @return the integer enumeration assigned to this object by this pool
 	 */
 	public synchronized E add(E obj) {
-		if (map.containsKey(obj))
-			return enumeration.get(map.get(obj));
+		Objects.requireNonNull(obj);
+		Integer get = map.get(obj);
+		if (get != null)
+			return enumeration.get(get);
 		map.put(obj, map.size());
 		enumeration.add(obj);
 		return obj;
+	}
+
+	/**
+	 * Adds an object to the pool.
+	 * <p/>
+	 * If the object is distinct from all others in the pool, the object will be
+	 * added and its integer mapping returned.  If a similar object already exists
+	 * in the pool, this object is not added and the integer mapping for the
+	 * similar object is returned.
+	 *
+	 * @param obj the object to add
+	 * @return the integer enumeration assigned to this object by this pool
+	 */
+	public synchronized Integer add2(E obj) {
+		Objects.requireNonNull(obj);
+		Integer get = map.get(obj);
+		if (get != null)
+			return get;
+		Integer e = map.size();
+		map.put(obj, e);
+		enumeration.add(obj);
+		return e;
 	}
 
 	public int size() {
@@ -62,10 +94,9 @@ public class HashPool<E> implements Iterable<E> {
 		return enumeration;
 	}
 
-	public int getEnumeration(E obj) {
+	public Integer getEnumeration(E obj) {
 		return map.get(obj);
 	}
-
 
 	@Override
 	public Iterator<E> iterator() {
