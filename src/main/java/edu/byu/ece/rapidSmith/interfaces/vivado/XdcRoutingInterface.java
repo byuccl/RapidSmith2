@@ -70,6 +70,21 @@ public class XdcRoutingInterface {
 	private Map<Bel, BelRoutethrough> belRoutethroughMap;
 	private Pattern pipNamePattern;
 	private Map<String, String> oocPortMap;
+	
+	/**
+	 * @return the oocPortMap
+	 */
+	public Map<String, String> getOocPortMap() {
+		return oocPortMap;
+	}
+
+	/**
+	 * @param oocPortMap the oocPortMap to set
+	 */
+	public void setOocPortMap(Map<String, String> oocPortMap) {
+		this.oocPortMap = oocPortMap;
+	}
+
 	private ImplementationMode implementationMode;
 	private boolean pipUsedInRoute = false;
 	
@@ -227,6 +242,7 @@ public class XdcRoutingInterface {
 			else { // pin is an output of the site
 				
 				if (net.getSourceSitePin() != null) {
+					System.out.println("Source Site Pin: " + net.getSourcePin().getFullName());
 					net.addSourceSitePin(pin);
 					continue;
 				}
@@ -264,6 +280,11 @@ public class XdcRoutingInterface {
 		CellPin sourceCellPin = tryGetNetSource(net);
 		BelPin sourceBelPin = tryGetMappedBelPin(sourceCellPin);
 				
+		// There may be no source Bel Pin if the design was implemented out-of-context.
+		if (sourceBelPin == null) {
+			return;
+		}
+		
 		Site site = sourceBelPin.getBel().getSite();
 		createIntrasiteRoute(net, sourceBelPin, true, design.getUsedSitePipsAtSite(site));
 		net.setIsIntrasite(true);
@@ -477,7 +498,7 @@ public class XdcRoutingInterface {
 	 * to mark sink cell pins as routed, and add pseudo pins
 	 * to the design is necessary (for VCC and GND nets only)
 	 * 
-	 * @param net {@link CellNet} the is currently being routed
+	 * @param net {@link CellNet} that is currently being routed
 	 * @param sinkSitePin {@link SitePin} that the net routing has reached
 	 * @return {@code true} is connected to the net AND being used, {@code false} otherwise.
 	 * 	
@@ -738,7 +759,7 @@ public class XdcRoutingInterface {
 	 * @param usedSiteWires Set of used pips within the site
 	 */
 	private void createIntrasiteRoute(CellNet net, BelPin pin, boolean isContained, Set<Integer> usedSiteWires) {
-	
+
 		IntrasiteRoute route = new IntrasiteRouteBelPinSource(net, pin, isContained);
 		buildIntrasiteRoute(route, usedSiteWires);
 		
@@ -1068,9 +1089,13 @@ public class XdcRoutingInterface {
 		
 		int mapCount = cellPin.getMappedBelPinCount(); 
 		
-		if (mapCount != 1) {
+		// Some out of context designs will not have cells, so there will be no mapped BelPin.
+		if (mapCount != 1 && implementationMode == ImplementationMode.OUT_OF_CONTEXT) {
+			return null;
+		}
+		else if (mapCount != 1) {
 			throw new ParseException(String.format("Cell pin source \"%s\" should map to exactly one BelPin, but maps to %d\n"
-												+ "On %d of %s", cellPin.getName(), mapCount, currentLineNumber, currentFile));
+					+ "On %d of %s", cellPin.getName(), mapCount, currentLineNumber, currentFile));	
 		}
 		
 		return cellPin.getMappedBelPin();

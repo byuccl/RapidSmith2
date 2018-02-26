@@ -103,7 +103,7 @@ public class ImportExportExample {
 	private void manipulateDesign()
 	{
 		System.out.println("\nPrinting out the design...");
-		DesignAnalyzer.prettyPrintDesign(design);
+	//	DesignAnalyzer.prettyPrintDesign(design);
 	}
 
 	/**

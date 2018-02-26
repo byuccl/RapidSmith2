@@ -497,7 +497,7 @@ public final class DeviceGenerator {
 	 * Creates the site pin templates and adds them to the site template.
 	 */
 	private void createAndSetSitePins(PrimitiveDef def, SiteTemplate siteTemplate) {
-		Map<String, SitePinTemplate> sources = new HashMap<>();
+		Map<String, SitePinTemplate> sources = new HashMap<String, SitePinTemplate>();
 		Map<String, SitePinTemplate> sinks = new HashMap<>();
 
 		for (PrimitiveDefPin pin : def.getPins()) {
