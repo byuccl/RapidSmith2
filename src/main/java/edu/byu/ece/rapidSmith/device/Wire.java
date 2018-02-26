@@ -35,7 +35,11 @@ public interface Wire extends Serializable {
 	String getFullName();
 	Tile getTile();
 	Site getSite();
-	
+
+
+	void setUsed(Boolean used);
+	Boolean isUsed();
+
 	/**
 	 * @deprecated Use {@link #getName} instead.
 	 */

@@ -362,54 +362,17 @@ public class Tile implements Serializable {
 	 * @param remove if true, the PIP wire connection is removed from the tile;
 	 * otherwise, the PIP wire connection is just marked as used.
 	 */
-	public void setUsedPIP(PIP pip, Boolean remove) {	
+	public void setUsedPIP(PIP pip, Boolean remove) {
 		if (!hasPIP(pip)) {
 			// TODO: throw an exception
 			System.out.println("This PIP does not exist in the tile!");
 			return;
-		}	
-		
-		int pipStartWire = pip.getStartWire().getWireEnum();
-		int pipEndWire = pip.getEndWire().getWireEnum();
-		
-		// Set the PIP wire connection to used
-		WireConnection[] wireConns = wireConnections.get(pipStartWire);
-		if (wireConns != null && wireConns.length >= 0) {
-				for (WireConnection wc : wireConns) {
-					if (wc.isPIP()) {					
-						if (wc.getWire() == pipEndWire) {
-							if (remove) {
-								// Remove connection from wireConnections
-								wireConnections.remove(pipStartWire, wc);
-							}
-							else {
-								wc.setUsed(true);
-								//wc.setUnavailable(false);								
-							}
-						}
-					}
-				}
 		}
-		
-		// Update reverse wire connections
-		// Set the PIP wire connection to used
-		WireConnection[] reverseWireConns = reverseWireConnections.get(pipEndWire);		
-		if (reverseWireConns != null && reverseWireConns.length >= 0) {
-			for (WireConnection wc : reverseWireConns) {
-				if (wc.isPIP()) {
-					if (wc.getWire() == pipStartWire) {
-						if (remove) {
-							// Remove connection from reverseWireConnections
-							reverseWireConnections.remove(pipEndWire, wc);
-						}
-						else {
-							wc.setUsed(true);
-							//wc.setUnavailable(false);	
-						}
-					}
-				}
-			}
-		}	
+
+		// Mark the source and sink wires as used
+		pip.getStartWire().setUsed(true);
+		pip.getEndWire().setUsed(true);
+
 	}
 	
 //	public void setUnavailablePIP(PIP pip) {

@@ -59,6 +59,16 @@ public class SiteWire implements Wire, Serializable {
 		return site;
 	}
 
+	@Override
+	public void setUsed(Boolean used) {
+		return;
+	}
+
+	@Override
+	public Boolean isUsed() {
+		return false;
+	}
+
 	public SiteType getSiteType() {
 		return siteType;
 	}

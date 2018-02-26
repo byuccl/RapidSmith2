@@ -34,12 +34,16 @@ public final class PIP implements Serializable {
 	private static final long serialVersionUID = 122367735864726588L;
 	private Wire startWire;
 	private Wire endWire;
-	private Boolean used; // used by the static design
-	private Boolean unavailable; // Unavailable as another PIP is using the same start or end wire.
+	//private Boolean used; // used by the static design
+	//private Boolean unavailable; // Unavailable as another PIP is using the same start or end wire.
 
 	public PIP(PIP other) {
 		this.startWire = other.startWire;
 		this.endWire = other.endWire;
+	}
+
+	public Boolean isUsed() {
+		return startWire.isUsed() || endWire.isUsed();
 	}
 
 	/**
