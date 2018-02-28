@@ -84,9 +84,9 @@ public class DesignAnalyzer {
 				System.out.println("    Cell is macro");
 				continue;
 			}
-			if (c.getPossibleAnchors().size() == 0)
+			if (c.getPossibleLocations().size() == 0)
 				System.out.println("    This cell cannot be placed.");
-			for (BelId b : c.getPossibleAnchors()) {
+			for (BelId b : c.getPossibleLocations()) {
 				System.out.println("    Can be placed onto sites of type " + b.getSiteType() + " on Bels of type " + b.getName());
 			}
 		}
@@ -105,7 +105,7 @@ public class DesignAnalyzer {
 	 * Print out a formatted representation of a design to help visualize it.  Another way of visualizing designs is illustrated
 	 * in the DotFilePrinterDemo program in the examples2 directory.  
 	 * @param design The design to be pretty printed.
-	 * @param Flag to control printing of detailed cellBelPinMappings 
+	 * @param cellBelPinMappings to control printing of detailed cellBelPinMappings
 	 */
 	public static void prettyPrintDesign(CellDesign design, boolean cellBelPinMappings) {
 		// Print the cells

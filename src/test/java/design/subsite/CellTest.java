@@ -198,7 +198,7 @@
      }
 
      @Test
-     @DisplayName("test Cell method 'getPossibleAnchors'")
+     @DisplayName("test Cell method 'getPossibleLocations'")
      public void testGetPossibleAnchors() {
          verifyAnchors(lutcell, Arrays.asList("SLICEL-D6", "SLICEL-D5", "SLICEL-C6", "SLICEL-C5", "SLICEL-B6", "SLICEL-B5", "SLICEL-A5", "SLICEL-A6", "SLICEM-D6", "SLICEM-D5", "SLICEM-C6", "SLICEM-C5", "SLICEM-B6", "SLICEM-B5", "SLICEM-A5", "SLICEM-A6"));
          verifyAnchors(iportcell, Arrays.asList("IOB33-PAD", "IOB33S-PAD", "IOB33M-PAD", "IPAD-PAD"));
@@ -214,7 +214,7 @@
       * expected the list of possible anchors to check for
       */
      private void verifyAnchors(Cell cell, List<String> expected) {
-         List<String> actual = cell.getPossibleAnchors().stream()
+         List<String> actual = cell.getPossibleLocations().stream()
                  .map(belid -> (belid.getSiteType()+"-"+belid.getName()).replace("ARTIX7.", "").replace("LUT", ""))
                  .collect(Collectors.toList());
          assertEquals(expected.size(), actual.size(), "Expected anchor count for " + cell.getName() + " doesn't match calculated.");
@@ -229,7 +229,7 @@
          // test each of the sample test cells
          for (Cell cell : testcells) {
              // Attempt to place and remove the cell on each type of anchor
-             for (BelId anchortype : cell.getPossibleAnchors()) {
+             for (BelId anchortype : cell.getPossibleLocations()) {
                  // Create a new empty CellDesign for the designated FPGA part
                  CellDesign design = new CellDesign("CellPlacementTest", "xc7a100tcsg324");
                  // Add the cell to the design

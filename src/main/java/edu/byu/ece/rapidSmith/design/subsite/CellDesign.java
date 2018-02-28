@@ -23,11 +23,13 @@ package edu.byu.ece.rapidSmith.design.subsite;
 import edu.byu.ece.rapidSmith.design.AbstractDesign;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.Site;
-import edu.byu.ece.rapidSmith.util.Exceptions;
 import edu.byu.ece.rapidSmith.interfaces.vivado.XdcConstraint;
+import edu.byu.ece.rapidSmith.util.Exceptions;
 
 import java.util.*;
 import java.util.stream.Stream;
+
+import static java.util.Collections.emptyMap;
 
 /**
  *  This class represents a logical netlist consisting of cells interconnected by
@@ -73,7 +75,7 @@ public class CellDesign extends AbstractDesign {
 	 */
 	public CellDesign() {
 		super();
-		init();
+		_init();
 		properties = new PropertyList();
 	}
 
@@ -86,11 +88,11 @@ public class CellDesign extends AbstractDesign {
 	 */
 	public CellDesign(String designName, String partName) {
 		super(designName, partName);
-		init();
+		_init();
 		properties = new PropertyList();
 	}
 
-	private void init() {
+	private void _init() {
 		cellMap = new HashMap<>();
 		internalCellMap = new HashMap<>();
 		placementMap = new HashMap<>();
@@ -191,7 +193,7 @@ public class CellDesign extends AbstractDesign {
 	 * are returned.
 	 */
 	public Stream<Cell> getLeafCells() {
-		return cellMap.values().stream().flatMap(c -> flatten(c));
+		return cellMap.values().stream().flatMap(c -> _flatten(c));
 	}
 	
 	/**
@@ -202,7 +204,7 @@ public class CellDesign extends AbstractDesign {
 	 * @param cell {@link Cell} object to flatten
 	 * @return A {@link Stream} of internal cells
 	 */
-	private Stream<Cell> flatten(Cell cell) {
+	private Stream<Cell> _flatten(Cell cell) {
 		return cell.isMacro() ? cell.getInternalCells().stream() : Collections.singletonList(cell).stream();
 	}
 	
@@ -246,10 +248,10 @@ public class CellDesign extends AbstractDesign {
 		if (cell.isInternal())
 			throw new Exceptions.DesignAssemblyException("Cannot add internal cell to design. Must add parent macro instead.");
 		
-		return registerCell(cell);
+		return _registerCell(cell);
 	}
 
-	private Cell registerCell(Cell cell) {
+	private Cell _registerCell(Cell cell) {
 		if (hasCell(cell.getName()))
 			throw new Exceptions.DesignAssemblyException("Cell with name already exists in design: " + cell.getName());
 
@@ -283,10 +285,10 @@ public class CellDesign extends AbstractDesign {
 		if (cell.isInternal()) 
 			throw new IllegalArgumentException("Cannot remove internal cell from the design. Remove the macro parent cell.");
 		
-		removeCell_impl(cell);
+		_removeCell(cell);
 	}
 
-	private void removeCell_impl(Cell cell) {
+	private void _removeCell(Cell cell) {
 		
 		cellMap.remove(cell.getName());
 		cell.clearDesign();
@@ -295,14 +297,14 @@ public class CellDesign extends AbstractDesign {
 		if (cell.isMacro()) {
 			for (Cell iCell: cell.getInternalCells()) {
 				iCell.clearDesign();
-				unplaceCell_impl(iCell);
+				_unplaceCell(iCell);
 				internalCellMap.remove(iCell.getName());
 			}
 			cell.getPins().stream().filter(CellPin::isConnectedToNet).forEach(p -> p.getNet().disconnectFromPin(p));
-			cell.getInternalNets().forEach(this::removeNet_impl);
+			cell.getInternalNets().forEach(this::_removeNet);
 		}
 		else {
-			disconnectCell_impl(cell);
+			_disconnectCell(cell);
 		}
 	}
 
@@ -322,17 +324,17 @@ public class CellDesign extends AbstractDesign {
 		
 		// for macros, disconnect the sub-cells
 		if (cell.isMacro()) {
-			cell.getInternalCells().forEach(this::unplaceCell_impl);
+			cell.getInternalCells().forEach(this::_unplaceCell);
 			cell.getPins().stream().filter(CellPin::isConnectedToNet).forEach(p -> p.getNet().disconnectFromPin(p));
 		}
 		else { // leaf cell
-			disconnectCell_impl(cell);
+			_disconnectCell(cell);
 		}
 	}
 
-	private void disconnectCell_impl(Cell cell) {
+	private void _disconnectCell(Cell cell) {
 
-		unplaceCell_impl(cell);
+		_unplaceCell(cell);
 
 		// disconnect the cell's pins from their nets
 		for (CellPin pin : cell.getPins()) {
@@ -398,10 +400,10 @@ public class CellDesign extends AbstractDesign {
 		if (net.isInDesign())
 			throw new Exceptions.DesignAssemblyException("Cannot add net from another design.");
 
-		return addNet_impl(net);
+		return _addNet(net);
 	}
 
-	protected CellNet addNet_impl(CellNet net) {
+	private CellNet _addNet(CellNet net) {
 		if (hasNet(net.getName()))
 			throw new Exceptions.DesignAssemblyException("Net with name already exists in design.");
 
@@ -438,10 +440,10 @@ public class CellDesign extends AbstractDesign {
 		if (!net.getPins().isEmpty())
 			throw new Exceptions.DesignAssemblyException("Cannot remove connected net." + net.getName());
 
-		removeNet_impl(net);
+		_removeNet(net);
 	}
 
-	private void removeNet_impl(CellNet net) {
+	private void _removeNet(CellNet net) {
 		net.setDesign(null);
 		
 		if (net.isVCCNet()) {
@@ -470,10 +472,10 @@ public class CellDesign extends AbstractDesign {
 		if (net.isInternal()) 
 			throw new Exceptions.DesignAssemblyException("Cannot disconnect internal net.");
 		
-		disconnectNet_impl(net);
+		_disconnectNet(net);
 	}
 
-	private void disconnectNet_impl(CellNet net) {
+	private void _disconnectNet(CellNet net) {
 		List<CellPin> pins = new ArrayList<>(net.getPins());
 		pins.forEach(net::disconnectFromPin);
 		net.unrouteFull();
@@ -571,19 +573,11 @@ public class CellDesign extends AbstractDesign {
 	 * the specified {@link Bel}.
 	 * 
 	 * @param cell {@link Cell} to place
-	 * @param anchor {@link Bel} to place the cell on
+	 * @param bel {@link Bel} to place the cell on
 	 */
-	public boolean canPlaceCellAt(Cell cell, Bel anchor) {
-		List<Bel> requiredBels = cell.getLibCell().getRequiredBels(anchor);
-		return canPlaceCellAt_impl(requiredBels);
-	}
-
-	private boolean canPlaceCellAt_impl(List<Bel> requiredBels) {
-		for (Bel bel : requiredBels) {
-			if (bel == null || isBelUsed(bel))
-				return false;
-		}
-		return true;
+	public boolean canPlaceCellAt(Cell cell, Bel bel) {
+		return bel != null && !isBelUsed(bel) &&
+			cell.getLibCell().getPossibleAnchors().contains(bel.getId());
 	}
 
 	/**
@@ -594,31 +588,66 @@ public class CellDesign extends AbstractDesign {
 	 * is finalized, and then apply the pin mappings.
 	 *
 	 * @param cell the cell to place
-	 * @param anchor the BEL where the cell is to be placed
+	 * @param bel the BEL where the cell is to be placed
 	 */
-	public void placeCell(Cell cell, Bel anchor) {
+	public void placeCell(Cell cell, Bel bel) {
 		Objects.requireNonNull(cell);
-		Objects.requireNonNull(anchor);
+		Objects.requireNonNull(bel);
 		if (cell.getDesign() != this)
 			throw new Exceptions.DesignAssemblyException("Cannot place cell not in the design.");
 		if (cell.isPlaced())
 			throw new Exceptions.DesignAssemblyException("Cell is already placed. Cannot re-place cell: " + cell.getName());
-		if (cell.isMacro()) 
+		if (cell.isMacro())
 			throw new Exceptions.DesignAssemblyException("Cannot place macro cell. Can only place internal cells to the macro.");
-		
-		List<Bel> requiredBels = cell.getLibCell().getRequiredBels(anchor);
-		if (!canPlaceCellAt_impl(requiredBels))
+		if (isBelUsed(bel))
 			throw new Exceptions.DesignAssemblyException("Cell already placed at location.");
 
-		placeCell_impl(cell, anchor, requiredBels);
+		_placeCell(cell, bel);
 	}
 
-	private void placeCell_impl(Cell cell, Bel anchor, List<Bel> requiredBels) {
-		requiredBels.forEach(b -> placeCellAt(cell, b));
-		cell.place(anchor);
+	/**
+	 * Same as {@link #placeCell(Cell, Bel)} but also checks that the BEL is a valid type for
+	 * the cell and that the type of the BEL does not clash with other BELs already used in
+	 * the site.  The type of the site is then updated to match the site type.
+	 * <p/>
+	 * When comparing against existing BELs used in the site, the check only compares against
+	 * one BEL in the site, chosen in a non-deterministic manner.
+	 *
+	 * @param cell the cell to place
+	 * @param bel the BEL where the cell is to be placed
+	 *
+	 * @throws Exceptions.DesignAssemblyException if the BEL types are incompatible
+	 */
+	public void placeCellSafe(Cell cell, Bel bel) {
+		Objects.requireNonNull(cell);
+		Objects.requireNonNull(bel);
+		if (cell.getDesign() != this)
+			throw new Exceptions.DesignAssemblyException("Cannot place cell not in the design.");
+		if (cell.isPlaced())
+			throw new Exceptions.DesignAssemblyException("Cell is already placed. Cannot re-place cell: " + cell.getName());
+		if (cell.isMacro())
+			throw new Exceptions.DesignAssemblyException("Cannot place macro cell. Can only place internal cells to the macro.");
+		if (!canPlaceCellAt(cell, bel))
+			throw new Exceptions.DesignAssemblyException("Cell already placed at location.");
+
+		_validateCellPlacement(bel);
+		bel.getSite().setType(bel.getId().getSiteType());
+
+		_placeCell(cell, bel);
 	}
 
-	private void placeCellAt(Cell cell, Bel bel) {
+	// Checks that the BEL to be occupied is compatible with other used BELs in the site.
+	private void _validateCellPlacement(Bel bel) {
+		Map<Bel, Cell> existingBels = placementMap.getOrDefault(bel.getSite(), emptyMap());
+		Optional<Bel> existingType = existingBels.keySet().stream().findAny();
+		existingType.ifPresent(t -> {
+			if (t.getId().getSiteType() != bel.getId().getSiteType())
+				throw new Exceptions.DesignAssemblyException("Site types of BELs in site differ from existing");
+		});
+	}
+
+	private void _placeCell(Cell cell, Bel bel) {
+		// update the placement map
 		Map<Bel, Cell> sitePlacementMap = placementMap.get(bel.getSite());
 		if (sitePlacementMap == null) {
 			sitePlacementMap = new HashMap<>();
@@ -627,6 +656,9 @@ public class CellDesign extends AbstractDesign {
 			assert sitePlacementMap.get(bel) == null;
 		}
 		sitePlacementMap.put(bel, cell);
+
+		// set the location in the cell
+		cell.place(bel);
 	}
 
 	/**
@@ -643,39 +675,42 @@ public class CellDesign extends AbstractDesign {
 
 		// for macros, unplace all internal cells
 		if (cell.isMacro()) {
-			cell.getInternalCells().forEach(this::unplaceCell_impl);
+			cell.getInternalCells().forEach(this::_unplaceCell);
 		}
 		else {
-			unplaceCell_impl(cell);
+			_unplaceCell(cell);
 		}
 	}
 
-	private void unplaceCell_impl(Cell cell) {
-		
+	private void _unplaceCell(Cell cell) {
 		assert(!cell.isMacro());
-		
+
+		_clearCellPlacement(cell);
+
+		// undo all cell pin mappings (if they exists)
+		cell.getPins().forEach(CellPin::clearPinMappings);
+	}
+
+	private void _clearCellPlacement(Cell cell) {
 		// if the cell is not placed, return
-		if (!cell.isPlaced()) {
+		if (!cell.isPlaced())
 			return;
-		}
-		
+
+		// remove the location from the placement map
 		Site site = cell.getSite();
 		Map<Bel, Cell> sitePlacementMap = placementMap.get(site);
 		sitePlacementMap.remove(cell.getBel());
 		if (sitePlacementMap.size() == 0)
 			placementMap.remove(site);
-		
+
+		// clear the location from the cell
 		cell.unplace();
-		
-		// undo all cell pin mappings (if they exists)
-		cell.getPins().forEach(CellPin::clearPinMappings);
 	}
 
 	/**
 	 * Unroutes the INTERSITE portions of all nets currently in the design.
 	 * This function is currently not recommended for use. Further testing is needed.
 	 */
-	@Deprecated
 	public void unrouteDesign() {
 		getNets().forEach(CellNet::unrouteIntersite);
 	}
@@ -684,7 +719,6 @@ public class CellDesign extends AbstractDesign {
 	 * Unroutes the INTERSITE portions of all nets currently in the design.
 	 * This function is currently not recommended for use. Further testing is needed.
 	 */
-	@Deprecated
 	public void unrouteDesignFull() {
 		getNets().forEach(CellNet::unrouteFull);
 		getCells().forEach(Cell::clearPinMappings);
@@ -695,20 +729,19 @@ public class CellDesign extends AbstractDesign {
 	 * mappings are undone as well. This function is currently not recommended for use.
 	 * Further testing is needed.   
 	 */
-	@Deprecated
 	public void unplaceDesign() {
 		unrouteDesign();
 
 		for (Cell cell : getCells()) {
 			if (cell.isMacro()) {
-				cell.getInternalCells().forEach(this::unplaceCell_impl);
+				cell.getInternalCells().forEach(this::_unplaceCell);
 			}
 			else {
-				this.unplaceCell_impl(cell);
+				this._unplaceCell(cell);
 			}
 		}
 	}
-	
+
 	/**
 	 * Set the INTRASITE routing of a {@link Site}. If you are modifying the logic within 
 	 * a {@link Site}, this function needs to be called before exporting a design. 
