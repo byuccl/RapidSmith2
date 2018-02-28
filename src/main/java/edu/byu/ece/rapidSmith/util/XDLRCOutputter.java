@@ -20,7 +20,6 @@
 
 package edu.byu.ece.rapidSmith.util;
 
-import edu.byu.ece.rapidSmith.design.xdl.XdlAttribute;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.primitiveDefs.PrimitiveConnection;
 import edu.byu.ece.rapidSmith.primitiveDefs.PrimitiveDef;
@@ -514,29 +513,34 @@ public class XDLRCOutputter {
 	}
 
 	private void createPIPMuxElements(SiteTemplate template, Map<Integer, Pin> pinWiresMap, PrimitiveDef def) {
-		for (int source : template.getPipAttributes().keySet()) {
-			int sink = template.getPipAttributes().get(source).keySet().iterator().next();
-			XdlAttribute attr = template.getPipAttributes().get(source).values().iterator().next();
+		for (int source : template.getRouting().keySet()) {
+			String sourceName = we.getWireName(source);
+			String elName = getElementNameFromWire(sourceName);
+			String srcPinName = getPinNameFromWire(sourceName);
 
-			String elName = attr.getPhysicalName();
-			PrimitiveElement el = def.getElement(elName);
-			if (el == null) {
-				el = new PrimitiveElement();
-				el.setName(elName);
-				el.setMux(true);
-				PrimitiveDefPin sinkPin = new PrimitiveDefPin();
-				sinkPin.setExternalName(getPinNameFromWire(we.getWireName(sink)));
-				sinkPin.setDirection(PinDirection.OUT);
-				el.addPin(sinkPin);
+			for (WireConnection wc : template.getWireConnections(source)) {
+				if (wc.isPIP()) {
+					String sinkName = we.getWireName(wc.getWire());
+					PrimitiveElement el = def.getElement(elName);
+					if (el == null) {
+						el = new PrimitiveElement();
+						el.setName(elName);
+						el.setMux(true);
+						PrimitiveDefPin sinkPin = new PrimitiveDefPin();
+						sinkPin.setExternalName(getPinNameFromWire(sinkName));
+						sinkPin.setDirection(PinDirection.OUT);
+						el.addPin(sinkPin);
+					}
+					PrimitiveDefPin sourcePin = new PrimitiveDefPin();
+					sourcePin.setExternalName(srcPinName);
+					sourcePin.setDirection(PinDirection.IN);
+					el.addPin(sourcePin);
+					el.addCfgOption(srcPinName);
+					def.addElement(el);
+
+					pinWiresMap.put(source, new Pin(el, srcPinName));
+				}
 			}
-			PrimitiveDefPin sourcePin = new PrimitiveDefPin();
-			sourcePin.setExternalName(attr.getValue());
-			sourcePin.setDirection(PinDirection.IN);
-			el.addPin(sourcePin);
-			el.addCfgOption(attr.getValue());
-			def.addElement(el);
-
-			pinWiresMap.put(source, new Pin(el, attr.getValue()));
 		}
 	}
 
@@ -643,6 +647,13 @@ public class XDLRCOutputter {
 		//noinspection ResultOfMethodCallIgnored
 		mo.find();
 		return mo.group(3);
+	}
+
+	private String getElementNameFromWire(String wireName) {
+		Matcher mo = INTRASITE_PATTERN.matcher(wireName);
+		//noinspection ResultOfMethodCallIgnored
+		mo.find();
+		return mo.group(2);
 	}
 
 	public static void main(String[] args) {

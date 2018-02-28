@@ -125,7 +125,7 @@ class RouteTreeTest {
 	private static void makeDummySite(Site dummySite, SiteType dummySiteType) {
 		dummySite.setName("dummy_site");
 		dummySite.setIndex(0);
-		dummySite.setType(dummySiteType);
+		dummySite.setTypeUnchecked(dummySiteType);
 		dummySite.setPossibleTypes(new SiteType[] {dummySiteType});
 
 		SiteTemplate siteTemplate = device.getSiteTemplate(dummySiteType);

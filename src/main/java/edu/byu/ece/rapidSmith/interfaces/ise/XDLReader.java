@@ -124,7 +124,7 @@ public final class XDLReader {
 			} else {
 				assert ctx.PLACED() != null;
 				String siteName = ctx.site.getText();
-				Site site = device.getSite(siteName); // TODO rename getPrimtiveSite to getSite
+				Site site = device.getSite(siteName);
 				if (site == null)
 					throw new ParseException("no such site on device: " + siteName);
 				// TODO add check against tile
