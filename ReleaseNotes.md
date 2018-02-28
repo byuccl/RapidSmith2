@@ -1,3 +1,22 @@
+## Release v2.0.0
+
+### Major Changes:
+* Reverse wire generation are now included in device files. The Extended Info Device files and associated classes have been removed. (#326/#340)
+* The versioning numbers for device files have been updated to prevent old device files from being created. As such, device files generated with previous versions of RS2 are incompatible with this release. (#326/#340)
+
+### Minor Changes:
+* Updated XDLRCParser to present the names of the parsed tokens for context when parsing the XDLRC. (#326/#340)
+* Created a compressered serialized XDLRC format, CXLDRC. This format can be used in place of XDLRCs. (#326/#340)
+
+### Patches / Bug Fixes:
+* Fixed a minor bug in the wire connection generation that was leading to connections being generated for wires that had no sources themselves. (#326/#340)
+
+## Release v1.1.1
+
+### Patches / Bug Fixes:
+* The instanceX and instanceY site variables are now deserialized properly. (#328)
+* The placement of LUT5's now comes before LUT6's in TCP's. (#336)
+
 ## Release v1.1.0
 
 ### Minor Changes:
