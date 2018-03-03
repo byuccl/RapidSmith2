@@ -755,7 +755,6 @@ public class XdcRoutingInterface {
 	 * 
 	 * @param pin Bel Pin to start the route
 	 * @param isContained True if all sinks of the net are in the same site as the source
-	 * @param isStatic True if the source of the net is a VCC or GND bel
 	 * @param usedSiteWires Set of used pips within the site
 	 */
 	private void createIntrasiteRoute(CellNet net, BelPin pin, boolean isContained, Set<Integer> usedSiteWires) {
@@ -1128,20 +1127,61 @@ public class XdcRoutingInterface {
 	 * @param design Design with nets to export
 	 * @throws IOException
 	 */
-	public void writeRoutingXDC(String xdcOut, CellDesign design) throws IOException {
+	public void writeRoutingXDC(String xdcOut, String oocXdcOut, CellDesign design) throws IOException {
 		
 		BufferedWriter fileout = new BufferedWriter (new FileWriter(xdcOut));
-		
+
+		ArrayList<CellNet> sourceNets = new ArrayList<>();
+		ArrayList<CellNet> sinkNets = new ArrayList<>();
+
 		//write the routing information to the TCL script
 		for(CellNet net : design.getNets()) {
 
 			// only print nets that have routing information. Grab the first RouteTree of the net and use this as the final route
 			if ( net.getIntersiteRouteTree() != null ) {
+
+				if (implementationMode.equals(ImplementationMode.OUT_OF_CONTEXT)) {
+					if (net.getSourcePin().getCell().isPort()) {
+						// If the net is driven by a port, it's net needs to be merged with the static portion coming first
+						System.out.println("Net " + net.getName() + " has source port " + net.getSourcePin().getCell().getName());
+						sourceNets.add(net);
+						continue;
+					}
+					else {
+						for (CellPin sink : (net.getSinkPins())) {
+							System.out.println("Net " + net.getName() + " has sink port " + sink.getCell().getName());
+							sinkNets.add(net);
+							break;
+						}
+						continue;
+					}
+				}
+
+				// TODO: Need to use the static design's net name (instead of the hierarchical net name)
+				// Trying to set the route with the hierarchical net name will fail with an error.
 				fileout.write(String.format("set_property ROUTE %s [get_nets {%s}]\n", getVivadoRouteString(net), net.getName()));
 			}
+
 		}
-		
 		fileout.close();
+
+		// Now write the OOC RoutingXDC
+		if (implementationMode.equals(ImplementationMode.OUT_OF_CONTEXT)) {
+			BufferedWriter oocFileOut = new BufferedWriter (new FileWriter(oocXdcOut));
+
+			for (CellNet net : sourceNets) {
+				// TODO: Find matching IBUF net from static resources
+				oocFileOut.write(String.format("set_property ROUTE %s [get_nets {%s}]\n", getVivadoRouteString(net), net.getName()));
+			}
+
+			for (CellNet net : sinkNets) {
+				// TODO: Find matching OBUF net from static resources
+				oocFileOut.write(String.format("set_property ROUTE %s [get_nets {%s}]\n", getVivadoRouteString(net), net.getName()));
+
+			}
+			oocFileOut.close();
+		}
+
 	}
 	
 	/**

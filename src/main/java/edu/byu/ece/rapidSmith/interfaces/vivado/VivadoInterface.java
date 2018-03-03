@@ -168,7 +168,7 @@ public final class VivadoInterface {
 	 * @throws InvalidEdifNameException 
 	 * @throws EdifNameConflictException 
 	 */
-	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells) throws IOException {
+	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells, ImplementationMode mode) throws IOException {
 				
 		new File(tcpDirectory).mkdir();
 		
@@ -183,8 +183,10 @@ public final class VivadoInterface {
 		
 		// Write routing.xdc
 		String routingOut = Paths.get(tcpDirectory, "routing.xdc").toString();
-		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, null, ImplementationMode.REGULAR);
-		routingInterface.writeRoutingXDC(routingOut, design);
+		String oocRoutingOut = Paths.get(tcpDirectory, "oocRouting.xdc").toString();
+
+		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, null, mode);
+		routingInterface.writeRoutingXDC(routingOut, oocRoutingOut, design);
 		
 		// Write EDIF netlist
 		String edifOut = Paths.get(tcpDirectory, "netlist.edf").toString();

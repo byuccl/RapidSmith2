@@ -82,6 +82,8 @@ public class UsedStaticResources {
 					case "USED_PIPS" : 
 						processUsedPips(toks);
 						break;
+					case "STATIC_RT" :
+						break;
 					case "VCC_SOURCES" : 
 					case "GND_SOURCES" : 
 					case "LUT_RTS" : 

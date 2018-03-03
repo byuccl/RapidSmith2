@@ -22,6 +22,7 @@ package edu.byu.ece.rapidSmith.examples;
 
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
+import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
@@ -113,7 +114,7 @@ public class ImportExportExample {
 	private void exportDesign() throws IOException
 	{
 		System.out.println("Exporting Modified Design...");
-		VivadoInterface.writeTCP(checkpointOut, design, device, libCells);
+		VivadoInterface.writeTCP(checkpointOut, design, device, libCells, ImplementationMode.REGULAR);
 	}
 
 }

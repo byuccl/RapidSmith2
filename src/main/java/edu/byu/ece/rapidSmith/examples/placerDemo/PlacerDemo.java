@@ -21,6 +21,7 @@
 package edu.byu.ece.rapidSmith.examples.placerDemo;
 
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
+import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
@@ -99,7 +100,7 @@ public class PlacerDemo {
 		
 		// Export the design to a TCP file
 		System.out.println("Exporting Placed Design...");
-		VivadoInterface.writeTCP(tcpDirectory, design, vcp.getDevice(), vcp.getLibCells());
+		VivadoInterface.writeTCP(tcpDirectory, design, vcp.getDevice(), vcp.getLibCells(), ImplementationMode.REGULAR);
 		System.out.println("Successfully created placed TCP at: " + tcpDirectory);
 		
 		if (interactiveMode) {
