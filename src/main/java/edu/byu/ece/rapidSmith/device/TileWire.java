@@ -21,7 +21,6 @@
 package edu.byu.ece.rapidSmith.device;
 
 import edu.byu.ece.rapidSmith.device.Connection.ReverseTileWireConnection;
-import edu.byu.ece.rapidSmith.device.Connection.TileToSiteConnection;
 import edu.byu.ece.rapidSmith.device.Connection.TileWireConnection;
 
 import java.io.Serializable;
@@ -30,9 +29,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singleton;
 
 /**
  * A wire inside a tile but outside a site.  This is part of the general
@@ -136,19 +132,6 @@ public class TileWire implements Wire, Serializable {
 	}
 
 	/**
-	 * Returns all connections into primitive sites this wire drives.
-	 */
-	@Override
-	@Deprecated
-	public Collection<Connection> getPinConnections() {
-		SitePin sitePin = getConnectedPin();
-		if (sitePin == null)
-			return emptyList();
-		Connection c = new TileToSiteConnection(sitePin);
-		return singleton(c);
-	}
-
-	/**
 	 * Returns the connection into a primitive site that this wire drives.
 	 */
 	@Override
@@ -157,15 +140,6 @@ public class TileWire implements Wire, Serializable {
 		if (sitePin == null || !sitePin.isInput())
 			return null;
 		return sitePin;
-	}
-
-	/**
-	 * Always return an empty list.
-	 */
-	@Override
-	@Deprecated
-	public Collection<Connection> getTerminals() {
-		return Collections.emptyList();
 	}
 
 	/**
@@ -203,18 +177,6 @@ public class TileWire implements Wire, Serializable {
 	}
 
 	/**
-	 * Returns all site pin connections driving this wire.
-	 */
-	@Override
-	@Deprecated
-	public Collection<Connection> getReversePinConnections() {
-		SitePin sitePin = getReverseConnectedPin();
-		if (sitePin == null)
-			return emptyList();
-		return singleton(new TileToSiteConnection(sitePin));
-	}
-
-	/**
 	 * Returns the site pin connection driving this wire.
 	 */
 	@Override
@@ -223,15 +185,6 @@ public class TileWire implements Wire, Serializable {
 		if (sitePin == null || !sitePin.isOutput())
 			return null;
 		return sitePin;
-	}
-
-	/**
-	 * Always returns an empty list.
-	 */
-	@Override
-	@Deprecated
-	public Collection<Connection> getSources() {
-		return Collections.emptyList();
 	}
 
 	/**

@@ -239,12 +239,19 @@ public class Cell {
 		return bel;
 	}
 
+	/**
+	 * @deprecated Use getPossibleLocations
+	 */
+	@Deprecated
 	public final List<BelId> getPossibleAnchors() {
 		return getLibCell().getPossibleAnchors();
 	}
 
-	public final List<Bel> getRequiredBels(Bel anchor) {
-		return getLibCell().getRequiredBels(anchor);
+	/**
+	 * @return the possible types of BELs this cell can be placed on.
+	 */
+	public final List<BelId> getPossibleLocations() {
+		return getLibCell().getPossibleAnchors();
 	}
 
 	/**

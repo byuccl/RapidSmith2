@@ -29,7 +29,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.byu.ece.rapidSmith.design.NetType;
-import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelId;
 
 /**
@@ -99,12 +98,6 @@ public class LibraryMacro extends LibraryCell {
 	@Override
 	public List<BelId> getPossibleAnchors() {
 		return null;
-	}
-
-	@Override
-	public List<Bel> getRequiredBels(Bel anchor) {
-		throw new UnsupportedOperationException("This functionality is not yet implemented.");
-
 	}
 
 	@Override
@@ -193,8 +186,7 @@ public class LibraryMacro extends LibraryCell {
 	 * Creates the internal cells of a macro cell instance. This function is package private
 	 * and is not for general use.  
 	 * 
-	 * @param parentName The string name of the parent macro cell. All cells that
-	 * 					are created from this function have the prefix "parentName/" 
+	 * @param parent The parent macro cell
 	 * @return A map containing the constructed cells
 	 */
 	Map<String, Cell> constructInternalCells(Cell parent) {

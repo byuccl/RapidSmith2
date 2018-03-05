@@ -1119,6 +1119,7 @@
             <pin>
               <name>CI</name>
               <possible>CYINIT</possible>
+              <possible>CIN</possible>
             </pin>
             <pin>
               <name>DI[3]</name>
@@ -1199,6 +1200,7 @@
             <pin>
               <name>CI</name>
               <possible>CYINIT</possible>
+              <possible>CIN</possible>
             </pin>
             <pin>
               <name>DI[3]</name>

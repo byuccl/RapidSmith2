@@ -115,6 +115,11 @@ public abstract class Connection implements Serializable {
 		public int hashCode() {
 			return Objects.hash(sourceWire, wc);
 		}
+
+		@Override
+		public String toString() {
+			return sourceWire + " -> " + getSinkWire();
+		}
 	}
 
 	public final static class ReverseTileWireConnection extends Connection {
@@ -200,6 +205,11 @@ public abstract class Connection implements Serializable {
 		@Override
 		public int hashCode() {
 			return Objects.hash(sourceWire, wc);
+		}
+
+		@Override
+		public String toString() {
+			return sourceWire + " <- " + getSinkWire();
 		}
 	}
 
@@ -294,6 +304,11 @@ public abstract class Connection implements Serializable {
 		public int hashCode() {
 			return Objects.hash(sourceWire, wc);
 		}
+
+		@Override
+		public String toString() {
+			return sourceWire + " -> " + getSinkWire();
+		}
 	}
 
 	public final static class ReverseSiteWireConnection extends Connection {
@@ -386,6 +401,11 @@ public abstract class Connection implements Serializable {
 		@Override
 		public int hashCode() {
 			return Objects.hash(sourceWire, wc);
+		}
+
+		@Override
+		public String toString() {
+			return sourceWire + " <- " + getSinkWire();
 		}
 	}
 
