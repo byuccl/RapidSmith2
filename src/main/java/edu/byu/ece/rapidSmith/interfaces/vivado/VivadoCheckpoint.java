@@ -31,6 +31,8 @@ import edu.byu.ece.rapidSmith.design.subsite.CellPin;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Device;
+import javafx.util.Pair;
+import org.apache.commons.lang3.tuple.MutablePair;
 
 /**
  * This class packages a TINCR checkpoint so that it can be returned to the user.
@@ -48,6 +50,7 @@ public final class VivadoCheckpoint {
 	private Collection<BelRoutethrough> routethroughObjects;
 	private Collection<Bel> staticSourceBels;
 	private Map<BelPin, CellPin> belPinToCellPinMap;
+	private Map<String, MutablePair<String, String>> staticRoutemap;
 
 	public VivadoCheckpoint(String partName, CellDesign design, Device device, CellLibrary libCells) {
 		this.partName = partName;
@@ -90,7 +93,15 @@ public final class VivadoCheckpoint {
 		this.routethroughBels = rtBels.keySet();
 		this.routethroughObjects = rtBels.values();
 	}
-	
+
+	public Map<String, MutablePair<String, String>> getStaticRoutemap() {
+		return staticRoutemap;
+	}
+
+	public void setStaticRoutemap(Map<String, MutablePair<String, String>> staticRoutemap) {
+		this.staticRoutemap = staticRoutemap;
+	}
+
 	public Collection<BelRoutethrough> getRoutethroughObjects() {
 		return routethroughObjects;
 	}

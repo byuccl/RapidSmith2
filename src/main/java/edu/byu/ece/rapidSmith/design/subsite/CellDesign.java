@@ -66,8 +66,13 @@ public class CellDesign extends AbstractDesign {
 	private ImplementationMode mode;
 	/** Map of used PIPs to their Input Values in a Site **/
 	private Map<Site, Map<String, String>> pipInValues;
+
+	// TODO: Re-think these three
 	/**Map of out-of-context ports to their ooc tile and node **/
 	private Map<String, String> oocPortMap;
+	// TODO: Merge these maps. Map of maps.
+	private Map <String, String> staticNetMap;
+	private Map <String, String> staticRoutemap;
 	
 	/**
 	 * Constructor which initializes all member data structures. Sets name and
@@ -824,4 +829,21 @@ public class CellDesign extends AbstractDesign {
 	public void setOocPortMap(Map<String, String> oocPortMap) {
 		this.oocPortMap = oocPortMap;
 	}
+
+	public Map<String, String> getStaticNetMap() {
+		return staticNetMap;
+	}
+
+	public void setStaticNetMap(Map<String, String> staticNetMap) {
+		this.staticNetMap = staticNetMap;
+	}
+
+	public Map<String, String> getStaticRoutemap() {
+		return staticRoutemap;
+	}
+
+	public void setStaticRoutemap(Map<String, String> staticRoutemap) {
+		this.staticRoutemap = staticRoutemap;
+	}
 }
+

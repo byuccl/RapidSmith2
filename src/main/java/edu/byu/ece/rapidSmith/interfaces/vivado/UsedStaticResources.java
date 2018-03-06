@@ -23,6 +23,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +36,8 @@ import edu.byu.ece.rapidSmith.device.Tile;
 import edu.byu.ece.rapidSmith.device.TileWire;
 import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.device.WireEnumerator;
+import javafx.util.Pair;
+import org.apache.commons.lang3.tuple.MutablePair;
 
 import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
 
@@ -47,6 +52,9 @@ public class UsedStaticResources {
 	private final CellDesign design;
 	private final WireEnumerator wireEnumerator;
 	private Pattern pipNamePattern;
+
+    // Map from port name to a pair of the static net name and the static portion of the route string
+	private Map<String, MutablePair<String, String>> staticRoutemap;
 
 	/**
 	 * Creates a new XdcRoutingInterface object.
@@ -83,6 +91,8 @@ public class UsedStaticResources {
 						processUsedPips(toks);
 						break;
 					case "STATIC_RT" :
+						// FIXME: Everything doesn't really need to be split by whitespace for processStaticRoutes.
+						processStaticRoutes(toks);
 						break;
 					case "VCC_SOURCES" : 
 					case "GND_SOURCES" : 
@@ -90,7 +100,9 @@ public class UsedStaticResources {
 					case "SITE_RTS":
 						// Used static sources, LUT Routethroughs, & Site Routethroughs
 						// aren't expected to be found within a PR region.
-						throw new ParseException("Unexpected Token: " + toks[0]);
+						if (toks.length > 1)
+							throw new ParseException("Unexpected Token Content: " + toks[0]);
+						break;
 					default : 
 						throw new ParseException("Unrecognized Token: " + toks[0]);
 				}
@@ -127,5 +139,44 @@ public class UsedStaticResources {
 			}
 		}	
 	}
+
+	/**
+	 *
+	 * @param toks
+	 */
+	private void processStaticRoutes(String[] toks) {
+		assert(toks.length > 3);
+		String staticRouteString = "";
+		ArrayList<String> portNames  = new ArrayList<>();
+
+		// First token (after STATIC_RT) is name of the static-net
+		String staticNetName = toks[1];
+
+		// Next tokens are the names of the associated ports
+		int i = 2;
+		while (!toks[i].equals("{")) {
+			portNames.add(toks[i]);
+			i++;
+		}
+
+		// FIXME: This is pretty unnecessary
+		for (; i < toks.length; i++) {
+			staticRouteString += toks[i] + " ";
+		}
+
+		MutablePair<String, String> netRoute = new MutablePair<>(staticNetName, staticRouteString);
+
+		if (this.staticRoutemap == null)
+			this.staticRoutemap = new HashMap<>();
+
+		for (String portName : portNames) {
+			staticRoutemap.put(portName, netRoute);
+		}
+
+	}
+
+    public Map<String, MutablePair<String, String>> getStaticRoutemap() {
+        return staticRoutemap;
+    }
 
 }
