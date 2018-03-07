@@ -346,11 +346,7 @@ public final class Zynq implements FamilyInfo {
 
         public static final SiteType SLICEL = SiteType.valueOf(FAMILY_TYPE, "SLICEL");
 
-        public static final SiteType OLOGICE3 = SiteType.valueOf(FAMILY_TYPE, "OLOGICE3");
-
-        public static final SiteType OLOGICE2 = SiteType.valueOf(FAMILY_TYPE, "OLOGICE2");
-
-        public static final SiteType OSERDESE2 = SiteType.valueOf(FAMILY_TYPE, "OSERDESE2");
+        public static final SiteType IDELAYE2 = SiteType.valueOf(FAMILY_TYPE, "IDELAYE2");
 
         public static final SiteType ILOGICE3 = SiteType.valueOf(FAMILY_TYPE, "ILOGICE3");
 
@@ -358,19 +354,23 @@ public final class Zynq implements FamilyInfo {
 
         public static final SiteType ISERDESE2 = SiteType.valueOf(FAMILY_TYPE, "ISERDESE2");
 
-        public static final SiteType IDELAYE2 = SiteType.valueOf(FAMILY_TYPE, "IDELAYE2");
+        public static final SiteType OLOGICE3 = SiteType.valueOf(FAMILY_TYPE, "OLOGICE3");
+
+        public static final SiteType OLOGICE2 = SiteType.valueOf(FAMILY_TYPE, "OLOGICE2");
+
+        public static final SiteType OSERDESE2 = SiteType.valueOf(FAMILY_TYPE, "OSERDESE2");
 
         public static final SiteType SLICEM = SiteType.valueOf(FAMILY_TYPE, "SLICEM");
+
+        public static final SiteType FIFO18E1 = SiteType.valueOf(FAMILY_TYPE, "FIFO18E1");
+
+        public static final SiteType RAMB18E1 = SiteType.valueOf(FAMILY_TYPE, "RAMB18E1");
 
         public static final SiteType RAMBFIFO36E1 = SiteType.valueOf(FAMILY_TYPE, "RAMBFIFO36E1");
 
         public static final SiteType FIFO36E1 = SiteType.valueOf(FAMILY_TYPE, "FIFO36E1");
 
         public static final SiteType RAMB36E1 = SiteType.valueOf(FAMILY_TYPE, "RAMB36E1");
-
-        public static final SiteType FIFO18E1 = SiteType.valueOf(FAMILY_TYPE, "FIFO18E1");
-
-        public static final SiteType RAMB18E1 = SiteType.valueOf(FAMILY_TYPE, "RAMB18E1");
 
         public static final SiteType BUFGCTRL = SiteType.valueOf(FAMILY_TYPE, "BUFGCTRL");
 
@@ -398,17 +398,17 @@ public final class Zynq implements FamilyInfo {
 
         public static final SiteType PS7 = SiteType.valueOf(FAMILY_TYPE, "PS7");
 
-        public static final SiteType PHASER_OUT_PHY = SiteType.valueOf(FAMILY_TYPE, "PHASER_OUT_PHY");
-
-        public static final SiteType PHASER_OUT = SiteType.valueOf(FAMILY_TYPE, "PHASER_OUT");
-
-        public static final SiteType PHASER_OUT_ADV = SiteType.valueOf(FAMILY_TYPE, "PHASER_OUT_ADV");
-
         public static final SiteType PHASER_IN_PHY = SiteType.valueOf(FAMILY_TYPE, "PHASER_IN_PHY");
 
         public static final SiteType PHASER_IN = SiteType.valueOf(FAMILY_TYPE, "PHASER_IN");
 
         public static final SiteType PHASER_IN_ADV = SiteType.valueOf(FAMILY_TYPE, "PHASER_IN_ADV");
+
+        public static final SiteType PHASER_OUT_PHY = SiteType.valueOf(FAMILY_TYPE, "PHASER_OUT_PHY");
+
+        public static final SiteType PHASER_OUT = SiteType.valueOf(FAMILY_TYPE, "PHASER_OUT");
+
+        public static final SiteType PHASER_OUT_ADV = SiteType.valueOf(FAMILY_TYPE, "PHASER_OUT_ADV");
 
         public static final SiteType PLLE2_ADV = SiteType.valueOf(FAMILY_TYPE, "PLLE2_ADV");
 
@@ -416,9 +416,9 @@ public final class Zynq implements FamilyInfo {
 
         public static final SiteType PHY_CONTROL = SiteType.valueOf(FAMILY_TYPE, "PHY_CONTROL");
 
-        public static final SiteType OUT_FIFO = SiteType.valueOf(FAMILY_TYPE, "OUT_FIFO");
-
         public static final SiteType IN_FIFO = SiteType.valueOf(FAMILY_TYPE, "IN_FIFO");
+
+        public static final SiteType OUT_FIFO = SiteType.valueOf(FAMILY_TYPE, "OUT_FIFO");
 
         public static final SiteType MMCME2_ADV = SiteType.valueOf(FAMILY_TYPE, "MMCME2_ADV");
 
@@ -430,23 +430,24 @@ public final class Zynq implements FamilyInfo {
 
         public static final SiteType EFUSE_USR = SiteType.valueOf(FAMILY_TYPE, "EFUSE_USR");
 
-        public static final SiteType USR_ACCESS = SiteType.valueOf(FAMILY_TYPE, "USR_ACCESS");
-
         public static final SiteType BSCAN = SiteType.valueOf(FAMILY_TYPE, "BSCAN");
-
-        public static final SiteType ICAP = SiteType.valueOf(FAMILY_TYPE, "ICAP");
-
-        public static final SiteType FRAME_ECC = SiteType.valueOf(FAMILY_TYPE, "FRAME_ECC");
-
-        public static final SiteType STARTUP = SiteType.valueOf(FAMILY_TYPE, "STARTUP");
 
         public static final SiteType CAPTURE = SiteType.valueOf(FAMILY_TYPE, "CAPTURE");
 
         public static final SiteType DCIRESET = SiteType.valueOf(FAMILY_TYPE, "DCIRESET");
 
+        public static final SiteType FRAME_ECC = SiteType.valueOf(FAMILY_TYPE, "FRAME_ECC");
+
+        public static final SiteType ICAP = SiteType.valueOf(FAMILY_TYPE, "ICAP");
+
+        public static final SiteType STARTUP = SiteType.valueOf(FAMILY_TYPE, "STARTUP");
+
+        public static final SiteType USR_ACCESS = SiteType.valueOf(FAMILY_TYPE, "USR_ACCESS");
+
         public static final SiteType XADC = SiteType.valueOf(FAMILY_TYPE, "XADC");
     }
 
+    /* ------ AUTO-GENERATED --- DO NOT EDIT ABOVE ------ */
     static {
         _GENERATED_FROM.add("xc7z020clg400");
         _TILE_TYPES.add(TileTypes.INT_L);
@@ -556,19 +557,19 @@ public final class Zynq implements FamilyInfo {
         _TILE_TYPES.add(TileTypes.CLK_PMV);
         _SITE_TYPES.add(SiteTypes.TIEOFF);
         _SITE_TYPES.add(SiteTypes.SLICEL);
-        _SITE_TYPES.add(SiteTypes.OLOGICE3);
-        _SITE_TYPES.add(SiteTypes.OLOGICE2);
-        _SITE_TYPES.add(SiteTypes.OSERDESE2);
+        _SITE_TYPES.add(SiteTypes.IDELAYE2);
         _SITE_TYPES.add(SiteTypes.ILOGICE3);
         _SITE_TYPES.add(SiteTypes.ILOGICE2);
         _SITE_TYPES.add(SiteTypes.ISERDESE2);
-        _SITE_TYPES.add(SiteTypes.IDELAYE2);
+        _SITE_TYPES.add(SiteTypes.OLOGICE3);
+        _SITE_TYPES.add(SiteTypes.OLOGICE2);
+        _SITE_TYPES.add(SiteTypes.OSERDESE2);
         _SITE_TYPES.add(SiteTypes.SLICEM);
+        _SITE_TYPES.add(SiteTypes.FIFO18E1);
+        _SITE_TYPES.add(SiteTypes.RAMB18E1);
         _SITE_TYPES.add(SiteTypes.RAMBFIFO36E1);
         _SITE_TYPES.add(SiteTypes.FIFO36E1);
         _SITE_TYPES.add(SiteTypes.RAMB36E1);
-        _SITE_TYPES.add(SiteTypes.FIFO18E1);
-        _SITE_TYPES.add(SiteTypes.RAMB18E1);
         _SITE_TYPES.add(SiteTypes.BUFGCTRL);
         _SITE_TYPES.add(SiteTypes.BUFG);
         _SITE_TYPES.add(SiteTypes.BUFMRCE);
@@ -582,34 +583,30 @@ public final class Zynq implements FamilyInfo {
         _SITE_TYPES.add(SiteTypes.DSP48E1);
         _SITE_TYPES.add(SiteTypes.IOPAD);
         _SITE_TYPES.add(SiteTypes.PS7);
-        _SITE_TYPES.add(SiteTypes.PHASER_OUT_PHY);
-        _SITE_TYPES.add(SiteTypes.PHASER_OUT);
-        _SITE_TYPES.add(SiteTypes.PHASER_OUT_ADV);
         _SITE_TYPES.add(SiteTypes.PHASER_IN_PHY);
         _SITE_TYPES.add(SiteTypes.PHASER_IN);
         _SITE_TYPES.add(SiteTypes.PHASER_IN_ADV);
+        _SITE_TYPES.add(SiteTypes.PHASER_OUT_PHY);
+        _SITE_TYPES.add(SiteTypes.PHASER_OUT);
+        _SITE_TYPES.add(SiteTypes.PHASER_OUT_ADV);
         _SITE_TYPES.add(SiteTypes.PLLE2_ADV);
         _SITE_TYPES.add(SiteTypes.PHASER_REF);
         _SITE_TYPES.add(SiteTypes.PHY_CONTROL);
-        _SITE_TYPES.add(SiteTypes.OUT_FIFO);
         _SITE_TYPES.add(SiteTypes.IN_FIFO);
+        _SITE_TYPES.add(SiteTypes.OUT_FIFO);
         _SITE_TYPES.add(SiteTypes.MMCME2_ADV);
         _SITE_TYPES.add(SiteTypes.PMV2);
         _SITE_TYPES.add(SiteTypes.BUFHCE);
         _SITE_TYPES.add(SiteTypes.DNA_PORT);
         _SITE_TYPES.add(SiteTypes.EFUSE_USR);
-        _SITE_TYPES.add(SiteTypes.USR_ACCESS);
         _SITE_TYPES.add(SiteTypes.BSCAN);
-        _SITE_TYPES.add(SiteTypes.ICAP);
-        _SITE_TYPES.add(SiteTypes.FRAME_ECC);
-        _SITE_TYPES.add(SiteTypes.STARTUP);
         _SITE_TYPES.add(SiteTypes.CAPTURE);
         _SITE_TYPES.add(SiteTypes.DCIRESET);
+        _SITE_TYPES.add(SiteTypes.FRAME_ECC);
+        _SITE_TYPES.add(SiteTypes.ICAP);
+        _SITE_TYPES.add(SiteTypes.STARTUP);
+        _SITE_TYPES.add(SiteTypes.USR_ACCESS);
         _SITE_TYPES.add(SiteTypes.XADC);
-    }
-
-    /* ------ AUTO-GENERATED --- DO NOT EDIT ABOVE ------ */
-    static {
     /* ------ CLASSIFICATIONS GO HERE ------ */
     }
 }

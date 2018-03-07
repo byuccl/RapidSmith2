@@ -64,7 +64,6 @@ public class CellNet implements Serializable {
 	private boolean isIntrasite;
 	/** Set to true if the net is an internal macro net*/
 	private boolean isInternal;
-
 	/** Route status of the net*/
 	private RouteStatus routeStatus;
 	
@@ -79,11 +78,11 @@ public class CellNet implements Serializable {
 	private Map<BelPin, RouteTree> belPinToSinkRTMap;
 	/** Maps a connecting SitePin of the net, to the RouteTree connected to the SitePin*/
 	private Map<SitePin, RouteTree> sitePinToRTMap;
-	
+
 	//speed up isClkNet call
 	private boolean isClkNet;
 	private boolean clkNetStatusSet = false;
-	
+
 	//speed up source pin call
 	private boolean isMultiSourcedNet;
 	private boolean multiSourceStatusSet = false;
@@ -251,7 +250,7 @@ public class CellNet implements Serializable {
 			this.isMultiSourcedNet = getAllSourcePins().size() > 1;
 			this.multiSourceStatusSet = true;
 		}
-		
+
 		return this.isMultiSourcedNet;
 	}
 
@@ -293,7 +292,7 @@ public class CellNet implements Serializable {
 		
 		pins.add(pin);
 		pin.setNet(this);
-		
+
 		if(pin.isOutpin()){
 			sourcePins.add(pin);
 		}
@@ -391,7 +390,7 @@ public class CellNet implements Serializable {
 		if(pin.isOutpin()){
 			sourcePins.remove(pin);
 		}
-		
+
 		if (sourcePin == pin) {
 			sourcePin = null;
 			List<CellPin> sourcePins = getAllSourcePins();
@@ -427,11 +426,11 @@ public class CellNet implements Serializable {
 	 * @return {@code true} if this net is a clock net
 	 */
 	public boolean isClkNet() {
-		
+
 		if(this.clkNetStatusSet){
 			return this.isClkNet;
 		}
-		
+
 		for (CellPin p : this.pins) {
 			if (p.getType() == CellPinType.CLOCK) {
 				this.isClkNet = true;
@@ -439,7 +438,7 @@ public class CellNet implements Serializable {
 		}
 		
 		this.clkNetStatusSet = true;
-		
+
 		return this.isClkNet;
 	}
 	
@@ -522,7 +521,7 @@ public class CellNet implements Serializable {
 		if (this.sourceSitePinList == null) {
 			this.sourceSitePinList = new ArrayList<SitePin>(2);
 	}
-	
+
 		// Throw an exception if the net already has two source pins
 		if (this.sourceSitePinList.size() >= 2) {
 			throw new AssertionError("CellNets should have at most two source site pins, not more. If you think this is incorrect, create a new issue "
@@ -544,12 +543,12 @@ public class CellNet implements Serializable {
 	}
 	
 	/**
-	 * Removes all source site pins from the net. 
+	 * Removes all source site pins from the net.
 	 */
 	public void removeAllSourceSitePins(){
 		this.sourceSitePinList = null;
 	}
-	
+
 	/**
 	 * Returns an unmodifiable list of {@link SitePin} objects that are
 	 * sources for the net.
@@ -834,7 +833,6 @@ public class CellNet implements Serializable {
 	 * several BelPin sinks within the Site of the SitePin.
 	 * 
 	 * @param sitePin Input (sink) SitePin
-	 * @return
 	 */
 	public RouteTree getSinkRouteTree(SitePin sitePin) {
 				
@@ -895,7 +893,7 @@ public class CellNet implements Serializable {
 	
 	/**
 	 * Returns all RouteTrees of this net that are connected to the specified CellPin.
-	 * If the CellPin only maps to one BelPin, use {@link #getSinkRouteTrees(CellPin)}  }
+	 * If the CellPin only maps to one BelPin, use {@link #getSinkRouteTree(CellPin)}
 	 * instead.
 	 * 
 	 * @param cellPin sink CellPin

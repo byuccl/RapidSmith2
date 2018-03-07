@@ -794,10 +794,10 @@
         <alternative>
           <name>OSERDESE2</name>
           <pinmaps>
-		   	<pin>
-				<name>RST</name>
-				<map>SR</map>
-			</pin>
+            <pin>
+              <name>RST</name>
+              <map>SR</map>
+            </pin>
           </pinmaps>
         </alternative>
       </alternatives>
@@ -848,10 +848,10 @@
         <alternative>
           <name>ISERDESE2</name>
           <pinmaps>
-		  	<pin>
-				<name>RST</name>
-				<map>SR</map>
-			</pin>
+            <pin>
+              <name>RST</name>
+              <map>SR</map>
+            </pin>
           </pinmaps>
         </alternative>
       </alternatives>
@@ -988,10 +988,10 @@
         <alternative>
           <name>IPAD</name>
           <pinmaps>
-			<pin>
-				<name>O</name>
-				<map>PADOUT</map>
-			</pin>
+            <pin>
+              <name>O</name>
+              <map>PADOUT</map>
+            </pin>
           </pinmaps>
         </alternative>
       </alternatives>
@@ -1054,6 +1054,10 @@
     <site_type>
       <name>IOB33M</name>
       <is_iob/>
+      <compatible_types>
+        <compatible_type>IOB33</compatible_type>
+        <compatible_type>IPAD</compatible_type>
+      </compatible_types>
       <alternatives>
         <alternative>
           <name>IOB33</name>
@@ -1063,10 +1067,10 @@
         <alternative>
           <name>IPAD</name>
           <pinmaps>
-		  	<pin>
-				<name>O</name>
-				<map>PADOUT</map>
-			</pin>
+            <pin>
+              <name>O</name>
+              <map>PADOUT</map>
+            </pin>
           </pinmaps>
         </alternative>
       </alternatives>
@@ -1132,40 +1136,40 @@
           <name>FIFO36E1</name>
           <pinmaps>
             <pin>
-			  <name>DO0</name>
-			  <map>DOADO0</map>
+              <name>DO0</name>
+              <map>DOADO0</map>
             </pin>
             <pin>
-			  <name>DO1</name>
-			  <map>DOADO1</map>
+              <name>DO1</name>
+              <map>DOADO1</map>
             </pin>
             <pin>
-			  <name>DO2</name>
-			  <map>DOADO2</map>
+              <name>DO2</name>
+              <map>DOADO2</map>
             </pin>
             <pin>
-			  <name>DO3</name>
-			  <map>DOADO3</map>
+              <name>DO3</name>
+              <map>DOADO3</map>
             </pin>
             <pin>
-			  <name>DO4</name>
-			  <map>DOADO4</map>
+              <name>DO4</name>
+              <map>DOADO4</map>
             </pin>
             <pin>
-			  <name>DO5</name>
-			  <map>DOADO5</map>
+              <name>DO5</name>
+              <map>DOADO5</map>
             </pin>
             <pin>
-			  <name>DO6</name>
-			  <map>DOADO6</map>
+              <name>DO6</name>
+              <map>DOADO6</map>
             </pin>
             <pin>
-			  <name>DO7</name>
-			  <map>DOADO7</map>
+              <name>DO7</name>
+              <map>DOADO7</map>
             </pin>
             <pin>
-			  <name>DO8</name>
-			  <map>DOADO8</map>
+              <name>DO8</name>
+              <map>DOADO8</map>
             </pin>
             <pin>
 			  <name>DO9</name>
@@ -1480,8 +1484,8 @@
 			  <map>RSTREGARSTREGU</map>
             </pin>
             <pin>
-			  <name>RDRCLKU</name>
-			  <map>REGCLKARDRCLKU</map>
+              <name>RDRCLKU</name>
+              <map>REGCLKARDRCLKU</map>
             </pin>
           </pinmaps>
         </alternative>
@@ -1953,10 +1957,10 @@
       <compatible_types>
         <compatible_type>IOB33S</compatible_type>
         <compatible_type>IOB33M</compatible_type>
-		<compatible_type>IOB33</compatible_type>
-		<compatible_type>IOB18S</compatible_type>
+        <compatible_type>IOB33</compatible_type>
+        <compatible_type>IOB18S</compatible_type>
         <compatible_type>IOB18M</compatible_type>
-		<compatible_type>IOB18</compatible_type>
+        <compatible_type>IOB18</compatible_type>
       </compatible_types>
       <alternatives>
       </alternatives>
@@ -3005,10 +3009,10 @@
         <alternative>
           <name>OSERDESE2</name>
           <pinmaps>
-		  	<pin>
-				<name>RST</name>
-				<map>SR</map>
-			</pin>
+            <pin>
+              <name>RST</name>
+              <map>SR</map>
+            </pin>
           </pinmaps>
         </alternative>
       </alternatives>
@@ -3075,12 +3079,17 @@
       </compatible_types>
       <alternatives>
         <alternative>
+          <name>ILOGICE3</name>
+          <pinmaps>
+          </pinmaps>
+        </alternative>
+        <alternative>
           <name>ISERDESE2</name>
           <pinmaps>
-		  	<pin>
-				<name>RST</name>
-				<map>SR</map>
-			</pin>
+            <pin>
+              <name>RST</name>
+              <map>SR</map>
+            </pin>
           </pinmaps>
         </alternative>
       </alternatives>
@@ -3123,6 +3132,9 @@
     </site_type>
     <site_type>
       <name>IDELAYE2_FINEDELAY</name>
+      <compatible_types>
+        <compatible_type>IDELAYE2</compatible_type>
+      </compatible_types>
       <alternatives>
         <alternative>
           <name>IDELAYE2</name>
@@ -3204,6 +3216,10 @@
     <site_type>
       <name>IOB18S</name>
       <is_iob/>
+      <compatible_types>
+        <compatible_type>IOB18</compatible_type>
+        <compatible_type>IPAD</compatible_type>
+      </compatible_types>
       <alternatives>
         <alternative>
           <name>IOB18</name>
@@ -3213,10 +3229,10 @@
         <alternative>
           <name>IPAD</name>
           <pinmaps>
-			<pin>
-				<name>O</name>
-				<map>PADOUT</map>
-			</pin>
+            <pin>
+              <name>O</name>
+              <map>PADOUT</map>
+            </pin>
           </pinmaps>
         </alternative>
       </alternatives>
@@ -3279,6 +3295,10 @@
     <site_type>
       <name>IOB18M</name>
       <is_iob/>
+      <compatible_types>
+        <compatible_type>IOB18</compatible_type>
+        <compatible_type>IPAD</compatible_type>
+      </compatible_types>
       <alternatives>
         <alternative>
           <name>IOB18</name>
@@ -3288,10 +3308,10 @@
         <alternative>
           <name>IPAD</name>
           <pinmaps>
-		  	<pin>
-				<name>O</name>
-				<map>PADOUT</map>
-			</pin>
+            <pin>
+              <name>O</name>
+              <map>PADOUT</map>
+            </pin>
           </pinmaps>
         </alternative>
       </alternatives>
@@ -3398,7 +3418,7 @@
       <name>OSERDESE2</name>
       <compatible_types>
         <compatible_type>OLOGICE3</compatible_type>
-		<compatible_type>OLOGICE2</compatible_type>
+        <compatible_type>OLOGICE2</compatible_type>
       </compatible_types>
       <bels>
         <bel>

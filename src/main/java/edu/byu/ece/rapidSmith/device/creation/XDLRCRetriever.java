@@ -20,6 +20,8 @@
 
 package edu.byu.ece.rapidSmith.device.creation;
 
+import edu.byu.ece.rapidSmith.device.xdlrc.XDLRCSource;
+
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -35,10 +37,10 @@ public interface XDLRCRetriever {
 	 *
 	 * @return the path to the created XDLRC
 	 */
-	Path getXDLRCFile() throws DeviceCreationException;
+	XDLRCSource getXDLRCSource() throws DeviceCreationException;
 
 	/**
 	 * The XDLRC file for the part is no longer needed and may be cleaned up.
 	 */
-	void cleanupXDLRCFile() throws IOException;
+	void cleanup() throws IOException;
 }

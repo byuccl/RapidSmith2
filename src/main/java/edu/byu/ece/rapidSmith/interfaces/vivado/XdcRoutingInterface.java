@@ -400,7 +400,7 @@ public class XdcRoutingInterface {
 			/*
 			// If the only wire in the route is the wire connecting to the source site pin, then the
 			// site pin is not a valid source, and so we remove it.
-			if (netRouteTree.getSinkTrees().size() == 0) {
+			if (netRouteTree.getChildren().size() == 0) {
 				pinsToRemove.add(sitePin);
 			}
 			else {
@@ -479,14 +479,14 @@ public class XdcRoutingInterface {
 					if (pipMap.getOrDefault(sourceWire.getFullName(), emptySet).contains(sinkWire.getFullName())) {
 						this.pipUsedInRoute = true;
 						connectionCount++;
-						RouteTree sinkTree = routeTree.addConnection(conn);
+						RouteTree sinkTree = routeTree.connect(conn);
 						searchQueue.add(sinkTree);
 						visited.add(sinkWire);
 					}
 				}
 				else { // if (!visited.contains(sinkWire)) {
 					connectionCount++;
-					RouteTree sinkTree = routeTree.addConnection(conn);
+					RouteTree sinkTree = routeTree.connect(conn);
 					searchQueue.add(sinkTree);
 					visited.add(sinkWire);
 				}
@@ -707,7 +707,7 @@ public class XdcRoutingInterface {
 
 		//create hashmap that shows pip used to input val
 		HashMap<String, String> pipToInputVal = new HashMap<String, String>();
-		
+
 		// Iterate over the list of used site pips, and store them in the site
 		for(int i = 2; i < toks.length; i++) {
 			String pipWireName = (namePrefix + toks[i].replace(":", "."));
@@ -740,7 +740,7 @@ public class XdcRoutingInterface {
 		
 		design.setUsedSitePipsAtSite(site, usedSitePips);
 		design.addPIPInputValsAtSite(site, pipToInputVal);
-		
+
 	}
 	
 	/**
@@ -893,7 +893,7 @@ public class XdcRoutingInterface {
 	 * 
 	 * @param intrasiteRoute {@link IntrasiteRoute} interface. See {@link IntrasiteRouteSitePinSource} and
 	 * 						{@link IntrasiteRouteBelPinSource} for more details
-	 * @param usedSiteWires
+	 * @param usedSiteWires a set to insert the used site wires into
 	 */
 	private void buildIntrasiteRoute(IntrasiteRoute intrasiteRoute, Set<Integer> usedSiteWires) {
 		
@@ -932,7 +932,7 @@ public class XdcRoutingInterface {
 					
 					// only add valid search connections to the queue
 					if (isQualifiedConnection(conn, currentWire, usedSiteWires)) {
-						RouteTree next = currentRoute.addConnection(conn);
+						RouteTree next = currentRoute.connect(conn);
 						routeQueue.add(next);
 						visitedWires.add(next.getWire());
 					}
@@ -1012,9 +1012,6 @@ public class XdcRoutingInterface {
 	/**
 	 * Compares the actual token length of a line in the routing.rsc file against the 
 	 * expected token length. If they do not agree, a {@link ParseException} is thrown.
-	 * 
-	 * @param tokenLength
-	 * @param expectedLength
 	 */
 	private void checkTokenLength(int tokenLength, int expectedLength) {
 		
@@ -1198,8 +1195,6 @@ public class XdcRoutingInterface {
 	/**
 	 * Tries to retrieve the integer enumeration of a wire name in the currently loaded device <br>
 	 * If the wire does not exist, a ParseException is thrown <br>
-	 * @param wireName
-	 * @return
 	 */
 	private int tryGetWireEnum(String wireName) {
 		
@@ -1219,7 +1214,7 @@ public class XdcRoutingInterface {
 	 * 
 	 * @param xdcOut Location to write the routing.xdc file
 	 * @param design Design with nets to export
-	 * @throws IOException
+	 * @throws IOException if the file {@code xdcOut} could not be opened
 	 */
 	public void writeRoutingXDC(String xdcOut, String oocXdcOut, CellDesign design) throws IOException {
 		
@@ -1385,13 +1380,13 @@ public class XdcRoutingInterface {
 		
 		if (net.getIntersiteRouteTreeList().size() == 1) {
 			RouteTree route = net.getIntersiteRouteTree();
-			return createVivadoRoutingString(route.getFirstSource());
+			return createVivadoRoutingString(route.getRoot());
 		}
 		
 		// otherwise we assume its a VCC or GND net, which has a special Route string
 		String routeString = "\" ";
 		for (RouteTree rt : net.getIntersiteRouteTreeList()) {
-			routeString += "( " + createVivadoRoutingString(rt.getFirstSource()) + ") ";
+			routeString += "( " + createVivadoRoutingString(rt.getRoot()) + ") ";
 		}
 
 		return routeString + "\"";
@@ -1411,7 +1406,7 @@ public class XdcRoutingInterface {
 			routeString = routeString.concat(t.getName() + "/" + currentRoute.getWire().getName() + " ");
 						
 			// children may be changed in the following loop, so make a copy
-			ArrayList<RouteTree> children = new ArrayList<RouteTree>(currentRoute.getSinkTrees());
+			ArrayList<RouteTree> children = new ArrayList<>(currentRoute.getChildren());
 			
 			if (children.size() == 0)
 				break;
@@ -1424,7 +1419,7 @@ public class XdcRoutingInterface {
 					trueChildren.add(child);
 				}
 				else { // if its a regular wire connection and we don't want to add this to the route tree					
-					children.addAll(child.getSinkTrees());
+					children.addAll(child.getChildren());
 				}
 			}
 			

@@ -37,7 +37,7 @@ import java.util.stream.Stream;
  */
 public class Tile implements Serializable {
 	/** Unique Serialization ID */
-	private static final long serialVersionUID = 4859877066322216633L;
+	private static final long serialVersionUID = -4200781031171608914L;
 	private Device dev;
 	/** XDL Name of the tile */
 	private String name;
@@ -259,30 +259,6 @@ public class Tile implements Serializable {
 	}
 
 	/**
-	 * This method adds a key/value pair to the wires HashMap.
-	 *
-	 * @param src  The wire (or key) of the HashMap to add.
-	 * @param dest The actual wire to add to the value or Wire[] in the HashMap.
-	 */
-	public void addConnection(int src, WireConnection dest) {
-		// Add the wire if it doesn't already exist
-		if (this.wireConnections.get(src) == null) {
-			WireConnection[] tmp = {dest};
-			this.wireConnections.put(src, tmp);
-		} else {
-			WireConnection[] currentConnections = this.wireConnections.get(src);
-			WireConnection[] tmp = new WireConnection[currentConnections.length + 1];
-			int i;
-			for (i = 0; i < currentConnections.length; i++) {
-				tmp[i] = currentConnections[i];
-			}
-			tmp[i] = dest;
-			Arrays.sort(tmp);
-			this.wireConnections.put(src, tmp);
-		}
-	}
-	
-	/**
 	 * Create Collection of TileWire objects for each wire in the tile.
 	 * @return Collection of TileWire objects.
 	 */
@@ -355,7 +331,7 @@ public class Tile implements Serializable {
 	public boolean hasPIP(PIP pip) {
 		return hasConnection(pip.getStartWire().getWireEnum(), pip.getEndWire().getWireEnum());
 	}
-	
+
 	/**
 	 * Set a PIP wire connection as used (or remove it from the tile)
 	 * @param pip the PIP whose corresponding connection is used
@@ -374,11 +350,11 @@ public class Tile implements Serializable {
 		pip.getEndWire().setUsed(true);
 
 	}
-	
+
 //	public void setUnavailablePIP(PIP pip) {
 //		int startWire = pip.getStartWire().getWireEnum();
 //		int endWire = pip.getEndWire().getWireEnum();
-//		
+//
 //		WireConnection[] wireConns = wireConnections.get(startWire);
 //		if (wireConns != null && wireConns.length >= 0) {
 //			for (WireConnection wc : wireConns) {
@@ -541,14 +517,12 @@ public class Tile implements Serializable {
 	}
 
 	private static class TileReplace implements Serializable {
-		private static final long serialVersionUID = 8084308269914591921L;
+		private static final long serialVersionUID = -3588973393824445640L;
 		private String name;
 		private TileType type;
 		private Site[] sites;
 		private WireHashMap wireConnections;
 		private WireHashMap reverseConnections;
-		private int[] sinks;
-		private int[] sources;
 
 		@SuppressWarnings("unused")
 		private Tile readResolve() {
@@ -577,8 +551,6 @@ public class Tile implements Serializable {
 		repl.sites = sites;
 		repl.wireConnections = wireConnections;
 		repl.reverseConnections = reverseWireConnections;
-		repl.sinks = null;
-		repl.sources = null;
 
 		return repl;
 	}

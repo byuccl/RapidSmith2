@@ -109,9 +109,6 @@ public class LutRoutethroughInserter {
 	/**
 	 * Runs the routethrough inserter. Looks for all LUT BELs in the design that are being
 	 * used as a routethrough, and inserts a LUT1 cell instead.
-	 *  
-	 * @param design CellDesign to insert routethroughs
-	 * @param libCells CellLibrary of the current part 
 	 */
 	public CellDesign execute() {
 		
@@ -144,7 +141,7 @@ public class LutRoutethroughInserter {
 	 */
 	private BelPin tryFindRoutethroughSourcePin(RouteTree route, List<CellPin> sinks ) {
 		
-		Iterator<RouteTree> rtIterator = route.getFirstSource().iterator();
+		Iterator<RouteTree> rtIterator = route.getRoot().iterator();
 		BelPin rtSource = null;
 		
 		while (rtIterator.hasNext()) {
@@ -155,7 +152,7 @@ public class LutRoutethroughInserter {
 			}
 			
 			if (current.getConnection().isRouteThrough()) {				
-				rtSource = current.getSourceTree().getConnectedBelPin();
+				rtSource = current.getParent().getConnectedBelPin();
 			}
 			else if (current.isLeaf()) {
 				BelPin bp = current.getConnectedBelPin();

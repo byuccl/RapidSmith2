@@ -111,11 +111,6 @@ public final class VivadoInterface {
 		routingInterface.parseRoutingXDC(routingFile);
 		design.setOocPortMap(routingInterface.getOocPortMap());
 
-		// Mark the used static resources
-		String resourcesFile = rscpPath.resolve("static_resources.rsc").toString();
-		UsedStaticResources staticResources = new UsedStaticResources(design, device);
-		staticResources.parseResourcesRSC(resourcesFile);
-
 		VivadoCheckpoint vivadoCheckpoint = new VivadoCheckpoint(partName, design, device, libCells);
 
 		if (storeAdditionalInfo) {
@@ -123,9 +118,11 @@ public final class VivadoInterface {
 			vivadoCheckpoint.setStaticSourceBels(routingInterface.getStaticSourceBels());
 			vivadoCheckpoint.setBelPinToCellPinMap(placementInterface.getPinMap());
 		}
-
-		// TODO: If PR-Flow
-		vivadoCheckpoint.setStaticRoutemap(staticResources.getStaticRoutemap());
+		
+		// Mark the used static resources
+		String resourcesFile = rscpPath.resolve("static_resources.rsc").toString();
+		UsedStaticResources staticResources = new UsedStaticResources(design, device);
+		staticResources.parseResourcesRSC(resourcesFile);
 
 		return vivadoCheckpoint;
 	}

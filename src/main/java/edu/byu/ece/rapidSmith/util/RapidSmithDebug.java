@@ -69,7 +69,7 @@ public final class RapidSmithDebug {
 		System.out.println("--> " + level);
 		
 		level++;
-		for(RouteTree r: rt.getSinkTrees()) {
+		for(RouteTree r: rt.getChildren()) {
 			printRouteTree(r, level);
 		}
 	}
@@ -112,7 +112,7 @@ public final class RapidSmithDebug {
 		
 		for(RouteTree rt : routeTrees) {
 
-			for (RouteTree routeTree : rt.getFirstSource()) {
+			for (RouteTree routeTree : rt.getRoot()) {
 				Wire w = routeTree.getWire();
 				cmd += w.getTile().getName() + "/" + w.getName() + " ";
 			}
