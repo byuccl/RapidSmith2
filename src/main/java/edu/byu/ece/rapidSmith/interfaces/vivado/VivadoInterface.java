@@ -117,9 +117,9 @@ public final class VivadoInterface {
 		}
 		
 		// Mark the used static resources
-		String resourcesFile = rscpPath.resolve("static_resources.rsc").toString();
-		UsedStaticResources staticResources = new UsedStaticResources(design, device);
-		staticResources.parseResourcesRSC(resourcesFile);
+		//String resourcesFile = rscpPath.resolve("static_resources.rsc").toString();
+	//	UsedStaticResources staticResources = new UsedStaticResources(design, device);
+	//	staticResources.parseResourcesRSC(resourcesFile);
 
 		return vivadoCheckpoint;
 	}
