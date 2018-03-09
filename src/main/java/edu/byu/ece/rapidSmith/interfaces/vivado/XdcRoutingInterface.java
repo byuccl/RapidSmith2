@@ -479,14 +479,14 @@ public class XdcRoutingInterface {
 					if (pipMap.getOrDefault(sourceWire.getFullName(), emptySet).contains(sinkWire.getFullName())) {
 						this.pipUsedInRoute = true;
 						connectionCount++;
-						RouteTree sinkTree = routeTree.connect(conn);
+						RouteTree sinkTree = routeTree.addConnection(conn);
 						searchQueue.add(sinkTree);
 						visited.add(sinkWire);
 					}
 				}
 				else { // if (!visited.contains(sinkWire)) {
 					connectionCount++;
-					RouteTree sinkTree = routeTree.connect(conn);
+					RouteTree sinkTree = routeTree.addConnection(conn);
 					searchQueue.add(sinkTree);
 					visited.add(sinkWire);
 				}
@@ -932,7 +932,7 @@ public class XdcRoutingInterface {
 					
 					// only add valid search connections to the queue
 					if (isQualifiedConnection(conn, currentWire, usedSiteWires)) {
-						RouteTree next = currentRoute.connect(conn);
+						RouteTree next = currentRoute.addConnection(conn);
 						routeQueue.add(next);
 						visitedWires.add(next.getWire());
 					}
@@ -1382,13 +1382,13 @@ public class XdcRoutingInterface {
 		
 		if (net.getIntersiteRouteTreeList().size() == 1) {
 			RouteTree route = net.getIntersiteRouteTree();
-			return createVivadoRoutingString(route.getRoot());
+			return createVivadoRoutingString(route.getFirstSource());
 		}
 		
 		// otherwise we assume its a VCC or GND net, which has a special Route string
 		String routeString = "\" ";
 		for (RouteTree rt : net.getIntersiteRouteTreeList()) {
-			routeString += "( " + createVivadoRoutingString(rt.getRoot()) + ") ";
+			routeString += "( " + createVivadoRoutingString(rt.getFirstSource()) + ") ";
 		}
 
 		return routeString + "\"";
@@ -1408,7 +1408,7 @@ public class XdcRoutingInterface {
 			routeString = routeString.concat(t.getName() + "/" + currentRoute.getWire().getName() + " ");
 						
 			// children may be changed in the following loop, so make a copy
-			ArrayList<RouteTree> children = new ArrayList<>(currentRoute.getChildren());
+			ArrayList<RouteTree> children = new ArrayList<RouteTree>(currentRoute.getSinkTrees());
 			
 			if (children.size() == 0)
 				break;
@@ -1421,7 +1421,7 @@ public class XdcRoutingInterface {
 					trueChildren.add(child);
 				}
 				else { // if its a regular wire connection and we don't want to add this to the route tree					
-					children.addAll(child.getChildren());
+					children.addAll(child.getSinkTrees());
 				}
 			}
 			

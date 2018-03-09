@@ -312,7 +312,7 @@ public class DotFilePrinter {
 			
 			// only print edges if the route tree has any
 			if (!tmp.isLeaf()) {
-				for (RouteTree sink : tmp.getChildren()) {
+				for (RouteTree sink : tmp.getSinkTrees()) {
 					String edgeColor = sink.getConnection().isPip() ? "red" : "black";
 					builder.append(String.format(" %d->%d [color=\"%s\"]\n", nodeIds.get(tmp), nodeIds.get(sink), edgeColor));
 					rtQueue.add(sink);

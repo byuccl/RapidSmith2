@@ -1,22 +1,22 @@
 /*
-* Copyright (c) 2016 Brigham Young University
-*
-* This file is part of the BYU RapidSmith Tools.
-*
-* BYU RapidSmith Tools is free software: you may redistribute it
-* and/or modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation, either version 3 of
-* the License, or (at your option) any later version.
-*
-* BYU RapidSmith Tools is distributed in the hope that it will be
-* useful, but WITHOUT ANY WARRANTY; without even the implied warranty
-* of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* A copy of the GNU General Public License is included with the BYU
-* RapidSmith Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
-* also get a copy of the license at <http://www.gnu.org/licenses/>.
-*/
+ * Copyright (c) 2016 Brigham Young University
+ *
+ * This file is part of the BYU RapidSmith Tools.
+ *
+ * BYU RapidSmith Tools is free software: you may redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * BYU RapidSmith Tools is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * A copy of the GNU General Public License is included with the BYU
+ * RapidSmith Tools. It can be found at doc/LICENSE.GPL3.TXT. You may
+ * also get a copy of the license at <http://www.gnu.org/licenses/>.
+ */
 
 package design.subsite;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
@@ -29,8 +29,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -110,7 +108,7 @@ class RouteTreeTest {
 	}
 
 	private static void makeDummyTile(
-		Tile dummyTile, FamilyType dummyFamilyType, SiteType dummySiteType
+			Tile dummyTile, FamilyType dummyFamilyType, SiteType dummySiteType
 	) {
 		dummyTile.setName("dummy_tile");
 		dummyTile.setType(TileType.valueOf(dummyFamilyType, "DUMMY_TILE"));
@@ -154,8 +152,8 @@ class RouteTreeTest {
 	void setUp() {
 		// each RouteTree has a unique value so that they hash differently
 		root = newDummyTree(); // unique value = 0
-		branch = root.connect(newDummyConnection(root.getWire(), 1, false)); // unique value = 1
-		leaf = branch.connect(newDummyConnection(root.getWire(), 2, true)); // unique value = 2
+		branch = root.addConnection(newDummyConnection(root.getWire(), 1, false)); // unique value = 1
+		leaf = branch.addConnection(newDummyConnection(root.getWire(), 2, true)); // unique value = 2
 	}
 
 	/**
@@ -201,9 +199,9 @@ class RouteTreeTest {
 	@DisplayName("test RouteTree method 'getFirstSource'")
 	void testGetFirstSource() {
 		// every RouteTree should return the root tree
-		assertEquals(root, root.getRoot(), "the first source tree of 'root' should be itself");
-		assertEquals(root, branch.getRoot(), "the first source tree of 'branch' should be 'root'");
-		assertEquals(root, leaf.getRoot(), "the first source tree of 'leaf' should be 'root'");
+		assertEquals(root, root.getFirstSource(), "the first source tree of 'root' should be itself");
+		assertEquals(root, branch.getFirstSource(), "the first source tree of 'branch' should be 'root'");
+		assertEquals(root, leaf.getFirstSource(), "the first source tree of 'leaf' should be 'root'");
 	}
 
 	/**
@@ -229,10 +227,10 @@ class RouteTreeTest {
 	@DisplayName("test RouteTree method 'removeConnection'")
 	void testRemoveConnection() {
 		// remove the leaf connection and verify that the branch RouteTree is now a leaf
-		branch.disconnect(leaf.getConnection());
+		branch.removeConnection(leaf.getConnection());
 		assertTrue(branch.isLeaf(), "The 'branch' should be a leaf after removing the 'leaf' RouteTree");
 		// verify that the orphaned RouteTree doesn't reference the main structure
-		assertNull(leaf.getParent(), "After removing the 'leaf', its source tree should be set to null");
+		assertNull(leaf.getSourceTree(), "After removing the 'leaf', its source tree should be set to null");
 	}
 
 	/**
@@ -247,108 +245,35 @@ class RouteTreeTest {
 		assertEquals(leaf.getConnection().getPip(), root.getAllPips().iterator().next(), "The leaf RouteTree contains the only PIP connection");
 	}
 
-	@Test
-	@DisplayName("test RouteTree method 'deepCopy' on a leaf node")
-	void testDeepCopyLeaf() {
-		Queue<RTPair> testQueue = new ArrayDeque<>();
-
-		// copy the RouteTree
-		RouteTree origRoot = leaf;
-		RouteTree copyRoot = origRoot.deepCopy();
-
-		// check that the root is copied
-		assertEquals(origRoot.getWire(), copyRoot.getWire());
-		assertFalse(copyRoot.isSourced());
-
-		// seed the queue
-		testQueue.add(new RTPair(origRoot, copyRoot));
-
-		while (!testQueue.isEmpty()) {
-			RTPair pair = testQueue.poll();
-
-			// build a map of the copied children to their parents
-			Map<Wire, RouteTree> copyChildren = pair.copy.getChildren().stream()
-				.collect(Collectors.toMap(
-					rt -> rt.getWire(), rt -> rt, (i1, i2) -> { assertNotEquals(i1, i2); return i1; }
-				));
-
-			// verify that each copy is a new object and not just a shallow reference
-			assertNotSame(pair.orig, pair.copy);
-
-			Iterator<RouteTree> main_index = pair.orig.getChildren().iterator();
-			while (main_index.hasNext()) {
-				RouteTree orig = main_index.next();
-				RouteTree copy = copyChildren.remove(orig.getWire());
-				assertNotNull(copy, () -> "No matching child with wire " + orig.getWire());
-
-				// verify that each sub-RouteTrees parent information matches the original
-				assertEquals(orig.getConnection(), copy.getConnection(), "Connection doesn't match in copied RouteTree");
-				assertSame(copy.getParent(), pair.copy);
-				assertNotSame(orig.getParent(), copy.getParent());
-
-				// queue up the children to compare
-				testQueue.add(new RTPair(orig, copy));
-			}
-			// verify that the copies have the same number of sub-RouteTrees
-			assertTrue(copyChildren.isEmpty(), "Copied RouteTree has more children");
-		}
-	}
-
+	/**
+	 * The values of a deeply copied object should be the same, but the references should be different. In the RouteTree
+	 * structure, every RouteTree needs to be copied into a new RouteTree while maintaining the Connection and Wire
+	 * values.
+	 */
 	@Test
 	@DisplayName("test RouteTree method 'deepCopy'")
-	void testDeepCopyRoot() {
-		Queue<RTPair> testQueue = new ArrayDeque<>();
-
+	void testDeepCopy() {
 		// copy the RouteTree
-		RouteTree origRoot = root;
-		RouteTree copyRoot = origRoot.deepCopy();
-
-		// check that the root is copied
-		assertEquals(origRoot.getWire(), copyRoot.getWire());
-		assertFalse(copyRoot.isSourced());
-
-		// seed the queue
-		testQueue.add(new RTPair(origRoot, copyRoot));
-
-		while (!testQueue.isEmpty()) {
-			RTPair pair = testQueue.poll();
-
-			// build a map of the copied children to their parents
-			Map<Wire, RouteTree> copyChildren = pair.copy.getChildren().stream()
-				.collect(Collectors.toMap(
-					rt -> rt.getWire(), rt -> rt, (i1, i2) -> { assertNotEquals(i1, i2); return i1; }
-				));
-
-			// verify that each copy is a new object and not just a shallow reference
-			assertNotSame(pair.orig, pair.copy);
-
-			Iterator<RouteTree> main_index = pair.orig.getChildren().iterator();
-			while (main_index.hasNext()) {
-				RouteTree orig = main_index.next();
-				RouteTree copy = copyChildren.remove(orig.getWire());
-				assertNotNull(copy, () -> "No matching child with wire " + orig.getWire());
-
-				// verify that each sub-RouteTrees parent information matches the original
-				assertEquals(orig.getConnection(), copy.getConnection(), "Connection doesn't match in copied RouteTree");
-				assertSame(copy.getParent(), pair.copy);
-				assertNotSame(orig.getParent(), copy.getParent());
-
-				// queue up the children to compare
-				testQueue.add(new RTPair(orig, copy));
-			}
-			// verify that the copies have the same number of sub-RouteTrees
-			assertTrue(copyChildren.isEmpty(), "Copied RouteTree has more children");
+		RouteTree copy = leaf.deepCopy();
+		// begin to iterate over each child RouteTree in both copies
+		Iterator<RouteTree> main_index = leaf.prefixIterator();
+		Iterator<RouteTree> copy_index = copy.prefixIterator();
+		while (main_index.hasNext() && copy_index.hasNext()) {
+			RouteTree main_next = main_index.next();
+			RouteTree copy_next = copy_index.next();
+			// verify that each sub-RouteTree matches the original
+			assertEquals(main_next.getConnection(), copy_next.getConnection(), "Connection doesn't match in copied RouteTree");
+			assertEquals(main_next.getWire(), copy_next.getWire(), "Wire doesn't match in copied RouteTree");
+			// verify that each copied RouteTree is a separate object from the original (not a shallow reference copy)
+			assertTrue(main_next != copy_next, "Copied RouteTree shouldn't have same reference");
+			if (main_next.isSourced())
+				assertTrue(main_next.getSourceTree() != copy_next.getSourceTree(), "Copied RouteTree should have different source tree");
+			else
+				assertNull(copy_next.getSourceTree(), "Copied RouteTree should have null source.");
 		}
-	}
-
-	private class RTPair {
-		RouteTree orig;
-		RouteTree copy;
-
-		RTPair(RouteTree orig, RouteTree copy) {
-			this.orig = orig;
-			this.copy = copy;
-		}
+		// verify that the copies have the same number of sub-RouteTrees
+		assertFalse(main_index.hasNext(), "Copied RouteTree has less children");
+		assertFalse(copy_index.hasNext(), "Copied RouteTree has more children");
 	}
 
 	/**
@@ -362,11 +287,11 @@ class RouteTreeTest {
 		// after pruning the RouteTree, only the root and the branch (terminal) should be left
 		boolean result = root.prune(Collections.singleton(branch));
 		assertAll(
-			() -> assertTrue(result, "Pruning should return 'true' to indicate that at least one terminal was found"),
-			() -> assertNotNull(root.getChildren(), "The root RouteTree should still have sink trees after pruning"),
-			() -> assertNotNull(branch.getChildren(), "The terminal RouteTree should still have a collection of children after pruning"),
-			() -> assertEquals(1, root.getChildren().size(), "The root RouteTree should still have a reference to the terminal RouteTree after pruning"),
-			() -> assertEquals(0, branch.getChildren().size(), "The terminal RouteTree shouldn't have any children after pruning")
+				() -> assertTrue(result, "Pruning should return 'true' to indicate that at least one terminal was found"),
+				() -> assertNotNull(root.getSinkTrees(), "The root RouteTree should still have sink trees after pruning"),
+				() -> assertNotNull(branch.getSinkTrees(), "The terminal RouteTree should still have a collection of children after pruning"),
+				() -> assertEquals(1, root.getSinkTrees().size(), "The root RouteTree should still have a reference to the terminal RouteTree after pruning"),
+				() -> assertEquals(0, branch.getSinkTrees().size(), "The terminal RouteTree shouldn't have any children after pruning")
 		);
 	}
 
@@ -375,14 +300,14 @@ class RouteTreeTest {
 	void testGetConnectedSitePin() {
 		Site site = device.getTile(0).getSite(0);
 		SitePin pin = site.getSinkPin("DUMMY_SITE_PIN");
-		RouteTree t = leaf.connect(newDummyConnection(leaf.getWire(), 4, false));
+		RouteTree t = leaf.addConnection(newDummyConnection(leaf.getWire(), 4, false));
 		assertEquals(pin, t.getConnectedSitePin());
 	}
 
 	@Test
 	@DisplayName("getConnectedSitePin is unidirectional")
 	void testGetConnectedSitePin2() {
-		RouteTree t = leaf.connect(newDummyConnection(leaf.getWire(), 5, false));
+		RouteTree t = leaf.addConnection(newDummyConnection(leaf.getWire(), 5, false));
 		assertNull(t.getConnectedSitePin());
 	}
 
@@ -391,11 +316,11 @@ class RouteTreeTest {
 	void testConnectTwoRouteTrees() {
 		RouteTree tree2 = new RouteTree(new TileWire(device.getTile(0), 5));
 		Connection c = newDummyConnection(tree2.getWire(), 0, true);
-		tree2.connect(c, root);
+		tree2.addConnection(c, root);
 		assertAll(
-			() -> assertTrue(tree2.getChildren().contains(root)),
-			() -> assertEquals(c, root.getConnection()),
-			() -> assertEquals(tree2, root.getParent())
+				() -> assertTrue(tree2.getSinkTrees().contains(root)),
+				() -> assertEquals(c, root.getConnection()),
+				() -> assertEquals(tree2, root.getSourceTree())
 		);
 	}
 
@@ -404,8 +329,8 @@ class RouteTreeTest {
 	void testSourcingAlreadySourcedTree() {
 		RouteTree tree2 = new RouteTree(new TileWire(device.getTile(0), 5));
 		Connection c = newDummyConnection(tree2.getWire(), 1, true);
-		assertThrows(IllegalStateException.class,
-			() -> tree2.connect(c, branch));
+		assertThrows(DesignAssemblyException.class,
+				() -> tree2.addConnection(c, branch));
 	}
 
 	@Test
@@ -414,16 +339,16 @@ class RouteTreeTest {
 		RouteTree tree2 = new RouteTree(new TileWire(device.getTile(0), 5));
 		Connection c = newDummyConnection(tree2.getWire(), 1, true);
 		assertThrows(DesignAssemblyException.class,
-			() -> tree2.connect(c, leaf));
+				() -> tree2.addConnection(c, leaf));
 	}
 
 	@Test
-	@DisplayName("test preorder iterator")
-	void testPreorderIterator() {
+	@DisplayName("test prefix iterator")
+	void testPrefixIterator() {
 		// adds an extra branch to the tree
 		Connection c = newDummyConnection(root.getWire(), 4, false);
-		RouteTree branch2 = root.connect(c);
-		Iterator<RouteTree> it = root.preorderIterator();
+		RouteTree branch2 = root.addConnection(c);
+		Iterator<RouteTree> it = root.prefixIterator();
 		assertTrue(it.hasNext());
 		assertEquals(root, it.next());
 
@@ -447,9 +372,9 @@ class RouteTreeTest {
 		// just to make variables "effectively final"
 		boolean b1f = b1, b2f = b2, lvf = lv;
 		assertAll(
-			() -> assertTrue(b1f, "branch not visited"),
-			() -> assertTrue(b2f, "branch2 not visited"),
-			() -> assertTrue(lvf, "leaf not visited")
+				() -> assertTrue(b1f, "branch not visited"),
+				() -> assertTrue(b2f, "branch2 not visited"),
+				() -> assertTrue(lvf, "leaf not visited")
 		);
 	}
 
@@ -458,7 +383,7 @@ class RouteTreeTest {
 	void testIterator() {
 		// adds an extra branch to the tree
 		Connection c = newDummyConnection(root.getWire(), 4, false);
-		RouteTree branch2 = root.connect(c);
+		RouteTree branch2 = root.addConnection(c);
 
 		Set<RouteTree> nodes = new HashSet<>();
 		for (RouteTree aRoot : root)
@@ -478,7 +403,7 @@ class RouteTreeTest {
 	void testIteratorMiddle() {
 		// adds an extra branch to the tree
 		Connection c = newDummyConnection(root.getWire(), 4, false);
-		root.connect(c);
+		root.addConnection(c);
 
 		Set<RouteTree> nodes = new HashSet<>();
 		for (RouteTree aBranch : branch)
@@ -492,11 +417,11 @@ class RouteTreeTest {
 	}
 
 	@Test
-	@DisplayName("tests preorder iterator does not include sources method")
-	void testPreorderIteratorMiddle() {
+	@DisplayName("tests iterator does not include sources method")
+	void testPrefixIteratorMiddle() {
 		// adds an extra branch to the tree
 		Connection c = newDummyConnection(root.getWire(), 4, false);
-		root.connect(c);
+		root.addConnection(c);
 
 		List<RouteTree> nodes = new ArrayList<>();
 		for (RouteTree aBranch : branch)

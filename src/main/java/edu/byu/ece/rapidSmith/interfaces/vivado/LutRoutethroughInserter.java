@@ -141,7 +141,7 @@ public class LutRoutethroughInserter {
 	 */
 	private BelPin tryFindRoutethroughSourcePin(RouteTree route, List<CellPin> sinks ) {
 		
-		Iterator<RouteTree> rtIterator = route.getRoot().iterator();
+		Iterator<RouteTree> rtIterator = route.getFirstSource().iterator();
 		BelPin rtSource = null;
 		
 		while (rtIterator.hasNext()) {
@@ -152,7 +152,7 @@ public class LutRoutethroughInserter {
 			}
 			
 			if (current.getConnection().isRouteThrough()) {				
-				rtSource = current.getParent().getConnectedBelPin();
+				rtSource = current.getSourceTree().getConnectedBelPin();
 			}
 			else if (current.isLeaf()) {
 				BelPin bp = current.getConnectedBelPin();
