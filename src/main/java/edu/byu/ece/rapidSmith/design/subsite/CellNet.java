@@ -30,6 +30,7 @@ import edu.byu.ece.rapidSmith.util.Exceptions;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *  Represents a net in a cell design.  Cell nets connect to pins on cells.
@@ -194,6 +195,17 @@ public class CellNet implements Serializable {
 	 */
 	public Collection<CellPin> getPins() {
 		return pins;
+	}
+
+	/**
+	 * Returns the pseudo pins of the net. This structure should not be modified by the user.
+	 *
+	 * @return pseudo pins of this net
+	 */
+	public Collection<CellPin> getPseudoPins() {
+		return getPins().stream()
+				.filter(CellPin::isPseudoPin)
+				.collect(Collectors.toList());
 	}
 
 	/**

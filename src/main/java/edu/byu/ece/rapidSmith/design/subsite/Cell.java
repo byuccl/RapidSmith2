@@ -163,6 +163,10 @@ public class Cell {
 	public final LibraryCell getLibCell() {
 		return libCell;
 	}
+
+	public final List<Bel> getRequiredBels(Bel anchor) {
+		return getLibCell().getRequiredBels(anchor);
+	}
 	
 	/**
 	 * Returns the type of cell this is (i.e LUT6)

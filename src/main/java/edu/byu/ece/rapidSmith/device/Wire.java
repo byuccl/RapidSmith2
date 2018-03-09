@@ -78,6 +78,13 @@ public interface Wire extends Serializable {
 	BelPin getTerminal();
 
 	/**
+	 * Returns the terminals (BelPins) this wire drives.
+	 */
+	@Deprecated
+	Collection<Connection> getTerminals();
+
+
+	/**
 	 * Returns connection linking this wire to its drivers in the same hierarchy.
 	 */
 	Collection<Connection> getReverseWireConnections();

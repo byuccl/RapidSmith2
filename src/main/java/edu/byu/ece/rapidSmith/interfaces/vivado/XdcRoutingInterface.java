@@ -1269,6 +1269,7 @@ public class XdcRoutingInterface {
 				//System.out.println("Port name = " + net.getSourcePin().getCell().getName());
 
 				// Find the matching static net from the static-only design
+				System.out.println("PortName: " + portName);
 				MutablePair<String, String> netRoutePair = staticRoutemap.get(portName);
 				//String staticNetName = netRoutePair.getKey();
 
@@ -1305,7 +1306,7 @@ public class XdcRoutingInterface {
 
 				// Merge the static and RM portions of the route
 				String partPinNode = oocPortMap.get(portName);
-				System.out.println("portName: " + portName);
+				//System.out.println("portName: " + portName);
 				assert(partPinNode != null);
 				String mergedRoute = mergePartialStaticRoute(netRoutePair.getValue(), partialRoute, partPinNode);
 
@@ -1315,8 +1316,9 @@ public class XdcRoutingInterface {
 			}
 
 			// Write the merged routing strings to the ooc routing xdc file
-            // TODO: Don't print the same routes twice (this happens when more than one key maps to the same value)
-			for (MutablePair<String, String> netRoutePair : staticRoutemap.values()) {
+			Set<MutablePair<String, String>> mergedRouteSet = new HashSet<>(staticRoutemap.values());
+
+			for (MutablePair<String, String> netRoutePair : mergedRouteSet) {
 				oocFileOut.write(String.format("set_property ROUTE %s [get_nets {%s}]\n", netRoutePair.getValue(), netRoutePair.getKey()));
 			}
 

@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 
 /**
@@ -51,6 +52,16 @@ public class SiteWire implements Wire, Serializable {
 		this.site = site;
 		this.siteType = siteType;
 		this.wire = wire;
+	}
+
+
+	@Override
+	public Collection<Connection> getTerminals() {
+		BelPin pin = getTerminal();
+		if (pin == null)
+			return emptyList();
+		Connection c = new Connection.Terminal(pin);
+		return singleton(c);
 	}
 
 	@Override
@@ -114,7 +125,7 @@ public class SiteWire implements Wire, Serializable {
 	public Collection<Connection> getWireConnections() {
 		WireConnection[] wireConnections = site.getWireConnections(siteType, wire);
 		if (wireConnections == null)
-			return Collections.emptyList();
+			return emptyList();
 
 		return Arrays.stream(wireConnections)
 				.map(wc -> new SiteWireConnection(this, wc))
@@ -150,7 +161,7 @@ public class SiteWire implements Wire, Serializable {
 	public Collection<Connection> getReverseWireConnections() {
 		WireConnection[] wireConnections = site.getReverseConnections(siteType, wire);
 		if (wireConnections == null)
-			return Collections.emptyList();
+			return emptyList();
 
 		return Arrays.stream(wireConnections)
 				.map(wc -> new ReverseSiteWireConnection(this, wc))

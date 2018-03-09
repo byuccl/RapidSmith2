@@ -29,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.byu.ece.rapidSmith.design.NetType;
+import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelId;
 
 /**
@@ -63,6 +64,11 @@ public class LibraryMacro extends LibraryCell {
 		pinMap = new HashMap<>();
 		internalToExternalPinMap = new HashMap<>();
 		internalCells = new ArrayList<>();
+	}
+
+	@Override
+	public List<Bel> getRequiredBels(Bel anchor) {
+				throw new UnsupportedOperationException("This functionality is not yet implemented.");
 	}
 
 	@Override

@@ -53,7 +53,7 @@ public class UsedStaticResources {
 	private final WireEnumerator wireEnumerator;
 	private Pattern pipNamePattern;
 
-    // Map from port name to a pair of the static net name and the static portion of the route string
+    // Map from port name(s) to a pair of the static net name and the static portion of the route string
 	private Map<String, MutablePair<String, String>> staticRoutemap;
 
 	/**

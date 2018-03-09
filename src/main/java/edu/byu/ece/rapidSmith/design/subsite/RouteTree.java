@@ -32,6 +32,7 @@ import java.util.*;
 public class RouteTree extends AbstractRouteTree<RouteTree> {
 	private RouteTree parent;
 	private Connection connection;
+	private int cost; // for routers
 
 	/**
 	 * Creates a new unsourced route tree.
@@ -39,6 +40,19 @@ public class RouteTree extends AbstractRouteTree<RouteTree> {
 	 */
 	public RouteTree(Wire wire) {
 		super(wire);
+	}
+
+	@Deprecated
+	public int getCost() {
+		return cost;
+	}
+
+	@Deprecated
+	public void setCost(int cost) {
+		if(cost < 0){
+			cost = Integer.MAX_VALUE;
+		}
+		this.cost = cost;
 	}
 
 	@Override

@@ -239,5 +239,14 @@ public abstract class LibraryCell implements Serializable {
 	 * @param anchor {@link Bel}
 	 */
 	abstract public Map<String, SiteProperty> getSharedSiteProperties(BelId anchor);
+
+
+		/**
+	 	 * For macro cells, returns a list of required bel object that are
+	 	 * needed to place the macro. This functionality is currently unimplemented
+	 	 * and should not be used.
+	 	 * @param anchor Anchor {@link Bel} for the macro
+	 	 */
+			abstract public List<Bel> getRequiredBels(Bel anchor);
 		
 }
