@@ -80,14 +80,14 @@ public final class XdcConstraint {
 	public class XdcConstraintPackagePin {
 		
 		private String pinName;
-		private String netName;
+		private String portName;
 
 		XdcConstraintPackagePin() {
 			Matcher matcher = patternPinPackage.matcher(XdcConstraint.this.toString().trim());
 			
 			assert matcher.find();
 			pinName = matcher.group(1);
-			netName = matcher.group(2);
+            portName = matcher.group(2);
 		}
 		
 		/**
@@ -101,7 +101,7 @@ public final class XdcConstraint {
 		 * @return The name of the port that is constrained to a pin.
 		 */
 		public String getPortName() {
-			return netName;
+			return portName;
 		}
 	}
 }

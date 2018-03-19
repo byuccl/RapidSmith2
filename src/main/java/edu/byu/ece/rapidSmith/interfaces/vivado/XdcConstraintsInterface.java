@@ -87,7 +87,6 @@ public class XdcConstraintsInterface {
         line = line.trim();
         line = line.replaceAll("[;]", "");
 
-
         int getPortsIndex = line.lastIndexOf("[get_ports");
         if (getPortsIndex != -1) {
             // Remove curly braces from [get_ports ... ] suffix
@@ -105,22 +104,17 @@ public class XdcConstraintsInterface {
                     String options = splitLine.substring(index + 1);
                     design.addVivadoConstraint(new XdcConstraint(command, options));
                 }
+                return;
             }
-            else {
-                // assuming a space after the command TODO: make sure this assumption is correct
-                int index = line.indexOf(" ");
-                String command = line.substring(0, index);
-                String options = line.substring(index + 1);
-                design.addVivadoConstraint(new XdcConstraint(command, options));
-            }
+
         }
-        else {
-            // Not a constraint that ends in "[get_ports ... ]
-            int index = line.indexOf(" ");
-            String command = line.substring(0, index);
-            String options = line.substring(index + 1);
-            design.addVivadoConstraint(new XdcConstraint(command, options));
-        }
+
+        // assuming a space after the command TODO: make sure this assumption is correct
+        int index = line.indexOf(" ");
+        String command = line.substring(0, index);
+        String options = line.substring(index + 1);
+        design.addVivadoConstraint(new XdcConstraint(command, options));
+
 	}
 
 	/**
