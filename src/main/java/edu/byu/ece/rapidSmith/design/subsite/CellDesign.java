@@ -806,6 +806,35 @@ public class CellDesign extends AbstractDesign {
 		}
 		vivadoConstraints.add(constraint);
 	}
+
+	/**
+	 * Creates a map from port cells to the site the cell is constrained to be placed on.
+	 * @return the map from port cells to their sites
+	 */
+	public Map<Cell, Site> getPortConstraintMap() {
+		Map<Cell, Site> portConstraintMap = new HashMap<>();
+
+		for (XdcConstraint constraint : vivadoConstraints) {
+			if (constraint.getPinPackageConstraint() == null)
+				continue;
+
+			String portName = constraint.getPinPackageConstraint().getPortName();
+			String siteName = constraint.getPinPackageConstraint().getPinName();
+
+			// Get the port cell
+			Cell portCell = this.getCell(portName);
+			assert(portCell.isPort());
+
+			// Get the package pin's site
+			Site site = device.getSite(siteName);
+			assert(site != null);
+
+			// Add to the port map
+			portConstraintMap.put(portCell, site);
+		}
+
+		return portConstraintMap;
+	}
 	
 	/**
 	 * Creates and returns a deep copy of the current CellDesign.

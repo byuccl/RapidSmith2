@@ -91,16 +91,16 @@ public final class XdcConstraint {
 		}
 		
 		/**
-		 * @return The name of the pin that the net is constrainted to (eg. D7)
+		 * @return The name of the pin that the net is constrained to (eg. D7)
 		 */
 		public String getPinName() {
 			return pinName;
 		}
 		
 		/**
-		 * @return The name of the net that is constrained to a pin.
+		 * @return The name of the port that is constrained to a pin.
 		 */
-		public String getNetName() {
+		public String getPortName() {
 			return netName;
 		}
 	}
