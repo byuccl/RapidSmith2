@@ -174,6 +174,7 @@ class CompressedXDLRC implements Serializable {
 		switch (value) {
 			case "input": return 0;
 			case "output": return 1;
+			case "bidir": return 2;
 		}
 		throw new IllegalArgumentException("Invalid direction " + value);
 	}
@@ -182,6 +183,7 @@ class CompressedXDLRC implements Serializable {
 		switch (value) {
 			case 0: return "input";
 			case 1: return "output";
+			case 2: return "bidir";
 		}
 		throw new IllegalArgumentException("Invalid direction " + value);
 	}
