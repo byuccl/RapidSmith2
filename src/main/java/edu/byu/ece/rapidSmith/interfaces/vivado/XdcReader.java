@@ -23,7 +23,7 @@ public class XdcReader {
 			throw new FileNotFoundException("XDC file path does not exist (" + filePath + ")");
 		}
 
-		ArrayList<XdcConstraint> constraints = new ArrayList<XdcConstraint>();
+		ArrayList<XdcConstraint> constraints = new ArrayList<>();
 
 		BufferedReader reader = new BufferedReader(new FileReader(filePath));
 

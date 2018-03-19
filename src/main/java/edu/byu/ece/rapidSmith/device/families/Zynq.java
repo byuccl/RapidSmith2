@@ -447,7 +447,6 @@ public final class Zynq implements FamilyInfo {
         public static final SiteType XADC = SiteType.valueOf(FAMILY_TYPE, "XADC");
     }
 
-    /* ------ AUTO-GENERATED --- DO NOT EDIT ABOVE ------ */
     static {
         _GENERATED_FROM.add("xc7z020clg400");
         _TILE_TYPES.add(TileTypes.INT_L);
@@ -607,6 +606,40 @@ public final class Zynq implements FamilyInfo {
         _SITE_TYPES.add(SiteTypes.STARTUP);
         _SITE_TYPES.add(SiteTypes.USR_ACCESS);
         _SITE_TYPES.add(SiteTypes.XADC);
-    /* ------ CLASSIFICATIONS GO HERE ------ */
+    }
+
+    /* ------ AUTO-GENERATED --- DO NOT EDIT ABOVE ------ */
+    static {
+        /* ------ CLASSIFICATIONS GO HERE ------ */
+        _CLB_TILES.add(TileTypes.CLBLL_L);
+        _CLB_TILES.add(TileTypes.CLBLL_R);
+        _CLB_TILES.add(TileTypes.CLBLM_L);
+        _CLB_TILES.add(TileTypes.CLBLM_R);
+        _SWITCHBOX_TILES.add(TileTypes.INT_L);
+        _SWITCHBOX_TILES.add(TileTypes.INT_R);
+        _BRAM_TILES.add(TileTypes.BRAM_L);
+        _BRAM_TILES.add(TileTypes.BRAM_R);
+        _DSP_TILES.add(TileTypes.DSP_L);
+        _DSP_TILES.add(TileTypes.DSP_R);
+        _IO_TILES.add(TileTypes.LIOB33_SING);
+        _IO_TILES.add(TileTypes.LIOB33);
+        _IO_TILES.add(TileTypes.RIOB33);
+        _IO_TILES.add(TileTypes.RIOB33_SING);
+        _SLICE_SITES.add(SiteTypes.SLICEL);
+        _SLICE_SITES.add(SiteTypes.SLICEM);
+        _BRAM_SITES.add(SiteTypes.RAMB18E1);
+        _BRAM_SITES.add(SiteTypes.RAMB36E1);
+        _BRAM_SITES.add(SiteTypes.RAMBFIFO36E1);
+        _FIFO_SITES.add(SiteTypes.FIFO18E1);
+        _FIFO_SITES.add(SiteTypes.FIFO36E1);
+        _FIFO_SITES.add(SiteTypes.IN_FIFO);
+        _FIFO_SITES.add(SiteTypes.OUT_FIFO);
+        _FIFO_SITES.add(SiteTypes.RAMBFIFO36E1);
+        _DSP_SITES.add(SiteTypes.DSP48E1);
+        _IO_SITES.add(SiteTypes.IOB33);
+        _IO_SITES.add(SiteTypes.IOB33S);
+        _IO_SITES.add(SiteTypes.IOB33M);
+        _IO_SITES.add(SiteTypes.IPAD);
+        _IO_SITES.add(SiteTypes.IOPAD);
     }
 }

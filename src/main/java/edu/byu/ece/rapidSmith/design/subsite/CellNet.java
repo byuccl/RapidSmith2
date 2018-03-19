@@ -21,10 +21,7 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.design.NetType;
-import edu.byu.ece.rapidSmith.device.PIP;
-import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.PinDirection;
-import edu.byu.ece.rapidSmith.device.SitePin;
+import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
 import java.io.Serializable;
@@ -561,6 +558,19 @@ public class CellNet implements Serializable {
 		this.sourceSitePinList = null;
 	}
 
+
+	public void removeAllIntersiteSinkPins() {
+		Site sourceSite = sourcePin.getCell().getSite();
+
+		for (CellPin sink : getSinkPins()) {
+			Site sinkSite = sink.getCell().getSite();
+			if (sinkSite != null && !sinkSite.equals(sourceSite)){
+				removeRoutedSink(sink);
+			}
+		}
+
+	}
+
 	/**
 	 * Returns an unmodifiable list of {@link SitePin} objects that are
 	 * sources for the net.
@@ -721,6 +731,7 @@ public class CellNet implements Serializable {
 
 	public void unrouteIntersite() {
 		intersiteRoutes = null;
+		//removeAllIntersiteSinkPins();
 		computeRouteStatus();
 	}
 	

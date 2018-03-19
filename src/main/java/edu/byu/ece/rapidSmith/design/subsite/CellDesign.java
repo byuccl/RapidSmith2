@@ -202,8 +202,15 @@ public class CellDesign extends AbstractDesign {
 	public Stream<Cell> getLeafCells() {
 		return cellMap.values().stream().flatMap(c -> _flatten(c));
 	}
-	
-	/**
+
+
+	public Stream<Cell> getUnplacedCells() {
+		return (cellMap.values().stream().flatMap(c -> _flatten(c))).filter(it -> !it.isPlaced());
+
+	}
+
+
+    /**
 	 * Returns a list of only the internal cells of the specified cell. If the input
 	 * cell is not a macro, then a singleton list is returned. The lists are converted to
 	 * streams before returning.
