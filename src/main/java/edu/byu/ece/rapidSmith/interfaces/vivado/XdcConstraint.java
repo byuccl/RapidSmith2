@@ -33,23 +33,18 @@ public final class XdcConstraint {
 
 	private final String command;
 	private final String options;
-	
-	XdcConstraintPinPackage constraintPinPackage = null;
-		
-	private static final Pattern patternPinPackage = Pattern.compile("\\s*set_property\\s+PACKAGE_PIN\\s+(\\w+)\\s+\\[\\s*get_ports\\s+(.*?)\\s*\\]\\s*;?$"); 
-	
+	private XdcConstraintPackagePin constraintPackagePin;
+	private static final Pattern patternPinPackage = Pattern.compile("\\s*set_property\\s+PACKAGE_PIN\\s+(\\w+)\\s+\\[\\s*get_ports\\s+(.*?)\\s*\\]\\s*;?$");
 	
 	public XdcConstraint(String command, String options){
 		this.command = command;
 		this.options = options;
-		
+
+		// Set the package pin if this constraint includes one.
 		String str = toString().trim();
-		
-		// Pin Package?
 		Matcher matcher = patternPinPackage.matcher(str);
 		if (matcher.find()) {
-			constraintPinPackage = new XdcConstraintPinPackage();
-			return;
+			constraintPackagePin = new XdcConstraintPackagePin();
 		}
 	}
 	
@@ -78,16 +73,16 @@ public final class XdcConstraint {
 	/**
 	 * @return The XDC pin package constraint instance
 	 */
-	public XdcConstraintPinPackage getPinPackageConstraint() {
-		return constraintPinPackage;		
+	public XdcConstraintPackagePin getPinPackageConstraint() {
+		return constraintPackagePin;
 	}
 	
-	public class XdcConstraintPinPackage {
+	public class XdcConstraintPackagePin {
 		
 		private String pinName;
 		private String netName;
-		
-		XdcConstraintPinPackage() {
+
+		XdcConstraintPackagePin() {
 			Matcher matcher = patternPinPackage.matcher(XdcConstraint.this.toString().trim());
 			
 			assert matcher.find();
@@ -103,7 +98,7 @@ public final class XdcConstraint {
 		}
 		
 		/**
-		 * @return The name of the net that is constrainted to a pin.
+		 * @return The name of the net that is constrained to a pin.
 		 */
 		public String getNetName() {
 			return netName;

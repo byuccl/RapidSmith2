@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 
 public class XdcReader {
-	
+	private CellDesign design;
 	
 	/**
 	 * @param filePath Path of XDC file to read constraints from
@@ -23,11 +23,11 @@ public class XdcReader {
 			throw new FileNotFoundException("XDC file path does not exist (" + filePath + ")");
 		}
 
-		ArrayList<XdcConstraint> constraints = new ArrayList<XdcConstraint>();
+		ArrayList<XdcConstraint> constraints = new ArrayList<>();
 
 		BufferedReader reader = new BufferedReader(new FileReader(filePath));
 
-		String line = null;
+		String line;
 		while ((line = reader.readLine()) != null) {
 			XdcConstraint constraint = parseLine(line);
 			if (constraint != null)
@@ -40,7 +40,7 @@ public class XdcReader {
 
 	}
 
-	private CellDesign design;
+
 
 	public XdcReader(CellDesign design) {
 		assert design != null;

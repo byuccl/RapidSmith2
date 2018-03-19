@@ -96,8 +96,10 @@ public final class VivadoInterface {
 		design.setImplementationMode(mode);
 		
 		// parse the constraints into RapidSmith
-		parseConstraintsXDC(design, rscpPath.resolve("constraints.xdc").toString());
-		
+		String constraintsFile = rscpPath.resolve("constraints.xdc").toString();
+		XdcConstraintsInterface constraintsInterface = new XdcConstraintsInterface(design, device);
+		constraintsInterface.parseConstraintsXDC(constraintsFile);
+
 		// re-create the placement and routing information
 		String placementFile = rscpPath.resolve("placement.rsc").toString();
 		XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device);
@@ -117,42 +119,7 @@ public final class VivadoInterface {
 		
 		return vivadoCheckpoint;
 	}
-	
-	/**
-	 * Loads Vivado constraints into the specified {@link CellDesign}. For now, these constraints are
-	 * loaded as two strings, a command and a list of arguments. There is no attempt right now to 
-	 * intelligently handle these constraints, and they are included so the user has access to them.
-	 * TODO: Update how we handle constraints files to make them easier to move
-	 * 
-	 * @param design {@link CellDesign}  
-	 * @param constraintPath File location of the constraints file. Typically rscpDirectory/constraints.rsc is the constraints file.
-	 */
-	private static void parseConstraintsXDC(CellDesign design, String constraintPath) {
-				
-		try (BufferedReader br = new BufferedReader(new FileReader(constraintPath))) {
-			
-			String line = null;
-			// add the design constraints to the design
-			while ((line = br.readLine()) != null) {
-				
-				String trimmed = line.trim();
-				
-				// Skip commented lines
-				if (trimmed.startsWith("#") || trimmed.length() < 1)
-					continue;
-				
-				// assuming a space after the command TODO: make sure this assumption is correct
-				int index = trimmed.indexOf(" ");
-				String command = trimmed.substring(0, index);
-				String options = trimmed.substring(index + 1);
-				design.addVivadoConstraint(new XdcConstraint(command, options));
-			}
-			
-		} catch (IOException e) {
-			throw new Exceptions.ParseException(e);
-		}
-	}
-		
+
 	/**
 	 * Export the RapidSmith2 design into an existing TINCR checkpoint file. 
 	 *   
