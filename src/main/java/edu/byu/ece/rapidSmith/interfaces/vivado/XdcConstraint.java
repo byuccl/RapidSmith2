@@ -20,6 +20,9 @@
 
 package edu.byu.ece.rapidSmith.interfaces.vivado;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * This class holds design constraints found in the constraints.xdc file.
  * TODO: Make these constraints easier to work with
@@ -31,9 +34,23 @@ public final class XdcConstraint {
 	private final String command;
 	private final String options;
 	
+	XdcConstraintPinPackage constraintPinPackage = null;
+		
+	private static final Pattern patternPinPackage = Pattern.compile("\\s*set_property\\s+PACKAGE_PIN\\s+(\\w+)\\s+\\[\\s*get_ports\\s+(.*?)\\s*\\]\\s*;?$"); 
+	
+	
 	public XdcConstraint(String command, String options){
 		this.command = command;
 		this.options = options;
+		
+		String str = toString().trim();
+		
+		// Pin Package?
+		Matcher matcher = patternPinPackage.matcher(str);
+		if (matcher.find()) {
+			constraintPinPackage = new XdcConstraintPinPackage();
+			return;
+		}
 	}
 	
 	/**
@@ -56,5 +73,40 @@ public final class XdcConstraint {
 	@Override
 	public String toString(){
 		return command + " " + options;
+	}
+	
+	/**
+	 * @return The XDC pin package constraint instance
+	 */
+	public XdcConstraintPinPackage getPinPackageConstraint() {
+		return constraintPinPackage;		
+	}
+	
+	public class XdcConstraintPinPackage {
+		
+		private String pinName;
+		private String netName;
+		
+		XdcConstraintPinPackage() {
+			Matcher matcher = patternPinPackage.matcher(XdcConstraint.this.toString().trim());
+			
+			assert matcher.find();
+			pinName = matcher.group(1);
+			netName = matcher.group(2);
+		}
+		
+		/**
+		 * @return The name of the pin that the net is constrainted to (eg. D7)
+		 */
+		public String getPinName() {
+			return pinName;
+		}
+		
+		/**
+		 * @return The name of the net that is constrainted to a pin.
+		 */
+		public String getNetName() {
+			return netName;
+		}
 	}
 }
