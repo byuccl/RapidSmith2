@@ -45,80 +45,23 @@ public class XdcConstraintsInterface {
 	}
 
     /**
-     * Splits an XDC constraint that includes a dictionary from a single command to multiple properties
-     * into individual XDC constraints that include only one command and one property.
-     * Example 1: set_property -dict "name1 value1 ... nameN valueN" [get_ports {portName}]
-     * Example 2: set_property -dict {name1 value1 ... nameN valueN} [get_ports {portName}]
-     * @param line the constraint line to split
-     * @return a list of the individual constraint strings
-     */
-    private ArrayList<String> splitDictConstraints(String line) {
-        int prefixEndIndex = line.lastIndexOf("-dict") + 5;
-
-        // TODO: Make this work with constraints other than get_ports.
-        int suffixBeginIndex = line.lastIndexOf("[get_ports");
-        String suffix = line.substring(suffixBeginIndex, line.length());
-        String prefix = line.substring(0, line.lastIndexOf("-dict"));
-
-        // Split up the individual properties
-        String properties = line.substring(prefixEndIndex, suffixBeginIndex);
-        properties = properties.replaceAll("[{}]", "");
-        properties = properties.trim();
-
-        ArrayList<String> splitConstraints = new ArrayList<>();
-        String[] splitProps = properties.split("\\s+");
-
-        for (int i = 0; i < splitProps.length - 1; i+=2)
-        {
-            splitConstraints.add(prefix + splitProps[i] + " " + splitProps[i+1] + " " + suffix);
-        }
-
-        return splitConstraints;
-    }
-
-    /**
      * Parses a single line from constraints.xdc, makes an XdcConstraint, and adds it to the design.
      * @param line the constraint line to parse
      */
 	private void parseConstraintsLine(String line) {
-        // Remove same line comments
-        int commentIndex = line.indexOf("#");
-        line = (commentIndex != -1) ? line.substring(0, commentIndex) : line;
-        line = line.trim();
-        line = line.replaceAll("[;]", "");
-
-        int getPortsIndex = line.lastIndexOf("[get_ports");
-        if (getPortsIndex != -1) {
-            // Remove curly braces from [get_ports ... ] suffix
-            String suffix = line.substring(getPortsIndex, line.length());
-            suffix = suffix.replaceAll("[{}]", "");
-            line = line.substring(0, line.lastIndexOf("[get_ports") - 1) + " " + suffix;
-
-            if (line.matches("(.*)(-dict)(.*)")) {
-                // Split up dict constraints into individual constraints for ease of use
-                ArrayList<String> splitLines = splitDictConstraints(line);
-
-                for (String splitLine : splitLines) {
-                    int index = splitLine.indexOf(" ");
-                    String command = splitLine.substring(0, index);
-                    String options = splitLine.substring(index + 1);
-                    design.addVivadoConstraint(new XdcConstraint(command, options));
-                }
-                return;
-            }
-        }
-
-        // assuming a space after the command TODO: make sure this assumption is correct
-        int index = line.indexOf(" ");
-        String command = line.substring(0, index);
-        String options = line.substring(index + 1);
-        design.addVivadoConstraint(new XdcConstraint(command, options));
+        int optIdx = line.indexOf(" ");
+        int cmntIdx = line.indexOf("#");
+        String command = line.substring(0, optIdx);
+        String options = (cmntIdx != -1) ? line.substring(optIdx + 1, cmntIdx).trim() : line.substring(optIdx + 1).trim();
+        String comment = (cmntIdx != -1) ? line.substring(cmntIdx) : null;
+        design.addVivadoConstraint(new XdcConstraint(command, options, comment));
 	}
 
 	/**
 	 * Loads Vivado constraints into the specified {@link CellDesign}. For now, these constraints are
-	 * loaded as two strings, a command and a list of arguments. There is not much of an attempt right now to
-	 * intelligently handle these constraints, and they are included so the user has access to them.
+	 * loaded as two strings, a command and a list of arguments. For package pin constraints, the pin and corresponding
+     * port is saved. Otherwise, there is no attempt right now to intelligently handle these constraints, and they are
+     * included so the user has access to them.
 	 * TODO: Update how we handle constraints files to make them easier to move
 	 * @param xdcFile constraints.xdc file
 	 * @throws IOException
@@ -130,8 +73,8 @@ public class XdcConstraintsInterface {
 		while ((line = br.readLine()) != null) {
 			String trimmed = line.trim();
 
-			// Skip empty and commented lines
-			if (line.equals("") || line.matches("\\s*#.*"))
+			// Skip empty and comment lines
+			if (trimmed.length() < 1 || trimmed.startsWith("#"))
 				continue;
 
 			parseConstraintsLine(trimmed);
@@ -149,9 +92,7 @@ public class XdcConstraintsInterface {
      * @throws IOException
      */
     public void writeConstraintsXdc(String xdcOut) throws IOException {
-
         try (BufferedWriter fileout = new BufferedWriter (new FileWriter(xdcOut))) {
-
             LocalDateTime time = LocalDateTime.now();
 
             fileout.write(String.format("##############################################################\n"

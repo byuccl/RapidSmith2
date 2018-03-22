@@ -33,18 +33,20 @@ public final class XdcConstraint {
 
 	private final String command;
 	private final String options;
+	private final String comment;
 	private XdcConstraintPackagePin constraintPackagePin;
-	private static final Pattern patternPinPackage = Pattern.compile("\\s*set_property\\s+PACKAGE_PIN\\s+(\\w+)\\s+\\[\\s*get_ports\\s+(.*?)\\s*\\]\\s*;?$");
-	
-	public XdcConstraint(String command, String options){
+	private static final Pattern patternPackagePin = Pattern.compile("\\s*set_property\\s+.*PACKAGE_PIN\\s+(\\w+)\\s+.*\\[\\s*get_ports*\\s+\\{?\\s*([^{}\\s]+)\\s*}?\\s*].*$");
+
+	public XdcConstraint(String command, String options, String comment){
 		this.command = command;
 		this.options = options;
+		this.comment = comment;
 
 		// Set the package pin if this constraint includes one.
-		String str = toString().trim();
-		Matcher matcher = patternPinPackage.matcher(str);
+		String constraint = command + " " + options;
+		Matcher matcher = patternPackagePin.matcher(constraint);
 		if (matcher.find()) {
-			constraintPackagePin = new XdcConstraintPackagePin();
+			constraintPackagePin = new XdcConstraintPackagePin(matcher.group(1), matcher.group(2));
 		}
 	}
 	
@@ -61,13 +63,18 @@ public final class XdcConstraint {
 	public String getOptions() {
 		return options;
 	}
+
+	/**
+	 * @return the comment of the XDC constraint. null if there is no comment.
+	 */
+	public String getComment() { return comment; }
 	
 	/**
 	 * Formats the XDC constraint and returns it as a string.
 	 */
 	@Override
 	public String toString(){
-		return command + " " + options;
+		return (comment != null) ? command + " " + options + " " + comment : command + " " + options;
 	}
 	
 	/**
@@ -83,11 +90,17 @@ public final class XdcConstraint {
 		private String portName;
 
 		XdcConstraintPackagePin() {
-			Matcher matcher = patternPinPackage.matcher(XdcConstraint.this.toString().trim());
+			String constraint = XdcConstraint.this.command + " " + XdcConstraint.this.options;
+			Matcher matcher = patternPackagePin.matcher(constraint);
 			
 			assert matcher.find();
 			pinName = matcher.group(1);
             portName = matcher.group(2);
+		}
+
+		XdcConstraintPackagePin(String pinName, String portName) {
+			this.pinName = pinName;
+			this.portName = portName;
 		}
 		
 		/**

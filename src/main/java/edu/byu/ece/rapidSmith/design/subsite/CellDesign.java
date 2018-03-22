@@ -808,11 +808,15 @@ public class CellDesign extends AbstractDesign {
 	}
 
 	/**
-	 * Creates a map from port cells to the site the cell is constrained to be placed on.
+	 * Creates a map from port cells to the sites the cells are constrained to be placed on according to the
+	 * imported constraints.xdc.
 	 * @return the map from port cells to their sites
 	 */
 	public Map<Cell, Site> getPortConstraintMap() {
 		Map<Cell, Site> portConstraintMap = new HashMap<>();
+
+		if (vivadoConstraints == null)
+			return portConstraintMap;
 
 		for (XdcConstraint constraint : vivadoConstraints) {
 			if (constraint.getPinPackageConstraint() == null)
