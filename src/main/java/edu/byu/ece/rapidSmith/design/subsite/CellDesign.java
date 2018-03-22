@@ -209,6 +209,10 @@ public class CellDesign extends AbstractDesign {
 
 	}
 
+	public Stream<Cell> getNonPortCells() {
+		return (cellMap.values().stream().flatMap(c -> _flatten(c))).filter(it -> !it.isPort());
+	}
+
 
     /**
 	 * Returns a list of only the internal cells of the specified cell. If the input
