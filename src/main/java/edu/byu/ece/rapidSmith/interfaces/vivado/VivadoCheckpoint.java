@@ -28,7 +28,6 @@ import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.Site;
 
 /**
  * This class packages a TINCR checkpoint so that it can be returned to the user.
@@ -112,5 +111,4 @@ public final class VivadoCheckpoint {
 	public Map<BelPin, CellPin> getBelPinToCellPinMap() {
 		return this.belPinToCellPinMap;
 	}
-
 }

@@ -814,7 +814,6 @@ public class CellDesign extends AbstractDesign {
 	 */
 	public Map<Cell, Site> getPortConstraintMap() {
 		Map<Cell, Site> portConstraintMap = new HashMap<>();
-
 		if (vivadoConstraints == null)
 			return portConstraintMap;
 
@@ -822,15 +821,12 @@ public class CellDesign extends AbstractDesign {
 			if (constraint.getPinPackageConstraint() == null)
 				continue;
 
-			String portName = constraint.getPinPackageConstraint().getPortName();
-			String siteName = constraint.getPinPackageConstraint().getPinName();
-
 			// Get the port cell
-			Cell portCell = this.getCell(portName);
+			Cell portCell = this.getCell(constraint.getPinPackageConstraint().getPortName());
 			assert(portCell.isPort());
 
 			// Get the package pin's site
-			Site site = device.getSite(siteName);
+			Site site = device.getSite(constraint.getPinPackageConstraint().getPinName());
 			assert(site != null);
 
 			// Add to the port map
