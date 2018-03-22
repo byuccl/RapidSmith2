@@ -80,7 +80,7 @@ public final class XdcConstraint {
 	/**
 	 * @return The XDC pin package constraint instance
 	 */
-	public XdcConstraintPackagePin getPinPackageConstraint() {
+	public XdcConstraintPackagePin getPackagePinConstraint() {
 		return constraintPackagePin;
 	}
 	
@@ -88,15 +88,6 @@ public final class XdcConstraint {
 		
 		private String pinName;
 		private String portName;
-
-		XdcConstraintPackagePin() {
-			String constraint = XdcConstraint.this.command + " " + XdcConstraint.this.options;
-			Matcher matcher = patternPackagePin.matcher(constraint);
-			
-			assert matcher.find();
-			pinName = matcher.group(1);
-            portName = matcher.group(2);
-		}
 
 		XdcConstraintPackagePin(String pinName, String portName) {
 			this.pinName = pinName;
