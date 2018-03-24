@@ -20,6 +20,9 @@
 
 package edu.byu.ece.rapidSmith.interfaces.vivado;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * This class holds design constraints found in the constraints.xdc file.
  * TODO: Make these constraints easier to work with
@@ -30,10 +33,21 @@ public final class XdcConstraint {
 
 	private final String command;
 	private final String options;
-	
-	public XdcConstraint(String command, String options){
+	private final String comment;
+	private XdcConstraintPackagePin constraintPackagePin;
+	private static final Pattern patternPackagePin = Pattern.compile("\\s*set_property\\s+.*PACKAGE_PIN\\s+(\\w+)\\s+.*\\[\\s*get_ports*\\s+\\{?\\s*([^{}\\s]+)\\s*}?\\s*].*$");
+
+	public XdcConstraint(String command, String options, String comment){
 		this.command = command;
 		this.options = options;
+		this.comment = comment;
+
+		// Set the package pin if this constraint includes one.
+		String constraint = command + " " + options;
+		Matcher matcher = patternPackagePin.matcher(constraint);
+		if (matcher.find()) {
+			constraintPackagePin = new XdcConstraintPackagePin(matcher.group(1), matcher.group(2));
+		}
 	}
 	
 	/**
@@ -49,12 +63,49 @@ public final class XdcConstraint {
 	public String getOptions() {
 		return options;
 	}
+
+	/**
+	 * @return the comment of the XDC constraint. null if there is no comment.
+	 */
+	public String getComment() { return comment; }
 	
 	/**
 	 * Formats the XDC constraint and returns it as a string.
 	 */
 	@Override
 	public String toString(){
-		return command + " " + options;
+		return (comment != null) ? command + " " + options + " " + comment : command + " " + options;
+	}
+	
+	/**
+	 * @return The XDC pin package constraint instance
+	 */
+	public XdcConstraintPackagePin getPackagePinConstraint() {
+		return constraintPackagePin;
+	}
+	
+	public class XdcConstraintPackagePin {
+		
+		private String pinName;
+		private String portName;
+
+		XdcConstraintPackagePin(String pinName, String portName) {
+			this.pinName = pinName;
+			this.portName = portName;
+		}
+		
+		/**
+		 * @return The name of the pin that the net is constrained to (eg. D7)
+		 */
+		public String getPinName() {
+			return pinName;
+		}
+		
+		/**
+		 * @return The name of the port that is constrained to a pin.
+		 */
+		public String getPortName() {
+			return portName;
+		}
 	}
 }
