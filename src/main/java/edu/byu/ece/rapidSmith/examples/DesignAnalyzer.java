@@ -217,7 +217,7 @@ public class DesignAnalyzer {
 
 		// A RouteTree object contains a collection of RouteTree objects which represent the downstream segments making up the route.
 		// If this collection has more than element, it represents that the physical wire branches at this point.
-		Collection<RouteTree> sinkTrees = rt.getSinkTrees();
+		Collection<RouteTree> sinkTrees = rt.getChildren();
 		
 		// Always print first wire at the head of a net's RouteTree. The format is "tileName/wireName".
 		if (head)

@@ -21,14 +21,15 @@
 package edu.byu.ece.rapidSmith.device;
 
 import edu.byu.ece.rapidSmith.device.Connection.ReverseSiteWireConnection;
-import edu.byu.ece.rapidSmith.device.Connection.SiteToTileConnection;
 import edu.byu.ece.rapidSmith.device.Connection.SiteWireConnection;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 
 /**
@@ -42,9 +43,7 @@ public class SiteWire implements Wire, Serializable {
 	private final int wire;
 
 	public SiteWire(Site site, int wire) {
-		this.site = site;
-		this.siteType = site.getType();
-		this.wire = wire;
+		this(site, site.getType(), wire);
 	}
 
 	public SiteWire(Site site, SiteType siteType, int wire) {
@@ -116,15 +115,6 @@ public class SiteWire implements Wire, Serializable {
 	}
 
 	@Override
-	public Collection<Connection> getPinConnections() {
-		SitePin pin = getConnectedPin();
-		if (pin == null)
-			return emptyList();
-		Connection c = new SiteToTileConnection(pin);
-		return singleton(c);
-	}
-
-	@Override
 	public Collection<SitePin> getAllConnectedPins() {
 		return singleton(getConnectedPin());
 	}
@@ -135,15 +125,6 @@ public class SiteWire implements Wire, Serializable {
 		if (sitePin == null || !sitePin.isOutput())
 			return null;
 		return sitePin;
-	}
-
-	@Override
-	public Collection<Connection> getTerminals() {
-		BelPin pin = getTerminal();
-		if (pin == null)
-			return emptyList();
-		Connection c = new Connection.Terminal(pin);
-		return singleton(c);
 	}
 
 	@Override
@@ -175,29 +156,11 @@ public class SiteWire implements Wire, Serializable {
 	}
 
 	@Override
-	public Collection<Connection> getReversePinConnections() {
-		SitePin pin = getReverseConnectedPin();
-		if (pin == null)
-			return emptyList();
-		Connection c = new SiteToTileConnection(pin);
-		return singleton(c);
-	}
-
-	@Override
 	public SitePin getReverseConnectedPin() {
 		SitePin sitePin = site.getSitePinOfInternalWire(siteType, this.wire);
 		if (sitePin == null || !sitePin.isInput())
 			return null;
 		return sitePin;
-	}
-
-	@Override
-	public Collection<Connection> getSources() {
-		BelPin pin = getSource();
-		if (pin == null)
-			return emptyList();
-		Connection c = new Connection.Terminal(pin);
-		return singleton(c);
 	}
 
 	@Override

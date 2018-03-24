@@ -262,7 +262,7 @@ public class DotFilePrinter {
 	 * Creates a DOT string of the specified {@link RouteTree} object.
 	 * The resulting DOT graph is given a default name of "RouteTree"
 	 * 
-	 * @param tree {@link RouteTree} to print
+	 * @param route {@link RouteTree} to print
 	 * @return A DOT string
 	 */
 	public static String getRouteTreeDotString(RouteTree route) {
@@ -282,7 +282,7 @@ public class DotFilePrinter {
 	/**
 	 * Creates a DOT string of the specified {@link RouteTree} object.
 	 * 
-	 * @param tree {@link RouteTree} to print
+	 * @param route {@link RouteTree} to print
 	 * @param name Name of the generated DOT graph.
 	 * @return A DOT string
 	 */
@@ -312,7 +312,7 @@ public class DotFilePrinter {
 			
 			// only print edges if the route tree has any
 			if (!tmp.isLeaf()) {
-				for (RouteTree sink : tmp.getSinkTrees()) {
+				for (RouteTree sink : tmp.getChildren()) {
 					String edgeColor = sink.getConnection().isPip() ? "red" : "black";
 					builder.append(String.format(" %d->%d [color=\"%s\"]\n", nodeIds.get(tmp), nodeIds.get(sink), edgeColor));
 					rtQueue.add(sink);
