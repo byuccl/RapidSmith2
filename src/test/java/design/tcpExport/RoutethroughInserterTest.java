@@ -121,7 +121,7 @@ public class RoutethroughInserterTest {
 
 		// create partial netlist
 		Cell lut1 = design.addCell(new Cell("lut1", libCells.get("LUT1")));
-		Cell carry = design.addCell(new Cell("carry", libCells.get("CARRY4")));
+		Cell carry = design.addCell(new Cell("carry", libCells.get("CARRY4"))); 
 		Cell iport1 = design.addCell(new Cell("iport1", libCells.get("IPORT")));
 		Cell iport2 = design.addCell(new Cell("iport2", libCells.get("IPORT")));
 
@@ -173,7 +173,7 @@ public class RoutethroughInserterTest {
 
 			// add all of the connections to the queue
 			for (Connection conn : tree.getWire().getWireConnections()) {
-				rtQueue.add(tree.addConnection(conn));
+				rtQueue.add(tree.connect(conn));
 			}
 		}
 

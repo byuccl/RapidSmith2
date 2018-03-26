@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 
 /**
