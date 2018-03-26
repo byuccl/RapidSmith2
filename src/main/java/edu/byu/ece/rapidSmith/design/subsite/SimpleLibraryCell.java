@@ -125,11 +125,6 @@ public class SimpleLibraryCell extends LibraryCell {
 		return compatibleBels;
 	}
 
-	@Override
-	public List<Bel> getRequiredBels(Bel anchor) {
-				return Collections.singletonList(anchor);
-	}
-
 	/**
 	 * List containing the {@link BelId}s of BELs that cells of this type can be
 	 * placed on.

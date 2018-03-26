@@ -53,16 +53,6 @@ public class SiteWire implements Wire, Serializable {
 		this.wire = wire;
 	}
 
-
-	@Override
-	public Collection<Connection> getTerminals() {
-		BelPin pin = getTerminal();
-		if (pin == null)
-			return emptyList();
-		Connection c = new Connection.Terminal(pin);
-		return singleton(c);
-	}
-
 	@Override
 	public Site getSite() {
 		return site;
@@ -124,7 +114,7 @@ public class SiteWire implements Wire, Serializable {
 	public Collection<Connection> getWireConnections() {
 		WireConnection[] wireConnections = site.getWireConnections(siteType, wire);
 		if (wireConnections == null)
-			return emptyList();
+			return Collections.emptyList();
 
 		return Arrays.stream(wireConnections)
 				.map(wc -> new SiteWireConnection(this, wc))
@@ -160,7 +150,7 @@ public class SiteWire implements Wire, Serializable {
 	public Collection<Connection> getReverseWireConnections() {
 		WireConnection[] wireConnections = site.getReverseConnections(siteType, wire);
 		if (wireConnections == null)
-			return emptyList();
+			return Collections.emptyList();
 
 		return Arrays.stream(wireConnections)
 				.map(wc -> new ReverseSiteWireConnection(this, wc))

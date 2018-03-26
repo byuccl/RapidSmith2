@@ -66,11 +66,6 @@ public class LibraryMacro extends LibraryCell {
 	}
 
 	@Override
-	public List<Bel> getRequiredBels(Bel anchor) {
-				throw new UnsupportedOperationException("This functionality is not yet implemented.");
-	}
-
-	@Override
 	public boolean isMacro() {
 		return true;
 	}

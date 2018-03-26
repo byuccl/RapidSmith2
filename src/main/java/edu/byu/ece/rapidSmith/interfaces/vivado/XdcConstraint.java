@@ -107,10 +107,6 @@ public final class XdcConstraint {
 		public String getPortName() {
 			return portName;
 		}
-		
-		@Override
-		public String toString(){
-			return command + " " + options + " " + pinName + " " + netName;
-		}
+
 	}
 }

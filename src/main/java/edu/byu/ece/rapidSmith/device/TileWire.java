@@ -66,15 +66,6 @@ public class TileWire implements Wire, Serializable {
 	}
 
 	/**
-	 * Always return an empty list.
-	 */
-	@Override
-	@Deprecated
-	public Collection<Connection> getTerminals() {
-		return Collections.emptyList();
-	}
-
-	/**
 	 * @deprecated Use {@link #getName} instead.
 	 */
 	@Override
