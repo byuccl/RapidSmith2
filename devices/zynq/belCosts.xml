@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <root>
-  <family>artix7</family>
+  <family>zynq</family>
   <bel>
     <id>
       <site_type>SLICEL</site_type>

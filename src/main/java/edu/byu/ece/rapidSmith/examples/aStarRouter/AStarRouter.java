@@ -15,9 +15,7 @@ import edu.byu.ece.rapidSmith.device.*;
 /**
  * Implements a very simple A* routing algorithm capable of routing a single {@link CellNet}
  * in a design. This code demonstrates how a physical route can be created using
- * RapidSmith data structures if you choose to use the {@link RouteTree} class. This class 
- * requires the extended device information to be loaded with the function call 
- * {@link edu.byu.ece.rapidSmith.device.creation.ExtendedDeviceInfo#loadExtendedInfo(Device)}.
+ * RapidSmith data structures if you choose to use the {@link RouteTree} class.
  */
 public class AStarRouter {
 	
