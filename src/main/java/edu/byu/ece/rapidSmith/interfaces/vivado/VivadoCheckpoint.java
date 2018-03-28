@@ -24,10 +24,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import edu.byu.ece.rapidSmith.design.subsite.BelRoutethrough;
-import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
-import edu.byu.ece.rapidSmith.design.subsite.CellPin;
+import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Device;

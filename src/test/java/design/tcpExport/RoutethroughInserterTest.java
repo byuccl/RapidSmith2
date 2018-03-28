@@ -78,7 +78,7 @@ public class RoutethroughInserterTest {
 	 */
 	@Test
 	@DisplayName("LUT Routethrough Insert Test")
-	public void routeThroughInsertTest() throws IOException {
+	public void routeThroughInsertTest() {
 		// Create the test design
 		CellDesign testDesign = createTestDesign();
 		assertNull(testDesign.getCell("rapidSmithRoutethrough0"), 
@@ -158,7 +158,7 @@ public class RoutethroughInserterTest {
 	private RouteTree routeInternalNet(Wire startWire, BelPin sink) {
 		
 		RouteTree start = new RouteTree(startWire);
-		Queue<RouteTree> rtQueue = new LinkedList<RouteTree>();
+		Queue<RouteTree> rtQueue = new LinkedList<>();
 		
 		rtQueue.add(start);
 		
@@ -173,7 +173,7 @@ public class RoutethroughInserterTest {
 			
 			// add all of the connections to the queue
 			for (Connection conn : tree.getWire().getWireConnections()) {
-				rtQueue.add(tree.addConnection(conn));
+				rtQueue.add(tree.connect(conn));
 			}
 		}
 		
