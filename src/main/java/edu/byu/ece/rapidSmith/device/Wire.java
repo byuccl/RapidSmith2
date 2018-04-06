@@ -71,11 +71,25 @@ public interface Wire extends Serializable {
 	 */
 	SitePin getConnectedPin();
 
+
+
 	/**
-	 * Returns connection linking this wire to another wire in a different
+	 * Returns sink connection linking this wire to another wire in a different
 	 * hierarchical level through a pin.
 	 */
+	BelPin getSinkTerminal();
+
+	/**
+	 * @deprecated use {@link #getSinkTerminal()}
+	 */
+	@Deprecated
 	BelPin getTerminal();
+
+	/**
+	 * Returns source connection linking this wire to another wire in a different
+	 * hierarchical level through a pin.
+	 */
+	BelPin getSourceTerminal();
 
 	/**
 	 * Returns connection linking this wire to its drivers in the same hierarchy.

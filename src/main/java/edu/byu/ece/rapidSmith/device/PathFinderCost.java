@@ -123,7 +123,15 @@ public class PathFinderCost{
 		}
 		
 		private void calculatePFCost(){
-			pfCost = (history+pipFactor) * usedPrev;
+			pfCost = (history + pipFactor) * usedPrev;
+
+			if (pfCost <= -1) {
+				System.out.println("history: " + history);
+				System.out.println("pipFactor: " + pipFactor);
+				System.out.println("usedPrev: " + usedPrev);
+				System.out.println("pfCost: " + pfCost);
+			}
+
 			assert pfCost > -1;
 		}
 		
@@ -138,7 +146,7 @@ public class PathFinderCost{
 		}
 		
 		public void incrementUsage(int iteration){
-			usedPrev+=(increaseCost*(iteration));
+			usedPrev += (increaseCost * (iteration));
 			calculatePFCost();
 		}
 		

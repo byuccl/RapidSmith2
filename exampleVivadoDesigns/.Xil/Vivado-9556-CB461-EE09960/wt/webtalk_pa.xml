@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<document>
+<!--The data in this file is primarily intended for consumption by Xilinx tools.
+The structure and the elements are likely to change over the next few releases.
+This means code written to parse this file will need to be revisited each subsequent release.-->
+<application name="pa" timeStamp="Mon Mar 12 15:50:42 2018">
+<section name="Project Information" visible="false">
+<property name="ProjectID" value="682f056db0004363b6e94ab5b62da2af" type="ProjectID"/>
+<property name="ProjectIteration" value="1" type="ProjectIteration"/>
+</section>
+<section name="PlanAhead Usage" visible="true">
+<item name="Project Data">
+<property name="SrcSetCount" value="1" type="SrcSetCount"/>
+<property name="ConstraintSetCount" value="1" type="ConstraintSetCount"/>
+<property name="DesignMode" value="GateLvl" type="DesignMode"/>
+<property name="ImplStrategy" value="Vivado Implementation Defaults" type="ImplStrategy"/>
+</item>
+<item name="Java Command Handlers">
+<property name="CloseCheckpoint" value="3" type="JavaHandler"/>
+<property name="CloseProject" value="2" type="JavaHandler"/>
+<property name="EditUndo" value="7" type="JavaHandler"/>
+<property name="EditUnplace" value="1" type="JavaHandler"/>
+<property name="FitSelection" value="74" type="JavaHandler"/>
+<property name="NewProject" value="1" type="JavaHandler"/>
+<property name="OpenCheckpoint" value="16" type="JavaHandler"/>
+<property name="ReportNets" value="1" type="JavaHandler"/>
+<property name="TclFind" value="8" type="JavaHandler"/>
+<property name="Unroute" value="3" type="JavaHandler"/>
+<property name="WriteCheckpoint" value="3" type="JavaHandler"/>
+</item>
+<item name="Gui Resources Info">
+<property name="PAResourceCommand.PACommandNames_OPEN_CHECKPOINT, Open Checkpoint..." value="2" type="GuiResourceData"/>
+<property name="PAResourceItoN.MainMenuMgr_FILE, File" value="4" type="GuiResourceData"/>
+<property name="PAResourceItoN.MainMenuMgr_OPEN_RECENT_CHECKPOINT, Open Recent Checkpoint" value="3" type="GuiResourceData"/>
+<property name="PAResourceItoN.MainMenuMgr_OPEN_RECENT_PROJECT, Open Recent Project" value="2" type="GuiResourceData"/>
+<property name="PAResourceOtoP.PAViews_DEVICE, 4590550, 2631278" value="1" type="GuiResourceData"/>
+<property name="PAResourceOtoP.PAViews_DEVICE, 4590560, 2631233" value="1" type="GuiResourceData"/>
+<property name="PAResourceOtoP.PAViews_DEVICE, 970097, 1124481" value="1" type="GuiResourceData"/>
+<property name="RDIResource.CommandsInput_TYPE_TCL_COMMAND_HERE, (String" value="2" type="GuiResourceData"/>
+<property name="RDIResource.CommandsInput_TYPE_TCL_COMMAND_HERE, cd .., true" value="1" type="GuiResourceData"/>
+<property name="RDIResource.CommandsInput_TYPE_TCL_COMMAND_HERE, pwd, true" value="1" type="GuiResourceData"/>
+<property name="RDIResource.CommandsInput_TYPE_TCL_COMMAND_HERE, tincr::read_tcp -verbose simple_switch_synth_routed.tcp, true" value="1" type="GuiResourceData"/>
+</item>
+<item name="Other">
+<property name="GuiMode" value="194" type="GuiMode"/>
+<property name="BatchMode" value="0" type="BatchMode"/>
+<property name="TclMode" value="187" type="TclMode"/>
+</item>
+</section>
+</application>
+</document>

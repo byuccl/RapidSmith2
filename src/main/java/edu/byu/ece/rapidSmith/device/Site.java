@@ -668,7 +668,7 @@ public final class Site implements Serializable{
 	 * Creates and returns the pin on the site which connects to the specified
 	 * internal wire.
 	 * @param wire the internal wire
-	 * @return the pin on thes site which connects to the specified internal wire
+	 * @return the pin on the site which connects to the specified internal wire
 	 *   or null if the wire connects to no pins on this site
 	 */
 	SitePin getSitePinOfInternalWire(SiteType type, int wire) {

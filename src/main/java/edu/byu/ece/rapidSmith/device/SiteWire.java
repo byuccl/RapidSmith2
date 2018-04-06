@@ -139,9 +139,25 @@ public class SiteWire implements Wire, Serializable {
 	}
 
 	@Override
-	public BelPin getTerminal() {
+	public BelPin getSinkTerminal() {
 		BelPin belPin = site.getBelPinOfWire(siteType, wire);
 		if (belPin == null || !belPin.isInput())
+			return null;
+		return belPin;
+	}
+
+	/**
+	 * @deprecated use {@link #getSinkTerminal()}
+	 */
+	@Deprecated
+	public BelPin getTerminal() {
+		return getSinkTerminal();
+	}
+
+	@Override
+	public BelPin getSourceTerminal() {
+		BelPin belPin = site.getBelPinOfWire(siteType, wire);
+		if (belPin == null || !belPin.isOutput())
 			return null;
 		return belPin;
 	}

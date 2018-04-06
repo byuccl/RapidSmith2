@@ -146,7 +146,28 @@ public class TileWire implements Wire, Serializable {
 	 * Always returns null.
 	 */
 	@Override
+	public BelPin getSinkTerminal() {
+		return null;
+	}
+
+	/**
+	 * Always returns null.
+	 */
+	@Override
+
+	/**
+	 * @deprecated use {@link #getSinkTerminal()}
+	 */
+	@Deprecated
 	public BelPin getTerminal() {
+		return null;
+	}
+
+	/**
+	 * Always returns null.
+	 */
+	@Override
+	public BelPin getSourceTerminal() {
 		return null;
 	}
 

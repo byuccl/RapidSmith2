@@ -27,7 +27,6 @@ import edu.byu.ece.rapidSmith.util.Exceptions;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  *  Represents a net in a cell design.  Cell nets connect to pins on cells.
@@ -67,7 +66,12 @@ public class CellNet implements Serializable {
 	
 	// Physical route information
 	/** List of pins where the net leaves its source site*/ 
-	private List<SitePin> sourceSitePinList; 
+	private List<SitePin> sourceSitePinList;
+
+	/** List of pins where the net enters a sink site*/
+	private List<SitePin> sinkSitePinList;
+
+
 	/** Route Tree connecting to the source pin of the net*/
 	private RouteTree source;
 	/** List of intersite RouteTree objects for the net*/
@@ -108,7 +112,7 @@ public class CellNet implements Serializable {
 		this.clkNetStatusSet = false;
 		this.isMultiSourcedNet = false;
 		this.multiSourceStatusSet = false;
-		this.sourcePins = new HashSet<CellPin>();
+		this.sourcePins = new HashSet<>();
 	}
 
 	/**
@@ -139,7 +143,7 @@ public class CellNet implements Serializable {
 	 * is a net that connects two internal cell pins together.
 	 * Cell pins are internal if they are attached to internal cells
 	 * of a macro.
-	 * @param isInternal
+	 * @param isInternal the internal status to set
 	 */
 	public void setIsInternal(boolean isInternal) {
 		this.isInternal = isInternal;
@@ -579,10 +583,19 @@ public class CellNet implements Serializable {
 		return this.sourceSitePinList == null ? Collections.emptyList() 
 					: Collections.unmodifiableList(this.sourceSitePinList);
 	}
+
+	/**
+	 * Returns an unmodifiable list of {@link SitePin} objects that are
+	 * sources for the net.
+	 */
+	public List<SitePin> getSinkSitePins() {
+		return this.sinkSitePinList == null ? Collections.emptyList()
+				: Collections.unmodifiableList(this.sinkSitePinList);
+	}
 	
 	/**
 	 * Returns the first {@link SitePin} in the list of site pin sources. If you 
-	 * know the net has only onw site pin source, then use this function.
+	 * know the net has only one site pin source, then use this function.
 	 */
 	public SitePin getSourceSitePin() {
 		return this.sourceSitePinList == null ? null : this.sourceSitePinList.get(0);
@@ -848,6 +861,17 @@ public class CellNet implements Serializable {
 			sitePinToRTMap = new HashMap<>();
 		}
 		sitePinToRTMap.put(sp, route);
+
+		// TODO: Get rid of this. Just return keys of sitePintoRTMap to get sink site pins
+		SitePin sitePin = route.getConnectedSitePin();
+
+		if (this.sinkSitePinList == null && sitePin != null) {
+			this.sinkSitePinList = new ArrayList<>();
+		}
+
+		if (sitePin != null)
+			this.sinkSitePinList.add(route.getConnectedSitePin());
+
 	}
 
 	/**
@@ -945,7 +969,38 @@ public class CellNet implements Serializable {
 	public RouteTree getSinkRouteTree(BelPin belPin) {
 		return belPinToSinkRTMap == null ? null : belPinToSinkRTMap.get(belPin);
 	}
-	
+
+
+	public List<SitePin> getSinkSitePins(CellPin cellPin) {
+		// site pins that map to the passed in cell pin (should only be 1)
+		List<SitePin> sitePins = new ArrayList<>();
+
+		for (BelPin belPin : cellPin.getMappedBelPins()) {
+			// Should only be one mapped bel pin
+
+			RouteTree routeTree = belPinToSinkRTMap.get(belPin);
+
+			// Get to the route tree that starts at the site pin
+			//RouteTree parent = routeTree.getParent();
+
+			while (routeTree.getParent() != null) {
+				routeTree = routeTree.getParent();
+			}
+
+			// Now, get the site connected site pin
+			SitePin	sitePin = routeTree.getWire().getReverseConnectedPin();
+			//Wire wire;
+			//wire.getReverseConnectedPin()
+
+			if (sitePin != null) // if null, it is an intrasite route (check if this is really true) and doesn't need to be routed to
+				sitePins.add(sitePin);
+		}
+
+		System.out.println("SitePins size: " + sitePins.size());
+
+		return sitePins;
+	}
+
 	/**
 	 * Returns a set of BelPins that the net is currently connected to.
 	 * 
@@ -1028,7 +1083,7 @@ public class CellNet implements Serializable {
 
 	/**
 	 * Not for normal use.
-	 * @param routeStatus
+	 * @param routeStatus the route status to set
 	 */
 	public void setRouteStatus(RouteStatus routeStatus) {
 		this.routeStatus = routeStatus;

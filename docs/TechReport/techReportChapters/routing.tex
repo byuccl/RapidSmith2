@@ -139,7 +139,7 @@ iterate over Connections in RapidSmith2, label=code:connections]
   }
 
   // Get the bel pin connected to a wire
-  BelPin pin = wire.getTerminal();
+  BelPin pin = wire.getSinkTerminal();
   if (pin != null)
 	  // Do something with the BelPin
   }

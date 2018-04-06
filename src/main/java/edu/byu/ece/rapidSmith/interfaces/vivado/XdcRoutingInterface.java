@@ -557,9 +557,9 @@ public class XdcRoutingInterface {
 
 				Wire sinkWire = conn.getSinkWire();
 
-				if (wiresInNet.contains(sinkWire.getFullWireName()) && !visited.contains(sinkWire)) {
+				if (wiresInNet.contains(sinkWire.getFullName()) && !visited.contains(sinkWire)) {
 					connectionCount++;
-					RouteTree sinkTree = routeTree.addConnection(conn);
+					RouteTree sinkTree = routeTree.connect(conn);
 					searchQueue.add(sinkTree);
 					visited.add(sinkWire);
 				}
@@ -567,7 +567,7 @@ public class XdcRoutingInterface {
 
 			// check to see if the current route tree object is connected to a valid sink site pin
 			// the connection count is used to filter out routethrough site pins
-			SitePin sinkSitePin = routeTree.getConnectingSitePin();
+			SitePin sinkSitePin = routeTree.getConnectedSitePin();
 			if (sinkSitePin != null && connectionCount == 0) {
 				terminals.add(routeTree);
 				processSitePinSink(net, sinkSitePin);
@@ -913,7 +913,7 @@ public class XdcRoutingInterface {
 
 			// reached a used bel pin that is not the source
 			if (intrasiteRoute.isValidBelPinSink(currentWire) && !currentWire.equals(startWire)) {
-				BelPin bp = currentWire.getTerminal();
+				BelPin bp = currentWire.getSinkTerminal();
 				intrasiteRoute.addBelPinSink(bp, currentRoute);
 			}
 			// reached a site pin
@@ -993,8 +993,8 @@ public class XdcRoutingInterface {
 		}
 		
 		// a bel routethrough must also be connected to a BEL pin 
-		assert sourceWire.getTerminal() != null : "Wire: " + sourceWire + " should connect to BelPin!";
-		BelPin source = sourceWire.getTerminal();
+		assert sourceWire.getSinkTerminal() != null : "Wire: " + sourceWire + " should connect to BelPin!";
+		BelPin source = sourceWire.getSinkTerminal();
 		
 		BelRoutethrough routethrough = this.belRoutethroughMap.get(source.getBel());
 		
@@ -1551,7 +1551,7 @@ public class XdcRoutingInterface {
 		@Override
 		public boolean isValidBelPinSink(Wire currentWire) {
 			
-			BelPin terminal = currentWire.getTerminal();
+			BelPin terminal = currentWire.getSinkTerminal();
 						
 			// BEL pin sink is valid if the wire connects to
 			// a bel pin and either:
@@ -1658,7 +1658,7 @@ public class XdcRoutingInterface {
 				CellPin pin = belPinToCellPinMap.get(bp);
 
 				 // Fix Vivado EDIF errors where cell pins aren't included in the netlist, but are physically routed to
-				if (pin.getNet() == null) {	;
+				if (pin.getNet() == null) {
 					net.connectToPin(pin);
 				} 
 				else if (pin.getNet() != net) {
@@ -1701,7 +1701,7 @@ public class XdcRoutingInterface {
 
 		@Override
 		public boolean isValidBelPinSink(Wire currentWire) {
-			BelPin terminal = currentWire.getTerminal();
+			BelPin terminal = currentWire.getSinkTerminal();
 			return terminal != null && isBelPinUsed(terminal);
 		}
 	}

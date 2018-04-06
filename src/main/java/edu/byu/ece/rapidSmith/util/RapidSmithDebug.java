@@ -63,7 +63,7 @@ public final class RapidSmithDebug {
 		if (w.getConnectedPin() != null) {
 			System.out.print(" (SitePin)");
 		} 
-		else if (w.getTerminal() != null) {
+		else if (w.getSinkTerminal() != null) {
 			System.out.print(" (BelPin)");
 		}
 		System.out.println("--> " + level);

@@ -72,7 +72,13 @@ public abstract class AbstractRouteTree<T extends AbstractRouteTree<T>> implemen
 	 * object is connected, null is returned.
 	 */
 	public final BelPin getConnectedBelPin() {
-		return wire.getTerminal();
+		return wire.getSinkTerminal();
+	}
+
+	/**
+	 */
+	public final BelPin getConnectedSourceBelPin() {
+		return wire.getSourceTerminal();
 	}
 
 	/**

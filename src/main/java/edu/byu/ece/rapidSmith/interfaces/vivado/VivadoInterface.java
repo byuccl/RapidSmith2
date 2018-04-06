@@ -146,6 +146,11 @@ public final class VivadoInterface {
 		// insert routethrough buffers
 		LutRoutethroughInserter inserter = new LutRoutethroughInserter(design, libCells);
 		inserter.execute();
+
+		// insert static sources
+		System.out.println("Guess");
+		//LutStaticSourceInserter staticSourceInserter = new LutStaticSourceInserter(design, libCells);
+		//staticSourceInserter.execute();
 		
 		// Write placement.xdc
 		String placementOut = Paths.get(tcpDirectory, "placement.xdc").toString();	
