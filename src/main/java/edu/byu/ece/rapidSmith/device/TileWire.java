@@ -172,6 +172,7 @@ public class TileWire implements Wire, Serializable {
 	@Override
 	public Collection<SitePin> getAllReverseSitePins() {
 		Collection<SitePin> sitePins = tile.getSitePinsOfWire(this.wire);
+
 		return sitePins.stream().filter(it -> !it.isOutput())
 			.collect(Collectors.toSet());
 	}

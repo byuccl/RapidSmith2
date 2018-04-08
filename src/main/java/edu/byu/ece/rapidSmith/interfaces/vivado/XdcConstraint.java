@@ -49,6 +49,19 @@ public final class XdcConstraint {
 			constraintPackagePin = new XdcConstraintPackagePin(matcher.group(1), matcher.group(2));
 		}
 	}
+
+	public XdcConstraint(String command, String options) {
+		this.command = command;
+		this.options = options;
+		this.comment = null;
+
+		// Set the package pin if this constraint includes one.
+		String constraint = command + " " + options;
+		Matcher matcher = patternPackagePin.matcher(constraint);
+		if (matcher.find()) {
+			constraintPackagePin = new XdcConstraintPackagePin(matcher.group(1), matcher.group(2));
+		}
+	}
 	
 	/**
 	 * @return The name of the XDC constraint command

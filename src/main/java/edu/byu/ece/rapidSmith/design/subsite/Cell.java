@@ -191,7 +191,7 @@ public class Cell {
 	public boolean isPort() {
 		return getLibCell().isPort();
 	}
-	
+
 	/**
 	 * Returns {@code true} if the current cell is a macro cell, {@code false} otherwise.
 	 */

@@ -77,6 +77,15 @@ public abstract class Connection implements Serializable {
 			return device.isRouteThrough(sourceWire.getWireEnum(), wc.getWire());
 		}
 
+		public Site getRoutethroughSite() {
+			if (!isRouteThrough())
+				return null;
+
+			Tile tile = sourceWire.getTile();
+			SitePin sitePin = tile.getSitePinOfWire(sourceWire.getWireEnum());
+			return sitePin.getSite();
+		}
+
 		@Override
 		public boolean isPinConnection() {
 			return false;
