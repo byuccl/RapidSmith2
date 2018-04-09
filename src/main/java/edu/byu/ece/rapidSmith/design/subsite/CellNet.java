@@ -86,6 +86,9 @@ public class CellNet implements Serializable {
 	private boolean multiSourceStatusSet = false;
 	private Set<CellPin> sourcePins;
 
+	/** List of pins where the net enters a sink site*/
+	private List<SitePin> sinkSitePinList;
+
 	/**
 	 * Creates a new net with the given name.
 	 *
@@ -572,6 +575,70 @@ public class CellNet implements Serializable {
 	}
 
 	/**
+	 * Returns a list of {@link SitePin} objects that are
+	 * sinks for the net.
+	 */
+	public List<SitePin> getSinkSitePins() {
+		if (sitePinToRTMap == null) {
+			return Collections.emptyList();
+		}
+
+		return sitePinToRTMap.keySet().stream().filter(SitePin::isInput).collect(Collectors.toList());
+	}
+
+	public List<SitePin> getSinkSitePins(CellPin cellPin) {
+		// site pins that map to the passed in cell pin (should only be 1)
+		List<SitePin> sitePins = new ArrayList<>();
+
+		for (BelPin belPin : cellPin.getMappedBelPins()) {
+			// Should only be one mapped bel pin
+
+			RouteTree routeTree = belPinToSinkRTMap.get(belPin);
+
+			// Get to the route tree that starts at the site pin
+			//RouteTree parent = routeTree.getParent();
+
+			while (routeTree.getParent() != null) {
+				routeTree = routeTree.getParent();
+			}
+
+			// Now, get the site connected site pin
+			SitePin	sitePin = routeTree.getWire().getReverseConnectedPin();
+			//Wire wire;
+			//wire.getReverseConnectedPin()
+
+			if (sitePin != null) // if null, it is an intrasite route (check if this is really true) and doesn't need to be routed to
+				sitePins.add(sitePin);
+		}
+
+		System.out.println("SitePins size: " + sitePins.size());
+
+		return sitePins;
+	}
+
+	/**
+	 * Returns a {@link SitePin} object that maps to the passed in cell pin.
+	 * @param cellPin
+	 * @return
+	 */
+	public SitePin getSinkSitePin(CellPin cellPin) {
+		// TODO: Handle this better.
+		assert (cellPin.getMappedBelPinCount() == 1);
+
+		RouteTree routeTree = belPinToSinkRTMap.get(cellPin.getMappedBelPin());
+
+		// Get the route tree that starts at the site pin
+		while (routeTree.getParent() != null) {
+			routeTree = routeTree.getParent();
+		}
+
+		// Get the connected site pin
+		// if null, it is an intrasite route (check if this is really true) and doesn't need to be routed to
+		return routeTree.getWire().getReverseConnectedPin();
+	}
+
+
+	/**
 	 * Returns an unmodifiable list of {@link SitePin} objects that are
 	 * sources for the net.
 	 */
@@ -721,6 +788,7 @@ public class CellNet implements Serializable {
 	public void unrouteFull() {
 		intersiteRoutes = null;
 		sourceSitePinList = null;
+		sinkSitePinList = null;
 		source = null;
 		belPinToSinkRTMap = null;
 		sitePinToRTMap = null;
@@ -834,6 +902,17 @@ public class CellNet implements Serializable {
 			belPinToSinkRTMap = new HashMap<>();
 		}
 		belPinToSinkRTMap.put(bp, route);
+
+		// TODO: Get rid of this. Just return keys of sitePintoRTMap to get sink site pins
+		/*SitePin sitePin = route.getConnectedSitePin();
+
+		if (this.sinkSitePinList == null && sitePin != null) {
+			this.sinkSitePinList = new ArrayList<>();
+		}
+
+		if (sitePin != null)
+			this.sinkSitePinList.add(route.getConnectedSitePin());
+        */
 	}
 	
 	/**
