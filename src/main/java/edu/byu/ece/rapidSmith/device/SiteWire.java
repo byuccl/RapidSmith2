@@ -208,10 +208,7 @@ public class SiteWire implements Wire, Serializable {
 	}
 
 	public PathFinderCost getPathFinderCost(){
-		return PathFinderCost.createOrGetPFCOfWire(this, 0);
+		return PathFinderCost.createOrGetPFCOfWire(this);
 	}
 
-	public PathFinderCost getPathFinderCost(boolean isPip){
-		return PathFinderCost.createOrGetPFCOfWire(this, 0, isPip);
-	}
 }

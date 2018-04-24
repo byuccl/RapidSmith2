@@ -700,39 +700,36 @@ public class XdcRoutingInterface {
 	 * {@code SITE_PIPS siteName pip0:input0 pip1:input1 ... pipN:inputN}
 	 */
 	private void readUsedSitePips(Site site, String[] toks) {
-		
 		HashSet<Integer> usedSitePips = new HashSet<>();
 		
 		String namePrefix = "intrasite:" + site.getType().name() + "/";
 
 		//create hashmap that shows pip used to input val
-		HashMap<String, String> pipToInputVal = new HashMap<String, String>();
+		HashMap<String, String> pipToInputVal = new HashMap<>();
 
 		// Iterate over the list of used site pips, and store them in the site
 		for(int i = 2; i < toks.length; i++) {
 			String pipWireName = (namePrefix + toks[i].replace(":", "."));
-			Integer wireEnum = tryGetWireEnum(pipWireName); 
-			
+			Integer wireEnum = tryGetWireEnum(pipWireName);
 			SiteWire sw = new SiteWire(site, wireEnum);
 			Collection<Connection> connList = sw.getWireConnections();
 			
-			// If the created wire has no connections, it is a polarity selector
-			// that has been removed from the site
-			if (connList.size() == 0) {
-				continue;
+			assert (connList.size() == 1 || connList.size() == 0) : "Site Pip wires should have one or no connections " + sw.getName() + " " + connList.size() ;
+
+			if (connList.size() == 1) {
+				Connection conn = connList.iterator().next();
+				assert (conn.isPip()) : "Site Pip connection should be a PIP connection!";
+
+				//add the input and output pip wires (there are two of these in RS2)
+				// TODO: Is it useful to add the output wires?...I don't think these are necessary
+				usedSitePips.add(wireEnum);
+				usedSitePips.add(conn.getSinkWire().getWireEnum());
+				// tryGetWireEnum(pipWireName.split("\\.")[0] + ".OUT")
 			}
-			
-			assert (connList.size() == 1) : "Site Pip wires should have exactly one connection " + sw.getName() + " " + connList.size() ;
-			
-			Connection conn = connList.iterator().next();
-			
-			assert (conn.isPip()) : "Site Pip connection should be a PIP connection!";
-			
-			//add the input and output pip wires (there are two of these in RS2)
-			// TODO: Is it useful to add the output wires?...I don't think these are necessary
-			usedSitePips.add(wireEnum); 	
-			usedSitePips.add(conn.getSinkWire().getWireEnum());
-			// tryGetWireEnum(pipWireName.split("\\.")[0] + ".OUT")
+
+			// If the created wire has no connections, it is a polarity selector
+			// that has been removed from the site. Still need input value in order to correctly import intrasite
+			// routing changes back into Vivado
 			String[] vals = toks[i].split(":");
 			assert vals.length == 2;
 			pipToInputVal.put(vals[0], vals[1]);
@@ -740,7 +737,6 @@ public class XdcRoutingInterface {
 		
 		design.setUsedSitePipsAtSite(site, usedSitePips);
 		design.addPIPInputValsAtSite(site, pipToInputVal);
-
 	}
 	
 	/**
@@ -808,7 +804,7 @@ public class XdcRoutingInterface {
 	private void createStaticNetImplicitSinks(SitePin sitePin, CellNet net) {
 		
 		IntrasiteRoute staticRoute = new IntrasiteRouteSitePinSource(sitePin, net, true);
-		buildIntrasiteRoute(staticRoute, design.getUsedSitePipsAtSite(sitePin.getSite()));
+		buildIntrasiteRoute(staticRoute, design. getUsedSitePipsAtSite(sitePin.getSite()));
 		
 		if (!staticRoute.isValid()) {
 			// NOTE: there are cases in ultrascale where a static net connects to a site pin, but the signal goes nowhere in the site
@@ -1222,6 +1218,56 @@ public class XdcRoutingInterface {
 
 		ArrayList<CellNet> sourceNets = new ArrayList<>();
 		ArrayList<CellNet> sinkNets = new ArrayList<>();
+
+		// Write used Site PIP information
+		Collection<Site> sites = design.getUsedSites();
+
+		for (Site site : sites) {
+			Map<String, String> pipInfo = design.getPIPInputValsAtSite(site);
+
+			if (pipInfo == null)
+				continue;
+
+			SiteType siteType = site.getType();
+
+			// Vivado crashes with IOB33. Remove this special case if this bug is fixed.
+			if (siteType.equals(SiteType.valueOf(design.getFamily(), "IOB33")))
+				continue;
+
+			fileout.write(String.format("set_property MANUAL_ROUTING %s [get_sites {%s}]\n", site.getType().name(), site.getName()));
+			StringBuilder sitePips = new StringBuilder();
+
+			for (Map.Entry<String, String> entry : pipInfo.entrySet()) {
+				sitePips.append(entry.getKey()).append(":").append(entry.getValue()).append(" ");
+			}
+			fileout.write(String.format("set_property SITE_PIPS {%s} [get_sites {%s}]\n", sitePips.toString(), site.getName()));
+		}
+
+		// setUsedSitePipsAtSite
+
+
+/*
+		if {[catch {$sites == ""}]} {
+			set sites [get_sites -quiet -filter IS_USED]
+		}
+
+		foreach site $sites {
+			set site_pips [get_site_pips -quiet -of_objects $site -filter IS_USED]
+
+        # The SITE_TYPE property of a site is unreliable. To determine the actual site type
+        # that is being used...use the BEL property of any cell in the site...we can probably
+        # update this code once/if this bug is fixed.
+					set sample_cell [lindex [get_cells -of $site] 0]
+        #set site_type [get_property SITE_TYPE $site]
+			set site_type [lindex [split [get_property BEL $sample_cell] "."] 0]
+
+        # TODO: We needed to add a special case for IOB33 since it causes Vivado to crash...update once this gets fixed
+			if {$site_pips != "" && $site_type != "IOB33"} {
+				puts $xdc "set_property MANUAL_ROUTING $site_type \[get_sites \{[get_property NAME $site]\}\]"
+				puts $xdc "set_property SITE_PIPS \{$site_pips\} \[get_sites \{[get_property NAME $site]\}\]"
+			}
+		}
+		*/
 
 		//write the routing information to the TCL script
 		for(CellNet net : design.getNets()) {

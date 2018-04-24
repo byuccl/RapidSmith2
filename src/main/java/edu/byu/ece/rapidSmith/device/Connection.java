@@ -21,7 +21,7 @@
 package edu.byu.ece.rapidSmith.device;
 
 import java.io.Serializable;
-import java.util.Objects;
+import java.util.*;
 
 import static edu.byu.ece.rapidSmith.util.Exceptions.DesignAssemblyException;
 
@@ -77,6 +77,7 @@ public abstract class Connection implements Serializable {
 			return device.isRouteThrough(sourceWire.getWireEnum(), wc.getWire());
 		}
 
+		@Override
 		public Site getRoutethroughSite() {
 			if (!isRouteThrough())
 				return null;
@@ -85,6 +86,68 @@ public abstract class Connection implements Serializable {
 			SitePin sitePin = tile.getSitePinOfWire(sourceWire.getWireEnum());
 			return sitePin.getSite();
 		}
+
+        /**
+         * Get the other end of the sink wire and return the tile it belongs to.
+         * @return
+         */
+        @Override
+		public Set<Wire> getSinkTileWires(List<Connection> alreadyVisited) {
+		    assert isPip();
+			Set<Wire> sinkTiles = new HashSet<>();
+			//List<Connection> alreadyVisited = new ArrayList<>();
+
+		    TileWire sinkWire = getSinkWire();
+		    //assert sinkWire.getWireConnections().size() == 1;
+
+            // if the sink wire has more than one connection, just return the original tile?
+            // since we need more info?
+
+			if (sinkWire.getWireConnections().size() == 0) {
+				return sinkTiles;
+			}
+            else {
+				Collection<Connection> conns = sinkWire.getWireConnections();
+                for (Connection sinkCon : conns) {
+
+                	if (!alreadyVisited.contains(sinkCon)) {
+						if (sinkCon.isPip()) {
+							// System.out.println("Recur into con " + sinkCon.toString());
+							alreadyVisited.add(sinkCon);
+							sinkTiles.addAll(sinkCon.getSinkTileWires(alreadyVisited));
+
+							//sinkTiles.add(sinkCon.getSourceWire().getTile());
+						}
+						else {
+							alreadyVisited.add(sinkCon);
+
+							if (sinkCon.getSinkWire().getTile().equals(sinkCon.getSourceWire().getTile())) {
+								// The tile is the same. The sink wire might connect to a pip
+								Collection<Connection> sinkCons = sinkCon.getSinkWire().getWireConnections();
+
+								for (Connection con : sinkCons) {
+									//if (con.isPip()) {
+									//	System.out.println("Recur2 into con " + con.toString());
+										alreadyVisited.add(con);
+										sinkTiles.addAll(con.getSinkTileWires(alreadyVisited));
+									//}
+								}
+
+
+							}
+
+							// sinkTiles.add(sinkCon.getSinkWire().getTile());
+							sinkTiles.add(sinkCon.getSinkWire());
+
+						}
+					}
+
+
+                }
+            }
+
+			return sinkTiles;
+        }
 
 		@Override
 		public boolean isPinConnection() {
@@ -142,6 +205,16 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
+		public Site getRoutethroughSite() {
+			return null;
+		}
+
+		@Override
+        public Set<Wire> getSinkTileWires(List<Connection> alreadyVisited) {
+            return null;
+        }
+
+        @Override
 		public TileWire getSourceWire() {
 			return sourceWire;
 		}
@@ -233,6 +306,16 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
+		public Site getRoutethroughSite() {
+			return null;
+		}
+
+		@Override
+        public Set<Wire> getSinkTileWires(List<Connection> alreadyVisited) {
+            return null;
+        }
+
+        @Override
 		public SiteWire getSourceWire() {
 			return sourceWire;
 		}
@@ -331,6 +414,16 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
+		public Site getRoutethroughSite() {
+			return null;
+		}
+
+		@Override
+        public Set<Wire> getSinkTileWires(List<Connection> alreadyVisited) {
+            return null;
+        }
+
+        @Override
 		public SiteWire getSourceWire() {
 			return sourceWire;
 		}
@@ -428,6 +521,16 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
+		public Site getRoutethroughSite() {
+			return null;
+		}
+
+		@Override
+        public Set<Wire> getSinkTileWires(List<Connection> alreadyVisited) {
+            return null;
+        }
+
+        @Override
 		public Wire getSourceWire() {
 			return pin.getExternalWire();
 		}
@@ -513,6 +616,16 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
+		public Site getRoutethroughSite() {
+			return null;
+		}
+
+		@Override
+        public Set<Wire> getSinkTileWires(List<Connection> alreadyVisited) {
+            return null;
+        }
+
+        @Override
 		public Wire getSourceWire() {
 			return pin.getInternalWire();
 		}
@@ -598,6 +711,16 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
+		public Site getRoutethroughSite() {
+			return null;
+		}
+
+		@Override
+        public Set<Wire> getSinkTileWires(List<Connection> alreadyVisited) {
+            return null;
+        }
+
+        @Override
 		public Wire getSourceWire() {
 			return belPin.getWire();
 		}
@@ -673,6 +796,9 @@ public abstract class Connection implements Serializable {
 //		}
 	}
 
+	public abstract Site getRoutethroughSite();
+
+	public abstract Set<Wire> getSinkTileWires(List<Connection> alreadyVisited);
 	public abstract Wire getSourceWire();
 
 	public abstract Wire getSinkWire();

@@ -20,6 +20,8 @@
 package edu.byu.ece.rapidSmith.device;
 
 
+import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
+
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -503,6 +505,27 @@ public class Tile implements Serializable {
 	public int getManhattanDistance(Tile tile) {
 		return Math.abs(tile.tileXCoordinate - tileXCoordinate) +
 				Math.abs(tile.tileYCoordinate - tileYCoordinate);
+	}
+
+	/**
+	 * Calculates the Manhattan distance between this tile and the given tile.
+	 * It calculates the distance based on the absolute indices of the tiles.
+	 *
+	 * @param compareTile The tile to compare against.
+	 * @return The integer Manhattan distance between this and the given tile.
+	 */
+	public int getIndexManhattanDistance(Tile compareTile) {
+		return Math.abs(compareTile.getColumn() - column ) +
+				Math.abs(compareTile.getRow() - row);
+	}
+
+	public int getXDistanceTo(Tile tile) {
+		return tile.tileXCoordinate - tileXCoordinate;
+	}
+
+	public int getYDistanceTo(Tile tile) {
+		return tile.tileYCoordinate - tileYCoordinate;
+
 	}
 
 	@Override

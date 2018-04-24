@@ -103,5 +103,4 @@ public interface Wire extends Serializable {
 
 	PathFinderCost getPathFinderCost();
 
-	PathFinderCost getPathFinderCost(boolean isPip);
 }

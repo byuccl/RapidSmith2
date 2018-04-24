@@ -20,16 +20,10 @@
 
 package edu.byu.ece.rapidSmith.interfaces.vivado;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.util.Map;
 
 import edu.byu.ece.edif.core.EdifNameConflictException;
 import edu.byu.ece.edif.core.InvalidEdifNameException;
@@ -39,8 +33,6 @@ import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.util.Exceptions;
-import javafx.util.Pair;
-import org.apache.commons.lang3.tuple.MutablePair;
 
 /**
  * This class is used to interface Vivado and RapidSmith2. 

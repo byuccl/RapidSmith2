@@ -1,13 +1,8 @@
 package edu.byu.ece.rapidSmith.examples.aStarRouter;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
+import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 import edu.byu.ece.rapidSmith.device.*;
@@ -24,11 +19,12 @@ public class AStarRouter {
 	private Map<RouteTree, Set<Wire>> usedConnectionMap;
 	private Tile targetTile;
 	private Tile startTile;
+	private CellDesign design;
 	 
 	/**
 	 * Constructor. Initializes a new A* router object
 	 */
-	public AStarRouter() {		
+	public AStarRouter(CellDesign design) {
 		
 		// Cost function for comparing RouteTree objects
 		routeTreeComparator = (one, two) -> {
@@ -40,6 +36,7 @@ public class AStarRouter {
 		};
 		
 		usedConnectionMap = new HashMap<>();
+		this.design = design;
 	}
 	
 	/**
@@ -66,23 +63,37 @@ public class AStarRouter {
 			Wire targetWire = getTargetSinkWire(sink);
 			targetTile = targetWire.getTile();
 			resortPriorityQueue(start);
+
+			System.out.println("Target wire is " + targetWire.getFullName());
+
+			if (targetWire.getFullName().equals("INT_L_X2Y71/IMUX_L24")) { // INT_L_X2Y71/IMUX_L31
+				System.out.println("Investigate this SOB");
+			}
 			
 			boolean routeFound = false;
 			// This loop actually builds the routing data structure
 			while (!routeFound) {
-				
+
 				// Grab the lowest cost route from the queue
 				RouteTreeWithCost current = priorityQueue.poll();
-				
+
 				// Get a set of sink wires from the current RouteTree that already exist in the queue
 				// we don't need to add them again
 				Set<Wire> existingBranches = usedConnectionMap.getOrDefault(current, new HashSet<Wire>());
-				
+
 				// Search all connections for the wire of the current RouteTree
-				for (Connection connection : current.getWire().getWireConnections()) {
-					
+				Collection<Connection> currConnections = current.getWire().getWireConnections();
+				for (Connection connection : currConnections) {
+
+					if (connection.isRouteThrough()) {
+						if (design.isSiteUsed(connection.getRoutethroughSite())) {
+							System.out.println("cant use");
+							continue;
+						}
+					}
+
 					Wire sinkWire = connection.getSinkWire();
-					
+
 					// Solution has been found
 					if (sinkWire.equals(targetWire)) {
 						RouteTreeWithCost sinkTree = current.connect(connection);
@@ -91,21 +102,24 @@ public class AStarRouter {
 						routeFound = true;
 						break;
 					}
-					
+
 					// Only create and add a new RouteTree object if it doesn't already exist in the queue
 					if (!existingBranches.contains(sinkWire)) {
 						RouteTreeWithCost sinkTree = current.connect(connection);
 						sinkTree.setCost(current.getCost() + 1);
 						priorityQueue.add(sinkTree);
 						existingBranches.add(sinkWire);
-					} 
+					}
 				}
+
 				
 				usedConnectionMap.put(current, existingBranches);
 			}
 			
 			// prune RouteTree objects not used in the final solution. This is not very efficient... 
 			start.prune(terminals);
+
+			//System.out.println("I routed a sink " + sink.getName());
 		}
 		
 		return start;

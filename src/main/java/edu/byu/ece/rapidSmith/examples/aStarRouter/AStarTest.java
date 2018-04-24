@@ -1,14 +1,14 @@
 package edu.byu.ece.rapidSmith.examples.aStarRouter;
-import java.io.IOException;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
-import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.design.subsite.CellNet;
-import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
+import edu.byu.ece.rapidSmith.design.subsite.*;
+import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.util.DotFilePrinter;
 import edu.byu.ece.rapidSmith.util.RapidSmithDebug;
+
+import java.io.IOException;
 
 /**
  * Demonstrates the sample {@link AStarRouter} on a single net in a CORDIC design. 
@@ -20,22 +20,24 @@ import edu.byu.ece.rapidSmith.util.RapidSmithDebug;
  * View the {@link AStarRouter} source code as an example of how to creating
  * routing algorithms in RapidSmith.
  */
-public class AStarRouterExample {
+public class AStarTest {
 
 	public static void main(String[] args) throws IOException {
-		// load the device and design
-		String checkpoint = RSEnvironment.defaultEnv().getEnvironmentPath()
-				.resolve("exampleVivadoDesigns")
-				.resolve("cordicPlaced.rscp").toString();
-		
+
+		if (args.length < 1) {
+			System.err.println("Usage: ImportPlaceRouteExport rscpCheckpointDirectoryName");
+			System.exit(1);
+		}
+
+		String checkpointIn = args[0];
 		System.out.println("Loading Device and Design...");
-		VivadoCheckpoint vcp = VivadoInterface.loadRSCP(checkpoint);
+		VivadoCheckpoint vcp = VivadoInterface.loadRSCP(checkpointIn, true);
 		CellDesign design = vcp.getDesign();
 
 		// Routing net
 		System.out.println("Routing Net...");
 		AStarRouter router = new AStarRouter(design);
-		CellNet net = design.getNet("u2/gen_pipe[8].Pipe/Zo_reg_n_0_[9]");
+		CellNet net = design.getNet("ld_IBUF");
 		RouteTree test = router.routeNet(net);
 		net.addIntersiteRouteTree(test);
 		
@@ -45,8 +47,14 @@ public class AStarRouterExample {
 		
 		System.out.println("\nRouteTree data structure in RapidSmith:");
 		RapidSmithDebug.printRouteTree(test);
-		
-		System.out.println("\nRouteTree data structure in DOT file format");
-		System.out.println("\n" + DotFilePrinter.getRouteTreeDotString(net));
+
+		String checkpointOut = checkpointIn.substring(0, checkpointIn.length() - 5) + "_astarred" + ".tcp";
+		design = vcp.getDesign();
+		Device device = vcp.getDevice();
+		CellLibrary libCells = vcp.getLibCells();
+		VivadoInterface.writeTCP(checkpointOut, design, device, libCells, ImplementationMode.REGULAR);
+
+		//System.out.println("\nRouteTree data structure in DOT file format");
+		//System.out.println("\n" + DotFilePrinter.getRouteTreeDotString(net));
 	}
 }

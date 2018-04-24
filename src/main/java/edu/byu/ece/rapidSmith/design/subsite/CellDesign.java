@@ -782,6 +782,28 @@ public class CellDesign extends AbstractDesign {
 	public void addPIPInputValsAtSite(Site ps, Map<String, String> pipInVals){
 		this.pipInValues.put(ps, pipInVals);
 	}
+
+	public void addPipInputValAtSite(Site site, String pip, String inputVal) {
+		if (this.getPIPInputValsAtSite(site) == null) {
+			Map<String, String> pipToInputVals = new HashMap<>();
+			pipToInputVals.put(pip, inputVal);
+			this.pipInValues.put(site, pipToInputVals);
+		}
+		else {
+			this.getPIPInputValsAtSite(site).put(pip, inputVal);
+		}
+	}
+
+	public void addPipInputValAtSite(Site site, Map<String, String> pipInputVals) {
+		if (this.getPIPInputValsAtSite(site) == null) {
+			Map<String, String> pipToInputVals = new HashMap<>();
+			pipToInputVals.putAll(pipInputVals);
+			this.pipInValues.put(site, pipToInputVals);
+		}
+		else {
+			this.getPIPInputValsAtSite(site).putAll(pipInputVals);
+		}
+	}
 	
 	/**
 	 * Returns a mapping of used PIPs to their input route

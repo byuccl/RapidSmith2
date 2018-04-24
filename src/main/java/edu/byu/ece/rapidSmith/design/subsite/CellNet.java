@@ -623,9 +623,14 @@ public class CellNet implements Serializable {
 	 */
 	public SitePin getSinkSitePin(CellPin cellPin) {
 		// TODO: Handle this better.
-		assert (cellPin.getMappedBelPinCount() == 1);
+//		assert (cellPin.getMappedBelPinCount() == 1);
 
 		RouteTree routeTree = belPinToSinkRTMap.get(cellPin.getMappedBelPin());
+
+		if (routeTree == null) {
+			// There is no corresponding sink route tree, so this is not a pin that actually should be routed to
+			return null;
+		}
 
 		// Get the route tree that starts at the site pin
 		while (routeTree.getParent() != null) {
@@ -649,7 +654,7 @@ public class CellNet implements Serializable {
 	
 	/**
 	 * Returns the first {@link SitePin} in the list of site pin sources. If you 
-	 * know the net has only onw site pin source, then use this function.
+	 * know the net has only one site pin source, then use this function.
 	 */
 	public SitePin getSourceSitePin() {
 		return this.sourceSitePinList == null ? null : this.sourceSitePinList.get(0);
@@ -904,7 +909,7 @@ public class CellNet implements Serializable {
 		belPinToSinkRTMap.put(bp, route);
 
 		// TODO: Get rid of this. Just return keys of sitePintoRTMap to get sink site pins
-		/*SitePin sitePin = route.getConnectedSitePin();
+		SitePin sitePin = route.getConnectedSitePin();
 
 		if (this.sinkSitePinList == null && sitePin != null) {
 			this.sinkSitePinList = new ArrayList<>();
@@ -912,7 +917,7 @@ public class CellNet implements Serializable {
 
 		if (sitePin != null)
 			this.sinkSitePinList.add(route.getConnectedSitePin());
-        */
+
 	}
 	
 	/**
