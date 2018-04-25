@@ -979,6 +979,19 @@ public class CellNet implements Serializable {
 									.map(sp -> sitePinToRTMap.get(sp))
 									.collect(Collectors.toList());
 	}
+
+	public List<RouteTree> getSinkRouteTrees() {
+
+		if (routedSinks == null || routedSinks.isEmpty())
+			return Collections.emptyList();
+
+		List<RouteTree> sinkTrees = new ArrayList<>();
+		for (CellPin sink : routedSinks) {
+			sinkTrees.add(this.getSinkRouteTree(sink));
+		}
+
+		return sinkTrees;
+	}
 	
 	/**
 	 * Returns a RouteTree object that is connected to the specified CellPin. If the CellPin

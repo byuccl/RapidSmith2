@@ -1243,32 +1243,6 @@ public class XdcRoutingInterface {
 			fileout.write(String.format("set_property SITE_PIPS {%s} [get_sites {%s}]\n", sitePips.toString(), site.getName()));
 		}
 
-		// setUsedSitePipsAtSite
-
-
-/*
-		if {[catch {$sites == ""}]} {
-			set sites [get_sites -quiet -filter IS_USED]
-		}
-
-		foreach site $sites {
-			set site_pips [get_site_pips -quiet -of_objects $site -filter IS_USED]
-
-        # The SITE_TYPE property of a site is unreliable. To determine the actual site type
-        # that is being used...use the BEL property of any cell in the site...we can probably
-        # update this code once/if this bug is fixed.
-					set sample_cell [lindex [get_cells -of $site] 0]
-        #set site_type [get_property SITE_TYPE $site]
-			set site_type [lindex [split [get_property BEL $sample_cell] "."] 0]
-
-        # TODO: We needed to add a special case for IOB33 since it causes Vivado to crash...update once this gets fixed
-			if {$site_pips != "" && $site_type != "IOB33"} {
-				puts $xdc "set_property MANUAL_ROUTING $site_type \[get_sites \{[get_property NAME $site]\}\]"
-				puts $xdc "set_property SITE_PIPS \{$site_pips\} \[get_sites \{[get_property NAME $site]\}\]"
-			}
-		}
-		*/
-
 		//write the routing information to the TCL script
 		for(CellNet net : design.getNets()) {
 

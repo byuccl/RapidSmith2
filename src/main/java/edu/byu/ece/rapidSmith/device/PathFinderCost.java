@@ -11,7 +11,7 @@ public class PathFinderCost {
 	private int pfCost = 0;
 	private static int wireCost; // pipFactor
 	private static final int historyFactor = 25; // default = 1
-	private static final int congestionFactor = 50; // default = 1.
+	private static final int congestionFactor = 100; // default = 1.
 
 
 	private static Map<Tile, Map<Wire, PathFinderCost>> pfcMap = new HashMap<>();
