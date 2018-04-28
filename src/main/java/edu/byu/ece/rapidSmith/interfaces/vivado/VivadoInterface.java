@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import edu.byu.ece.edif.core.EdifNameConflictException;
 import edu.byu.ece.edif.core.InvalidEdifNameException;
@@ -33,6 +34,7 @@ import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.util.Exceptions;
+import org.apache.commons.lang3.tuple.MutablePair;
 
 /**
  * This class is used to interface Vivado and RapidSmith2. 
@@ -112,15 +114,21 @@ public final class VivadoInterface {
 			vivadoCheckpoint.setStaticSourceBels(routingInterface.getStaticSourceBels());
 			vivadoCheckpoint.setBelPinToCellPinMap(placementInterface.getPinMap());
 		}
-		
+
+		//TODO: If partial_reconfig MODE
 		// Mark the used static resources
-		//String resourcesFile = rscpPath.resolve("static_resources.rsc").toString();
-		//UsedStaticResources staticResources = new UsedStaticResources(design, device);
-		//staticResources.parseResourcesRSC(resourcesFile);
-		//vivadoCheckpoint.setStaticRoutemap(staticResources.getStaticRoutemap());
+		String resourcesFile = rscpPath.resolve("static_resources.rsc").toString();
+		UsedStaticResources staticResources = new UsedStaticResources(design, device);
+		staticResources.parseResourcesRSC(resourcesFile);
+		vivadoCheckpoint.setStaticRoutemap(staticResources.getStaticRoutemap());
 
 		return vivadoCheckpoint;
 	}
+
+	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells, ImplementationMode mode) throws IOException {
+		writeTCP(tcpDirectory, design, device, libCells, mode, null);
+	}
+
 
 	/**
 	 * Export the RapidSmith2 design into an existing TINCR checkpoint file. 
@@ -131,7 +139,7 @@ public final class VivadoInterface {
 	 * @throws InvalidEdifNameException 
 	 * @throws EdifNameConflictException 
 	 */
-	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells, ImplementationMode mode) throws IOException {
+	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells, ImplementationMode mode, Map<String, MutablePair<String, String>> staticRoutemap) throws IOException {
 				
 		new File(tcpDirectory).mkdir();
 		
@@ -148,7 +156,7 @@ public final class VivadoInterface {
 		String routingOut = Paths.get(tcpDirectory, "routing.xdc").toString();
 		String oocRoutingOut = Paths.get(tcpDirectory, "oocRouting.xdc").toString();
 
-		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, null, mode);
+		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, null, mode, staticRoutemap);
 		routingInterface.writeRoutingXDC(routingOut, oocRoutingOut, design);
 		
 		// Write EDIF netlist

@@ -86,9 +86,6 @@ public class CellNet implements Serializable {
 	private boolean multiSourceStatusSet = false;
 	private Set<CellPin> sourcePins;
 
-	/** List of pins where the net enters a sink site*/
-	private List<SitePin> sinkSitePinList;
-
 	/**
 	 * Creates a new net with the given name.
 	 *
@@ -793,7 +790,6 @@ public class CellNet implements Serializable {
 	public void unrouteFull() {
 		intersiteRoutes = null;
 		sourceSitePinList = null;
-		sinkSitePinList = null;
 		source = null;
 		belPinToSinkRTMap = null;
 		sitePinToRTMap = null;
@@ -907,17 +903,6 @@ public class CellNet implements Serializable {
 			belPinToSinkRTMap = new HashMap<>();
 		}
 		belPinToSinkRTMap.put(bp, route);
-
-		// TODO: Get rid of this. Just return keys of sitePintoRTMap to get sink site pins
-		SitePin sitePin = route.getConnectedSitePin();
-
-		if (this.sinkSitePinList == null && sitePin != null) {
-			this.sinkSitePinList = new ArrayList<>();
-		}
-
-		if (sitePin != null)
-			this.sinkSitePinList.add(route.getConnectedSitePin());
-
 	}
 	
 	/**

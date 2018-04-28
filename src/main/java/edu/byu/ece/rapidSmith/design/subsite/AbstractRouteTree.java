@@ -75,6 +75,10 @@ public abstract class AbstractRouteTree<T extends AbstractRouteTree<T>> implemen
 		return wire.getTerminal();
 	}
 
+	public final BelPin getConnectedSourceBelPin() {
+		return wire.getSource();
+	}
+
 	/**
 	 * Creates and adds a new child node connected to this node through {@link Connection} c.
 	 * @param c the {@link Connection} connecting wires between this node and child.

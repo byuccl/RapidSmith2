@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<document>
+<!--The data in this file is primarily intended for consumption by Xilinx tools.
+The structure and the elements are likely to change over the next few releases.
+This means code written to parse this file will need to be revisited each subsequent release.-->
+<application name="pa" timeStamp="Fri Apr 27 17:05:47 2018">
+<section name="Project Information" visible="false">
+<property name="ProjectID" value="57fef5bddf274e60bc1a8431bb587cd5" type="ProjectID"/>
+<property name="ProjectIteration" value="1" type="ProjectIteration"/>
+</section>
+<section name="PlanAhead Usage" visible="true">
+<item name="Project Data">
+<property name="SrcSetCount" value="1" type="SrcSetCount"/>
+<property name="ConstraintSetCount" value="1" type="ConstraintSetCount"/>
+<property name="DesignMode" value="GateLvl" type="DesignMode"/>
+<property name="ImplStrategy" value="Vivado Implementation Defaults" type="ImplStrategy"/>
+</item>
+<item name="Java Command Handlers">
+<property name="EditProperties" value="1" type="JavaHandler"/>
+<property name="EditUndo" value="5" type="JavaHandler"/>
+<property name="FitSelection" value="9" type="JavaHandler"/>
+<property name="OpenCheckpoint" value="4" type="JavaHandler"/>
+<property name="OpenProject" value="1" type="JavaHandler"/>
+</item>
+<item name="Gui Resources Info">
+<property name="PAResourceItoN.NetlistTreeView_NETLIST_TREE, [alu, Leaf Cells (2" value="2" type="GuiResourceData"/>
+<property name="PAResourceItoN.NetlistTreeView_NETLIST_TREE, [alu, Nets (5" value="4" type="GuiResourceData"/>
+<property name="PAResourceOtoP.PAViews_DEVICE, 3173470, 3125298" value="1" type="GuiResourceData"/>
+<property name="RDIResource.CommandsInput_TYPE_TCL_COMMAND_HERE, close_project, true" value="1" type="GuiResourceData"/>
+<property name="RDIResource.CommandsInput_TYPE_TCL_COMMAND_HERE, stop_gui, true" value="1" type="GuiResourceData"/>
+<property name="RDIResource.CommandsInput_TYPE_TCL_COMMAND_HERE, tincr::read_tcp -ooc C:/git/PartialDeviceDesigns/partial/alu/RSCP/add_routed.tcp, true" value="1" type="GuiResourceData"/>
+<property name="RDIResource.CommandsInput_TYPE_TCL_COMMAND_HERE, tincr::read_tcp -ooc, true" value="1" type="GuiResourceData"/>
+</item>
+<item name="Other">
+<property name="GuiMode" value="5" type="GuiMode"/>
+<property name="BatchMode" value="0" type="BatchMode"/>
+<property name="TclMode" value="4" type="TclMode"/>
+</item>
+</section>
+</application>
+</document>

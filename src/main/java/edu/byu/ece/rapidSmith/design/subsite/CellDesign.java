@@ -72,7 +72,7 @@ public class CellDesign extends AbstractDesign {
 	// TODO: Re-think these three
 	/**Map of out-of-context ports to their ooc tile and node **/
 	private Map<String, String> oocPortMap;
-	// TODO: Merge these maps. Map of maps.
+	// TODO: Merge these maps. Map of maps. Static in the partial reconfig. context.
 	private Map <String, String> staticNetMap;
 	private Map <String, String> staticRoutemap;
 
