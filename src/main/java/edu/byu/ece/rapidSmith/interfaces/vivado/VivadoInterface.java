@@ -89,7 +89,14 @@ public final class VivadoInterface {
 		
 		// create the RS2 netlist
 		String edifFile = rscpPath.resolve("netlist.edf").toString();
-		CellDesign design = EdifInterface.parseEdif(edifFile, libCells);
+
+		CellDesign design;
+		// TODO: Make a PARTIAL_RECONFIG mode.
+		//if (mode.equals(ImplementationMode.OUT_OF_CONTEXT))
+		//	design = EdifInterface.parseEdif(edifFile, libCells, partName);
+		//else
+			design = EdifInterface.parseEdif(edifFile, libCells);
+
 		design.setImplementationMode(mode);
 		
 		// parse the constraints into RapidSmith
@@ -154,10 +161,10 @@ public final class VivadoInterface {
 		
 		// Write routing.xdc
 		String routingOut = Paths.get(tcpDirectory, "routing.xdc").toString();
-		String oocRoutingOut = Paths.get(tcpDirectory, "oocRouting.xdc").toString();
+		String partpinRoutingOut = Paths.get(tcpDirectory, "partpin_routing.xdc").toString();
 
 		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, null, mode, staticRoutemap);
-		routingInterface.writeRoutingXDC(routingOut, oocRoutingOut, design);
+		routingInterface.writeRoutingXDC(routingOut, partpinRoutingOut, design);
 		
 		// Write EDIF netlist
 		String edifOut = Paths.get(tcpDirectory, "netlist.edf").toString();

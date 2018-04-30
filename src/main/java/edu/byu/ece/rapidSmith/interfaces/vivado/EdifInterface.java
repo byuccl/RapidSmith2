@@ -112,26 +112,42 @@ public final class EdifInterface {
 	 * @throws FileNotFoundException
 	 */
 	public static CellDesign parseEdif(String edifFile, CellLibrary libCells) {
-		
+		return parseEdif(edifFile, libCells, null);
+	}
+
+	/**
+	 * Parses the Edif netlist into a RapidSmith2 CellDesign data structure
+	 *
+	 * @param edifFile Input EDIF file
+	 * @param libCells A Cell library for a specific Xilinx part
+	 * @param partName Name of the part for the design. Needs to be set manually for partial devices when using a netlist
+	 *                 synthesized by Vivado, since the netlist contains the name of the full part.
+	 *
+	 * @return The RapidSmith2 representation of the EDIF netlist
+	 * @throws FileNotFoundException
+	 */
+	public static CellDesign parseEdif(String edifFile, CellLibrary libCells, String partName) {
+
 		List<CellNet> vccNets = new ArrayList<>();
 		List<CellNet> gndNets = new ArrayList<>();
 		Map<EdifPort, Integer> portOffsetMap = new HashMap<EdifPort, Integer>();
 
-		try {		
+		try {
 			// parse edif into the BYU edif tools data structures
 			EdifEnvironment top = EdifParser.translate(edifFile);
 			EdifCell topLevelCell = top.getTopCell();
-			
+
 			// create RS2 cell design
-			String partName = ((StringTypedValue)top.getTopDesign().getProperty("part").getValue()).getStringValue();
-			CellDesign design= new CellDesign(top.getTopDesign().getName(), partName);	
+			if (partName == null)
+				partName = ((StringTypedValue)top.getTopDesign().getProperty("part").getValue()).getStringValue();
+			CellDesign design= new CellDesign(top.getTopDesign().getName(), partName);
 			design.getProperties().updateAll(createCellProperties(topLevelCell.getPropertyList()));
-			
+
 			// add all the cells and nets to the design
 			processTopLevelEdifPorts(design, topLevelCell.getInterface(), libCells, portOffsetMap);
 			processEdifCells(design, topLevelCell.getCellInstanceList(), libCells, vccNets, gndNets);
 			processEdifNets(design, topLevelCell.getNetList(), vccNets, gndNets, portOffsetMap);
-					
+
 			collapseStaticNets(design, libCells, vccNets, gndNets);
 			return design;
 		}

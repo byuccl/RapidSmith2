@@ -91,6 +91,8 @@ public class Cell {
 		// for port cells, set the direction property
 		if(libCell.isPort()) {
 			this.properties.update(new Property("Dir", PropertyType.USER, PortDirection.getPortDirectionForImport(this)));
+
+			// For partial reconfiguration... ?
 		}
 		
 		// additional initialization for macro cells
