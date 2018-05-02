@@ -43,5 +43,6 @@ public enum CellPinType {
 	WRITE_ENABLE,
 	DATA, 
 	PSEUDO,
-	MACRO
+	MACRO,
+	PARTITION
 }

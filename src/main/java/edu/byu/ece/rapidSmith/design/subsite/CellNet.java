@@ -283,7 +283,7 @@ public class CellNet implements Serializable {
 		
 		// If the cellpin is part of a macro cell, add all of the internal pins
 		// to the net instead of the external macro pins
-		if (pin.getCell().isMacro()) {
+		if (!pin.isPartitionPin() && pin.getCell().isMacro()) {
 			pin.getCell().mapToInternalPins(pin).forEach(this::connectToLeafPin);
 			pin.setNet(this);
 		}

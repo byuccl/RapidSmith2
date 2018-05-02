@@ -112,7 +112,7 @@ public class ImportExportExample {
 	{
 		importDesign();
 		manipulateDesign();
-		setUsedPips();
+		//setUsedPips();
 		exportDesign();
 	}
 

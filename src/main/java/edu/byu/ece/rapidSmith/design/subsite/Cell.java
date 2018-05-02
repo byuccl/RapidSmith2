@@ -274,7 +274,30 @@ public class Cell {
 	void unplace() {
 		this.bel = null;
 	}
-	
+
+	public boolean attachPartitionPin(CellPin pin) {
+		if (!pin.isPartitionPin()) {
+			throw new IllegalArgumentException("Expected argument \"pin\" to be a partition pin.\n"
+					+ "Cell: " + getName() + " Pin: " + pin.getName());
+		}
+
+		if (!this.isPort()) {
+			throw new IllegalArgumentException("Cannot attach partition pin to a non-port cell\n"
+					+ "Cell: " + getName() + " Pin: " + pin.getName());
+		}
+
+		if (pinMap.containsKey(pin.getName())) {
+			throw new IllegalArgumentException("Pin \"" + pin.getName() + "\" already attached to cell  \""
+					+ getName() + "\". Cannot attach it again");
+		}
+
+		pin.setCell(this);
+		this.pinMap.put(pin.getName(), pin);
+		// this.pseudoPins.add(pin);
+		return true;
+	}
+
+
 	/**
 	 * Creates a new pseudo pin, and attaches it to the cell. 
 	 * 

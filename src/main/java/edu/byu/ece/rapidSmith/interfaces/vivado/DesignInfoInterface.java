@@ -145,7 +145,7 @@ public class DesignInfoInterface {
 	 * TODO: Update this file to output the mode as well?
 	 * 
 	 * @param partInfoOut Output design.info file location
-	 * @param partname Name of part this design is mapped to
+	 * @param partName Name of part this design is mapped to
 	 * @throws IOException
 	 */
 	public static void writeInfoFile(String partInfoOut, String partName) throws IOException {

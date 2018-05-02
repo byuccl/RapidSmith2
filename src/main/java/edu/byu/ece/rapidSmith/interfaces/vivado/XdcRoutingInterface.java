@@ -382,7 +382,7 @@ public class XdcRoutingInterface {
 			createIntrasiteRoute(net, net.getSourceBelPin(), false, design.getUsedSitePipsAtSite(site));
 		}
 		
-		assert (net.sourceSitePinCount() > 0 || implementationMode == ImplementationMode.OUT_OF_CONTEXT) : 
+		assert (net.sourceSitePinCount() > 0 || implementationMode == ImplementationMode.OUT_OF_CONTEXT || implementationMode == ImplementationMode.RECONFIG_MODULE) :
 			net.getName() + " should have at least one source site pin";
 		
 		// Using the pip map, recreate each route as a RouteTree object
@@ -413,7 +413,7 @@ public class XdcRoutingInterface {
 		pinsToRemove.forEach(pin -> net.removeSourceSitePin(pin));
 				
 		// For out-of-context checkpoints, look for hierarchical ports that are routed to floating wires
-		if (implementationMode==ImplementationMode.OUT_OF_CONTEXT && net.getSourcePin().getCell().isPort()) {
+		if ((implementationMode == ImplementationMode.OUT_OF_CONTEXT || implementationMode == ImplementationMode.RECONFIG_MODULE) && net.getSourcePin().getCell().isPort()) {
 			
 			Cell port = net.getSourcePin().getCell();
 			String startWireName = oocPortMap.get(port.getName());
@@ -429,7 +429,7 @@ public class XdcRoutingInterface {
 			}
 		}
 
-		assert net.sourceSitePinCount() > 0 || implementationMode==ImplementationMode.OUT_OF_CONTEXT : 
+		assert net.sourceSitePinCount() > 0 || implementationMode==ImplementationMode.OUT_OF_CONTEXT || implementationMode==ImplementationMode.RECONFIG_MODULE :
 			"Net " + net.getName() + " should have a source site pin. ";
 		net.computeRouteStatus();
 	}
@@ -685,7 +685,7 @@ public class XdcRoutingInterface {
 		assert (toks.length == 3) : String.format("Token error on line %d: Expected format is \"OOC_PORT\" PortName Tile/Wire ", this.currentLineNumber); 
 		
 		if (this.oocPortMap == null) {
-			this.oocPortMap = new HashMap<String, String>();
+			this.oocPortMap = new HashMap<>();
 		}
 		
 		oocPortMap.put(toks[1], toks[2]); 
@@ -1176,7 +1176,7 @@ public class XdcRoutingInterface {
 		int mapCount = cellPin.getMappedBelPinCount(); 
 		
 		// Some out of context designs will not have cells, so there will be no mapped BelPin.
-		if (mapCount != 1 && implementationMode == ImplementationMode.OUT_OF_CONTEXT) {
+		if (mapCount != 1 && (implementationMode == ImplementationMode.OUT_OF_CONTEXT || implementationMode==ImplementationMode.RECONFIG_MODULE)) {
 			return null;
 		}
 		else if (mapCount != 1) {
@@ -1251,10 +1251,10 @@ public class XdcRoutingInterface {
 
 				// If OOC, build lists of source nets and sink nets.
 				// These routes are exported to the oocRouting XDC file.
-				if (implementationMode.equals(ImplementationMode.OUT_OF_CONTEXT)) {
-					if (net.getSourcePin().getCell().isPort()) {
+				if (implementationMode.equals(ImplementationMode.OUT_OF_CONTEXT) || implementationMode==ImplementationMode.RECONFIG_MODULE) {
+					if (net.getSourcePin().isPartitionPin()) {
 						// If the net is driven by a port, it's net needs to be merged with the static portion coming first
-						System.out.println("Net " + net.getName() + " has source port " + net.getSourcePin().getCell().getName());
+						//System.out.println("Net " + net.getName() + " has source port " + net.getSourcePin().getCell().getName());
 						sourceNets.add(net);
 						continue;
 					}
@@ -1263,7 +1263,7 @@ public class XdcRoutingInterface {
 						Iterator<CellPin> iterator = net.getSinkPins().iterator();
 						//assert(iterator.hasNext());
 						CellPin sink = iterator.next();
-						System.out.println("Net " + net.getName() + " has sink port " + sink.getCell().getName());
+						//System.out.println("Net " + net.getName() + " has sink port " + sink.getCell().getName());
 
 						sinkNets.add(net);
 						continue;
@@ -1279,22 +1279,17 @@ public class XdcRoutingInterface {
 		fileout.close();
 
 		// Now write the OOC RoutingXDC
-		if (implementationMode.equals(ImplementationMode.OUT_OF_CONTEXT)) {
+		if (implementationMode == ImplementationMode.RECONFIG_MODULE) {
 			BufferedWriter oocFileOut = new BufferedWriter (new FileWriter(oocXdcOut));
 
 			for (CellNet net : sourceNets) {
 				// TODO: Find matching IBUF net from static resources
 
-				String portName = net.getSourcePin().getCell().getName();
-				//System.out.println("Port name = " + net.getSourcePin().getCell().getName());
+				String portName = net.getSourcePin().getPortName();
 
 				// Find the matching static net from the static-only design
 				System.out.println("PortName: " + portName);
 				MutablePair<String, String> netRoutePair = staticRoutemap.get(portName);
-				//String staticNetName = netRoutePair.getKey();
-
-				//System.out.println("Static net name: " + netRoutePair.getKey());
-
 				String partialRoute = getVivadoRouteString(net);
 
 				// Merge the static and RM portions of the route
@@ -1302,37 +1297,29 @@ public class XdcRoutingInterface {
 				String mergedRoute = mergePartialStaticRoute(netRoutePair.getValue(), partialRoute, partPinNode);
 
 				// Update the value in the map
-				//netRoutePair.
 				netRoutePair.setValue(mergedRoute);
-				//staticRoutemap.put(portName, new Pair<>(netRoutePair.getKey(), mergedRoute));
-
 			}
 
 			for (CellNet net : sinkNets) {
 				// TODO: Find matching OBUF net from static resources
-
-
 				System.out.println("# of Sink Pins for net " + net.getName() + " = " + net.getSinkPins().size());
 
 				Iterator<CellPin> iterator = net.getSinkPins().iterator();
 				CellPin sinkPin = iterator.next();
-
-				String portName = sinkPin.getCell().getName();
+				String portName = sinkPin.getPortName();
 
 				// Find the matching static net from the static-only design
 				MutablePair<String, String> netRoutePair = staticRoutemap.get(portName);
-
 				String partialRoute = getVivadoRouteString(net);
 
 				// Merge the static and RM portions of the route
 				String partPinNode = oocPortMap.get(portName);
-				//System.out.println("portName: " + portName);
+				System.out.println("portName: " + portName);
 				assert(partPinNode != null);
 				String mergedRoute = mergePartialStaticRoute(netRoutePair.getValue(), partialRoute, partPinNode);
 
 				// Update the value in the map
 				netRoutePair.setValue(mergedRoute);
-				//staticRoutemap.put(portName, new Pair<>(netRoutePair.getKey(), mergedRoute));
 			}
 
 			// Write the merged routing strings to the ooc routing xdc file
@@ -1341,13 +1328,8 @@ public class XdcRoutingInterface {
 			for (MutablePair<String, String> netRoutePair : mergedRouteSet) {
 				oocFileOut.write(String.format("set_property ROUTE %s [get_nets {%s}]\n", netRoutePair.getValue(), netRoutePair.getKey()));
 			}
-
 			oocFileOut.close();
-
 		}
-
-
-
 	}
 
 	/**

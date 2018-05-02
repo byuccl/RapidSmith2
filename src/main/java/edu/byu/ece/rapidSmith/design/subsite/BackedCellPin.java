@@ -24,10 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import edu.byu.ece.rapidSmith.device.Bel;
-import edu.byu.ece.rapidSmith.device.BelId;
-import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.PinDirection;
+import edu.byu.ece.rapidSmith.device.*;
 
 /**
  *  A CellPin that is "backed" by a {@link LibraryPin}. This means they represent 
@@ -72,12 +69,22 @@ public class BackedCellPin extends CellPin {
 	}
 
 	@Override
+	public String getPortName() {
+		return null;
+	}
+
+	@Override
 	public PinDirection getDirection() {
 		return libraryPin.getDirection();
 	}
 
 	@Override
 	public boolean isPseudoPin() {
+		return false;
+	}
+
+	@Override
+	public boolean isPartitionPin() {
 		return false;
 	}
 
@@ -122,5 +129,10 @@ public class BackedCellPin extends CellPin {
 	@Override
 	public CellPin getExternalPin() {		
 		return isInternal() ? getCell().getParent().getExternalPin(this) : null;
+	}
+
+	@Override
+	public Wire getWire() {
+		return null;
 	}
 }

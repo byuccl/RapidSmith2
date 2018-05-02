@@ -67,7 +67,7 @@ public class AStarRouter {
 			System.out.println("Target wire is " + targetWire.getFullName());
 
 			if (targetWire.getFullName().equals("INT_L_X2Y71/IMUX_L24")) { // INT_L_X2Y71/IMUX_L31
-				System.out.println("Investigate this SOB");
+				System.out.println("Investigate this");
 			}
 			
 			boolean routeFound = false;

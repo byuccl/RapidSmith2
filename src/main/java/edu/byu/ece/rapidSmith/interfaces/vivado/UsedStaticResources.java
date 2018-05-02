@@ -29,13 +29,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.PIP;
-import edu.byu.ece.rapidSmith.device.Tile;
-import edu.byu.ece.rapidSmith.device.TileWire;
-import edu.byu.ece.rapidSmith.device.Wire;
-import edu.byu.ece.rapidSmith.device.WireEnumerator;
+import edu.byu.ece.rapidSmith.design.subsite.*;
+import edu.byu.ece.rapidSmith.device.*;
 import javafx.util.Pair;
 import org.apache.commons.lang3.tuple.MutablePair;
 
@@ -55,6 +50,7 @@ public class UsedStaticResources {
 
     // Map from port name(s) to a pair of the static net name and the static portion of the route string
 	private Map<String, MutablePair<String, String>> staticRoutemap;
+	private Map<String, String> oocPortMap; // Map from port name to the associated partition pin's node
 
 	/**
 	 * Creates a new XdcRoutingInterface object.
@@ -103,11 +99,70 @@ public class UsedStaticResources {
 						if (toks.length > 1)
 							throw new ParseException("Unexpected Token Content: " + toks[0]);
 						break;
+					case "OOC_PORT" : processOocPort(toks);
+						break;
 					default : 
 						throw new ParseException("Unrecognized Token: " + toks[0]);
 				}
 			}
 		}
+	}
+
+	/**
+	 * Processes the "OOC_PORT" token in the static_resources.rsc of a RSCP. Specifically,
+	 * this function adds the OOC port and corresponding port wire to the oocPortMap
+	 * data structure for later processing.
+	 *
+	 * Expected Format: OOC_PORT portName Tile/Wire direction
+	 * @param toks An array of space separated string values parsed from the placement.rsc
+	 */
+	private void processOocPort(String[] toks) {
+
+		// TODO: Add currentLineNumber back in
+		//assert (toks.length == 4) : String.format("Token error on line %d: Expected format is \"OOC_PORT\" PortName Tile/Wire ", this.currentLineNumber);
+
+		if (this.oocPortMap == null) {
+			this.oocPortMap = new HashMap<>();
+		}
+
+		oocPortMap.put(toks[1], toks[2]);
+		String portName = toks[1];
+		Cell portCell = design.getCell(portName);
+
+		String[] wireToks = toks[2].split("/");
+		// TODO: Try get tile, etc.
+		Tile tile = device.getTile(wireToks[0]);
+		assert (tile != null);
+		TileWire partPinWire = tile.getWire(wireToks[1]);
+		assert (partPinWire != null);
+
+		String direction = toks[3];
+
+		PinDirection pinDirection;
+		switch (direction) {
+			case "IN" : pinDirection = PinDirection.IN; break;
+			case "OUT" : pinDirection = PinDirection.OUT; break;
+			case "INOUT" :
+			default: throw new AssertionError("Invalid direction");
+		}
+
+
+		// Remove the port cell's pin from the design (they are outside of the partial device)
+		assert (portCell.getPins().size() == 1);
+		CellPin cellPin = portCell.getPins().iterator().next();
+		CellNet net = cellPin.getNet();
+		net.disconnectFromPin(cellPin);
+
+		// Add the partition pin to the port cell
+		// Get the partpin node
+
+		//PartitionPin partPin = new PartitionPin("partPin." + portName + "." + direction, partPinWire, pinDirection);
+		CellPin partPin = new PartitionPin( portName, partPinWire, pinDirection);
+		portCell.attachPartitionPin(partPin);
+		net.connectToPin(partPin);
+		//partPin.setCell(portCell);
+
+
 	}
 	
 	/**
@@ -178,5 +233,14 @@ public class UsedStaticResources {
     public Map<String, MutablePair<String, String>> getStaticRoutemap() {
         return staticRoutemap;
     }
+
+
+	/**
+	 * @return the oocPortMap
+	 */
+	public Map<String, String> getOocPortMap() {
+		return oocPortMap;
+	}
+
 
 }

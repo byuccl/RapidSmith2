@@ -364,7 +364,7 @@ public class XdcPlacementInterface {
 			}
 			
 			// If OOC mode, write the partition pin location properties
-			if (design.getImplementationMode() == ImplementationMode.OUT_OF_CONTEXT)
+			if (design.getImplementationMode() == ImplementationMode.OUT_OF_CONTEXT || design.getImplementationMode() == ImplementationMode.RECONFIG_MODULE)
 			{
 				// Iterate through the ooc port map to construct the properties
 				Map<String, String> oocPortMap = design.getOocPortMap();

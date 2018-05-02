@@ -27,11 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import edu.byu.ece.rapidSmith.device.Bel;
-import edu.byu.ece.rapidSmith.device.BelId;
-import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.PinDirection;
-import edu.byu.ece.rapidSmith.device.SitePin;
+import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
 /**
@@ -343,6 +339,8 @@ public abstract class CellPin implements Serializable {
 	 */
 	public abstract String getFullName();
 
+	public abstract String getPortName();
+
 	/**
 	 * @return the direction of this pin from the cell's perspective
 	 */
@@ -351,8 +349,10 @@ public abstract class CellPin implements Serializable {
 	/** 
 	 * @return <code>true</code> if the pin is a pseudo pin. <code>false</code> otherwise.
 	 */
-	public abstract boolean isPseudoPin(); 
-	
+	public abstract boolean isPseudoPin();
+
+	public abstract boolean isPartitionPin();
+
 	/**
 	 * Returns the BelPins that this pin can potentially be mapped onto. The BEL that this pin's parent
 	 * cell is placed on is used to determine the potential mappings. This function should 
@@ -412,6 +412,8 @@ public abstract class CellPin implements Serializable {
 	 * @return 
 	 */
 	public abstract CellPin getExternalPin();
+
+	public abstract Wire getWire();
 
 	public void setMacroPinToGlobalNet(CellNet n) {
 		setNet(n);

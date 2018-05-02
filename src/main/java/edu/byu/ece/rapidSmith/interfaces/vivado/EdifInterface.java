@@ -689,7 +689,7 @@ public final class EdifInterface {
 			if (cellPin.isPseudoPin()) {
 				continue;
 			}
-						
+
 			Cell parentCell = cellPin.getCell();
 			
 			EdifPortRef portRef = parentCell.isPort() ?

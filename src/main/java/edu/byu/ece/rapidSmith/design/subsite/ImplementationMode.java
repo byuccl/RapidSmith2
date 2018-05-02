@@ -25,8 +25,9 @@ package edu.byu.ece.rapidSmith.design.subsite;
  * <ul>
  * <li> regular
  * <li> out_of_context
+ * <li> reconfig_module
  * </ul?
  */
 public enum ImplementationMode {
-	REGULAR, OUT_OF_CONTEXT
+	REGULAR, OUT_OF_CONTEXT, RECONFIG_MODULE
 }
