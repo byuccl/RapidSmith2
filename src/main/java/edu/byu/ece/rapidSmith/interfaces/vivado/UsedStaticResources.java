@@ -47,7 +47,8 @@ public class UsedStaticResources {
 	private final CellDesign design;
 	private final WireEnumerator wireEnumerator;
 	private Pattern pipNamePattern;
-
+	private int currentLineNumber;
+	private String currentFile;
     // Map from port name(s) to a pair of the static net name and the static portion of the route string
 	private Map<String, MutablePair<String, String>> staticRoutemap;
 	private Map<String, String> oocPortMap; // Map from port name to the associated partition pin's node
@@ -132,6 +133,18 @@ public class UsedStaticResources {
 		String[] wireToks = toks[2].split("/");
 		// TODO: Try get tile, etc.
 		Tile tile = device.getTile(wireToks[0]);
+
+		// If tile is null, the tile is probably outside of the partial device boundaries (do a better check for this?)
+		// See if the partition pin node exists in the hierarchical port
+		// TODO: Check that the node is exactly the right one. IE make sure the true tile name matches as well.
+		if (tile == null) {
+			System.out.println("Wanted to get tile " + wireToks[0]);
+
+			tile = device.getTile("HIER_PORT_X0Y0");
+			System.out.println("Cool I got the hier port");
+
+		}
+
 		assert (tile != null);
 		TileWire partPinWire = tile.getWire(wireToks[1]);
 		assert (partPinWire != null);
@@ -201,7 +214,7 @@ public class UsedStaticResources {
 	 */
 	private void processStaticRoutes(String[] toks) {
 		assert(toks.length > 3);
-		String staticRouteString = "";
+		StringBuilder staticRouteString = new StringBuilder();
 		ArrayList<String> portNames  = new ArrayList<>();
 
 		// First token (after STATIC_RT) is name of the static-net
@@ -214,12 +227,31 @@ public class UsedStaticResources {
 			i++;
 		}
 
-		// FIXME: This is pretty unnecessary
+		// Iterate through the rest of the static route
 		for (; i < toks.length; i++) {
-			staticRouteString += toks[i] + " ";
+
+			if (!toks[i].equals("{") && !toks[i].equals("}")) {
+				// Some wires in the static route will be outside of the partial device, but some of the wires will be
+				// within the partial device. These wires need to be marked as used so routers know they cannot be used.
+				String[] wireToks = toks[i].split("/");
+				Tile tile = device.getTile(wireToks[0]);
+				Integer wireEnum = wireEnumerator.getWireEnum(wireToks[1]);
+
+				// If the wire exists within the partial device, mark it as used
+				if (tile != null && wireEnum != null) {
+					Wire tileWire = new TileWire(tile, wireEnum);
+
+					// Set the tile wire as used so routers know to not use it
+					tileWire.setUsed(true);
+				}
+
+			}
+
+			// Append the "{", "}", or wire to the static route string
+			staticRouteString.append(toks[i]).append(" ");
 		}
 
-		MutablePair<String, String> netRoute = new MutablePair<>(staticNetName, staticRouteString);
+		MutablePair<String, String> netRoute = new MutablePair<>(staticNetName, staticRouteString.toString());
 
 		if (this.staticRoutemap == null)
 			this.staticRoutemap = new HashMap<>();
@@ -241,6 +273,5 @@ public class UsedStaticResources {
 	public Map<String, String> getOocPortMap() {
 		return oocPortMap;
 	}
-
 
 }

@@ -1251,22 +1251,25 @@ public class XdcRoutingInterface {
 
 				// If OOC, build lists of source nets and sink nets.
 				// These routes are exported to the oocRouting XDC file.
-				if (implementationMode.equals(ImplementationMode.OUT_OF_CONTEXT) || implementationMode==ImplementationMode.RECONFIG_MODULE) {
+				if (implementationMode == ImplementationMode.RECONFIG_MODULE) {
 					if (net.getSourcePin().isPartitionPin()) {
-						// If the net is driven by a port, it's net needs to be merged with the static portion coming first
+						// If the net is driven by a port, its net needs to be merged with the static portion coming first
 						//System.out.println("Net " + net.getName() + " has source port " + net.getSourcePin().getCell().getName());
 						sourceNets.add(net);
 						continue;
 					}
 					else if (!net.isGNDNet() && net.getSinkPins().size() > 0){
-						assert(net.getSinkPins().size() == 1);
-						Iterator<CellPin> iterator = net.getSinkPins().iterator();
-						//assert(iterator.hasNext());
-						CellPin sink = iterator.next();
-						//System.out.println("Net " + net.getName() + " has sink port " + sink.getCell().getName());
 
-						sinkNets.add(net);
-						continue;
+						// I think there is a problem with nets like this. see partial_add8
+						//assert(net.getSinkPins().size() == 1);
+						Iterator<CellPin> iterator = net.getSinkPins().iterator();
+						assert(iterator.hasNext());
+						CellPin sink = iterator.next();
+
+						if (sink.isPartitionPin()) {
+							sinkNets.add(net);
+							continue;
+						}
 					}
 				}
 
@@ -1315,6 +1318,10 @@ public class XdcRoutingInterface {
 				// Merge the static and RM portions of the route
 				String partPinNode = oocPortMap.get(portName);
 				System.out.println("portName: " + portName);
+
+				if (portName == null)
+					System.out.println("Error: How is this null?");
+
 				assert(partPinNode != null);
 				String mergedRoute = mergePartialStaticRoute(netRoutePair.getValue(), partialRoute, partPinNode);
 

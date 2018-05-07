@@ -24,14 +24,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.Map;
 
 import edu.byu.ece.edif.core.EdifNameConflictException;
 import edu.byu.ece.edif.core.InvalidEdifNameException;
 import edu.byu.ece.rapidSmith.RSEnvironment;
-import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
-import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
+import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 import org.apache.commons.lang3.tuple.MutablePair;
@@ -129,6 +128,24 @@ public final class VivadoInterface {
 			staticResources.parseResourcesRSC(resourcesFile);
 			vivadoCheckpoint.setStaticRoutemap(staticResources.getStaticRoutemap());
 			design.setOocPortMap(staticResources.getOocPortMap());
+
+			// It's possible the RM netlist may include OOC ports (partition pins) that are not used by the RM.
+			// One reason this can happen is other RMs (for the same RP) may actually use these partition pins, while
+			// this one does not. These ports need to remain in the netlist for the PR flow to work correctly.
+			// For now, disconnect the pins from nets to make packing easier?
+			// See partial count design for example of this.
+//			for (Iterator<Cell> iterator = design.getPorts().iterator(); iterator.hasNext();) {
+//				Cell port = iterator.next();
+//
+	//			for (CellPin pin : port.getPins()) {
+	//				if (!pin.isPartitionPin()) {
+	//					if (pin.getNet() != null) {
+	//						pin.getNet().disconnectFromPin(pin);
+	//					}
+	//				}
+	//
+	//		   }
+	//		}
 		}
 
 
