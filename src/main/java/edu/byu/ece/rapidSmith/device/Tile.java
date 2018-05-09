@@ -74,6 +74,7 @@ public class Tile implements Serializable {
 	 */
 	public Tile() {
 		wireConnections = null;
+		reverseWireConnections = null;
 		dev = null;
 	}
 
@@ -334,38 +335,6 @@ public class Tile implements Serializable {
 		return hasConnection(pip.getStartWire().getWireEnum(), pip.getEndWire().getWireEnum());
 	}
 
-	/**
-	 * Set a PIP wire connection as used (or remove it from the tile)
-	 * @param pip the PIP whose corresponding connection is used
-	 * @param remove if true, the PIP wire connection is removed from the tile;
-	 * otherwise, the PIP wire connection is just marked as used.
-	 */
-	public void setUsedPIP(PIP pip, Boolean remove) {
-		if (!hasPIP(pip)) {
-			// TODO: throw an exception
-			System.out.println("This PIP does not exist in the tile!");
-			return;
-		}
-
-		// Mark the source and sink wires as used
-		pip.getStartWire().setUsed(true);
-		pip.getEndWire().setUsed(true);
-
-	}
-
-//	public void setUnavailablePIP(PIP pip) {
-//		int startWire = pip.getStartWire().getWireEnum();
-//		int endWire = pip.getEndWire().getWireEnum();
-//
-//		WireConnection[] wireConns = wireConnections.get(startWire);
-//		if (wireConns != null && wireConns.length >= 0) {
-//			for (WireConnection wc : wireConns) {
-//				if (wc.getWire() == endWire && wc.isPIP()) {
-//					wc.setUnavailable(true);
-//				}
-//			}
-//		}
-//	}
 
 	private boolean hasConnection(int startWire, int endWire) {
 		WireConnection[] wireConns = wireConnections.get(startWire);

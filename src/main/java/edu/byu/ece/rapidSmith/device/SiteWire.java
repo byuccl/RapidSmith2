@@ -41,7 +41,6 @@ public class SiteWire implements Wire, Serializable {
 	private final Site site;
 	private final SiteType siteType;
 	private final int wire;
-	private PathFinderCost pfc;
 
 	public SiteWire(Site site, int wire) {
 		this(site, site.getType(), wire);
@@ -56,16 +55,6 @@ public class SiteWire implements Wire, Serializable {
 	@Override
 	public Site getSite() {
 		return site;
-	}
-
-	@Override
-	public void setUsed(Boolean used) {
-		return;
-	}
-
-	@Override
-	public Boolean isUsed() {
-		return false;
 	}
 
 	public SiteType getSiteType() {

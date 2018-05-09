@@ -26,7 +26,7 @@ import java.util.Map;
 
 /**
  * Contains the mapping from wire enumeration to wire names as well as
- * types and directions of the wires.
+ * types, directions, and usage of the wires.
  * Created by Travis Haroldsen on 11/15/14.
  */
 public class WireEnumerator implements Serializable {

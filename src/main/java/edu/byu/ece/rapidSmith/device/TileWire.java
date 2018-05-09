@@ -40,19 +40,7 @@ public class TileWire implements Wire, Serializable {
 	private static final long serialVersionUID = 5844788118958981887L;
 	private Tile tile;
 	private int wire;
-	private PathFinderCost pfc;
 
-	private Boolean used; // used by the static design
-
-	public Boolean isUsed() {
-		return used;
-	}
-
-	public void setUsed(Boolean used) {
-		this.used = used;
-	}
-
-	
 	public TileWire(Tile tile, int wire) {
 		assert tile != null;
 

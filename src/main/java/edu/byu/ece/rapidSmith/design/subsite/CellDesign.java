@@ -23,6 +23,7 @@ package edu.byu.ece.rapidSmith.design.subsite;
 import edu.byu.ece.rapidSmith.design.AbstractDesign;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.Site;
+import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.interfaces.vivado.XdcConstraint;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
@@ -68,6 +69,8 @@ public class CellDesign extends AbstractDesign {
 	private ImplementationMode mode;
 	/** Map of used PIPs to their Input Values in a Site **/
 	private Map<Site, Map<String, String>> pipInValues;
+
+	private Set<Wire> reservedWires;
 
 	// TODO: Re-think these three
 	/**Map of out-of-context ports to their ooc tile and node **/
@@ -933,6 +936,18 @@ public class CellDesign extends AbstractDesign {
 
 	public void setStaticRoutemap(Map<String, String> staticRoutemap) {
 		this.staticRoutemap = staticRoutemap;
+	}
+
+	public Set<Wire> getReservedWires() {
+		return reservedWires;
+	}
+
+	public boolean isWireReserved(Wire wire) {
+		return reservedWires.contains(wire);
+	}
+
+	public void setReservedWires(Set<Wire> reservedWires) {
+		this.reservedWires = reservedWires;
 	}
 }
 

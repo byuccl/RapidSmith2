@@ -55,17 +55,7 @@ public abstract class Connection implements Serializable {
 		public boolean isWireConnection() {
 			return true;
 		}
-		
-		@Override
-		public boolean isUsed() {
-			return wc.isUsed();
-		}
-		
-//		@Override
-//		public boolean isUnavailable() {
-//			return wc.isUnavailable();
-//		}
-		
+
 		@Override
 		public boolean isPip() {
 			return wc.isPIP();
@@ -230,16 +220,6 @@ public abstract class Connection implements Serializable {
 		}
 		
 		@Override
-		public boolean isUsed() {
-			return wc.isUsed();
-		}
-		
-//		@Override
-//		public boolean isUnavailable() {
-//			return wc.isUnavailable();
-//		}
-
-		@Override
 		public boolean isPip() {
 			return wc.isPIP();
 		}
@@ -331,16 +311,6 @@ public abstract class Connection implements Serializable {
 		public boolean isWireConnection() {
 			return true;
 		}
-		
-		@Override
-		public boolean isUsed() {
-			return wc.isUsed();
-		}
-		
-//		@Override
-//		public boolean isUnavailable() {
-//			return wc.isUnavailable();
-//		}
 
 		@Override
 		public boolean isPip() {
@@ -440,16 +410,6 @@ public abstract class Connection implements Serializable {
 			return true;
 		}
 
-		@Override
-		public boolean isUsed() {
-			return wc.isUsed();
-		}
-		
-//		@Override
-//		public boolean isUnavailable() {
-//			return wc.isUnavailable();
-//		}
-		
 		@Override
 		public boolean isPip() {
 			return wc.isPIP();
@@ -593,17 +553,6 @@ public abstract class Connection implements Serializable {
 			return Objects.hash(pin);
 		}
 
-		@Override
-		public boolean isUsed() {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-//		@Override
-//		public boolean isUnavailable() {
-//			// TODO Auto-generated method stub
-//			return false;
-//		}
 	}
 
 	@Deprecated
@@ -688,17 +637,6 @@ public abstract class Connection implements Serializable {
 			return Objects.hash(pin);
 		}
 
-		@Override
-		public boolean isUsed() {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-//		@Override
-//		public boolean isUnavailable() {
-//			// TODO Auto-generated method stub
-//			return false;
-//		}
 	}
 
 	@Deprecated
@@ -783,17 +721,6 @@ public abstract class Connection implements Serializable {
 			return Objects.hash(belPin);
 		}
 
-		@Override
-		public boolean isUsed() {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-//		@Override
-//		public boolean isUnavailable() {
-//			// TODO Auto-generated method stub
-//			return false;
-//		}
 	}
 
 	public abstract Site getRoutethroughSite();
@@ -806,10 +733,6 @@ public abstract class Connection implements Serializable {
 	@Deprecated
 	public abstract boolean isWireConnection();
 	
-	public abstract boolean isUsed();
-	
-//	public abstract boolean isUnavailable();
-
 	public abstract boolean isPip();
 
 	public abstract boolean isRouteThrough();

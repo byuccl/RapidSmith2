@@ -36,19 +36,8 @@ import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
 import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
-import edu.byu.ece.rapidSmith.device.Connection;
+import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
-import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.Bel;
-import edu.byu.ece.rapidSmith.device.SitePin;
-import edu.byu.ece.rapidSmith.device.SiteType;
-import edu.byu.ece.rapidSmith.device.SiteWire;
-import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.Site;
-import edu.byu.ece.rapidSmith.device.Tile;
-import edu.byu.ece.rapidSmith.device.TileWire;
-import edu.byu.ece.rapidSmith.device.Wire;
-import edu.byu.ece.rapidSmith.device.WireEnumerator;
 import javafx.util.Pair;
 import org.apache.commons.lang3.tuple.MutablePair;
 
@@ -1244,10 +1233,10 @@ public class XdcRoutingInterface {
 		}
 
 		//write the routing information to the TCL script
-		for(CellNet net : design.getNets()) {
+		for (CellNet net : design.getNets()) {
 
 			// only print nets that have routing information. Grab the first RouteTree of the net and use this as the final route
-			if ( net.getIntersiteRouteTree() != null ) {
+			if (net.getIntersiteRouteTree() != null) {
 
 				// If OOC, build lists of source nets and sink nets.
 				// These routes are exported to the oocRouting XDC file.
@@ -1262,11 +1251,9 @@ public class XdcRoutingInterface {
 
 						// I think there is a problem with nets like this. see partial_add8
 						//assert(net.getSinkPins().size() == 1);
-						Iterator<CellPin> iterator = net.getSinkPins().iterator();
-						assert(iterator.hasNext());
-						CellPin sink = iterator.next();
 
-						if (sink.isPartitionPin()) {
+						// If any of ths sinks are partition pins, add the net to the list of sinkNets
+						if (net.getSinkPins().stream().anyMatch(CellPin::isPartitionPin)) {
 							sinkNets.add(net);
 							continue;
 						}
@@ -1287,17 +1274,15 @@ public class XdcRoutingInterface {
 
 			for (CellNet net : sourceNets) {
 				// TODO: Find matching IBUF net from static resources
-
 				String portName = net.getSourcePin().getPortName();
 
 				// Find the matching static net from the static-only design
-				System.out.println("PortName: " + portName);
 				MutablePair<String, String> netRoutePair = staticRoutemap.get(portName);
 				String partialRoute = getVivadoRouteString(net);
 
 				// Merge the static and RM portions of the route
 				String partPinNode = oocPortMap.get(portName);
-				String mergedRoute = mergePartialStaticRoute(netRoutePair.getValue(), partialRoute, partPinNode);
+				String mergedRoute = mergePartialStaticRoute(netRoutePair.getValue(), partialRoute, partPinNode, false);
 
 				// Update the value in the map
 				netRoutePair.setValue(mergedRoute);
@@ -1305,28 +1290,21 @@ public class XdcRoutingInterface {
 
 			for (CellNet net : sinkNets) {
 				// TODO: Find matching OBUF net from static resources
-				System.out.println("# of Sink Pins for net " + net.getName() + " = " + net.getSinkPins().size());
-
-				Iterator<CellPin> iterator = net.getSinkPins().iterator();
-				CellPin sinkPin = iterator.next();
-				String portName = sinkPin.getPortName();
-
-				// Find the matching static net from the static-only design
-				MutablePair<String, String> netRoutePair = staticRoutemap.get(portName);
 				String partialRoute = getVivadoRouteString(net);
 
-				// Merge the static and RM portions of the route
-				String partPinNode = oocPortMap.get(portName);
-				System.out.println("portName: " + portName);
+				for (CellPin partPin : net.getPartitionPins()) {
+					String portName = partPin.getPortName();
+					MutablePair<String, String> netRoutePair = staticRoutemap.get(portName);
 
-				if (portName == null)
-					System.out.println("Error: How is this null?");
+					// Merge the static and RM portions of the route
+					String partPinNode = oocPortMap.get(portName);
 
-				assert(partPinNode != null);
-				String mergedRoute = mergePartialStaticRoute(netRoutePair.getValue(), partialRoute, partPinNode);
+					assert(partPinNode != null);
+					String mergedRoute = mergePartialStaticRoute(netRoutePair.getValue(), partialRoute, partPinNode, true);
 
-				// Update the value in the map
-				netRoutePair.setValue(mergedRoute);
+					// Update the value in the map
+					netRoutePair.setValue(mergedRoute);
+				}
 			}
 
 			// Write the merged routing strings to the ooc routing xdc file
@@ -1342,30 +1320,61 @@ public class XdcRoutingInterface {
 	/**
 	 * Merges the partial and static route strings of a route.
 	 */
-	private String mergePartialStaticRoute(String staticRoute, String partialRoute, String partPinNode) {
-		String mergedRoute = "";
-		// Remove the opening and closing curly braces from the partial route string
-		partialRoute = partialRoute.substring(1, partialRoute.length()-2);
+	private String mergePartialStaticRoute(String staticRoute, String partialRoute, String partPinNode, boolean staticSink) {
+		StringBuilder mergedRoute = new StringBuilder();
+		String[] toks;
+		if (staticSink) {
+			// Remove the opening and closing curly braces from the static route string
+			staticRoute = staticRoute.substring(1, staticRoute.length()-2);
 
-		// Find the partition pin in the staticRoute
-		Pattern whitespacePattern = Pattern.compile("\\s+");
-		String[] toks = whitespacePattern.split(staticRoute);
+			// Find the partition pin in the partialRoute
+			Pattern whitespacePattern = Pattern.compile("\\s+");
+			toks = whitespacePattern.split(partialRoute);
 
-		// TODO: Optimize this whole thing. Make a better way to know where the partition pins are
-		// in the static route string.
-		for (int i = 0; i < toks.length; i++) {
-			if (toks[i].equals(partPinNode)) {
-				System.out.println("Found the partition pin node!");
-				toks[i] = partialRoute;
+			// TODO: Optimize this whole thing. Make a better way to know where the partition pins are
+			// in the static route string.
+			for (int i = 0; i < toks.length; i++) {
+				if (toks[i].equals(partPinNode)) {
+					//System.out.println("Found the partition pin node!");
+
+					// if the staic portion has a sink, it begins with the partition pin node (and ends in a sink)
+					// just insert the static portion
+
+					toks[i] = staticRoute;
+				}
+			}
+		}
+		else {
+			// Remove the opening and closing curly braces from the static route string
+			partialRoute = partialRoute.substring(1, partialRoute.length()-2);
+
+			// Find the partition pin in the partialRoute
+			Pattern whitespacePattern = Pattern.compile("\\s+");
+			toks = whitespacePattern.split(staticRoute);
+
+			// TODO: Optimize this whole thing. Make a better way to know where the partition pins are
+			// in the static route string.
+			for (int i = 0; i < toks.length; i++) {
+				if (toks[i].equals(partPinNode)) {
+					//System.out.println("Found the partition pin node!");
+
+					// if the staic portion has the source, the partial portion will begin with the partition pin node
+					// (and ends in one or more sinks)
+					toks[i] = partialRoute;
+				}
 			}
 		}
 
+		// The static portion of the route string will begin with the partition pin node if it the static portion of the net
+		// contains a sink outside of the partial device. It will end with the partition pin node if the static portion
+		// of the net contains the driver of the net.
+
 		// Put the tokens back into a single string
 		for (String tok : toks) {
-			mergedRoute += tok + " ";
+			mergedRoute.append(tok).append(" ");
 		}
 
-		return mergedRoute;
+		return mergedRoute.toString();
 
 
 
@@ -1414,11 +1423,18 @@ public class XdcRoutingInterface {
 			
 		while ( true ) {
 			Tile t = currentRoute.getWire().getTile();
-			routeString = routeString.concat(t.getName() + "/" + currentRoute.getWire().getName() + " ");
+
+			// TODO: Don't use a string comparison. Possibly change naming of HIER_PORT wires in partial device file.
+			if (t.getName().equals("HIER_PORT_X0Y0")) {
+				// Don't include "HIER_PORT_X0Y0". Also get rid of leading "IWIRE:" or "OWIRE:"
+				routeString = routeString.concat(currentRoute.getWire().getName().substring(6) + " ");
+			}
+			else
+				routeString = routeString.concat(t.getName() + "/" + currentRoute.getWire().getName() + " ");
 						
 			// children may be changed in the following loop, so make a copy
 			ArrayList<RouteTree> children = new ArrayList<>(currentRoute.getChildren());
-			
+
 			if (children.size() == 0)
 				break;
 			

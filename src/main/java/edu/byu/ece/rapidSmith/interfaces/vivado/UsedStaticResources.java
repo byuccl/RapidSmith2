@@ -23,9 +23,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,6 +50,7 @@ public class UsedStaticResources {
     // Map from port name(s) to a pair of the static net name and the static portion of the route string
 	private Map<String, MutablePair<String, String>> staticRoutemap;
 	private Map<String, String> oocPortMap; // Map from port name to the associated partition pin's node
+	private Set<Wire> reservedWires;
 
 	/**
 	 * Creates a new XdcRoutingInterface object.
@@ -63,7 +62,8 @@ public class UsedStaticResources {
 		this.device = device;
 		this.wireEnumerator = device.getWireEnumerator();
 		this.design = design;
-		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)"); 
+		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)");
+		reservedWires = new HashSet<>();
 	}
 	
 	/**
@@ -107,6 +107,8 @@ public class UsedStaticResources {
 				}
 			}
 		}
+
+		design.setReservedWires(reservedWires);
 	}
 
 	/**
@@ -134,21 +136,25 @@ public class UsedStaticResources {
 		// TODO: Try get tile, etc.
 		Tile tile = device.getTile(wireToks[0]);
 
+		TileWire partPinWire;
+
 		// If tile is null, the tile is probably outside of the partial device boundaries (do a better check for this?)
 		// See if the partition pin node exists in the hierarchical port
-		// TODO: Check that the node is exactly the right one. IE make sure the true tile name matches as well.
+		// TODO: Check that the node is exactly the right one. ie make sure the true tile name matches as well.
 		if (tile == null) {
-			System.out.println("Wanted to get tile " + wireToks[0]);
-
 			tile = device.getTile("HIER_PORT_X0Y0");
-			System.out.println("Cool I got the hier port");
+			// TODO: Try IPORT also.
 
+			partPinWire = tile.getWire("IWIRE:" + wireToks[0] + "/" + wireToks[1]);
+		}
+		else {
+			partPinWire = tile.getWire(wireToks[1]);
 		}
 
-		assert (tile != null);
-		TileWire partPinWire = tile.getWire(wireToks[1]);
-		assert (partPinWire != null);
+		// Add the partition pin node to the list of reserved wires
+		reservedWires.add(partPinWire);
 
+		assert (partPinWire != null);
 		String direction = toks[3];
 
 		PinDirection pinDirection;
@@ -197,9 +203,13 @@ public class UsedStaticResources {
 				Tile tile = device.getTile(tileName);
 				Wire startWire = new TileWire(tile, wireEnumerator.getWireEnum(source));
 				Wire sinkWire = new TileWire(tile, wireEnumerator.getWireEnum(sink));
+
+				// Mark both the startWire and sinkWire as being reserved.
+				reservedWires.add(startWire);
+				reservedWires.add(sinkWire);
 		
-				PIP pip = new PIP(startWire, sinkWire);
-				tile.setUsedPIP(pip, false); // Mark the PIP as used 
+				//PIP pip = new PIP(startWire, sinkWire);
+				//tile.setUsedPIP(pip, false); // Mark the PIP as used
 	 				
 			}
 			else {
@@ -242,9 +252,8 @@ public class UsedStaticResources {
 					Wire tileWire = new TileWire(tile, wireEnum);
 
 					// Set the tile wire as used so routers know to not use it
-					tileWire.setUsed(true);
+					reservedWires.add(tileWire);
 				}
-
 			}
 
 			// Append the "{", "}", or wire to the static route string

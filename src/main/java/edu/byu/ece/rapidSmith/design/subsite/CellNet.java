@@ -206,6 +206,17 @@ public class CellNet implements Serializable {
 	}
 
 	/**
+	 * Returns the partition pins of the net. This structure should not be modified by the user.
+	 *
+	 * @return Partition pins of the net
+	 */
+	public Collection<CellPin> getPartitionPins() {
+		return getPins().stream()
+				.filter(CellPin::isPartitionPin)
+				.collect(Collectors.toList());
+	}
+
+	/**
 	 * Returns the sink pins of the net. This structure should not be modified by the user.
 	 * 
 	 * @return CellPin sinks of the net

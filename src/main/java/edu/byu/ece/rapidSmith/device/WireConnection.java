@@ -170,17 +170,4 @@ public class WireConnection implements Serializable, Comparable<WireConnection>{
 //		this.unavailable = unavailable;
 //	}
 
-	/**
-	 * @return the used
-	 */
-	public boolean isUsed() {
-		return used;
-	}
-
-	/**
-	 * @param used the used to set
-	 */
-	public void setUsed(boolean used) {
-		this.used = used;
-	}
 }

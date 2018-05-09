@@ -42,10 +42,6 @@ public final class PIP implements Serializable {
 		this.endWire = other.endWire;
 	}
 
-	public Boolean isUsed() {
-		return startWire.isUsed() || endWire.isUsed();
-	}
-
 	/**
 	 * Constructs a new PIP.
 	 *

@@ -22,6 +22,8 @@ public class PathFinderCost {
 		usedPrev = 1;
 		wireCost = 1;
 
+		//assert (!wire.isUsed());
+
 		if (findIsPip(wire)) {
 			setIsPip(wire);
 		}
