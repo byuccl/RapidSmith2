@@ -489,7 +489,7 @@ public final class EdifInterface {
 	 * @param edifOutputFile Output EDIF file path
 	 * @param design RapidSmith design to convert to EDIF
 	 * @throws IOException
-	 */
+	 */ 
 	public static void writeEdif(String edifOutputFile, CellDesign design) throws IOException {
 		
 		try {
