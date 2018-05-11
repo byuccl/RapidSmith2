@@ -489,7 +489,7 @@ public final class EdifInterface {
 	 * @param edifOutputFile Output EDIF file path
 	 * @param design RapidSmith design to convert to EDIF
 	 * @throws IOException
-	 */
+	 */ 
 	public static void writeEdif(String edifOutputFile, CellDesign design) throws IOException {
 		
 		try {
@@ -505,9 +505,9 @@ public final class EdifInterface {
 			EdifLibrary edifPrimitiveLibrary = new EdifLibrary(libManager, "hdi_primitives");
 			
 			HashMap<LibraryCell, EdifCell> cellMap = new HashMap<>();
-			
+
 			for (LibraryCell libCell : getUniqueLibraryCellsInDesign(design)) {
-				EdifCell edifCell = createEdifLibraryCell(libCell, edifPrimitiveLibrary); 
+				EdifCell edifCell = createEdifLibraryCell(libCell, edifPrimitiveLibrary);
 				edifPrimitiveLibrary.addCell(edifCell);
 				cellMap.put(libCell, edifCell);
 			}
@@ -654,10 +654,8 @@ public final class EdifInterface {
 		
 		Objects.requireNonNull(edifLibCell);
 		EdifCellInstance cellInstance = new EdifCellInstance(createEdifNameable(cell.getName()), parent, edifLibCell);
-	
-		// create an equivalent edif property for each RS2 property
 		cellInstance.addPropertyList(createEdifPropertyList(cell.getProperties()));
-				
+
 		return cellInstance;
 	}
 	
@@ -743,25 +741,27 @@ public final class EdifInterface {
 		PropertyList edifProperties = new PropertyList();
 		
 		for (Property prop : properties) {
-			// The key and value of the property need sensible toString() methods when exporting to EDIF
-			// this function is for creating properties for printing only!
-			// TODO: make sure to inform the user of this 
-			
-			edu.byu.ece.edif.core.Property edifProperty;
-			
-			Object value = prop.getValue(); 
-			
-			if (value instanceof Boolean) {
-				edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), (Boolean) value);
+
+			if (prop.getType().equals(PropertyType.EDIF)) {
+				// The key and value of the property need sensible toString() methods when exporting to EDIF
+				// this function is for creating properties for printing only!
+				// TODO: make sure to inform the user of this
+
+				edu.byu.ece.edif.core.Property edifProperty;
+
+				Object value = prop.getValue();
+
+				if (value instanceof Boolean) {
+					edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), (Boolean) value);
+				}
+				else if (value instanceof Integer) {
+					edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), (Integer) value);
+				}
+				else {
+					edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), prop.getValue().toString());
+				}
+				edifProperties.addProperty(edifProperty);
 			}
-			else if (value instanceof Integer) {
-				edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), (Integer) value);
-			}
-			else {	
-				edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), prop.getValue().toString());
-			}
-			
-			edifProperties.addProperty(edifProperty);
 		}
 		
 		return edifProperties;
@@ -770,6 +770,7 @@ public final class EdifInterface {
 	/*
 	 * Creates an EDIF cell that corresponds to a RapidSmith library cell
 	 */
+	//maybe get rid of unwanted properties in this method. We only want EDIF properties
 	private static EdifCell createEdifLibraryCell(LibraryCell cell, EdifLibrary library) throws EdifNameConflictException, InvalidEdifNameException {
 		// this will print a cell with the "view PRIM" ... vivado prints them with "view netlist" this shouldn't be a problem
 		EdifCell edifCell = new EdifCell(library, createEdifNameable(cell.getName()), true);
