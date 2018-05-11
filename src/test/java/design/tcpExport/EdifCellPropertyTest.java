@@ -45,8 +45,12 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-/*This class tests the Output Edif property list which is written to the tcp netlist.edf in the edifInterface class.
-  Only Edif Property Types are allowed in the netlist.edf which can be imported into Vivado using Tincr*/
+/**tests the {@link EdifInterface} to verify that edif Property lists only contain EDIF type properties
+  *Only EDIF Property Types are allowed in the netlist.edf to be imported into Vivado using Tincr.
+ * @author Dallon Glick
+ * @author Jesse Grigg
+ *
+  */
 
 public class EdifCellPropertyTest {
     private static final Path rscpDirectory = RSEnvironment.defaultEnv().getEnvironmentPath()
@@ -82,7 +86,7 @@ public class EdifCellPropertyTest {
         tmpFile.delete();
     }
 
-    //Test to make sure output netlist.edf does not have DESIGN type properties
+    /**Test to make sure output netlist.edf does not have DESIGN type properties*/
     @Test
     @DisplayName("EdifCellPropertyTest DESIGN Property Test")
     public void designPropertyTest() throws IOException {
@@ -104,7 +108,7 @@ public class EdifCellPropertyTest {
 
     }
 
-    //Test to make sure output netlist.edf does not have USER type properties
+    /**Test to make sure output netlist.edf does not have USER type properties*/
     @Test
     @DisplayName("EdifCellPropertyTest USER Property Test")
     public void userPropertyTest() throws IOException {
@@ -125,7 +129,7 @@ public class EdifCellPropertyTest {
         }
     }
 
-    //Test to make sure output netlist.edf does not have BELPROP type properties
+    /**Test to make sure output netlist.edf does not have BELPROP type properties*/
     @Test
     @DisplayName("EdifCellPropertyTest BELPROP Property Test")
     public void belpropPropertyTest() throws IOException {
@@ -146,8 +150,9 @@ public class EdifCellPropertyTest {
         }
     }
 
-    //Test to make sure output netlist.edf does have EDIF type properties. These property
-    //types work when importing netlist back into Vivado
+    /**Test to make sure output netlist.edf does have EDIF type properties. These property
+     *types work when importing netlist back into Vivado
+     */
     @Test
     @DisplayName("EdifCellPropertyTest EDIF Property Test")
     public void edifPropertyTest() throws IOException {
