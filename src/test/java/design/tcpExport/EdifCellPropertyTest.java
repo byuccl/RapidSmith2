@@ -34,6 +34,7 @@ import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -44,6 +45,8 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+/*This class tests the Output Edif property list which is written to the tcp netlist.edf in the edifInterface class.
+  Only Edif Property Types are allowed in the netlist.edf which can be imported into Vivado using Tincr*/
 
 public class EdifCellPropertyTest {
     private static final Path rscpDirectory = RSEnvironment.defaultEnv().getEnvironmentPath()
@@ -79,7 +82,9 @@ public class EdifCellPropertyTest {
         tmpFile.delete();
     }
 
+    //Test to make sure output netlist.edf does not have DESIGN type properties
     @Test
+    @DisplayName("EdifCellPropertyTest DESIGN Property Test")
     public void designPropertyTest() throws IOException {
         Cell cell = design.getCell("q[8]_i_2");
         Property designProp = new Property("DesignPropKey", PropertyType.DESIGN, "DesignPropVal");
@@ -99,7 +104,9 @@ public class EdifCellPropertyTest {
 
     }
 
+    //Test to make sure output netlist.edf does not have USER type properties
     @Test
+    @DisplayName("EdifCellPropertyTest USER Property Test")
     public void userPropertyTest() throws IOException {
         Cell cell = design.getCell("q[8]_i_2");
         Property userProp = new Property("userPropKey", PropertyType.USER, "userPropVal");
@@ -118,7 +125,9 @@ public class EdifCellPropertyTest {
         }
     }
 
+    //Test to make sure output netlist.edf does not have BELPROP type properties
     @Test
+    @DisplayName("EdifCellPropertyTest BELPROP Property Test")
     public void belpropPropertyTest() throws IOException {
         Cell cell2 = design.getCell("q[8]_i_2");
         Property belProp = new Property("belPropKey", PropertyType.BELPROP, "belPropVal");
@@ -137,7 +146,10 @@ public class EdifCellPropertyTest {
         }
     }
 
+    //Test to make sure output netlist.edf does have EDIF type properties. These property
+    //types work when importing netlist back into Vivado
     @Test
+    @DisplayName("EdifCellPropertyTest EDIF Property Test")
     public void edifPropertyTest() throws IOException {
         Cell cell2 = design.getCell("q[8]_i_2");
         Property edifProp = new Property("edifPropKey", PropertyType.EDIF, "edifPropVal");
