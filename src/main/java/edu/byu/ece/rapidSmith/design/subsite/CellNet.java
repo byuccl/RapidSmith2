@@ -544,7 +544,7 @@ public class CellNet implements Serializable {
 	
 	/**
 	 * Returns the first {@link SitePin} in the list of site pin sources. If you 
-	 * know the net has only onw site pin source, then use this function.
+	 * know the net has only one site pin source, then use this function.
 	 */
 	public SitePin getSourceSitePin() {
 		return this.sourceSitePinList == null ? null : this.sourceSitePinList.get(0);

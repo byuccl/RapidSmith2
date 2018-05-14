@@ -1100,8 +1100,29 @@ public class XdcRoutingInterface {
 	public void writeRoutingXDC(String xdcOut, CellDesign design) throws IOException {
 		
 		BufferedWriter fileout = new BufferedWriter (new FileWriter(xdcOut));
-		
-		//write the routing information to the TCL script
+
+		// Write used site PIPs (intrasite routing information)
+		for (Site site : design.getUsedSites()) {
+			Map<String, String> pipInfo = design.getPIPInputValsAtSite(site);
+
+			// Don't write the used site PIPs for sites whose intrasite routing has not been modified
+			if (pipInfo == null)
+				continue;
+
+			// Vivado crashes with IOB33. Remove this special case if this bug is fixed.
+			if (site.getType().equals(SiteType.valueOf(design.getFamily(), "IOB33")))
+				continue;
+
+			fileout.write(String.format("set_property MANUAL_ROUTING %s [get_sites {%s}]\n", site.getType().name(), site.getName()));
+
+			StringBuilder sitePips = new StringBuilder();
+			for (Map.Entry<String, String> entry : pipInfo.entrySet()) {
+				sitePips.append(entry.getKey()).append(":").append(entry.getValue()).append(" ");
+			}
+			fileout.write(String.format("set_property SITE_PIPS {%s} [get_sites {%s}]\n", sitePips.toString(), site.getName()));
+		}
+
+		// Write the intersite routing information for each net
 		for(CellNet net : design.getNets()) {
 
 			// only print nets that have routing information. Grab the first RouteTree of the net and use this as the final route
