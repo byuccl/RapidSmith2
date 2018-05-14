@@ -25,7 +25,6 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-
 /**tests the {@link EdifInterface} to verify that edif Property lists only contain EDIF type properties
   *Only EDIF Property Types are allowed in the netlist.edf to be imported into Vivado using Tincr.
   * @author Dallon Glick

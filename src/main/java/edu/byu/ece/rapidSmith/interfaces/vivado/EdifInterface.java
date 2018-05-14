@@ -762,7 +762,6 @@ public final class EdifInterface {
 				edifProperties.addProperty(edifProperty);
 			}
 		}
-		
 		return edifProperties;
 	}
 	
