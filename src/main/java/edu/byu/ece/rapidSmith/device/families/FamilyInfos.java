@@ -37,6 +37,7 @@ public class FamilyInfos {
         familyInfoMap.put(Virtex6.FAMILY_TYPE, new Virtex6());
         familyInfoMap.put(Artix7.FAMILY_TYPE, new Artix7());
         familyInfoMap.put(Kintexu.FAMILY_TYPE, new Kintexu());
+        familyInfoMap.put(Zynq.FAMILY_TYPE, new Zynq());
     }
 
     public static FamilyInfo get(FamilyType family) {
