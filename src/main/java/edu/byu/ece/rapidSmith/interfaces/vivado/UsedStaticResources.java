@@ -146,6 +146,21 @@ public class UsedStaticResources {
 			// TODO: Try IPORT also.
 
 			partPinWire = tile.getWire("IWIRE:" + wireToks[0] + "/" + wireToks[1]);
+
+
+			// If there is more than one connection into the device from a given wire, such as
+			// CLK_HROW_TOP_R_X87Y78/CLK_HROW_CK_BUFHCLK_L7, then there will be multiple HIER IWIRES, one for each
+			// connection. This seems really dumb in hindsight. It seems to me it would make much more sense for there to
+			// one wire, with all possible connections.
+			// TODO: Massive fix may be needed. I suppose the partial device really just has CONNECTIONS into the pdevice.
+			if (partPinWire == null) {
+				partPinWire = tile.getWire("IWIRE:" + wireToks[0] + "/" + wireToks[1] + "(1)");
+			}
+
+			Collection<Connection> conns = partPinWire.getWireConnections();
+			System.out.println("There are " + conns.size() + " conns");
+
+
 		}
 		else {
 			partPinWire = tile.getWire(wireToks[1]);
@@ -153,7 +168,6 @@ public class UsedStaticResources {
 
 		// Add the partition pin node to the list of reserved wires
 		reservedWires.add(partPinWire);
-
 		assert (partPinWire != null);
 		String direction = toks[3];
 

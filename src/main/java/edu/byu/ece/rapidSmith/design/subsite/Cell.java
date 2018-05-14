@@ -297,6 +297,10 @@ public class Cell {
 		return true;
 	}
 
+	public boolean hasPartitionPin() {
+		return (pinMap.values().stream().anyMatch(CellPin::isPartitionPin));
+	}
+
 
 	/**
 	 * Creates a new pseudo pin, and attaches it to the cell. 

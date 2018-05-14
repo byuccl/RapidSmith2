@@ -44,5 +44,6 @@ public enum CellPinType {
 	DATA, 
 	PSEUDO,
 	MACRO,
-	PARTITION
+	PARTITION,
+	PARTITION_CLK
 }

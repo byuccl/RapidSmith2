@@ -217,6 +217,14 @@ public class CellNet implements Serializable {
 	}
 
 	/**
+	 * Returns whether or not the net has at least one associated partition pin.
+	 * @return
+	 */
+	public boolean hasPartitionPin() {
+		return getPins().stream().anyMatch(CellPin::isPartitionPin);
+	}
+
+	/**
 	 * Returns the sink pins of the net. This structure should not be modified by the user.
 	 * 
 	 * @return CellPin sinks of the net
