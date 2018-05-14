@@ -251,7 +251,7 @@ public class XdcRoutingInterface {
 			else { // pin is an output of the site
 				
 				if (net.getSourceSitePin() != null) {
-					System.out.println("Source Site Pin: " + net.getSourcePin().getFullName());
+					// System.out.println("Source Site Pin: " + net.getSourcePin().getFullName());
 					net.addSourceSitePin(pin);
 					continue;
 				}
