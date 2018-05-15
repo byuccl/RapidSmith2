@@ -155,7 +155,8 @@ public class WireHashMap implements Serializable {
 
 	public WireConnection[] get(int key) {
 		int i = indexFor(key);
-		if (keys[i] == -1 || keys[i] == 0)
+		//if (keys[i] == -1 || keys[i] == 0)
+		if (keys[i] == -1)
 			return null;
 		return values[i];
 	}
@@ -178,6 +179,7 @@ public class WireHashMap implements Serializable {
 	 * 
 	 * @param key
 	 */
+	/*
 	public void remove(int key) {
 		System.out.println("Remove all of key " + key);
 		int i = indexFor(key);
@@ -195,12 +197,14 @@ public class WireHashMap implements Serializable {
 		
 		wireHashMapModification++;
 	}
+	*/
 
 	/**
 	 * Removes a WireConnection from the value array for the specified key.
 	 * @param key
 	 * @param value
 	 */
+	/*
 	public void remove(int key, WireConnection value) {		
 		int i = indexFor(key);
 		if(keys[i] == -1) {
@@ -214,6 +218,7 @@ public class WireHashMap implements Serializable {
 		size--;
 		wireHashMapModification++;
 	}
+	*/
 
 	private void grow() {
 		int newCapacity = keys.length * 2;

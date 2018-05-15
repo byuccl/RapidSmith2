@@ -555,6 +555,15 @@ public final class Site implements Serializable{
 	}
 
 	private List<SitePin> getSinkPins(SiteTemplate template) {
+		/*
+		Map<String, SitePinTemplate> sinkTemplates = template.getSinks();
+		List<SitePin> pins = new ArrayList<>(sinkTemplates.size());
+		for (SitePinTemplate pinTemplate : sinkTemplates.values()) {
+			int externalWire = getExternalWire(template.getType(), pinTemplate.getName());
+			pins.add(new SitePin(this, pinTemplate, externalWire));
+		}
+		return pins;
+		*/
 		Map<String, SitePinTemplate> sinkTemplates = template.getSinks();
 		List<SitePin> pins = new ArrayList<>(sinkTemplates.size());
 		for (SitePinTemplate pinTemplate : sinkTemplates.values()) {
@@ -567,6 +576,7 @@ public final class Site implements Serializable{
 			}
 		}
 		return pins;
+
 	}
 
 	/**

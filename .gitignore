@@ -9,6 +9,7 @@
 /*.iml
 /build/
 /.settings/
+**/.Xil
 /testdesigns/.Xil
 /testdesigns/*.tcp
 /testdesigns/*.jou

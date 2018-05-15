@@ -43,9 +43,6 @@ public class WireConnection implements Serializable, Comparable<WireConnection>{
 	private int columnOffset;
 	/** Does the source wire connected to this wire make a PIP? */
 	private boolean isPIP;
-	
-	private boolean used;
-//	private boolean unavailable;
 
 	public WireConnection(){
 		this.wire = -1;
@@ -155,19 +152,5 @@ public class WireConnection implements Serializable, Comparable<WireConnection>{
 	public String toString(WireEnumerator we){
 		return we.getWireName(this.wire) +"("+ this.rowOffset +","+ this.columnOffset +","+ this.isPIP + ")";
 	}
-
-//	/**
-//	 * @return the unavailable
-//	 */
-//	public boolean isUnavailable() {
-//		return unavailable;
-//	}
-
-//	/**
-//	 * @param unavailable the unavailable to set
-//	 */
-//	public void setUnavailable(boolean unavailable) {
-//		this.unavailable = unavailable;
-//	}
 
 }
