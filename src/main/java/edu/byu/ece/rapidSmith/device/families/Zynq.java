@@ -630,6 +630,9 @@ public final class Zynq implements FamilyInfo {
     /* ------ AUTO-GENERATED --- DO NOT EDIT ABOVE ------ */
     static {
         /* ------ CLASSIFICATIONS GO HERE ------ */
+        /* ***********************
+         * 		Tile Types
+         * ***********************/
         _CLB_TILES.add(TileTypes.CLBLL_L);
         _CLB_TILES.add(TileTypes.CLBLL_R);
         _CLB_TILES.add(TileTypes.CLBLM_L);
@@ -644,6 +647,9 @@ public final class Zynq implements FamilyInfo {
         _IO_TILES.add(TileTypes.LIOB33);
         _IO_TILES.add(TileTypes.RIOB33);
         _IO_TILES.add(TileTypes.RIOB33_SING);
+        /* ***********************
+         * 		Site Types
+         * ***********************/
         _SLICE_SITES.add(SiteTypes.SLICEL);
         _SLICE_SITES.add(SiteTypes.SLICEM);
         _BRAM_SITES.add(SiteTypes.RAMB18E1);
