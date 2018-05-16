@@ -746,24 +746,22 @@ public final class EdifInterface {
 			// The key and value of the property need sensible toString() methods when exporting to EDIF
 			// this function is for creating properties for printing only!
 			// TODO: make sure to inform the user of this 
-			
-			edu.byu.ece.edif.core.Property edifProperty;
-			
-			Object value = prop.getValue(); 
-			
-			if (value instanceof Boolean) {
-				edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), (Boolean) value);
+			if (prop.getType().equals(PropertyType.EDIF)){/**Only get PropertyType EDIF when creating EDIF propertyList*/
+				edu.byu.ece.edif.core.Property edifProperty;
+
+				Object value = prop.getValue();
+
+				if (value instanceof Boolean) {
+					edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), (Boolean) value);
+				} else if (value instanceof Integer) {
+					edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), (Integer) value);
+				} else {
+					edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), prop.getValue().toString());
+				}
+
+				edifProperties.addProperty(edifProperty);
 			}
-			else if (value instanceof Integer) {
-				edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), (Integer) value);
-			}
-			else {	
-				edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), prop.getValue().toString());
-			}
-			
-			edifProperties.addProperty(edifProperty);
 		}
-		
 		return edifProperties;
 	}
 	
