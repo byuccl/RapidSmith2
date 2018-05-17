@@ -130,6 +130,7 @@ public class UsedStaticResources {
 
 		oocPortMap.put(toks[1], toks[2]);
 		String portName = toks[1];
+
 		Cell portCell = design.getCell(portName);
 
 		String[] wireToks = toks[2].split("/");
@@ -143,32 +144,16 @@ public class UsedStaticResources {
 		// TODO: Check that the node is exactly the right one. ie make sure the true tile name matches as well.
 		if (tile == null) {
 			tile = device.getTile("HIER_PORT_X0Y0");
-			// TODO: Try IPORT also.
-
+			// TODO: Handle OWIRE as well? (I don't think this can occur)
 			partPinWire = tile.getWire("IWIRE:" + wireToks[0] + "/" + wireToks[1]);
-
-
-			// If there is more than one connection into the device from a given wire, such as
-			// CLK_HROW_TOP_R_X87Y78/CLK_HROW_CK_BUFHCLK_L7, then there will be multiple HIER IWIRES, one for each
-			// connection. This seems really dumb in hindsight. It seems to me it would make much more sense for there to
-			// one wire, with all possible connections.
-			// TODO: Massive fix may be needed. I suppose the partial device really just has CONNECTIONS into the pdevice.
-			if (partPinWire == null) {
-				partPinWire = tile.getWire("IWIRE:" + wireToks[0] + "/" + wireToks[1] + "(1)");
-			}
-
-			Collection<Connection> conns = partPinWire.getWireConnections();
-			System.out.println("There are " + conns.size() + " conns");
-
-
 		}
 		else {
 			partPinWire = tile.getWire(wireToks[1]);
 		}
+		assert (partPinWire != null);
 
 		// Add the partition pin node to the list of reserved wires
 		reservedWires.add(partPinWire);
-		assert (partPinWire != null);
 		String direction = toks[3];
 
 		PinDirection pinDirection;
