@@ -31,6 +31,24 @@ import com.trolltech.qt.gui.QKeyEvent;
 import com.trolltech.qt.gui.QMouseEvent;
 import com.trolltech.qt.gui.QWheelEvent;
 
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;//handles button clicks etc.
+import javafx.scene.*;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.stage.Stage;
+
+import javafx.geometry.Point2D; //like QPoint and QPointF
+import javafx.scene.control.Label;
+import javafx.scene.input.KeyEvent;//like Qt.Key
+import javafx.scene.input.MouseEvent;//kind of like Qcursor
+import javafx.scene.Scene;//like QGraphicsScene?
+import javafx.scene.input.ScrollEvent;//like the QWheelEvent
+import javafx.scene.layout.VBox;//program window
+
+
 /**
  * This class is written specifically for the DeviceBrowser class and provides
  * the Qt View.  It controls much of the interaction from the user.
@@ -42,7 +60,7 @@ public class TileView extends QGraphicsView{
 	QPoint lastPan;
 	/** A flag indicating if the right mouse button has been pressed */
 	private boolean rightPressed;
-	
+
 	public boolean hasPanned;
 	/** The maximum value to which we can zoom out */
 	protected static double zoomMin = 0.05;
@@ -113,8 +131,8 @@ public class TileView extends QGraphicsView{
 
 	/**
 	 * This method is called when the mouse wheel or scroll is used.
-	 * In this case, it allows the user to zoom in and out of the 
-	 * array of tiles. 
+	 * In this case, it allows the user to zoom in and out of the
+	 * array of tiles.
 	 */
 	public void wheelEvent(QWheelEvent event){
 		// Get the position of the mouse before scaling, in scene coords
@@ -143,14 +161,14 @@ public class TileView extends QGraphicsView{
 		this.horizontalScrollBar().setValue(offset.x() + this.horizontalScrollBar().value());
 		this.verticalScrollBar().setValue(offset.y() + this.verticalScrollBar().value());
 	}
-	
+
 	/**
-	 * This method gets called when a key on the keyboard is pressed.  
+	 * This method gets called when a key on the keyboard is pressed.
 	 * In this case, if the '=' key is pressed, it zooms in.  If the
 	 * '-' key is pressed, it zooms out.
 	 */
 	public void keyPressEvent(QKeyEvent event){
-		double scaleFactor = 1.15; 
+		double scaleFactor = 1.15;
 		if (event.key() == Key.Key_Equal.value()){
 			// Zoom in (if not at limit)
 			if(this.matrix().m11() < zoomMax)
@@ -159,19 +177,18 @@ public class TileView extends QGraphicsView{
 			// Zoom out (if not at limit)
 			if(this.matrix().m11() > zoomMin)
 				scale(1.0 / scaleFactor, 1.0 / scaleFactor);
-		}		
+		}
 	}
-	
-	public void zoomIn(){ 
+
+	public void zoomIn(){
 		// Zoom in (if not at limit)
 		if(this.matrix().m11() < zoomMax)
 			scale(scaleFactor, scaleFactor);
 	}
-	
+
 	public void zoomOut(){
 		// Zoom out (if not at limit)
 		if(this.matrix().m11() > zoomMin)
 			scale(1.0 / scaleFactor, 1.0 / scaleFactor);
 	}
 }
-

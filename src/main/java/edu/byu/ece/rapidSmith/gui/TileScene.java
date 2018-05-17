@@ -46,6 +46,28 @@ import edu.byu.ece.rapidSmith.device.families.FamilyInfo;
 import edu.byu.ece.rapidSmith.device.families.FamilyInfos;
 import edu.byu.ece.rapidSmith.device.families.Virtex6;
 
+
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;//handles button clicks etc.
+import javafx.geometry.Rectangle2D;
+import javafx.scene.*;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
+
+import javafx.geometry.Point2D; //like QPoint and QPointF
+import javafx.scene.control.Label;
+import javafx.scene.input.KeyEvent;//like Qt.Key
+import javafx.scene.input.MouseEvent;//kind of like Qcursor
+import javafx.scene.Scene;//like QGraphicsScene?
+import javafx.scene.input.ScrollEvent;//like the QWheelEvent
+import javafx.scene.layout.VBox;//program window
+import javafx.scene.canvas.Canvas;
+
+
 /**
  * This class is used for the design explorer although, it could 
  * be used for building other applications as well.
@@ -54,8 +76,10 @@ import edu.byu.ece.rapidSmith.device.families.Virtex6;
 public class TileScene extends QGraphicsScene{
 	/** The actual square used to highlight a tile */
 	public QGraphicsRectItem highlit;
+	public Rectangle highlit;
 	/** Pen used to draw tile cursor */
 	public QPen cursorPen = new QPen(QColor.yellow, 2);
+	public Rectangle2D
 	/** The current X location of the mouse */
 	public int currX;
 	/** The current Y location of the mouse */

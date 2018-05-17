@@ -46,8 +46,8 @@ public class WireConnectionLine extends QGraphicsLineItem{
 	private Tile tile;
 	/** The current wire */
 	private int wire;
-	
-	/** 
+
+	/**
 	 * Creates a new wire connection line.
 	 * @param x1 Starting X coordinate.
 	 * @param y1 Starting Y coordinate.
@@ -65,21 +65,21 @@ public class WireConnectionLine extends QGraphicsLineItem{
 		this.wire = wire;
 		highlighted = new QPen(QColor.red, 0.25, PenStyle.SolidLine);
 	}
-	
+
 	@Override
 	public void hoverEnterEvent(QGraphicsSceneHoverEvent event){
 		this.setPen(highlighted);
 	}
-	
+
 	@Override
 	public void hoverLeaveEvent(QGraphicsSceneHoverEvent event){
 		this.setPen(unHighlighted);
 	}
-	
+
 	@Override
 	public void mousePressEvent(QGraphicsSceneMouseEvent event){
 		if(scene.getClass().equals(DeviceBrowserScene.class)){
-			((DeviceBrowserScene)scene).drawConnectingWires(tile, wire);			
+			((DeviceBrowserScene)scene).drawConnectingWires(tile, wire);
 		}
 	}
 

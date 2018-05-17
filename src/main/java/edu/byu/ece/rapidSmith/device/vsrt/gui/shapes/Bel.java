@@ -5,6 +5,9 @@ import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreeElement;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.QTreePin;
 import edu.byu.ece.rapidSmith.device.vsrt.gui.VsrtColor;
 import edu.byu.ece.rapidSmith.device.vsrt.primitiveDefs.PrimitiveDefPinDirection;
+import javafx.scene.shape.Rectangle;
+//import javafx.scene.shape.
+//import javafx.scene.paint.
 
 import com.trolltech.qt.core.QPointF;
 import com.trolltech.qt.core.QRectF;
@@ -25,6 +28,7 @@ public class Bel extends ElementShape{
 	
 	/**Bounding shape where the item can be selected */	
 	QRectF shape;
+	Rectangle shape1;
 		
 	/**
 	 * Initializes the Bel object
