@@ -698,6 +698,9 @@ public final class EdifInterface {
 			
 			edifNet.addPortConnection(portRef);
 		}
+
+		// create an equivalent edif property for each RS2 property
+		edifNet.addPropertyList(createEdifPropertyList(cellNet.getProperties()));
 					
 		return edifNet;
 	}
