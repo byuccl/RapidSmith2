@@ -386,7 +386,10 @@ public class XdcPlacementInterface {
 		ArrayList<Cell> lutCellsD6 = new ArrayList<>();
 		ArrayList<Cell> lutCellsABC6 = new ArrayList<>();
 		ArrayList<Cell> carryCells = new ArrayList<>();
-		ArrayList<Cell> ffCells = new ArrayList<>();
+		ArrayList<Cell> ffCellsA = new ArrayList<>();
+		ArrayList<Cell> ffCellsB = new ArrayList<>();
+		ArrayList<Cell> ffCellsC = new ArrayList<>();
+		ArrayList<Cell> ffCellsD = new ArrayList<>();
 		ArrayList<Cell> ff5Cells = new ArrayList<>();
 		ArrayList<Cell> muxCells = new ArrayList<>();
 
@@ -433,7 +436,18 @@ public class XdcPlacementInterface {
 				ff5Cells.add(cell);
 			}
 			else if (belName.endsWith("FF")) {
-				ffCells.add(cell);
+				if (belName.contains("A")) {
+					ffCellsA.add(cell);
+				}
+				else if (belName.contains("B")) {
+					ffCellsB.add(cell);
+				}
+				else if (belName.contains("C")) {
+					ffCellsC.add(cell);
+				}
+				else {
+					ffCellsD.add(cell);
+				}
 			}
 			else if(belName.endsWith("MUX")) {
 				muxCells.add(cell);
@@ -450,8 +464,11 @@ public class XdcPlacementInterface {
 				lutCellsABC5.stream(), 
 				lutCellsH6.stream(),
 				lutCellsD6.stream(), 
-				lutCellsABC6.stream(), 
-				ffCells.stream(), 
+				lutCellsABC6.stream(),
+				ffCellsD.stream(),
+				ffCellsC.stream(),
+				ffCellsB.stream(),
+				ffCellsA.stream(),
 				carryCells.stream(),
 				muxCells.stream(),
 				ff5Cells.stream())
