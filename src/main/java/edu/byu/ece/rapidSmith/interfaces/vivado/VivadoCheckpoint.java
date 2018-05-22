@@ -28,7 +28,6 @@ import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Device;
-import javafx.util.Pair;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 /**

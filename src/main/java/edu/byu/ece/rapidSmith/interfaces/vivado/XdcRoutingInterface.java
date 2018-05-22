@@ -38,7 +38,6 @@ import edu.byu.ece.rapidSmith.design.subsite.CellPin;
 import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
-import javafx.util.Pair;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
@@ -233,7 +232,6 @@ public class XdcRoutingInterface {
 	 * where space separated elements are different elements in the array
 	 */
 	private void processIntersitePins(String[] toks) {
-		
 		CellNet net = tryGetCellNet(toks[1]);		
 		
 		for (int index = 2 ; index < toks.length; index++) {

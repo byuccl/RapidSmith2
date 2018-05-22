@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Brigham Young University
+ * Copyright (c) 2018 Brigham Young University
  *
  * This file is part of the BYU RapidSmith Tools.
  *
@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.*;
-import javafx.util.Pair;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
