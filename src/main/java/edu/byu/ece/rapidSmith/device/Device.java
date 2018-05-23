@@ -446,6 +446,17 @@ public class Device implements Serializable {
 	}
 
 	/**
+	 * Checks if the device has at least one site of the given type. Useful for partial devices.
+	 * @param type the site type to check the device for
+	 * @return
+	 */
+	public boolean hasSiteType(SiteType type) {
+		// Check if there are sites of the given type
+		return getAllSitesOfType(type) != null;
+	}
+
+
+	/**
 	 * This method will return all compatible sites for a particular site type in
 	 * this device.  For example, a SLICEL can be placed at all SLICEL sites and
 	 * all SLICEM sites.  If the type given were SLICEL, this method would return
@@ -481,6 +492,10 @@ public class Device implements Serializable {
 			return Collections.emptyList();
 		}
 		return compatibleList;
+	}
+
+	public boolean hasTileType(TileType type) {
+		return tileMap.values().stream().anyMatch(tile -> tile.getType().equals(type));
 	}
 
 	/**
