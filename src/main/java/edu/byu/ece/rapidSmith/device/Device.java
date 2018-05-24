@@ -455,6 +455,18 @@ public class Device implements Serializable {
 		return getAllSitesOfType(type) != null;
 	}
 
+	public int getTopYCoordinate() {
+		return tileMap.values().stream()
+				.filter(tile -> !tile.getType().equals(TileType.valueOf(family, "NULL")))
+				.filter(tile -> !tile.getType().equals(TileType.valueOf(family, "HIERARCHICAL_PORT")))
+				.max(Comparator.comparing(Tile::getTileYCoordinate)).get().getTileYCoordinate();
+	}
+
+	public int getBottomYCoordinate() {
+		return tileMap.values().stream()
+				.filter(tile -> !tile.getType().equals(TileType.valueOf(family, "NULL")))
+				.filter(tile -> !tile.getType().equals(TileType.valueOf(family, "HIERARCHICAL_PORT")))
+				.min(Comparator.comparing(Tile::getTileYCoordinate)).get().getTileYCoordinate();	}
 
 	/**
 	 * This method will return all compatible sites for a particular site type in
