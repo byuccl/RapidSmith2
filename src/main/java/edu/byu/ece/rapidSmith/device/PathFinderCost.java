@@ -1,6 +1,5 @@
 package edu.byu.ece.rapidSmith.device;
 
-import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.device.Connection.ReverseTileWireConnection;
 
 import java.util.*;

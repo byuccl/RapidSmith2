@@ -3,12 +3,15 @@ package edu.byu.ece.rapidSmith.examples.aStarRouter;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.util.DotFilePrinter;
 import edu.byu.ece.rapidSmith.util.RapidSmithDebug;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Demonstrates the sample {@link AStarRouter} on a single net in a CORDIC design. 
@@ -36,17 +39,18 @@ public class AStarTest {
 
 		// Routing net
 		System.out.println("Routing Net...");
-		AStarRouter router = new AStarRouter(design);
+		Map<Wire, PFCost> wireUsage = new HashMap<>();
+		AStarRouter router = new AStarRouter(wireUsage);
 		CellNet net = design.getNet("ld_IBUF");
-		RouteTree test = router.routeNet(net);
-		net.addIntersiteRouteTree(test);
+		//RouteTree test = router.routeNet(net);
+		//net.addIntersiteRouteTree(test);
 		
 		// Displaying results
 		System.out.println("\nCommand to highlight chosen wires in Vivado: ");
-		System.out.println(RapidSmithDebug.createHighlightWiresTclCommand(test));
+		//System.out.println(RapidSmithDebug.createHighlightWiresTclCommand(test));
 		
 		System.out.println("\nRouteTree data structure in RapidSmith:");
-		RapidSmithDebug.printRouteTree(test);
+		//RapidSmithDebug.printRouteTree(test);
 
 		String checkpointOut = checkpointIn.substring(0, checkpointIn.length() - 5) + "_astarred" + ".tcp";
 		design = vcp.getDesign();

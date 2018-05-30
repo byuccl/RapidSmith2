@@ -1,10 +1,13 @@
 package edu.byu.ece.rapidSmith.examples.aStarRouter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
+import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import edu.byu.ece.rapidSmith.util.DotFilePrinter;
@@ -26,7 +29,7 @@ public class AStarRouterExample {
 		// load the device and design
 		String checkpoint = RSEnvironment.defaultEnv().getEnvironmentPath()
 				.resolve("exampleVivadoDesigns")
-				.resolve("cordicPlaced.rscp").toString();
+				.resolve("addPlaced.rscp").toString();
 		
 		System.out.println("Loading Device and Design...");
 		VivadoCheckpoint vcp = VivadoInterface.loadRSCP(checkpoint);
@@ -34,17 +37,19 @@ public class AStarRouterExample {
 
 		// Routing net
 		System.out.println("Routing Net...");
-		AStarRouter router = new AStarRouter(design);
-		CellNet net = design.getNet("u2/gen_pipe[8].Pipe/Zo_reg_n_0_[9]");
-		RouteTree test = router.routeNet(net);
-		net.addIntersiteRouteTree(test);
+		Map<Wire, PFCost> wireUsage = new HashMap<>();
+
+		AStarRouter router = new AStarRouter(wireUsage);
+		CellNet net = design.getNet("b_IBUF");
+		//RouteTree test = router.routeNet(net);
+		//net.addIntersiteRouteTree(test);
 		
 		// Displaying results
 		System.out.println("\nCommand to highlight chosen wires in Vivado: ");
-		System.out.println(RapidSmithDebug.createHighlightWiresTclCommand(test));
+		//System.out.println(RapidSmithDebug.createHighlightWiresTclCommand(test));
 		
 		System.out.println("\nRouteTree data structure in RapidSmith:");
-		RapidSmithDebug.printRouteTree(test);
+		//RapidSmithDebug.printRouteTree(test);
 		
 		System.out.println("\nRouteTree data structure in DOT file format");
 		System.out.println("\n" + DotFilePrinter.getRouteTreeDotString(net));
