@@ -28,7 +28,7 @@ import java.util.Map;
 
 import edu.byu.ece.edif.core.EdifNameConflictException;
 import edu.byu.ece.edif.core.InvalidEdifNameException;
-import edu.byu.ece.partialreconfig.pynqTools.interfaces.yosys.YosysEdifInterface;
+import edu.byu.ece.rapidSmith.interfaces.yosys.YosysEdifInterface;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.Device;
