@@ -28,6 +28,7 @@ import java.util.Map;
 
 import edu.byu.ece.edif.core.EdifNameConflictException;
 import edu.byu.ece.edif.core.InvalidEdifNameException;
+import edu.byu.ece.partialreconfig.pynqTools.interfaces.yosys.YosysEdifInterface;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.Device;
@@ -44,7 +45,11 @@ public final class VivadoInterface {
 	private static final String CELL_LIBRARY_NAME = "cellLibrary.xml";
 	
 	public static VivadoCheckpoint loadRSCP(String rscp) throws IOException {
-		return loadRSCP(rscp, false);
+		return loadRSCP(rscp, false, EdifType.VIVADO);
+	}
+
+	public static VivadoCheckpoint loadRSCP (String rscp, boolean storeAdditionalInfo) throws IOException {
+		return loadRSCP(rscp, storeAdditionalInfo, EdifType.VIVADO);
 	}
 	
 	/**
@@ -54,8 +59,8 @@ public final class VivadoInterface {
 	 * @throws InvalidEdifNameException 
 	 * @throws EdifNameConflictException 
 	 */
-	public static VivadoCheckpoint loadRSCP (String rscp, boolean storeAdditionalInfo) throws IOException {
-	
+	public static VivadoCheckpoint loadRSCP (String rscp, boolean storeAdditionalInfo, EdifType edifType) throws IOException {
+		//TODO: Rethink where EDIFType should come from (design.info maybe?, auto-detect?)
 		Path rscpPath = Paths.get(rscp);
 		
 		if (!rscpPath.getFileName().toString().endsWith(".rscp")) {
@@ -93,6 +98,10 @@ public final class VivadoInterface {
 		//if (mode.equals(ImplementationMode.OUT_OF_CONTEXT))
 		//	design = EdifInterface.parseEdif(edifFile, libCells, partName);
 		//else
+
+		if (edifType.equals(EdifType.YOSYS))
+			design = YosysEdifInterface.parseEdif(edifFile, libCells, partName);
+		else
 			design = EdifInterface.parseEdif(edifFile, libCells);
 
 		design.setImplementationMode(mode);
