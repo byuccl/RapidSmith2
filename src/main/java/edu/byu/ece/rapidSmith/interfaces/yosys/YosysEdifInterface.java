@@ -3,6 +3,8 @@ package edu.byu.ece.rapidSmith.interfaces.yosys;
 import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import edu.byu.ece.edif.core.*;
 import edu.byu.ece.edif.core.PropertyList;
@@ -376,10 +378,165 @@ public final class YosysEdifInterface {
 		newNet.connectToPins(sinkPins);
 	}
 
-//	public YosysEdifInterface(CellLibrary cellLib, String partName) {
-	//	this.cellLib = cellLib;
-	//	this.partName = partName;
-	//}
+
+
+	public static void transformCarryCells(CellDesign design, CellLibrary libCells) {
+		// Find the beginning of carry chains
+		Collection<Cell> xorInitCells = design.getCells().stream()
+				.filter(cell -> cell.getType().equals("XORCY"))
+				.filter(cell -> cell.getPin("CI").getNet().isStaticNet())
+				.collect(Collectors.toList());
+
+		for (Cell xorCell : xorInitCells) {
+			// Get the corresponding MUXCY cell (if it exists)
+			Cell finalXorCell = xorCell;
+			Collection<CellPin> gndSinks = xorCell.getPin("CI").getNet().getSinkPins().stream().filter(cellPin -> !cellPin.getCell().equals(finalXorCell)).collect(Collectors.toList());
+			Cell muxCell = ((List<CellPin>) gndSinks).get(0).getCell();
+
+			boolean chainStart = true;
+
+
+			Cell carryCell = new Cell(xorCell.getName() + "_CARRY4", libCells.get("CARRY4"));
+			int i = 0;
+
+			Cell nextMuxCell = null;
+			Cell nextXorCell = null;
+
+			// Replace xorcell
+			while (xorCell != null) {
+
+				// XOR inputs
+				for (CellPin cellPin : xorCell.getInputPins()) {
+					CellNet net = cellPin.getNet();
+
+					switch (cellPin.getName()) {
+						case "CI":
+							if (chainStart && i == 0) {
+								net.connectToPin(carryCell.getPin("CYINIT"));
+							} else if (i == 0)
+								net.connectToPin(carryCell.getPin("CI"));
+							break;
+						case "LI":
+							net.connectToPin(carryCell.getPin("S" + "[" + i + "]"));
+							break;
+						default:
+							System.out.println("WARNING! UNEXPECTED XOR CELL PIN");
+							break;
+					}
+
+					net.disconnectFromPin(cellPin);
+
+				}
+
+				// XOR outputs
+				for (CellPin cellPin : xorCell.getOutputPins()) {
+					CellNet net = cellPin.getNet();
+					net.disconnectFromPin(cellPin);
+					// O pin
+					if (cellPin.getName().equals("O")) {
+						net.connectToPin(carryCell.getPin("O" + "[" + i + "]"));
+					}
+
+
+				}
+
+				// MUX inputs
+				if (muxCell != null) {
+					for (CellPin cellPin : muxCell.getInputPins()) {
+						System.out.println("In Pin: " + cellPin.getName());
+						CellNet net = cellPin.getNet();
+						if (net != null) {
+							if (cellPin.getName().equals("CI")) {
+								if (chainStart) {
+									if (!net.getPins().contains(carryCell.getPin("CYINIT")))
+										net.connectToPin(carryCell.getPin("CYINIT"));
+								} else  if (i == 0) {
+									if (!net.getPins().contains(carryCell.getPin("CI")))
+										net.connectToPin(carryCell.getPin("CI"));
+								}
+							} else {
+								// either DI or S
+								CellPin carryPin = carryCell.getPin(cellPin.getName() + "[" + i + "]");
+								if (!net.getPins().contains(carryPin))
+									net.connectToPin(carryPin);
+
+							}
+							net.disconnectFromPin(cellPin);
+
+						}
+					}
+					// MUX sinks
+					CellNet muxOutNet = muxCell.getPin("O").getNet();
+					for (CellPin pin : muxOutNet.getSinkPins()) {
+						CellNet net = pin.getNet();
+
+						Cell sinkCell = pin.getCell();
+
+						switch (sinkCell.getType()) {
+							case "MUXCY":
+								// Found another internal cell of a carry cell
+
+								// if this will connect to a different carry cell
+								if (i == 3) {
+									// disconnect from source
+									net.disconnectFromPin(muxCell.getPin("O"));
+
+									// connect to carry4 source
+									net.connectToPin(carryCell.getPin("CO[3]"));
+								}
+
+								nextMuxCell = sinkCell;
+								break;
+							case "XORCY":
+								// if this will connect to a different carry cell
+								if (i == 3) {
+									// disconnect from source
+									net.disconnectFromPin(net.getSourcePin());
+
+									// connect to carry4 source
+									net.connectToPin(carryCell.getPin("CO[3]"));
+								}
+								nextXorCell = sinkCell;
+								break;
+							default:
+								// CO sink
+								CellNet coNet = pin.getNet();
+								coNet.disconnectFromPin(pin);
+								coNet.connectToPin(carryCell.getPin("CO" + "[" + i + "]"));
+								break;
+						}
+					}
+				}
+
+
+				if (muxCell != null)
+					design.removeCell(muxCell);
+
+				design.removeCell(xorCell);
+
+				chainStart = false;
+				muxCell = nextMuxCell;
+				nextMuxCell = null;
+				xorCell = nextXorCell;
+				nextXorCell = null;
+
+				if (i == 3) {
+					design.addCell(carryCell);
+					carryCell = new Cell(xorCell.getName() + "_CARRY4", libCells.get("CARRY4"));
+					i = 0;
+				}
+				else
+					i++;
+
+				if (xorCell == null)
+					design.addCell(carryCell);
+			}
+
+
+		}
+
+
+	}
 
 	/**
 	 * Parses the Edif netlist into a RapidSmith2 CellDesign data structure
@@ -444,7 +601,9 @@ public final class YosysEdifInterface {
 			processEdifCells(design, topLevelCell.getCellInstanceList(), libCells, vccNets, gndNets);
 			processEdifNets(design, topLevelCell.getNetList(), vccNets, gndNets, portOffsetMap);
 
+			transformCarryCells(design, libCells);
 			collapseStaticNets(design, libCells, vccNets, gndNets);
+
 			return design;
 		}
 		catch (FileNotFoundException | ParseException e) {
