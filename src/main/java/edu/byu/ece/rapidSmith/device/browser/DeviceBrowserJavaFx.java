@@ -1,48 +1,32 @@
 package edu.byu.ece.rapidSmith.device.browser;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
+//import edu.byu.ece.rapidSmith.gui.PanZoomGestures;
+import com.sun.javafx.geom.Line2D;
+import edu.byu.ece.rapidSmith.gui.wireItemJavaFx;
 import javafx.application.Application;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
+import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseButton;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Line;
 import javafx.stage.Stage;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
-
-import com.trolltech.qt.core.QModelIndex;
-import com.trolltech.qt.core.Qt.DockWidgetArea;
-import com.trolltech.qt.core.Qt.ItemDataRole;
-import com.trolltech.qt.core.Qt.SortOrder;
-import com.trolltech.qt.gui.QApplication;
-import com.trolltech.qt.gui.QDockWidget;
-import com.trolltech.qt.gui.QLabel;
-import com.trolltech.qt.gui.QMainWindow;
-import com.trolltech.qt.gui.QStatusBar;
-import com.trolltech.qt.gui.QTreeWidget;
-import com.trolltech.qt.gui.QTreeWidgetItem;
-import com.trolltech.qt.gui.QWidget;
-import com.trolltech.qt.gui.QDockWidget.DockWidgetFeature;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.gui.TileView;
-import edu.byu.ece.rapidSmith.gui.WidgetMaker;
-
-import javafx.scene.paint.Color;
-import javafx.scene.layout.StackPane;
-import edu.byu.ece.rapidSmith.RSEnvironment;
-import edu.byu.ece.rapidSmith.device.*;
-import edu.byu.ece.rapidSmith.gui.TileView;
-import edu.byu.ece.rapidSmith.gui.WidgetMaker;
 
 
 /**
@@ -59,113 +43,88 @@ import edu.byu.ece.rapidSmith.gui.WidgetMaker;
  * Created on: May 14,2018
  */
 public class DeviceBrowserJavaFx extends Application{//QMainWindow {
-    protected TileView view;
     /** The javafx Scene for the browser */
-    private DeviceBrowserScene scene;
+    private static Scene scene;
+    /** Parent Template Node of most of the application */
+    private static BorderPane borderPane = new BorderPane();//becomes new root node
+    /**List of available parts*/
+    private static List<String> parts;
+    /** The Labels for the status bar at the bottom and side bar windows*/
+    private static Label statusLabel = new Label();
+    private static Label selectPart = new Label("Select a part...");//Labels are useful for displaying text that is required to fit within specific area
+    private static Label siteListName = new Label ("Site List");
+    private static Label wireListName = new Label("Wire List");
 
-    BorderPane borderPane = new BorderPane();//becomes new root node
+    /** The Stackpane for the side bar (parent node for all side bar objects) */
+    private static VBox sideBarPane = new VBox();
+    private static VBox bottomPane = new VBox();
 
-    /**
-     * The label for the status bar at the bottom
-     */
-    private Label statusLabel;
-    private Label selectPart = new Label("Select a part...");//Labels are useful for displaying text that is required to fit within specific area
-    private Label siteListName = new Label ("Site List");
-    private Label wireListName = new Label("Wire List");
+    /** Can set Device Browser to not show tiles or sites with these booleans*/
+    private boolean hideTiles = false;
+    private boolean drawSites = true;
+    /** The current device loaded */
+    private Device device;
 
-    /**
-     * The Stackpane for the side bar
-     */
-    //private StackPane browserPane = new StackPane();
-    private VBox browserPane = new VBox();
-
-    /**
-     * The current device loaded
-     */
-    private Device device;//RS2 class for the device
-
-    private WireEnumerator we;//""
-
-    List<String> parts;
-
-    /**
-     * The current part name of the device loaded
-     */
+    private WireEnumerator we;
+    /**TileWindowJavaFx object is basically a javafx canvas with all of the visuals(such as tiles, wires, etc) drawn on it*/
+    private TileWindowJavaFx tileWindow;
+    /**For saving the current wires drawn*/
+    private ArrayList<Line> currLines;
+    /** The current part name of the device loaded*/
     private String currPart;
+    /**Helps in creating part TreeView and organizing parts by families*/
+    private static HashMap<TreeItem<String>, FamilyType> familyItems = new HashMap<>();//this hashMap helps check to see if you already have family in tree
 
-    /**
-     * This is the tree of parts to select
-     */
-    //private QTreeWidget treeWidget;
+    /**This is the tree of parts to select*/
     private TreeView<String> partTree;
 
-    /**
-     * This is the list of sites in the current tile selected
-     */
-    //private QTreeWidget siteList;
-    private TableView siteTable;
-    /**
-     * This is the list of wires in the current tile selected
-     */
-    //private QTreeWidget wireList;
+    /**This is the list of sites in the current tile selected*/
+    private TableView<Site> siteTable;
+    TableColumn<Site, String> siteCol;
+    TableColumn<Site, String> typeCol;
+
+    TableColumn<Wire, String> wireCol;
+    TableColumn<Wire, String> sinkCol;
+    /**Displays the wires for current tile after a tile is double clicked. Child node of sideBarPane*/
     private TableView wireTable;
 
-    /**
-     * A constantly updated list of sites for current tile
-     */
+    /**A constantly updated list of sites for current tile*/
+    private ArrayList<Site> sites = new ArrayList<>();//will change as needed
     private ObservableList<Site> siteList;
-    /**
-     * This is the current tile that has been selected
-     */
+    /**A constantly updated list of Wires/Connections for current tile*/
+    private ArrayList<Wire> actualWires = new ArrayList<>();
+    private ArrayList<wireItemJavaFx> wires = new ArrayList<>();//will change as needed
+    private ObservableList<wireItemJavaFx> wireList;
+    /**An object easier to display in the wireTable since it has private variables for name and number of connections*/
+    private wireItemJavaFx displayWire;
+    /**This is the current tile that has been selected*/
     private Tile currTile = null;
 
-    private boolean hideTiles = false;
+    private Tile showWiresTile = null;
 
-    private boolean drawSites = true;
+    private static double sceneX;
+    private static double sceneY;
+//    private Scale scaleTransform;
 
-    /**
-     * Main method setting up the Qt environment for the program to run.
-     *
-     * @param args the input arguments
-     */
-//    public static void main(String[] args) {
-//        QApplication.setGraphicsSystem("raster");
-//        QApplication.initialize(args);
-//        DeviceBrowser testPTB = new DeviceBrowser(null);
-//        testPTB.show();
-//        QApplication.exec();
-//
-//        //launch(args);
-//    }
+    private TileViewJavaFx tileView;
 
-    /**
-     * Constructor which initializes the GUI and loads the first part found.
-     *
-     * @param parent The Parent widget, used to add this window into other GUIs.
-     */
 
-//
-//        // Setup the scene and view for the GUI
-//        scene = new DeviceBrowserScene(device, hideTiles, drawSites, this);
-//        view = new TileView(scene);
-//        setCentralWidget(view);
-//
-//        // Setup some signals for when the user interacts with the view
-//        scene.updateStatus.connect(this, "updateStatus(String, Tile)");
-//        scene.updateTile.connect(this, "updateTile(Tile)");
-//
-//        // Initialize the status bar at the bottom
-//        statusLabel = new QLabel("Status Bar");
-//        statusLabel.setText("Status Bar");
-//        QStatusBar statusBar = new QStatusBar();
-//        statusBar.addWidget(statusLabel);
-//        setStatusBar(statusBar);
-//
-//        // Set the opening default window size to 1024x768 pixels
-//        resize(1024, 768);
-//    }
-    /**make Branch method creates a branch for the treeView
-     */
+    /** Current center of this view */
+    Point2D currCenter;
+    /** Stores the last pan of the view */
+    Point2D lastPan;
+    /** A flag indicating if the right mouse button has been pressed */
+    private boolean rightPressed;
+
+    public boolean hasPanned;
+    /** The maximum value to which we can zoom out */
+    protected static double zoomMin = 0.05;
+    /** The maximum value to which we can zoom in */
+    protected static double zoomMax = 30;
+    /** The rate at which we zoom */
+    protected static double scaleFactor = 1.15;
+
+    /**This method allows for easy expansion of a TreeView object. Mostly for testing purposes*/
     public TreeItem<String> makeBranch(String title, TreeItem<String> parent){
         TreeItem<String> item = new TreeItem<>(title);
         item.setExpanded(true);
@@ -173,117 +132,138 @@ public class DeviceBrowserJavaFx extends Application{//QMainWindow {
         return item;
     }
     /**
-     * Populates the treeWidget with the various parts and families of devices
-     * currently available in this installation of RapidSmith.  It also creates
-     * the windows for the site list and wire list.
+     * Creates the side bar consisting of a TreeView of Device parts, siteList table, and wireList table
+     * Allows resizing of each sidebar Window using a WindowResizer class. Cannot resize windows smaller than default size.
      */
     private void initializeSideBar() {
-
         partTree = createAvailablePartTree();//uses method call to create tree out of all parts their family types
         siteTable = createSiteTable();
         wireTable = createWireTable();
-        partTree.getSelectionModel().selectedItemProperty()
-                .addListener((v, oldValue, newValue) -> {
-                    if(newValue != null){//and check that item is a device and not just family name
-
-                        System.out.println(newValue+" Loaded");
-                    }
-                    //load partName
-                });
-        partTree.setOnMouseClicked(e -> {
-            if(e.getButton().equals(MouseButton.PRIMARY)){
-                if(e.getClickCount() == 2){//and value is not familyName
-                    //Load device to tile view
-                    System.out.println("Double clicked");
-                }
-            }
-        });
-
-          browserPane.getChildren().addAll(selectPart,partTree, siteListName, siteTable, wireListName, wireTable);
-          borderPane.setLeft(browserPane);
+            partTree.setPrefHeight(100);
+            siteTable.setPrefHeight(150);
+            wireTable.setPrefHeight(400);
+            //Make partTree height resizeable
+            WindowResizer resizable = new WindowResizer(partTree);
+            resizable.makeResizable(partTree);
+            WindowResizer resizable1 = new WindowResizer(siteTable);
+            resizable1.makeResizable(siteTable);
+            WindowResizer resizable2 = new WindowResizer(wireTable);
+            resizable2.makeResizable(wireTable);
+            sideBarPane.getChildren().addAll(selectPart,partTree, siteListName, siteTable, wireListName, wireTable);
+            borderPane.setLeft(sideBarPane);
     }
 
-    public static TreeView<String> createAvailablePartTree(){//creates parts Tree View
+    /**
+     * This method creates a TreeView so user can select the FPGA device to display
+     * @return the new PartTree for viewing in side bar
+     */
+    public TreeView<String> createAvailablePartTree(){//creates parts Tree View
         TreeView<String> partTreeView = new TreeView<>();
         partTreeView.setShowRoot(false);
         TreeItem<String> root = new TreeItem<>();
         partTreeView.setRoot(root);
         root.setExpanded(true);
-        HashMap<FamilyType, TreeItem<String>> familyItems = new HashMap<>();//this hashMap helps check to see if you already have family in tree
+        //HashMap<FamilyType, TreeItem<String>> familyItems = new HashMap<>();//this hashMap helps check to see if you already have family in tree
         RSEnvironment env = RSEnvironment.defaultEnv();//get all part names from environment directory
         for(String partName : env.getAvailableParts()){//get individual part name for creating ViewTree
             FamilyType type = env.getFamilyTypeFromPart(partName);//get the FamilyType of current part
-            TreeItem<String> familyItem = familyItems.get(type);//create treeItem from that family type
-            System.out.println("Created familyItem:"+ type.name());
-
-            if(familyItem == null){//check to see if family type does not exist
-                familyItem = new TreeItem<>(type.name());
+            TreeItem<String> familyItem = new TreeItem(type.name());
+            FamilyType test = familyItems.get(familyItem);
+            if(test == null){//check to see if family type does not exist
                 root.getChildren().add(familyItem);//add familyItem to the root of the tree as one of main branches in TreeView
-                familyItems.put(type, familyItem);
-                System.out.println("familyItem was null(should happen twice");
+                familyItems.put(familyItem, type);
+                //System.out.println("familyItem: "+familyItem.getValue()+" was added as a family branch and to HashMap"); //for testing purposes
             }
             TreeItem<String> partItem = new TreeItem(partName);//else add TreeItem as a leaf Node to the familyItem branch
             //need to get the familyItem from the HashTable else I will attach partName to a new instance of that family branch
             familyItem.getChildren().add(partItem);//add partItem to that family's branch
         }
+//        partTreeView.setOnMouseClicked(e -> {
+//            if (e.getButton().equals(MouseButton.PRIMARY) && e.getClickCount() == 2) {//If double clicked with primary button
+//                TreeItem<String> loadPart = partTreeView.getSelectionModel().getSelectedItem();//grab TreeItem from TreeView
+//                // assume it is a device and not a family.
+//                if (familyItems.get(loadPart)==null) {
+//                    showPart(loadPart.getValue());
+//                }
+//            }
+//        });
         return partTreeView; //return completed TreeView object
 }
 
-    public static TableView createSiteTable(){
-        TableView siteTable = new TableView();
-        TableColumn<Site, String> siteCol = new TableColumn("Site");
-        TableColumn<Site, String> typeCol = new TableColumn("Type");
-        siteTable.getColumns().addAll(siteCol,typeCol);
+    public TableView createSiteTable(){
+        siteCol = new TableColumn<>("Site");//Create first column
+        siteCol.setMinWidth(150);
+        siteCol.setCellValueFactory(new PropertyValueFactory<>("name"));//set values of column to be the name of each site
+
+        typeCol = new TableColumn<>("Type");
+        typeCol.setMinWidth(150);
+        typeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
+        siteTable = new TableView();//create table for Sites info
+        siteTable.getColumns().addAll(siteCol, typeCol);
         return siteTable;
     }
 
-    public static TableView createWireTable(){
+    public TableView createWireTable(){
+        wireCol = new TableColumn<>("Wire");
+        wireCol.setMinWidth(150);
+        wireCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        sinkCol = new TableColumn("Sink Connections");
+        sinkCol.setMinWidth(150);
+        sinkCol.setCellValueFactory(new PropertyValueFactory<>("connections"));
         TableView wireTable = new TableView();
-        TableColumn<Wire, String> wireCol = new TableColumn("Wire");
-        TableColumn<Wire, String> sinkCol = new TableColumn("Sink Connections");
-        wireTable.getColumns().add(wireCol);
-        wireTable.getColumns().add(sinkCol);
+        wireTable.getColumns().addAll(wireCol, sinkCol);
+        wireTable.setRowFactory(w -> {
+            TableRow<wireItemJavaFx> row = new TableRow<>();
+            row.setOnMouseClicked(e -> {
+                if(e.getClickCount() == 2 && (!row.isEmpty())){
+                    displayWire = row.getItem();
+                    showWiresTile = currTile;
+                    wireDoubleClicked(displayWire.getName());
+                    //System.out.println("draw "+displayWire.getName()+" connections");
+                }
+            });
+            return row;
+        });
+        wireTable.getSortOrder().add(wireCol);
         return wireTable;
     }
 
     /**
      * This method creates a menu bar across the top of the device browser with a file and help section.
      */
-    private void initializeMenuBar(){
+    private void initializeMenuBar() {
         MenuBar menu = new MenuBar();
         Menu menuFile = new Menu("File");
         Menu menuHelp = new Menu("Help");
         menu.getMenus().addAll(menuFile, menuHelp);
         borderPane.setTop(menu);
-
-
     }
+
     /**
      * This method will draw all of the wire connections based on the wire given.
-     *
-     * @param index The index of the wire in the wire list.
      */
-//    protected void wireDoubleClicked(QModelIndex index) {
-//        scene.clearCurrentLines();
-//        if (currTile == null) return;
-//        if (index.column() != 0) return;
-//        int currWire = we.getWireEnum(index.data().toString());
-//        if (currWire < 0) return;
-//        if (currTile.getWireConnections(we.getWireEnum(index.data().toString())) == null) return;
-//        for (WireConnection wire : currTile.getWireConnections(we.getWireEnum(index.data().toString()))) {
-//            scene.drawWire(currTile, currWire, wire.getTile(currTile), wire.getWire());
-//        }
-//    }
+    protected void wireDoubleClicked(String wireName){
+        tileWindow.resetAfterWire();//erase and redraw
+        if(showWiresTile == null) return;
+        TileWire tileWire = showWiresTile.getWire(wireName);
+        if(tileWire == null) return;
+        if(tileWire.getWireConnections().isEmpty()) return;
+        for(Connection wire : tileWire.getWireConnections()){
+            tileWindow.drawWire(showWiresTile, tileWire, wire.getSinkWire().getTile(), wire.getSinkWire());
+        }
+    }
+
+    public wireItemJavaFx getDisplayWire(){return displayWire;}
 
     /**
      * This method gets called each time a user double clicks on a tile.
      *
      * @param tile the tile to update
      */
-    protected void updateTile(Tile tile) {
+    protected void updateSelectedTile(Tile tile) {
         currTile = tile;
-        updateSiteList();
-       // updateWireList();
+        updateSiteList();//update Site table
+        updateWireList();//update Wire Table
     }
 
     /**
@@ -291,104 +271,150 @@ public class DeviceBrowserJavaFx extends Application{//QMainWindow {
      * selected tile.
 //     */
     private void updateSiteList() {
-        siteTable.getItems().clear();
-        if (currTile == null || currTile.getSites() == null) return;
-        siteList.addAll(currTile.getSites());
-        siteTable.getVisibleLeafColumn(0).setCellValueFactory(new PropertyValueFactory("name"));
+        sites.clear();//clear out sites from last selected tile
+        if (currTile == null || currTile.getSites() == null) {
+            siteList = FXCollections.observableList(sites);
+            siteTable.setItems(siteList);
+            return;//just in case
+        }
+         for(Site site : currTile.getSites()){//fills ArrayList with Sites from currently selected tile,
+                sites.add(site);
+         }
+        siteList = FXCollections.observableList(sites);
         siteTable.setItems(siteList);
-//        for (Site ps : currTile.getSites()) {
-//            //TreeItem<String> treeItem = new TreeItem<>();
-//            QTreeWidgetItem treeItem = new QTreeWidgetItem();
-//            treeItem.setText(0, ps.getName());
-//            treeItem.setText(1, ps.getType().toString());
-//            siteList.insertTopLevelItem(0, treeItem);
-//        }
     }
 
     /**
      * This will update the wire list window based on the current
      * selected tile.
      */
-//    private void updateWireList() {
-//        wireList.clear();
-//        if (currTile == null || currTile.getWireHashMap() == null) return;
-//        for (Integer wire : currTile.getWireHashMap().keySet()) {
-//            QTreeWidgetItem treeItem = new QTreeWidgetItem();
-//            treeItem.setText(0, we.getWireName(wire));
-//            WireConnection[] connections = currTile.getWireConnections(wire);
-//            treeItem.setText(1, String.format("%3d", connections == null ? 0 : connections.length));
-//            wireList.insertTopLevelItem(0, treeItem);
-//        }
-//        wireList.sortByColumn(0, SortOrder.AscendingOrder);
-//    }
-
-    /**
-     * This method loads a new device based on the part name selected in the
-     * treeWidget.
-     *
-     * @param qmIndex The index of the part to load.
-     */
-//    protected void showPart(QModelIndex qmIndex) {
-//        Object data = qmIndex.data(ItemDataRole.AccessibleDescriptionRole);
-//        if (data != null) {
-//            if (currPart.equals(data))
-//                return;
-//            currPart = (String) data;
-//            device = RSEnvironment.defaultEnv().getDevice(currPart);
-//            we = device.getWireEnumerator();
-//            scene.setDevice(device);
-//            scene.initializeScene(hideTiles, drawSites);
-//            statusLabel.setText("Loaded: " + currPart.toUpperCase());
-//        }
-//    }
-
-    /**
-     * This method updates the status bar each time the mouse moves from a
-     * different tile.
-     *
-     * @param text the new text for the status
-     * @param tile unused
-     */
-    protected void updateStatus(String text, Tile tile) {
-        statusLabel.setText(text);
-        currTile = tile;
-        System.out.println("currTile=" + tile);
+    private void updateWireList() {
+    //use wires and wiresList
+        actualWires.clear();
+        wires.clear();
+        if (currTile == null || currTile.getWireHashMap() == null) return;
+        for (Integer curWire : currTile.getWireHashMap().keySet()) {
+              wireItemJavaFx wire = new wireItemJavaFx(we.getWireName(curWire), currTile.getWireConnections(curWire).length);
+              wires.add(wire);
+        }
+//        actualWires.addAll(currTile.getW)
+        wireList = FXCollections.observableList(wires);
+        wireTable.setItems(wireList);
+        wireTable.getSortOrder().add(wireCol);
     }
+
+    /**
+     * This method loads a new device based on the part name selected in the TreeView called partsList.
+     * @param partName
+     */
+    protected void showPart(String partName, MouseEvent e) {//had QModelIndex qmIndex as a passed in argument before
+            System.out.println("device:"+partName+" was loaded");//working but lists device twice
+            currPart = partName;
+            device = RSEnvironment.defaultEnv().getDevice(currPart);
+            we = device.getWireEnumerator();
+//            tileWindow = new TileWindowJavaFx(this, device, hideTiles, drawSites);
+            tileWindow.setDevice(device);
+            statusLabel.setText("Loaded: " + currPart.toUpperCase());
+            tileWindow.initializeScene(hideTiles, drawSites);
+            tileView.setTileWindow(tileWindow);
+            //System.out.println("value of tileView:"+tileView.toString());
+
+    }
+
+    /**
+     * This method updates the status bar each time the mouse moves from tile to tile.
+     * @param e The event of moving the mouse cursor
+     */
+    protected void updateStatus(MouseEvent e) {
+        statusLabel.setText(tileWindow.mouseMoveEvent(e));
+    }
+
+    /**If mouse cursor is hovering along a wire then highlight red*/
+    protected void checkForWireHighlight(MouseEvent e){
+        for(Line2D line : tileWindow.getLines()) {
+            Line2D currLine = line;
+
+        }
+
+    }
+
+    /**
+     * Method for testing the handling of event of entering a node with the mouse cursor.
+     * Prints out the coordinates of where your cursor entered the tileWindow object
+     * @param e The event of moving the mouse cursor into tileWindow
+     */
+    public void enteredCanvas(MouseEvent e){//for testing purposes
+        sceneX = e.getX();
+        sceneY = e.getY();
+        System.out.println("Mouse Entered canvas node at X:"+sceneX+" Y:"+sceneY);
+
+    }
+
+    /**
+     * Method for testing the handling of event of entering a node with the mouse cursor.
+     * Prints out the coordinates of where your cursor exited the tileWindow object
+     * @param e The event of moving the mouse cursor out of tileWindow
+     */
+    public void exitedCanvas(MouseEvent e) {//for testing purposes
+        sceneX = e.getX();
+        sceneY = e.getY();
+        System.out.println("Mouse Exited canvas node at X:" + sceneX + " Y:" + sceneY);
+    }
+
+    /**Standard main method. Initializes application*/
     public static void main(String[] args) {
         launch(args);
     }
 
+    /**Initializes the GUI and loads the first part found.*/
     @Override
     public void start(Stage primaryStage) throws Exception {
-
-        Circle cir = new Circle(200, 200, 100);
-        cir.setFill(Color.RED);
         // Gets the available parts in RapidSmith and populates the selection tree
         parts = RSEnvironment.defaultEnv().getAvailableParts();
-
         if (parts.size() < 1) {
-            System.err.println("No available parts.  Please generate part database files.");
+            System.err.println("No available parts.  Please generate part database files.");//error message
             System.exit(1);
         }
         currPart = parts.get(0);
-        device = RSEnvironment.defaultEnv().getDevice(currPart);
-        we = device.getWireEnumerator();
-//        Device testDevice= new Device();
-//        for(String part: parts) {
-//            System.out.println("current Part:");
-//            System.out.println(part);
-//            System.out.println("The Family Type is:");
-//            testDevice = RSEnvironment.defaultEnv().getDevice(part);
-//            System.out.println(testDevice.getFamily().toString());
-//        }
         initializeSideBar();
         initializeMenuBar();
-        //initializeTileView();
+        device = RSEnvironment.defaultEnv().getDevice(currPart);//default program to first device in partsList
+        we = device.getWireEnumerator();
+        tileWindow = new TileWindowJavaFx(this, device, hideTiles, drawSites);
+        GraphicsContext gc = tileWindow.getGraphicsContext2D();//in case I need it in main application
+        partTree.setOnMouseClicked(e -> {
+            if (e.getButton().equals(MouseButton.PRIMARY) && e.getClickCount() == 2) {//If double clicked with primary button
+                TreeItem<String> loadPart = partTree.getSelectionModel().getSelectedItem();//grab TreeItem from TreeView
+                // assume it is a device and not a family.
+                if (familyItems.get(loadPart)==null) {
+                    showPart(loadPart.getValue(), e);
+                }
+            }
+        });
 
-        Scene scene = new Scene(borderPane, 1000, 600);
-        primaryStage.setTitle("Device Browser Testing");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
+        tileWindow.setOnMouseMoved(e -> {
+            updateStatus(e);
+            checkForWireHighlight(e);
+        });//updates status Label at bottom of app depending on tile mouse cursor is over
+        tileWindow.setOnMouseClicked(e -> {//highlights tile selected by double click
+            if (e.getButton().equals(MouseButton.PRIMARY) && e.getClickCount() == 2) {
+                tileWindow.mouseDoubleClickEvent(e);
+                updateSelectedTile(tileWindow.getSelectedTile());
+            }
+            else if(e.isSecondaryButtonDown() || (e.getClickCount() == 2 && e.getButton().equals(MouseButton.SECONDARY)))
+            {
+                tileWindow.rightClickEvent(e);
+                e.consume();
+            }
+        });
+            tileView = new TileViewJavaFx(tileWindow);
+            bottomPane.getChildren().add(statusLabel);
+            borderPane.setCenter(tileView);
+            borderPane.setBottom(bottomPane);
+            scene = new Scene(borderPane, 1024, 768);
+            primaryStage.setTitle("Device Browser Testing");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+    }//end start()
 
-}
+}//end class
