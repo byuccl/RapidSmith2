@@ -13,6 +13,9 @@ import com.trolltech.qt.gui.QKeyEvent;
 import com.trolltech.qt.gui.QMouseEvent;
 import com.trolltech.qt.gui.QWheelEvent;
 
+import edu.byu.ece.rapidSmith.device.Tile;
+import edu.byu.ece.rapidSmith.device.Wire;
+import edu.byu.ece.rapidSmith.device.WireEnumerator;
 import edu.byu.ece.rapidSmith.gui.DragContextJavaFx;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
@@ -31,6 +34,7 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 
@@ -40,6 +44,10 @@ import javafx.scene.Scene;//like QGraphicsScene?
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import static javafx.scene.transform.Transform.scale;
 
@@ -65,6 +73,10 @@ public class TileViewJavaFx extends ScrollPane {
      */
     protected static double scaleFactor = 1.15;
 
+    int lineWidth = 1;
+
+    int offset = (int) Math.ceil((lineWidth / 2.0));
+
     TileWindowJavaFx tileWindow;
 
     Group group;
@@ -73,6 +85,8 @@ public class TileViewJavaFx extends ScrollPane {
 
     DoubleProperty myScale = new SimpleDoubleProperty(1.0);
     StackPane content;
+
+    ArrayList<Line> lines = new ArrayList<>();
 
     TileViewJavaFx(TileWindowJavaFx tileWindowIn) {
 //        super();
@@ -187,5 +201,38 @@ public class TileViewJavaFx extends ScrollPane {
 
     public void setTileWindow(TileWindowJavaFx in){
         setup(in);
+    }
+
+    public void drawWireLines(Tile src, Wire wireSrc, Tile dst, Wire wireDst) {
+        WireEnumerator we = tileWindow.we;
+        double enumSize = we.getWires().length;
+        double offsetX1 = 1 / enumSize;
+        double offsetX2 = 10 % enumSize;
+        double offsetY = -2;
+        HashMap tileXMap = tileWindow.tileXMap;
+        HashMap tileYMap = tileWindow.tileYMap;
+        int tileSize =  tileWindow.tileSize;
+        try {
+            double x1 = (double) ((Integer)tileXMap.get(src) * tileSize + (wireSrc.getWireEnum() % tileSize));
+            double y1 = (double) ((Integer)tileYMap.get(src) * tileSize + (wireSrc.getWireEnum() * tileSize)) / enumSize;
+            double x2 = (double) ((Integer)tileXMap.get(dst) * tileSize + (wireDst.getWireEnum() % tileSize));
+            double y2 = (double) ((Integer)tileYMap.get(dst) * tileSize + (wireDst.getWireEnum() * tileSize)) / enumSize;
+//            gc.setStroke(Color.ORANGE);
+//            gc.setLineWidth(lineWidth);
+//            gc.strokeLine(x1, y1, x2, y2);
+
+            Line line = new Line(x1,y1,x2,y2);
+            line.setStroke(Color.ORANGE);
+            lines.add(line);
+            group.getChildren().add(line);
+
+        } catch (NullPointerException e) {
+            //System.out.println("Error, new Device means need to click on tile");
+            return;
+        }
+    }
+
+    public void removeWires(){
+        group.getChildren().remove(lines);
     }
 }

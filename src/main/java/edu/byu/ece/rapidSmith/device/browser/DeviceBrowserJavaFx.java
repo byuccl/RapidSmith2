@@ -250,6 +250,7 @@ public class DeviceBrowserJavaFx extends Application{//QMainWindow {
         if(tileWire.getWireConnections().isEmpty()) return;
         for(Connection wire : tileWire.getWireConnections()){
             tileWindow.drawWire(showWiresTile, tileWire, wire.getSinkWire().getTile(), wire.getSinkWire());
+//            tileView.drawWireLines(showWiresTile, tileWire, wire.getSinkWire().getTile(), wire.getSinkWire());
         }
     }
 
@@ -408,8 +409,12 @@ public class DeviceBrowserJavaFx extends Application{//QMainWindow {
             }
         });
             tileView = new TileViewJavaFx(tileWindow);
+            TileViewTest tileViewTest = new TileViewTest(this, device, hideTiles, drawSites);
+
+
             bottomPane.getChildren().add(statusLabel);
-            borderPane.setCenter(tileView);
+//            borderPane.setCenter(tileViewTest);//change as needed to display either tileWindow or tileView
+            borderPane.setCenter(tileView);//change as needed to display either tileWindow or tileView
             borderPane.setBottom(bottomPane);
             scene = new Scene(borderPane, 1024, 768);
             primaryStage.setTitle("Device Browser Testing");
