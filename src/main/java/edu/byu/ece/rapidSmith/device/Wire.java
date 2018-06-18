@@ -52,6 +52,8 @@ public interface Wire extends Serializable {
 	 * Return connection linking this wire to other wires in the same hierarchy.
 	 */
 	Collection<Connection> getWireConnections();
+
+	Connection getWireConnection(Wire targetWire);
 	
 	WireConnection[] getWireConnectionsArray();
 

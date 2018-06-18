@@ -455,18 +455,19 @@ public class Device implements Serializable {
 		return getAllSitesOfType(type) != null;
 	}
 
-	public int getTopYCoordinate() {
-		return tileMap.values().stream()
-				.filter(tile -> !tile.getType().equals(TileType.valueOf(family, "NULL")))
-				.filter(tile -> !tile.getType().equals(TileType.valueOf(family, "HIERARCHICAL_PORT")))
-				.max(Comparator.comparing(Tile::getTileYCoordinate)).get().getTileYCoordinate();
+	// TODO: Move to Site Pack Unit Generator
+	public int getTopYCoordinate(SiteType type) {
+		return sites.values().stream()
+				.filter(site -> Arrays.asList(site.getPossibleTypes()).contains(type))
+				.max(Comparator.comparing(Site::getInstanceY)).get().getInstanceY();
 	}
 
-	public int getBottomYCoordinate() {
-		return tileMap.values().stream()
-				.filter(tile -> !tile.getType().equals(TileType.valueOf(family, "NULL")))
-				.filter(tile -> !tile.getType().equals(TileType.valueOf(family, "HIERARCHICAL_PORT")))
-				.min(Comparator.comparing(Tile::getTileYCoordinate)).get().getTileYCoordinate();	}
+	// TODO: Move to Site Pack Unit Generator
+	public int getBottomYCoordinate(SiteType type) {
+		return sites.values().stream()
+				.filter(site -> Arrays.asList(site.getPossibleTypes()).contains(type))
+				.min(Comparator.comparing(Site::getInstanceY)).get().getInstanceY();
+	}
 
 	/**
 	 * This method will return all compatible sites for a particular site type in
@@ -601,6 +602,7 @@ public class Device implements Serializable {
 		this.columns = tiles[0].length;
 	}
 
+	// NOTE: I modified this to include alternate site types as well. This is to help with site pack unit generation.
 	/**
 	 * This will create a data structure which organizes all sites by types.
 	 * The outer ArrayList uses the SiteType.ordinal() value as the index for
@@ -614,7 +616,9 @@ public class Device implements Serializable {
 				Site[] sites = tiles[i][j].getSites();
 				if (sites == null) continue;
 				for (Site site : sites) {
-					tmp.computeIfAbsent(site.getDefaultType(), k -> new ArrayList<>()).add(site);
+					for (SiteType type : site.getPossibleTypes()) {
+						tmp.computeIfAbsent(type, k -> new ArrayList<>()).add(site);
+					}
 				}
 			}
 		}

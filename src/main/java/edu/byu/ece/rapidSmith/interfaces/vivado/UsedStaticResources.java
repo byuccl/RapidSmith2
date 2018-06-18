@@ -49,7 +49,7 @@ public class UsedStaticResources {
     // Map from port name(s) to a pair of the static net name and the static portion of the route string
 	private Map<String, MutablePair<String, String>> staticRoutemap;
 	private Map<String, String> oocPortMap; // Map from port name to the associated partition pin's node
-	private Set<Wire> reservedWires;
+	//private Set<Wire> reservedWires;
 
 	/**
 	 * Creates a new XdcRoutingInterface object.
@@ -62,7 +62,7 @@ public class UsedStaticResources {
 		this.wireEnumerator = device.getWireEnumerator();
 		this.design = design;
 		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)");
-		reservedWires = new HashSet<>();
+		//reservedWires = new HashSet<>();
 	}
 	
 	/**
@@ -106,8 +106,6 @@ public class UsedStaticResources {
 				}
 			}
 		}
-
-		design.setReservedWires(reservedWires);
 	}
 
 	/**
@@ -152,7 +150,8 @@ public class UsedStaticResources {
 		assert (partPinWire != null);
 
 		// Add the partition pin node to the list of reserved wires
-		reservedWires.add(partPinWire);
+		design.addReservedWire(partPinWire);
+		//reservedWires.add(partPinWire);
 		String direction = toks[3];
 
 		PinDirection pinDirection;
@@ -203,8 +202,10 @@ public class UsedStaticResources {
 				Wire sinkWire = new TileWire(tile, wireEnumerator.getWireEnum(sink));
 
 				// Mark both the startWire and sinkWire as being reserved.
-				reservedWires.add(startWire);
-				reservedWires.add(sinkWire);
+				design.addReservedWire(startWire);
+				design.addReservedWire(sinkWire);
+				//reservedWires.add(startWire);
+				//reservedWires.add(sinkWire);
 		
 				//PIP pip = new PIP(startWire, sinkWire);
 				//tile.setUsedPIP(pip, false); // Mark the PIP as used
@@ -250,7 +251,8 @@ public class UsedStaticResources {
 					Wire tileWire = new TileWire(tile, wireEnum);
 
 					// Set the tile wire as used so routers know to not use it
-					reservedWires.add(tileWire);
+					design.addReservedWire(tileWire);
+					//reservedWires.add(tileWire);
 				}
 			}
 

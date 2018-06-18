@@ -991,6 +991,7 @@ public class CellNet implements Serializable {
 
 		List<RouteTree> sinkTrees = new ArrayList<>();
 		for (CellPin sink : routedSinks) {
+			assert (this.getSinkRouteTree(sink) != null);
 			sinkTrees.add(this.getSinkRouteTree(sink));
 		}
 

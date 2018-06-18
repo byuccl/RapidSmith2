@@ -97,7 +97,6 @@ public class XdcRoutingInterface {
 		this.currentLineNumber = 0;
 		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)"); 
 		this.implementationMode = mode;
-		//this.oocPortMap = oocPortMap;
 		this.staticRoutemap = staticRoutemap;
 
 		oocPortMap = design.getOocPortMap();

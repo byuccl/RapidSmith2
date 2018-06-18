@@ -258,7 +258,7 @@ public class XdcPlacementInterface {
 		Site site = device.getSite(siteName);
 		
 		if (site == null) {
-			throw new ParseException("Site \"" + siteName + "\" not found in the current device. \n" 
+			throw new ParseException("Site \"" + siteName + "\" not found in the current device. \n"
 									+ "On line " + this.currentLineNumber + " of " + currentFile);
 		}
 		
@@ -399,7 +399,7 @@ public class XdcPlacementInterface {
 			Cell cell = cellIt.next();
 			
 			// only add cells that are placed to the list
-			if ( !cell.isPlaced() ) {
+			if (!cell.isPlaced()) {
 				continue;
 			}
 			

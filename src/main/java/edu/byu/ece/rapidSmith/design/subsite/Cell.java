@@ -20,12 +20,7 @@
 
 package edu.byu.ece.rapidSmith.design.subsite;
 
-import edu.byu.ece.rapidSmith.device.Bel;
-import edu.byu.ece.rapidSmith.device.BelId;
-import edu.byu.ece.rapidSmith.device.BondedType;
-import edu.byu.ece.rapidSmith.device.PinDirection;
-import edu.byu.ece.rapidSmith.device.PortDirection;
-import edu.byu.ece.rapidSmith.device.Site;
+import edu.byu.ece.rapidSmith.device.*;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -54,16 +49,60 @@ public class Cell {
 	private final Map<String, CellPin> pinMap;
 	/**	Set of pseudo pins attached to the cell */
 	private Set<CellPin> pseudoPins;
-	
+	/** Whether or not the cell is a pseudo cell */
+	private boolean pseudo;
+
 	// Macro specific cell categories.
-	
 	/** Parent of this cell (for internal cells only)*/
 	private Cell parent;
 	/** Mapping of cell name to internal cell*/
 	private Map<String, Cell> internalCells;
 	/** Mapping of net name to internal net*/
 	private Map<String, CellNet> internalNets;
-	
+
+    public boolean isPseudo() {
+        return pseudo;
+    }
+
+	// Pseudo Cell
+	public Cell(String name, LibraryCell libCell, boolean pseudo) {
+		assert (pseudo);
+		this.pseudo = true;
+
+		Objects.requireNonNull(name);
+		Objects.requireNonNull(libCell);
+
+		this.name = name;
+		this.libCell = libCell;
+		this.bonded = BondedType.INTERNAL;
+
+		this.bel = null;
+
+		this.properties = new PropertyList(libCell.getDefaultPropertyMap());
+
+		this.pinMap = new HashMap<>();
+		for (LibraryPin pin : libCell.getLibraryPins()) {
+			this.pinMap.put(pin.getName(), new BackedCellPin(this, pin));
+		}
+
+		// for port cells, set the direction property
+		if(libCell.isPort()) {
+			this.properties.update(new Property("Dir", PropertyType.USER, PortDirection.getPortDirectionForImport(this)));
+
+			// For partial reconfiguration... ?
+		}
+
+		// additional initialization for macro cells
+		if (libCell.isMacro()) {
+			LibraryMacro macroCell = (LibraryMacro) libCell;
+			this.internalCells = macroCell.constructInternalCells(this);
+			this.internalNets = macroCell.constructInternalNets(this.name, this.internalCells);
+		}
+
+		this.design = null;
+	}
+
+
 	/**
 	 * Creates a new cell with specified name and type.
 	 *
@@ -77,6 +116,7 @@ public class Cell {
 		this.name = name;
 		this.libCell = libCell;
 		this.bonded = BondedType.INTERNAL;
+		this.pseudo = false;
 
 		this.design = null;
 		this.bel = null;

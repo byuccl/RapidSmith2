@@ -70,6 +70,7 @@ public class CellDesign extends AbstractDesign {
 	/** Map of used PIPs to their Input Values in a Site **/
 	private Map<Site, Map<String, String>> pipInValues;
 
+	// TODO: Should be un-modifiable?
 	private Set<Wire> reservedWires;
 
 	// TODO: Re-think these three
@@ -110,6 +111,7 @@ public class CellDesign extends AbstractDesign {
 		usedSitePipsMap = new HashMap<>();
 		mode = ImplementationMode.REGULAR;
 		pipInValues = new HashMap<>();
+		reservedWires = new HashSet<>();
 	}
 
 	/**
@@ -206,8 +208,20 @@ public class CellDesign extends AbstractDesign {
 		return cellMap.values().stream().flatMap(c -> _flatten(c));
 	}
 
-	public Stream<Cell> getNonPortCells() {
-		return (cellMap.values().stream().flatMap(c -> _flatten(c))).filter(it -> !it.isPort());
+	/**
+	 * Returns a flattened view of the in-context cells in the netlist. Macro
+	 * cells are not returned in this list, only leaf and internal cells
+	 * are returned.
+	 * WARNING: Ports are assumed to be out-of-context. This is true for 7-Series RMs, but is
+	 * not necessarily true for ultrascale RMs.
+	 */
+	public Stream<Cell> getInContextLeafCells() {
+		// TODO: For non 7-series designs, determine which ports are in-context and which are out-of-context
+		// TODO: Also check ImplementationMode.OUT_OF_CONTEXT
+		if (this.mode.equals(ImplementationMode.RECONFIG_MODULE))
+			return (cellMap.values().stream().flatMap(c -> _flatten(c))).filter(it -> !it.isPort());
+		else
+			return cellMap.values().stream().flatMap(c -> _flatten(c));
 	}
 
 
@@ -546,6 +560,12 @@ public class CellDesign extends AbstractDesign {
 		if (sitePlacementMap == null)
 			return null;
 		return sitePlacementMap.values();
+	}
+
+	public Collection<Bel> getUsedBelsAtSite(Site site) {
+		Objects.requireNonNull(site);
+
+		return placementMap.get(site).keySet();
 	}
 
 	/**
@@ -940,6 +960,10 @@ public class CellDesign extends AbstractDesign {
 
 	public Set<Wire> getReservedWires() {
 		return reservedWires;
+	}
+
+	public void addReservedWire(Wire reservedWire) {
+		reservedWires.add(reservedWire);
 	}
 
 	public boolean isWireReserved(Wire wire) {

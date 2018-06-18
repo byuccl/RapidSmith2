@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import edu.byu.ece.edif.core.EdifNameConflictException;
 import edu.byu.ece.edif.core.InvalidEdifNameException;
@@ -89,12 +90,7 @@ public final class VivadoInterface {
 		String edifFile = rscpPath.resolve("netlist.edf").toString();
 
 		CellDesign design;
-		// TODO: Make a PARTIAL_RECONFIG mode.
-		//if (mode.equals(ImplementationMode.OUT_OF_CONTEXT))
-		//	design = EdifInterface.parseEdif(edifFile, libCells, partName);
-		//else
-			design = EdifInterface.parseEdif(edifFile, libCells);
-
+		design = EdifInterface.parseEdif(edifFile, libCells);
 		design.setImplementationMode(mode);
 		
 		// parse the constraints into RapidSmith
@@ -174,6 +170,14 @@ public final class VivadoInterface {
 		writeTCP(tcpDirectory, design, device, libCells, mode, null);
 	}
 
+	/**
+	 * Removes and unplaces all pseudo cells in the design
+	 */
+	private static void removePseudoCells(CellDesign design) {
+		for (Cell pseudoCell : design.getCells().stream().filter(Cell::isPseudo).collect(Collectors.toList())) {
+			design.removeCell(pseudoCell);
+		}
+	}
 
 	/**
 	 * Export the RapidSmith2 design into an existing TINCR checkpoint file. 
@@ -187,6 +191,9 @@ public final class VivadoInterface {
 	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells, ImplementationMode mode, Map<String, MutablePair<String, String>> staticRoutemap) throws IOException {
 				
 		new File(tcpDirectory).mkdir();
+
+		// "Un-place" pseudo cells
+		removePseudoCells(design);
 		
 		// insert routethrough buffers
 		LutRoutethroughInserter inserter = new LutRoutethroughInserter(design, libCells);
