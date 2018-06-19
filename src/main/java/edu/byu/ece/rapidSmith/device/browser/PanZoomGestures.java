@@ -1,20 +1,14 @@
 package edu.byu.ece.rapidSmith.device.browser;
 
-import edu.byu.ece.rapidSmith.device.Tile;
-import edu.byu.ece.rapidSmith.device.Wire;
-import edu.byu.ece.rapidSmith.device.WireEnumerator;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-
 import javafx.geometry.Bounds;
+
 import javafx.scene.*;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
-import javafx.scene.transform.Scale;
-import javafx.stage.Stage;
 
 import javafx.geometry.Point2D; //like QPoint and QPointF
 import javafx.scene.control.Label;
@@ -36,7 +30,7 @@ import static javafx.scene.transform.Transform.scale;
  * including pan and zoom upon pressing CTRL and scrolling with mouse.
  */
 
-public class TileViewJavaFx extends ScrollPane {
+public class PanZoomGestures extends ScrollPane {
 //    StackPane windowPane;
 //    ScrollPane scrollPane;
 //    Group group;
@@ -45,7 +39,7 @@ public class TileViewJavaFx extends ScrollPane {
     /**
      * The maximum value to which we can zoom in
      */
-    protected static double zoomMax = 5;
+    protected static double zoomMax = 20;
     /**
      * The rate at which we zoom
      */
@@ -55,7 +49,7 @@ public class TileViewJavaFx extends ScrollPane {
 
     int offset = (int) Math.ceil((lineWidth / 2.0));
 
-    TileWindowJavaFx tileWindow;
+    TileViewTest tileView;
 
     Group group;
 
@@ -66,16 +60,15 @@ public class TileViewJavaFx extends ScrollPane {
 
     ArrayList<Line> lines = new ArrayList<>();
 
-    TileViewJavaFx(TileWindowJavaFx tileWindowIn) {
-//        super();
-        setup(tileWindowIn);
+    PanZoomGestures(TileViewTest tileViewIn) {
+        setup(tileViewIn);
     }
 
-    public void setup(TileWindowJavaFx in){
-        tileWindow = in;
-        group = new Group(tileWindow);
+    public void setup(TileViewTest in){
+        tileView = in;
+        group = new Group(tileView);
         content = new StackPane(group);
-        tileWindow.layoutBoundsProperty().addListener((observable, oldBounds, newBounds) -> {
+        tileView.layoutBoundsProperty().addListener((observable, oldBounds, newBounds) -> {
             // keep it at least as large as the content
             content.setMinWidth(newBounds.getWidth());
             content.setMinHeight(newBounds.getHeight());
@@ -84,7 +77,7 @@ public class TileViewJavaFx extends ScrollPane {
         setContent(content);//Scrollpane now has stackpane as contents
         setPannable(true);//takes care of panning capability
 
-        content.setPrefSize(tileWindow.getWidth(), tileWindow.getHeight());//set preferred size to same as tileWindow
+        content.setPrefSize(tileView.getWidth(), tileView.getHeight());//set preferred size to same as tileWindow
         content.setStyle("-fx-background-color: black;");//set background to black
 
         viewportBoundsProperty().addListener((observable, oldBounds, newBounds) -> {
@@ -137,10 +130,10 @@ public class TileViewJavaFx extends ScrollPane {
 //                  // do the resizing of the tileWindow(canvas) itself by setting the scale of the "picture"
 //                     to the current scale times the calculated zoom factor
 
-                if (!(zoomFactor * tileWindow.getScaleX() > zoomMax || zoomFactor * tileWindow.getScaleX() < zoomMin)) {
+                if (!(zoomFactor * tileView.getScaleX() > zoomMax || zoomFactor * tileView.getScaleX() < zoomMin)) {
                     setPivot(evt);
-                    tileWindow.setScaleX(zoomFactor * tileWindow.getScaleX());
-                    tileWindow.setScaleY(zoomFactor * tileWindow.getScaleY());
+                    tileView.setScaleX(zoomFactor * tileView.getScaleX());
+                    tileView.setScaleY(zoomFactor * tileView.getScaleY());
                     layout();
 
                     groupBounds = group.getLayoutBounds();
@@ -152,8 +145,8 @@ public class TileViewJavaFx extends ScrollPane {
 
     }
     public void setPivot(ScrollEvent e) {
-        tileWindow.setTranslateX(e.getX());
-        tileWindow.setTranslateY(e.getY());
+        tileView.setTranslateX(e.getX());
+        tileView.setTranslateY(e.getY());
     }
 
     public static double clamp( double value, double min, double max) {
@@ -174,38 +167,38 @@ public class TileViewJavaFx extends ScrollPane {
         myScale.set(scale);
     }
 
-    public void setTileWindow(TileWindowJavaFx in){
+    public void setTileView(TileViewTest in){
         setup(in);
     }
 
-    public void drawWireLines(Tile src, Wire wireSrc, Tile dst, Wire wireDst) {
-        WireEnumerator we = tileWindow.we;
-        double enumSize = we.getWires().length;
-        double offsetX1 = 1 / enumSize;
-        double offsetX2 = 10 % enumSize;
-        double offsetY = -2;
-        HashMap tileXMap = tileWindow.tileXMap;
-        HashMap tileYMap = tileWindow.tileYMap;
-        int tileSize =  tileWindow.tileSize;
-        try {
-            double x1 = (double) ((Integer)tileXMap.get(src) * tileSize + (wireSrc.getWireEnum() % tileSize));
-            double y1 = (double) ((Integer)tileYMap.get(src) * tileSize + (wireSrc.getWireEnum() * tileSize)) / enumSize;
-            double x2 = (double) ((Integer)tileXMap.get(dst) * tileSize + (wireDst.getWireEnum() % tileSize));
-            double y2 = (double) ((Integer)tileYMap.get(dst) * tileSize + (wireDst.getWireEnum() * tileSize)) / enumSize;
+//    public void drawWireLines(Tile src, Wire wireSrc, Tile dst, Wire wireDst) {
+//        WireEnumerator we = tileWindow.we;
+//        double enumSize = we.getWires().length;
+//        double offsetX1 = 1 / enumSize;
+//        double offsetX2 = 10 % enumSize;
+//        double offsetY = -2;
+//        HashMap tileXMap = tileWindow.tileXMap;
+//        HashMap tileYMap = tileWindow.tileYMap;
+//        int tileSize =  tileWindow.tileSize;
+//        try {
+//            double x1 = (double) ((Integer)tileXMap.get(src) * tileSize + (wireSrc.getWireEnum() % tileSize));
+//            double y1 = (double) ((Integer)tileYMap.get(src) * tileSize + (wireSrc.getWireEnum() * tileSize)) / enumSize;
+//            double x2 = (double) ((Integer)tileXMap.get(dst) * tileSize + (wireDst.getWireEnum() % tileSize));
+//            double y2 = (double) ((Integer)tileYMap.get(dst) * tileSize + (wireDst.getWireEnum() * tileSize)) / enumSize;
 //            gc.setStroke(Color.ORANGE);
 //            gc.setLineWidth(lineWidth);
 //            gc.strokeLine(x1, y1, x2, y2);
-
-            Line line = new Line(x1,y1,x2,y2);
-            line.setStroke(Color.ORANGE);
-            lines.add(line);
-            group.getChildren().add(line);
-
-        } catch (NullPointerException e) {
-            //System.out.println("Error, new Device means need to click on tile");
-            return;
-        }
-    }
+//
+//            Line line = new Line(x1,y1,x2,y2);
+//            line.setStroke(Color.ORANGE);
+//            lines.add(line);
+//            group.getChildren().add(line);
+//
+//        } catch (NullPointerException e) {
+//            //System.out.println("Error, new Device means need to click on tile");
+//            return;
+//        }
+//    }
 
     public void removeWires(){
         group.getChildren().remove(lines);

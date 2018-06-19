@@ -54,8 +54,10 @@ public class TileViewTest extends Pane {
         public int selY;
 
         /**The rendered size of each XDL Tile*/
-        public int tileSize = 33;//
-        public int rectSide = tileSize - 4;
+        public int tileSize = 40;//
+        public double lineWidth = 1;
+        int offset = (int) Math.ceil((lineWidth / 2.0));
+        public int rectSide = (tileSize - 4)*offset;
         /**Number of tile columns being referenced on the device*/
         public int cols;
         /**Number of tile rows being referenced on the device*/
@@ -67,7 +69,7 @@ public class TileViewTest extends Pane {
         /** Gets the Y coordinate of the tile in the drawnTiles grid */
         public HashMap<Tile,Integer> tileYMap;
         /**Width of the lines drawn in between tiles when columns/rows are hidden*/
-        public double lineWidth = 1;
+
         /**The device corresponding to this scene*/
         protected Device device;
         /**The current design associated with this tileScene*/
@@ -78,10 +80,14 @@ public class TileViewTest extends Pane {
         private HashSet<TileType> tileColumnTypesToHide;
         /** This is the set of row tile types which should not be drawn */
         private HashSet<TileType> tileRowTypesToHide;
+
+        public HashMap<Tile,Rectangle> drawnTilesMap;
         /**canvas for drawing everything*/
         private static GraphicsContext gc;
         /**Menu for getting reachability of tiles*/
         ContextMenu contextMenu = new ContextMenu();
+
+        public Rectangle highlight;
 
         /** */
         protected static Font font1 = new Font("Times New Roman", 10);
@@ -95,9 +101,9 @@ public class TileViewTest extends Pane {
 
         private ArrayList<NumberedHighlightedTile> currentTiles = new ArrayList<>();
 
-        private ArrayList<Line2D> lines = new ArrayList<>();
+        private ArrayList<Line> lines = new ArrayList<>();
 
-        private ObservableList<Line2D> wires =  FXCollections.observableList(lines);
+        private ObservableList<Line> wires =  FXCollections.observableList(lines);
 
         //Tile src, Wire wireSrc, Tile dst, Wire wireDst
         private Tile source;
@@ -113,7 +119,7 @@ public class TileViewTest extends Pane {
         private Tile reachabilityTile;
         //Initialize object with null
 
-        int offset = (int) Math.ceil((lineWidth / 2.0));
+
 
         /**
          * Creates a new tile window with a selected design.
@@ -129,7 +135,7 @@ public class TileViewTest extends Pane {
             selectedTile = null;
             //widthProperty().addListener(evt -> initializeScene(hideTiles, drawSites));
             //heightProperty().addListener(evt ->initializeScene(hideTiles, drawSites));
-            initializeScene(hideTiles, false);
+            initializeScene(hideTiles, drawSites);
             MenuItem action1 = new MenuItem("Draw Reachability (1 Hop)");
             MenuItem action2 = new MenuItem("Draw Reachability (2 Hop)");
             MenuItem action3= new MenuItem("Draw Reachability (3 Hop)");
@@ -212,19 +218,18 @@ public class TileViewTest extends Pane {
          */
         public void mouseDoubleClickEvent(MouseEvent event) {
             selectedTile = getTile(event);//currX and currY are set here
-            drawFPGAFabric(true); //redraw tiles
-            if(reachabilityDrawn) drawReachability(findReachability(reachabilityTile, hops));
-            displayWire = deviceBrowser.getDisplayWire();
-            if(displayWire!=null)deviceBrowser.wireDoubleClicked(displayWire.getName());
-            //System.out.println("color is:"+gc.getStroke().toString());
-            gc.setStroke(Color.YELLOW); //set stroke to yellow for selection box
             selX = currX;
             selY = currY;
             prevX = currX;
             prevY = currY;
             previousTile = selectedTile;
             if (selX >= 0 && selY >= 0 && selX < cols && selY < rows) {
-                gc.strokeRect(currX * tileSize, currY * tileSize,(rectSide)*offset, (rectSide)*offset);//draw square
+                this.getChildren().remove(highlight);
+                highlight = new Rectangle(currX * tileSize, currY * tileSize,rectSide-1, rectSide);
+                highlight.setStroke(Color.YELLOW);
+                highlight.setStrokeWidth(3);
+                highlight.setFill(Color.TRANSPARENT);
+                this.getChildren().add(highlight);
             }
         }
 
@@ -241,25 +246,42 @@ public class TileViewTest extends Pane {
             double offsetX2 = 10%enumSize;
             double offsetY = -2;
             try {
-                double x1 = (double) tileXMap.get(src) * tileSize + (wireSrc.getWireEnum() % tileSize)*offset+offset;
+                double x1 = (double) tileXMap.get(src) * tileSize + (wireSrc.getWireEnum() % tileSize);
                 double y1 = (double) tileYMap.get(src) * tileSize + (wireSrc.getWireEnum() * tileSize)/enumSize;
-                double x2 = (double) tileXMap.get(dst) * tileSize + (wireDst.getWireEnum() % tileSize)*offset+offset;
+                double x2 = (double) tileXMap.get(dst) * tileSize + (wireDst.getWireEnum() % tileSize);
                 double y2 = (double) tileYMap.get(dst) * tileSize + (wireDst.getWireEnum() * tileSize)/enumSize;
-                gc.setStroke(Color.ORANGE);
-                gc.setLineWidth(lineWidth);
-                gc.strokeLine(x1, y1, x2, y2);
 
-                Line2D line = new Line2D((float)x1, (float)y1,(float) x2,(float) y2);
-
+                Line line = new Line(x1, y1, x2, y2);
+                line.setStroke(Color.ORANGE);
+                line.setFill(Color.ORANGE);
+                line.setOnMouseEntered(e-> {
+                    line.setFill(Color.RED);
+                    line.setStroke(Color.RED);
+                });
+                line.setOnMouseExited(e-> {
+                    line.setFill(Color.ORANGE);
+                    line.setStroke(Color.ORANGE);
+                });
+                line.setOnMouseClicked(e-> drawConnectingWires(dst, wireDst));
                 lines.add(line);
+                getChildren().add(line);
+
 
             }
             catch(NullPointerException e){
-                //System.out.println("Error, new Device means need to click on tile");
                 return;
             }
         }
 
+     void drawConnectingWires(Tile tile, Wire wire){
+        resetAfterWire();
+        if(tile == null) return;
+        TileWire tileWire = tile.getWire(wire.getName());
+        if(tileWire.getWireConnections().isEmpty()) return;
+        for(Connection newWire : tileWire.getWireConnections()){
+            drawWire(tile, wire, newWire.getSinkWire().getTile(), newWire.getSinkWire());
+        }
+    }
         /**
          * Method for drawing FPGA design including tiles and sites
          * Used many times for erasing/resetting tileWindow
@@ -297,6 +319,7 @@ public class TileViewTest extends Pane {
             }
             rows = rows-rowsToSkip.size();
             cols = cols-colsToSkip.size();
+            setPrefSize((cols + 1) * (tileSize + 1), (rows + 1) * (tileSize + 1));
             i = 0;
             for(int col : colsToSkip){
                 int realCol = col - i;
@@ -322,16 +345,15 @@ public class TileViewTest extends Pane {
 
                     int rectX = x * tileSize;
                     int rectY = y * tileSize;
-                    int rectSide1 = rectSide * offset;
                     if(drawSites){
                         if (familyInfo.clbTiles().contains(tileType)) {
-                            drawCLB(rectX, rectY, rectSide1);
+                            drawCLB(rectX, rectY, tile, color);
                         }else if (familyInfo.switchboxTiles().contains(tileType)) {
-                            drawSwitchBox(rectX, rectY, rectSide1);
+                            drawSwitchBox(rectX, rectY, color);
                         } else if (familyInfo.bramTiles().contains(tileType)) {
-                            drawBRAM(rectX, rectY, rectSide1, color);
+                            drawBRAM(rectX, rectY, color);
                         } else if (familyInfo.dspTiles().contains(tileType)) {
-                            drawDSP(rectX, rectY, rectSide1, color);
+                            drawDSP(rectX, rectY, color);
                         } else { // Just fill the tile in with a appropriate color
                             colorTile(x, y, color);
                         }
@@ -348,12 +370,7 @@ public class TileViewTest extends Pane {
          * Then redraws correct selected tile
          */
         public void resetAfterWire(){
-            drawFPGAFabric(true);
-            if(reachabilityDrawn)findReachability(reachabilityTile, hops);
-            if(selectedTile == previousTile) {
-                gc.setStroke(Color.YELLOW); //set square to yellow selected box
-                gc.strokeRect(prevX * tileSize, prevY * tileSize,(rectSide)*offset, (rectSide)*offset);//draw square
-            }
+            getChildren().removeAll(lines);
             lines.clear();
         }
 
@@ -444,7 +461,7 @@ public class TileViewTest extends Pane {
             return tileSize;
         }
 
-        public ArrayList<Line2D> getLines() {return lines;}
+       public ObservableList<Line> getDrawnWires() {return wires;}
         /*
          * Helper Drawing Methods..Needs redone using graphics context of Canvas instead.
          */
@@ -452,12 +469,16 @@ public class TileViewTest extends Pane {
         /**
          * Helper drawing methods for drawing FPGA fabric. Correctly draws different tiles with respective color.
          */
-        private void drawCLB(int rectX, int rectY, int rectSide){
-            gc.strokeRect(rectX, rectY + rectSide / 2, rectSide / 2 - 1, rectSide / 2 - 1);
-            gc.strokeRect(rectX + rectSide / 2, rectY, rectSide / 2 - 1, rectSide / 2 - 1);
+        private void drawCLB(int rectX, int rectY, Tile tile, Color color){
+            Rectangle rect = new Rectangle(rectX, rectY + rectSide / 2, rectSide / 2 - 1, rectSide / 2 - 1);
+            rect.setStroke(color);
+            Rectangle rect1 = new Rectangle(rectX + rectSide / 2, rectY, rectSide / 2 - 1, rectSide / 2 - 1);
+            rect1.setStroke(color);
+            getChildren().addAll(rect, rect1);
+
         }
 
-        private void drawBRAM(int rectX, int rectY, int rectSide,  Color color){
+        private void drawBRAM(int rectX, int rectY,  Color color){
             switch(device.getFamily().name()) {
 //			case SPARTAN6:
 //				gc.strokeRect(rectX, rectY - 3 * tileSize, rectSide - 1, 4 * rectSide + 3 * 2 * offset - 1);
@@ -474,18 +495,21 @@ public class TileViewTest extends Pane {
                 case "ARTIX7":
                 case "KINTEX7":
                 case "VIRTEX7":
-                    gc.strokeRect(rectX, rectY - 4 * tileSize, rectSide , 5 * (rectSide) + 5 * 2 * offset+2);
+                    Rectangle rect0 = new Rectangle(rectX, rectY - 4 * tileSize, rectSide , 5 * (rectSide) + 5 * 2);
+                    rect0.setStroke(color);
                     color = color.darker();
                     color = color.darker();
                     color = color.darker();
-                    gc.setStroke(color);
-                    gc.strokeRect(rectX+4, (rectY-4 * tileSize) + 4, rectSide - 8, ((int)(2.5 * (rectSide-2))) + 5 * 2 * offset-2);
-                    gc.strokeRect(rectX+4, (rectY-2 * tileSize) + 12, rectSide - 8, ((int)(2.5 * (rectSide-2))) + 5 * 2 * offset-2);
+                    Rectangle rect1 = new Rectangle(rectX+4, (rectY-4 * tileSize) + 4, rectSide - 8, ((int)(2.5 * (rectSide-2))) + 30);
+                    rect1.setStroke(color);
+                    Rectangle rect2 = new Rectangle(rectX+4, (rectY-2 * tileSize) + 16, rectSide - 8, ((int)(2.5 * (rectSide-2))) + 5);
+                    rect2.setStroke(color);
+                    getChildren().addAll(rect0, rect1, rect2);
                     break;
             }
         }
 
-        private void drawDSP(int rectX, int rectY, int rectSide, Color color){
+        private void drawDSP(int rectX, int rectY, Color color){
             switch(device.getFamily().name()) {
 //			case SPARTAN6:
 //				painter.drawRect(rectX, rectY - 3 * tileSize, rectSide - 1, 4 * rectSide + 3 * 2 * offset - 1);
@@ -497,26 +521,33 @@ public class TileViewTest extends Pane {
                 case "ARTIX7":
                 case "KINTEX7":
                 case "VIRTEX7":
-                    gc.strokeRect(rectX, rectY - 4 * tileSize, rectSide , 5 * (rectSide) + 5 * 2 * offset+2);
+                    Rectangle rect0 = new Rectangle(rectX, rectY - 4 * tileSize, rectSide , 5 * (rectSide) + 5 * 2);
+                    rect0.setStroke(color);
                     color = color.darker();
                     color = color.darker();
                     color = color.darker();
-                    gc.setStroke(color);
-                    gc.strokeRect(rectX+4, (rectY-4 * tileSize) + 4, rectSide - 8, ((int)(2.5 * (rectSide-2))) + 5 * 2 * offset-2);
-                    gc.strokeRect(rectX+4, (rectY-2 * tileSize) + 12, rectSide - 8, ((int)(2.5 * (rectSide-2))) + 5 * 2 * offset-2);
+                    Rectangle rect1 = new Rectangle(rectX+4, (rectY-4 * tileSize) + 4, rectSide - 8, ((int)(2.5 * (rectSide-2))) + 30);
+                    rect1.setStroke(color);
+                    Rectangle rect2 = new Rectangle(rectX+4, (rectY-2 * tileSize) + 16, rectSide - 8, ((int)(2.5 * (rectSide-2))) + 5);
+                    rect2.setStroke(color);
+                    getChildren().addAll(rect0, rect1, rect2);
                     break;
             }
         }
 
-        private void drawSwitchBox(int rectX, int rectY, int rectSide){
-            gc.strokeRect(rectX + rectSide / 6, rectY, 4 * rectSide / 6 - 1, rectSide - 1);
+        private void drawSwitchBox(int rectX, int rectY, Color color){
+            Rectangle rect = new Rectangle(rectX + rectSide / 6, rectY, 4 * rectSide / 6 - 1, rectSide - 1);
+            rect.setStroke(color);
+            getChildren().add(rect);
+
         }
 
 
         private void colorTile(int x, int y, Color color){
-            Rectangle tile = new Rectangle(x * tileSize, y * tileSize,tileSize - 4 * offset, tileSize - 4 * offset);
+            Rectangle tile = new Rectangle(x * tileSize, y * tileSize,rectSide, rectSide);
             tile.setFill(color);
             this.getChildren().add(tile);
+//            drawnTilesMap.put()
         }
 
         private void populateTileTypesToHide () {
@@ -582,39 +613,38 @@ public class TileViewTest extends Pane {
             return reachabilityMap;
         }
         private void drawReachability(HashMap<Tile, Integer> map){
-            FamilyInfo familyInfo = FamilyInfos.get(device.getFamily());
             for(Tile t : map.keySet()){
-                TileType tileType = t.getType();
                 int color = map.get(t)*16 > 255 ? 255 : map.get(t)*16;
                 Color fillColor = Color.rgb(0, color, 0);
                 int rectSide1 = rectSide * offset;
-                gc.setFill(fillColor);
                 //draw tile with new brighter color
                 int number = map.get(t);
-                Text text = new Text(Integer.toString(number));
                 int x = getDrawnTileX(t) * tileSize;
                 int y = getDrawnTileY(t) * tileSize;
-                gc.fillRect(x, y, rectSide1, rectSide1);
-                gc.setStroke(Color.BLACK);
+                Rectangle rect0 = new Rectangle(x, y, rectSide1, rectSide1);
+                rect0.setFill(fillColor);
+                getChildren().add(rect0);
+                Text text = new Text(Integer.toString(number));
+
                 if(number<100){
                     text.setFont(font3);
-                    gc.setFont(text.getFont());
-                    gc.strokeText(text.getText(), x+4, y+(tileSize*2)/3);
+                    text.setX(x+4);
+                    text.setY(y+(tileSize*2)/3);
+                    text.setFill(Color.rgb(105,107,107));
+                    text.setStroke(Color.rgb(105,107,107));
+                    getChildren().add(text);
+//                    gc.strokeText(text.getText(), x+4, y+(tileSize*2)/3);
                 }else if(number < 1000){
                     text.setFont(font2);
-                    gc.setFont(text.getFont());
-                    gc.strokeText(text.getText(), x+tileSize/8, y+(tileSize*2)/3);
+                    text.setX(x+tileSize/8);
+                    text.setY(y+(tileSize*2)/3);
+                    getChildren().add(text);
                 }else {
                     text.setFont(font1);
-                    gc.setFont(text.getFont());
-                    gc.strokeText(text.getText(), x+2, y+(tileSize*2)/3);
+                    text.setX(x+2);
+                    text.setY(y+(tileSize*2)/3);
+                    getChildren().add(text);
                 }
-
-                //colorTile(x, y, offset, fillColor);
-
-
-
-
             }
         }
 
@@ -626,52 +656,21 @@ public class TileViewTest extends Pane {
 
         private void menuReachabilityClear(){
             reachabilityDrawn = false;
+            this.getChildren().clear();
             drawFPGAFabric(true);
-            gc.setStroke(Color.YELLOW); //set square to yellow selected box
-            gc.strokeRect(selX * tileSize, selY * tileSize, rectSide, rectSide);//draw square
+//            gc.setStroke(Color.YELLOW); //set square to yellow selected box
+//            gc.strokeRect(selX * tileSize, selY * tileSize, rectSide, rectSide);//draw square
+            this.getChildren().add(highlight);
             displayWire = deviceBrowser.getDisplayWire();
             if(displayWire!=null)deviceBrowser.wireDoubleClicked(displayWire.getName());
             currentTiles.clear();
         }
 
-        public void rightClickEvent(MouseEvent e){
+        public void rightClickEvent(MouseEvent e) {
             //System.out.println("right click detected. NonPan");
             reachabilityTile = getTile(e);
             contextMenu.hide();
             contextMenu.show(this, e.getScreenX(), e.getScreenY());
-
-//  QAction action1 = new QAction("Draw Reachability (1 Hop)", this);
-//        QAction action2 = new QAction("Draw Reachability (2 Hops)", this);
-//        QAction action3 = new QAction("Draw Reachability (3 Hops)", this);
-//        QAction action4 = new QAction("Draw Reachability (4 Hops)", this);
-//        QAction action5 = new QAction("Draw Reachability (5 Hops)", this);
-//        QAction actionClear = new QAction("Clear Highlighted Tiles", this);
-//        action1.triggered.connect(this, "menuReachability1()");
-//        action2.triggered.connect(this, "menuReachability2()");
-//        action3.triggered.connect(this, "menuReachability3()");
-//        action4.triggered.connect(this, "menuReachability4()");
-//        action5.triggered.connect(this, "menuReachability5()");
-//        actionClear.triggered.connect(this, "menuReachabilityClear()");
-//        menu.addAction(action1);
-//        menu.addAction(action2);
-//        menu.addAction(action3);
-//        menu.addAction(action4);
-//        menu.addAction(action5);
-//        menu.addAction(actionClear);
-//        menu.exec(event.screenPos());
         }
-//    private draw
-//    @Override
-//    public boolean isResizable() {
-//        return true;
-//    }
-//    @Override
-//    public double prefWidth(double height) {
-//        return getWidth();
-//    }
-//    @Override
-//    public double prefHeight(double width) {
-//        return getHeight();
-//    }
 
 }

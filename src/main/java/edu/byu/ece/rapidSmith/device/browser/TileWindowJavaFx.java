@@ -50,8 +50,8 @@ public class TileWindowJavaFx extends Canvas {
     public int selY;
 
     /**The rendered size of each XDL Tile*/
-    public int tileSize = 30;
-    public int rectSide = tileSize -4;
+    public int tileSize = 33;//
+    public int rectSide = tileSize - 4;
     /**Number of tile columns being referenced on the device*/
     public int cols;
     /**Number of tile rows being referenced on the device*/
@@ -80,11 +80,11 @@ public class TileWindowJavaFx extends Canvas {
     ContextMenu contextMenu = new ContextMenu();
 
     /** */
-    protected static Font font1 = new Font("Helvetica", 10);
+    protected static Font font1 = new Font("Times New Roman", 10);
     /** */
-    protected static Font font2 = new Font("Helvetica", 14);
+    protected static Font font2 = new Font("Times New Roman", 16);
     /** */
-    protected static Font font3 = new Font("Helvetica", 18);
+    protected static Font font3 = new Font("Times New Roman", 20);
 
     /**	 */
 
@@ -111,8 +111,9 @@ public class TileWindowJavaFx extends Canvas {
     public TileWindowJavaFx(){
         setDesign(null);
 //        initializeScene(true, true);
-
     }
+
+    int offset = (int) Math.ceil((lineWidth / 2.0));
 
     /**
      * Creates a new tile window with a selected design.
@@ -215,13 +216,13 @@ public class TileWindowJavaFx extends Canvas {
         if(reachabilityDrawn) drawReachability(findReachability(reachabilityTile, hops));
         displayWire = deviceBrowser.getDisplayWire();
         if(displayWire!=null)deviceBrowser.wireDoubleClicked(displayWire.getName());
+        //System.out.println("color is:"+gc.getStroke().toString());
         gc.setStroke(Color.YELLOW); //set stroke to yellow for selection box
         selX = currX;
         selY = currY;
         prevX = currX;
         prevY = currY;
         previousTile = selectedTile;
-        int offset = (int) Math.ceil((lineWidth / 2.0));
         if (selX >= 0 && selY >= 0 && selX < cols && selY < rows) {
             gc.strokeRect(currX * tileSize, currY * tileSize,(rectSide)*offset, (rectSide)*offset);//draw square
         }
@@ -236,16 +237,16 @@ public class TileWindowJavaFx extends Canvas {
      */
     void drawWire(Tile src, Wire wireSrc, Tile dst, Wire wireDst){
         double enumSize = we.getWires().length;
-        double offsetX1 = -1+1/enumSize;
+        double offsetX1 = 1/enumSize;
         double offsetX2 = 10%enumSize;
         double offsetY = -2;
         try {
-            double x1 = (double) tileXMap.get(src) * tileSize + (wireSrc.getWireEnum() % tileSize) + offsetX1;
-            double y1 = (double) tileYMap.get(src) * tileSize + (wireSrc.getWireEnum() * tileSize) / enumSize + offsetY;
-            double x2 = (double) tileXMap.get(dst) * tileSize + (wireDst.getWireEnum() % tileSize) + offsetX2;
-            double y2 = (double) tileYMap.get(dst) * tileSize + (wireDst.getWireEnum() * tileSize) / enumSize + offsetY;
+            double x1 = (double) tileXMap.get(src) * tileSize + (wireSrc.getWireEnum() % tileSize)*offset+offset;
+            double y1 = (double) tileYMap.get(src) * tileSize + (wireSrc.getWireEnum() * tileSize)/enumSize;
+            double x2 = (double) tileXMap.get(dst) * tileSize + (wireDst.getWireEnum() % tileSize)*offset+offset;
+            double y2 = (double) tileYMap.get(dst) * tileSize + (wireDst.getWireEnum() * tileSize)/enumSize;
             gc.setStroke(Color.ORANGE);
-            
+            gc.setLineWidth(lineWidth);
             gc.strokeLine(x1, y1, x2, y2);
 
             Line2D line = new Line2D((float)x1, (float)y1,(float) x2,(float) y2);
@@ -258,7 +259,6 @@ public class TileWindowJavaFx extends Canvas {
             return;
         }
     }
-
 
     /**
      * Method for drawing FPGA design including tiles and sites
@@ -316,8 +316,8 @@ public class TileWindowJavaFx extends Canvas {
         }
 //
         // Draw the tile layout
-        int offset = (int) Math.ceil((lineWidth / 2.0));
-
+//        int offset = (int) Math.ceil((lineWidth / 2.0));
+//
         FamilyInfo familyInfo = FamilyInfos.get(device.getFamily());
         for(int y = 0; y < rows; y++){
             for(int x = 0; x < cols; x++){
@@ -328,22 +328,22 @@ public class TileWindowJavaFx extends Canvas {
 
                 int rectX = x * tileSize;
                 int rectY = y * tileSize;
-                int rectSide1 = (rectSide) * offset;
+                int rectSide1 = rectSide * offset;
                 if(drawSites){
                     if (familyInfo.clbTiles().contains(tileType)) {
                         drawCLB(rectX, rectY, rectSide1);
                     }else if (familyInfo.switchboxTiles().contains(tileType)) {
                         drawSwitchBox(rectX, rectY, rectSide1);
                     } else if (familyInfo.bramTiles().contains(tileType)) {
-                        drawBRAM(rectX, rectY, rectSide1, offset, color);
+                        drawBRAM(rectX, rectY, rectSide1, color);
                     } else if (familyInfo.dspTiles().contains(tileType)) {
-                        drawDSP(rectX, rectY, rectSide1, offset, color);
+                        drawDSP(rectX, rectY, rectSide1, color);
                     } else { // Just fill the tile in with a appropriate color
-                        colorTile(x, y, offset, color);
+                        colorTile(x, y, color);
                     }
                 }
                 else{
-                    colorTile(x, y, offset, color);
+                    colorTile(x, y, color);
                 }
             }
         }
@@ -358,9 +358,7 @@ public class TileWindowJavaFx extends Canvas {
             if(reachabilityDrawn)findReachability(reachabilityTile, hops);
             if(selectedTile == previousTile) {
                 gc.setStroke(Color.YELLOW); //set square to yellow selected box
-                int offset = (int) Math.ceil((lineWidth / 2.0));
                 gc.strokeRect(prevX * tileSize, prevY * tileSize,(rectSide)*offset, (rectSide)*offset);//draw square
-//                currX * tileSize, currY * tileSize,(rectSide-4)*offset, (rectSide-4)*offset
             }
             lines.clear();
         }
@@ -465,7 +463,7 @@ public class TileWindowJavaFx extends Canvas {
         gc.strokeRect(rectX + rectSide / 2, rectY, rectSide / 2 - 1, rectSide / 2 - 1);
     }
 
-    private void drawBRAM(int rectX, int rectY, int rectSide, int offset, Color color){
+    private void drawBRAM(int rectX, int rectY, int rectSide,  Color color){
         switch(device.getFamily().name()) {
 //			case SPARTAN6:
 //				gc.strokeRect(rectX, rectY - 3 * tileSize, rectSide - 1, 4 * rectSide + 3 * 2 * offset - 1);
@@ -488,12 +486,12 @@ public class TileWindowJavaFx extends Canvas {
                 color = color.darker();
                 gc.setStroke(color);
                 gc.strokeRect(rectX+4, (rectY-4 * tileSize) + 4, rectSide - 8, ((int)(2.5 * (rectSide-2))) + 5 * 2 * offset-2);
-                gc.strokeRect(rectX+4, (rectY-2 * tileSize) + 10, rectSide - 8, ((int)(2.5 * (rectSide-2))) + 5 * 2 * offset-2);
+                gc.strokeRect(rectX+4, (rectY-2 * tileSize) + 12, rectSide - 8, ((int)(2.5 * (rectSide-2))) + 5 * 2 * offset-2);
                 break;
         }
     }
 
-    private void drawDSP(int rectX, int rectY, int rectSide, int offset, Color color){
+    private void drawDSP(int rectX, int rectY, int rectSide, Color color){
         switch(device.getFamily().name()) {
 //			case SPARTAN6:
 //				painter.drawRect(rectX, rectY - 3 * tileSize, rectSide - 1, 4 * rectSide + 3 * 2 * offset - 1);
@@ -511,7 +509,7 @@ public class TileWindowJavaFx extends Canvas {
                 color = color.darker();
                 gc.setStroke(color);
                 gc.strokeRect(rectX+4, (rectY-4 * tileSize) + 4, rectSide - 8, ((int)(2.5 * (rectSide-2))) + 5 * 2 * offset-2);
-                gc.strokeRect(rectX+4, (rectY-2 * tileSize) + 10, rectSide - 8, ((int)(2.5 * (rectSide-2))) + 5 * 2 * offset-2);
+                gc.strokeRect(rectX+4, (rectY-2 * tileSize) + 12, rectSide - 8, ((int)(2.5 * (rectSide-2))) + 5 * 2 * offset-2);
                 break;
         }
     }
@@ -521,7 +519,7 @@ public class TileWindowJavaFx extends Canvas {
     }
 
 
-    private void colorTile(int x, int y, int offset, Color color){
+    private void colorTile(int x, int y, Color color){
         gc.setFill(color);
         gc.fillRect(x * tileSize, y * tileSize,
                 tileSize - 4 * offset, tileSize - 4 * offset);
@@ -595,7 +593,6 @@ public class TileWindowJavaFx extends Canvas {
             TileType tileType = t.getType();
             int color = map.get(t)*16 > 255 ? 255 : map.get(t)*16;
             Color fillColor = Color.rgb(0, color, 0);
-            int offset = (int) Math.ceil((lineWidth / 2.0));
             int rectSide1 = rectSide * offset;
             gc.setFill(fillColor);
             //draw tile with new brighter color
@@ -608,7 +605,7 @@ public class TileWindowJavaFx extends Canvas {
             if(number<100){
                 text.setFont(font3);
                 gc.setFont(text.getFont());
-                gc.strokeText(text.getText(), x, y+(tileSize*2)/3);
+                gc.strokeText(text.getText(), x+4, y+(tileSize*2)/3);
             }else if(number < 1000){
                 text.setFont(font2);
                 gc.setFont(text.getFont());

@@ -2,7 +2,7 @@ package edu.byu.ece.rapidSmith.device.browser;
 
 import java.util.*;
 
-//import edu.byu.ece.rapidSmith.gui.PanZoomGestures;
+//import edu.byu.ece.rapidSmith.device.browser.PanZoomGestures;
 import com.sun.javafx.geom.Line2D;
 import edu.byu.ece.rapidSmith.gui.wireItemJavaFx;
 import javafx.application.Application;
@@ -68,6 +68,7 @@ public class DeviceBrowserJavaFx extends Application{//QMainWindow {
     private WireEnumerator we;
     /**TileWindowJavaFx object is basically a javafx canvas with all of the visuals(such as tiles, wires, etc) drawn on it*/
     private TileWindowJavaFx tileWindow;
+    private TileViewTest tileViewTest;
     /**For saving the current wires drawn*/
     private ArrayList<Line> currLines;
     /** The current part name of the device loaded*/
@@ -107,6 +108,7 @@ public class DeviceBrowserJavaFx extends Application{//QMainWindow {
 //    private Scale scaleTransform;
 
     private TileViewJavaFx tileView;
+    PanZoomGestures panWindow;
 
 
     /** Current center of this view */
@@ -219,7 +221,7 @@ public class DeviceBrowserJavaFx extends Application{//QMainWindow {
                     displayWire = row.getItem();
                     showWiresTile = currTile;
                     wireDoubleClicked(displayWire.getName());
-                    //System.out.println("draw "+displayWire.getName()+" connections");
+                    System.out.println("draw "+displayWire.getName()+" connections");
                 }
             });
             return row;
@@ -243,13 +245,14 @@ public class DeviceBrowserJavaFx extends Application{//QMainWindow {
      * This method will draw all of the wire connections based on the wire given.
      */
     protected void wireDoubleClicked(String wireName){
-        tileWindow.resetAfterWire();//erase and redraw
+        tileViewTest.resetAfterWire();//erase and redraw
         if(showWiresTile == null) return;
         TileWire tileWire = showWiresTile.getWire(wireName);
         if(tileWire == null) return;
         if(tileWire.getWireConnections().isEmpty()) return;
         for(Connection wire : tileWire.getWireConnections()){
-            tileWindow.drawWire(showWiresTile, tileWire, wire.getSinkWire().getTile(), wire.getSinkWire());
+            System.out.println("should move to draw method");
+            tileViewTest.drawWire(showWiresTile, tileWire, wire.getSinkWire().getTile(), wire.getSinkWire());
 //            tileView.drawWireLines(showWiresTile, tileWire, wire.getSinkWire().getTile(), wire.getSinkWire());
         }
     }
@@ -314,10 +317,14 @@ public class DeviceBrowserJavaFx extends Application{//QMainWindow {
             device = RSEnvironment.defaultEnv().getDevice(currPart);
             we = device.getWireEnumerator();
 //            tileWindow = new TileWindowJavaFx(this, device, hideTiles, drawSites);
-            tileWindow.setDevice(device);
+//            tileWindow.setDevice(device);
+            tileViewTest.setDevice(device);
             statusLabel.setText("Loaded: " + currPart.toUpperCase());
-            tileWindow.initializeScene(hideTiles, drawSites);
-            tileView.setTileWindow(tileWindow);
+//            tileWindow.initializeScene(hideTiles, drawSites);
+            tileViewTest.getChildren().clear();
+            tileViewTest.initializeScene(hideTiles, drawSites);
+//            tileView.setTileWindow(tileWindow);
+            panWindow.setTileView(tileViewTest);
             //System.out.println("value of tileView:"+tileView.toString());
 
     }
@@ -327,7 +334,8 @@ public class DeviceBrowserJavaFx extends Application{//QMainWindow {
      * @param e The event of moving the mouse cursor
      */
     protected void updateStatus(MouseEvent e) {
-        statusLabel.setText(tileWindow.mouseMoveEvent(e));
+//        statusLabel.setText(tileWindow.mouseMoveEvent(e));
+        statusLabel.setText(tileViewTest.mouseMoveEvent(e));
     }
 
     /**If mouse cursor is hovering along a wire then highlight red*/
@@ -336,7 +344,6 @@ public class DeviceBrowserJavaFx extends Application{//QMainWindow {
             Line2D currLine = line;
 
         }
-
     }
 
     /**
@@ -382,7 +389,6 @@ public class DeviceBrowserJavaFx extends Application{//QMainWindow {
         device = RSEnvironment.defaultEnv().getDevice(currPart);//default program to first device in partsList
         we = device.getWireEnumerator();
         tileWindow = new TileWindowJavaFx(this, device, hideTiles, drawSites);
-        GraphicsContext gc = tileWindow.getGraphicsContext2D();//in case I need it in main application
         partTree.setOnMouseClicked(e -> {
             if (e.getButton().equals(MouseButton.PRIMARY) && e.getClickCount() == 2) {//If double clicked with primary button
                 TreeItem<String> loadPart = partTree.getSelectionModel().getSelectedItem();//grab TreeItem from TreeView
@@ -393,33 +399,57 @@ public class DeviceBrowserJavaFx extends Application{//QMainWindow {
             }
         });
 
-        tileWindow.setOnMouseMoved(e -> {
-            updateStatus(e);
-            checkForWireHighlight(e);
-        });//updates status Label at bottom of app depending on tile mouse cursor is over
-        tileWindow.setOnMouseClicked(e -> {//highlights tile selected by double click
+//        tileWindow.setOnMouseMoved(e -> {
+//            updateStatus(e);
+//            checkForWireHighlight(e);
+//        });
+//        tileWindow.setOnMouseClicked(e -> {//highlights tile selected by double click
+//            if (e.getButton().equals(MouseButton.PRIMARY) && e.getClickCount() == 2) {
+//                tileWindow.mouseDoubleClickEvent(e);
+//                updateSelectedTile(tileWindow.getSelectedTile());
+//            }
+//            else if(e.isSecondaryButtonDown() || (e.getClickCount() == 2 && e.getButton().equals(MouseButton.SECONDARY)))
+//            {
+//                tileWindow.rightClickEvent(e);
+//                e.consume();
+//            }
+//        });
+//        tileView = new TileViewJavaFx(tileWindow);
+
+        /**New TileView model**************
+         *
+         *
+         *
+         * */
+        tileViewTest = new TileViewTest(this, device, hideTiles, drawSites);
+        tileViewTest.setOnMouseClicked(e -> {//highlights tile selected by double click
             if (e.getButton().equals(MouseButton.PRIMARY) && e.getClickCount() == 2) {
-                tileWindow.mouseDoubleClickEvent(e);
-                updateSelectedTile(tileWindow.getSelectedTile());
+                tileViewTest.mouseDoubleClickEvent(e);
+                updateSelectedTile(tileViewTest.getSelectedTile());
             }
             else if(e.isSecondaryButtonDown() || (e.getClickCount() == 2 && e.getButton().equals(MouseButton.SECONDARY)))
             {
-                tileWindow.rightClickEvent(e);
+                tileViewTest.rightClickEvent(e);
                 e.consume();
             }
         });
-            tileView = new TileViewJavaFx(tileWindow);
-            TileViewTest tileViewTest = new TileViewTest(this, device, hideTiles, drawSites);
+        ObservableList<Line> drawnWires = tileViewTest.getDrawnWires();
+         tileViewTest.setOnMouseMoved(e -> {
+            updateStatus(e);
+            checkForWireHighlight(e);
+         });
+        panWindow = new PanZoomGestures(tileViewTest);
 
 
-            bottomPane.getChildren().add(statusLabel);
+
+        bottomPane.getChildren().add(statusLabel);
 //            borderPane.setCenter(tileViewTest);//change as needed to display either tileWindow or tileView
-            borderPane.setCenter(tileView);//change as needed to display either tileWindow or tileView
-            borderPane.setBottom(bottomPane);
-            scene = new Scene(borderPane, 1024, 768);
-            primaryStage.setTitle("Device Browser Testing");
-            primaryStage.setScene(scene);
-            primaryStage.show();
-    }//end start()
+        borderPane.setCenter(panWindow);//change as needed to display either tileWindow or tileView
+        borderPane.setBottom(bottomPane);
+        scene = new Scene(borderPane, 1024, 768);
+        primaryStage.setTitle("Device Browser Testing");
+        primaryStage.setScene(scene);
+        primaryStage.show();
 
-}//end class
+    }//end Application
+}
