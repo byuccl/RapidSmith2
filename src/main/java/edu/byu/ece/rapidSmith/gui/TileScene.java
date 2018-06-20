@@ -76,10 +76,10 @@ import javafx.scene.canvas.Canvas;
 public class TileScene extends QGraphicsScene{
 	/** The actual square used to highlight a tile */
 	public QGraphicsRectItem highlit;
-	public Rectangle highlit;
+
 	/** Pen used to draw tile cursor */
 	public QPen cursorPen = new QPen(QColor.yellow, 2);
-	public Rectangle2D
+
 	/** The current X location of the mouse */
 	public int currX;
 	/** The current Y location of the mouse */

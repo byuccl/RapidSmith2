@@ -45,24 +45,22 @@ public class TileColorsJavaFx {
         TileType type = tile.getType();
         FamilyInfo familyInfo = FamilyInfos.get(device.getFamily());
         if (familyInfo.clbTiles().contains(type)) {
-            return Color.BLUE;
+            Color blue = Color.rgb(0,0,255);
+            return blue;
         } else if (familyInfo.dspTiles().contains(type)) {
-            return Color.DARKCYAN;
+            return Color.CYAN.brighter();
         } else if (familyInfo.bramTiles().contains(type)) {
-            return Color.DARKMAGENTA;
+            return Color.MAGENTA.brighter();
         } else if (familyInfo.switchboxTiles().contains(type)) {
-            return Color.DARKGREEN;
+            return Color.GREEN.brighter();
         } else if (familyInfo.ioTiles().contains(type)) {
-            Color g = Color.GOLD;
-            g = g.darker();
-            g = g.desaturate();
-            return g;
+            return Color.DARKGOLDENROD;
         } else if (type.name().startsWith("EMPTY")) {
             return Color.color(240, 141, 45);
         } else if (type.name().contains("TERM")) {
             return Color.DARKGRAY;
         } else if (type.name().startsWith("HCLK")) {
-            return Color.CYAN;
+            return Color.DARKCYAN;
         } else if (type.name().matches(".*(BRKH|VBRK|GCLK).*") || type.name().startsWith("REG")) {
             return Color.DARKBLUE;
         } else if (type.name().matches(".*(DCM|PLL).*")) {

@@ -245,13 +245,21 @@ public class TileViewTest extends Pane {
             double offsetX1 = 1/enumSize;
             double offsetX2 = 10%enumSize;
             double offsetY = -2;
+            System.out.println("value of wireSrc.getWireEnum()="+wireSrc.getWireEnum());
+            System.out.println("value for javafx enumSize="+enumSize);
+
             try {
                 double x1 = (double) tileXMap.get(src) * tileSize + (wireSrc.getWireEnum() % tileSize);
                 double y1 = (double) tileYMap.get(src) * tileSize + (wireSrc.getWireEnum() * tileSize)/enumSize;
                 double x2 = (double) tileXMap.get(dst) * tileSize + (wireDst.getWireEnum() % tileSize);
                 double y2 = (double) tileYMap.get(dst) * tileSize + (wireDst.getWireEnum() * tileSize)/enumSize;
+                System.out.println("x1="+x1);
+                System.out.println("y1="+y1);
+                System.out.println("x2="+x2);
+                System.out.println("y2="+y2);
 
                 Line line = new Line(x1, y1, x2, y2);
+                line.setStrokeWidth(1.2);
                 line.setStroke(Color.ORANGE);
                 line.setFill(Color.ORANGE);
                 line.setOnMouseEntered(e-> {

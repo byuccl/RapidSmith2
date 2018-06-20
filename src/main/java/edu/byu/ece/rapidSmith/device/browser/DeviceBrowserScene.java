@@ -78,10 +78,19 @@ public class DeviceBrowserScene extends TileScene{
 
 	void drawWire(Tile src, int wireSrc, Tile dst, int wireDst){
 		double enumSize = we.getWires().length;
+		System.out.println("value for original wiresrc="+wireSrc);
+		System.out.println("value for original enumSize="+enumSize);
+
+
 		double x1 = (double) tileXMap.get(src)*tileSize  + (wireSrc%tileSize);
 		double y1 = (double) tileYMap.get(src)*tileSize  + (wireSrc*tileSize)/enumSize;
 		double x2 = (double) tileXMap.get(dst)*tileSize  + (wireDst%tileSize);
 		double y2 = (double) tileYMap.get(dst)*tileSize  + (wireDst*tileSize)/enumSize;
+		System.out.println("x1="+x1);
+		System.out.println("y1="+y1);
+		System.out.println("x2="+x2);
+		System.out.println("y2="+y2);
+
 		WireConnectionLine line = new WireConnectionLine(x1,y1,x2,y2, this, dst, wireDst);
 		line.setToolTip(src.getName() + " " + we.getWireName(wireSrc) + " -> " +
 				dst.getName() + " " + we.getWireName(wireDst));

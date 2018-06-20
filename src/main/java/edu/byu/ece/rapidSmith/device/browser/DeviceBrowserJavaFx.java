@@ -69,8 +69,7 @@ public class DeviceBrowserJavaFx extends Application{//QMainWindow {
     /**TileWindowJavaFx object is basically a javafx canvas with all of the visuals(such as tiles, wires, etc) drawn on it*/
     private TileWindowJavaFx tileWindow;
     private TileViewTest tileViewTest;
-    /**For saving the current wires drawn*/
-    private ArrayList<Line> currLines;
+
     /** The current part name of the device loaded*/
     private String currPart;
     /**Helps in creating part TreeView and organizing parts by families*/
