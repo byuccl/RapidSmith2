@@ -235,6 +235,13 @@ public class CellNet implements Serializable {
 				.collect(Collectors.toList());
 	}
 
+	public Collection<CellPin> getSinkPartitionPins() {
+		return getPins().stream()
+				.filter(CellPin::isPartitionPin)
+				.filter(p -> p != sourcePin)
+				.collect(Collectors.toList());
+	}
+
 	/**
 	 * Checks if this net has a source pin.
 	 *
@@ -984,6 +991,7 @@ public class CellNet implements Serializable {
 
 		List<RouteTree> sinkTrees = new ArrayList<>();
 		for (CellPin sink : routedSinks) {
+			assert (this.getSinkRouteTree(sink) != null);
 			sinkTrees.add(this.getSinkRouteTree(sink));
 		}
 

@@ -97,7 +97,6 @@ public class XdcRoutingInterface {
 		this.currentLineNumber = 0;
 		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)"); 
 		this.implementationMode = mode;
-		//this.oocPortMap = oocPortMap;
 		this.staticRoutemap = staticRoutemap;
 
 		oocPortMap = design.getOocPortMap();
@@ -544,9 +543,9 @@ public class XdcRoutingInterface {
 
 				Wire sinkWire = conn.getSinkWire();
 
-				if (wiresInNet.contains(sinkWire.getFullWireName()) && !visited.contains(sinkWire)) {
+				if (wiresInNet.contains(sinkWire.getFullName()) && !visited.contains(sinkWire)) {
 					connectionCount++;
-					RouteTree sinkTree = routeTree.addConnection(conn);
+					RouteTree sinkTree = routeTree.connect(conn);
 					searchQueue.add(sinkTree);
 					visited.add(sinkWire);
 				}

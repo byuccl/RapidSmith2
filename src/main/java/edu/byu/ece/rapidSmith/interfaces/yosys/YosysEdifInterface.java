@@ -443,7 +443,6 @@ public final class YosysEdifInterface {
 				// MUX inputs
 				if (muxCell != null) {
 					for (CellPin cellPin : muxCell.getInputPins()) {
-						System.out.println("In Pin: " + cellPin.getName());
 						CellNet net = cellPin.getNet();
 						if (net != null) {
 							if (cellPin.getName().equals("CI")) {
