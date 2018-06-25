@@ -386,16 +386,22 @@ public final class YosysEdifInterface {
 				.filter(cell -> cell.getType().equals("XORCY"))
 				.filter(cell -> cell.getPin("CI").getNet().isStaticNet())
 				.collect(Collectors.toList());
-
 		for (Cell xorCell : xorInitCells) {
+			
 			// Get the corresponding MUXCY cell (if it exists)
-			Cell finalXorCell = xorCell;
-			Collection<CellPin> gndSinks = xorCell.getPin("CI").getNet().getSinkPins().stream().filter(cellPin -> !cellPin.getCell().equals(finalXorCell)).collect(Collectors.toList());
-			Cell muxCell = ((List<CellPin>) gndSinks).get(0).getCell();
+			// The XORCY and MUXCY both share an input (the S input pin for MUXCY and the LI input pin for XORCY)
+			CellNet initMuxSelectNet = xorCell.getPin("LI").getNet();
+			Cell muxCell = null;
+			Collection<CellPin> muxSinkPins = initMuxSelectNet.getSinkPins().stream()
+					.filter(cellPin -> cellPin.getCell().getType().equals("MUXCY"))
+					.collect(Collectors.toList());
+
+			if (muxSinkPins.size() > 0) {
+				assert (muxSinkPins.size() == 1);
+				muxCell = muxSinkPins.iterator().next().getCell();
+			}
 
 			boolean chainStart = true;
-
-
 			Cell carryCell = new Cell(xorCell.getName() + "_CARRY4", libCells.get("CARRY4"));
 			int i = 0;
 
@@ -452,7 +458,7 @@ public final class YosysEdifInterface {
 								} else  if (i == 0) {
 									if (!net.getPins().contains(carryCell.getPin("CI")))
 										net.connectToPin(carryCell.getPin("CI"));
-								}
+								} // else nothing needs to be done
 							} else {
 								// either DI or S
 								CellPin carryPin = carryCell.getPin(cellPin.getName() + "[" + i + "]");
@@ -464,37 +470,30 @@ public final class YosysEdifInterface {
 
 						}
 					}
-					// MUX sinks
-					CellNet muxOutNet = muxCell.getPin("O").getNet();
+					// MUX outputs
+					CellPin muxOutPin = muxCell.getPin("O");
+					CellNet muxOutNet =muxOutPin.getNet();
+
+					// If connecting to a different carry cell
+					if (muxOutNet.getSinkPins().size() > 0 && i == 3) {
+						// The nets for each sink pin should be the same
+						CellNet net = muxOutNet.getSinkPins().iterator().next().getNet();
+
+						// disconnect from source
+						net.disconnectFromPin(muxOutPin);
+
+						// connect to carry4 source
+						net.connectToPin(carryCell.getPin("CO[3]"));
+					}
+
 					for (CellPin pin : muxOutNet.getSinkPins()) {
-						CellNet net = pin.getNet();
-
 						Cell sinkCell = pin.getCell();
-
 						switch (sinkCell.getType()) {
 							case "MUXCY":
 								// Found another internal cell of a carry cell
-
-								// if this will connect to a different carry cell
-								if (i == 3) {
-									// disconnect from source
-									net.disconnectFromPin(muxCell.getPin("O"));
-
-									// connect to carry4 source
-									net.connectToPin(carryCell.getPin("CO[3]"));
-								}
-
 								nextMuxCell = sinkCell;
 								break;
 							case "XORCY":
-								// if this will connect to a different carry cell
-								if (i == 3) {
-									// disconnect from source
-									net.disconnectFromPin(net.getSourcePin());
-
-									// connect to carry4 source
-									net.connectToPin(carryCell.getPin("CO[3]"));
-								}
 								nextXorCell = sinkCell;
 								break;
 							default:
@@ -519,22 +518,17 @@ public final class YosysEdifInterface {
 				xorCell = nextXorCell;
 				nextXorCell = null;
 
-				if (i == 3) {
+				if (xorCell == null)
+					design.addCell(carryCell);
+				else if (i == 3) {
 					design.addCell(carryCell);
 					carryCell = new Cell(xorCell.getName() + "_CARRY4", libCells.get("CARRY4"));
 					i = 0;
 				}
 				else
 					i++;
-
-				if (xorCell == null)
-					design.addCell(carryCell);
 			}
-
-
 		}
-
-
 	}
 
 	/**
