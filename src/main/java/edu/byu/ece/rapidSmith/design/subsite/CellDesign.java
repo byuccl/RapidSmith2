@@ -568,6 +568,14 @@ public class CellDesign extends AbstractDesign {
 		return placementMap.get(site).keySet();
 	}
 
+	public Collection<Bel> getUsedBels() {
+		Collection<Bel> usedBels = new ArrayList<>();
+		for (Site site : getUsedSites()) {
+			usedBels.addAll(placementMap.get(site).keySet());
+		}
+		return usedBels;
+	}
+
 	/**
 	 * Tests if the specified BEL is occupied in this design.
 	 *

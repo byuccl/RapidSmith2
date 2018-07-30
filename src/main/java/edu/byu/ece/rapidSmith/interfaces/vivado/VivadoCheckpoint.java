@@ -42,9 +42,31 @@ public final class VivadoCheckpoint {
 	private final Device device;
 	private final CellDesign design;
 	private final String partName;
-	private Set<Bel> routethroughBels;
-	private Collection<BelRoutethrough> routethroughObjects;
-	private Collection<Bel> staticSourceBels;
+	private Map<Bel, BelRoutethrough> belRoutethroughMap;
+
+	public Map<Bel, BelRoutethrough> getBelRoutethroughMap() {
+		return belRoutethroughMap;
+	}
+
+	public Collection<Bel> getVccSourceBels() {
+		return vccSourceBels;
+	}
+
+	public void setVccSourceBels(Collection<Bel> vccSourceBels) {
+		this.vccSourceBels = vccSourceBels;
+	}
+
+	public Collection<Bel> getGndSourceBels() {
+		return gndSourceBels;
+	}
+
+	public void setGndSourceBels(Collection<Bel> gndSourceBels) {
+		this.gndSourceBels = gndSourceBels;
+	}
+
+	private Collection<Bel> vccSourceBels;
+	private Collection<Bel> gndSourceBels;
+	//private Collection<Bel> staticSourceBels;
 	private Map<BelPin, CellPin> belPinToCellPinMap;
 	private Map<String, MutablePair<String, String>> staticRoutemap;
 
@@ -86,8 +108,7 @@ public final class VivadoCheckpoint {
 	}
 	
 	public void setRoutethroughBels(Map<Bel, BelRoutethrough> rtBels) {
-		this.routethroughBels = rtBels.keySet();
-		this.routethroughObjects = rtBels.values();
+		this.belRoutethroughMap = rtBels;
 	}
 
 	public Map<String, MutablePair<String, String>> getStaticRoutemap() {
@@ -99,21 +120,13 @@ public final class VivadoCheckpoint {
 	}
 
 	public Collection<BelRoutethrough> getRoutethroughObjects() {
-		return routethroughObjects;
+		return belRoutethroughMap.values();
 	}
 	
 	public Set<Bel> getBelRoutethroughs() {
-		return routethroughBels;
+		return belRoutethroughMap.keySet();
 	}
-	
-	public void setStaticSourceBels(Collection<Bel> bels) {
-		this.staticSourceBels = bels;
-	}
-	
-	public Collection<Bel> getStaticSourceBels() {
-		return this.staticSourceBels;
-	}
-	
+
 	public void setBelPinToCellPinMap(Map<BelPin, CellPin> pinMap) {
 		this.belPinToCellPinMap = pinMap;
 	}

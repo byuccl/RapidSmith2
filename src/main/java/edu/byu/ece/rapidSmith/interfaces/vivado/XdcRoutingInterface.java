@@ -54,7 +54,8 @@ public class XdcRoutingInterface {
 	private final HashMap<SitePin, IntrasiteRoute> sitePinToRouteMap;
 	private final Map<BelPin, CellPin> belPinToCellPinMap;
 	private final Map<SiteType, Set<String>> staticSourceMap;
-	private Set<Bel> staticSourceBels;
+	private Set<Bel> gndSourceBels;
+	private Set<Bel> vccSourceBels;
 	private int currentLineNumber;
 	private String currentFile;
 	private Map<Bel, BelRoutethrough> belRoutethroughMap;
@@ -131,11 +132,34 @@ public class XdcRoutingInterface {
 	 * Returns a set of BELs that are being used as a static source (VCC or GND).
 	 * This is only valid after {@link XdcRoutingInterface::parseRoutingXDC} has been called.
 	 */
+	/*
+    //TODO: Remake this method
 	public Set<Bel> getStaticSourceBels() {
 		
 		return (staticSourceBels == null) ? 
 				Collections.emptySet() :
 				staticSourceBels;
+	}
+	*/
+
+	/**
+	 * Returns a set of BELs that are being used as a VCC source.
+	 * This is only valid after {@link XdcRoutingInterface::parseRoutingXDC} has been called.
+	 */
+	public Set<Bel> getVccSourceBels() {
+		return (vccSourceBels == null) ?
+				Collections.emptySet() :
+				vccSourceBels;
+	}
+
+	/**
+	 * Returns a set of BELs that are being used as a GND source.
+	 * This is only valid after {@link XdcRoutingInterface::parseRoutingXDC} has been called.
+	 */
+	public Set<Bel> getGndSourceBels() {
+		return (gndSourceBels == null) ?
+				Collections.emptySet() :
+				gndSourceBels;
 	}
 		
 	/**
@@ -639,8 +663,12 @@ public class XdcRoutingInterface {
 	 */
 	private void processStaticSources(String[] toks, boolean isVcc) {
 		
-		if (toks.length > 1) {
-			this.staticSourceBels = new HashSet<>();
+		if (isVcc && toks.length > 1) {
+			this.vccSourceBels = new HashSet<>();
+		}
+
+		if (!isVcc && toks.length > 1) {
+			this.gndSourceBels = new HashSet<>();
 		}
 		
 		CellNet net = isVcc ? design.getVccNet() : design.getGndNet(); 
@@ -654,7 +682,11 @@ public class XdcRoutingInterface {
 			BelPin sourcePin = tryGetBelPin(bel, staticToks[2]);
 			boolean routeFound = tryCreateStaticIntrasiteRoute(net, sourcePin, design.getUsedSitePipsAtSite(site));
 			assert routeFound : site.getName() + "/" + bel.getName() + "/" + sourcePin.getName();
-			staticSourceBels.add(bel);
+
+			if (isVcc)
+				vccSourceBels.add(bel);
+			else
+				gndSourceBels.add(bel);
 		}
 	}
 	
