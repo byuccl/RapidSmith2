@@ -95,10 +95,6 @@ public final class VivadoInterface {
 		String edifFile = rscpPath.resolve("netlist.edf").toString();
 
 		CellDesign design;
-		// TODO: Make a PARTIAL_RECONFIG mode.
-		//if (mode.equals(ImplementationMode.OUT_OF_CONTEXT))
-		//	design = EdifInterface.parseEdif(edifFile, libCells, partName);
-		//else
 
 		if (edifType.equals(EdifType.YOSYS))
 			design = YosysEdifInterface.parseEdif(edifFile, libCells, partName);
@@ -134,47 +130,10 @@ public final class VivadoInterface {
 		// Mark the used static resources
 		if (mode == ImplementationMode.RECONFIG_MODULE) {
 			String resourcesFile = rscpPath.resolve("static_resources.rsc").toString();
-			UsedStaticResources staticResources = new UsedStaticResources(design, device);
+			UsedStaticResources staticResources = new UsedStaticResources(design, device, libCells);
 			staticResources.parseResourcesRSC(resourcesFile);
 			vivadoCheckpoint.setStaticRoutemap(staticResources.getStaticRoutemap());
 			design.setOocPortMap(staticResources.getOocPortMap());
-
-			// There may be some ports in the RM netlist which are unused. One way in which this can occur is if
-			// the RM drives a bus into the static portion of the design, but not all of the bits in the bus need
-			// to be driven. The undriven bits of the bus are still OOC ports, but they are not partition pins.
-
-			// To make packing easier, just disconnect the pins from these OOC ports.
-			// TODO: Is this the best solution?
-		/*	for (Iterator<Cell> iterator = design.getPorts().iterator(); iterator.hasNext();) {
-				Cell port = iterator.next();
-
-						for (CellPin pin : port.getPins()) {
-							if (!pin.isPartitionPin()) {
-								if (pin.getNet() != null) {
-									pin.getNet().disconnectFromPin(pin);
-								}
-							}
-
-					   }
-					}		*/
-
-			// It's possible the RM netlist may include OOC ports (partition pins) that are not used by the RM.
-			// One reason this can happen is other RMs (for the same RP) may actually use these partition pins, while
-			// this one does not. These ports need to remain in the netlist for the PR flow to work correctly.
-			// For now, disconnect the pins from nets to make packing easier?
-			// See partial count design for example of this.
-//			for (Iterator<Cell> iterator = design.getPorts().iterator(); iterator.hasNext();) {
-//				Cell port = iterator.next();
-//
-	//			for (CellPin pin : port.getPins()) {
-	//				if (!pin.isPartitionPin()) {
-	//					if (pin.getNet() != null) {
-	//						pin.getNet().disconnectFromPin(pin);
-	//					}
-	//				}
-	//
-	//		   }
-	//		}
 		}
 
 

@@ -771,13 +771,16 @@ public final class EdifInterface {
 			Object value = prop.getValue(); 
 			
 			if (value instanceof Boolean) {
-				edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), (Boolean) value);
+				edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey(), (Boolean) value);
 			}
 			else if (value instanceof Integer) {
-				edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), (Integer) value);
+				edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey(), (Integer) value);
+			}
+			else if (value instanceof Long) {
+				edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey(), (new IntegerTypedValue((long)value)));
 			}
 			else {	
-				edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), prop.getValue().toString());
+				edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey(), prop.getValue().toString());
 			}
 			
 			edifProperties.addProperty(edifProperty);

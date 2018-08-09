@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.*;
 import org.apache.commons.lang3.tuple.MutablePair;
@@ -42,8 +43,11 @@ public class UsedStaticResources {
 
 	private final Device device;
 	private final CellDesign design;
+	private final CellLibrary libCells;
 	private final WireEnumerator wireEnumerator;
 	private Pattern pipNamePattern;
+	private static final String BUFFER_INIT_STRING = "2'h2";
+
 	private int currentLineNumber;
 	private String currentFile;
     // Map from port name(s) to a pair of the static net name and the static portion of the route string
@@ -57,10 +61,11 @@ public class UsedStaticResources {
 	 * @param design {@link CellDesign} to add routing information to
 	 * @param device {@link Device} of the specified design
 	 */
-	public UsedStaticResources(CellDesign design, Device device) {
+	public UsedStaticResources(CellDesign design, Device device, CellLibrary libCells) {
 		this.device = device;
 		this.wireEnumerator = device.getWireEnumerator();
 		this.design = design;
+		this.libCells = libCells;
 		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)");
 		//reservedWires = new HashSet<>();
 	}
@@ -99,7 +104,13 @@ public class UsedStaticResources {
 						if (toks.length > 1)
 							throw new ParseException("Unexpected Token Content: " + toks[0]);
 						break;
-					case "OOC_PORT" : processOocPort(toks);
+					case "PART_PIN" : processOocPort(toks);
+						break;
+					case "VCC_PART_PINS":
+						processStaticPartPins(toks, true);
+						break;
+					case "GND_PART_PINS":
+						processStaticPartPins(toks, false);
 						break;
 					default : 
 						throw new ParseException("Unrecognized Token: " + toks[0]);
@@ -109,11 +120,52 @@ public class UsedStaticResources {
 	}
 
 	/**
-	 * Processes the "OOC_PORT" token in the static_resources.rsc of a RSCP. Specifically,
+	 * Processes the "VCC_PART_PINS" token in the static_resources.rsc of a RSCP.
+	 * Expected Format: VCC_PART_PINS partPinName partPinName ...
+	 * @param toks An array of space separated string values parsed from the placement.rsc
+	 */
+	private void processStaticPartPins(String[] toks, boolean isVcc) {
+		for (int i = 1; i < toks.length; i++) {
+
+			if (oocPortMap == null) {
+				oocPortMap = new HashMap<>();
+			}
+			String oocPortVal = isVcc? "VCC" : "GND";
+
+			oocPortMap.put(toks[i], oocPortVal);
+			String portName = toks[i];
+			Cell portCell = design.getCell(portName);
+
+			// Remove the port cell's pin from the design (they are outside of the partial device)
+			assert (portCell.getPins().size() == 1);
+			CellPin cellPin = portCell.getPins().iterator().next();
+			CellNet net = cellPin.getNet();
+
+			// Detach the port's pin from its current net
+			assert (net != null);
+			//if (net != null)
+			net.disconnectFromPin(cellPin);
+
+			// Re-assign the net's pins to either VCC or GND
+			CellNet staticNet = isVcc? design.getVccNet() : design.getGndNet();
+
+			// Assuming driver has already been removed
+			List<CellPin> pins = new ArrayList<>(net.getPins());
+			net.disconnectFromPins(pins);
+			design.removeNet(net);
+			staticNet.connectToPins(pins);
+
+			CellPin partPin = new PartitionPin( portName, null, PinDirection.IN);
+			portCell.attachPartitionPin(partPin);
+		}
+	}
+
+	/**
+	 * Processes the "PART_PIN" token in the static_resources.rsc of a RSCP. Specifically,
 	 * this function adds the OOC port and corresponding port wire to the oocPortMap
 	 * data structure for later processing.
 	 *
-	 * Expected Format: OOC_PORT portName Tile/Wire direction
+	 * Expected Format: PART_PIN portName Tile/Wire direction
 	 * @param toks An array of space separated string values parsed from the placement.rsc
 	 */
 	private void processOocPort(String[] toks) {
@@ -167,7 +219,16 @@ public class UsedStaticResources {
 		assert (portCell.getPins().size() == 1);
 		CellPin cellPin = portCell.getPins().iterator().next();
 		CellNet net = cellPin.getNet();
-		net.disconnectFromPin(cellPin);
+
+		// If the the cell pin has no net, that means that this part pin is a sink that is not used by this RM.
+		// We will need to insert a LUT1 buffer and tie some nets.
+		if (net != null)
+			net.disconnectFromPin(cellPin);
+
+		// TODO: Figure out if this is a true assumption
+		// If the net is GND, this part pin is a driver, but the RM's HDL is not driving it with anything.
+		// We must insert a LUT1 buffer to drive the part pin.
+
 
 		// Add the partition pin to the port cell
 		// Get the partpin node
@@ -175,10 +236,65 @@ public class UsedStaticResources {
 		//PartitionPin partPin = new PartitionPin("partPin." + portName + "." + direction, partPinWire, pinDirection);
 		CellPin partPin = new PartitionPin( portName, partPinWire, pinDirection);
 		portCell.attachPartitionPin(partPin);
-		net.connectToPin(partPin);
+
+		if (net == null || net.isStaticNet())
+			insertBufferPartitionPinNet(partPin, net);
+		else
+			net.connectToPin(partPin);
 		//partPin.setCell(portCell);
+	}
 
+	private void insertBufferPartitionPinNet(CellPin partPin, CellNet staticNet) {
+		switch (partPin.getDirection()) {
+			case IN:
+				// The signal is leaving the partial device
 
+				// If it doesn't have a net, assume it needs to be GND.
+				if (staticNet == null)
+					staticNet = design.getGndNet();
+
+				assert (staticNet.isStaticNet());
+
+				// Make a LUT1 buffer.
+				String bufferName = ((staticNet.isVCCNet()) ? "VCC" : "GND") + "_Inserted_" + partPin.getPortName();
+				Cell lutCell = new Cell(bufferName, libCells.get("LUT1"));
+				lutCell.getProperties().update(new Property("INIT", PropertyType.EDIF, BUFFER_INIT_STRING));
+				design.addCell(lutCell);
+
+				// Drive the LUT1 with GND/VCC
+				//design.getGndNet().connectToPin(lutCell.getPin("I0"));
+				staticNet.connectToPin(lutCell.getPin("I0"));
+
+				// Make a net to drive the partition pin
+				CellNet net = new CellNet(partPin.getPortName(), NetType.WIRE);
+				design.addNet(net);
+
+				net.connectToPin(lutCell.getPin("O"));
+				net.connectToPin(partPin);
+				break;
+			case OUT:
+				assert (staticNet == null);
+				// The signal is coming from outside the partial device
+
+				// We need to make a new net, carefully creating the name to be what is expected (needs to match
+				// what the static_resources file has).
+				// TODO: Is it satisfactory to just use the name of the port as the name of this net?
+				net = new CellNet(partPin.getPortName(), NetType.WIRE);
+				design.addNet(net);
+
+				// Create a LUT1 buffer. The net will drive this LUT, but the LUT's output will go nowhere.
+				lutCell = new Cell("IN_BUF_Inserted_" + partPin.getPortName(), libCells.get("LUT1"));
+				design.addCell(lutCell);
+				lutCell.getProperties().update(new Property("INIT", PropertyType.EDIF, BUFFER_INIT_STRING));
+
+				// Connect the net to the part pin and to the LUT1 buffer
+				net.connectToPin(partPin);
+				net.connectToPin(lutCell.getPin("I0"));
+
+				break;
+			case INOUT:
+			default: throw new AssertionError("Invalid direction");
+		}
 	}
 	
 	/**
