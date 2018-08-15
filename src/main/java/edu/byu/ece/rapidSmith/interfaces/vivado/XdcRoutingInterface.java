@@ -1030,7 +1030,7 @@ public class XdcRoutingInterface {
 	private void checkTokenLength(int tokenLength, int expectedLength) {
 		
 		if (tokenLength != expectedLength) {
-			throw new ParseException(String.format("Incorrect number of tokens on line %d of %s.\n"
+  			throw new ParseException(String.format("Incorrect number of tokens on line %d of %s.\n"
 												+ "Expected: %d Actual: %d", currentLineNumber, currentFile, tokenLength, expectedLength));
 		}
 	}
@@ -1277,10 +1277,6 @@ public class XdcRoutingInterface {
 						continue;
 					}
 					else if (!net.isGNDNet() && net.getSinkPins().size() > 0){
-
-						// I think there is a problem with nets like this. see partial_add8
-						//assert(net.getSinkPins().size() == 1);
-
 						// If any of ths sinks are partition pins, add the net to the list of sinkNets
 						if (net.getSinkPins().stream().anyMatch(CellPin::isPartitionPin)) {
 							sinkNets.add(net);

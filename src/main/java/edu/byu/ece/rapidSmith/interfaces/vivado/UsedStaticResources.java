@@ -220,15 +220,28 @@ public class UsedStaticResources {
 		CellPin cellPin = portCell.getPins().iterator().next();
 		CellNet net = cellPin.getNet();
 
-		// If the the cell pin has no net, that means that this part pin is a sink that is not used by this RM.
-		// We will need to insert a LUT1 buffer and tie some nets.
-		if (net != null)
+		// From Vivado: If the the cell pin has no net, that means that this part pin is a sink (source to the RM)
+		// that is not used by this RM. We need to insert a LUT1 buffer and tie some nets.
+		// From Yosys: If the net associated with the port only has one pin and it is a PAD source, then this part pin is
+		// a sink (source to the RM) that is not used by this RM. We need to insert a LUT1 buffer and tie some nets.
+		boolean unusedPartPinDriver = false; // true if the part pin, which is a driver to the RM, is unused
+
+		if (net != null) {
 			net.disconnectFromPin(cellPin);
 
+			// If pinDirection is out, then that means the port pin was a source.
+			if (pinDirection == PinDirection.OUT && net.getFanOut() == 0) {
+				// The net has no sinks.
+				unusedPartPinDriver = true;
+
+			}
+		}
+
 		// TODO: Figure out if this is a true assumption
+		// TODO: Learn how to handle this case when using Yosys
+		// Note! The below may only true when exporting a synthesized RM from Vivado!
 		// If the net is GND, this part pin is a driver, but the RM's HDL is not driving it with anything.
 		// We must insert a LUT1 buffer to drive the part pin.
-
 
 		// Add the partition pin to the port cell
 		// Get the partpin node
@@ -237,50 +250,55 @@ public class UsedStaticResources {
 		CellPin partPin = new PartitionPin( portName, partPinWire, pinDirection);
 		portCell.attachPartitionPin(partPin);
 
-		if (net == null || net.isStaticNet())
+		if (unusedPartPinDriver || net == null || net.isStaticNet())
 			insertBufferPartitionPinNet(partPin, net);
 		else
 			net.connectToPin(partPin);
 		//partPin.setCell(portCell);
 	}
 
-	private void insertBufferPartitionPinNet(CellPin partPin, CellNet staticNet) {
+	private void insertBufferPartitionPinNet(CellPin partPin, CellNet net) {
 		switch (partPin.getDirection()) {
 			case IN:
 				// The signal is leaving the partial device
 
 				// If it doesn't have a net, assume it needs to be GND.
-				if (staticNet == null)
-					staticNet = design.getGndNet();
+				if (net == null)
+					net = design.getGndNet();
 
-				assert (staticNet.isStaticNet());
+				assert (net.isStaticNet());
 
 				// Make a LUT1 buffer.
-				String bufferName = ((staticNet.isVCCNet()) ? "VCC" : "GND") + "_Inserted_" + partPin.getPortName();
+				String bufferName = ((net.isVCCNet()) ? "VCC" : "GND") + "_Inserted_" + partPin.getPortName();
 				Cell lutCell = new Cell(bufferName, libCells.get("LUT1"));
 				lutCell.getProperties().update(new Property("INIT", PropertyType.EDIF, BUFFER_INIT_STRING));
 				design.addCell(lutCell);
 
 				// Drive the LUT1 with GND/VCC
 				//design.getGndNet().connectToPin(lutCell.getPin("I0"));
-				staticNet.connectToPin(lutCell.getPin("I0"));
+				net.connectToPin(lutCell.getPin("I0"));
 
 				// Make a net to drive the partition pin
-				CellNet net = new CellNet(partPin.getPortName(), NetType.WIRE);
-				design.addNet(net);
+				CellNet partPinDriverNet = new CellNet(partPin.getPortName(), NetType.WIRE);
+				design.addNet(partPinDriverNet);
 
-				net.connectToPin(lutCell.getPin("O"));
-				net.connectToPin(partPin);
+				partPinDriverNet.connectToPin(lutCell.getPin("O"));
+				partPinDriverNet.connectToPin(partPin);
 				break;
 			case OUT:
-				assert (staticNet == null);
+				//assert (staticNet == null);
 				// The signal is coming from outside the partial device
 
 				// We need to make a new net, carefully creating the name to be what is expected (needs to match
 				// what the static_resources file has).
 				// TODO: Is it satisfactory to just use the name of the port as the name of this net?
-				net = new CellNet(partPin.getPortName(), NetType.WIRE);
-				design.addNet(net);
+
+				// The net will be null coming from Vivado, but will already exists if coming from Yosys
+				if (net == null) {
+					net = new CellNet(partPin.getPortName(), NetType.WIRE);
+					design.addNet(net);
+				}
+
 
 				// Create a LUT1 buffer. The net will drive this LUT, but the LUT's output will go nowhere.
 				lutCell = new Cell("IN_BUF_Inserted_" + partPin.getPortName(), libCells.get("LUT1"));
