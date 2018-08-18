@@ -34,6 +34,7 @@ import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.util.Exceptions;
+import edu.byu.ece.rapidSmith.util.Time;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 /**
@@ -76,9 +77,14 @@ public final class VivadoInterface {
 		if (partName == null) {
 			throw new Exceptions.ParseException("Part name for the design not found in the design.info file!");
 		}
-		
+
+		//Time runTime = new Time();
+		//runTime.setStartTime();
 		Device device = RSEnvironment.defaultEnv().getDevice(partName);
-		
+		//runTime.setEndTime();
+		//System.out.println("Took " + runTime.getTotalTime() + " seconds to get device");
+
+
 		if (device == null) {
 			throw new Exceptions.EnvironmentException("Device files for part: " + partName + " cannot be found.");
 		}

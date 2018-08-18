@@ -53,6 +53,8 @@ public class UsedStaticResources {
     // Map from port name(s) to a pair of the static net name and the static portion of the route string
 	private Map<String, MutablePair<String, String>> staticRoutemap;
 	private Map<String, String> oocPortMap; // Map from port name to the associated partition pin's node
+
+	private Collection<CellNet> multiPortSinkNets;
 	//private Set<Wire> reservedWires;
 
 	/**
@@ -68,6 +70,8 @@ public class UsedStaticResources {
 		this.libCells = libCells;
 		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)");
 		//reservedWires = new HashSet<>();
+		this.multiPortSinkNets = getMultiPortSinkNets();
+
 	}
 	
 	/**
@@ -160,6 +164,23 @@ public class UsedStaticResources {
 		}
 	}
 
+	// Get the number of port and/or partition pin sinks a net has
+	private long getNumPortSinks(CellNet net) {
+		return net.getPins().stream()
+				.filter( cellPin -> (cellPin.getDirection().equals(PinDirection.IN) && (cellPin.isPartitionPin() || cellPin.getCell().isPort())))
+				.count();
+	}
+
+	// Get all nets with more than one port as a sink
+	private Collection<CellNet> getMultiPortSinkNets() {
+		Collection<CellNet> nets = new ArrayList<>();
+		for (CellNet net : design.getNets()) {
+			if (net.getPins().stream().filter(cellPin -> cellPin.getDirection().equals(PinDirection.IN) && cellPin.getCell().isPort()).count() > 1)
+				nets.add(net);
+		}
+		return nets;
+	}
+
 	/**
 	 * Processes the "PART_PIN" token in the static_resources.rsc of a RSCP. Specifically,
 	 * this function adds the OOC port and corresponding port wire to the oocPortMap
@@ -227,14 +248,35 @@ public class UsedStaticResources {
 		boolean unusedPartPinDriver = false; // true if the part pin, which is a driver to the RM, is unused
 
 		if (net != null) {
-			net.disconnectFromPin(cellPin);
 
-			// If pinDirection is out, then that means the port pin was a source.
-			if (pinDirection == PinDirection.OUT && net.getFanOut() == 0) {
-				// The net has no sinks.
-				unusedPartPinDriver = true;
+			// TODO: Get rid of the static check. Merge code.
+			if (!net.isStaticNet() && multiPortSinkNets.contains(net)) {
+				assert (pinDirection == PinDirection.IN);
+				// This net drives more than one partition pin.
+				// This seems similar (maybe identical) to the VCC/GND case.
 
+				// We need to insert a buffer cell and net.
+
+				net.disconnectFromPin(cellPin);
+				CellPin partPin = new PartitionPin( portName, partPinWire, pinDirection);
+				portCell.attachPartitionPin(partPin);
+
+				insertBufferPartitionPinNet(partPin, net);
+				return;
 			}
+			else {
+				net.disconnectFromPin(cellPin);
+
+				// If pinDirection is out, then that means the port pin was a source.
+				if (pinDirection == PinDirection.OUT && net.getFanOut() == 0) {
+					// The net has no sinks.
+					unusedPartPinDriver = true;
+
+				}
+			}
+
+
+
 		}
 
 		// TODO: Figure out if this is a true assumption
@@ -257,6 +299,7 @@ public class UsedStaticResources {
 		//partPin.setCell(portCell);
 	}
 
+
 	private void insertBufferPartitionPinNet(CellPin partPin, CellNet net) {
 		switch (partPin.getDirection()) {
 			case IN:
@@ -266,10 +309,11 @@ public class UsedStaticResources {
 				if (net == null)
 					net = design.getGndNet();
 
-				assert (net.isStaticNet());
+				//assert (net.isStaticNet());
 
 				// Make a LUT1 buffer.
-				String bufferName = ((net.isVCCNet()) ? "VCC" : "GND") + "_Inserted_" + partPin.getPortName();
+				//String bufferName = ((net.isVCCNet()) ? "VCC" : "GND") + "_Inserted_" + partPin.getPortName();
+				String bufferName = net.getName() + "_Inserted_" + partPin.getPortName();
 				Cell lutCell = new Cell(bufferName, libCells.get("LUT1"));
 				lutCell.getProperties().update(new Property("INIT", PropertyType.EDIF, BUFFER_INIT_STRING));
 				design.addCell(lutCell);
