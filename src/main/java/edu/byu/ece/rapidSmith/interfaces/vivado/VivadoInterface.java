@@ -78,7 +78,7 @@ public final class VivadoInterface {
 			throw new Exceptions.ParseException("Part name for the design not found in the design.info file!");
 		}
 
-		//Time runTime = new Time();
+		//ime runTime = new Time();
 		//runTime.setStartTime();
 		Device device = RSEnvironment.defaultEnv().getDevice(partName);
 		//runTime.setEndTime();
@@ -90,49 +90,71 @@ public final class VivadoInterface {
 		}
 
 		// load the cell library
+		//runTime.setStartTime();
 		CellLibrary libCells = new CellLibrary(RSEnvironment.defaultEnv()
 				.getPartFolderPath(partName)
 				.resolve(CELL_LIBRARY_NAME));
+		//runTime.setEndTime();
+		//System.out.println("Took " + runTime.getTotalTime() + " seconds to load cell lib");
 		
 		// add additional macro cell specifications to the cell library before parsing the EDIF netlist
+		//runTime.setStartTime();
 		libCells.loadMacroXML(rscpPath.resolve("macros.xml"));
+		//runTime.setEndTime();
+		//System.out.println("Took " + runTime.getTotalTime() + " seconds to load macros xml");
 		
 		// create the RS2 netlist
 		String edifFile = rscpPath.resolve("netlist.edf").toString();
 
 		CellDesign design;
 
+		//runTime.setStartTime();
 		if (edifType.equals(EdifType.YOSYS))
 			design = YosysEdifInterface.parseEdif(edifFile, libCells, partName);
 		else
 			design = EdifInterface.parseEdif(edifFile, libCells);
+		//runTime.setEndTime();
+		//System.out.println("Took " + runTime.getTotalTime() + " seconds to parse edif");
 
 		design.setImplementationMode(mode);
 		
 		// parse the constraints into RapidSmith
+		//runTime.setStartTime();
 		String constraintsFile = rscpPath.resolve("constraints.xdc").toString();
 		XdcConstraintsInterface constraintsInterface = new XdcConstraintsInterface(design, device);
 		constraintsInterface.parseConstraintsXDC(constraintsFile);
+		//runTime.setEndTime();
+		//System.out.println("Took " + runTime.getTotalTime() + " seconds to parse constraints");
 
 		// re-create the placement and routing information
+		//runTime.setStartTime();
 		String placementFile = rscpPath.resolve("placement.rsc").toString();
 		XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device);
 		placementInterface.parsePlacementXDC(placementFile);
- 
+		//runTime.setEndTime();
+		//System.out.println("Took " + runTime.getTotalTime() + " seconds to import placement");
+
+		//runTime.setStartTime();
 		String routingFile = rscpPath.resolve("routing.rsc").toString();
 		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap(), mode);
 		routingInterface.parseRoutingXDC(routingFile);
 		design.setOocPortMap(routingInterface.getOocPortMap());
+		//runTime.setEndTime();
+		//System.out.println("Took " + runTime.getTotalTime() + " seconds to import routing");
 
 		VivadoCheckpoint vivadoCheckpoint = new VivadoCheckpoint(partName, design, device, libCells);
 
+		//runTime.setStartTime();
 		if (storeAdditionalInfo) {
 			vivadoCheckpoint.setRoutethroughBels(routingInterface.getRoutethroughsBels());
 			vivadoCheckpoint.setVccSourceBels(routingInterface.getVccSourceBels());
 			vivadoCheckpoint.setGndSourceBels(routingInterface.getGndSourceBels());
 			vivadoCheckpoint.setBelPinToCellPinMap(placementInterface.getPinMap());
 		}
+		//runTime.setEndTime();
+		//System.out.println("Took " + runTime.getTotalTime() + " seconds to store additional info");
 
+		//runTime.setStartTime();
 		// Mark the used static resources
 		if (mode == ImplementationMode.RECONFIG_MODULE) {
 			String resourcesFile = rscpPath.resolve("static_resources.rsc").toString();
@@ -141,6 +163,8 @@ public final class VivadoInterface {
 			vivadoCheckpoint.setStaticRoutemap(staticResources.getStaticRoutemap());
 			design.setOocPortMap(staticResources.getOocPortMap());
 		}
+		//runTime.setEndTime();
+		//System.out.println("Took " + runTime.getTotalTime() + " seconds to parse static resources");
 
 
 		return vivadoCheckpoint;
