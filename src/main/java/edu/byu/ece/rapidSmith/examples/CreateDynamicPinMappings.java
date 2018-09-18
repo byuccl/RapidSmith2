@@ -42,7 +42,7 @@ public class CreateDynamicPinMappings {
 					System.out.println("    Once it is done, re-run this program and it should be found in the cache.");
     				List<String> res = PinMapping.createPinMappings( 
     						c, 
-    						c.getBel().getName(), 
+    						c.getBel().getFullName(),
     						true);
 					
 				}
