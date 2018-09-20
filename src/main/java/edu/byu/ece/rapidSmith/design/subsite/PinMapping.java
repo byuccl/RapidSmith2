@@ -1,21 +1,9 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import edu.byu.ece.rapidSmith.RSEnvironment;
-
+import edu.byu.ece.rapidSmith.device.FamilyType;
+import edu.byu.ece.rapidSmith.device.TileType;
+import edu.byu.ece.rapidSmith.util.VivadoConsole;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -23,8 +11,10 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
-import edu.byu.ece.rapidSmith.device.FamilyType;
-import edu.byu.ece.rapidSmith.util.VivadoConsole;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 
 /**
  * Represents the pin mappings for a single cell/bel/properties combination. 
@@ -309,14 +299,14 @@ public class PinMapping {
 		FamilyType family = cell.getDesign().getFamily();
 		getPinMappings(family);
 		getPinMapProperties(family);
-		String partialhash = cell.getType() + " " + belName;
-		String hash = partialhash;
+		String partialhash = buildPartialHash(cell, belName);
+		StringBuilder hash = new StringBuilder(partialhash);
 		List<String> props = getPinMapProperties(family).get(partialhash);
 		if (props == null)
 			return null;
 		for (String s : props)
-			hash += " " + cell.getProperties().getValue(s).toString();
-		return hash;
+			hash.append(" ").append(cell.getProperties().getValue(s).toString());
+		return hash.toString();
 	}
 	
 	// Run a command through the VivadoConsole.  
@@ -340,44 +330,97 @@ public class PinMapping {
 	 * @throws JDOMException
 	 */
 	public static List<String> createPinMappings(
+		Cell cell,
+		String belName,
+		TileType tileType,
+		int siteIndex,
+		boolean verbose
+	) throws IOException, JDOMException {
+		String partname = cell.getDesign().getPartName();
+		return createPinMappings(cell, belName, verbose, (out, propstring) -> {
+			out.write("set partname " + partname + "\n");
+			out.write("set libcellname " + cell.getType() + "\n");
+			out.write("set belname " + belName + "\n");
+			out.write("link_design -part $partname\n");
+			out.write("set libcell [get_lib_cells $libcellname]\n");
+			out.write("set cell [create_cell -reference $libcell \"tmpcell\"]\n");
+			out.write("set tile [lindex [get_tiles -filter {TYPE == " + tileType.name() + "}] 0]\n");
+			out.write("set site [lindex [get_sites -of $tile] " + siteIndex + "]\n");
+			out.write("set bel [concat $site/$belname]\n");
+			out.write("place_cell $cell $bel\n");
+			out.write("set bel [get_bels $bel]\n");
+			out.write("unplace_cell $cell\n");
+			out.write("set config_dict [dict create " + propstring + "]\n");
+			out.write("set pin_mappings [tincr::cells::create_nondefault_pin_mappings $cell $bel $config_dict]\n");
+			out.write("set filename newMapping.xml\n");
+			out.write("tincr::cells::write_nondefault_pin_mappings $cell $bel $pin_mappings $config_dict $filename\n");
+		});
+	}
+
+	/**
+	 * Run Vivado using the VivadoConsole to place a cell onto a bel and then record the pin mappings.  
+	 * The resulting pinmappings will be placed into a file such as: "$RAPIDSMITH_PATH/devices/artix7/pinMappings/newMapping.xml"
+	 * @param cell The {@link Cell} to be placed
+	 * @param belName The name of the bel the cell is to be placed on
+	 * @param verbose Whether to echo the commands being executed in Vivado and the results
+	 * @return The results from running Vivado
+	 * @throws IOException
+	 * @throws JDOMException
+	 */
+	public static List<String> createPinMappings(
 			Cell cell,
 			String belName, 
 			boolean verbose
 			) throws IOException, JDOMException {
 		
-
-		FamilyType family = cell.getDesign().getFamily(); 
-		Path path = RSEnvironment.defaultEnv().getPartFolderPath(family).resolve("pinMappings");
 		String partname = cell.getDesign().getPartName();
-		String partialhash = cell.getType() + " " + belName;
+		return createPinMappings(cell, belName, verbose, (out, propstring) -> {
+			out.write("set partname " + partname + "\n");
+			out.write("set libcellname " + cell.getType() + "\n");
+			out.write("set belname " + belName + "\n");
+			out.write("link_design -part $partname\n");
+			out.write("set libcell [get_lib_cells $libcellname]");
+			out.write("set cell [create_cell -reference $libcell \"tmpcell\"]");
+			out.write("set bel [lindex [get_bels *$belname] 0]");
+			out.write("set config_dict [dict create " + propstring + "]\n");
+			out.write("set pin_mappings [tincr::cells::create_nondefault_pin_mappings $cell $bel $config_dict]");
+			out.write("set filename newMapping.xml" + "\n");
+			out.write("tincr::cells::write_nondefault_pin_mappings $cell $bel $pin_mappings $config_dict $filename");
+		});
+	}
+
+	private static List<String> createPinMappings(
+		Cell cell, String belName, boolean verbose,
+		ThrowingBiConsumer<BufferedWriter, String, IOException> makeSetup
+	) throws IOException, JDOMException {
+		FamilyType family = cell.getDesign().getFamily();
+		Path path = RSEnvironment.defaultEnv().getPartFolderPath(family).resolve("pinMappings");
+
+		String partialhash = buildPartialHash(cell, belName);
 		List<String> props = getPinMapProperties(family).get(partialhash);
-		String propstring = "";
+		StringBuilder propstring = new StringBuilder();
 		for (String p : props) {
-			propstring += p + " " + cell.getProperties().getValue(p) + " ";
+			propstring.append(p + " " + cell.getProperties().getValue(p) + " ");
 		}
-		
-		BufferedWriter out = new BufferedWriter(new FileWriter(path.resolve("setup.tcl").toString()));
-		out.write("set config_dict [dict create " + propstring + "]\n");
-		out.write("set partname " + partname + "\n");
-		out.write("set libcellname " + cell.getType()+ "\n");
-		out.write("set belname " + belName + "\n");
-		out.write("set filename newMapping.xml" + "\n");
-		out.write("source create_nondefault_pin_mappings.tcl\n");
-		out.close();
+
+		try (BufferedWriter out = Files.newBufferedWriter(path.resolve("setup.tcl"))) {
+			makeSetup.accept(out, propstring.toString());
+		}
+
 		VivadoConsole vc = new VivadoConsole(path.toString());
 		List<String> results = doCmd(vc, "source setup.tcl", verbose);
 		//List<String> results = null;
 		if (verbose)
 			for (String s : results)
 				System.out.println(s);
-		
+
 		// If all goes well the file newMapping.xml will be created in the pinMappings subdirectory of the device architecture directory
 		// Now, let' load it in and add it to the cache
 		PinMapping pm = loadNewPinMapping(family);
-		
+
 		// Get the pinsmappings from the cache for this family
 		Map<String, PinMapping> pms = getPinMappings(family);
-		
+
 		// See if the pinmappings are a duplicate of another already in the cache
 		// If so, point them to the other entry using the duplic member
 		// Note: at this point pm.hasDuplic() == false
@@ -389,28 +432,34 @@ public class PinMapping {
 				pm.duplic = hash;
 			}
 		}
-		
+
 		// Add the new mapping to the mappings for this family
 		pms.put(pm.getHash(), pm);
-		
+
 		savePinMappings(family, pms);
 		return results;
 	}
-	
+
+	private static String buildPartialHash(Cell cell, String belName) {
+		String[] split = belName.split("/");
+		String shortName = split[split.length - 1];
+		return cell.getType() + " " + shortName;
+	}
+
 	public String toString() {
-		String s = "";
-		s = "Hash:[ " + hash + " ]\n";
-		s += "Properties:\n";
+		StringBuilder s = new StringBuilder();
+		s = new StringBuilder("Hash:[ " + hash + " ]\n");
+		s.append("Properties:\n");
 		for (Map.Entry<String, String> entry : props.entrySet()) 
-			s += "  " + entry.getKey() + ":" + entry.getValue() + "\n";
+			s.append("  ").append(entry.getKey()).append(":").append(entry.getValue()).append("\n");
 		if (hasDuplic()) {
-			s += "Duplic: " + getDuplic();
+			s.append("Duplic: ").append(getDuplic());
 		}
 		else {
-			s += "Pins:\n";
-			s = pinsToString(s);
+			s.append("Pins:\n");
+			s = new StringBuilder(pinsToString(s.toString()));
 		}
-		return s;
+		return s.toString();
 	}
 	
 	/**
@@ -444,4 +493,9 @@ class SortPins implements Comparator<Element> {
     	if (r != 0) return r;
     	return e1.getAttributeValue("belPin").compareTo(e2.getAttributeValue("belPin"));
     }
+}
+
+@FunctionalInterface
+interface ThrowingBiConsumer<T, R, E extends Exception> {
+	void accept(T t, R r) throws E;
 }
