@@ -229,9 +229,4 @@ public class TileWire implements Wire, Serializable {
 		return tile.getName() + " " + tile.getDevice().getWireEnumerator().getWireName(wire);
 	}
 
-	public PathFinderCost getPathFinderCost(){
-		return PathFinderCost.createOrGetPFCOfWire(this);
-	}
-
-
 }

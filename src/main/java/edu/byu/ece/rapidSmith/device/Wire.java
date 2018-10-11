@@ -99,6 +99,4 @@ public interface Wire extends Serializable {
 	 */
 	BelPin getSource();
 
-	PathFinderCost getPathFinderCost();
-
 }

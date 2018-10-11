@@ -213,8 +213,4 @@ public class SiteWire implements Wire, Serializable {
 		return site.getName() + " " + site.getTile().getDevice().getWireEnumerator().getWireName(wire);
 	}
 
-	public PathFinderCost getPathFinderCost(){
-		return PathFinderCost.createOrGetPFCOfWire(this);
-	}
-
 }
