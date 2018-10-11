@@ -252,6 +252,15 @@ public class Tile implements Serializable {
 	}
 
 	/**
+	 * Gets and returns the reverse wires HashMap for this tile.
+	 *
+	 * @return The reverse wires HashMap for this tile.
+	 */
+	public WireHashMap getReverseWireHashMap() {
+		return reverseWireConnections;
+	}
+
+	/**
 	 * This is used to populate the tile wires and should probably not be called
 	 * during normal usage.
 	 *
@@ -310,11 +319,14 @@ public class Tile implements Serializable {
 		return wireConnections.get(wire);
 	}
 
-	public WireHashMap getReverseWireHashMap() {
-		return reverseWireConnections;
-	}
-
-	public WireConnection[] getReverseConnections(int wire) {
+	/**
+	 * This will get all of the reverse wire connections that can be
+	 * made from the given wire in this tile.
+	 *
+	 * @param wire A wire in this tile to query its potential connections.
+	 * @return An array of wires which connect to the given wire.
+	 */
+	public WireConnection[] getReverseWireConnections(int wire) {
 		if (reverseWireConnections == null)
 			return new WireConnection[0];
 		return reverseWireConnections.get(wire);

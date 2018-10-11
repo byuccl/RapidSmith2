@@ -161,7 +161,7 @@ public class TileWire implements Wire, Serializable {
 	 */
 	@Override
 	public Collection<Connection> getReverseWireConnections() {
-		WireConnection[] wireConnections = tile.getReverseConnections(wire);
+		WireConnection[] wireConnections = tile.getReverseWireConnections(wire);
 		if (wireConnections == null)
 			return Collections.emptyList();
 
@@ -171,7 +171,7 @@ public class TileWire implements Wire, Serializable {
 	}
 	
 	public WireConnection[] getReverseWireConnectionsArray() {
-		return tile.getReverseConnections(wire);
+		return tile.getReverseWireConnections(wire);
 	}
 
 	@Override
