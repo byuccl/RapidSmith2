@@ -61,8 +61,11 @@ public class PartitionPin extends CellPin {
 		this.portName = portName;
 		this.name = "partPin." + portName + "." + pinDir.toString();
 		this.direction = pinDir;
-		this.pinType = CellPinType.PARTITION;
 		this.wire = wire;
+
+		// If the partition pin wire is an HCLK row, this is a special clock partition pin
+		// QUESTION: Is there a better way to identify this other than the name of the wire?
+		this.pinType = (wire.getName().contains("CLK_HROW")) ? CellPinType.PARTITION_CLK : CellPinType.PARTITION;
 	}
 
 	@Override
@@ -127,7 +130,7 @@ public class PartitionPin extends CellPin {
 
 	@Override
 	public CellPinType getType() {
-		return null;
+		return pinType;
 	}
 
 	@Override

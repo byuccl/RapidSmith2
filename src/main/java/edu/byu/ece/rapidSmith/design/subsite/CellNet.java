@@ -469,6 +469,29 @@ public class CellNet implements Serializable {
 
 		return false;
 	}
+
+	// TODO: In my usage of this, I call both isCLKNet and isPartPinCLKNet.
+	// This needlessly repeats work. Decide how to better organize
+	/**
+	 * Checks if a net is a partition pin clock net (but not a true clock net).
+	 * Checks that the net is not a true clock net and checks if any attached partition
+	 * pins are of type {@link CellPinType#PARTITION_CLK}.
+	 *
+	 * @return {@code true} if this net is a partition pin clock net
+	 */
+	public boolean isPartPinCLKNet() {
+		for (CellPin p : this.pins) {
+			if (p.getType() == CellPinType.CLOCK) {
+				return false;
+			}
+			else if (p.getType() == CellPinType.PARTITION_CLK) {
+				return true;
+			}
+		}
+
+		return false;
+
+	}
 	
 	/**
 	 * Checks if a net is a clk net and should use the clock routing resources.

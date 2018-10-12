@@ -376,11 +376,7 @@ public final class EdifInterface {
 			else if (node.isGndSource()) {
 				net.setType(NetType.GND);
 			}
-			
-			//if (net.getName().equals("vga_o[76]")) {
-			//	System.out.println(" --> " + pinname  + " " + node.getPin(pinname) + " " + node.isMacro());
-			//}
-			
+
 			net.connectToPin(node.getPin(pinname));						
 		}		
 	}

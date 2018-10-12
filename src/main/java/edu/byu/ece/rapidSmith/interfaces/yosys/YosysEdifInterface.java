@@ -703,42 +703,9 @@ public final class YosysEdifInterface {
 	 * @throws FileNotFoundException
 	 */
 	public static CellDesign parseEdif(String edifFile, CellLibrary libCells, String partName) {
-		// partName must NOT be null.
-
-		// Add the PART property to the netlist
-		//EdifEnvironment top = EdifParser.translate(edifPath.toString());
-		//EdifDesign edifDesign = top.getTopDesign();
-		//edifDesign.addProperty(new Property("PART", partName));
-
-		//EdifCell topLevelCell = top.getTopCell();
-		//EdifCellInterface topInterface = topLevelCell.getInterface();
-
-		// Rename bus ports
-		// ie: (port (array LED 7) (direction OUTPUT)) -> (port (array (rename LED "LED[6:0]") 7) (direction OUTPUT))
-		// TODO: Re-evaluate. This may not be very robust.
-		/*
-		for ( EdifPort port : topInterface.getPortList() ) {
-			if (port.isBus()) {
-				String portName = port.getName();
-				int portWidth = port.getWidth();
-				int portDir = port.getDirection();
-				EdifNameable edifPortName = null;
-
-				edifPortName = new RenamedObject(port.getName(), String.format("%s[%d:%d]", portName, portWidth - 1, 0));
-
-				// Delete the old bus port and add the renamed bus port
-				topInterface.deletePort(port);
-				topInterface.addPort(edifPortName, portWidth, portDir);
-			}
-		}
-		*/
-
-
-
-
 		List<CellNet> vccNets = new ArrayList<>();
 		List<CellNet> gndNets = new ArrayList<>();
-		Map<EdifPort, Integer> portOffsetMap = new HashMap<EdifPort, Integer>();
+		Map<EdifPort, Integer> portOffsetMap = new HashMap<>();
 
 		try {
 			// parse edif into the BYU edif tools data structures
