@@ -633,7 +633,8 @@ public final class EdifInterface {
 			}
 			else {
 				// Some bus ports have bad names like port[0:0][7:0].
-				// Because of this, just always make sure the new name is Edif Nameable
+				// Because of this, just always make sure the new name is Edif Nameable.
+				// Doing so checks that all port names are valid EDIF names, likely slightly increasing EDIF export time.
 				edifPortName = new RenamedObject(createEdifNameable(portName), String.format("%s[%d:%d]", portName, portInfo.getMax(), portInfo.getMin()));
 			}
 						
