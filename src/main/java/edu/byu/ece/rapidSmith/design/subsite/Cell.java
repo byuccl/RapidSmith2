@@ -22,6 +22,7 @@ package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.device.*;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -32,7 +33,8 @@ import java.util.stream.Collectors;
  *  are immutable.  Pins on the cell are initialized upon cell creation based upon
  *  the cell's type.
  */
-public class Cell {
+public class Cell implements Serializable {
+	private static final long serialVersionUID = -7022378736571999208L;
 	/** Unique name of this instance */
 	private String name;
 	/** The CellDesign this cell exists in */

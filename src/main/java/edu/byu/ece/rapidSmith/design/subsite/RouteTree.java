@@ -22,6 +22,7 @@ package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.device.*;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -29,7 +30,8 @@ import java.util.*;
  * a node in the tree (with its associated wire in the device) and contains the
  * sinks and connections to the sinks.
  */
-public class RouteTree extends AbstractRouteTree<RouteTree> {
+public class RouteTree extends AbstractRouteTree<RouteTree> implements Serializable {
+	private static final long serialVersionUID = -4159542642483118218L;
 	private RouteTree parent;
 	private Connection connection;
 

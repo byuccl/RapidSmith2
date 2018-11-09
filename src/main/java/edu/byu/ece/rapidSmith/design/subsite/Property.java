@@ -20,11 +20,14 @@
 
 package edu.byu.ece.rapidSmith.design.subsite;
 
+import java.io.Serializable;
+
 /**
  * A property containing a key/value pair.  A property type can be specified
  * to indicate the source and use of the property.
  */
-public final class Property {
+public final class Property implements Serializable {
+	private static final long serialVersionUID = 5908732846156628350L;
 	private final String key;
 	private PropertyType type;
 	private Object value;
