@@ -379,13 +379,14 @@ public class PinMapping {
 			out.write("set libcellname " + cell.getType() + "\n");
 			out.write("set belname " + belName + "\n");
 			out.write("link_design -part $partname\n");
-			out.write("set libcell [get_lib_cells $libcellname]");
-			out.write("set cell [create_cell -reference $libcell \"tmpcell\"]");
-			out.write("set bel [lindex [get_bels *$belname] 0]");
+			out.write("set libcell [get_lib_cells $libcellname]\n");
+			out.write("set cell [create_cell -reference $libcell \"tmpcell\"]\n");
+			out.write("place_cell $cell $belname\n");
+			out.write("set bel [lindex [get_bels $belname] 0]\n");
 			out.write("set config_dict [dict create " + propstring + "]\n");
-			out.write("set pin_mappings [tincr::cells::create_nondefault_pin_mappings $cell $bel $config_dict]");
-			out.write("set filename newMapping.xml" + "\n");
-			out.write("tincr::cells::write_nondefault_pin_mappings $cell $bel $pin_mappings $config_dict $filename");
+			out.write("set pin_mappings [tincr::cells::create_nondefault_pin_mappings $cell $bel $config_dict]\n");
+			out.write("set filename newMapping.xml\n");
+			out.write("tincr::cells::write_nondefault_pin_mappings $cell $bel $pin_mappings $config_dict $filename\n");
 		});
 	}
 
@@ -427,7 +428,7 @@ public class PinMapping {
 		for (Map.Entry<String, PinMapping> entry : pms.entrySet()) {
 			String hash = entry.getKey();
 			PinMapping pm2 = entry.getValue();
-			if (pm.getPins().equals(pm2.getPins())) {
+			if (!pm.getHash().equals(pm2.getHash()) && pinsEquals(pm.getPins(), pm2.getPins())) {
 				pm.pins = null;
 				pm.duplic = hash;
 			}
@@ -438,6 +439,20 @@ public class PinMapping {
 
 		savePinMappings(family, pms);
 		return results;
+	}
+	
+	private static boolean pinsEquals(Map<String, List<String>> pm1, Map<String, List<String>> pm2) {
+		Map<String, Set<String>> pmeq1 = new HashMap<>();
+		for (Map.Entry<String, List<String>> e : pm1.entrySet()) {
+			pmeq1.put(e.getKey(), new HashSet<>(e.getValue()));
+		}
+
+		Map<String, Set<String>> pmeq2 = new HashMap<>();
+		for (Map.Entry<String, List<String>> e : pm2.entrySet()) {
+			pmeq2.put(e.getKey(), new HashSet<>(e.getValue()));
+		}
+
+		return pmeq1.equals(pmeq2);
 	}
 
 	private static String buildPartialHash(Cell cell, String belName) {
