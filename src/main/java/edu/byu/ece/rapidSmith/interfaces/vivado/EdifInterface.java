@@ -177,12 +177,12 @@ public final class EdifInterface {
 
 			int offset = 0;
 			
-			// find the port suffix and offset
-			String portSuffix = port.getOldName();
+			// find the port prefix and offset
+			String portPrefix = port.getOldName();
 			if (port.isBus()) {
 				Matcher matcher = busNamePattern.matcher(port.getOldName());
 				if (matcher.matches()) {
-					portSuffix = matcher.group(1);
+					portPrefix = matcher.group(1);
 					offset = Integer.parseInt(matcher.group(2));
 					portOffsetMap.put(port, offset);
 				}
@@ -197,10 +197,9 @@ public final class EdifInterface {
 				LibraryCell libCell = libCells.get(libraryPortType);
 				
 				String portName = port.isBus() ?
-									String.format("%s[%d]", portSuffix, reverseBusIndex(port.getWidth(), busMember.bitPosition(), offset)) :
-									portSuffix;
+									String.format("%s[%d]", portPrefix, reverseBusIndex(port.getWidth(), busMember.bitPosition(), offset)) :
+									portPrefix;
 				Cell portCell = new Cell(portName, libCell);
-				//portCell.getProperties().update(new Property("Dir", PropertyType.USER, PortDirection.getPortDirectionForImport(portCell)));
 				design.addCell(portCell);
 			}
 		}
@@ -337,7 +336,7 @@ public final class EdifInterface {
 			if (portRef.isTopLevelPortRef()) {
 								
 				String portname = portRef.isSingleBitPortRef() ? port.getOldName() : 
-				 				  String.format("%s[%d]", getPortNameSuffix(port.getName()), reverseBusIndex(port.getWidth(), portRef.getBusMember(), portOffsetMap.get(port)));
+				 				  String.format("%s[%d]", getPortNamePrefix(port.getOldName()), reverseBusIndex(port.getWidth(), portRef.getBusMember(), portOffsetMap.get(port)));
 				
 				Cell portCell = design.getCell(portname);
 				
@@ -385,9 +384,9 @@ public final class EdifInterface {
 	 * Vivado ports that are buses are named portName[15:0]
 	 * This function will return the "portName" portion of the bus name
 	 */
-	private static String getPortNameSuffix(String portName) {
+	private static String getPortNamePrefix(String portName) {
 		
-		int bracketIndex = portName.indexOf("[");
+		int bracketIndex = portName.lastIndexOf("[");
 		return bracketIndex == -1 ? portName : portName.substring(0, bracketIndex);
 	}
 		
@@ -583,7 +582,6 @@ public final class EdifInterface {
 		
 		// create the cell instances
 		Iterator<Cell> cellIt = design.getLeafCells().iterator();
-		//for (Cell cell : design.getCells) {
 		while (cellIt.hasNext()) {
 			Cell cell = cellIt.next();
 			
@@ -650,7 +648,10 @@ public final class EdifInterface {
 						createEdifNameable(portName);
 			}
 			else {
-				edifPortName = new RenamedObject(portName, String.format("%s[%d:%d]", portName, portInfo.getMax(), portInfo.getMin()));
+				// Some bus ports have bad names like port[0:0][7:0].
+				// Because of this, just always make sure the new name is Edif Nameable.
+				// Doing so checks that all port names are valid EDIF names, likely slightly increasing EDIF export time.
+				edifPortName = new RenamedObject(createEdifNameable(portName), String.format("%s[%d:%d]", portName, portInfo.getMax(), portInfo.getMin()));
 			}
 						
 			cellInterface.addPort(edifPortName, portInfo.getWidth(), portInfo.getDirection());
@@ -685,7 +686,7 @@ public final class EdifInterface {
 			if (cellPin.isPseudoPin()) {
 				continue;
 			}
-
+						
 			Cell parentCell = cellPin.getCell();
 			
 			EdifPortRef portRef = parentCell.isPort() ?
@@ -694,10 +695,10 @@ public final class EdifInterface {
 			
 			edifNet.addPortConnection(portRef);
 		}
-
+		// QUESTION: Why isn't this on master???
 		// create an equivalent edif property for each RS2 property
 		edifNet.addPropertyList(createEdifPropertyList(cellNet.getProperties()));
-					
+
 		return edifNet;
 	}
 	
@@ -705,15 +706,15 @@ public final class EdifInterface {
 	 * Creates a port reference (connection) for an EDIF net from a top-level port cell.
 	 */
 	private static EdifPortRef createEdifPortRefFromPort(Cell port, EdifCell edifParent, EdifNet edifNet, int portOffset) {
-		
-		String[] toks = port.getName().split("\\[");
+		// Split on the last '['
+		String[] toks = port.getName().split("\\[(?!.*\\[)");
 		
 		assert(toks.length == 1 || toks.length == 2);
-		
+
 		EdifPort edifPort = edifParent.getPort(toks[0]);
 		
 		if (edifPort == null) {
-			edifPort = edifParent.getPort(createEdifNameable(port.getName()).getName());
+			edifPort = edifParent.getPort(getEdifName(toks[0]));
 		}
 		
 		int portIndex = 1;
@@ -775,13 +776,12 @@ public final class EdifInterface {
 			else if (value instanceof Long) {
 				edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey(), (new IntegerTypedValue((long)value)));
 			}
-			else {	
+			else {
 				edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey(), prop.getValue().toString());
 			}
 			
 			edifProperties.addProperty(edifProperty);
 		}
-		
 		return edifProperties;
 	}
 	
