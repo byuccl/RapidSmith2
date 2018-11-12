@@ -170,6 +170,10 @@ public final class VivadoInterface {
 		return vivadoCheckpoint;
 	}
 
+	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells) throws IOException {
+		writeTCP(tcpDirectory, design, device, libCells, ImplementationMode.REGULAR, null);
+	}
+
 	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells, ImplementationMode mode) throws IOException {
 		writeTCP(tcpDirectory, design, device, libCells, mode, null);
 	}
