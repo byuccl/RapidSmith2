@@ -5,7 +5,7 @@ apply plugin: 'eclipse'
 apply plugin: 'java-library-distribution'
 
 group 'edu.byu.ece'
-version '2.1-SNAPSHOT'
+version '2.3-SNAPSHOT'
 sourceCompatibility = '1.8'
 assemble.dependsOn(installDist)
 
