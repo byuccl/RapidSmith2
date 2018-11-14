@@ -477,7 +477,19 @@ public final class EdifInterface {
 	/* *********************
 	 *    Export Section
 	 ***********************/
-	
+
+	private static void removeLutPairs(CellDesign design) {
+		Iterator<Cell> cellIt =
+				design.getLeafCells().filter(Cell::isLut).iterator();
+		while
+				(cellIt.hasNext()) {
+			Cell lutCell = cellIt.next();
+			lutCell.getProperties().remove("LUTNM");
+			lutCell.getProperties().remove("HLUTNM");
+			lutCell.getProperties().remove("SOFT_HLUTNM");
+		}
+	}
+
 	/**
 	 * Creates an EDIF netlist file from a RapidSmith CellDesign netlist.
 	 * 
@@ -486,7 +498,7 @@ public final class EdifInterface {
 	 * @throws IOException
 	 */
 	public static void writeEdif(String edifOutputFile, CellDesign design) throws IOException {
-		
+		removeLutPairs(design);
 		try {
 			// TODO: copy old edif environment properties into new edif environment properties
 			EdifEnvironment edifEnvironment = new EdifEnvironment(createEdifNameable(design.getName()));
