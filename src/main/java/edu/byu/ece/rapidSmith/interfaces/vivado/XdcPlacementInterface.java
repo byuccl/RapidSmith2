@@ -26,19 +26,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import edu.byu.ece.rapidSmith.design.subsite.Cell;
-import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.design.subsite.CellPin;
-import edu.byu.ece.rapidSmith.design.subsite.Property;
-import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
+import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Device;
@@ -313,53 +306,74 @@ public class XdcPlacementInterface {
 	 * @throws IOException
 	 */
 	public void writePlacementXDC(String xdcOut) throws IOException {
+
+		// Adding code to generate checking script to see if Vivado import worked
 		
 		try (BufferedWriter fileout = new BufferedWriter (new FileWriter(xdcOut)) ) {
+			try (BufferedWriter chkout = new BufferedWriter(new FileWriter(xdcOut + ".chk"))) {
 
-			Iterator<Cell> cellIt = sortCellsForXdcExport(design).iterator();
-			
-			// All cells are assumed placed in this while loop
-			while (cellIt.hasNext()) {
-				Cell cell = cellIt.next();
-				Site site = cell.getSite();
-				Bel bel = cell.getBel();
+				Iterator<Cell> cellIt = sortCellsForXdcExport(design).iterator();
 
-				String cellname = cell.getName();
-				
-				// ports need a package pin reference, and aren't placed in Vivado
-				if (cell.isPort()) {
-					PackagePin packagePin = device.getPackagePin(bel);
-					// if the port is not mapped to a valid package pin, thrown an exception
-					if (packagePin == null) {
-						if (device.getPackagePins().isEmpty()) {
-							throw new ImplementationException("Device " + device.getPartName() + " is missing package pin information: cannot generate TCP without it.\n"
-									+ "To generate the package pin information and add it to your device follow these three steps: \n"
-									+ "1.) Run the Tincr command \"tincr::create_xml_device_info\" for your part.\n"
-									+ "2.) Store the generated XML file to the devices/family directory which corresponds to your part.\n"
-									+ "3.) Run the DeviceInfoInstaller in the util package to add the package pins to the device");
-						}
-						
-						throw new ImplementationException("Cannot export placement information for port cell " + cellname + ".\n"
-								+ "Package Pin for BEL " + bel.getFullName() + " cannot be found.");
-					}
-					fileout.write(String.format("set_property PACKAGE_PIN %s [get_ports {%s}]\n", packagePin.getName(), cellname));
-				}
-				else {
-					fileout.write(String.format("set_property BEL %s.%s [get_cells {%s}]\n", site.getType().name(), bel.getName(), cellname));
-					fileout.write(String.format("set_property LOC %s [get_cells {%s}]\n", site.getName(), cellname));
-										
-					//TODO: Update this function when more cells with LOCK_PINS are discovered
-					if (cell.isLut()) { 
-						fileout.write("set_property LOCK_PINS { ");
-						for(CellPin cp: cell.getInputPins()) {
-							if (!cp.isPseudoPin() && cp.getMappedBelPin() != null) {
-								fileout.write(String.format("%s:%s ", cp.getName(), cp.getMappedBelPin().getName()));
+				chkout.write("proc doChk {} {");
+
+				// All cells are assumed placed in this while loop
+				while (cellIt.hasNext()) {
+					Cell cell = cellIt.next();
+					Site site = cell.getSite();
+					Bel bel = cell.getBel();
+
+					String cellname = cell.getName();
+
+
+					// ports need a package pin reference, and aren't placed in Vivado
+					if (cell.isPort()) {
+						PackagePin packagePin = device.getPackagePin(bel);
+						// if the port is not mapped to a valid package pin, thrown an exception
+						if (packagePin == null) {
+							if (device.getPackagePins().isEmpty()) {
+								throw new ImplementationException("Device " + device.getPartName() + " is missing package pin information: cannot generate TCP without it.\n"
+										+ "To generate the package pin information and add it to your device follow these three steps: \n"
+										+ "1.) Run the Tincr command \"tincr::create_xml_device_info\" for your part.\n"
+										+ "2.) Store the generated XML file to the devices/family directory which corresponds to your part.\n"
+										+ "3.) Run the DeviceInfoInstaller in the util package to add the package pins to the device");
 							}
+
+							throw new ImplementationException("Cannot export placement information for port cell " + cellname + ".\n"
+									+ "Package Pin for BEL " + bel.getFullName() + " cannot be found.");
 						}
-						
-						fileout.write("} [get_cells {" + cellname + "}]\n");
+						fileout.write(String.format("set_property PACKAGE_PIN %s [get_ports {%s}]\n", packagePin.getName(), cellname));
+					} else {
+						fileout.write(String.format("set_property BEL %s.%s [get_cells {%s}]\n", site.getType().name(), bel.getName(), cellname));
+
+						String sbp = site.getType().name() + "." + bel.getName();
+
+						chkout.write(String.format("\n  set c [get_cells {%s}]\n  set bp [get_property BEL  $c]\n", cellname));
+						chkout.write(String.format("  if {$bp != \"%s\"} { puts \"ERROR: wrong BEL for  Cell $c, is {$bp} instead of {%s}\" }\n", sbp, sbp));
+
+						fileout.write(String.format("set_property LOC %s [get_cells {%s}]\n", site.getName(), cellname));
+
+						chkout.write(String.format("  set loc [get_property LOC  [get_cells {%s}]]\n", cellname));
+						chkout.write(String.format("  if {$loc != \"%s\"} {\n", site.getName()));
+						chkout.write(String.format("    if {[string first {IOB} $loc] != 0} { puts \"ERROR: wrong LOC for  Cell %s, is {$loc} instead of {%s}\"\n",
+								cellname, site.getName()));
+						chkout.write(String.format("    } else { puts \"WARNING: IOB LOC mismatch for Cell %s, is {$loc} instead of {%s}\" }\n",
+								cellname, site.getName()));
+						chkout.write(String.format("  }"));
+
+						//TODO: Update this function when more cells with LOCK_PINS are discovered
+						if (cell.isLut()) {
+							fileout.write("set_property LOCK_PINS { ");
+							for (CellPin cp : cell.getInputPins()) {
+								if (!cp.isPseudoPin() && cp.getMappedBelPin() != null) {
+									fileout.write(String.format("%s:%s ", cp.getName(), cp.getMappedBelPin().getName()));
+								}
+							}
+
+							fileout.write("} [get_cells {" + cellname + "}]\n");
+						}
 					}
 				}
+				chkout.write("\n}\n\ndoChk\n");
 			}
 		}
 	}
