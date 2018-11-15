@@ -20,6 +20,7 @@
 
 package edu.byu.ece.rapidSmith.interfaces.vivado;
 
+import java.util.*;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -35,6 +36,7 @@ import edu.byu.ece.edif.core.InvalidEdifNameException;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
+import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.util.Exceptions;
@@ -130,6 +132,22 @@ public final class VivadoInterface {
 	 * @throws EdifNameConflictException 
 	 */
 	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells) throws IOException {
+
+		// Let's not output nets with no loads to avoid downstream warnings by Vivado
+		Collection<CellNet> netsToDelete = new ArrayList<CellNet>();
+		for (CellNet n : design.getNets()) {
+			if (n.getSinkPins().size() == 0) {
+				System.out.println("WARNING: net " + n.getName() + " has no sinks deleting");
+				netsToDelete.add(n);
+			}
+		}
+		for (CellNet n : netsToDelete) {
+			if (n.getPins().size() != 1)
+				System.out.println("ERROR: trying to disconnect net: " + n.getName());
+			n.disconnectFromPin(n.getSourcePin());
+			design.removeNet(n);
+		}
+
 				
 		new File(tcpDirectory).mkdir();
 		
