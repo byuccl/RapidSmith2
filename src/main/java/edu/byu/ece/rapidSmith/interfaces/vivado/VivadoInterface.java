@@ -122,17 +122,13 @@ public final class VivadoInterface {
 		return vivadoCheckpoint;
 	}
 
-	/**
-	 * Export the RapidSmith2 design into an existing TINCR checkpoint file. 
-	 *   
-	 * @param tcpDirectory TINCR checkpoint directory to write XDC files to
-	 * @param design CellDesign to convert to a TINCR checkpoint
-	 * @throws IOException
-	 * @throws InvalidEdifNameException 
-	 * @throws EdifNameConflictException 
-	 */
-	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells) throws IOException {
 
+	/**
+	 * Disconnect and delete nets which have no loads (sinks).  This prevents
+	 * Vivado from throwing warnings on importing of the TCP.
+	 * @param design
+	 */
+	public static void deleteSinklessNets(CellDesign design) {
 		// Let's not output nets with no loads to avoid downstream warnings by Vivado
 		Collection<CellNet> netsToDelete = new ArrayList<CellNet>();
 		for (CellNet n : design.getNets()) {
@@ -147,8 +143,21 @@ public final class VivadoInterface {
 			n.disconnectFromPin(n.getSourcePin());
 			design.removeNet(n);
 		}
+	}
 
-				
+	/**
+	 * Export the RapidSmith2 design into an existing TINCR checkpoint file. 
+	 *   
+	 * @param tcpDirectory TINCR checkpoint directory to write XDC files to
+	 * @param design CellDesign to convert to a TINCR checkpoint
+	 * @throws IOException
+	 * @throws InvalidEdifNameException 
+	 * @throws EdifNameConflictException 
+	 */
+	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells) throws IOException {
+
+		deleteSinklessNets(design);
+
 		new File(tcpDirectory).mkdir();
 		
 		// insert routethrough buffers
