@@ -133,13 +133,13 @@ public final class VivadoInterface {
 		Collection<CellNet> netsToDelete = new ArrayList<CellNet>();
 		for (CellNet n : design.getNets()) {
 			if (n.getSinkPins().size() == 0) {
-				System.out.println("WARNING: net " + n.getName() + " has no sinks deleting");
+				System.out.println("INFO: net " + n.getName() + " has no sinks deleting");
 				netsToDelete.add(n);
 			}
 		}
 		for (CellNet n : netsToDelete) {
 			if (n.getPins().size() != 1)
-				System.out.println("ERROR: trying to disconnect net: " + n.getName());
+				System.err.println("ERROR in deleteSinklessNets(): trying to disconnect net: " + n.getName());
 			n.disconnectFromPin(n.getSourcePin());
 			design.removeNet(n);
 		}
