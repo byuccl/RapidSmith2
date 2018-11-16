@@ -488,7 +488,12 @@ public class PinMapping {
 		getPinMapProperties(family);
 		String hash = buildHashForCell(cell, bel);
 		PinMapping pm = getPinMappings(family).get(hash); 
-		if (pm == null) return null;
+		if (pm == null) {
+			System.err.println("findPinMapingForCell(): Cannot find pinmapping for cell: " + cell + " being placed on: " + bel);
+			System.err.println("  Hash is: " + hash);
+			System.err.println("  You may want to consider running CreateDynamicPinMappings for a placed version of your RSCP checkpoint...");
+			return null;
+		}
 		return pm;
 	}
 	
