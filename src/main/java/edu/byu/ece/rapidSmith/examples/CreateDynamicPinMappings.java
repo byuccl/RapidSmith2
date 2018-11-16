@@ -31,7 +31,8 @@ public class CreateDynamicPinMappings {
 				// The limitation of following lines of code is that this cell is 
 				// already placed and so we know the bel.  In reality, you will 
 				// usually be asking the question regarding a potential cell placement 
-				// onto a  bel. 
+				// onto a  bel.
+				System.out.println("Doing mapping for: " + c + " " + c.getBel());
 				PinMapping pm = PinMapping.findPinMappingForCell(
 						c, 
 						c.getBel().getName());
