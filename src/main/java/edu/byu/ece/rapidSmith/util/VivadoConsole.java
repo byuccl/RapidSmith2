@@ -157,7 +157,7 @@ public class VivadoConsole {
 	public synchronized List<String> runCommand(String cmd) {		
 		
 		resultValid = false;
-		String command = "::tincr::run_rapidsmith_command \"" + cmd + "\" \n";   
+		String command = "package require tincr\n::tincr::run_rapidsmith_command \"" + cmd + "\" \n";   
 		try {
 			out.write(command);
 			out.flush();
