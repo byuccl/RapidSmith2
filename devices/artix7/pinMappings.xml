@@ -699,6 +699,16 @@
       <pin cellPin="WEBWE[7]" belPin="nc" />
     </pins>
   </cell>
+  <cell type="RAMB36E1" bel="RAMB36E1" hash="RAMB36E1 RAMB36E1 TDP 4 4 4 4">
+    <properties>
+      <property key="RAM_MODE" val="TDP" />
+      <property key="READ_WIDTH_A" val="4" />
+      <property key="READ_WIDTH_B" val="4" />
+      <property key="WRITE_WIDTH_A" val="4" />
+      <property key="WRITE_WIDTH_B" val="4" />
+    </properties>
+    <duplic hash="RAMB36E1 RAMB36E1 SDP 72 0 0 72" />
+  </cell>
   <cell type="RAMB36E1" bel="RAMB36E1" hash="RAMB36E1 RAMB36E1 SDP 72 0 0 72">
     <properties>
       <property key="RAM_MODE" val="SDP" />
