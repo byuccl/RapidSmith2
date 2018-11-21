@@ -1264,7 +1264,7 @@ public class XdcRoutingInterface {
 				}
 			}
 			else {
-				if (sinkCellPin == null || !sinkCellPin.getNet().equals(this.net)) {
+				if (sinkCellPin == null || !Objects.equals(sinkCellPin.getNet(), this.net)) {
 					return false;
 				}
 			}
