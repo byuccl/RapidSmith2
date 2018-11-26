@@ -1095,38 +1095,43 @@ public class XdcRoutingInterface {
 	 * 
 	 * @param xdcOut Location to write the routing.xdc file
 	 * @param design Design with nets to export
+	 * @param intrasiteRouting Whether to export commands to manually set the intrasite routing in Vivado
 	 * @throws IOException if the file {@code xdcOut} could not be opened
 	 */
-	public void writeRoutingXDC(String xdcOut, CellDesign design) throws IOException {
+	public void writeRoutingXDC(String xdcOut, CellDesign design, boolean intrasiteRouting) throws IOException {
 		
 		BufferedWriter fileout = new BufferedWriter (new FileWriter(xdcOut));
 
-		// Write used site PIPs (intrasite routing information)
-		for (Site site : design.getUsedSites()) {
-			Map<String, String> pipInfo = design.getPIPInputValsAtSite(site);
+		if (intrasiteRouting) {
+			// Write used site PIPs (intrasite routing information)
+			for (Site site : design.getUsedSites()) {
+				Map<String, String> pipInfo = design.getPIPInputValsAtSite(site);
 
-			// Don't write the used site PIPs for sites whose intrasite routing has not been modified
-			if (pipInfo == null)
-				continue;
+				if (pipInfo == null)
+					continue;
 
-			// Vivado crashes with IOB33. Remove this special case if this bug is fixed.
-			if (site.getType().equals(SiteType.valueOf(design.getFamily(), "IOB33")))
-				continue;
+				// Vivado crashes if you try to set the IOB33s' SITE_PIPS property as well as the PACKAGE_PIN propety.
+				// Remove this special case if this bug is ever fixed.
+				if (site.getType().equals(SiteType.valueOf(design.getFamily(), "IOB33"))
+						|| site.getType().equals(SiteType.valueOf(design.getFamily(), "IOB33S"))
+						|| site.getType().equals(SiteType.valueOf(design.getFamily(), "IOB33M")))
+					continue;
 
-			fileout.write(String.format("set_property MANUAL_ROUTING %s [get_sites {%s}]\n", site.getType().name(), site.getName()));
+				fileout.write(String.format("set_property MANUAL_ROUTING %s [get_sites {%s}]\n", site.getType().name(), site.getName()));
 
-			StringBuilder sitePips = new StringBuilder();
-			for (Map.Entry<String, String> entry : pipInfo.entrySet()) {
-				sitePips.append(entry.getKey()).append(":").append(entry.getValue()).append(" ");
+				StringBuilder sitePips = new StringBuilder();
+				for (Map.Entry<String, String> entry : pipInfo.entrySet()) {
+					sitePips.append(entry.getKey()).append(":").append(entry.getValue()).append(" ");
+				}
+				fileout.write(String.format("set_property SITE_PIPS {%s} [get_sites {%s}]\n", sitePips.toString(), site.getName()));
 			}
-			fileout.write(String.format("set_property SITE_PIPS {%s} [get_sites {%s}]\n", sitePips.toString(), site.getName()));
 		}
 
 		// Write the intersite routing information for each net
 		for(CellNet net : design.getNets()) {
 
 			// only print nets that have routing information. Grab the first RouteTree of the net and use this as the final route
-			if ( net.getIntersiteRouteTree() != null ) {
+			if (net.getIntersiteRouteTree() != null ) {
 				fileout.write(String.format("set_property ROUTE %s [get_nets {%s}]\n", getVivadoRouteString(net), net.getName()));
 			}
 		}
