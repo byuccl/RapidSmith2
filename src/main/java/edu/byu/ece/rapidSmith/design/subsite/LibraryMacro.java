@@ -76,6 +76,17 @@ public class LibraryMacro extends LibraryCell {
 	}
 
 	@Override
+	public boolean isFlipFlop() {
+		return false;
+	}
+
+	@Override
+	public boolean isLatch() {
+		return false;
+	}
+
+
+	@Override
 	public boolean isVccSource() {
 		return false;
 	}

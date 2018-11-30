@@ -212,6 +212,11 @@ public abstract class LibraryCell implements Serializable {
 	 * Returns {@code true} if the cell is a LUT cell (LUT1, LUT2, etc.), {@code false} otherwise.
 	 */
 	abstract public boolean isLut();
+
+	abstract public boolean isFlipFlop();
+
+	abstract public boolean isLatch();
+
 	/**
 	 * Returns {@code true} if the cell represents a top-level port cell.
 	 */

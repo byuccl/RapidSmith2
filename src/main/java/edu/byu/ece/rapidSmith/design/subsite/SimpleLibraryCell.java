@@ -22,6 +22,7 @@ package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.device.BelId;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -41,6 +42,9 @@ public class SimpleLibraryCell extends LibraryCell {
 	private boolean isGndSource;
 	private Integer numLutInputs = null;
 	private boolean isPort;
+
+	private final List<String> FLIP_FLOP_CELLS = Arrays.asList("FDCE", "FDPE", "FDRE", "FDSE");
+	private final List<String> LATCH_CELLS = Arrays.asList("LDCE", "LDPE");
 
 	/**
 	 * Creates a new simple library cell with the specified name.
@@ -109,6 +113,16 @@ public class SimpleLibraryCell extends LibraryCell {
 	@Override
 	public boolean isLut() {
 		return numLutInputs != null;
+	}
+
+	@Override
+	public boolean isFlipFlop() {
+		return FLIP_FLOP_CELLS.contains(this.getName());
+	}
+
+	@Override
+	public boolean isLatch() {
+		return LATCH_CELLS.contains(this.getName());
 	}
 
 	@Override

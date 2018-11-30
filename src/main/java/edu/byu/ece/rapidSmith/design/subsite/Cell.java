@@ -205,7 +205,16 @@ public class Cell {
 	public boolean isLut() {
 		return libCell.isLut();
 	}
-	
+
+	public boolean isFlipFlop() {
+		return libCell.isFlipFlop();
+	}
+
+	public boolean isLatch() {
+		return libCell.isLatch();
+	}
+
+
 	/**
 	 * Returns the bondedness of this cell.  IO are either BONDED or UNBONDED,
 	 * all others INTERNAL.
