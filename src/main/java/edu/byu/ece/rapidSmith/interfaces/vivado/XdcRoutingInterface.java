@@ -1068,6 +1068,72 @@ public class XdcRoutingInterface {
 		
 		return wireEnum;
 	}
+
+	/**
+	 * Writes the intrasite routing TCL commands for the design to the routing.xdc file.
+	 * For now, only support slices. Other site types don't have much flexibility in routing.
+	 * Additionally, trying to set the intrasite routing of IOB sites (IOB33, IOB33S, IOB33M) causes Vivado to crash.
+	 *
+	 * @param design Design with nets to export
+	 * @param fileout BufferedWriter for the routing.xdc file
+	 * @throws IOException if the file can't be written to
+	 */
+	private void writeIntrasiteRouting(CellDesign design, BufferedWriter fileout) throws IOException {
+		FamilyInfo familyInfo = FamilyInfos.get(device.getFamily());
+
+		for (Site site : design.getUsedSites()) {
+			if (!familyInfo.sliceSites().contains(site.getType()))
+				continue;
+
+			// Get all site PIP values for the site (excluding polarity selectors)
+			Map<String, String> pipInfo = design.getPIPInputValsAtSite(site);
+
+			if (pipInfo == null || pipInfo.isEmpty())
+				continue;
+
+			fileout.write(String.format("set_property MANUAL_ROUTING %s [get_sites {%s}]\n", site.getType().name(), site.getName()));
+
+			// Build up the SITE_PIPS property for the site
+			StringBuilder sitePips = new StringBuilder();
+			for (Map.Entry<String, String> entry : pipInfo.entrySet()) {
+				sitePips.append(entry.getKey()).append(":").append(entry.getValue()).append(" ");
+			}
+
+			// Handle polarity selectors.
+			if (FamilyInfos.SERIES7_FAMILIES.contains(device.getFamily())) {
+				// For series 7 devices, we must obtain the value of the CLKINV polarity selector
+				Cell ffLatchCell = design.getCellsAtSite(site).stream()
+						.filter(cell -> cell.isFlipFlop() || cell.isLatch())
+						.findAny().orElse(null);
+
+				if (ffLatchCell != null) {
+					Property clkInvProperty = ffLatchCell.getProperties().get("IS_C_INVERTED");
+					String clkInvValue = (clkInvProperty == null) ? "1'b0" : clkInvProperty.getStringValue();
+
+					// For series 7, polarity selectors have two inputs and so the appropriate value must be
+					// included in the SITE_PIPS property.
+					if (clkInvValue.equals("1'b1"))
+						sitePips.append("CLKINV:CLK_B");
+					else
+						sitePips.append("CLKINV:CLK");
+				}
+			}
+			else if (FamilyInfos.ULTRASCALE_FAMILIES.contains(device.getFamily())) {
+				// In Ultrascale, polarity selectors only have a single input and are always configured the same in
+				// the SITE_PIPS property. Still, if a polarity selector is used, it must be included in the SITE_PIPS property.
+				// For simplicity, we set all polarity selectors for Ultrascale to their only possible values.
+				if (site.getType().equals(SiteType.valueOf(device.getFamily(), "SLICEM")))
+					sitePips.append("LCLKINV:CLK ");
+				sitePips.append("CLK1INV:CLK ");
+				sitePips.append("CLK2INV:CLK ");
+				sitePips.append("RST_ABCDINV:RST ");
+				sitePips.append("RST_EFGHINV:RST");
+			}
+
+			// Write used site PIPs (intrasite routing information)
+			fileout.write(String.format("set_property SITE_PIPS {%s} [get_sites {%s}]\n", sitePips.toString(), site.getName()));
+		}
+	}
 	
 	/**
 	 * Creates a routing.xdc file from the nets of the given design. <br>
@@ -1082,62 +1148,8 @@ public class XdcRoutingInterface {
 		BufferedWriter fileout = new BufferedWriter (new FileWriter(xdcOut));
 
 		if (intrasiteRouting) {
-			FamilyInfo familyInfo = FamilyInfos.get(device.getFamily());
-
-			for (Site site : design.getUsedSites()) {
-				// For now, only support slices. Other site types don't have much flexibility in routing.
-				// Additionally, trying to set the intrasite routing of IOB sites (IOB33, IOB33S, IOB33M) causes Vivado to crash.
-				if (!familyInfo.sliceSites().contains(site.getType()))
-					continue;
-
-				// Get all site PIP values for the site (excluding polarity selectors)
-				Map<String, String> pipInfo = design.getPIPInputValsAtSite(site);
-
-				if (pipInfo == null || pipInfo.isEmpty())
-					continue;
-
-				fileout.write(String.format("set_property MANUAL_ROUTING %s [get_sites {%s}]\n", site.getType().name(), site.getName()));
-
-				// Build up the SITE_PIPS property for the site
-				StringBuilder sitePips = new StringBuilder();
-				for (Map.Entry<String, String> entry : pipInfo.entrySet()) {
-					sitePips.append(entry.getKey()).append(":").append(entry.getValue()).append(" ");
-				}
-
-				// Handle polarity selectors.
-				if (FamilyInfos.SERIES7_FAMILIES.contains(device.getFamily())) {
-					// For series 7 devices, we must obtain the value of the CLKINV polarity selector
-					Cell ffLatchCell = design.getCellsAtSite(site).stream()
-							.filter(cell -> cell.isFlipFlop() || cell.isLatch())
-							.findAny().orElse(null);
-
-					if (ffLatchCell != null) {
-						Property clkInvProperty = ffLatchCell.getProperties().get("IS_C_INVERTED");
-						String clkInvValue = (clkInvProperty == null) ? "1'b0" : clkInvProperty.getStringValue();
-
-						// For series 7, polarity selectors have two inputs and so the appropriate value must be
-						// included in the SITE_PIPS property.
-						if (clkInvValue.equals("1'b1"))
-							sitePips.append("CLKINV:CLK_B");
-						else
-							sitePips.append("CLKINV:CLK");
-					}
-				}
-				else if (FamilyInfos.ULTRASCALE_FAMILIES.contains(device.getFamily())) {
-					// In Ultrascale, polarity selectors only have a single input and are always configured the same in
-					// the SITE_PIPS property. Still, if a polarity selector is used, it must be included in the SITE_PIPS property.
-					// For simplicity, we set all polarity selectors for Ultrascale to their only possible values.
-					if (site.getType().equals(SiteType.valueOf(device.getFamily(), "SLICEM")))
-						sitePips.append("LCLKINV:CLK ");
-					sitePips.append("CLK1INV:CLK ");
-					sitePips.append("CLK2INV:CLK ");
-					sitePips.append("RST_ABCDINV:RST ");
-					sitePips.append("RST_EFGHINV:RST");
-				}
-
-				// Write used site PIPs (intrasite routing information)
-				fileout.write(String.format("set_property SITE_PIPS {%s} [get_sites {%s}]\n", sitePips.toString(), site.getName()));
-			}
+			// Write the intrasite routing commands for the design
+			writeIntrasiteRouting(design, fileout);
 		}
 
 		// Write the intersite routing information for each net
