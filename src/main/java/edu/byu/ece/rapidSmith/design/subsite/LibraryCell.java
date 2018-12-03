@@ -212,9 +212,13 @@ public abstract class LibraryCell implements Serializable {
 	 * Returns {@code true} if the cell is a LUT cell (LUT1, LUT2, etc.), {@code false} otherwise.
 	 */
 	abstract public boolean isLut();
-
+	/**
+	 * Returns {@code true} if the cell is a flip-flop cell (FDRE, FDSE, etc.), {@code false} otherwise.
+	 */
 	abstract public boolean isFlipFlop();
-
+	/**
+	 * Returns {@code true} if the cell is a latch cell (LDCE, LDPE, etc.), {@code false} otherwise.
+	 */
 	abstract public boolean isLatch();
 
 	/**

@@ -206,10 +206,16 @@ public class Cell {
 		return libCell.isLut();
 	}
 
+	/**
+	 * Returns true if this cell is a flip-flop cell.
+	 */
 	public boolean isFlipFlop() {
 		return libCell.isFlipFlop();
 	}
 
+	/**
+	 * Returns true if this cell is a latch cell.
+	 */
 	public boolean isLatch() {
 		return libCell.isLatch();
 	}
