@@ -20,6 +20,7 @@
 
 package edu.byu.ece.rapidSmith.design.subsite;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -287,7 +288,8 @@ public class LibraryMacro extends LibraryCell {
 	/**
 	 * Holds all necessary information to reconstruct an internal cell of a macro  
 	 */
-	private class InternalCell {
+	private class InternalCell implements Serializable{
+		private static final long serialVersionUID = 1079675840398922230L;
 		private final String name;
 		private final SimpleLibraryCell leafCell;
 		
@@ -309,7 +311,8 @@ public class LibraryMacro extends LibraryCell {
 	 * Holds all necessary information to reconstruct the internal nets of a macro
 	 * after the internal cells have been created. 
 	 */
-	private class InternalNet {
+	private class InternalNet implements Serializable {
+		private static final long serialVersionUID = 5784228467866262364L;
 		private final String name;
 		private final NetType type;
 		private final List<InternalPin> internalPins;
@@ -356,7 +359,8 @@ public class LibraryMacro extends LibraryCell {
 	/**
 	 *	Represents a pin on an internal macro cell.  
 	 */
-	private class InternalPin {
+	private class InternalPin implements Serializable {
+		private static final long serialVersionUID = 6937489115157346853L;
 		private final String cellName;
 		private final String pinName;
 		
