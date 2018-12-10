@@ -20,6 +20,7 @@
 
 package edu.byu.ece.rapidSmith.interfaces.vivado;
 
+import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,8 +30,9 @@ import java.util.regex.Pattern;
  * TODO: Provide an example XDC constraints file.
  *
  */
-public final class XdcConstraint {
+public final class XdcConstraint implements Serializable {
 
+	private static final long serialVersionUID = -257894222589253665L;
 	private final String command;
 	private final String options;
 	private final String comment;

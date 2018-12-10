@@ -19,6 +19,8 @@
  */
 package edu.byu.ece.rapidSmith.design.subsite;
 
+import java.io.Serializable;
+
 /**
  * Class that encapsulates all of the important information of a
  * library cell property. It is package private, and should not
@@ -26,8 +28,8 @@ package edu.byu.ece.rapidSmith.design.subsite;
  * 
  * TODO: How to handle read-only properties?
  */
-final class LibraryCellProperty {
-
+final class LibraryCellProperty implements Serializable {
+	private static final long serialVersionUID = 1726711718270864375L;
 	private final String name;
 	private final String type;
 	private final String[] possibleValues;
