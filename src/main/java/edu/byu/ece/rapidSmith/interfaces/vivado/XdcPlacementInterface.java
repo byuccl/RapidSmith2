@@ -353,7 +353,7 @@ public class XdcPlacementInterface {
 						fileout.write(String.format("set_property LOC %s [get_cells {%s}]\n", site.getName(), cellname));
 
 						chkout.write(String.format("  set loc [get_property LOC  [get_cells {%s}]]\n", cellname));
-						chkout.write(String.format("  if {$loc != \"%s\"} {\n", site.getName()));
+						chkout.write(String.format("  if {$loc != \"%s\" && $loc != [get_sites \"%s\"]} {\n", site.getName(), site.getName()));
 						chkout.write(String.format("    if {[string first {IOB} $loc] != 0} { puts \"ERROR: wrong LOC for  Cell %s, is {$loc} instead of {%s}\"\n",
 								cellname, site.getName()));
 						chkout.write(String.format("    } else { puts \"WARNING: IOB LOC mismatch for Cell %s, is {$loc} instead of {%s}\" }\n",
