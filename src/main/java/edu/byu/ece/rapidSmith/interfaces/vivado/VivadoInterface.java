@@ -50,10 +50,10 @@ public final class VivadoInterface {
 
 	private static final String CELL_LIBRARY_NAME = "cellLibrary.xml";
 	
-	public static VivadoCheckpoint loadRSCP(String rscp) throws IOException {
+ 	public static VivadoCheckpoint loadRSCP(String rscp) throws IOException {
 		return loadRSCP(rscp, false);
 	}
-	
+
 	/**
 	 * Parses a RSCP generated from Tincr, and creates an equivalent RapidSmith2 design.
 	 * 
@@ -90,6 +90,8 @@ public final class VivadoInterface {
 				.resolve(CELL_LIBRARY_NAME));
 		
 		// add additional macro cell specifications to the cell library before parsing the EDIF netlist
+		// Usually these are in macros.xml but there may be technology-specific cases where others may be needed
+		//
 		libCells.loadMacroXML(rscpPath.resolve("macros.xml"));
 		
 		// create the RS2 netlist
@@ -121,6 +123,56 @@ public final class VivadoInterface {
 		
 		return vivadoCheckpoint;
 	}
+	/**
+	 * Parses a RSCP generated from Tincr, and creates an equivalent RapidSmith2 design.
+	 *
+	 * @param tcp Path to the RSCP to import
+	 * @throws InvalidEdifNameException
+	 * @throws EdifNameConflictException
+	 */
+	public static VivadoCheckpoint loadTCPLogic(String tcp) throws IOException {
+
+		Path tcpPath = Paths.get(tcp);
+
+		if (!tcpPath.getFileName().toString().endsWith(".tcp")) {
+			throw new AssertionError("Specified directory is not a TCP. The directory should end in \".tcp\"");
+		}
+
+		// load the device
+		DesignInfoInterface designInfo = new DesignInfoInterface();
+		designInfo.parse(tcpPath);
+		String partName = designInfo.getPart();
+		ImplementationMode mode = designInfo.getMode();
+		if (partName == null) {
+			throw new Exceptions.ParseException("Part name for the design not found in the design.info file!");
+		}
+
+		Device device = RSEnvironment.defaultEnv().getDevice(partName);
+
+		if (device == null) {
+			throw new Exceptions.EnvironmentException("Device files for part: " + partName + " cannot be found.");
+		}
+
+		// load the cell library
+		CellLibrary libCells = new CellLibrary(RSEnvironment.defaultEnv()
+				.getPartFolderPath(partName)
+				.resolve(CELL_LIBRARY_NAME));
+
+		// create the RS2 netlist
+		String edifFile = tcpPath.resolve("netlist.edf").toString();
+		CellDesign design = EdifInterface.parseEdif(edifFile, libCells);
+		design.setImplementationMode(mode);
+
+		// parse the constraints into RapidSmith
+		String constraintsFile = tcpPath.resolve("constraints.xdc").toString();
+		XdcConstraintsInterface constraintsInterface = new XdcConstraintsInterface(design, device);
+		constraintsInterface.parseConstraintsXDC(constraintsFile);
+
+		VivadoCheckpoint vivadoCheckpoint = new VivadoCheckpoint(partName, design, device, libCells);
+
+
+		return vivadoCheckpoint;
+	}
 
 
 	/**
@@ -129,20 +181,26 @@ public final class VivadoInterface {
 	 * @param design
 	 */
 	public static void deleteSinklessNets(CellDesign design) {
+/*
 		// Let's not output nets with no loads to avoid downstream warnings by Vivado
 		Collection<CellNet> netsToDelete = new ArrayList<CellNet>();
 		for (CellNet n : design.getNets()) {
 			if (n.getSinkPins().size() == 0) {
-				System.out.println("INFO: net " + n.getName() + " has no sinks deleting");
+				//System.out.println("INFO: net " + n.getName() + " has no sinks deleting");
 				netsToDelete.add(n);
 			}
 		}
 		for (CellNet n : netsToDelete) {
 			if (n.getPins().size() != 1)
 				System.err.println("ERROR in deleteSinklessNets(): trying to disconnect net: " + n.getName());
-			n.disconnectFromPin(n.getSourcePin());
-			design.removeNet(n);
+			// Cannot disconnect internal pins of macros - not doing so here is OK since
+			// all we are trying to do is minimize Vivado import warnings
+			if (!n.getSourcePin().isInternal()) {
+				n.disconnectFromPin(n.getSourcePin());
+				design.removeNet(n);
+			}
 		}
+*/
 	}
 
 	/**
@@ -156,6 +214,7 @@ public final class VivadoInterface {
 	 */
 	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells) throws IOException {
 
+		//BEN - this is avoid so many warnings on import
 		deleteSinklessNets(design);
 
 		new File(tcpDirectory).mkdir();
