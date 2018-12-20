@@ -492,6 +492,7 @@ public class PinMapping {
 			System.err.println("findPinMapingForCell(): Cannot find pinmapping for cell: " + cell + " being placed on: " + bel);
 			System.err.println("  Hash is: " + hash);
 			System.err.println("  You may want to consider running CreateDynamicPinMappings for a placed version of your RSCP checkpoint...");
+			System.err.println("      as in: java edu.byu.ece.rapidSmith.examples.CreateDynamicPinMappings myDesign.rscp");
 			return null;
 		}
 		return pm;
