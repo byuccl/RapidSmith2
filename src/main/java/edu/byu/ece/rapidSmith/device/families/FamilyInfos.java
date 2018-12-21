@@ -33,11 +33,17 @@ public class FamilyInfos {
 
     private static final FamilyInfo EMPTY_FAMILYINFO = new EmptyFamilyInfo();
 
+    private static final HashSet<FamilyType> _SERIES7_FAMILIES = new HashSet<>();
+    private static final HashSet<FamilyType> _ULTRASCALE_FAMILIES = new HashSet<>();
+
     static {
         familyInfoMap.put(Virtex6.FAMILY_TYPE, new Virtex6());
         familyInfoMap.put(Artix7.FAMILY_TYPE, new Artix7());
         familyInfoMap.put(Kintexu.FAMILY_TYPE, new Kintexu());
         familyInfoMap.put(Zynq.FAMILY_TYPE, new Zynq());
+        _SERIES7_FAMILIES.add(Artix7.FAMILY_TYPE);
+        _SERIES7_FAMILIES.add(Zynq.FAMILY_TYPE);
+        _ULTRASCALE_FAMILIES.add(Kintexu.FAMILY_TYPE);
     }
 
     public static FamilyInfo get(FamilyType family) {
@@ -47,6 +53,11 @@ public class FamilyInfos {
     public static Set<FamilyType> supportedFamilies() {
         return Collections.unmodifiableSet(familyInfoMap.keySet());
     }
+
+    public static final Set<FamilyType> SERIES7_FAMILIES = Collections.unmodifiableSet(_SERIES7_FAMILIES);
+
+    public static final Set<FamilyType> ULTRASCALE_FAMILIES = Collections.unmodifiableSet(_ULTRASCALE_FAMILIES);
+
 
     private static final class EmptyFamilyInfo implements FamilyInfo {
 

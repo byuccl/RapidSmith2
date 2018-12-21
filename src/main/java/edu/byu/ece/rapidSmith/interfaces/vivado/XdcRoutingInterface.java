@@ -19,36 +19,16 @@
  */
 package edu.byu.ece.rapidSmith.interfaces.vivado;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.LineNumberReader;
+import edu.byu.ece.rapidSmith.design.subsite.*;
+import edu.byu.ece.rapidSmith.device.*;
+import edu.byu.ece.rapidSmith.device.families.FamilyInfo;
+import edu.byu.ece.rapidSmith.device.families.FamilyInfos;
+
+import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import edu.byu.ece.rapidSmith.design.subsite.BelRoutethrough;
-import edu.byu.ece.rapidSmith.design.subsite.Cell;
-import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.design.subsite.CellNet;
-import edu.byu.ece.rapidSmith.design.subsite.CellPin;
-import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
-import edu.byu.ece.rapidSmith.device.Connection;
-import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
-import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.Bel;
-import edu.byu.ece.rapidSmith.device.SitePin;
-import edu.byu.ece.rapidSmith.device.SiteType;
-import edu.byu.ece.rapidSmith.device.SiteWire;
-import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.Site;
-import edu.byu.ece.rapidSmith.device.Tile;
-import edu.byu.ece.rapidSmith.device.TileWire;
-import edu.byu.ece.rapidSmith.device.Wire;
-import edu.byu.ece.rapidSmith.device.WireEnumerator;
 
 import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
 
@@ -491,7 +471,7 @@ public class XdcRoutingInterface {
 		}
 		else if (net.isStaticNet()) {
 			// implicit intrasite net. An Example is a GND/VCC net going to the A6 pin of a LUT.
-			// I does not actually show the bel pin as used, but it is being used.
+			// It does not actually show the bel pin as used, but it is being used.
 			// another example is the A1 pin on a SRL cell
 			//assert(net.isStaticNet()) : "Only static nets should connect to floating site pins: " + net.getName() + " " + sinkSitePin;
 			createStaticNetImplicitSinks(sinkSitePin, net);
@@ -1088,6 +1068,72 @@ public class XdcRoutingInterface {
 		
 		return wireEnum;
 	}
+
+	/**
+	 * Writes the intrasite routing TCL commands for the design to the routing.xdc file.
+	 * For now, only support slices. Other site types don't have much flexibility in routing.
+	 * Additionally, trying to set the intrasite routing of IOB sites (IOB33, IOB33S, IOB33M) causes Vivado to crash.
+	 *
+	 * @param design Design with nets to export
+	 * @param fileout BufferedWriter for the routing.xdc file
+	 * @throws IOException if the file can't be written to
+	 */
+	private void writeIntrasiteRouting(CellDesign design, BufferedWriter fileout) throws IOException {
+		FamilyInfo familyInfo = FamilyInfos.get(device.getFamily());
+
+		for (Site site : design.getUsedSites()) {
+			if (!familyInfo.sliceSites().contains(site.getType()))
+				continue;
+
+			// Get all site PIP values for the site (excluding polarity selectors)
+			Map<String, String> pipInfo = design.getPIPInputValsAtSite(site);
+
+			if (pipInfo == null || pipInfo.isEmpty())
+				continue;
+
+			fileout.write(String.format("set_property MANUAL_ROUTING %s [get_sites {%s}]\n", site.getType().name(), site.getName()));
+
+			// Build up the SITE_PIPS property for the site
+			StringBuilder sitePips = new StringBuilder();
+			for (Map.Entry<String, String> entry : pipInfo.entrySet()) {
+				sitePips.append(entry.getKey()).append(":").append(entry.getValue()).append(" ");
+			}
+
+			// Handle polarity selectors.
+			if (FamilyInfos.SERIES7_FAMILIES.contains(device.getFamily())) {
+				// For series 7 devices, we must obtain the value of the CLKINV polarity selector
+				Cell ffLatchCell = design.getCellsAtSite(site).stream()
+						.filter(cell -> cell.isFlipFlop() || cell.isLatch())
+						.findAny().orElse(null);
+
+				if (ffLatchCell != null) {
+					Property clkInvProperty = ffLatchCell.getProperties().get("IS_C_INVERTED");
+					String clkInvValue = (clkInvProperty == null) ? "1'b0" : clkInvProperty.getStringValue();
+
+					// For series 7, polarity selectors have two inputs and so the appropriate value must be
+					// included in the SITE_PIPS property.
+					if (clkInvValue.equals("1'b1"))
+						sitePips.append("CLKINV:CLK_B");
+					else
+						sitePips.append("CLKINV:CLK");
+				}
+			}
+			else if (FamilyInfos.ULTRASCALE_FAMILIES.contains(device.getFamily())) {
+				// In Ultrascale, polarity selectors only have a single input and are always configured the same in
+				// the SITE_PIPS property. Still, if a polarity selector is used, it must be included in the SITE_PIPS property.
+				// For simplicity, we set all polarity selectors for Ultrascale to their only possible values.
+				if (site.getType().equals(SiteType.valueOf(device.getFamily(), "SLICEM")))
+					sitePips.append("LCLKINV:CLK ");
+				sitePips.append("CLK1INV:CLK ");
+				sitePips.append("CLK2INV:CLK ");
+				sitePips.append("RST_ABCDINV:RST ");
+				sitePips.append("RST_EFGHINV:RST");
+			}
+
+			// Write used site PIPs (intrasite routing information)
+			fileout.write(String.format("set_property SITE_PIPS {%s} [get_sites {%s}]\n", sitePips.toString(), site.getName()));
+		}
+	}
 	
 	/**
 	 * Creates a routing.xdc file from the nets of the given design. <br>
@@ -1095,17 +1141,22 @@ public class XdcRoutingInterface {
 	 * 
 	 * @param xdcOut Location to write the routing.xdc file
 	 * @param design Design with nets to export
+	 * @param intrasiteRouting Whether to export commands to manually set the intrasite routing in Vivado
 	 * @throws IOException if the file {@code xdcOut} could not be opened
 	 */
-	public void writeRoutingXDC(String xdcOut, CellDesign design) throws IOException {
-		
+	public void writeRoutingXDC(String xdcOut, CellDesign design, boolean intrasiteRouting) throws IOException {
 		BufferedWriter fileout = new BufferedWriter (new FileWriter(xdcOut));
-		
-		//write the routing information to the TCL script
+
+		if (intrasiteRouting) {
+			// Write the intrasite routing commands for the design
+			writeIntrasiteRouting(design, fileout);
+		}
+
+		// Write the intersite routing information for each net
 		for(CellNet net : design.getNets()) {
 
 			// only print nets that have routing information. Grab the first RouteTree of the net and use this as the final route
-			if ( net.getIntersiteRouteTree() != null ) {
+			if (net.getIntersiteRouteTree() != null ) {
 				fileout.write(String.format("set_property ROUTE %s [get_nets {%s}]\n", getVivadoRouteString(net), net.getName()));
 			}
 		}
