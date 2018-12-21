@@ -41,10 +41,10 @@ proc compile {top} {
     synth_design -top $top -flatten_hierarchy full 
     
 #    puts "Placing Design..."
-#    place_design
+    place_design
     
     puts "Routing Design..."
-#    route_design
+    route_design
 
     #	remove files
 #    file delete {*}[glob *.log]
@@ -55,7 +55,7 @@ proc compile {top} {
     puts "Writing rscp"
     tincr::write_rscp $top
     puts "All done..."
-    close_project
+#    close_project
 
     }
 
@@ -99,3 +99,66 @@ proc generate_cell_distribution_dictionary { } {
     
     return $cell_dictionary
 }	
+
+proc prepPacked {top} {
+    puts "Closing any designs that are currently open..."
+    puts ""
+
+    close_project -quiet
+
+    puts "Continuing..."
+    link_design -part xc7a100t-csg324-3
+    
+    if {[glob -nocomplain $top/*.sv] != ""} {
+	puts "Reading SV files..."
+	read_verilog -sv [glob $top/*.sv]
+    }
+    if {[glob -nocomplain $top/*.v] != ""} {
+	puts "Reading Verilog files..."
+	read_verilog  [glob $top/*.v]
+    }
+    if {[glob -nocomplain $top/*.vhd] != ""} {
+	puts "Reading VHDL files..."
+	read_vhdl [glob $top/*.vhd]
+    }
+
+    puts "Synthesizing design..."
+    synth_design -top $top -flatten_hierarchy full 
+    
+    puts "Writing checkpoint"
+    write_checkpoint -force $top.dcp
+    puts "Writing rscp"
+    tincr::write_rscp $top
+    puts "All done..."
+  }
+
+proc fixPorts { } {
+    foreach port [get_ports] {
+        set package_pin [get_property PACKAGE_PIN $port]
+        set io_standard [get_property IOSTANDARD $port]
+        set_property -dict "PACKAGE_PIN $package_pin IOSTANDARD $io_standard" $port
+    }
+}
+
+proc doPacked { des } {
+    close_project -quiet
+    tincr::read_tcp -verbose "${des}.tcp"
+    fixPorts
+    set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets clk_IBUF]
+    route_design
+    write_checkpoint -force "${des}_packed.dcp"
+    close_project
+    open_checkpoint "${des}_packed.dcp"
+    write_bitstream -force "${des}_packed.bit"
+}
+
+proc loadPacked { des } {
+    close_project -quiet
+    tincr::read_tcp -verbose "${des}.tcp"
+#    fixPorts
+#    route_design
+#    write_checkpoint -force "${des}_packed.dcp"
+#    close_project
+#    open_checkpoint "${des}_packed.dcp"
+#    write_bitstream -force "${des}_packed.bit"
+}

@@ -24,3 +24,11 @@
 /doc/*.toc
 /doc/*.log
 /doc/*.synctex.gz
+/exampleVivadoDesigns/*.rscp
+/exampleVivadoDesigns/*.tcp
+/exampleVivadoDesigns/*.edf
+exampleVivadoDesigns/*.jou
+exampleVivadoDesigns/*.log
+exampleVivadoDesigns/*.html
+
+
