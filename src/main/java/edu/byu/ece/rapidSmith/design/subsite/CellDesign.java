@@ -71,7 +71,8 @@ public class CellDesign extends AbstractDesign {
 	private Map<Site, Map<String, String>> pipInValues;
 
 	// TODO: Should be un-modifiable?
-	private Set<Wire> reservedWires;
+	//rivate Set<Wire> reservedWires;
+	private Map<Wire, CellNet> reservedWires;
 
 	// TODO: Re-think these three
 	/**Map of out-of-context ports to their ooc tile and node **/
@@ -111,7 +112,8 @@ public class CellDesign extends AbstractDesign {
 		usedSitePipsMap = new HashMap<>();
 		mode = ImplementationMode.REGULAR;
 		pipInValues = new HashMap<>();
-		reservedWires = new HashSet<>();
+		//reservedWires = new HashSet<>();
+		reservedWires = new HashMap<>();
 	}
 
 	/**
@@ -966,19 +968,24 @@ public class CellDesign extends AbstractDesign {
 		this.staticRoutemap = staticRoutemap;
 	}
 
-	public Set<Wire> getReservedWires() {
+	public Map<Wire, CellNet> getReservedWires() {
 		return reservedWires;
 	}
 
-	public void addReservedWire(Wire reservedWire) {
-		reservedWires.add(reservedWire);
+	public void addReservedWire(Wire reservedWire, CellNet net) {
+		// TODO: This isn't good enough. Need to make a method that reserves an entire node - start wire, end wire,
+		// and wires that branch off, etc. ex: INT_R_X39Y15/SS2END_N0_3
+
+		reservedWires.put(reservedWire, net);
+		//reservedWires.add(reservedWire);
 	}
 
 	public boolean isWireReserved(Wire wire) {
-		return reservedWires.contains(wire);
+		return reservedWires.containsKey(wire);
+		//return reservedWires.contains(wire);
 	}
 
-	public void setReservedWires(Set<Wire> reservedWires) {
+	public void setReservedWires(Map<Wire, CellNet> reservedWires) {
 		this.reservedWires = reservedWires;
 	}
 }

@@ -93,7 +93,7 @@ public class UsedStaticResources {
 	
 				switch (toks[0]) {
 					case "USED_PIPS" : 
-						processUsedPips(toks);
+						//processUsedPips(toks);
 						break;
 					case "STATIC_RT" :
 						// FIXME: Everything doesn't really need to be split by whitespace for processStaticRoutes.
@@ -222,8 +222,10 @@ public class UsedStaticResources {
 		}
 		assert (partPinWire != null);
 
-		// Add the partition pin node to the list of reserved wires
-		design.addReservedWire(partPinWire);
+		// Add the partition pin node to the list of reserved wires (so a router knows it can't be used)
+	//	if (design.getNet(portName) == null)
+		//	System.out.println("AHDH1");
+		design.addReservedWire(partPinWire, design.getNet(portName));
 		//reservedWires.add(partPinWire);
 		String direction = toks[3];
 
@@ -376,12 +378,20 @@ public class UsedStaticResources {
 				String sink = m.group(4);
 
 				Tile tile = device.getTile(tileName);
+
+				if (tile == null)
+					System.out.println("stop");
+
 				Wire startWire = new TileWire(tile, wireEnumerator.getWireEnum(source));
 				Wire sinkWire = new TileWire(tile, wireEnumerator.getWireEnum(sink));
 
 				// Mark both the startWire and sinkWire as being reserved.
-				design.addReservedWire(startWire);
-				design.addReservedWire(sinkWire);
+
+				//design.addReservedWire(startWire);
+				//design.addReservedWire(sinkWire);
+
+
+
 				//reservedWires.add(startWire);
 				//reservedWires.add(sinkWire);
 		
@@ -429,7 +439,10 @@ public class UsedStaticResources {
 					Wire tileWire = new TileWire(tile, wireEnum);
 
 					// Set the tile wire as used so routers know to not use it
-					design.addReservedWire(tileWire);
+					// TODO: Add all port names (net names)
+			//		if (design.getNet(portNames.get(0)) == null)
+			//			System.out.println("AHDH");
+					design.addReservedWire(tileWire, design.getNet(portNames.get(0)));
 					//reservedWires.add(tileWire);
 				}
 			}
