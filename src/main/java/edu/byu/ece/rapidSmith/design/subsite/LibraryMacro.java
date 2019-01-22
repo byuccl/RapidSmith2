@@ -20,16 +20,13 @@
 
 package edu.byu.ece.rapidSmith.design.subsite;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.device.BelId;
+import edu.byu.ece.rapidSmith.device.SiteType;
 
 /**
  * Represents a primitive MACRO cell from Vivado cell library. A macro library 
@@ -42,16 +39,40 @@ public class LibraryMacro extends LibraryCell {
 
 	private Map<LibraryPin, List<InternalPin>> pinMap;
 	private Map<String, String> internalToExternalPinMap;	
-	private List<InternalCell> internalCells;
+	//private List<InternalCell> internalCells;
+	private Map<String, InternalCell> internalCells;
 	private List<InternalNet> internalNets;
 	private Map<String, Integer> pinOffsetMap;
 	private static Pattern pinNamePattern;
+	private static Pattern lutramPattern;
+
+
+	// LUTRAM cells are different for different series...
+	private final List<String> LUTRAM_MACROS = Arrays.asList("RAM128X1D", "RAM128X1S", "RAM256X1D", "RAM256X1S", "RAM32M", "RAM32M16", "RAM32X1D", "RAM32X1S", "RAM32X1S_1", "RAM32X2S", "RAM512X1S", "RAM64M", "RAM64M8", "RAM64X1D", "RAM64X1S", "RAM64X1S_1");
+
+	@Override
+	public boolean isLutRamMacro() {
+		Matcher m = lutramPattern.matcher(this.getName());
+		return m.matches();
+	}
+
+	public Map<SiteType, RPM> getRpmsMap() {
+		return rpmsMap;
+	}
+
+	public void setRpmsMap(Map<SiteType, RPM> rpmsMap) {
+		this.rpmsMap = rpmsMap;
+	}
+
+	private Map<SiteType, RPM> rpmsMap; // temp map
 	
 	static 
 	{
 		pinNamePattern = Pattern.compile("(.+)/([^/]+)$");
+		lutramPattern = Pattern.compile("RAM[^B].*");
 	}
-	
+
+
 	
 	/**
 	 * Creates a new library macro
@@ -62,7 +83,8 @@ public class LibraryMacro extends LibraryCell {
 		super(name);
 		pinMap = new HashMap<>();
 		internalToExternalPinMap = new HashMap<>();
-		internalCells = new ArrayList<>();
+		internalCells = new HashMap<>();
+		rpmsMap = new HashMap<>();
 	}
 
 	@Override
@@ -156,9 +178,40 @@ public class LibraryMacro extends LibraryCell {
 	 * @param libCell Internal cell type 
 	 */
 	void addInternalCell(String name, SimpleLibraryCell libCell) {
-		this.internalCells.add(new InternalCell(name, libCell));
+		this.internalCells.put(name, new InternalCell(name, libCell));
+		//this.internalCells.add(new InternalCell(name, libCell));
 	}
-	
+
+	public InternalCell getInternalCell(String name) {
+		return this.internalCells.get(name);
+	}
+
+	/**
+	 * Adds a new {@link InternalCell} to the library macro.
+	 *
+	 * @param name Relative name of the internal cell
+	 * @param libCell Internal cell type
+	 */
+	void addInternalCell(String name, SimpleLibraryCell libCell, List<BelId> compatibleBels) {
+		this.internalCells.put(name, new InternalCell(name, libCell, compatibleBels, "X0Y0"));
+		//this.internalCells.add(new InternalCell(name, libCell, compatibleBels));
+	}
+
+
+	void addRpmCellEntry(SiteType siteType, String internalCellName, BelId belId, String rloc) {
+
+		RPM rpm = rpmsMap.get(siteType);
+
+		if (rpm == null) {
+			rpm = new RPM(siteType);
+			rpmsMap.put(siteType, rpm);
+		}
+
+		rpm.addCellEntry(internalCells.get(internalCellName), belId, rloc);
+;
+	}
+
+
 	/**
 	 * Adds a new {@link InternalNet} to the library macro.
 	 * 
@@ -192,6 +245,27 @@ public class LibraryMacro extends LibraryCell {
 		
 		return macroCell.getPin(internalToExternalPinMap.get(relativePinName));		
 	}
+
+	// Assumes LUTRAM
+	private void addInternalCellToLutRamRPM(InternalCell internalCell, Cell cell, String parentName) {
+		// 1. Add the BEL constraint to the netlist. Internal cells BEL constraints cannot change and need to be in place
+		// to ensure Vivado can place the macro (at least in the case of LUT RAMs)
+
+
+		//Get site type to RPM map
+		// There is only one site type a LUT RAM can be placed on, so grab the first one
+		RPM rpm = rpmsMap.values().iterator().next();
+		//RPM rpm = rpmsMap.get(SiteType.valueOf())
+		BelIdRlocPair belIdRlocPair = rpm.getCellToBelRlocMap().get(internalCell);
+
+		// Add a U_SET property for the internal cell
+		cell.getProperties().update("U_SET", PropertyType.EDIF, parentName);
+
+		cell.getProperties().update("BEL", PropertyType.EDIF, belIdRlocPair.getBelId().getName());
+
+		// Set the RLOC property
+		cell.getProperties().update("RLOC", PropertyType.EDIF, belIdRlocPair.getRloc());
+	}
 	
 	/**
 	 * Creates the internal cells of a macro cell instance. This function is package private
@@ -201,16 +275,20 @@ public class LibraryMacro extends LibraryCell {
 	 * @return A map containing the constructed cells
 	 */
 	Map<String, Cell> constructInternalCells(Cell parent) {
-		
 		Map<String, Cell> internalCellMap = new HashMap<>();
 		
 		String parentName = parent.getName();
 		
-		for (InternalCell internalCell : internalCells) {
+		for (InternalCell internalCell : internalCells.values()) {
 			String fullCellName = parentName + "/" + internalCell.getName();
 			Cell cell = new Cell(fullCellName, internalCell.getLeafCell());
 			cell.setParent(parent);
 			internalCellMap.put(fullCellName, cell);
+
+			if (parent.getLibCell().isLutRamMacro()) {
+				addInternalCellToLutRamRPM(internalCell, cell, parentName);
+			}
+
 		}
 		
 		return internalCellMap;	
@@ -301,18 +379,41 @@ public class LibraryMacro extends LibraryCell {
 	private class InternalCell {
 		private final String name;
 		private final SimpleLibraryCell leafCell;
+		/** List of types of BELs cells of this type can be placed on */
+		private List<BelId> compatibleBels;
+
+		/** A map from the bel type a macro is placed on to the rloc and bel id for the internal cell*/
+		//private macroToRlocMap
+
+		/** The RLOC (relative location) of the internal cell in the form of "X0Y0" */
+		private String rloc;
 		
 		public InternalCell(String name, SimpleLibraryCell cell) {
 			this.name = name;
 			this.leafCell = cell;
 		}
-		
+
+		public InternalCell(String name, SimpleLibraryCell cell, List<BelId> compatibleBels, String rloc) {
+			this.name = name;
+			this.leafCell = cell;
+			this.compatibleBels = compatibleBels;
+			this.rloc = rloc;
+		}
+
 		public String getName(){
 			return name;
 		}
 		
 		public LibraryCell getLeafCell() {
 			return leafCell;
+		}
+
+		public List<BelId> getCompatibleBels() {
+			return compatibleBels;
+		}
+
+		public String getRloc() {
+			return rloc;
 		}
 	}
 	
@@ -384,4 +485,46 @@ public class LibraryMacro extends LibraryCell {
 			return pinName;
 		}
 	}
+
+	private class BelIdRlocPair {
+		// TODO: Final or no?
+		private final BelId belId;
+		private final String rloc;
+
+		public BelIdRlocPair(BelId belId, String rloc) {
+			this.belId = belId;
+			this.rloc = rloc;
+		}
+
+		public BelId getBelId() {
+			return belId;
+		}
+
+		public String getRloc() {
+			return rloc;
+		}
+
+	}
+
+	private class RPM {
+		/** The site type the whole macro is placed on for this RPM **/
+		private SiteType siteType;
+
+		public Map<InternalCell, BelIdRlocPair> getCellToBelRlocMap() {
+			return cellToBelRlocMap;
+		}
+
+		private Map<InternalCell, BelIdRlocPair> cellToBelRlocMap;
+
+		public RPM(SiteType siteType) {
+			this.siteType = siteType;
+			this.cellToBelRlocMap = new HashMap<>();
+		}
+
+		public void addCellEntry(InternalCell internalCell, BelId belId, String rloc) {
+			cellToBelRlocMap.put(internalCell, new BelIdRlocPair(belId, rloc));
+		}
+
+	}
+
 }

@@ -140,7 +140,7 @@ public abstract class LibraryCell implements Serializable {
 		if (defaultProperties == null) {
 			return null;
 		}
-		
+
 		Property prop = defaultProperties.get(propertyName);
 		return prop == null ? null : prop.getStringValue();
 	}
@@ -220,6 +220,8 @@ public abstract class LibraryCell implements Serializable {
 	 * Returns {@code true} if the cell is a latch cell (LDCE, LDPE, etc.), {@code false} otherwise.
 	 */
 	abstract public boolean isLatch();
+
+	abstract public boolean isLutRamMacro();
 
 	/**
 	 * Returns {@code true} if the cell represents a top-level port cell.

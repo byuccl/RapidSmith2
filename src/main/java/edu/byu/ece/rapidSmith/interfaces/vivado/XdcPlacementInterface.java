@@ -26,10 +26,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -373,9 +370,6 @@ public class XdcPlacementInterface {
 	 */
 	private Stream<Cell> sortCellsForXdcExport(CellDesign design) {
 		
-		design.getDevice().getAllSitesOfType(SiteType.valueOf(design.getFamily(), "SLICEL"));
-		
-		
 		// cell bins
 		ArrayList<Cell> sorted = new ArrayList<>(design.getCells().size());		
 		ArrayList<Cell> lutCellsH5 = new ArrayList<>();
@@ -391,7 +385,9 @@ public class XdcPlacementInterface {
 
 		// traverse the cells and drop them in the correct bin
 		Iterator<Cell> cellIt = design.getLeafCells().iterator();
-		
+		Iterator<Cell> cellIt2 = design.getCells().iterator();
+		Collection<Cell> cells = design.getCells();
+
 		while (cellIt.hasNext()) {
 			Cell cell = cellIt.next();
 			
@@ -445,10 +441,10 @@ public class XdcPlacementInterface {
 		// append all other cells in the correct order
 		return Stream.of(sorted.stream(),
 				lutCellsH5.stream(),
-				lutCellsD5.stream(), 
-				lutCellsABC5.stream(), 
 				lutCellsH6.stream(),
-				lutCellsD6.stream(), 
+				lutCellsD5.stream(),
+				lutCellsD6.stream(),
+				lutCellsABC5.stream(),
 				lutCellsABC6.stream(), 
 				ffCells.stream(), 
 				carryCells.stream(),

@@ -268,6 +268,7 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		LibraryMacro macroCell = new LibraryMacro(type);
 
 		loadInternalCellsFromXml(macroEl, macroCell);
+		loadRpmsFromXml(macroEl, macroCell);
 		loadPinsFromXml(macroEl, macroCell);
 		loadInternalNetsFromXml(macroEl, macroCell);
 		add(macroCell);
@@ -311,7 +312,36 @@ public class CellLibrary implements Iterable<LibraryCell> {
 		}
 		libCell.setLibraryPins(pins);
 	}
-	
+
+
+	private void loadRpmsFromXml(Element macroEl, LibraryMacro macroCell) {
+		Element rpmsEl = macroEl.getChild("rpms");
+
+		for (Element rpmEl : rpmsEl.getChildren("rpm")) {
+			SiteType macroSiteType = SiteType.valueOf(familyType, rpmEl.getChildText("type"));
+
+			// TODO: Maybe add a <cells> part to the xml
+
+			for (Element internalEl : rpmEl.getChildren("internal")) {
+
+				// TODO: Throw an error if the internal cell is not found
+				String internalCellName = internalEl.getChildText("name");
+
+
+				Element belEl = internalEl.getChild("bel");
+				Element id = belEl.getChild("id");
+				String site_type = id.getChildText("site_type");
+				BelId belId = new BelId(
+						SiteType.valueOf(familyType, site_type),
+						id.getChildText("name")
+				);
+
+				String rloc = internalEl.getChildText("rloc");
+				macroCell.addRpmCellEntry(macroSiteType, internalCellName, belId, rloc);
+			}
+		}
+	}
+
 	private void loadInternalCellsFromXml(Element macroEl, LibraryMacro macroCell) {
 		
 		Element cellsEl = macroEl.getChild("cells");
@@ -326,7 +356,7 @@ public class CellLibrary implements Iterable<LibraryCell> {
 			else if (libCell.isMacro()) {
 				throw new Exceptions.ParseException("Nested hierarchy is not supported. Cell: \"" + macroEl.getChildText("type") + "\"");
 			}
-			
+
 			macroCell.addInternalCell(internalEl.getChildText("name"), (SimpleLibraryCell)libCell);
 		}
 	}

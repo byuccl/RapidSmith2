@@ -118,6 +118,11 @@ public class SimpleLibraryCell extends LibraryCell {
 		return FLIP_FLOP_CELLS.contains(this.getName());
 	}
 
+	@Override
+	public boolean isLutRamMacro() {
+		return false;
+	}
+
 	/**
 	 * Returns {@code true} if the library cell is a latch (LDCE, LDPE, etc.), {@code false} otherwise.
 	 */
