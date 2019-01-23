@@ -319,15 +319,8 @@ public class CellLibrary implements Iterable<LibraryCell> {
 
 		for (Element rpmEl : rpmsEl.getChildren("rpm")) {
 			SiteType macroSiteType = SiteType.valueOf(familyType, rpmEl.getChildText("type"));
-
-			// TODO: Maybe add a <cells> part to the xml
-
 			for (Element internalEl : rpmEl.getChildren("internal")) {
-
-				// TODO: Throw an error if the internal cell is not found
 				String internalCellName = internalEl.getChildText("name");
-
-
 				Element belEl = internalEl.getChild("bel");
 				Element id = belEl.getChild("id");
 				String site_type = id.getChildText("site_type");
@@ -335,7 +328,6 @@ public class CellLibrary implements Iterable<LibraryCell> {
 						SiteType.valueOf(familyType, site_type),
 						id.getChildText("name")
 				);
-
 				String rloc = internalEl.getChildText("rloc");
 				macroCell.addRpmCellEntry(macroSiteType, internalCellName, belId, rloc);
 			}
