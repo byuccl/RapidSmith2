@@ -127,6 +127,14 @@ public class SimpleLibraryCell extends LibraryCell {
 	}
 
 	/**
+	 * Returns {@code true} if the cell is a LUT RAM macro cell, {@code false} otherwise.
+	 */
+	@Override
+	public boolean isLutRamMacro() {
+		return false;
+	}
+
+	/**
 	 * Returns {@code true} if the library cell is a LUT (LUT1, LUT2, etc.), {@code false} otherwise.
 	 */
 	@Override

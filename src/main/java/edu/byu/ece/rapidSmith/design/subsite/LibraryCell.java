@@ -220,7 +220,10 @@ public abstract class LibraryCell implements Serializable {
 	 * Returns {@code true} if the cell is a latch cell (LDCE, LDPE, etc.), {@code false} otherwise.
 	 */
 	abstract public boolean isLatch();
-
+	/**
+	 * Returns {@code true} if the cell is a LUT RAM macro cell, {@code false} otherwise.
+	 */
+	abstract public boolean isLutRamMacro();
 	/**
 	 * Returns {@code true} if the cell represents a top-level port cell.
 	 */
