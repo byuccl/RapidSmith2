@@ -36,7 +36,7 @@ import java.nio.file.Paths;
  * necessary for RapidSmith to operate.   
  * @author Chris Lavin
  */
-public class Installer {
+public class DeviceInstaller {
 	public static final String nl = System.getProperty("line.separator");
 	public static final String disclaimer =
 		"This material is based upon work supported by the National" + nl + 
@@ -46,7 +46,7 @@ public class Installer {
 		"reflect the views of the National Science Foundation.";
 	
 	public static void main(String[] args){
-		MessageGenerator.printHeader("RapidSmith Release " + Device.rapidSmithVersion + " - Installer");
+		MessageGenerator.printHeader("RapidSmith Release " + Device.rapidSmithVersion + " - DeviceInstaller");
 
 		ArgumentParser parser = buildArgParser();
 
@@ -122,11 +122,11 @@ public class Installer {
 		}
 		System.out.println("END: " + FileTools.getTimeString());
 		System.out.println("Time Elapsed: " + (System.currentTimeMillis() - timeStart)/60000.0 + " minutes");
-		MessageGenerator.printHeader("Installer Completed Successfully!");
+		MessageGenerator.printHeader("DeviceInstaller Completed Successfully!");
 	}
 
 	private static ArgumentParser buildArgParser() {
-		ArgumentParser parser = ArgumentParsers.newArgumentParser("RapidSmith Installer")
+		ArgumentParser parser = ArgumentParsers.newArgumentParser("RapidSmith DeviceInstaller")
 				.defaultHelp(true)
 				.description("Adds support to RapidSmith for a device.");
 		parser.addArgument("--generate")
