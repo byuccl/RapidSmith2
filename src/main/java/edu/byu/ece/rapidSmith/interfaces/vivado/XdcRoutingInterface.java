@@ -422,7 +422,7 @@ public class XdcRoutingInterface {
 		// remove all invalid site pins sources for the net
 		pinsToRemove.forEach(pin -> net.removeSourceSitePin(pin));
 				
-		// For out-of-context checkpoints, look for hierarchical ports that are routed to floating wires
+		// For out-of-context checkpoints, look for hierarchical ports that are routed from floating wires
 		if ((implementationMode == ImplementationMode.OUT_OF_CONTEXT || implementationMode == ImplementationMode.RECONFIG_MODULE) && net.getSourcePin().getCell().isPort()) {
 			
 			Cell port = net.getSourcePin().getCell();
