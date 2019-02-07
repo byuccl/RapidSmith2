@@ -36,7 +36,7 @@ import java.util.Map.Entry;
  * <pre>
  * ------------------------------------------- <br>
  * |         |       |        ||             | <br>
- * |  INT_R  |  CLB  |  VBRK  ||  OOC_WIRES  | <br>
+ * |  INT_R  |  CLB  |  VBRK  ||  OOC_WIRE  | <br>
  * |         |       |        ||             | <br>
  * |------------------------------------------ <br>
  * |         |       |        ||             | <br>
@@ -48,14 +48,14 @@ import java.util.Map.Entry;
  * |         |       |        ||             | <br>
  * |------------------------------------------ <br>
  *                                   |         <br>
- *                     Extra Column for OOC_WIRES tile <br>
+ *                     Extra Column for OOC_WIRE tile <br>
  * </pre>
  * As can be seen, when creating a 3X3 device file, an extra column is added to the device.
  * The purpose of this column is to represent out-of-context wires for the partial device.
  * These are either IWIREs or OWIREs. OWIREs are wires that start <b>within</b> the partial
  * device, but leave the partial device boundaries. IWIREs are wires that start <b>outside</b>
  * the partial device boundaries, but enter the partial device. These OOC wires are all tile
- * wires that are added to the "OOC_WIRES" tile. All other tiles in the rightmost column are
+ * wires that are added to the "OOC_WIRE" tile. All other tiles in the rightmost column are
  * set to be of type NULL so they take up as little memory as possible.
  * 
  * <p>
@@ -116,8 +116,8 @@ public class PartialDeviceGenerator {
 			}
 		}
 
-		// Step Four: create an OOC_WIRES tile in the upper-right corner of the device, and add the OOC wires
-		createOocWiresTile(newDevice, toOutputWires, toInputWires);
+		// Step Four: create an OOC_WIRE tile in the upper-right corner of the device, and add the OOC wires
+		createOocWireTile(newDevice, toOutputWires, toInputWires);
 		
 		// Step Five: Set the types of the unused tiles in the last column to NULL;
 		generateNullTiles(newDevice);
@@ -184,7 +184,7 @@ public class PartialDeviceGenerator {
 	/**
 	 * Checks that the specified topLeft and bottomRight Tiles form a valid rectangular
 	 * region, and creates the tile array for the new partial device based on this
-	 * region. An extra column is added for the "OOC_WIRES" tile which contains
+	 * region. An extra column is added for the "OOC_WIRE" tile which contains
 	 * all of the out-of-context wires in the device.
 	 *  
 	 * @param topLeft Top-left Tile in the partial region
@@ -240,7 +240,7 @@ public class PartialDeviceGenerator {
 	 * </ul>
 	 * 
 	 * This function also records which wires leave the partial device boundaries
-	 * so they can be included in the "OOC_WIRES" tile.
+	 * so they can be included in the "OOC_WIRE" tile.
 	 *
 	 * @param oldTile Tile in the original device
 	 * @param newTile Corresponding Tile in the partial device
@@ -323,16 +323,16 @@ public class PartialDeviceGenerator {
 	}
 	
 	/**
-	 * Creates the out-of-context wires tile.
+	 * Creates the out-of-context wire tile.
 	 * 
 	 * @param newDevice Partial device data structure
 	 * @param toOutputWires Map of wire names to {@link TileWire} objects that leave the partial device
 	 * @param toInputWires Map of wire names to {@link TileWire} objects that enter the partial device
 	 */
-	private void createOocWiresTile(Device newDevice, Map<String, List<TileWire>> toOutputWires, Map<String, List<TileWire>> toInputWires) {
+	private void createOocWireTile(Device newDevice, Map<String, List<TileWire>> toOutputWires, Map<String, List<TileWire>> toInputWires) {
 		Tile oocWiresTile = newDevice.getTile(0,  newDevice.getColumns() - 1);
-		oocWiresTile.setName("OOC_WIRES_X0Y0");
-		oocWiresTile.setType(TileType.valueOf(newDevice.getFamily(), "OOC_WIRES"));
+		oocWiresTile.setName("OOC_WIRE_X0Y0");
+		oocWiresTile.setType(TileType.valueOf(newDevice.getFamily(), "OOC_WIRE"));
 
 		// create ooc wires
 		createOocWires(newDevice, toOutputWires, toInputWires);
@@ -341,7 +341,7 @@ public class PartialDeviceGenerator {
 	
 	/**
 	 * Creates new wires that are needed for the partial device file and adds them 
-	 * to the {@link WireEnumerator}. These wires include all wires in the new "OOC_WIRES" tile.
+	 * to the {@link WireEnumerator}. These wires include all wires in the new "OOC_WIRE" tile.
 	 *  
 	 * @param device Partial device data structure
 	 * @param toOutputWires Map of Wire Names to {@link TileWire}s that leave the partial device region.
@@ -374,9 +374,9 @@ public class PartialDeviceGenerator {
 	}
 
 	/**
-	 * Creates the forward and reverse wire connections for the "OOC_WIRES" tile.
+	 * Creates the forward and reverse wire connections for the "OOC_WIRE" tile.
 	 *  
-	 * @param oocWiresTile OOC_WIRES tile (top-right tile of the partial device)
+	 * @param oocWiresTile OOC_WIRE tile (top-right tile of the partial device)
 	 * @param toOutput Map of wire names to {@link TileWire} objects that leave the partial device
 	 * @param toInput Map of wire names to {@link TileWire} objects that enter the partial device
 	 */
@@ -395,18 +395,18 @@ public class PartialDeviceGenerator {
 				Tile pdTile = tileWire.getTile();
 				int pdEnum = tileWire.getWireEnum();
 
-				// create the forward connection from the OOC_WIRES tile -> small device tile
+				// create the forward connection from the OOC_WIRE tile -> small device tile
 				int rowOffset = oocWiresTile.getRow() - pdTile.getRow();
 				int colOffset = oocWiresTile.getColumn() - pdTile.getColumn();
 				forwardConnections[i] = new WireConnection(pdEnum, rowOffset, colOffset, false);
 
-				//create the reverse wire connection from the small device tile -> OOC_WIRES tile
+				//create the reverse wire connection from the small device tile -> OOC_WIRE tile
 				WireConnection pdTileConn = new WireConnection(we.getWireEnum(wireName), -rowOffset, -colOffset, false);
 				WireHashMap pdReverseMap = pdTile.getReverseWireHashMap();
 				pdReverseMap.put(pdEnum, addConnection(pdReverseMap.get(pdEnum), pdTileConn) );
 			}
 
-				// add the forward connections from the OOC_WIRES tile -> partial device tile
+				// add the forward connections from the OOC_WIRE tile -> partial device tile
 				forwardMap.put(we.getWireEnum(wireName), forwardConnections);
 		}
 		
@@ -421,18 +421,18 @@ public class PartialDeviceGenerator {
 				Tile pdTile = tileWire.getTile();
 				int pdEnum = tileWire.getWireEnum();
 
-				// create the reverse connection from the OOC_WIRES tile -> partial device tile
+				// create the reverse connection from the OOC_WIRE tile -> partial device tile
 				int rowOffset = oocWiresTile.getRow() - pdTile.getRow();
 				int colOffset = oocWiresTile.getColumn() - pdTile.getColumn();
 				reverseConnections[i] = new WireConnection(pdEnum, rowOffset, colOffset, false);
 
-				// create the forward connection from the partial device tile -> OOC_WIRES tile
+				// create the forward connection from the partial device tile -> OOC_WIRE tile
 				WireConnection pdTileConn = new WireConnection(we.getWireEnum(wireName), -rowOffset, -colOffset, false);
 				WireHashMap pdWireMap = pdTile.getWireHashMap();
 				pdWireMap.put(pdEnum, addConnection(pdWireMap.get(pdEnum), pdTileConn) );
 			}
 
-			// add the reverse connections from the OOC_WIRES tile -> partial device tile
+			// add the reverse connections from the OOC_WIRE tile -> partial device tile
 			reverseMap.put(we.getWireEnum(wireName), reverseConnections);
 		}
 		
@@ -460,7 +460,7 @@ public class PartialDeviceGenerator {
 
 	/**
 	 * Sets the tile types of all tiles in the right-most column 
-	 * to NULL (besides the OOC_WIRES tile)
+	 * to NULL (besides the OOC_WIRE tile)
 	 *  
 	 * @param device Partial device data structure
 	 */
