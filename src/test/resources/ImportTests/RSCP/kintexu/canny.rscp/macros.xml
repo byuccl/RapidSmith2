@@ -13,6 +13,54 @@
                 <type>INBUF</type>
             </internal>
         </cells>
+        <rpms>
+            <rpm>
+              <type>HPIOB</type>
+              <internal>
+                <name>IBUFCTRL_INST</name>
+                <bel>
+                  <id>
+                    <site_type>HPIOB</site_type>
+                    <name>IBUFCTRL</name>
+                  </id>
+                </bel>
+                <rloc>X0Y0</rloc>
+              </internal>
+              <internal>
+                <name>INBUF_INST</name>
+                <bel>
+                  <id>
+                    <site_type>HPIOB</site_type>
+                    <name>INBUF</name>
+                  </id>
+                </bel>
+                <rloc>X0Y0</rloc>
+              </internal>
+            </rpm>
+            <rpm>
+              <type>HRIO</type>
+              <internal>
+                <name>IBUFCTRL_INST</name>
+                <bel>
+                  <id>
+                    <site_type>HRIO</site_type>
+                    <name>IBUFCTRL</name>
+                  </id>
+                </bel>
+                <rloc>X0Y0</rloc>
+              </internal>
+              <internal>
+                <name>INBUF_INST</name>
+                <bel>
+                  <id>
+                    <site_type>HRIO</site_type>
+                    <name>INBUF</name>
+                  </id>
+                </bel>
+                <rloc>X0Y0</rloc>
+              </internal>
+            </rpm>
+        </rpms>
         <pins>
             <pin>
                 <name>O</name>

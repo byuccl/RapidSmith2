@@ -4,7 +4,7 @@
   (keywordmap (keywordlevel 0))
 (status
  (written
-  (timeStamp 2017 05 31 19 43 14)
+  (timeStamp 2019 02 07 12 31 22)
   (program "Vivado" (version "2016.2"))
   (comment "Built on 'Thu Jun  2 16:32:40 MDT 2016'")
   (comment "Built by 'xbuild'")
@@ -5719,6 +5719,8 @@
            (property INIT (string "1'b0"))
          )
          (instance (rename multiplier_0_product "multiplier_0/product") (viewref netlist (cellref DSP48E2 (libraryref hdi_primitives)))
+           (property USE_SIMD (string "ONE48"))
+           (property USE_PATTERN_DETECT (string "NO_PATDET"))
            (property XORSIMD (string "XOR24_48_96"))
            (property USE_WIDEXOR (string "FALSE"))
            (property ACASCREG (integer 0))
@@ -5749,8 +5751,6 @@
            (property SEL_MASK (string "MASK"))
            (property SEL_PATTERN (string "PATTERN"))
            (property USE_MULT (string "MULTIPLY"))
-           (property USE_PATTERN_DETECT (string "NO_PATDET"))
-           (property USE_SIMD (string "ONE48"))
          )
          (instance (rename multiplier_0_reshi_reg_0_ "multiplier_0/reshi_reg[0]") (viewref netlist (cellref FDCE (libraryref hdi_primitives)))
            (property INIT (string "1'b0"))
@@ -39791,6 +39791,7 @@
   (design openMSP430
     (cellref openMSP430 (libraryref work))
     (property (rename PHYSOPT_ROUTE_DESIGN_CALLED "PHYSOPT.ROUTE_DESIGN_CALLED") (integer 1))
+    (property (rename PHYSOPT_VERSION "PHYSOPT.VERSION") (string "2016.2_6"))
     (property part (string "xcku025-ffva1156-1-c"))
   )
 )

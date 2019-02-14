@@ -13,6 +13,54 @@
                 <type>INBUF</type>
             </internal>
         </cells>
+        <rpms>
+            <rpm>
+              <type>HPIOB</type>
+              <internal>
+                <name>IBUFCTRL_INST</name>
+                <bel>
+                  <id>
+                    <site_type>HPIOB</site_type>
+                    <name>IBUFCTRL</name>
+                  </id>
+                </bel>
+                <rloc>X0Y0</rloc>
+              </internal>
+              <internal>
+                <name>INBUF_INST</name>
+                <bel>
+                  <id>
+                    <site_type>HPIOB</site_type>
+                    <name>INBUF</name>
+                  </id>
+                </bel>
+                <rloc>X0Y0</rloc>
+              </internal>
+            </rpm>
+            <rpm>
+              <type>HRIO</type>
+              <internal>
+                <name>IBUFCTRL_INST</name>
+                <bel>
+                  <id>
+                    <site_type>HRIO</site_type>
+                    <name>IBUFCTRL</name>
+                  </id>
+                </bel>
+                <rloc>X0Y0</rloc>
+              </internal>
+              <internal>
+                <name>INBUF_INST</name>
+                <bel>
+                  <id>
+                    <site_type>HRIO</site_type>
+                    <name>INBUF</name>
+                  </id>
+                </bel>
+                <rloc>X0Y0</rloc>
+              </internal>
+            </rpm>
+        </rpms>
         <pins>
             <pin>
                 <name>O</name>
@@ -45,11 +93,11 @@
         <type>BUFGP</type>
         <cells>
             <internal>
-                <name>BUFG/BUFGCE_INST</name>
+                <name>BUFG</name>
                 <type>BUFGCE</type>
             </internal>
             <internal>
-                <name>BUFG/VCC</name>
+                <name>VCC</name>
                 <type>VCC</type>
             </internal>
             <internal>
@@ -61,13 +109,15 @@
                 <type>INBUF</type>
             </internal>
         </cells>
+        <rpms>
+        </rpms>
         <pins>
             <pin>
                 <name>O</name>
                 <direction>output</direction>
                 <type>MACRO</type>
                 <internalConnections>
-                    <pinname>BUFG/BUFGCE_INST/O</pinname>
+                    <pinname>BUFG/O</pinname>
                 </internalConnections>
             </pin>
             <pin>
@@ -83,16 +133,16 @@
             <internalNet>
                 <name>IBUFG_2_BUFG</name>
                 <pins>
-                    <pinname>BUFG/BUFGCE_INST/I</pinname>
+                    <pinname>BUFG/I</pinname>
                     <pinname>IBUF/IBUFCTRL_INST/O</pinname>
                 </pins>
             </internalNet>
             <internalNet>
                 <type>VCC</type>
-                <name>BUFG/VCC_1</name>
+                <name>VCC_1</name>
                 <pins>
-                    <pinname>BUFG/BUFGCE_INST/CE</pinname>
-                    <pinname>BUFG/VCC/P</pinname>
+                    <pinname>VCC/P</pinname>
+                    <pinname>BUFG/CE</pinname>
                 </pins>
             </internalNet>
             <internalNet>

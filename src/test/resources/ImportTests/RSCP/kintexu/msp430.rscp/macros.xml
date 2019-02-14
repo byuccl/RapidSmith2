@@ -13,6 +13,8 @@
                 <type>INBUF</type>
             </internal>
         </cells>
+        <rpms>
+        </rpms>
         <pins>
             <pin>
                 <name>O</name>
@@ -77,6 +79,91 @@
                 <type>DSP_PREADD</type>
             </internal>
         </cells>
+        <rpms>
+            <rpm>
+              <type>DSP48E2</type>
+              <internal>
+                <name>DSP_ALU_INST</name>
+                <bel>
+                  <id>
+                    <site_type>DSP48E2</site_type>
+                    <name>DSP_ALU</name>
+                  </id>
+                </bel>
+                <rloc>X0Y0</rloc>
+              </internal>
+              <internal>
+                <name>DSP_A_B_DATA_INST</name>
+                <bel>
+                  <id>
+                    <site_type>DSP48E2</site_type>
+                    <name>DSP_A_B_DATA</name>
+                  </id>
+                </bel>
+                <rloc>X0Y0</rloc>
+              </internal>
+              <internal>
+                <name>DSP_C_DATA_INST</name>
+                <bel>
+                  <id>
+                    <site_type>DSP48E2</site_type>
+                    <name>DSP_C_DATA</name>
+                  </id>
+                </bel>
+                <rloc>X0Y0</rloc>
+              </internal>
+              <internal>
+                <name>DSP_MULTIPLIER_INST</name>
+                <bel>
+                  <id>
+                    <site_type>DSP48E2</site_type>
+                    <name>DSP_MULTIPLIER</name>
+                  </id>
+                </bel>
+                <rloc>X0Y0</rloc>
+              </internal>
+              <internal>
+                <name>DSP_M_DATA_INST</name>
+                <bel>
+                  <id>
+                    <site_type>DSP48E2</site_type>
+                    <name>DSP_M_DATA</name>
+                  </id>
+                </bel>
+                <rloc>X0Y0</rloc>
+              </internal>
+              <internal>
+                <name>DSP_OUTPUT_INST</name>
+                <bel>
+                  <id>
+                    <site_type>DSP48E2</site_type>
+                    <name>DSP_OUTPUT</name>
+                  </id>
+                </bel>
+                <rloc>X0Y0</rloc>
+              </internal>
+              <internal>
+                <name>DSP_PREADD_DATA_INST</name>
+                <bel>
+                  <id>
+                    <site_type>DSP48E2</site_type>
+                    <name>DSP_PREADD_DATA</name>
+                  </id>
+                </bel>
+                <rloc>X0Y0</rloc>
+              </internal>
+              <internal>
+                <name>DSP_PREADD_INST</name>
+                <bel>
+                  <id>
+                    <site_type>DSP48E2</site_type>
+                    <name>DSP_PREADD</name>
+                  </id>
+                </bel>
+                <rloc>X0Y0</rloc>
+              </internal>
+            </rpm>
+        </rpms>
         <pins>
             <pin>
                 <name>ACOUT[29]</name>

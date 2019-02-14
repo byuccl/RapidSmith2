@@ -47,7 +47,7 @@ public class LibraryMacro extends LibraryCell {
 	private Map<String, InternalCell> internalCells;
 	private List<InternalNet> internalNets;
 	private Map<String, Integer> pinOffsetMap;
-	private static Map<SiteType, RPM> rpmsMap;
+	private Map<SiteType, RPM> rpmsMap;
 	private static Pattern pinNamePattern;
 	private static Pattern lutramPattern;
 	
