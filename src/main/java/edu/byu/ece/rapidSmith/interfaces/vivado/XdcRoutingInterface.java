@@ -19,25 +19,36 @@
  */
 package edu.byu.ece.rapidSmith.interfaces.vivado;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.LineNumberReader;
+import edu.byu.ece.rapidSmith.design.subsite.*;
+import edu.byu.ece.rapidSmith.device.*;
+import edu.byu.ece.rapidSmith.device.families.FamilyInfo;
+import edu.byu.ece.rapidSmith.device.families.FamilyInfos;
+
+import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
+import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
 import edu.byu.ece.rapidSmith.design.subsite.BelRoutethrough;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
 import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
-import edu.byu.ece.rapidSmith.device.*;
+import edu.byu.ece.rapidSmith.device.Connection;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
+import edu.byu.ece.rapidSmith.device.BelPin;
+import edu.byu.ece.rapidSmith.device.Bel;
+import edu.byu.ece.rapidSmith.device.SitePin;
+import edu.byu.ece.rapidSmith.device.SiteType;
+import edu.byu.ece.rapidSmith.device.SiteWire;
+import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.device.Site;
+import edu.byu.ece.rapidSmith.device.Tile;
+import edu.byu.ece.rapidSmith.device.TileWire;
+import edu.byu.ece.rapidSmith.device.Wire;
+import edu.byu.ece.rapidSmith.device.WireEnumerator;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
@@ -63,19 +74,7 @@ public class XdcRoutingInterface {
 	private Map<String, String> oocPortMap; // Map from port name to the associated partition pin's node
 	private Map<String, MutablePair<String, String>> staticRoutemap;
 
-	/**
-	 * @return the oocPortMap
-	 */
-	public Map<String, String> getOocPortMap() {
-		return oocPortMap;
-	}
 
-	/**
-	 * @param oocPortMap the oocPortMap to set
-	 */
-	public void setOocPortMap(Map<String, String> oocPortMap) {
-		this.oocPortMap = oocPortMap;
-	}
 
 	private ImplementationMode implementationMode;
 	private boolean pipUsedInRoute = false;
@@ -96,15 +95,15 @@ public class XdcRoutingInterface {
 		this.staticSourceMap = new HashMap<>();
 		this.belPinToCellPinMap = pinMap;
 		this.currentLineNumber = 0;
-		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)"); 
+		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)");
 		this.implementationMode = mode;
 		this.staticRoutemap = staticRoutemap;
 
-		oocPortMap = design.getOocPortMap();
+		this.oocPortMap = design.getOocPortMap();
 
 	}
 
-	public XdcRoutingInterface(CellDesign design, Device device, Map<BelPin, CellPin> pinMap, ImplementationMode mode) {
+	public XdcRoutingInterface(CellDesign design, Device device, Map<BelPin, CellPin> pinMap, Map<String, String> oocPortMap) {
 		this.device = device;
 		this.wireEnumerator = device.getWireEnumerator();
 		this.design = design;
@@ -113,7 +112,11 @@ public class XdcRoutingInterface {
 		this.belPinToCellPinMap = pinMap;
 		this.currentLineNumber = 0;
 		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)");
-		this.implementationMode = mode;
+		this.implementationMode = design.getImplementationMode();
+
+		//TODO: Create part pins in placement interface?
+		this.oocPortMap = oocPortMap;
+
 	}
 	
 	/**
@@ -161,7 +164,7 @@ public class XdcRoutingInterface {
 				Collections.emptySet() :
 				gndSourceBels;
 	}
-		
+
 	/**
 	 * Parses the specified routing.xdc file, and applies the physical wire information to the nets of the design
 	 * 
@@ -210,8 +213,6 @@ public class XdcRoutingInterface {
 						String[] gndStartWires = br.readLine().split("\\s+");
 						assert (gndStartWires[0].equals("START_WIRES"));
 						processStaticNet2(toks, gndStartWires);
-						break;
-					case "OOC_PORT" : processOocPort(toks);
 						break;
 					default : 
 						throw new ParseException("Unrecognized Token: " + toks[0]);
@@ -272,7 +273,6 @@ public class XdcRoutingInterface {
 			else { // pin is an output of the site
 				
 				if (net.getSourceSitePin() != null) {
-					// System.out.println("Source Site Pin: " + net.getSourcePin().getFullName());
 					net.addSourceSitePin(pin);
 					continue;
 				}
@@ -314,7 +314,7 @@ public class XdcRoutingInterface {
 		if (sourceBelPin == null) {
 			return;
 		}
-		
+
 		Site site = sourceBelPin.getBel().getSite();
 		createIntrasiteRoute(net, sourceBelPin, true, design.getUsedSitePipsAtSite(site));
 		net.setIsIntrasite(true);
@@ -383,6 +383,7 @@ public class XdcRoutingInterface {
 	 */
 	private void processIntersiteRoutePips(String[] toks) {
 		CellNet net = tryGetCellNet(toks[1]);
+		System.out.println("Net: " + net.getName());
 		Map<String, Set<String>> pipMap = buildPipMap(toks, 2);
 
 		// There is a bug in Vivado where site pins for some nets starting at PAD's are
@@ -691,25 +692,6 @@ public class XdcRoutingInterface {
 	}
 	
 	/**
-	 * Processes the "OOC_PORT" token in the placement.rsc of a RSCP. Specifically,
-	 * this function adds the OOC port and corresponding port wire to the oocPortMap
-	 * data structure for later processing. 
-	 * 
-	 * Expected Format: OOC_PORT portName Tile/Wire
-	 * @param toks An array of space separated string values parsed from the placement.rsc
-	 */
-	private void processOocPort(String[] toks) {
-	
-		assert (toks.length == 3) : String.format("Token error on line %d: Expected format is \"OOC_PORT\" PortName Tile/Wire ", this.currentLineNumber); 
-		
-		if (this.oocPortMap == null) {
-			this.oocPortMap = new HashMap<>();
-		}
-		
-		oocPortMap.put(toks[1], toks[2]); 
-	}
-	
-	/**
 	 * Parse the used PIPS within a given {@link Site}, and store that information in the current {@link CellDesign}
 	 * data structure. These site pips are used to correctly import intrasite routing later in the parse process. 
 	 * 
@@ -718,6 +700,7 @@ public class XdcRoutingInterface {
 	 * {@code SITE_PIPS siteName pip0:input0 pip1:input1 ... pipN:inputN}
 	 */
 	private void readUsedSitePips(Site site, String[] toks) {
+		
 		HashSet<Integer> usedSitePips = new HashSet<>();
 		
 		String namePrefix = "intrasite:" + site.getType().name() + "/";
@@ -755,6 +738,7 @@ public class XdcRoutingInterface {
 		
 		design.setUsedSitePipsAtSite(site, usedSitePips);
 		design.addPIPInputValsAtSite(site, pipToInputVal);
+		
 	}
 	
 	/**
@@ -1063,7 +1047,7 @@ public class XdcRoutingInterface {
 	 */
 	private Tile tryGetTile(String tileName) {
 		Tile tile = device.getTile(tileName);
-		
+
 		if (tile == null) {
 			throw new ParseException("Tile \"" + tileName + "\" not found in device " + device.getPartName() + ". \n"  
 					+ "On line " + this.currentLineNumber + " of " + currentFile); 
@@ -1199,7 +1183,7 @@ public class XdcRoutingInterface {
 		}
 		else if (mapCount != 1) {
 			throw new ParseException(String.format("Cell pin source \"%s\" should map to exactly one BelPin, but maps to %d\n"
-					+ "On %d of %s", cellPin.getName(), mapCount, currentLineNumber, currentFile));	
+					+ "On %d of %s", cellPin.getName(), mapCount, currentLineNumber, currentFile));
 		}
 		
 		return cellPin.getMappedBelPin();
@@ -1221,51 +1205,98 @@ public class XdcRoutingInterface {
 		
 		return wireEnum;
 	}
-	
+
+	/**
+	 * Writes the intrasite routing TCL commands for the design to the routing.xdc file.
+	 * For now, only support slices. Other site types don't have much flexibility in routing.
+	 * Additionally, trying to set the intrasite routing of IOB sites (IOB33, IOB33S, IOB33M) causes Vivado to crash.
+	 *
+	 * @param design Design with nets to export
+	 * @param fileout BufferedWriter for the routing.xdc file
+	 * @throws IOException if the file can't be written to
+	 */
+	private void writeIntrasiteRouting(CellDesign design, BufferedWriter fileout) throws IOException {
+		FamilyInfo familyInfo = FamilyInfos.get(device.getFamily());
+
+		for (Site site : design.getUsedSites()) {
+			if (!familyInfo.sliceSites().contains(site.getType()))
+				continue;
+
+			// Get all site PIP values for the site (excluding polarity selectors)
+			Map<String, String> pipInfo = design.getPIPInputValsAtSite(site);
+
+			if (pipInfo == null || pipInfo.isEmpty())
+				continue;
+
+			fileout.write(String.format("set_property MANUAL_ROUTING %s [get_sites {%s}]\n", site.getType().name(), site.getName()));
+
+			// Build up the SITE_PIPS property for the site
+			StringBuilder sitePips = new StringBuilder();
+			for (Map.Entry<String, String> entry : pipInfo.entrySet()) {
+				sitePips.append(entry.getKey()).append(":").append(entry.getValue()).append(" ");
+			}
+
+			// Handle polarity selectors.
+			if (FamilyInfos.SERIES7_FAMILIES.contains(device.getFamily())) {
+				// For series 7 devices, we must obtain the value of the CLKINV polarity selector
+				Cell ffLatchCell = design.getCellsAtSite(site).stream()
+						.filter(cell -> cell.isFlipFlop() || cell.isLatch())
+						.findAny().orElse(null);
+
+				if (ffLatchCell != null) {
+					Property clkInvProperty = ffLatchCell.getProperties().get("IS_C_INVERTED");
+					String clkInvValue = (clkInvProperty == null) ? "1'b0" : clkInvProperty.getStringValue();
+
+					// For series 7, polarity selectors have two inputs and so the appropriate value must be
+					// included in the SITE_PIPS property.
+					if (clkInvValue.equals("1'b1"))
+						sitePips.append("CLKINV:CLK_B");
+					else
+						sitePips.append("CLKINV:CLK");
+				}
+			}
+			else if (FamilyInfos.ULTRASCALE_FAMILIES.contains(device.getFamily())) {
+				// In Ultrascale, polarity selectors only have a single input and are always configured the same in
+				// the SITE_PIPS property. Still, if a polarity selector is used, it must be included in the SITE_PIPS property.
+				// For simplicity, we set all polarity selectors for Ultrascale to their only possible values.
+				if (site.getType().equals(SiteType.valueOf(device.getFamily(), "SLICEM")))
+					sitePips.append("LCLKINV:CLK ");
+				sitePips.append("CLK1INV:CLK ");
+				sitePips.append("CLK2INV:CLK ");
+				sitePips.append("RST_ABCDINV:RST ");
+				sitePips.append("RST_EFGHINV:RST");
+			}
+
+			// Write used site PIPs (intrasite routing information)
+			fileout.write(String.format("set_property SITE_PIPS {%s} [get_sites {%s}]\n", sitePips.toString(), site.getName()));
+		}
+	}
+
 	/**
 	 * Creates a routing.xdc file from the nets of the given design. <br>
 	 * This file can be imported into Vivado to constrain the physical location of nets. 
 	 * 
 	 * @param xdcOut Location to write the routing.xdc file
+	 * @param oocXdcOut Location to write the part_pin_routing.xdc file
 	 * @param design Design with nets to export
+	 * @param intrasiteRouting Whether to export commands to manually set the intrasite routing in Vivado
 	 * @throws IOException if the file {@code xdcOut} could not be opened
 	 */
-	public void writeRoutingXDC(String xdcOut, String oocXdcOut, CellDesign design) throws IOException {
-		
-		BufferedWriter fileout = new BufferedWriter (new FileWriter(xdcOut));
-
+	public void writeRoutingXDC(String xdcOut, String oocXdcOut, CellDesign design, boolean intrasiteRouting) throws IOException {
 		ArrayList<CellNet> sourceNets = new ArrayList<>();
 		ArrayList<CellNet> sinkNets = new ArrayList<>();
+		BufferedWriter fileout = new BufferedWriter (new FileWriter(xdcOut));
 
-		// Write used Site PIP information
-		Collection<Site> sites = design.getUsedSites();
-
-		for (Site site : sites) {
-			Map<String, String> pipInfo = design.getPIPInputValsAtSite(site);
-
-			if (pipInfo == null)
-				continue;
-
-			SiteType siteType = site.getType();
-
-			// Vivado crashes with IOB33. Remove this special case if this bug is fixed.
-			if (siteType.equals(SiteType.valueOf(design.getFamily(), "IOB33")))
-				continue;
-
-			fileout.write(String.format("set_property MANUAL_ROUTING %s [get_sites {%s}]\n", site.getType().name(), site.getName()));
-			StringBuilder sitePips = new StringBuilder();
-
-			for (Map.Entry<String, String> entry : pipInfo.entrySet()) {
-				sitePips.append(entry.getKey()).append(":").append(entry.getValue()).append(" ");
-			}
-			fileout.write(String.format("set_property SITE_PIPS {%s} [get_sites {%s}]\n", sitePips.toString(), site.getName()));
+		if (intrasiteRouting) {
+			// Write the intrasite routing commands for the design
+			writeIntrasiteRouting(design, fileout);
 		}
 
-		//write the routing information to the TCL script
-		for (CellNet net : design.getNets()) {
+		// Write the intersite routing information for each net
+		for(CellNet net : design.getNets()) {
 
 			// only print nets that have routing information. Grab the first RouteTree of the net and use this as the final route
-			if (net.getIntersiteRouteTree() != null) {
+			if (net.getIntersiteRouteTree() != null ) {
 
 				// If OOC, build lists of source nets and sink nets.
 				// These routes are exported to the oocRouting XDC file.
@@ -1277,7 +1308,7 @@ public class XdcRoutingInterface {
 						continue;
 					}
 					else if (!net.isGNDNet() && net.getSinkPins().size() > 0){
-						// If any of ths sinks are partition pins, add the net to the list of sinkNets
+						// If any of the sinks are partition pins, add the net to the list of sinkNets
 						if (net.getSinkPins().stream().anyMatch(CellPin::isPartitionPin)) {
 							sinkNets.add(net);
 							continue;
@@ -1289,8 +1320,8 @@ public class XdcRoutingInterface {
 				// Trying to set the route with the hierarchical net name will fail with an error.
 				fileout.write(String.format("set_property ROUTE %s [get_nets {%s}]\n", getVivadoRouteString(net), net.getName()));
 			}
-
 		}
+		
 		fileout.close();
 
 		// Now write the OOC RoutingXDC
@@ -1333,13 +1364,22 @@ public class XdcRoutingInterface {
 			}
 
 			// Write the merged routing strings to the ooc routing xdc file
-			Set<MutablePair<String, String>> mergedRouteSet = new HashSet<>(staticRoutemap.values());
+			// Only write routing strings for nets that are routed.
+			//Set<MutablePair<String, String>> mergedRouteSet = staticRoutemap.values().stream()
+			//		.filter(v -> design.getNet(v.left).getIntersiteRouteTree() != null).collect(Collectors.toSet());
+
+			Set<MutablePair<String, String>> mergedRouteSet = staticRoutemap.entrySet()
+					.stream()
+					.filter(e -> design.getNet(e.getKey()).getIntersiteRouteTree() != null)
+					.map(Map.Entry::getValue)
+					.collect(Collectors.toSet());
 
 			for (MutablePair<String, String> netRoutePair : mergedRouteSet) {
 				oocFileOut.write(String.format("set_property ROUTE %s [get_nets {%s}]\n", netRoutePair.getValue(), netRoutePair.getKey()));
 			}
 			oocFileOut.close();
 		}
+
 	}
 
 	/**
@@ -1409,7 +1449,7 @@ public class XdcRoutingInterface {
 
 	}
 
-	
+
 	/**
 	 * Creates the Vivado equivalent route string of the specified net. 
 	 * If the net is a generic net (i.e. not VCC or GND), the first RouteTree 
@@ -1450,7 +1490,7 @@ public class XdcRoutingInterface {
 			Tile t = currentRoute.getWire().getTile();
 
 			// TODO: Don't use a string comparison. Possibly change naming of HIER_PORT wires in partial device file.
-			if (t.getName().equals("HIER_PORT_X0Y0")) {
+			if (t.getName().equals("OOC_WIRE_X0Y0")) {
 				// Don't include "HIER_PORT_X0Y0". Also get rid of leading "IWIRE:" or "OWIRE:"
 				routeString = routeString.concat(currentRoute.getWire().getName().substring(6) + " ");
 			}

@@ -607,7 +607,7 @@ public class CellDesign extends AbstractDesign {
 	
 	/**
 	 * Returns a collections of {@link Site}s that currently have
-	 * one or more {@Cell} objects placed there. 
+	 * one or more {@link Cell} objects placed there.
 	 */
 	public Collection<Site> getUsedSites() {
 		return placementMap.keySet();

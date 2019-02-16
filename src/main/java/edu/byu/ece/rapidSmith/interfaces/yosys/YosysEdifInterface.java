@@ -57,8 +57,8 @@ public final class YosysEdifInterface {
 
 			int offset = 0;
 
-			// find the port suffix and offset
-			String portSuffix = port.getOldName();
+			// find the port prefix and offset
+			String portPrefix = port.getOldName();
 			if (port.isBus()) {
 				//Matcher matcher = busNamePattern.matcher(port.getOldName());
 			//	if (matcher.matches()) {
@@ -80,8 +80,8 @@ public final class YosysEdifInterface {
 				LibraryCell libCell = libCells.get(libraryPortType);
 
 				String portName = port.isBus() ?
-						String.format("%s[%d]", portSuffix, reverseBusIndex(port.getWidth(), busMember.bitPosition(), offset)) :
-						portSuffix;
+						String.format("%s[%d]", portPrefix, reverseBusIndex(port.getWidth(), busMember.bitPosition(), offset)) :
+						portPrefix;
 				Cell portCell = new Cell(portName, libCell);
 				//portCell.getProperties().update(new Property("Dir", PropertyType.USER, PortDirection.getPortDirectionForImport(portCell)));
 				design.addCell(portCell);
@@ -220,7 +220,7 @@ public final class YosysEdifInterface {
 			if (portRef.isTopLevelPortRef()) {
 
 				String portname = portRef.isSingleBitPortRef() ? port.getOldName() :
-						String.format("%s[%d]", getPortNameSuffix(port.getName()), reverseBusIndex(port.getWidth(), portRef.getBusMember(), portOffsetMap.get(port)));
+						String.format("%s[%d]", getPortNamePrefix(port.getOldName()), reverseBusIndex(port.getWidth(), portRef.getBusMember(), portOffsetMap.get(port)));
 
 				Cell portCell = design.getCell(portname);
 
@@ -272,9 +272,9 @@ public final class YosysEdifInterface {
 	 * Vivado ports that are buses are named portName[15:0]
 	 * This function will return the "portName" portion of the bus name
 	 */
-	private static String getPortNameSuffix(String portName) {
+	private static String getPortNamePrefix(String portName) {
 
-		int bracketIndex = portName.indexOf("[");
+		int bracketIndex = portName.lastIndexOf("[");
 		return bracketIndex == -1 ? portName : portName.substring(0, bracketIndex);
 	}
 
@@ -710,6 +710,9 @@ public final class YosysEdifInterface {
 		try {
 			// parse edif into the BYU edif tools data structures
 			EdifEnvironment top = EdifParser.translate(edifFile);
+
+			String edifProgram = top.getProgram();
+			//EdifParser.main();
 			EdifCell topLevelCell = top.getTopCell();
 
 			// create RS2 cell design

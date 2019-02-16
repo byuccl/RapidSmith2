@@ -100,7 +100,7 @@ public class PlacerDemo {
 		
 		// Export the design to a TCP file
 		System.out.println("Exporting Placed Design...");
-		VivadoInterface.writeTCP(tcpDirectory, design, vcp.getDevice(), vcp.getLibCells(), ImplementationMode.REGULAR);
+		VivadoInterface.writeTCP(tcpDirectory, design, vcp.getDevice(), vcp.getLibCells());
 		System.out.println("Successfully created placed TCP at: " + tcpDirectory);
 		
 		if (interactiveMode) {

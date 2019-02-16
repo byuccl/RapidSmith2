@@ -22,6 +22,7 @@ package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.device.BelId;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -41,6 +42,9 @@ public class SimpleLibraryCell extends LibraryCell {
 	private boolean isGndSource;
 	private Integer numLutInputs = null;
 	private boolean isPort;
+
+	private final List<String> FLIP_FLOP_CELLS = Arrays.asList("FDCE", "FDPE", "FDRE", "FDSE");
+	private final List<String> LATCH_CELLS = Arrays.asList("LDCE", "LDPE");
 
 	/**
 	 * Creates a new simple library cell with the specified name.
@@ -106,6 +110,33 @@ public class SimpleLibraryCell extends LibraryCell {
 		this.numLutInputs = numInputs;
 	}
 
+	/**
+	 * Returns {@code true} if the library cell is a flip-flop (FDRE, FDSE, etc.), {@code false} otherwise.
+	 */
+	@Override
+	public boolean isFlipFlop() {
+		return FLIP_FLOP_CELLS.contains(this.getName());
+	}
+
+	/**
+	 * Returns {@code true} if the library cell is a latch (LDCE, LDPE, etc.), {@code false} otherwise.
+	 */
+	@Override
+	public boolean isLatch() {
+		return LATCH_CELLS.contains(this.getName());
+	}
+
+	/**
+	 * Returns {@code true} if the cell is a LUT RAM macro cell, {@code false} otherwise.
+	 */
+	@Override
+	public boolean isLutRamMacro() {
+		return false;
+	}
+
+	/**
+	 * Returns {@code true} if the library cell is a LUT (LUT1, LUT2, etc.), {@code false} otherwise.
+	 */
 	@Override
 	public boolean isLut() {
 		return numLutInputs != null;

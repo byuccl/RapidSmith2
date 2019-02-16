@@ -182,6 +182,9 @@ public class LutRoutethroughInserter {
 		Cell buffer = new Cell(ROUTETHROUGH_NAME + routethroughID, libCells.get("LUT1") );
 		buffer.getProperties().update(new Property("INIT", PropertyType.EDIF, ROUTETHROUGH_INIT_STRING));
 		design.addCell(buffer);
+
+		// Add DONT_TOUCH to prevent Vivado from optimizing the route-through away
+		buffer.getProperties().update("DONT_TOUCH", PropertyType.EDIF, "TRUE");
 		
 		// break the netlist 
 		net.disconnectFromPins(sinks);
@@ -193,6 +196,7 @@ public class LutRoutethroughInserter {
 		routethroughNet.connectToPins(sinks);
 		routethroughNet.setIsIntrasite(true); // mark the second portion of the net as intrasite
 		netsToAdd.add(routethroughNet);
+		routethroughNet.getProperties().update("DONT_TOUCH", PropertyType.EDIF, "TRUE");
 		
 		// place lut cell and map pins correctly
 		Bel rtBel = rtSource.getBel();

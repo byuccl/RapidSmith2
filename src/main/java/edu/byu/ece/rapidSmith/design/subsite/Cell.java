@@ -249,7 +249,22 @@ public class Cell implements Serializable {
 	public boolean isLut() {
 		return libCell.isLut();
 	}
-	
+
+	/**
+	 * Returns true if this cell is a flip-flop cell.
+	 */
+	public boolean isFlipFlop() {
+		return libCell.isFlipFlop();
+	}
+
+	/**
+	 * Returns true if this cell is a latch cell.
+	 */
+	public boolean isLatch() {
+		return libCell.isLatch();
+	}
+
+
 	/**
 	 * Returns the bondedness of this cell.  IO are either BONDED or UNBONDED,
 	 * all others INTERNAL.

@@ -108,7 +108,8 @@ public class UsedStaticResources {
 						if (toks.length > 1)
 							throw new ParseException("Unexpected Token Content: " + toks[0]);
 						break;
-					case "PART_PIN" : processOocPort(toks);
+					case "PART_PIN" :
+						processOocPort(toks);
 						break;
 					case "VCC_PART_PINS":
 						processStaticPartPins(toks, true);
@@ -213,7 +214,9 @@ public class UsedStaticResources {
 		// See if the partition pin node exists in the hierarchical port
 		// TODO: Check that the node is exactly the right one. ie make sure the true tile name matches as well.
 		if (tile == null) {
-			tile = device.getTile("HIER_PORT_X0Y0");
+			tile = device.getTile("OOC_WIRE_X0Y0");
+			// TODO: Throw an error if the tile doesn't exist
+			assert (tile != null);
 			// TODO: Handle OWIRE as well? (I don't think this can occur)
 			partPinWire = tile.getWire("IWIRE:" + wireToks[0] + "/" + wireToks[1]);
 		}
@@ -223,8 +226,6 @@ public class UsedStaticResources {
 		assert (partPinWire != null);
 
 		// Add the partition pin node to the list of reserved wires (so a router knows it can't be used)
-	//	if (design.getNet(portName) == null)
-		//	System.out.println("AHDH1");
 		design.addReservedWire(partPinWire, design.getNet(portName));
 		//reservedWires.add(partPinWire);
 		String direction = toks[3];
@@ -253,7 +254,9 @@ public class UsedStaticResources {
 
 			// TODO: Get rid of the static check. Merge code.
 			if (!net.isStaticNet() && multiPortSinkNets.contains(net)) {
+				System.out.println("Case 1");
 				assert (pinDirection == PinDirection.IN);
+
 				// This net drives more than one partition pin.
 				// This seems similar (maybe identical) to the VCC/GND case.
 
@@ -262,6 +265,7 @@ public class UsedStaticResources {
 				net.disconnectFromPin(cellPin);
 				CellPin partPin = new PartitionPin( portName, partPinWire, pinDirection);
 				portCell.attachPartitionPin(partPin);
+
 
 				insertBufferPartitionPinNet(partPin, net);
 				return;
@@ -276,9 +280,6 @@ public class UsedStaticResources {
 
 				}
 			}
-
-
-
 		}
 
 		// TODO: Figure out if this is a true assumption
@@ -294,11 +295,22 @@ public class UsedStaticResources {
 		CellPin partPin = new PartitionPin( portName, partPinWire, pinDirection);
 		portCell.attachPartitionPin(partPin);
 
-		if (unusedPartPinDriver || net == null || net.isStaticNet())
+		if (unusedPartPinDriver || net == null || net.isStaticNet()) {
 			insertBufferPartitionPinNet(partPin, net);
+		}
+
 		else
 			net.connectToPin(partPin);
 		//partPin.setCell(portCell);
+
+		// The partition pin might now correspond to a different net than originally.
+		// If needed, update the static route map to reflect this.
+		if (!staticRoutemap.containsKey(partPin.getNet().getName())) {
+			MutablePair<String, String> value = staticRoutemap.get(partPin.getPortName());
+			assert (value != null);
+			staticRoutemap.remove(partPin.getPortName());
+			staticRoutemap.put(partPin.getNet().getName(), value);
+		}
 	}
 
 
@@ -315,7 +327,7 @@ public class UsedStaticResources {
 
 				// Make a LUT1 buffer.
 				//String bufferName = ((net.isVCCNet()) ? "VCC" : "GND") + "_Inserted_" + partPin.getPortName();
-				String bufferName = net.getName() + "_Inserted_" + partPin.getPortName();
+				String bufferName = net.getName() + "_InsertedInst_" + partPin.getPortName();
 				Cell lutCell = new Cell(bufferName, libCells.get("LUT1"));
 				lutCell.getProperties().update(new Property("INIT", PropertyType.EDIF, BUFFER_INIT_STRING));
 				design.addCell(lutCell);
@@ -325,8 +337,15 @@ public class UsedStaticResources {
 				net.connectToPin(lutCell.getPin("I0"));
 
 				// Make a net to drive the partition pin
-				CellNet partPinDriverNet = new CellNet(partPin.getPortName(), NetType.WIRE);
+				//CellNet partPinDriverNet = new CellNet(partPin.getPortName(), NetType.WIRE);
+				CellNet partPinDriverNet = new CellNet(net.getName() + "_InsertedNet_" + partPin.getPortName(), NetType.WIRE);
 				design.addNet(partPinDriverNet);
+
+				// Update the static route map to reflect that a net with a different name now corresponds to the partition pin route
+				//MutablePair<String, String> value = staticRoutemap.get(partPin.getPortName());
+				//assert (value != null);
+				//staticRoutemap.remove(partPin.getPortName());
+				//staticRoutemap.put(partPinDriverNet.getName(), value);
 
 				partPinDriverNet.connectToPin(lutCell.getPin("O"));
 				partPinDriverNet.connectToPin(partPin);
@@ -339,7 +358,7 @@ public class UsedStaticResources {
 				// what the static_resources file has).
 				// TODO: Is it satisfactory to just use the name of the port as the name of this net?
 
-				// The net will be null coming from Vivado, but will already exists if coming from Yosys
+				// The net will be null coming from Vivado, but will already exist if coming from Yosys
 				if (net == null) {
 					net = new CellNet(partPin.getPortName(), NetType.WIRE);
 					design.addNet(net);

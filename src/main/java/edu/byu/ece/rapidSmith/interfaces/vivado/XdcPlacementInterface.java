@@ -62,13 +62,28 @@ public class XdcPlacementInterface {
 	private int currentLineNumber;
 	private String currentFile;
 	private final Map<BelPin, CellPin> belPinToCellPinMap;
-	
+	private Map<String, String> oocPortMap; // Map from port name to the associated partition pin's node
+
 	public XdcPlacementInterface(CellDesign design, Device device) {
 		this.design = design;
 		this.device = device;
 		belPinToCellPinMap = new HashMap<>();
 	}
-	
+
+	/**
+	 * @return the oocPortMap
+	 */
+	public Map<String, String> getOocPortMap() {
+		return oocPortMap;
+	}
+
+	/**
+	 * @param oocPortMap the oocPortMap to set
+	 */
+	public void setOocPortMap(Map<String, String> oocPortMap) {
+		this.oocPortMap = oocPortMap;
+	}
+
 	/**
 	 * Applies the placement constraints from the TINCR checkpoint files
 	 * to the RapidSmith2 Cell Design.
@@ -98,12 +113,33 @@ public class XdcPlacementInterface {
 					break;
 				case "IPROP" : applyInternalCellProperty(toks) ; 
 					break;
+				case "PART_PIN" : processOocPort(toks);
+					break;
 				default :
 					throw new ParseException(String.format("Unrecognized Token: %s \nOn %d of %s", toks[0], currentLineNumber, currentFile));
 			}
 		}
 
 		br.close();
+	}
+
+	/**
+	 * Processes the "OOC_PORT" token in the placement.rsc of a RSCP. Specifically,
+	 * this function adds the OOC port and corresponding port wire to the oocPortMap
+	 * data structure for later processing.
+	 *
+	 * Expected Format: OOC_PORT portName Tile/Wire
+	 * @param toks An array of space separated string values parsed from the placement.rsc
+	 */
+	private void processOocPort(String[] toks) {
+
+		//assert (toks.length == 3) : String.format("Token error on line %d: Expected format is \"PART_PIN\" PortName Tile/Wire ", this.currentLineNumber);
+
+		if (this.oocPortMap == null) {
+			this.oocPortMap = new HashMap<>();
+		}
+
+		oocPortMap.put(toks[1], toks[2]);
 	}
 	
 	private void applyCellPlacement(String[] toks) {

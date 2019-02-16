@@ -148,7 +148,7 @@ public class ImportExportExample {
 	private void exportDesign() throws IOException
 	{
 		System.out.println("Exporting Modified Design...");
-		VivadoInterface.writeTCP(checkpointOut, design, device, libCells, ImplementationMode.REGULAR);
+		VivadoInterface.writeTCP(checkpointOut, design, device, libCells);
 	}
 
 }
