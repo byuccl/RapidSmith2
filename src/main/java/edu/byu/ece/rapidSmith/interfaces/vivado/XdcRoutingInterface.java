@@ -383,7 +383,6 @@ public class XdcRoutingInterface {
 	 */
 	private void processIntersiteRoutePips(String[] toks) {
 		CellNet net = tryGetCellNet(toks[1]);
-		System.out.println("Net: " + net.getName());
 		Map<String, Set<String>> pipMap = buildPipMap(toks, 2);
 
 		// There is a bug in Vivado where site pins for some nets starting at PAD's are
@@ -432,7 +431,12 @@ public class XdcRoutingInterface {
 				String[] wireToks = startWireName.split("/");
 				assert (wireToks.length == 2);
 				Tile tile = tryGetTile(wireToks[0]);
-				int wireEnum = tryGetWireEnum(wireToks[1]);
+				int wireEnum;
+				if (tile.getType() == TileType.valueOf(device.getFamily(), "OOC_WIRE"))
+					wireEnum = tryGetWireEnum("IWIRE:" + wireToks[0] + "/" + wireToks[1]);
+				else
+					wireEnum = tryGetWireEnum(wireToks[1]);
+
 				Wire startTileWire = new TileWire(tile, wireEnum);
 				RouteTree netRouteTree = recreateRoutingNetwork2(net, startTileWire, pipMap);
 				net.addIntersiteRouteTree(netRouteTree);
@@ -850,7 +854,7 @@ public class XdcRoutingInterface {
 	 * @param usedSiteWires Set of used pips within the site
 	 */
 	private void createIntrasiteRoute(CellNet net, BelPin pin, boolean isContained, Set<Integer> usedSiteWires) {
-
+		System.out.println("Net: " + net.getName());
 		IntrasiteRoute route = new IntrasiteRouteBelPinSource(net, pin, isContained);
 		buildIntrasiteRoute(route, usedSiteWires);
 		
@@ -1047,6 +1051,12 @@ public class XdcRoutingInterface {
 	 */
 	private Tile tryGetTile(String tileName) {
 		Tile tile = device.getTile(tileName);
+
+		// TODO: Check that the node is exactly the right one. ie make sure the true tile name matches as well.
+		if (tile == null && implementationMode == ImplementationMode.RECONFIG_MODULE) {
+			// Assume the tile is outside the partial device boundaries.
+			tile = device.getTile("OOC_WIRE_X0Y0");
+		}
 
 		if (tile == null) {
 			throw new ParseException("Tile \"" + tileName + "\" not found in device " + device.getPartName() + ". \n"  
@@ -1333,7 +1343,7 @@ public class XdcRoutingInterface {
 				String portName = net.getSourcePin().getPortName();
 
 				// Find the matching static net from the static-only design
-				MutablePair<String, String> netRoutePair = staticRoutemap.get(portName);
+				MutablePair<String, String> netRoutePair = staticRoutemap.get(net.getName());
 				String partialRoute = getVivadoRouteString(net);
 
 				// Merge the static and RM portions of the route
@@ -1350,7 +1360,7 @@ public class XdcRoutingInterface {
 
 				for (CellPin partPin : net.getPartitionPins()) {
 					String portName = partPin.getPortName();
-					MutablePair<String, String> netRoutePair = staticRoutemap.get(portName);
+					MutablePair<String, String> netRoutePair = staticRoutemap.get(net.getName());
 
 					// Merge the static and RM portions of the route
 					String partPinNode = oocPortMap.get(portName);

@@ -26,25 +26,15 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import edu.byu.ece.rapidSmith.design.subsite.Cell;
-import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.design.subsite.CellPin;
-import edu.byu.ece.rapidSmith.design.subsite.Property;
-import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
-import edu.byu.ece.rapidSmith.device.Bel;
-import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.PackagePin;
-import edu.byu.ece.rapidSmith.device.Site;
-import edu.byu.ece.rapidSmith.device.SiteType;
+import edu.byu.ece.rapidSmith.design.NetType;
+import edu.byu.ece.rapidSmith.design.subsite.*;
+import edu.byu.ece.rapidSmith.device.*;
+import org.apache.commons.lang3.tuple.MutablePair;
 
 import static edu.byu.ece.rapidSmith.util.Exceptions.*;
 
@@ -59,15 +49,37 @@ public class XdcPlacementInterface {
 
 	private final CellDesign design;
 	private final Device device;
+	private final CellLibrary libCells;
+	private static final String BUFFER_INIT_STRING = "2'h2";
 	private int currentLineNumber;
 	private String currentFile;
 	private final Map<BelPin, CellPin> belPinToCellPinMap;
 	private Map<String, String> oocPortMap; // Map from port name to the associated partition pin's node
+	private Collection<CellNet> multiPortSinkNets;
+
 
 	public XdcPlacementInterface(CellDesign design, Device device) {
 		this.design = design;
 		this.device = device;
+		libCells = null;
 		belPinToCellPinMap = new HashMap<>();
+	}
+
+	public XdcPlacementInterface(CellDesign design, Device device, CellLibrary libCells) {
+		this.design = design;
+		this.device = device;
+		this.libCells = libCells;
+		belPinToCellPinMap = new HashMap<>();
+	}
+
+	// Get all nets with more than one port as a sink
+	private Collection<CellNet> getMultiPortSinkNets() {
+		Collection<CellNet> nets = new ArrayList<>();
+		for (CellNet net : design.getNets()) {
+			if (net.getPins().stream().filter(cellPin -> cellPin.getDirection().equals(PinDirection.IN) && cellPin.getCell().isPort()).count() > 1)
+				nets.add(net);
+		}
+		return nets;
 	}
 
 	/**
@@ -115,6 +127,11 @@ public class XdcPlacementInterface {
 					break;
 				case "PART_PIN" : processOocPort(toks);
 					break;
+				// TODO: Include this code
+				case "VCC_PART_PINS":
+					break;
+				case "GND_PART_PINS":
+					break;
 				default :
 					throw new ParseException(String.format("Unrecognized Token: %s \nOn %d of %s", toks[0], currentLineNumber, currentFile));
 			}
@@ -124,22 +141,183 @@ public class XdcPlacementInterface {
 	}
 
 	/**
-	 * Processes the "OOC_PORT" token in the placement.rsc of a RSCP. Specifically,
+	 * Processes the "PART_PIN" token in the placement.rsc of a RSCP. Specifically,
 	 * this function adds the OOC port and corresponding port wire to the oocPortMap
 	 * data structure for later processing.
 	 *
-	 * Expected Format: OOC_PORT portName Tile/Wire
+	 * Expected Format: PART_PIN PortName Tile/Wire Direction
 	 * @param toks An array of space separated string values parsed from the placement.rsc
 	 */
 	private void processOocPort(String[] toks) {
 
-		//assert (toks.length == 3) : String.format("Token error on line %d: Expected format is \"PART_PIN\" PortName Tile/Wire ", this.currentLineNumber);
+		assert (toks.length == 4) : String.format("Token error on line %d: Expected format is \"PART_PIN\" PortName Tile/Wire Direction", this.currentLineNumber);
 
 		if (this.oocPortMap == null) {
 			this.oocPortMap = new HashMap<>();
 		}
 
 		oocPortMap.put(toks[1], toks[2]);
+
+		String portName = toks[1];
+		Cell portCell = tryGetCell(portName);
+
+		String[] wireToks = toks[2].split("/");
+		Tile tile = tryGetTile(wireToks[0]);
+		int wireEnum;
+		if (tile.getType() == TileType.valueOf(device.getFamily(), "OOC_WIRE"))
+			wireEnum = tryGetWireEnum("IWIRE:" + wireToks[0] + "/" + wireToks[1]);
+		else
+			wireEnum = tryGetWireEnum(wireToks[1]);
+		TileWire partPinNode = new TileWire(tile, wireEnum);
+		assert (partPinNode != null);
+
+		// Add the part pin node to the list of reserved wires
+		design.addReservedWire(partPinNode, design.getNet(portName));
+
+		String direction = toks[3];
+		PinDirection partPinDirection;
+		switch (direction) {
+			case "IN" : partPinDirection = PinDirection.IN; break;
+			case "OUT" : partPinDirection = PinDirection.OUT; break;
+			case "INOUT" :
+			default: throw new AssertionError("Invalid direction");
+		}
+
+		// Remove the port cell's pin from the design (they are outside of the partial device)
+		assert (portCell.getPins().size() == 1);
+		//CellPin cellPin = portCell.getPins().iterator().next();
+		//CellNet net = cellPin.getNet();
+
+		handleSpecialPartPinCases(portCell, partPinNode, partPinDirection);
+	}
+
+	private void handleSpecialPartPinCases(Cell portCell, TileWire partPinNode, PinDirection partPinDirection) {
+		assert (portCell.getPins().size() == 1);
+
+		if (multiPortSinkNets == null)
+			multiPortSinkNets = getMultiPortSinkNets();
+
+		// TODO: Add Yosys support! Either in here or in the Yosys EDIF Interface (which is better?)
+		boolean unusedPartPinDriver = false;
+		CellPin portCellPin = portCell.getPins().iterator().next();
+		CellNet net = portCellPin.getNet();
+
+		System.out.println("The net is: " + net.getName());
+
+		assert (net != null);
+
+		// Attach the partition pin to the net
+		net.disconnectFromPin(portCellPin);
+		CellPin partPin = new PartitionPin(portCell.getName(), partPinNode, partPinDirection);
+		portCell.attachPartitionPin(partPin);
+
+		switch (partPinDirection) {
+			case OUT: // If the partition pin is a driver from the RM's perspective
+
+				// Case 1: The static side is driving the partition pin, but the RM has no active loads for it.
+				if (net.getFanOut() == 0) {
+
+
+
+					// Create a LUT1 buffer. The partition pin will drive this LUT, but the LUT's output will go nowhere.
+					Cell lutCell = new Cell("IN_BUF_Inserted_" + partPin.getPortName(), libCells.get("LUT1"));
+					design.addCell(lutCell);
+					lutCell.getProperties().update(new Property("INIT", PropertyType.EDIF, BUFFER_INIT_STRING));
+
+					// Make a net and attach it to the partition pin and LUT1 buffer.
+					// TODO: Is this true? Is it always null from Vivado?
+					// The net will be null coming from Vivado, but will already exist if coming from Yosys
+					if (net == null) {
+						net = new CellNet(partPin.getPortName(), NetType.WIRE);
+						design.addNet(net);
+					}
+
+					net.connectToPin(partPin);
+					net.connectToPin(lutCell.getPin("I0"));
+
+				}
+				else {
+					// Normal case
+					net.connectToPin(partPin);
+				}
+
+
+
+				break;
+			case IN: // If the partition pin is a sink from the RM's perspective
+
+				// Case 2: The RM is driving the partition pin with VCC or GND.
+				// Case 3: The RM is driving additional partition pins with the same net.
+				if (net.isStaticNet() || multiPortSinkNets.contains(net)) {
+					// Make a LUT1 buffer and drive it with the net.
+					String bufferName = net.getName() + "_InsertedInst_" + partPin.getPortName();
+					Cell lutCell = new Cell(bufferName, libCells.get("LUT1"));
+					lutCell.getProperties().update(new Property("INIT", PropertyType.EDIF, BUFFER_INIT_STRING));
+					design.addCell(lutCell);
+					net.connectToPin(lutCell.getPin("I0"));
+
+					// Make another net and connect it to the output of the LUT1 buffer and the partition pin.
+					CellNet partPinDriverNet = new CellNet(net.getName() + "_InsertedNet_" + partPin.getPortName(), NetType.WIRE);
+					design.addNet(partPinDriverNet);
+					partPinDriverNet.connectToPin(lutCell.getPin("O"));
+					partPinDriverNet.connectToPin(partPin);
+				}
+				else {
+					// Normal case
+					net.connectToPin(partPin);
+				}
+
+
+
+				break;
+			case INOUT:
+			default:
+				throw new AssertionError("Invalid direction");
+
+		}
+
+	}
+
+
+	// TODO: Don't duplicate
+	/**
+	 * Tries to retrieve the integer enumeration of a wire name in the currently loaded device <br>
+	 * If the wire does not exist, a ParseException is thrown <br>
+	 */
+	private int tryGetWireEnum(String wireName) {
+
+		Integer wireEnum = device.getWireEnumerator().getWireEnum(wireName);
+
+		if (wireEnum == null) {
+			throw new ParseException(String.format("Wire: \"%s\" does not exist in the current device. \n"
+					+ "On line %d of %s", wireName, currentLineNumber, currentFile));
+		}
+
+		return wireEnum;
+	}
+
+	// TODO: Don't have this funciton in both Placement and Routing interfaces.
+	/**
+	 * Tries to retrieve the Tile object with the given name from the currently
+	 * loaded device. If no such tile exists, a {@link ParseException} is thrown.
+	 *
+	 * @param tileName Name of the tile to get a handle of
+	 * @return {@link Tile} object
+	 */
+	private Tile tryGetTile(String tileName) {
+		Tile tile = device.getTile(tileName);
+
+		// TODO: Check that the node is exactly the right one. ie make sure the true tile name matches as well.
+		if (tile == null && design.getImplementationMode() == ImplementationMode.RECONFIG_MODULE) {
+			// Assume the tile is outside the partial device boundaries.
+			tile = device.getTile("OOC_WIRE_X0Y0");
+		}
+
+		if (tile == null) {
+			throw new ParseException("Tile \"" + tileName + "\" not found in device " + device.getPartName() + ". \n"
+					+ "On line " + this.currentLineNumber + " of " + currentFile);
+		}
+		return tile;
 	}
 	
 	private void applyCellPlacement(String[] toks) {

@@ -26,6 +26,7 @@ import java.io.LineNumberReader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.design.subsite.*;
@@ -92,7 +93,7 @@ public class UsedStaticResources {
 				String[] toks = whitespacePattern.split(line);
 	
 				switch (toks[0]) {
-					case "USED_PIPS" : 
+					case "USED_WIRES" :
 						//processUsedPips(toks);
 						break;
 					case "STATIC_RT" :
@@ -122,6 +123,21 @@ public class UsedStaticResources {
 				}
 			}
 		}
+
+		// The nets that partition pin routes correspond with may have changed during placement import.
+		// Find such pins and update the static route map accordingly.
+		// TODO: Do this less dumb.
+		for (Cell port : design.getPorts().collect(Collectors.toList())) {
+			for (CellPin partPin : port.getPins().stream().filter(p -> p.isPartitionPin()).collect(Collectors.toList())) {
+				if (!staticRoutemap.containsKey(partPin.getNet().getName())) {
+					MutablePair<String, String> value = staticRoutemap.get(partPin.getPortName());
+					assert (value != null);
+					staticRoutemap.remove(partPin.getPortName());
+					staticRoutemap.put(partPin.getNet().getName(), value);
+				}
+			}
+		}
+
 	}
 
 	/**

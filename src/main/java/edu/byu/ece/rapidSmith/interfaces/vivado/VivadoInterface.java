@@ -108,7 +108,7 @@ public final class VivadoInterface {
 
 		// re-create the placement and routing information
 		String placementFile = rscpPath.resolve("placement.rsc").toString();
-		XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device);
+		XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device, libCells);
 		placementInterface.parsePlacementXDC(placementFile);
 
 		// TODO: Do this?
@@ -134,7 +134,7 @@ public final class VivadoInterface {
 			UsedStaticResources staticResources = new UsedStaticResources(design, device, libCells);
 			staticResources.parseResourcesRSC(resourcesFile);
 			vivadoCheckpoint.setStaticRoutemap(staticResources.getStaticRoutemap());
-			design.setOocPortMap(staticResources.getOocPortMap());
+			//design.setOocPortMap(staticResources.getOocPortMap());
 		}
 
 		return vivadoCheckpoint;
@@ -185,7 +185,7 @@ public final class VivadoInterface {
 		
 		// Write placement.xdc
 		String placementOut = Paths.get(tcpDirectory, "placement.xdc").toString();	
-		XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device);
+		XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device, libCells);
 		placementInterface.writePlacementXDC(placementOut);
 		
 		// Write routing.xdc
