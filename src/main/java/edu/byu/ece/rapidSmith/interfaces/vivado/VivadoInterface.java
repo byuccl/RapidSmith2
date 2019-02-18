@@ -131,7 +131,7 @@ public final class VivadoInterface {
 		// Mark the used static resources
 		if (mode == ImplementationMode.RECONFIG_MODULE) {
 			String resourcesFile = rscpPath.resolve("static_resources.rsc").toString();
-			UsedStaticResources staticResources = new UsedStaticResources(design, device, libCells);
+			UsedStaticResources staticResources = new UsedStaticResources(design, device);
 			staticResources.parseResourcesRSC(resourcesFile);
 			vivadoCheckpoint.setStaticRoutemap(staticResources.getStaticRoutemap());
 			//design.setOocPortMap(staticResources.getOocPortMap());

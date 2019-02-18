@@ -35,6 +35,7 @@ import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.*;
 import org.apache.commons.lang3.tuple.MutablePair;
+import sun.nio.ch.Net;
 
 import static edu.byu.ece.rapidSmith.util.Exceptions.*;
 
@@ -125,12 +126,13 @@ public class XdcPlacementInterface {
 					break;
 				case "IPROP" : applyInternalCellProperty(toks) ; 
 					break;
-				case "PART_PIN" : processOocPort(toks);
+				case "PART_PIN" : processPartPin(toks);
 					break;
-				// TODO: Include this code
 				case "VCC_PART_PINS":
+					processStaticPartPins(toks, true);
 					break;
 				case "GND_PART_PINS":
+					processStaticPartPins(toks, false);
 					break;
 				default :
 					throw new ParseException(String.format("Unrecognized Token: %s \nOn %d of %s", toks[0], currentLineNumber, currentFile));
@@ -141,6 +143,47 @@ public class XdcPlacementInterface {
 	}
 
 	/**
+	 * Processes the "VCC_PART_PINS" or "GND_PART_PINS" token in the static_resources.rsc of a RSCP.
+	 * Expected Format: VCC_PART_PINS partPinName partPinName ...
+	 * @param toks An array of space separated string values parsed from the placement.rsc
+	 */
+	private void processStaticPartPins(String[] toks, boolean isVcc) {
+		for (int i = 1; i < toks.length; i++) {
+
+			if (oocPortMap == null) {
+				oocPortMap = new HashMap<>();
+			}
+			String oocPortVal = isVcc? "VCC" : "GND";
+
+			oocPortMap.put(toks[i], oocPortVal);
+			String portName = toks[i];
+			Cell portCell = design.getCell(portName);
+
+			// Remove the port cell's pin from the design (they are outside of the partial device)
+			assert (portCell.getPins().size() == 1);
+			CellPin cellPin = portCell.getPins().iterator().next();
+			CellNet net = cellPin.getNet();
+
+			// Detach the port's pin from its current net
+			assert (net != null);
+			//if (net != null)
+			net.disconnectFromPin(cellPin);
+
+			// Re-assign the net's pins to either VCC or GND
+			CellNet staticNet = isVcc? design.getVccNet() : design.getGndNet();
+
+			// Assuming driver has already been removed
+			List<CellPin> pins = new ArrayList<>(net.getPins());
+			net.disconnectFromPins(pins);
+			design.removeNet(net);
+			staticNet.connectToPins(pins);
+
+			CellPin partPin = new PartitionPin( portName, null, PinDirection.IN);
+			portCell.attachPartitionPin(partPin);
+		}
+	}
+
+	/**
 	 * Processes the "PART_PIN" token in the placement.rsc of a RSCP. Specifically,
 	 * this function adds the OOC port and corresponding port wire to the oocPortMap
 	 * data structure for later processing.
@@ -148,7 +191,7 @@ public class XdcPlacementInterface {
 	 * Expected Format: PART_PIN PortName Tile/Wire Direction
 	 * @param toks An array of space separated string values parsed from the placement.rsc
 	 */
-	private void processOocPort(String[] toks) {
+	private void processPartPin(String[] toks) {
 
 		assert (toks.length == 4) : String.format("Token error on line %d: Expected format is \"PART_PIN\" PortName Tile/Wire Direction", this.currentLineNumber);
 
@@ -170,6 +213,7 @@ public class XdcPlacementInterface {
 			wireEnum = tryGetWireEnum(wireToks[1]);
 		TileWire partPinNode = new TileWire(tile, wireEnum);
 		assert (partPinNode != null);
+		// TODO: Should I create or get a tile wire?
 
 		// Add the part pin node to the list of reserved wires
 		design.addReservedWire(partPinNode, design.getNet(portName));
@@ -183,55 +227,45 @@ public class XdcPlacementInterface {
 			default: throw new AssertionError("Invalid direction");
 		}
 
-		// Remove the port cell's pin from the design (they are outside of the partial device)
-		assert (portCell.getPins().size() == 1);
-		//CellPin cellPin = portCell.getPins().iterator().next();
-		//CellNet net = cellPin.getNet();
-
-		handleSpecialPartPinCases(portCell, partPinNode, partPinDirection);
+		// Create and add the partition pin to the design
+		addPartitionPin(portCell, partPinNode, partPinDirection);
 	}
 
-	private void handleSpecialPartPinCases(Cell portCell, TileWire partPinNode, PinDirection partPinDirection) {
+	private void addPartitionPin(Cell portCell, TileWire partPinNode, PinDirection partPinDirection) {
 		assert (portCell.getPins().size() == 1);
 
 		if (multiPortSinkNets == null)
 			multiPortSinkNets = getMultiPortSinkNets();
 
-		// TODO: Add Yosys support! Either in here or in the Yosys EDIF Interface (which is better?)
-		boolean unusedPartPinDriver = false;
 		CellPin portCellPin = portCell.getPins().iterator().next();
 		CellNet net = portCellPin.getNet();
 
-		System.out.println("The net is: " + net.getName());
-
-		assert (net != null);
-
-		// Attach the partition pin to the net
-		net.disconnectFromPin(portCellPin);
-		CellPin partPin = new PartitionPin(portCell.getName(), partPinNode, partPinDirection);
-		portCell.attachPartitionPin(partPin);
-
 		switch (partPinDirection) {
 			case OUT: // If the partition pin is a driver from the RM's perspective
+				// Create the partition pin
+				CellPin partPin = new PartitionPin(portCell.getName(), partPinNode, partPinDirection);
+				portCell.attachPartitionPin(partPin);
 
+				// If the EDIF came from Vivado, there may be no net driving this partition pin
+				// This depends on the implementation steps that have been completed.
+				if (net == null) {
+					net = new CellNet(partPin.getPortName(), NetType.WIRE);
+					design.addNet(net);
+				}
+				else {
+					// Detach the port cell pin from the net
+					net.disconnectFromPin(portCellPin);
+				}
+
+				// Attach the partition pin to the net
 				// Case 1: The static side is driving the partition pin, but the RM has no active loads for it.
 				if (net.getFanOut() == 0) {
-
-
-
 					// Create a LUT1 buffer. The partition pin will drive this LUT, but the LUT's output will go nowhere.
 					Cell lutCell = new Cell("IN_BUF_Inserted_" + partPin.getPortName(), libCells.get("LUT1"));
 					design.addCell(lutCell);
 					lutCell.getProperties().update(new Property("INIT", PropertyType.EDIF, BUFFER_INIT_STRING));
 
-					// Make a net and attach it to the partition pin and LUT1 buffer.
-					// TODO: Is this true? Is it always null from Vivado?
-					// The net will be null coming from Vivado, but will already exist if coming from Yosys
-					if (net == null) {
-						net = new CellNet(partPin.getPortName(), NetType.WIRE);
-						design.addNet(net);
-					}
-
+					// Aattach the net to the partition pin and LUT1 buffer.
 					net.connectToPin(partPin);
 					net.connectToPin(lutCell.getPin("I0"));
 
@@ -240,11 +274,24 @@ public class XdcPlacementInterface {
 					// Normal case
 					net.connectToPin(partPin);
 				}
-
-
-
 				break;
 			case IN: // If the partition pin is a sink from the RM's perspective
+
+				// Create the partition pin and attach it to the port.
+				partPin = new PartitionPin(portCell.getName(), partPinNode, partPinDirection);
+				portCell.attachPartitionPin(partPin);
+
+				// If the EDIF came from Vivado, there may be no net driving this partition pin
+				// This depends on the implementation steps that have been completed.
+				if (net == null) {
+					net = design.getGndNet();
+				}
+				else {
+					// Detach the port cell pin from the net
+					net.disconnectFromPin(portCellPin);
+				}
+
+				// Attach the partition pin to the net
 
 				// Case 2: The RM is driving the partition pin with VCC or GND.
 				// Case 3: The RM is driving additional partition pins with the same net.
@@ -266,16 +313,12 @@ public class XdcPlacementInterface {
 					// Normal case
 					net.connectToPin(partPin);
 				}
-
-
-
 				break;
 			case INOUT:
 			default:
 				throw new AssertionError("Invalid direction");
 
 		}
-
 	}
 
 

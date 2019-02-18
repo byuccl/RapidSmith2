@@ -270,7 +270,7 @@ public class LibraryMacro extends LibraryCell {
 			// (see the IOBUF macro for an example). Additionally, only LUTRAM macros seem to need to have RPMs in
 			// place for Vivado to create the correct placer macros when it reads the EDIF.
 			if (parent.getLibCell().isLutRamMacro()) {
-				addInternalCellRPMProperties(internalCell, cell);
+				//addInternalCellRPMProperties(internalCell, cell);
 			}
 		}
 		
