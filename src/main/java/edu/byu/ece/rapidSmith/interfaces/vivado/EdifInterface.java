@@ -22,13 +22,7 @@ package edu.byu.ece.rapidSmith.interfaces.vivado;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -578,6 +572,7 @@ public final class EdifInterface {
 		
 		// create the cell instances
 		for (Cell cell : design.getCells()) {
+
 			if (cell.isPort())
 				continue;
 
@@ -599,7 +594,7 @@ public final class EdifInterface {
 		}
 		
 		// create the net instances
-		for (CellNet net : design.getNets()) {
+		for (CellNet net : getEdifExportNets(design)) {
 		 	topLevelCell.addNet(createEdifNet(net, topLevelCell, portInfoMap));
 		}
 
@@ -687,7 +682,7 @@ public final class EdifInterface {
 		EdifNet edifNet = new EdifNet(createEdifNameable(cellNet.getName()), edifParentCell);
 
 		// create the port references for the edif net
-		for (CellPin cellPin : getEdifNetPins(cellNet)) {
+		for (CellPin cellPin : getEdifExportNetPins(cellNet)) {
 
 			if (cellPin.isPseudoPin()) {
 				continue;
@@ -871,13 +866,33 @@ public final class EdifInterface {
 	 * internal cell pins if the corresponding internal cell has not been placed.
 	 * @return
 	 */
-	private static Collection<CellPin> getEdifNetPins(CellNet net) {
+	private static Collection<CellPin> getEdifExportNetPins(CellNet net) {
 		return net.getPins().stream().map(p -> {
 			if (p.isInternal() && !p.getCell().isPlaced())
 				return p.getExternalPin();
 			return p;
-		})
-				.collect(Collectors.toSet());
+		}).collect(Collectors.toSet());
+	}
+
+	/**
+	 * Returns a collection of external {@link CellNet}s and internal nets for placed macro cells
+	 * that are currently in the design.
+	 */
+	private static Collection<CellNet> getEdifExportNets(CellDesign design) {
+		// Only include internal nets for macro cells that are placed.
+		Collection<CellNet> nets = design.getNets().stream()
+				.filter(n -> !n.isInternal()).collect(Collectors.toList());
+
+		Iterator<Cell> cellIt = design.getMacros().iterator();
+
+		while (cellIt.hasNext()) {
+			Cell macroCell = cellIt.next();
+
+			if (macroCell.isPlaced()) {
+				nets.addAll(macroCell.getInternalNets());
+			}
+		}
+		return nets;
 	}
 
 }
