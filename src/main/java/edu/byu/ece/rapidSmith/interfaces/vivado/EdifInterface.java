@@ -26,12 +26,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import edu.byu.ece.edif.core.BooleanTypedValue;
 import edu.byu.ece.edif.core.EdifCell;
@@ -84,12 +84,20 @@ import edu.byu.ece.rapidSmith.util.Exceptions;
 public final class EdifInterface {
 
 	private static boolean suppressWarnings = false;
-	
+	private static boolean suppressInfoMessages = false;
+
 	/**
 	 * Suppress non-critical warnings while parsing an EDIF file. 
 	 */
 	public static void suppressWarnings(boolean suppress) {
 		suppressWarnings = suppress;
+	}
+
+	/**
+	 * Suppress info messages while parsing an EDIF file.
+	 */
+	public static void suppressInfoMessages(boolean suppress) {
+		suppressInfoMessages = suppress;
 	}
 	
 	/* ********************
@@ -536,22 +544,26 @@ public final class EdifInterface {
 	 * Returns a hashset of all unique library cells in a given design
 	 */
 	private static HashSet<LibraryCell> getUniqueLibraryCellsInDesign(CellDesign design) {
-		
 		HashSet<LibraryCell> uniqueLibraryCells = new HashSet<>();
-		
-		Iterator<Cell> cellIt = design.getLeafCells().iterator();
-		
-		// for (Cell c : design.getCells()) {
-		while (cellIt.hasNext()) {
-			Cell c = cellIt.next();
-			
-			if (!c.isPort())
-				uniqueLibraryCells.add(c.getLibCell());
+
+		for (Cell cell : design.getCells()) {
+			if (!cell.isPort()) {
+				if (cell.isMacro() && cell.isPlaced()) {
+					for (Cell internalCell : cell.getInternalCells()) {
+						uniqueLibraryCells.add(internalCell.getLibCell());
+					}
+				} else {
+					// If the macro cell has not been placed, include the full macro in the EDIF.
+					// If the full macro for unplaced LUTRAMs is not included in the EDIF, Vivado will
+					// be unable to place them.
+					uniqueLibraryCells.add(cell.getLibCell());
+				}
+			}
 		}
-		
+
 		return uniqueLibraryCells;
 	}
-	
+
 	/*
 	 * Creates the top level EDIF cell that contains the design
 	 */
@@ -565,22 +577,32 @@ public final class EdifInterface {
 		topLevelCell.setInterface(cellInterface);
 		
 		// create the cell instances
-		Iterator<Cell> cellIt = design.getLeafCells().iterator();
-		while (cellIt.hasNext()) {
-			Cell cell = cellIt.next();
-			
+		for (Cell cell : design.getCells()) {
 			if (cell.isPort())
 				continue;
-			
-			EdifCell edifLibCell = cellMap.get(cell.getLibCell());
-			topLevelCell.addSubCell( createEdifCellInstance(cell, topLevelCell, edifLibCell) );
+
+			if (cell.isMacro() && cell.isPlaced()) {
+				if (!suppressInfoMessages)
+					System.out.println("[Info] Macro cell " + cell.getName() + " is placed and will be flattened.");
+
+				for (Cell internalCell : cell.getInternalCells()) {
+					EdifCell edifLibCell = cellMap.get(internalCell.getLibCell());
+					topLevelCell.addSubCell(createEdifCellInstance(internalCell, topLevelCell, edifLibCell));
+				}
+			} else {
+				if (cell.isMacro() && !suppressInfoMessages)
+					System.out.println("[Info] Macro cell " + cell.getName() + " is unplaced and will NOT be flattened.");
+
+				EdifCell edifLibCell = cellMap.get(cell.getLibCell());
+				topLevelCell.addSubCell(createEdifCellInstance(cell, topLevelCell, edifLibCell));
+			}
 		}
 		
 		// create the net instances
 		for (CellNet net : design.getNets()) {
 		 	topLevelCell.addNet(createEdifNet(net, topLevelCell, portInfoMap));
 		}
-			
+
 		topLevelCell.addPropertyList(createEdifPropertyList(design.getProperties()));
 		return topLevelCell; 
 	}
@@ -607,7 +629,7 @@ public final class EdifInterface {
 					int busMember = Integer.parseInt(m.group(2));
 					PortInformation portInfo = portMap.getOrDefault(portName, new PortInformation(portName, direction, false, busMember));
 					portInfo.addPort(busMember);
-					portMap.computeIfAbsent(portName, k -> portInfo);
+					portMap.putIfAbsent(portName, portInfo);
 					portInfoMap.put(cell, portInfo);
 				} 
 				else {
@@ -622,7 +644,7 @@ public final class EdifInterface {
 			String portName = entry.getKey();
 			PortInformation portInfo = entry.getValue();
 			
-			EdifNameable edifPortName = null;
+			EdifNameable edifPortName;
 			
 			if (portInfo.isSingleBitPort()) {
 				// some single-bit ports can be names like port[0]...which matches the bus pattern for port names...
@@ -663,16 +685,16 @@ public final class EdifInterface {
 	 */
 	private static EdifNet createEdifNet(CellNet cellNet, EdifCell edifParentCell, Map<Cell, PortInformation> portInfoMap) {
 		EdifNet edifNet = new EdifNet(createEdifNameable(cellNet.getName()), edifParentCell);
-				
+
 		// create the port references for the edif net
-		for (CellPin cellPin : cellNet.getPins()) {
-			
+		for (CellPin cellPin : getEdifNetPins(cellNet)) {
+
 			if (cellPin.isPseudoPin()) {
 				continue;
 			}
 						
 			Cell parentCell = cellPin.getCell();
-			
+
 			EdifPortRef portRef = parentCell.isPort() ?
 									createEdifPortRefFromPort(parentCell, edifParentCell, edifNet, portInfoMap.get(parentCell).getMin()) : 
 									createEdifPortRefFromCellPin(cellPin, edifParentCell, edifNet) ;
@@ -712,8 +734,8 @@ public final class EdifInterface {
 	 * to the connection.
 	 */
 	private static EdifPortRef createEdifPortRefFromCellPin(CellPin cellPin, EdifCell edifParent, EdifNet edifNet) {
-		
 		EdifCellInstance cellInstance = edifParent.getCellInstance(getEdifName(cellPin.getCell().getName()));
+
 		EdifCell libCell = cellInstance.getCellType();
 		
 		String[] toks = cellPin.getName().split("\\["); 
@@ -742,18 +764,19 @@ public final class EdifInterface {
 		for (Property prop : properties) {
 			// The key and value of the property need sensible toString() methods when exporting to EDIF
 			// this function is for creating properties for printing only!
-			// TODO: make sure to inform the user of this 
-			if (prop.getType().equals(PropertyType.EDIF)){/**Only get PropertyType EDIF when creating EDIF propertyList*/
+			// TODO: make sure to inform the user of this
+			// Only get PropertyType EDIF when creating EDIF propertyList
+			if (prop.getType().equals(PropertyType.EDIF)){
 				edu.byu.ece.edif.core.Property edifProperty;
 
 				Object value = prop.getValue();
 
 				if (value instanceof Boolean) {
-					edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), (Boolean) value);
+					edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey(), (Boolean) value);
 				} else if (value instanceof Integer) {
-					edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), (Integer) value);
+					edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey(), (Integer) value);
 				} else {
-					edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey().toString(), prop.getValue().toString());
+					edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey(), prop.getValue().toString());
 				}
 
 				edifProperties.addProperty(edifProperty);
@@ -841,4 +864,20 @@ public final class EdifInterface {
 		
 		return PortDirection.isInputPort(portCell) ? EdifPort.IN : EdifPort.OUT; 
 	}
+
+
+	/**
+	 * Returns the cell pins of a net, returning macro cell pins in place of
+	 * internal cell pins if the corresponding internal cell has not been placed.
+	 * @return
+	 */
+	private static Collection<CellPin> getEdifNetPins(CellNet net) {
+		return net.getPins().stream().map(p -> {
+			if (p.isInternal() && !p.getCell().isPlaced())
+				return p.getExternalPin();
+			return p;
+		})
+				.collect(Collectors.toSet());
+	}
+
 }
