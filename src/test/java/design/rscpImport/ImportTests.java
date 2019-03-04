@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.interfaces.vivado.EdifInterface;
+import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoEdifInterface;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 
@@ -33,8 +33,8 @@ public class ImportTests {
 	 */
 	@BeforeAll
 	public static void initializeClass() {
-		EdifInterface.suppressWarnings(true);
-		EdifInterface.suppressInfoMessages(true);
+		VivadoEdifInterface.suppressWarnings(true);
+		VivadoEdifInterface.suppressInfoMessages(true);
 	}
 	
 	@Test
