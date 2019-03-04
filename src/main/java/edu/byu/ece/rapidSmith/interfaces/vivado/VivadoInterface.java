@@ -58,8 +58,7 @@ public final class VivadoInterface {
 	 * Parses a RSCP generated from Tincr, and creates an equivalent RapidSmith2 design.
 	 * 
 	 * @param rscp Path to the RSCP to import
-	 * @throws InvalidEdifNameException 
-	 * @throws EdifNameConflictException 
+	 * @throws IOException
 	 */
 	public static VivadoCheckpoint loadRSCP (String rscp, boolean storeAdditionalInfo) throws IOException {
 		Path rscpPath = Paths.get(rscp);

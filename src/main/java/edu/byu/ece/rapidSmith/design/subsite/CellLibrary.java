@@ -32,6 +32,7 @@ import org.jdom2.input.SAXBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Matcher;
