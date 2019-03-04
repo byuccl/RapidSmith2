@@ -34,6 +34,7 @@ public class ImportTests {
 	@BeforeAll
 	public static void initializeClass() {
 		EdifInterface.suppressWarnings(true);
+		EdifInterface.suppressInfoMessages(true);
 	}
 	
 	@Test

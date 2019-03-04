@@ -32,7 +32,6 @@ import org.jdom2.input.SAXBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -270,7 +269,6 @@ public class CellLibrary implements Iterable<LibraryCell>, Serializable {
 		LibraryMacro macroCell = new LibraryMacro(type);
 
 		loadInternalCellsFromXml(macroEl, macroCell);
-		//loadRpmsFromXml(macroEl, macroCell);
 		loadPinsFromXml(macroEl, macroCell);
 		loadInternalNetsFromXml(macroEl, macroCell);
 		add(macroCell);
@@ -315,26 +313,6 @@ public class CellLibrary implements Iterable<LibraryCell>, Serializable {
 		libCell.setLibraryPins(pins);
 	}
 
-	private void loadRpmsFromXml(Element macroEl, LibraryMacro macroCell) {
-		Element rpmsEl = macroEl.getChild("rpms");
-
-		for (Element rpmEl : rpmsEl.getChildren("rpm")) {
-			SiteType macroSiteType = SiteType.valueOf(familyType, rpmEl.getChildText("type"));
-			for (Element internalEl : rpmEl.getChildren("internal")) {
-				String internalCellName = internalEl.getChildText("name");
-				Element belEl = internalEl.getChild("bel");
-				Element id = belEl.getChild("id");
-				String site_type = id.getChildText("site_type");
-				BelId belId = new BelId(
-						SiteType.valueOf(familyType, site_type),
-						id.getChildText("name")
-				);
-				String rloc = internalEl.getChildText("rloc");
-				macroCell.addRpmCellEntry(macroSiteType, internalCellName, belId, rloc);
-			}
-		}
-	}
-	
 	private void loadInternalCellsFromXml(Element macroEl, LibraryMacro macroCell) {
 		
 		Element cellsEl = macroEl.getChild("cells");

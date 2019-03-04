@@ -31,8 +31,6 @@ import java.util.regex.Pattern;
 
 import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.device.BelId;
-import edu.byu.ece.rapidSmith.device.SiteType;
-import edu.byu.ece.rapidSmith.util.Exceptions;
 
 /**
  * Represents a primitive MACRO cell from Vivado cell library. A macro library 
@@ -45,10 +43,9 @@ public class LibraryMacro extends LibraryCell {
 
 	private Map<LibraryPin, List<InternalPin>> pinMap;
 	private Map<String, String> internalToExternalPinMap;
-	private Map<String, InternalCell> internalCells;
+	private List<InternalCell> internalCells;
 	private List<InternalNet> internalNets;
 	private Map<String, Integer> pinOffsetMap;
-	private static Map<SiteType, RPM> rpmsMap;
 	private static Pattern pinNamePattern;
 	private static Pattern lutramPattern;
 	
@@ -68,8 +65,7 @@ public class LibraryMacro extends LibraryCell {
 		super(name);
 		pinMap = new HashMap<>();
 		internalToExternalPinMap = new HashMap<>();
-		internalCells = new HashMap<>();
-		rpmsMap = new HashMap<>();
+		internalCells = new ArrayList<>();
 	}
 
 	@Override
@@ -171,27 +167,9 @@ public class LibraryMacro extends LibraryCell {
 	 * @param libCell Internal cell type 
 	 */
 	void addInternalCell(String name, SimpleLibraryCell libCell) {
-		this.internalCells.put(name, new InternalCell(name, libCell));
+		this.internalCells.add(new InternalCell(name, libCell));
 	}
 
-	/**
-	 * Adds an entry for an internal cell to the RPM map.
-	 * @param siteType the site type of the particular RPM
-	 * @param internalCellName name of the internal cell
-	 * @param belId the belID the internal cell can be placed on for the RPM
-	 * @param rloc the RLOC of the internal cell for the RPM
-	 */
-	void addRpmCellEntry(SiteType siteType, String internalCellName, BelId belId, String rloc) {
-		RPM rpm = rpmsMap.computeIfAbsent(siteType, s -> new RPM(siteType));
-		InternalCell internalCell = internalCells.get(internalCellName);
-		if (internalCell == null) {
-			throw new Exceptions.ParseException("Internal Cell referenced in macro RPM xml \"" + internalCellName +
-					"\" not found \"");
-		}
-
-		rpm.addCellEntry(internalCell, belId, rloc);
-	}
-	
 	/**
 	 * Adds a new {@link InternalNet} to the library macro.
 	 * 
@@ -221,31 +199,9 @@ public class LibraryMacro extends LibraryCell {
 		assert (internalPin.isInternal()) : "Input cell pin to this function must be internal" ;
 		
 		String pinName = internalPin.getFullName();
-		String relativePinName = pinName.substring(pinName.indexOf("/") + 1);
-		
-		return macroCell.getPin(internalToExternalPinMap.get(relativePinName));		
-	}
+		String relativePinName = pinName.substring(pinName.substring(0, pinName.lastIndexOf("/")).lastIndexOf("/")+1);
 
-	/**
-	 * Adds RPM EDIF properties to an internal cell. Currently only works for LUTRAM internal cells.
-	 * @param internalCell the internal cell to add the RPM properties to.
-	 * @param cell the cell instance of the internal cell
-	 */
-	private void addInternalCellRPMProperties(InternalCell internalCell, Cell cell) {
-		// Get site type to RPM map
-		// There is only one site type a LUT RAM can be placed on, so grab the first one
-		RPM rpm = rpmsMap.values().iterator().next();
-		BelIdRlocPair belIdRlocPair = rpm.getCellToBelRlocMap().get(internalCell);
-
-		// Add a U_SET property for the internal cell
-		cell.getProperties().update("U_SET", PropertyType.EDIF, cell.getParent().getName());
-
-		// Add the BEL constraint. Internal cells BEL constraints cannot change and need to be in place
-		// to ensure Vivado can place the macro (at least in the case of LUT RAMs).
-		cell.getProperties().update("BEL", PropertyType.EDIF, belIdRlocPair.getBelId().getName());
-
-		// Set the RLOC property
-		cell.getProperties().update("RLOC", PropertyType.EDIF, belIdRlocPair.getRloc());
+		return macroCell.getPin(internalToExternalPinMap.get(relativePinName));
 	}
 	
 	/**
@@ -259,19 +215,11 @@ public class LibraryMacro extends LibraryCell {
 		Map<String, Cell> internalCellMap = new HashMap<>();
 		String parentName = parent.getName();
 		
-		for (InternalCell internalCell : internalCells.values()) {
+		for (InternalCell internalCell : internalCells) {
 			String fullCellName = parentName + "/" + internalCell.getName();
 			Cell cell = new Cell(fullCellName, internalCell.getLeafCell());
 			cell.setParent(parent);
 			internalCellMap.put(fullCellName, cell);
-
-			// For now, only add an RPM for LUTRAM macros. LUTRAM macros can only be placed in one exact way
-			// (on a SLICEM), whereas other macros have more than one possible type of placement
-			// (see the IOBUF macro for an example). Additionally, only LUTRAM macros seem to need to have RPMs in
-			// place for Vivado to create the correct placer macros when it reads the EDIF.
-			if (parent.getLibCell().isLutRamMacro()) {
-				//addInternalCellRPMProperties(internalCell, cell);
-			}
 		}
 		
 		return internalCellMap;	
@@ -447,52 +395,6 @@ public class LibraryMacro extends LibraryCell {
 		public String getPinName() {
 			return pinName;
 		}
-	}
-
-	/**
-	 * A Bel ID and RLOC pair.
-	 */
-	private class BelIdRlocPair {
-		private final BelId belId;
-		private final String rloc;
-
-		public BelIdRlocPair(BelId belId, String rloc) {
-			this.belId = belId;
-			this.rloc = rloc;
-		}
-
-		public BelId getBelId() {
-			return belId;
-		}
-
-		public String getRloc() {
-			return rloc;
-		}
-
-	}
-
-	/**
-	 * An RPM for a library macro. There may be multiple RPMs for a given library macro.
-	 */
-	private class RPM {
-		/** The site type the whole macro is placed on for this RPM. Used as an identifier **/
-		private SiteType siteType;
-
-		public Map<InternalCell, BelIdRlocPair> getCellToBelRlocMap() {
-			return cellToBelRlocMap;
-		}
-
-		private Map<InternalCell, BelIdRlocPair> cellToBelRlocMap;
-
-		public RPM(SiteType siteType) {
-			this.siteType = siteType;
-			this.cellToBelRlocMap = new HashMap<>();
-		}
-
-		public void addCellEntry(InternalCell internalCell, BelId belId, String rloc) {
-			cellToBelRlocMap.put(internalCell, new BelIdRlocPair(belId, rloc));
-		}
-
 	}
 
 }

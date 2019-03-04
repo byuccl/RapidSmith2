@@ -286,6 +286,10 @@ public class Cell implements Serializable {
 	 * Returns true if this cell is placed on a BEL.
 	 */
 	public final boolean isPlaced() {
+		if (libCell.isMacro()) {
+			return internalCells.values().stream().allMatch(Cell::isPlaced);
+		}
+
 		return bel != null;
 	}
 
