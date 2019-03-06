@@ -61,7 +61,6 @@ import edu.byu.ece.rapidSmith.device.PortDirection;
 import edu.byu.ece.rapidSmith.interfaces.AbstractEdifInterface;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
-
 /**
  * This class is used to interface RapidSmith with EDIF files generated from Vivado.
  * It is capable of: <br>  
@@ -125,9 +124,13 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 			throw new Exceptions.ParseException(e);
 		}
 	}
-	
-	/*
+
+	/**
 	 * Converts EDIF top level ports to equivalent RapidSmith port cells and adds them to the design
+	 * @param design
+	 * @param topInterface
+	 * @param libCells
+	 * @param portOffsetMap
 	 */
 	private void processTopLevelEdifPorts (CellDesign design, EdifCellInterface topInterface, CellLibrary libCells, Map<EdifPort, Integer> portOffsetMap) {
 		
@@ -233,9 +236,12 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 			throw new AssertionError(e);
 		}
 	}
-	
-	/*
+
+	/**
 	 * Returns a hashset of all unique library cells in a given design
+	 *
+	 * @param design
+	 * @return
 	 */
 	private HashSet<LibraryCell> getUniqueLibraryCellsInDesign(CellDesign design) {
 		HashSet<LibraryCell> uniqueLibraryCells = new HashSet<>();
@@ -258,8 +264,15 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 		return uniqueLibraryCells;
 	}
 
-	/*
+	/**
 	 * Creates the top level EDIF cell that contains the design
+	 *
+	 * @param design
+	 * @param library
+	 * @param cellMap
+	 * @return
+	 * @throws EdifNameConflictException
+	 * @throws InvalidEdifNameException
 	 */
 	private EdifCell createEdifTopLevelCell(CellDesign design, EdifLibrary library, HashMap<LibraryCell, EdifCell> cellMap) throws EdifNameConflictException, InvalidEdifNameException {
 		
@@ -301,11 +314,17 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 		topLevelCell.addPropertyList(createEdifPropertyList(design.getProperties()));
 		return topLevelCell; 
 	}
-	
-	/*
+
+	/**
 	 * Creates the EDIF interface for the top level cell
-	 * 
-	 * TODO: This is only guaranteed to work with netlists imported from Vivado. 
+	 * TODO: This is only guaranteed to work with netlists imported from Vivado.
+	 *
+	 * @param design
+	 * @param topLevelEdifCell
+	 * @param portInfoMap
+	 * @return
+	 * @throws EdifNameConflictException
+	 * @throws InvalidEdifNameException
 	 */
 	private EdifCellInterface createTopLevelInterface(CellDesign design, EdifCell topLevelEdifCell, Map<Cell, PortInformation> portInfoMap) throws EdifNameConflictException, InvalidEdifNameException {
 		
@@ -360,9 +379,14 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 				
 		return cellInterface;
 	}
-	
-	/*
+
+	/**
 	 * Creates an EDIF cell instance from a corresponding RapidSmith cell
+	 *
+	 * @param cell
+	 * @param parent
+	 * @param edifLibCell
+	 * @return
 	 */
 	private EdifCellInstance createEdifCellInstance(Cell cell, EdifCell parent, EdifCell edifLibCell) {
 		
@@ -374,9 +398,14 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 				
 		return cellInstance;
 	}
-	
-	/*
+
+	/**
 	 * Creates an EDIF net from a corresponding RapidSmith net
+	 *
+	 * @param cellNet
+	 * @param edifParentCell
+	 * @param portInfoMap
+	 * @return
 	 */
 	private EdifNet createEdifNet(CellNet cellNet, EdifCell edifParentCell, Map<Cell, PortInformation> portInfoMap) {
 		EdifNet edifNet = new EdifNet(createEdifNameable(cellNet.getName()), edifParentCell);
@@ -399,9 +428,15 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 					
 		return edifNet;
 	}
-	
-	/*
+
+	/**
 	 * Creates a port reference (connection) for an EDIF net from a top-level port cell.
+	 *
+	 * @param port
+	 * @param edifParent
+	 * @param edifNet
+	 * @param portOffset
+	 * @return
 	 */
 	private EdifPortRef createEdifPortRefFromPort(Cell port, EdifCell edifParent, EdifNet edifNet, int portOffset) {
 		// Split on the last '['
@@ -422,11 +457,16 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 		EdifSingleBitPort singlePort = new EdifSingleBitPort(edifPort, portIndex);
 		return new EdifPortRef(edifNet, singlePort, null);	
 	}
-	
-	/*
-	 * Creates a port reference (connection) for an EDIF net from a cell pin. 
+
+	/**
+	 * Creates a port reference (connection) for an EDIF net from a cell pin.
 	 * This is different than the port implementation because it needs to add a cell instance
 	 * to the connection.
+	 *
+	 * @param cellPin
+	 * @param edifParent
+	 * @param edifNet
+	 * @return
 	 */
 	private EdifPortRef createEdifPortRefFromCellPin(CellPin cellPin, EdifCell edifParent, EdifNet edifNet) {
 		EdifCellInstance cellInstance = edifParent.getCellInstance(getEdifName(cellPin.getCell().getName()));
