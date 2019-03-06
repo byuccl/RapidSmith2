@@ -10,7 +10,7 @@ import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
 import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
-import edu.byu.ece.rapidSmith.interfaces.vivado.EdifInterface;
+import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoEdifInterface;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import org.junit.jupiter.api.AfterAll;
@@ -25,7 +25,7 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-/**tests the {@link EdifInterface} to verify that edif Property lists only contain EDIF type properties
+/**tests the {@link VivadoEdifInterface} to verify that edif Property lists only contain EDIF type properties
   *Only EDIF Property Types are allowed in the netlist.edf to be imported into Vivado using Tincr.
   * @author Dallon Glick
   * @author Jesse Grigg
@@ -74,7 +74,8 @@ public class EdifCellPropertyTest {
         Cell cell = design.getCell("q[8]_i_2");
         Property designProp = new Property("DesignPropKey", PropertyType.DESIGN, "DesignPropVal");
         cell.getProperties().add(designProp);
-        EdifInterface.writeEdif(testEdifPath.toString(), design);
+        VivadoEdifInterface vivadoEdifInterface = new VivadoEdifInterface();
+        vivadoEdifInterface.writeEdif(testEdifPath.toString(), design);
 
         try {
             EdifEnvironment env = EdifParser.translate(testEdifPath.toString());
@@ -97,7 +98,8 @@ public class EdifCellPropertyTest {
         Cell cell = design.getCell("q[8]_i_2");
         Property userProp = new Property("userPropKey", PropertyType.USER, "userPropVal");
         cell.getProperties().add(userProp);
-        EdifInterface.writeEdif(testEdifPath.toString(), design);
+        VivadoEdifInterface vivadoEdifInterface = new VivadoEdifInterface();
+        vivadoEdifInterface.writeEdif(testEdifPath.toString(), design);
 
         try {
             EdifEnvironment env = EdifParser.translate(testEdifPath.toString());
@@ -118,7 +120,8 @@ public class EdifCellPropertyTest {
         Cell cell2 = design.getCell("q[8]_i_2");
         Property belProp = new Property("belPropKey", PropertyType.BELPROP, "belPropVal");
         cell2.getProperties().add(belProp);
-        EdifInterface.writeEdif(testEdifPath.toString(), design);
+        VivadoEdifInterface vivadoEdifInterface = new VivadoEdifInterface();
+        vivadoEdifInterface.writeEdif(testEdifPath.toString(), design);
         try {
             EdifEnvironment env = EdifParser.translate(testEdifPath.toString());
             EdifCell topLevelCell = env.getTopCell();
@@ -140,7 +143,8 @@ public class EdifCellPropertyTest {
         Cell cell2 = design.getCell("q[8]_i_2");
         Property edifProp = new Property("edifPropKey", PropertyType.EDIF, "edifPropVal");
         cell2.getProperties().add(edifProp);
-        EdifInterface.writeEdif(testEdifPath.toString(), design);
+        VivadoEdifInterface vivadoEdifInterface = new VivadoEdifInterface();
+        vivadoEdifInterface.writeEdif(testEdifPath.toString(), design);
 
         try {
             EdifEnvironment env = EdifParser.translate(testEdifPath.toString());

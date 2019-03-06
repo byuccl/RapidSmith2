@@ -227,7 +227,6 @@ public class PrimitiveDef implements Serializable{
 	/**
 	 * Generates the connections for each bel in the primitive site
 	 * @param element
-	 * @param pipNames
 	 */
 	private void generateBelConnections(Element element){
 		for (PrimitiveDefPin pin : element.getPins()) {

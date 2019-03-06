@@ -20,7 +20,7 @@
 package edu.byu.ece.rapidSmith.interfaces.vivado;
 
 /**
- *	This class is used in the {@link EdifInterface} class to 
+ *	This class is used in the {@link VivadoEdifInterface} class to
  *	consolidate port information together. For bus ports,
  *	it keeps track of the minimum and maximum bus index for the port.
  */
