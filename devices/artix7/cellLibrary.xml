@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- ~ Copyright (c) 2019 Brigham Young University
+ ~ Copyright (c) 2016 Brigham Young University
  ~ 
  ~ This file is part of the BYU RapidSmith Tools.
 
@@ -67466,31 +67466,6 @@
                 <type>IBUFDS</type>
             </internal>
         </cells>
-        <rpms>
-            <rpm>
-              <type>IOB33M</type>
-              <internal>
-                <name>IBUFDS</name>
-                <bel>
-                  <id>
-                    <site_type>IOB33M</site_type>
-                    <name>INBUF_EN</name>
-                  </id>
-                </bel>
-                <rloc>X0Y0</rloc>
-              </internal>
-              <internal>
-                <name>IBUFDS_0</name>
-                <bel>
-                  <id>
-                    <site_type>IOB33S</site_type>
-                    <name>INBUF_EN</name>
-                  </id>
-                </bel>
-                <rloc>X0Y1</rloc>
-              </internal>
-            </rpm>
-        </rpms>
         <pins>
             <pin>
                 <name>O</name>
