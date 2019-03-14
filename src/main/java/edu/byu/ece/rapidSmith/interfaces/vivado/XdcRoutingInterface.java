@@ -1255,11 +1255,22 @@ public class XdcRoutingInterface {
 
 				if (ffLatchCell != null) {
 					Property clkInvProperty = ffLatchCell.getProperties().get("IS_C_INVERTED");
-					String clkInvValue = (clkInvProperty == null) ? "1'b0" : clkInvProperty.getStringValue();
+					String clkInvValueStr = "1'b0";
+
+					if (clkInvProperty != null) {
+						Object clkInvValue = clkInvProperty.getValue();
+						if (clkInvValue instanceof String) {
+							clkInvValueStr = (String) clkInvValue;
+						}
+						else if (clkInvValue instanceof Long || clkInvValue instanceof Integer) {
+							clkInvValueStr = "1'b" + clkInvValue;
+						}
+					}
+
 
 					// For series 7, polarity selectors have two inputs and so the appropriate value must be
 					// included in the SITE_PIPS property.
-					if (clkInvValue.equals("1'b1"))
+					if (clkInvValueStr.equals("1'b1"))
 						sitePips.append("CLKINV:CLK_B");
 					else
 						sitePips.append("CLKINV:CLK");

@@ -166,7 +166,6 @@ public class XdcPlacementInterface {
 
 			// Detach the port's pin from its current net
 			assert (net != null);
-			//if (net != null)
 			net.disconnectFromPin(cellPin);
 
 			// Re-assign the net's pins to either VCC or GND
@@ -180,6 +179,9 @@ public class XdcPlacementInterface {
 
 			CellPin partPin = new PartitionPin( portName, null, PinDirection.IN);
 			portCell.attachPartitionPin(partPin);
+
+			// Make the partition pin point to the appropriate global static net
+			partPin.setPinToGlobalNet(staticNet);
 		}
 	}
 

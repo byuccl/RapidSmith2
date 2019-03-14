@@ -415,7 +415,13 @@ public abstract class CellPin implements Serializable {
 
 	public abstract Wire getWire();
 
+	// TODO: Deprecate
 	public void setMacroPinToGlobalNet(CellNet n) {
+		setNet(n);
+	}
+
+	public void setPinToGlobalNet(CellNet n) {
+		// TODO: Throw error if not macro pin or part pin
 		setNet(n);
 	}
 

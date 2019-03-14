@@ -102,8 +102,11 @@ public class UsedStaticResources {
 		// TODO: Do this less dumb.
 		for (Cell port : design.getPorts().collect(Collectors.toList())) {
 			for (CellPin partPin : port.getPins().stream().filter(p -> p.isPartitionPin()).collect(Collectors.toList())) {
-				if (!staticRoutemap.containsKey(partPin.getNet().getName())) {
+				CellNet partPinNet = partPin.getNet();
+
+				if (!partPinNet.isStaticNet() && !staticRoutemap.containsKey(partPinNet.getName())) {
 					MutablePair<String, String> value = staticRoutemap.get(partPin.getPortName());
+
 					assert (value != null);
 					staticRoutemap.remove(partPin.getPortName());
 					staticRoutemap.put(partPin.getNet().getName(), value);
@@ -132,7 +135,8 @@ public class UsedStaticResources {
 			Wire wire = new TileWire(tile, wireEnumerator.getWireEnum(wireName));
 
 			// Mark wire as reserved.
-			//design.addReservedWire(wire);
+			// TODO: Map to the net/net name?
+			design.addReservedWire(wire, null);
 		}
 	}
 

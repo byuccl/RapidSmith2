@@ -20,11 +20,7 @@
 
 package edu.byu.ece.rapidSmith.interfaces.vivado;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -92,12 +88,8 @@ public final class VivadoInterface {
 		
 		// create the RS2 netlist
 		String edifFile = rscpPath.resolve("netlist.edf").toString();
-
-		CellDesign design;
-
-
-		design = EdifInterface.parseEdif(edifFile, libCells);
-
+		VivadoEdifInterface vivadoEdifInterface = new VivadoEdifInterface();
+		CellDesign design = vivadoEdifInterface.parseEdif(edifFile, libCells, partName);
 		design.setImplementationMode(mode);
 		
 		// parse the constraints into RapidSmith
@@ -112,7 +104,7 @@ public final class VivadoInterface {
 
 		// TODO: Do this?
 		design.setOocPortMap(placementInterface.getOocPortMap());
- 
+
 		String routingFile = rscpPath.resolve("routing.rsc").toString();
 		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap(), placementInterface.getOocPortMap());
 		routingInterface.parseRoutingXDC(routingFile);
@@ -149,16 +141,18 @@ public final class VivadoInterface {
 	}
 
 	/**
-	 * Export the RapidSmith2 design into an existing TINCR checkpoint file. 
-	 *   
+	 * Export the RapidSmith2 design into an existing TINCR checkpoint file.
+	 *
 	 * @param tcpDirectory TINCR checkpoint directory to write XDC files to
 	 * @param design CellDesign to convert to a TINCR checkpoint
 	 * @throws IOException
-	 * @throws InvalidEdifNameException 
-	 * @throws EdifNameConflictException 
 	 */
 	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells) throws IOException {
 		writeTCP(tcpDirectory, design, device, libCells, false, ImplementationMode.REGULAR, null);
+	}
+
+	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells, boolean intrasiteRouting, ImplementationMode mode) throws IOException {
+		writeTCP(tcpDirectory, design, device, libCells, intrasiteRouting, mode, null);
 	}
 
 	/**
@@ -168,8 +162,6 @@ public final class VivadoInterface {
 	 * @param design CellDesign to convert to a TINCR checkpoint
 	 * @param intrasiteRouting Whether to include commands to manually set intrasite routing in Vivado
 	 * @throws IOException
-	 * @throws InvalidEdifNameException
-	 * @throws EdifNameConflictException
 	 */
 	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells, boolean intrasiteRouting, ImplementationMode mode, Map<String, MutablePair<String, String>> staticRoutemap) throws IOException {
 				
@@ -196,7 +188,8 @@ public final class VivadoInterface {
 
 		// Write EDIF netlist
 		String edifOut = Paths.get(tcpDirectory, "netlist.edf").toString();
-		EdifInterface.writeEdif(edifOut, design);
+		VivadoEdifInterface vivadoEdifInterface = new VivadoEdifInterface();
+		vivadoEdifInterface.writeEdif(edifOut, design);
 
 		// write constraints.xdc
 		String constraintsOut = Paths.get(tcpDirectory, "constraints.xdc").toString();

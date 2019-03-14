@@ -27,7 +27,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import edu.byu.ece.edif.core.BooleanTypedValue;
 import edu.byu.ece.edif.core.EdifCell;
 import edu.byu.ece.edif.core.EdifCellInstance;
 import edu.byu.ece.edif.core.EdifCellInterface;
@@ -42,27 +41,24 @@ import edu.byu.ece.edif.core.EdifPort;
 import edu.byu.ece.edif.core.EdifPortRef;
 import edu.byu.ece.edif.core.EdifPrintWriter;
 import edu.byu.ece.edif.core.EdifSingleBitPort;
-import edu.byu.ece.edif.core.EdifTypedValue;
-import edu.byu.ece.edif.core.IntegerTypedValue;
 import edu.byu.ece.edif.core.InvalidEdifNameException;
 import edu.byu.ece.edif.core.PropertyList;
 import edu.byu.ece.edif.core.RenamedObject;
 import edu.byu.ece.edif.core.StringTypedValue;
 import edu.byu.ece.edif.util.parse.EdifParser;
 import edu.byu.ece.edif.util.parse.ParseException;
-import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.design.subsite.CellNet;
 import edu.byu.ece.rapidSmith.design.subsite.CellPin;
 import edu.byu.ece.rapidSmith.design.subsite.LibraryCell;
-import edu.byu.ece.rapidSmith.design.subsite.LibraryMacro;
 import edu.byu.ece.rapidSmith.design.subsite.LibraryPin;
 import edu.byu.ece.rapidSmith.design.subsite.Property;
 import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
 import edu.byu.ece.rapidSmith.device.PinDirection;
 import edu.byu.ece.rapidSmith.device.PortDirection;
+import edu.byu.ece.rapidSmith.interfaces.AbstractEdifInterface;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
 /**
@@ -75,31 +71,14 @@ import edu.byu.ece.rapidSmith.util.Exceptions;
  * Currently, the EdifInterace class only supports EDIF files created from fully flattened Vivado designs.
  * All BYU EDIF exceptions are wrapped into RapidSmith2 exceptions before being thrown. 
  */
-public final class EdifInterface {
-
-	private static boolean suppressWarnings = false;
-	private static boolean suppressInfoMessages = false;
-
-	/**
-	 * Suppress non-critical warnings while parsing an EDIF file. 
-	 */
-	public static void suppressWarnings(boolean suppress) {
-		suppressWarnings = suppress;
-	}
-
-	/**
-	 * Suppress info messages while parsing an EDIF file.
-	 */
-	public static void suppressInfoMessages(boolean suppress) {
-		suppressInfoMessages = suppress;
-	}
+public final class VivadoEdifInterface extends AbstractEdifInterface {
 
 	/* ********************
 	 * 	 Import Section
 	 *********************/
-	private static Pattern busNamePattern; 
-	
-	static 
+	private static Pattern busNamePattern;
+
+	static
 	{
 		busNamePattern = Pattern.compile("(.*)\\[.+:(.+)\\]");
 	}
@@ -111,40 +90,28 @@ public final class EdifInterface {
 	 * @param libCells A Cell library for a specific Xilinx part
 	 * 
 	 * @return The RapidSmith2 representation of the EDIF netlist
-	 * @throws FileNotFoundException
 	 */
-	public static CellDesign parseEdif(String edifFile, CellLibrary libCells) {
-		return parseEdif(edifFile, libCells, null);
-	}
-
-	/**
-	 * Parses the Edif netlist into a RapidSmith2 CellDesign data structure
-	 *
-	 * @param edifFile Input EDIF file
-	 * @param libCells A Cell library for a specific Xilinx part
-	 * @param partName Name of the part for the design. Needs to be set manually for partial devices when using a netlist
-	 *                 synthesized by Vivado, since the netlist contains the name of the full part.
-	 *
-	 * @return The RapidSmith2 representation of the EDIF netlist
-	 * @throws FileNotFoundException
-	 */
-	public static CellDesign parseEdif(String edifFile, CellLibrary libCells, String partName) {
-
+	public CellDesign parseEdif(String edifFile, CellLibrary libCells, String partName) {
+		
 		List<CellNet> vccNets = new ArrayList<>();
 		List<CellNet> gndNets = new ArrayList<>();
-		Map<EdifPort, Integer> portOffsetMap = new HashMap<EdifPort, Integer>();
+		Map<EdifPort, Integer> portOffsetMap = new HashMap<>();
 
-		try {
+		try {		
 			// parse edif into the BYU edif tools data structures
 			EdifEnvironment top = EdifParser.translate(edifFile);
 			EdifCell topLevelCell = top.getTopCell();
-
+			
 			// create RS2 cell design
-			if (partName == null)
-				partName = ((StringTypedValue)top.getTopDesign().getProperty("part").getValue()).getStringValue();
-			CellDesign design= new CellDesign(top.getTopDesign().getName(), partName);
-			design.getProperties().updateAll(createCellProperties(topLevelCell.getPropertyList()));
+			String edifPartName = ((StringTypedValue)top.getTopDesign().getProperty("part").getValue()).getStringValue();
 
+			if (!suppressWarnings && !partName.equals(edifPartName)) {
+				System.err.println("[Warning] Part name in EDIF, " + edifPartName + ", does not match part name in design.info, " + partName);
+			}
+
+			CellDesign design= new CellDesign(top.getTopDesign().getName(), partName);	
+			design.getProperties().updateAll(createCellProperties(topLevelCell.getPropertyList()));
+			
 			// add all the cells and nets to the design
 			processTopLevelEdifPorts(design, topLevelCell.getInterface(), libCells, portOffsetMap);
 			processEdifCells(design, topLevelCell.getCellInstanceList(), libCells, vccNets, gndNets);
@@ -157,11 +124,15 @@ public final class EdifInterface {
 			throw new Exceptions.ParseException(e);
 		}
 	}
-	
-	/*
+
+	/**
 	 * Converts EDIF top level ports to equivalent RapidSmith port cells and adds them to the design
+	 * @param design
+	 * @param topInterface
+	 * @param libCells
+	 * @param portOffsetMap
 	 */
-	private static void processTopLevelEdifPorts (CellDesign design, EdifCellInterface topInterface, CellLibrary libCells, Map<EdifPort, Integer> portOffsetMap) {
+	private void processTopLevelEdifPorts (CellDesign design, EdifCellInterface topInterface, CellLibrary libCells, Map<EdifPort, Integer> portOffsetMap) {
 		
 		for ( EdifPort port : topInterface.getPortList() ) {
 			
@@ -206,292 +177,7 @@ public final class EdifInterface {
 			}
 		}
 	}
-		
-	/*
-	 * Converts EDIF cell instances to equivalent RapidSmith cells and adds them to the design
-	 */
-	private static void processEdifCells(CellDesign design, Collection<EdifCellInstance> edifCellInstances, CellLibrary libCells, List<CellNet> vccNets, List<CellNet> gndNets) {
-		// TODO: think about throwing an error or warning here
-		if (edifCellInstances == null || edifCellInstances.size() == 0) {
-			if (!suppressWarnings) {
-				System.err.println("[Warning] No cells found in the edif netlist");
-			}
-			return;
-		}
-		
-		// create equivalent RS2 cells from the edif cell instances
-		for(EdifCellInstance eci : edifCellInstances) {
-			// create the corresponding RS2 cell
-			LibraryCell lcType = libCells.get(eci.getType());
-			if (lcType == null) {
-				throw new Exceptions.ParseException("Unable to find library cell of type: " + eci.getType());
-			}
-			
-			// Check for naming conflicts and rename cells as required...this should not be necessary for designs
-			// synthesized and implemented in Vivado, but if the netlist is manipulated by an external tool,
-			// this can happen
-			if (design.hasCell(eci.getOldName())) {
-				handleNamingConflict(design, design.getCell(eci.getOldName()));
-			}
-			
-			Cell newcell = design.addCell(new Cell(eci.getOldName(), lcType));
-			
-			// Add properties to the cell 
-			newcell.getProperties().updateAll(createCellProperties(eci.getPropertyList()));
-			
-			// look for internal macro nets
-			if (newcell.isMacro()) {
-				for (CellNet net : newcell.getInternalNets()) {
-					if (net.isVCCNet()) {
-						vccNets.add(net);
-					}
-					else if (net.isGNDNet()) {
-						gndNets.add(net);
-					}
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Some EDIF netlists from Vivado can have identical port and cell names. This function renames the ports
-	 * so that there is no naming conflict in RapidSmith. 
-	 * 
-	 * @param design CellDesign
-	 * @param cell Cell to rename (should be a port cell)
-	 */
-	private static void handleNamingConflict (CellDesign design, Cell cell) {
-		assert cell.isPort() : "Conflicting cell names should only happen with Port cells: " + cell.getName();
-		
-		// print a warning to the user
-		if (!suppressWarnings) {
-			System.err.println("[Warning] A top-level port and another cell in the netlist have identical names: " + cell.getName() 
-			              + ". The port cell will be renamed to " + cell.getName() + "_rsport");
-		}
-		
-		// update the name of the cell 
-		design.removeCell(cell);
-		Cell newPortCell = new Cell(cell.getName() + "_rsport", cell.getLibCell());
-		design.addCell(newPortCell);
-	}
-	
-	/*
-	 * Converts EDIF nets to equivalent RapidSmith nets and adds them to the design
-	 */
-	private static void processEdifNets(CellDesign design, Collection<EdifNet> edifNets, List<CellNet> vccNets, List<CellNet> gndNets, Map<EdifPort, Integer> portOffsetMap) {
-		 
-		if (edifNets == null || edifNets.size() == 0) {
-			if (!suppressWarnings) {
-				System.err.println("[Warning] No nets found in the edif netlist");
-			}
-			return;
-		}
-		
-		// Go through the cell's nets and hook up inputs and outputs 
-		for(EdifNet net : edifNets) {
-			
-			//create a new net
-			CellNet cn = new CellNet(net.getOldName(), NetType.WIRE); 
-			
-			// Add all the source and sink connections to the net
-			//Collection<EdifPortRef> sources = net.getSourcePortRefs(false, true);
-			
-			// process all net connections
-			processNetConnections(net.getPortRefList(), design, cn, portOffsetMap);
-			
-			//report a warning if no sources on a net are found
-			if (cn.getAllSourcePins().size() == 0) {
-				if (!suppressWarnings) {
-					System.err.println("[Warning] No source for net " + net.getOldName());
-				}
-			}
-						
-			// Add the net to the design if is is NOT a static net.
-			// Otherwise, store it for later use (will collapse later)
-			if (cn.isVCCNet()) {
-				vccNets.add(cn);
-			}
-			else if (cn.isGNDNet()) {
-				gndNets.add(cn);
-			}
-			else {
-				design.addNet(cn);
-			}
-			
-			cn.getProperties().updateAll(createCellProperties(net.getPropertyList()));
-		}
-	}
-	
-	/*
-	 * Builds the connections of CellNet based on the specified EDIF port references. Returns true
-	 * if the given net is attached to a top-level port, false otherwise
-	 * 
-	 * TODO: update this once top-level ports are added
-	 */
-	private static void processNetConnections(Collection<EdifPortRef> portRefs, CellDesign design, CellNet net, Map<EdifPort, Integer> portOffsetMap) {
-			
-		for (EdifPortRef portRef: portRefs) {  
-			
-			EdifPort port = portRef.getPort(); 
-			
-			// Connects to a top-level port
-			if (portRef.isTopLevelPortRef()) {
-								
-				String portname = portRef.isSingleBitPortRef() ? port.getOldName() : 
-				 				  String.format("%s[%d]", getPortNamePrefix(port.getOldName()), reverseBusIndex(port.getWidth(), portRef.getBusMember(), portOffsetMap.get(port)));
-				
-				Cell portCell = design.getCell(portname);
-				
-				if (portCell == null) {
-					throw new Exceptions.ParseException("Port Cell " + portname + " does not exist in the design!");
-				}
-				else if (!portCell.isPort()) {
-					portCell = design.getCell(portname + "_rsport");
-				}
-				
-				net.connectToPin(portCell.getPin("PAD"));
-								
-				continue; 
-			}
-			
-			Cell node = design.getCell(portRef.getCellInstance().getOldName()); 
-			if (node == null) {
-				throw new Exceptions.ParseException("Cell: " + portRef.getCellInstance().getOldName()  + " does not exist in the design!");
-			}
-			
-			int busOffset = 0;
-			if (node.isMacro()) {
-				LibraryMacro macro = (LibraryMacro)node.getLibCell(); 
-				busOffset = macro.getPinOffset(port.getName());
-			}
-			
-			// Connects to a cell pin
-			// TODO: take a closer look at this...I am using the edif name of a cell pin name which should be ok, but be aware
-			String pinname = portRef.isSingleBitPortRef() ? port.getName() 
-					 : String.format("%s[%d]", port.getName(), reverseBusIndex(port.getWidth(), portRef.getBusMember(), busOffset));
-			
-			// Mark GND and VCC nets 
-			if (node.isVccSource()) {
-				net.setType(NetType.VCC);
-			}
-			else if (node.isGndSource()) {
-				net.setType(NetType.GND);
-			}
 
-			net.connectToPin(node.getPin(pinname));						
-		}		
-	}
-	
-	/*
-	 * Vivado ports that are buses are named portName[15:0]
-	 * This function will return the "portName" portion of the bus name
-	 */
-	private static String getPortNamePrefix(String portName) {
-		
-		int bracketIndex = portName.lastIndexOf("[");
-		return bracketIndex == -1 ? portName : portName.substring(0, bracketIndex);
-	}
-		
-	/*
-	 * Creates a list of RapidSmith cell properties from an EDIF property list
-	 */
-	private static List<Property> createCellProperties(PropertyList edifPropertyList) {
-		List<Property> cellProperties = new ArrayList<>();
-		
-		if (edifPropertyList != null) {
-			for (String keyName : edifPropertyList.keySet()) {
-				edu.byu.ece.edif.core.Property property = edifPropertyList.getProperty(keyName);
-				Property prop = new Property(property.getName(), PropertyType.EDIF, getValueFromEdifType(property.getValue()));
-				cellProperties.add(prop);
-			}
-		}
-		
-		return cellProperties;
-	}
-	
-	/*
-	 * Converts an EdifTypedValue to the corresponding native Java type
-	 */
-	private static Object getValueFromEdifType(EdifTypedValue typedValue) {
-		
-		Object value;
-		if (typedValue instanceof IntegerTypedValue) {
-			value = ((IntegerTypedValue)typedValue).getIntegerValue();
-		}
-		else if (typedValue instanceof BooleanTypedValue) {
-			value = ((BooleanTypedValue)typedValue).getBooleanValue();
-		}
-		else  { // default is string type
-			value = ((StringTypedValue)typedValue).getStringValue();
-		}
-		return value;
-	}
-	
-	/*
-	 * Because EDIF files reverse the index of bus members, this function
-	 * is used to get the original index of a port into a bus.  
-	 */
-	private static int reverseBusIndex(int width, int busMember, int offset) {
-		return width - 1 - busMember + offset;
-	}
-	
-	private static void collapseStaticNets(CellDesign design, CellLibrary libCells, List<CellNet> vccNets, List<CellNet> gndNets) {
-		
-		// Create new global VCC/GND cells and nets
-		Cell globalVCC = new Cell("RapidSmithGlobalVCC", libCells.getVccSource());
-		Cell globalGND = new Cell("RapidSmithGlobalGND", libCells.getGndSource());		
-		CellNet globalVCCNet = new CellNet("RapidSmithGlobalVCCNet", NetType.VCC);
-		CellNet globalGNDNet = new CellNet("RapidSmithGlobalGNDNet", NetType.GND);
-		
-		// Connect the global sources to the global nets
-		globalVCCNet.connectToPin(globalVCC.getOutputPins().iterator().next());
-		globalGNDNet.connectToPin(globalGND.getOutputPins().iterator().next());
-		
-		// Add all VCC/GND sink pins to the global nets
-		for(CellNet net : vccNets) {
-			transferSinkPins(net, globalVCCNet);
-		}
-		
-		for(CellNet net : gndNets) {
-			transferSinkPins(net, globalGNDNet);
-		}
-			
-		// Remove the old VCC/GND cells from the list
-		List<Cell> cellsToRemove = new ArrayList<>();
-		for (Cell cell : design.getCells()) {
-			if (cell.isVccSource() || cell.isGndSource()) {
-				cellsToRemove.add(cell);
-			}
-		}
-		cellsToRemove.forEach(design::removeCell);
-				
-		// Add the new master cells/nets to the design
-		design.addCell(globalVCC);
-		design.addNet(globalVCCNet);
-		design.addCell(globalGND);
-		design.addNet(globalGNDNet);
-		
-		// For macro pins tied to power or ground, make them point to the appropriate global static net
-		for (Cell c : design.getCells()) {
-			for (CellPin cp : c.getPins()) {
-				if (cp.getNet()!= null) {
-					if (cp.getNet() != globalGNDNet && cp.getNet().getType() == NetType.GND) 
-						cp.setMacroPinToGlobalNet(globalGNDNet);
-					else if (cp.getNet() != globalVCCNet && cp.getNet().getType() == NetType.VCC) 
-						cp.setMacroPinToGlobalNet(globalVCCNet);
-				}
-			}
-		}
-
-	}
-	
-	private static void transferSinkPins(CellNet oldNet, CellNet newNet) {
-		Collection<CellPin> sinkPins = oldNet.getSinkPins();
-		oldNet.detachNet();
-		oldNet.unrouteFull();
-		newNet.connectToPins(sinkPins);
-	}
-	
 	/* *********************
 	 *    Export Section
 	 ***********************/
@@ -503,7 +189,8 @@ public final class EdifInterface {
 	 * @param design RapidSmith design to convert to EDIF
 	 * @throws IOException
 	 */
-	public static void writeEdif(String edifOutputFile, CellDesign design) throws IOException {
+	@Override
+	public void writeEdif(String edifOutputFile, CellDesign design) throws IOException {
 		
 		try {
 			// TODO: copy old edif environment properties into new edif environment properties
@@ -549,11 +236,14 @@ public final class EdifInterface {
 			throw new AssertionError(e);
 		}
 	}
-	
-	/*
+
+	/**
 	 * Returns a hashset of all unique library cells in a given design
+	 *
+	 * @param design
+	 * @return
 	 */
-	private static HashSet<LibraryCell> getUniqueLibraryCellsInDesign(CellDesign design) {
+	private HashSet<LibraryCell> getUniqueLibraryCellsInDesign(CellDesign design) {
 		HashSet<LibraryCell> uniqueLibraryCells = new HashSet<>();
 
 		for (Cell cell : design.getCells()) {
@@ -574,10 +264,17 @@ public final class EdifInterface {
 		return uniqueLibraryCells;
 	}
 
-	/*
+	/**
 	 * Creates the top level EDIF cell that contains the design
+	 *
+	 * @param design
+	 * @param library
+	 * @param cellMap
+	 * @return
+	 * @throws EdifNameConflictException
+	 * @throws InvalidEdifNameException
 	 */
-	private static EdifCell createEdifTopLevelCell(CellDesign design, EdifLibrary library, HashMap<LibraryCell, EdifCell> cellMap) throws EdifNameConflictException, InvalidEdifNameException {	
+	private EdifCell createEdifTopLevelCell(CellDesign design, EdifLibrary library, HashMap<LibraryCell, EdifCell> cellMap) throws EdifNameConflictException, InvalidEdifNameException {
 		
 		EdifCell topLevelCell = new EdifCell(library, createEdifNameable(design.getName()));
 		
@@ -617,13 +314,19 @@ public final class EdifInterface {
 		topLevelCell.addPropertyList(createEdifPropertyList(design.getProperties()));
 		return topLevelCell; 
 	}
-	
-	/*
+
+	/**
 	 * Creates the EDIF interface for the top level cell
-	 * 
-	 * TODO: This is only guaranteed to work with netlists imported from Vivado. 
+	 * TODO: This is only guaranteed to work with netlists imported from Vivado.
+	 *
+	 * @param design
+	 * @param topLevelEdifCell
+	 * @param portInfoMap
+	 * @return
+	 * @throws EdifNameConflictException
+	 * @throws InvalidEdifNameException
 	 */
-	private static EdifCellInterface createTopLevelInterface(CellDesign design, EdifCell topLevelEdifCell, Map<Cell, PortInformation> portInfoMap) throws EdifNameConflictException, InvalidEdifNameException {
+	private EdifCellInterface createTopLevelInterface(CellDesign design, EdifCell topLevelEdifCell, Map<Cell, PortInformation> portInfoMap) throws EdifNameConflictException, InvalidEdifNameException {
 		
 		EdifCellInterface cellInterface = new EdifCellInterface(topLevelEdifCell);
 		Pattern portNamePattern = Pattern.compile("(.*)\\[(.*)\\]");
@@ -676,11 +379,16 @@ public final class EdifInterface {
 				
 		return cellInterface;
 	}
-	
-	/*
+
+	/**
 	 * Creates an EDIF cell instance from a corresponding RapidSmith cell
+	 *
+	 * @param cell
+	 * @param parent
+	 * @param edifLibCell
+	 * @return
 	 */
-	private static EdifCellInstance createEdifCellInstance(Cell cell, EdifCell parent, EdifCell edifLibCell) {
+	private EdifCellInstance createEdifCellInstance(Cell cell, EdifCell parent, EdifCell edifLibCell) {
 		
 		Objects.requireNonNull(edifLibCell);
 		EdifCellInstance cellInstance = new EdifCellInstance(createEdifNameable(cell.getName()), parent, edifLibCell);
@@ -690,11 +398,16 @@ public final class EdifInterface {
 				
 		return cellInstance;
 	}
-	
-	/*
+
+	/**
 	 * Creates an EDIF net from a corresponding RapidSmith net
+	 *
+	 * @param cellNet
+	 * @param edifParentCell
+	 * @param portInfoMap
+	 * @return
 	 */
-	private static EdifNet createEdifNet(CellNet cellNet, EdifCell edifParentCell, Map<Cell, PortInformation> portInfoMap) {
+	private EdifNet createEdifNet(CellNet cellNet, EdifCell edifParentCell, Map<Cell, PortInformation> portInfoMap) {
 		EdifNet edifNet = new EdifNet(createEdifNameable(cellNet.getName()), edifParentCell);
 
 		// create the port references for the edif net
@@ -718,11 +431,17 @@ public final class EdifInterface {
 
 		return edifNet;
 	}
-	
-	/*
+
+	/**
 	 * Creates a port reference (connection) for an EDIF net from a top-level port cell.
+	 *
+	 * @param port
+	 * @param edifParent
+	 * @param edifNet
+	 * @param portOffset
+	 * @return
 	 */
-	private static EdifPortRef createEdifPortRefFromPort(Cell port, EdifCell edifParent, EdifNet edifNet, int portOffset) {
+	private EdifPortRef createEdifPortRefFromPort(Cell port, EdifCell edifParent, EdifNet edifNet, int portOffset) {
 		// Split on the last '['
 		String[] toks = port.getName().split("\\[(?!.*\\[)");
 		
@@ -741,13 +460,18 @@ public final class EdifInterface {
 		EdifSingleBitPort singlePort = new EdifSingleBitPort(edifPort, portIndex);
 		return new EdifPortRef(edifNet, singlePort, null);	
 	}
-	
-	/*
-	 * Creates a port reference (connection) for an EDIF net from a cell pin. 
+
+	/**
+	 * Creates a port reference (connection) for an EDIF net from a cell pin.
 	 * This is different than the port implementation because it needs to add a cell instance
 	 * to the connection.
+	 *
+	 * @param cellPin
+	 * @param edifParent
+	 * @param edifNet
+	 * @return
 	 */
-	private static EdifPortRef createEdifPortRefFromCellPin(CellPin cellPin, EdifCell edifParent, EdifNet edifNet) {
+	private EdifPortRef createEdifPortRefFromCellPin(CellPin cellPin, EdifCell edifParent, EdifNet edifNet) {
 		EdifCellInstance cellInstance = edifParent.getCellInstance(getEdifName(cellPin.getCell().getName()));
 		EdifCell libCell = cellInstance.getCellType();
 		
@@ -771,7 +495,7 @@ public final class EdifInterface {
 	/*
 	 * Converts a collection of RapidSmith properties to an EDIF property list
 	 */
-	private static PropertyList createEdifPropertyList (edu.byu.ece.rapidSmith.design.subsite.PropertyList properties) {
+	private PropertyList createEdifPropertyList(edu.byu.ece.rapidSmith.design.subsite.PropertyList properties) {
 		PropertyList edifProperties = new PropertyList();
 		
 		for (Property prop : properties) {
@@ -801,7 +525,7 @@ public final class EdifInterface {
 	/*
 	 * Creates an EDIF cell that corresponds to a RapidSmith library cell
 	 */
-	private static EdifCell createEdifLibraryCell(LibraryCell cell, EdifLibrary library) throws EdifNameConflictException, InvalidEdifNameException {
+	private EdifCell createEdifLibraryCell(LibraryCell cell, EdifLibrary library) throws EdifNameConflictException, InvalidEdifNameException {
 		// this will print a cell with the "view PRIM" ... vivado prints them with "view netlist" this shouldn't be a problem
 		EdifCell edifCell = new EdifCell(library, createEdifNameable(cell.getName()), true);
 		
@@ -838,7 +562,7 @@ public final class EdifInterface {
 	/*
 	 * Creates a valid EDIF nameable for the specified input
 	 */
-	private static EdifNameable createEdifNameable(String name) {
+	private EdifNameable createEdifNameable(String name) {
 		
 		return RenamedObject.createValidEdifNameable(name);
 	}
@@ -846,14 +570,14 @@ public final class EdifInterface {
 	/*
 	 * Returns the valid EDIF name for the specified input
 	 */
-	private static String getEdifName(String originalName) {
+	private String getEdifName(String originalName) {
 		return RenamedObject.createValidEdifString(originalName);
 	}
 	
 	/*
 	 * Converts a RapidSmith pin direction to an EDIF pin direction
 	 */
-	private static int getEdifPinDirection(PinDirection direction) {	
+	private int getEdifPinDirection(PinDirection direction) {
 		switch(direction) {
 			case IN:
 				return EdifPort.IN;
@@ -870,7 +594,7 @@ public final class EdifInterface {
 	 * Returns the corresponding EDIF port direction of a RapidSmith
 	 * port cell.
 	 */
-	private static int getEdifPinDirection(Cell portCell) {		
+	private int getEdifPinDirection(Cell portCell) {
 		if (PortDirection.isInoutPort(portCell)) {
 			return EdifPort.INOUT;
 		}
@@ -884,7 +608,7 @@ public final class EdifInterface {
 	 * internal cell pins if the corresponding internal cell has not been placed.
 	 * @return
 	 */
-	private static Collection<CellPin> getEdifExportNetPins(CellNet net) {
+	private Collection<CellPin> getEdifExportNetPins(CellNet net) {
 		return net.getPins().stream().map(p -> {
 			if (p.isInternal() && !p.getCell().isPlaced())
 				return p.getExternalPin();
@@ -896,7 +620,7 @@ public final class EdifInterface {
 	 * Returns a collection of external {@link CellNet}s and internal nets for placed macro cells
 	 * that are currently in the design.
 	 */
-	private static Collection<CellNet> getEdifExportNets(CellDesign design) {
+	private Collection<CellNet> getEdifExportNets(CellDesign design) {
 		// Only include internal nets for macro cells that are placed.
 		Collection<CellNet> nets = design.getNets().stream()
 				.filter(n -> !n.isInternal()).collect(Collectors.toList());

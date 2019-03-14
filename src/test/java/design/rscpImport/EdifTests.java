@@ -22,21 +22,20 @@ package design.rscpImport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import edu.byu.ece.rapidSmith.interfaces.vivado.EdifInterface;
+import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoEdifInterface;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.IOException;
-
 /**
- * This class is used to test the {@link EdifInterface}. Add tests as necessary.
+ * This class is used to test the {@link VivadoEdifInterface}. Add tests as necessary.
  */
 public class EdifTests {
 
 	@Test
 	@DisplayName("Parse Exception")
-	public void exceptionTest() throws IOException {
-		assertThrows(Exceptions.ParseException.class, () -> EdifInterface.parseEdif("bogusEdifFile.edf", null));
+	public void exceptionTest() {
+		VivadoEdifInterface vivadoEdifInterface = new VivadoEdifInterface();
+		assertThrows(Exceptions.ParseException.class, () -> vivadoEdifInterface.parseEdif("bogusEdifFile.edf", null, null));
 	}
 }
