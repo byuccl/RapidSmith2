@@ -68,8 +68,8 @@ public class Cell implements Serializable {
 
 	// Pseudo Cell
 	public Cell(String name, LibraryCell libCell, boolean pseudo) {
-		assert (pseudo);
-		this.pseudo = true;
+		//assert (pseudo);
+		this.pseudo = pseudo;
 
 		Objects.requireNonNull(name);
 		Objects.requireNonNull(libCell);
@@ -220,6 +220,10 @@ public class Cell implements Serializable {
 	 */
 	public boolean isVccSource() {
 		return getLibCell().isVccSource();
+	}
+
+	public boolean isStaticSource() {
+		return isVccSource() || isGndSource();
 	}
 
 	/**

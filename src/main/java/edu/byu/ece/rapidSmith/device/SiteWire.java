@@ -24,12 +24,10 @@ import edu.byu.ece.rapidSmith.device.Connection.ReverseSiteWireConnection;
 import edu.byu.ece.rapidSmith.device.Connection.SiteWireConnection;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.addAll;
 import static java.util.Collections.singleton;
 
 /**
@@ -211,6 +209,13 @@ public class SiteWire implements Wire, Serializable {
 	@Override
 	public String toString() {
 		return site.getName() + " " + site.getTile().getDevice().getWireEnumerator().getWireName(wire);
+	}
+
+	@Override
+	public Set<Wire> getWiresInNode() {
+		Set<Wire> wires = new HashSet<>();
+		wires.add(this);
+		return wires;
 	}
 
 }

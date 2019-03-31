@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class AbstractEdifInterface {
 
@@ -35,6 +37,15 @@ public abstract class AbstractEdifInterface {
 	 * 	 Import Section
 	 *********************/
 
+	private static Pattern busNamePattern;
+
+	static
+	{
+		//busNamePattern = Pattern.compile("(.*)\\[.+:(.+)\\]");
+		busNamePattern = Pattern.compile("(.*)\\[(.+):(.+)]");
+	}
+
+
 	public abstract CellDesign parseEdif(String edifFile, CellLibrary libCells, String partName);
 
 	/**
@@ -45,7 +56,7 @@ public abstract class AbstractEdifInterface {
 	 * @param vccNets
 	 * @param gndNets
 	 */
-		protected void processEdifCells(CellDesign design, Collection<EdifCellInstance> edifCellInstances, CellLibrary libCells, List<CellNet> vccNets, List<CellNet> gndNets) {
+	protected void processEdifCells(CellDesign design, Collection<EdifCellInstance> edifCellInstances, CellLibrary libCells, List<CellNet> vccNets, List<CellNet> gndNets) {
 		if (edifCellInstances == null || edifCellInstances.size() == 0) {
 			if (!suppressWarnings) {
 				System.err.println("[Warning] No cells found in the edif netlist");
@@ -107,6 +118,61 @@ public abstract class AbstractEdifInterface {
 		design.removeCell(cell);
 		Cell newPortCell = new Cell(cell.getName() + "_rsport", cell.getLibCell());
 		design.addCell(newPortCell);
+	}
+
+	/**
+	 * Converts EDIF top level ports to equivalent RapidSmith port cells and adds them to the design
+	 * @param design
+	 * @param topInterface
+	 * @param libCells
+	 * @param portOffsetMap
+	 */
+	protected void processTopLevelEdifPorts (CellDesign design, EdifCellInterface topInterface, CellLibrary libCells, Map<EdifPort, Integer> portOffsetMap) {
+
+		for ( EdifPort port : topInterface.getPortList() ) {
+
+			String libraryPortType;
+
+			if (port.isInOut()) {
+				libraryPortType = "IOPORT";
+			}
+			else if (port.isInput()) {
+				libraryPortType = "IPORT";
+			}
+			else {
+				libraryPortType = "OPORT";
+			}
+
+			int offset = 0;
+
+			// find the port prefix and offset
+			String portPrefix = port.getOldName();
+			if (port.isBus()) {
+				Matcher matcher = busNamePattern.matcher(port.getOldName());
+				if (matcher.matches()) {
+					portPrefix = matcher.group(1);
+					int fromBit = Integer.parseInt(matcher.group(2));
+					int downToBit = Integer.parseInt(matcher.group(3));
+					offset = Math.min(fromBit, downToBit);
+					portOffsetMap.put(port, offset);
+				}
+				else {
+					throw new AssertionError("Vivado Naming pattern for bus does not match expected pattern");
+				}
+			}
+
+			// Create a new RapidSmith cell for each port in the EDIF
+			for (EdifSingleBitPort busMember : port.getSingleBitPortList() ) {
+
+				LibraryCell libCell = libCells.get(libraryPortType);
+
+				String portName = port.isBus() ?
+						String.format("%s[%d]", portPrefix, reverseBusIndex(port.getWidth(), busMember.bitPosition(), offset)) :
+						portPrefix;
+				Cell portCell = new Cell(portName, libCell);
+				design.addCell(portCell);
+			}
+		}
 	}
 
 	/**
@@ -178,6 +244,8 @@ public abstract class AbstractEdifInterface {
 			// Connects to a top-level port
 			if (portRef.isTopLevelPortRef()) {
 
+
+
 				String portname = portRef.isSingleBitPortRef() ? port.getOldName() :
 						String.format("%s[%d]", getPortNamePrefix(port.getOldName()), reverseBusIndex(port.getWidth(), portRef.getBusMember(), portOffsetMap.get(port)));
 
@@ -189,6 +257,9 @@ public abstract class AbstractEdifInterface {
 				else if (!portCell.isPort()) {
 					portCell = design.getCell(portname + "_rsport");
 				}
+
+				// TODO: Change Yosys to use port names for the nets instead of changing it here!
+				net.setName(portname);
 
 				net.connectToPin(portCell.getPin("PAD"));
 

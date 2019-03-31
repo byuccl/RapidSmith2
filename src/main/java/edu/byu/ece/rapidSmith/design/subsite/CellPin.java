@@ -421,7 +421,7 @@ public abstract class CellPin implements Serializable {
 	}
 
 	public void setPinToGlobalNet(CellNet n) {
-		// TODO: Throw error if not macro pin or part pin
+		// TODO: Throw error if not macro pin, part pin, or static-source LUT
 		setNet(n);
 	}
 

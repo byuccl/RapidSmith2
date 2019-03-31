@@ -59,7 +59,8 @@ public class PartitionPin extends CellPin {
 		// Pass null to the super constructor to represent that this pin has not been attached to a cell 
 		super(null);
 		this.portName = portName;
-		this.name = "partPin." + portName + "." + pinDir.toString();
+		//this.name = "partPin." + portName + "." + pinDir.toString();
+		this.name = portName;
 		this.direction = pinDir;
 		this.wire = wire;
 

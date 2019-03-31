@@ -209,16 +209,13 @@ public class XdcPlacementInterface {
 		String[] wireToks = toks[2].split("/");
 		Tile tile = tryGetTile(wireToks[0]);
 		int wireEnum;
-		if (tile.getType() == TileType.valueOf(device.getFamily(), "OOC_WIRE"))
-			wireEnum = tryGetWireEnum("IWIRE:" + wireToks[0] + "/" + wireToks[1]);
+		if (tile.getType() == TileType.valueOf(device.getFamily(), "OOC_WIRE")) {
+			wireEnum = tryGetWireEnum(wireToks[0] + "/" + wireToks[1]);
+		}
+
 		else
 			wireEnum = tryGetWireEnum(wireToks[1]);
-		TileWire partPinNode = new TileWire(tile, wireEnum);
-		assert (partPinNode != null);
-		// TODO: Should I create or get a tile wire?
-
-		// Add the part pin node to the list of reserved wires
-		design.addReservedWire(partPinNode, design.getNet(portName));
+		TileWire partPinWire = new TileWire(tile, wireEnum);
 
 		String direction = toks[3];
 		PinDirection partPinDirection;
@@ -230,7 +227,13 @@ public class XdcPlacementInterface {
 		}
 
 		// Create and add the partition pin to the design
-		addPartitionPin(portCell, partPinNode, partPinDirection);
+		addPartitionPin(portCell, partPinWire, partPinDirection);
+
+		// Given the partition pin wire, mark all wires in the node as reserved
+		for (Wire wire : partPinWire.getWiresInNode()) {
+			CellPin partPin = portCell.getPin(portName);
+			design.addReservedWire(wire, partPin.getNet());
+		}
 	}
 
 	private void addPartitionPin(Cell portCell, TileWire partPinNode, PinDirection partPinDirection) {

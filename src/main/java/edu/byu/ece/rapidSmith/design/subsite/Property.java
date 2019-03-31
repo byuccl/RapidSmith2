@@ -82,6 +82,13 @@ public final class Property implements Serializable {
 		return (int) value;
 	}
 
+
+
+	public long getLongValue() {
+		return (long) value;
+	}
+
+
 	/**
 	 * Convenience method to get the value of the property casted as a boolean.
 	 */

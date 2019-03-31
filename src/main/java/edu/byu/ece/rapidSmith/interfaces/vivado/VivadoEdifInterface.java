@@ -27,24 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import edu.byu.ece.edif.core.EdifCell;
-import edu.byu.ece.edif.core.EdifCellInstance;
-import edu.byu.ece.edif.core.EdifCellInterface;
-import edu.byu.ece.edif.core.EdifDesign;
-import edu.byu.ece.edif.core.EdifEnvironment;
-import edu.byu.ece.edif.core.EdifLibrary;
-import edu.byu.ece.edif.core.EdifLibraryManager;
-import edu.byu.ece.edif.core.EdifNameConflictException;
-import edu.byu.ece.edif.core.EdifNameable;
-import edu.byu.ece.edif.core.EdifNet;
-import edu.byu.ece.edif.core.EdifPort;
-import edu.byu.ece.edif.core.EdifPortRef;
-import edu.byu.ece.edif.core.EdifPrintWriter;
-import edu.byu.ece.edif.core.EdifSingleBitPort;
-import edu.byu.ece.edif.core.InvalidEdifNameException;
-import edu.byu.ece.edif.core.PropertyList;
-import edu.byu.ece.edif.core.RenamedObject;
-import edu.byu.ece.edif.core.StringTypedValue;
+import edu.byu.ece.edif.core.*;
 import edu.byu.ece.edif.util.parse.EdifParser;
 import edu.byu.ece.edif.util.parse.ParseException;
 import edu.byu.ece.rapidSmith.design.subsite.Cell;
@@ -76,13 +59,7 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 	/* ********************
 	 * 	 Import Section
 	 *********************/
-	private static Pattern busNamePattern;
 
-	static
-	{
-		busNamePattern = Pattern.compile("(.*)\\[.+:(.+)\\]");
-	}
-	
 	/**
 	 * Parses the Edif netlist into a RapidSmith2 CellDesign data structure
 	 * 
@@ -122,59 +99,6 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 		}
 		catch (FileNotFoundException | ParseException e) {
 			throw new Exceptions.ParseException(e);
-		}
-	}
-
-	/**
-	 * Converts EDIF top level ports to equivalent RapidSmith port cells and adds them to the design
-	 * @param design
-	 * @param topInterface
-	 * @param libCells
-	 * @param portOffsetMap
-	 */
-	private void processTopLevelEdifPorts (CellDesign design, EdifCellInterface topInterface, CellLibrary libCells, Map<EdifPort, Integer> portOffsetMap) {
-		
-		for ( EdifPort port : topInterface.getPortList() ) {
-			
-			String libraryPortType;
-			
-			if (port.isInOut()) {
-				libraryPortType = "IOPORT";
-			}
-			else if (port.isInput()) {
-				libraryPortType = "IPORT";
-			}
-			else {
-				libraryPortType = "OPORT";
-			}
-
-			int offset = 0;
-			
-			// find the port prefix and offset
-			String portPrefix = port.getOldName();
-			if (port.isBus()) {
-				Matcher matcher = busNamePattern.matcher(port.getOldName());
-				if (matcher.matches()) {
-					portPrefix = matcher.group(1);
-					offset = Integer.parseInt(matcher.group(2));
-					portOffsetMap.put(port, offset);
-				}
-				else {
-					throw new AssertionError("Vivado Naming pattern for bus does not match expected pattern");
-				}
-			}
-			
-			// Create a new RapidSmith cell for each port in the EDIF
-			for (EdifSingleBitPort busMember : port.getSingleBitPortList() ) {
-				
-				LibraryCell libCell = libCells.get(libraryPortType);
-				
-				String portName = port.isBus() ?
-									String.format("%s[%d]", portPrefix, reverseBusIndex(port.getWidth(), busMember.bitPosition(), offset)) :
-									portPrefix;
-				Cell portCell = new Cell(portName, libCell);
-				design.addCell(portCell);
-			}
 		}
 	}
 
@@ -252,6 +176,8 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 					for (Cell internalCell : cell.getInternalCells()) {
 						uniqueLibraryCells.add(internalCell.getLibCell());
 					}
+					// TODO: Why did I do this before? didn't work with this.
+				//} else if (!cell.isGndSource() && !cell.isVccSource()) {
 				} else {
 					// If the macro cell has not been placed, include the full macro in the EDIF.
 					// If the full macro for unplaced LUTRAMs is not included in the EDIF, Vivado will
@@ -302,6 +228,10 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 					System.out.println("[Info] Macro cell " + cell.getName() + " is unplaced and will NOT be flattened.");
 
 				EdifCell edifLibCell = cellMap.get(cell.getLibCell());
+
+				if (edifLibCell == null)
+					System.out.println("How could u be null");
+
 				topLevelCell.addSubCell(createEdifCellInstance(cell, topLevelCell, edifLibCell));
 			}
 		}
@@ -497,7 +427,7 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 	 */
 	private PropertyList createEdifPropertyList(edu.byu.ece.rapidSmith.design.subsite.PropertyList properties) {
 		PropertyList edifProperties = new PropertyList();
-		
+
 		for (Property prop : properties) {
 			// The key and value of the property need sensible toString() methods when exporting to EDIF
 			// this function is for creating properties for printing only!
@@ -508,10 +438,13 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 
 				Object value = prop.getValue();
 
+				// Value should no longer ever be int after the Edif Tools Update
+				assert (!(value instanceof Integer));
+
 				if (value instanceof Boolean) {
 					edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey(), (Boolean) value);
-				} else if (value instanceof Integer) {
-					edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey(), (Integer) value);
+				} else if (value instanceof Long) {
+					edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey(), new IntegerTypedValue((long)value));
 				} else {
 					edifProperty = new edu.byu.ece.edif.core.Property(prop.getKey(), prop.getValue().toString());
 				}

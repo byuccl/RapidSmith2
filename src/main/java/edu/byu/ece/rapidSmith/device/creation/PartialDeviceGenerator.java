@@ -351,9 +351,11 @@ public class PartialDeviceGenerator {
 		WireEnumerator we = device.getWireEnumerator();
 		List<String> wireNames = new ArrayList<> (Arrays.asList(we.getWires()));
 		Map<String, Integer> enumMap = we.getWireMap();
-		
+
+		/*
 		// create a new tile wire for each output wire leaving the partial device
 		for (String wire : toOutputWires.keySet()) {
+			String wireName = "OWIRE:" + wire;
 			String wireName = "OWIRE:" + wire;
 			wireNames.add(wireName);
 			enumMap.put(wireName, enumMap.size());
@@ -364,6 +366,16 @@ public class PartialDeviceGenerator {
 			String wireName = "IWIRE:" + wire;
 			wireNames.add(wireName);
 			enumMap.put(wireName, enumMap.size());
+		}
+		*/
+
+		// Create a new tile wire for all wires entering/leaving the partial device
+		Set<String> oocWires = new HashSet<>();
+		oocWires.addAll(toOutputWires.keySet());
+		oocWires.addAll(toInputWires.keySet());
+		for (String wire : oocWires) {
+			wireNames.add(wire);
+			enumMap.put(wire, enumMap.size());
 		}
 
 		// update the wirename array and wire map of the WireEnumerator accordingly
@@ -387,7 +399,8 @@ public class PartialDeviceGenerator {
 		WireHashMap forwardMap = new WireHashMap();
 		
 		for (Entry<String, List<TileWire>> entry : toInput.entrySet()) {
-			String wireName = "IWIRE:" + entry.getKey();
+			//String wireName = "IWIRE:" + entry.getKey();
+			String wireName = entry.getKey();
 			WireConnection[] forwardConnections = new WireConnection[entry.getValue().size()];
 
 			for (int i = 0; i < entry.getValue().size(); i++) {
@@ -413,7 +426,8 @@ public class PartialDeviceGenerator {
 		// create the connections for the output OOC wires
 		WireHashMap reverseMap = new WireHashMap();
 		for (Entry<String, List<TileWire>> entry : toOutput.entrySet()) {
-			String wireName = "OWIRE:" + entry.getKey();
+			//String wireName = "OWIRE:" + entry.getKey();
+			String wireName = entry.getKey();
 			WireConnection[] reverseConnections = new WireConnection[entry.getValue().size()];
 
 			for (int i = 0; i < entry.getValue().size(); i++) {

@@ -44,6 +44,12 @@ public class CellNet implements Serializable {
 	
 	/** Unique Serialization ID for this class*/
 	private static final long serialVersionUID = 6082237548065721803L;
+
+	// TODO: Remove when no longer needed?
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	/** Unique name of the net */
 	private String name;
 	/**Type of net*/
@@ -77,6 +83,31 @@ public class CellNet implements Serializable {
 	/** Maps a connecting SitePin of the net, to the RouteTree connected to the SitePin*/
 	private Map<SitePin, RouteTree> sitePinToRTMap;
 
+	public Set<CellNet> getAliases() {
+		return aliases;
+	}
+
+	public void setAliases(Set<CellNet> aliases) {
+		this.aliases = aliases;
+	}
+
+	/** Aliases for this cellnet */
+	private Set<CellNet> aliases;
+
+	public Set<Wire> getReservedWires() {
+		return reservedWires;
+	}
+
+	public void setReservedWires(Set<Wire> reservedWires) {
+		this.reservedWires = reservedWires;
+	}
+
+	public void addReservedWire(Wire wire) {
+		this.reservedWires.add(wire);
+	}
+
+	private Set<Wire> reservedWires;
+
 	//speed up isClkNet call
 	// private boolean isClkNet;
 	// private boolean clkNetStatusSet = false;
@@ -109,6 +140,8 @@ public class CellNet implements Serializable {
 		this.isMultiSourcedNet = false;
 		this.multiSourceStatusSet = false;
 		this.sourcePins = new HashSet<>();
+		reservedWires = new HashSet<>();
+		this.aliases = new HashSet<>();
 	}
 
 	/**
@@ -410,7 +443,9 @@ public class CellNet implements Serializable {
 			pin.getCell().mapToInternalPins(pin).forEach(this::disconnectFromLeafPin);
 			pin.clearNet();
 		}
-		else {
+		// If the cellpin drives a static net, but the cell is not a VCC or GND cell, do not
+		// attempt to disconnect. This can come up with static source LUTs, etc.
+		else if (!(pin.getNet().isStaticNet() && pin.isOutpin() && !pin.getCell().isStaticSource())) {
 			disconnectFromLeafPin(pin);
 		}
 	}
@@ -570,7 +605,7 @@ public class CellNet implements Serializable {
 	 */
 	public void addSourceSitePin(SitePin sitePin) {
 		if (this.sourceSitePinList == null) {
-			this.sourceSitePinList = new ArrayList<SitePin>(2);
+			this.sourceSitePinList = new ArrayList<>(2);
 	}
 
 		// Throw an exception if the net already has two source pins
@@ -1014,8 +1049,11 @@ public class CellNet implements Serializable {
 
 		List<RouteTree> sinkTrees = new ArrayList<>();
 		for (CellPin sink : routedSinks) {
-			assert (this.getSinkRouteTree(sink) != null);
-			sinkTrees.add(this.getSinkRouteTree(sink));
+			if (this.getSinkRouteTree(sink) == null)
+				System.err.println("Error needs to be fixed");
+			//assert (this.getSinkRouteTree(sink) != null);
+			if (this.getSinkRouteTree(sink) != null)
+				sinkTrees.add(this.getSinkRouteTree(sink));
 		}
 
 		return sinkTrees;

@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -132,11 +133,15 @@ public final class VivadoInterface {
 	}
 
 	/**
-	 * Removes and unplaces all pseudo cells in the design
+	 * Removes all static source LUTs from the design. These LUTs are implied and should not be included
+	 * in the EDIF netlist or be placed.
 	 */
-	private static void removePseudoCells(CellDesign design) {
-		for (Cell pseudoCell : design.getCells().stream().filter(Cell::isPseudo).collect(Collectors.toList())) {
-			design.removeCell(pseudoCell);
+	private static void removeStaticSourceLUTs(CellDesign design) {
+		for (Cell staticSource : design.getCells().stream()
+				.filter(Cell::isLut)
+				.filter(c -> c.getPin("O").getNet() != null && c.getPin("O").getNet().isStaticNet())
+				.collect(Collectors.toList())) {
+			design.removeCell(staticSource);
 		}
 	}
 
@@ -167,8 +172,8 @@ public final class VivadoInterface {
 				
 		new File(tcpDirectory).mkdir();
 
-		// "Un-place" pseudo cells
-		removePseudoCells(design);
+		// Remove static-source LUTs
+		removeStaticSourceLUTs(design);
 
 		// insert routethrough buffers
 		LutRoutethroughInserter inserter = new LutRoutethroughInserter(design, libCells);

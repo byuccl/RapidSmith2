@@ -432,8 +432,10 @@ public class XdcRoutingInterface {
 				assert (wireToks.length == 2);
 				Tile tile = tryGetTile(wireToks[0]);
 				int wireEnum;
-				if (tile.getType() == TileType.valueOf(device.getFamily(), "OOC_WIRE"))
-					wireEnum = tryGetWireEnum("IWIRE:" + wireToks[0] + "/" + wireToks[1]);
+				if (tile.getType() == TileType.valueOf(device.getFamily(), "OOC_WIRE")) {
+					//wireEnum = tryGetWireEnum("IWIRE:" + wireToks[0] + "/" + wireToks[1]);
+					wireEnum = tryGetWireEnum(wireToks[0] + "/" + wireToks[1]);
+				}
 				else
 					wireEnum = tryGetWireEnum(wireToks[1]);
 
@@ -582,7 +584,7 @@ public class XdcRoutingInterface {
 
 			// check to see if the current route tree object is connected to a valid sink site pin
 			// the connection count is used to filter out routethrough site pins
-			SitePin sinkSitePin = routeTree.getConnectingSitePin();
+			SitePin sinkSitePin = routeTree.getConnectedSitePin();
 			if (sinkSitePin != null && connectionCount == 0) {
 				terminals.add(routeTree);
 				processSitePinSink(net, sinkSitePin);
@@ -1406,6 +1408,8 @@ public class XdcRoutingInterface {
 	/**
 	 * Merges the partial and static route strings of a route.
 	 */
+	// TODO: Come up with a better way to do this. This is error-prone and can get tricky...
+	// Would it help to have a route string tree? Probably...
 	private String mergePartialStaticRoute(String staticRoute, String partialRoute, String partPinNode, boolean staticSink) {
 		StringBuilder mergedRoute = new StringBuilder();
 		String[] toks;
@@ -1423,10 +1427,15 @@ public class XdcRoutingInterface {
 				if (toks[i].equals(partPinNode)) {
 					//System.out.println("Found the partition pin node!");
 
-					// if the staic portion has a sink, it begins with the partition pin node (and ends in a sink)
 					// just insert the static portion
 
+					// TODO: If the partial device route has more sinks than just the partition pin, something
+					// might get messed up here with the curly braces...
+
 					toks[i] = staticRoute;
+
+					// We can't just break here because there may be more sinks past the partition pin
+					break;
 				}
 			}
 		}
@@ -1444,9 +1453,11 @@ public class XdcRoutingInterface {
 				if (toks[i].equals(partPinNode)) {
 					//System.out.println("Found the partition pin node!");
 
-					// if the staic portion has the source, the partial portion will begin with the partition pin node
+					// if the static portion has the source, the partial portion will begin with the partition pin node
 					// (and ends in one or more sinks)
 					toks[i] = partialRoute;
+
+					break;
 				}
 			}
 		}
@@ -1483,16 +1494,15 @@ public class XdcRoutingInterface {
 	 * @return Vivado ROUTE string
 	 */
 	public static String getVivadoRouteString(CellNet net) {
-		
 		if (net.getIntersiteRouteTreeList().size() == 1) {
 			RouteTree route = net.getIntersiteRouteTree();
 			return createVivadoRoutingString(route.getRoot());
 		}
 		
 		// otherwise we assume its a VCC or GND net, which has a special Route string
-		String routeString = "\" ";
+		StringBuilder routeString = new StringBuilder("\" ");
 		for (RouteTree rt : net.getIntersiteRouteTreeList()) {
-			routeString += "( " + createVivadoRoutingString(rt.getRoot()) + ") ";
+			routeString.append("( ").append(createVivadoRoutingString(rt.getRoot())).append(") ");
 		}
 
 		return routeString + "\"";
@@ -1503,17 +1513,16 @@ public class XdcRoutingInterface {
 	 * TODO: refactor...this code is confusing to read
 	 */
 	private static String createVivadoRoutingString (RouteTree rt) {
-		
-		RouteTree currentRoute = rt; 
+		RouteTree currentRoute = rt;
 		String routeString = "{ ";
 			
 		while ( true ) {
 			Tile t = currentRoute.getWire().getTile();
 
-			// TODO: Don't use a string comparison. Possibly change naming of HIER_PORT wires in partial device file.
+			// TODO: Don't use a string comparison.
 			if (t.getName().equals("OOC_WIRE_X0Y0")) {
-				// Don't include "HIER_PORT_X0Y0". Also get rid of leading "IWIRE:" or "OWIRE:"
-				routeString = routeString.concat(currentRoute.getWire().getName().substring(6) + " ");
+				// Don't include "OOC_WIRE_X0Y0". Also get rid of leading "IWIRE:" or "OWIRE:"
+				routeString = routeString.concat(currentRoute.getWire().getName() + " ");
 			}
 			else
 				routeString = routeString.concat(t.getName() + "/" + currentRoute.getWire().getName() + " ");
@@ -1538,11 +1547,32 @@ public class XdcRoutingInterface {
 			
 			if (trueChildren.size() == 0)
 				break;
-			
-			for(int i = 0; i < trueChildren.size() - 1; i++) 
+
+			for(int i = 0; i < trueChildren.size() - 1; i++)
 				routeString = routeString.concat(createVivadoRoutingString(trueChildren.get(i)));
-			
-			currentRoute = trueChildren.get(trueChildren.size() - 1) ; 
+
+			// For global clocks, the partial static route string will be formatted a bit differently.
+			// Most partial static routes look like look like this:
+			// " . . . { INT_R_X47Y38/SL1BEG2 INT_R_X47Y37/WW2BEG2 INT_R_X45Y37/SS2BEG2 } . . . ", where
+			// INT_R_X45Y37/SS2BEG2 is the partition pin wire.
+			// But for global clock nets, which have partition pin wires outside the partial device, the routes look like this:
+			// " . . . CLK_HROW_BOT_R_X87Y26/CLK_HROW_CK_BUFHCLK_R0 { . . . " where CLK_HROW_BOT_R_X87Y26/CLK_HROW_CK_BUFHCLK_R0
+			// is the partition pin wire. In this case, we must make sure there are brackets surrounding the last child
+			// of the root route tree string, hence this special case. In the normal case, we don't need to do this, because
+			// the static route will not have any sinks that are children of the partition pin. For the clock case, the static route
+			// may indeed have sinks that ARE children of the partition pin.
+			// TODO: What if the static route DOES NOT have sinks for the clock route? This probably messes that case up.
+			// TODO: Don't use a string comparison.
+			//if (t.getName().equals("OOC_WIRE_X0Y0")) {
+				// Don't include "OOC_WIRE_X0Y0". Also get rid of leading "IWIRE:" or "OWIRE:"
+			//	routeString = routeString.concat(createVivadoRoutingString(trueChildren.get(trueChildren.size() - 1)));
+			//	break;
+			//}
+			//else {
+				currentRoute = trueChildren.get(trueChildren.size() - 1) ;
+			//}
+
+
 		}
 		
 		return routeString + "} ";

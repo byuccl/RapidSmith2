@@ -72,7 +72,7 @@ public class CellDesign extends AbstractDesign {
 
 	// TODO: Should be un-modifiable?
 	//rivate Set<Wire> reservedWires;
-	private Map<Wire, CellNet> reservedWires;
+	private Map<Wire, Set<CellNet>> reservedWires;
 
 	// TODO: Re-think these three
 	/**Map of out-of-context ports to their ooc tile and node **/
@@ -806,6 +806,15 @@ public class CellDesign extends AbstractDesign {
 	public  Set<Integer> getUsedSitePipsAtSite(Site ps) {
 		return this.usedSitePipsMap.getOrDefault(ps, Collections.emptySet());
 	}
+
+	public boolean isSitePipAtSiteUsed(Site site, String sitePip) {
+		Map<String, String> sitePips = pipInValues.get(site);
+
+		if (sitePips == null)
+			return false;
+
+		return sitePips.containsKey(sitePip);
+	}
 	
 	/**
 	 * Add a mapping of used PIPs to their input route in a site. 
@@ -829,8 +838,7 @@ public class CellDesign extends AbstractDesign {
 
 	public void addPipInputValAtSite(Site site, Map<String, String> pipInputVals) {
 		if (this.getPIPInputValsAtSite(site) == null) {
-			Map<String, String> pipToInputVals = new HashMap<>();
-			pipToInputVals.putAll(pipInputVals);
+			Map<String, String> pipToInputVals = new HashMap<>(pipInputVals);
 			this.pipInValues.put(site, pipToInputVals);
 		}
 		else {
@@ -968,16 +976,62 @@ public class CellDesign extends AbstractDesign {
 		this.staticRoutemap = staticRoutemap;
 	}
 
-	public Map<Wire, CellNet> getReservedWires() {
+	public Map<Wire, Set<CellNet>> getReservedWires() {
 		return reservedWires;
 	}
 
-	public void addReservedWire(Wire reservedWire, CellNet net) {
-		// TODO: This isn't good enough. Need to make a method that reserves an entire node - start wire, end wire,
-		// and wires that branch off, etc. ex: INT_R_X39Y15/SS2END_N0_3
+	// TODO: Add reservedNode: Reserve all wires in a node, given a wire
+	// reserves an entire node - start wire, end wire,
+	// and wires that branch off, etc. ex: INT_R_X39Y15/SS2END_N0_3
 
-		reservedWires.put(reservedWire, net);
-		//reservedWires.add(reservedWire);
+	// For when the net is in the static design
+	public void addReservedWire(Wire reservedWire) {
+		if (reservedWires.containsKey(reservedWire)) {
+			reservedWires.get(reservedWire).add(null);
+		}
+		else {
+			Set<CellNet> nets = new HashSet<>();
+			reservedWires.put(reservedWire, nets);
+		}
+	}
+
+
+	public void addReservedWire(Wire reservedWire, Set<CellNet> nets) {
+		if (reservedWires.containsKey(reservedWire)) {
+			reservedWires.get(reservedWire).addAll(nets);
+		}
+		else {
+			reservedWires.put(reservedWire, nets);
+		}
+
+		for (CellNet net : nets) {
+			net.addReservedWire(reservedWire);
+		}
+	}
+
+	public void addReservedWire(Wire reservedWire, CellNet net) {
+		if (reservedWires.containsKey(reservedWire)) {
+			// TODO: Check that these nets are aliases of each other; i.e., they are allowed to share the same wire
+			reservedWires.get(reservedWire).add(net);
+
+			//if (reservedWires.get(reservedWire).size() > 1)
+			//{
+			//	System.out.println("Warning: The following nets all have reserved " + reservedWire.getFullName());
+			//	for (CellNet cellNet : reservedWires.get(reservedWire)) {
+			//		System.out.println("  " + cellNet.getName());
+			//	}
+			//}
+
+
+
+		}
+		else {
+			Set<CellNet> nets = new HashSet<>();
+			nets.add(net);
+			reservedWires.put(reservedWire, nets);
+		}
+
+		//net.addReservedWire(reservedWire);
 	}
 
 	public boolean isWireReserved(Wire wire) {
@@ -985,7 +1039,14 @@ public class CellDesign extends AbstractDesign {
 		//return reservedWires.contains(wire);
 	}
 
-	public void setReservedWires(Map<Wire, CellNet> reservedWires) {
+	public boolean isWireReservedByNet(Wire wire, CellNet net) {
+		if (reservedWires.containsKey(wire)) {
+			return reservedWires.get(wire).contains(net);
+		}
+		return false;
+	}
+
+	public void setReservedWires(Map<Wire, Set<CellNet>> reservedWires) {
 		this.reservedWires = reservedWires;
 	}
 }

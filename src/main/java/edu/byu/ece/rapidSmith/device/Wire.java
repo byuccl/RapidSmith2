@@ -22,6 +22,7 @@ package edu.byu.ece.rapidSmith.device;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * Wires represent a piece of metal on a device.  Wires are composed of two
@@ -98,5 +99,7 @@ public interface Wire extends Serializable {
 	 * Returns the sources (BelPins) which drive this wire.
 	 */
 	BelPin getSource();
+
+	Set<Wire> getWiresInNode();
 
 }
