@@ -34,8 +34,6 @@ import java.util.stream.Stream;
 import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.*;
-import org.apache.commons.lang3.tuple.MutablePair;
-import sun.nio.ch.Net;
 
 import static edu.byu.ece.rapidSmith.util.Exceptions.*;
 
