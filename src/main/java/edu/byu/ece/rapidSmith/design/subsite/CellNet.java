@@ -503,7 +503,7 @@ public class CellNet implements Serializable {
 	 */
 	public void addSourceSitePin(SitePin sitePin) {
 		if (this.sourceSitePinList == null) {
-			this.sourceSitePinList = new ArrayList<SitePin>(2);
+			this.sourceSitePinList = new ArrayList<>(2);
 	}
 	
 		// Throw an exception if the net already has two source pins
