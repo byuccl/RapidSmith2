@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class AbstractEdifInterface {
 
@@ -34,6 +36,13 @@ public abstract class AbstractEdifInterface {
 	/* ********************
 	 * 	 Import Section
 	 *********************/
+
+	private static Pattern busNamePattern;
+
+	static
+	{
+		busNamePattern = Pattern.compile("(.*)\\[(.+):(.+)]");
+	}
 
 	public abstract CellDesign parseEdif(String edifFile, CellLibrary libCells, String partName);
 
@@ -83,6 +92,61 @@ public abstract class AbstractEdifInterface {
 						gndNets.add(net);
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * Converts EDIF top level ports to equivalent RapidSmith port cells and adds them to the design
+	 * @param design
+	 * @param topInterface
+	 * @param libCells
+	 * @param portOffsetMap
+	 */
+	protected void processTopLevelEdifPorts (CellDesign design, EdifCellInterface topInterface, CellLibrary libCells, Map<EdifPort, Integer> portOffsetMap) {
+
+		for ( EdifPort port : topInterface.getPortList() ) {
+
+			String libraryPortType;
+
+			if (port.isInOut()) {
+				libraryPortType = "IOPORT";
+			}
+			else if (port.isInput()) {
+				libraryPortType = "IPORT";
+			}
+			else {
+				libraryPortType = "OPORT";
+			}
+
+			int offset = 0;
+
+			// find the port prefix and offset
+			String portPrefix = port.getOldName();
+			if (port.isBus()) {
+				Matcher matcher = busNamePattern.matcher(port.getOldName());
+				if (matcher.matches()) {
+					portPrefix = matcher.group(1);
+					int fromBit = Integer.parseInt(matcher.group(2));
+					int downToBit = Integer.parseInt(matcher.group(3));
+					offset = Math.min(fromBit, downToBit);
+					portOffsetMap.put(port, offset);
+				}
+				else {
+					throw new AssertionError("Vivado Naming pattern for bus does not match expected pattern");
+				}
+			}
+
+			// Create a new RapidSmith cell for each port in the EDIF
+			for (EdifSingleBitPort busMember : port.getSingleBitPortList() ) {
+
+				LibraryCell libCell = libCells.get(libraryPortType);
+
+				String portName = port.isBus() ?
+						String.format("%s[%d]", portPrefix, reverseBusIndex(port.getWidth(), busMember.bitPosition(), offset)) :
+						portPrefix;
+				Cell portCell = new Cell(portName, libCell);
+				design.addCell(portCell);
 			}
 		}
 	}

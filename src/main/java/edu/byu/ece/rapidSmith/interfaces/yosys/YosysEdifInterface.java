@@ -264,48 +264,6 @@ public class YosysEdifInterface extends AbstractEdifInterface {
 		}
 	}
 
-	/**
-	 * Converts EDIF top level ports to equivalent RapidSmith port cells and adds them to the design
-	 * @param design
-	 * @param topInterface
-	 * @param libCells
-	 * @param portOffsetMap
-	 */
-	private void processTopLevelEdifPorts (CellDesign design, EdifCellInterface topInterface, CellLibrary libCells, Map<EdifPort, Integer> portOffsetMap) {
-		for ( EdifPort port : topInterface.getPortList() ) {
-			String libraryPortType;
-
-			if (port.isInOut()) {
-				libraryPortType = "IOPORT";
-			}
-			else if (port.isInput()) {
-				libraryPortType = "IPORT";
-			}
-			else {
-				libraryPortType = "OPORT";
-			}
-
-			// find the port prefix and offset
-			int offset = 0;
-			String portPrefix = port.getOldName();
-			// TODO: For now assume the port offset will always be 0. Revisit once Yosys issue #568 is resolved.
-			if (port.isBus())
-				portOffsetMap.put(port, offset);
-
-			// Create a new RapidSmith cell for each port in the EDIF
-			for (EdifSingleBitPort busMember : port.getSingleBitPortList() ) {
-
-				LibraryCell libCell = libCells.get(libraryPortType);
-
-				String portName = port.isBus() ?
-						String.format("%s[%d]", portPrefix, reverseBusIndex(port.getWidth(), busMember.bitPosition(), offset)) :
-						portPrefix;
-				Cell portCell = new Cell(portName, libCell);
-				design.addCell(portCell);
-			}
-		}
-	}
-
 	@Override
 	public CellDesign parseEdif(String edifFile, CellLibrary libCells, String partName) {
 		return parseEdif(edifFile, libCells, partName, false);

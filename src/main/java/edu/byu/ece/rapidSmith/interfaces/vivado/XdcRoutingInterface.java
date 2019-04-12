@@ -1183,9 +1183,9 @@ public class XdcRoutingInterface {
 		}
 		
 		// otherwise we assume its a VCC or GND net, which has a special Route string
-		String routeString = "\" ";
+		StringBuilder routeString = new StringBuilder("\" ");
 		for (RouteTree rt : net.getIntersiteRouteTreeList()) {
-			routeString += "( " + createVivadoRoutingString(rt.getRoot()) + ") ";
+			routeString.append("( ").append(createVivadoRoutingString(rt.getRoot())).append(") ");
 		}
 
 		return routeString + "\"";
