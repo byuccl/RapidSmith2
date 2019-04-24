@@ -497,7 +497,7 @@ public class CellNet implements Serializable {
 	 */
 	public boolean isClkNet() {
 		for (CellPin p : this.pins) {
-			if (p.getType() == CellPinType.CLOCK) {
+			if (p.getType() == CellPinType.CLOCK || p.getType() == CellPinType.PARTITION_CLK) {
 				return true;
 			}
 		}

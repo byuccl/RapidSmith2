@@ -228,10 +228,7 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 					System.out.println("[Info] Macro cell " + cell.getName() + " is unplaced and will NOT be flattened.");
 
 				EdifCell edifLibCell = cellMap.get(cell.getLibCell());
-
-				if (edifLibCell == null)
-					System.out.println("How could u be null");
-
+				assert (edifLibCell != null);
 				topLevelCell.addSubCell(createEdifCellInstance(cell, topLevelCell, edifLibCell));
 			}
 		}

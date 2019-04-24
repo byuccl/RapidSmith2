@@ -2,8 +2,6 @@ package edu.byu.ece.rapidSmith.interfaces.yosys;
 
 import java.io.FileNotFoundException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import edu.byu.ece.edif.core.*;

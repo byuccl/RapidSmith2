@@ -54,7 +54,7 @@ public class XdcPlacementInterface {
 	private String currentFile;
 	private final Map<BelPin, CellPin> belPinToCellPinMap;
 	private Map<String, String> oocPortMap; // Map from port name to the associated partition pin's node
-	private Collection<CellNet> multiPortSinkNets;
+	private Collection<CellNet> multiPortSinkNets; // nets with more than one port as a sink
 
 
 	public XdcPlacementInterface(CellDesign design, Device device) {
@@ -298,7 +298,8 @@ public class XdcPlacementInterface {
 
 				// Case 2: The RM is driving the partition pin with VCC or GND.
 				// Case 3: The RM is driving additional partition pins with the same net.
-				if (net.isStaticNet() || multiPortSinkNets.contains(net)) {
+				// Case 4: The RM is driving this partition pin with another partition pin
+				if (net.isStaticNet() || multiPortSinkNets.contains(net) || net.getSourcePin().isPartitionPin()) {
 					// Make a LUT1 buffer and drive it with the net.
 					String bufferName = net.getName() + "_InsertedInst_" + partPin.getPortName();
 					Cell lutCell = new Cell(bufferName, libCells.get("LUT1"));
