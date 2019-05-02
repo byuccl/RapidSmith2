@@ -345,7 +345,7 @@ public class XdcPlacementInterface {
 		return wireEnum;
 	}
 
-	// TODO: Don't have this funciton in both Placement and Routing interfaces.
+	// TODO: Don't have this function in both Placement and Routing interfaces.
 	/**
 	 * Tries to retrieve the Tile object with the given name from the currently
 	 * loaded device. If no such tile exists, a {@link ParseException} is thrown.
