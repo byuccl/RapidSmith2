@@ -298,8 +298,10 @@ public class XdcPlacementInterface {
 
 				// Case 2: The RM is driving the partition pin with VCC or GND.
 				// Case 3: The RM is driving additional partition pins with the same net.
-				// Case 4: The RM is driving this partition pin with another partition pin
-				if (net.isStaticNet() || multiPortSinkNets.contains(net) || net.getSourcePin().isPartitionPin()) {
+				// Case 4: The RM is driving this partition pin with another partition pin / port
+				// Whether it is considered a port or partition pin depends only on whether or not the source net was
+				// processed first.
+				if (net.isStaticNet() || multiPortSinkNets.contains(net) || net.getSourcePin().isPartitionPin() || net.getSourcePin().getCell().isPort()) {
 					// Make a LUT1 buffer and drive it with the net.
 					String bufferName = net.getName() + "_InsertedInst_" + partPin.getPortName();
 					Cell lutCell = new Cell(bufferName, libCells.get("LUT1"));
