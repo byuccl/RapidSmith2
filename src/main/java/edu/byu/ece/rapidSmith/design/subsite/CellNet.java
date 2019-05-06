@@ -104,7 +104,7 @@ public class CellNet implements Serializable {
 		this.isInternal = false;
 		this.isMultiSourcedNet = false;
 		this.multiSourceStatusSet = false;
-		sourcePins = new HashSet<CellPin>();
+		this.sourcePins = new HashSet<>();
 	}
 
 	/**
@@ -226,7 +226,7 @@ public class CellNet implements Serializable {
 	 * @return all of the pins that source the net
 	 */
 	public List<CellPin> getAllSourcePins() {
-		return sourcePins.stream().collect(Collectors.toList());
+		return new ArrayList<>(sourcePins);
 	}
 
 	/**
@@ -265,7 +265,7 @@ public class CellNet implements Serializable {
 		
 		// If the cellpin is part of a macro cell, add all of the internal pins
 		// to the net instead of the external macro pins
-		if (pin.getCell().isMacro()) {
+		if (!pin.isPartitionPin() && pin.getCell().isMacro()) {
 			pin.getCell().mapToInternalPins(pin).forEach(this::connectToLeafPin);
 			pin.setNet(this);
 		}
@@ -366,7 +366,9 @@ public class CellNet implements Serializable {
 			pin.getCell().mapToInternalPins(pin).forEach(this::disconnectFromLeafPin);
 			pin.clearNet();
 		}
-		else {
+		// If the cellpin drives a static net, but the cell is not a VCC or GND cell, do not
+		// attempt to disconnect. This can come up with static source LUTs, etc.
+		else if (!(pin.getNet().isStaticNet() && pin.isOutpin() && !pin.getCell().isStaticSource())) {
 			disconnectFromLeafPin(pin);
 		}
 	}

@@ -32,6 +32,7 @@ import org.jdom2.input.SAXBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -41,7 +42,8 @@ import java.util.stream.Collectors;
 /**
  *  Contains a set of cells for a design.
  */
-public class CellLibrary implements Iterable<LibraryCell> {
+public class CellLibrary implements Iterable<LibraryCell>, Serializable {
+	private static final long serialVersionUID = 5624517328792801532L;
 	private final Map<String, LibraryCell> library;
 	private LibraryCell vccSource;
 	private LibraryCell gndSource;

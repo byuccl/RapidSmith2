@@ -726,7 +726,7 @@ public class CellDesign extends AbstractDesign {
 	}
 
 	/**
-	 * Unroutes the INTERSITE portions of all nets currently in the design.
+	 * Unroutes the INTERSITE and INTRASITE portions of all nets currently in the design.
 	 * This function is currently not recommended for use. Further testing is needed.
 	 */
 	public void unrouteDesign() {

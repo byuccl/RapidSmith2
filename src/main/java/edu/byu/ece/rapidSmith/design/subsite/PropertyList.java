@@ -20,12 +20,14 @@
 
 package edu.byu.ece.rapidSmith.design.subsite;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * This class represents an objects that can have properties.
  */
-public final class PropertyList implements Iterable<Property> {
+public final class PropertyList implements Iterable<Property>, Serializable {
+	private static final long serialVersionUID = 969996324308298671L;
 	/** Properties in the property list */
 	private Map<String, Property> properties;
 
