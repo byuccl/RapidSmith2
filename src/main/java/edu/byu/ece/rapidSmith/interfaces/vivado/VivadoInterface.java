@@ -95,7 +95,11 @@ public final class VivadoInterface {
 
 		// re-create the placement and routing information
 		String placementFile = rscpPath.resolve("placement.rsc").toString();
-		XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device);
+		XdcPlacementInterface placementInterface;
+		if (mode == ImplementationMode.OUT_OF_CONTEXT || mode == ImplementationMode.RECONFIG_MODULE)
+			placementInterface = new XdcPlacementInterface(design, device, libCells);
+		else
+			placementInterface = new XdcPlacementInterface(design, device);
 		placementInterface.parsePlacementXDC(placementFile);
  
 		String routingFile = rscpPath.resolve("routing.rsc").toString();

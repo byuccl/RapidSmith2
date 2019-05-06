@@ -24,10 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import edu.byu.ece.rapidSmith.device.Bel;
-import edu.byu.ece.rapidSmith.device.BelId;
-import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.PinDirection;
+import edu.byu.ece.rapidSmith.device.*;
 
 /**
  *  A CellPin that is "backed" by a {@link LibraryPin}. This means they represent 
@@ -82,6 +79,11 @@ public class BackedCellPin extends CellPin {
 	}
 
 	@Override
+	public boolean isPartitionPin() {
+		return false;
+	}
+
+	@Override
 	public List<BelPin> getPossibleBelPins() {
 		return getPossibleBelPins(getCell().getBel());
 	}
@@ -123,4 +125,11 @@ public class BackedCellPin extends CellPin {
 	public CellPin getExternalPin() {		
 		return isInternal() ? getCell().getParent().getExternalPin(this) : null;
 	}
+
+
+	@Override
+	public Wire getPartPinWire() {
+		return null;
+	}
+
 }

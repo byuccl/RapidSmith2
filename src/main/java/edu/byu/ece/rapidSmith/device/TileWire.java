@@ -24,10 +24,7 @@ import edu.byu.ece.rapidSmith.device.Connection.ReverseTileWireConnection;
 import edu.byu.ece.rapidSmith.device.Connection.TileWireConnection;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -181,6 +178,33 @@ public class TileWire implements Wire, Serializable {
 	@Override
 	public BelPin getSource() {
 		return null;
+	}
+
+	/**
+	 * Gets wires that are part of the same node.
+	 * Only includes start and end wires (intermediate wires aren't included)
+	 * @return a set including the wires of the node
+	 */
+	@Override
+	public Set<Wire> getWiresInNode() {
+		Set<Wire> wiresInNode = new HashSet<>();
+		wiresInNode.add(this);
+
+		Collection<Connection> directForwardConnections = getWireConnections().stream()
+				.filter(connection -> !connection.isPip()).collect(Collectors.toList());
+
+		Collection<Connection> directReverseConnections = getReverseWireConnections().stream()
+				.filter(connection -> !connection.isPip()).collect(Collectors.toList());
+
+		for (Connection conn : directForwardConnections) {
+			wiresInNode.add(conn.getSinkWire());
+		}
+
+		for (Connection conn : directReverseConnections) {
+			wiresInNode.add(conn.getSinkWire());
+		}
+
+		return wiresInNode;
 	}
 
 	/**

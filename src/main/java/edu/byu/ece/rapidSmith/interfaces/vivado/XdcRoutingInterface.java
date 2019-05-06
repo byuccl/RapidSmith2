@@ -23,6 +23,7 @@ import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.device.families.FamilyInfo;
 import edu.byu.ece.rapidSmith.device.families.FamilyInfos;
+import edu.byu.ece.rapidSmith.interfaces.AbstractXdcInterface;
 
 import java.io.*;
 import java.util.*;
@@ -36,11 +37,11 @@ import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
  * This class is used for parsing and writing routing XDC files in a TINCR checkpoint.
  * Routing.xdc files are used to specify the physical wires that a net in Vivado uses.
  */
-public class XdcRoutingInterface {
+public class XdcRoutingInterface extends AbstractXdcInterface {
 
-	private final Device device;
+	//private final Device device;
 	private final CellDesign design;
-	private final WireEnumerator wireEnumerator;
+	//private final WireEnumerator wireEnumerator;
 	private final HashMap<SitePin, IntrasiteRoute> sitePinToRouteMap;
 	private final Map<BelPin, CellPin> belPinToCellPinMap;
 	private final Map<SiteType, Set<String>> staticSourceMap;
@@ -49,7 +50,7 @@ public class XdcRoutingInterface {
 	private String currentFile;
 	private Map<Bel, BelRoutethrough> belRoutethroughMap;
 	private Pattern pipNamePattern;
-	private Map<String, String> oocPortMap;
+	private Map<String, String> partPinMap;
 	private ImplementationMode implementationMode;
 	private boolean pipUsedInRoute = false;
 	
@@ -62,13 +63,14 @@ public class XdcRoutingInterface {
 	 * 				pin that is currently mapped onto the bel pin)  
 	 */
 	public XdcRoutingInterface(CellDesign design, Device device, Map<BelPin, CellPin> pinMap, ImplementationMode mode) {
-		this.device = device;
-		this.wireEnumerator = device.getWireEnumerator();
+		super(device);
+		//this.device = device;
+		//this.wireEnumerator = device.getWireEnumerator();
 		this.design = design;
 		this.sitePinToRouteMap = new HashMap<>();
 		this.staticSourceMap = new HashMap<>();
 		this.belPinToCellPinMap = pinMap;
-		this.currentLineNumber = 0;
+		//this.currentLineNumber = 0;
 		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)"); 
 		this.implementationMode = mode;
 	}
@@ -145,9 +147,7 @@ public class XdcRoutingInterface {
 						assert (gndStartWires[0].equals("START_WIRES"));
 						processStaticNet2(toks, gndStartWires);
 						break;
-					case "OOC_PORT" : processOocPort(toks);
-						break;
-					default : 
+					default :
 						throw new ParseException("Unrecognized Token: " + toks[0]);
 				}
 			}
@@ -325,8 +325,7 @@ public class XdcRoutingInterface {
 			net.getName() + " should have at least one source site pin";
 		
 		// Using the pip map, recreate each route as a RouteTree object
-		List<SitePin> pinsToRemove = new ArrayList<SitePin>(); 
-		//System.out.println(net.getSourceSitePins().size() + " " + net.getSourceSitePin().getName() + " " + net.getSourceSitePin().getExternalWire().getFullName());
+		List<SitePin> pinsToRemove = new ArrayList<>();
 		for (SitePin sitePin : net.getSourceSitePins()) {
 			RouteTree netRouteTree = recreateRoutingNetwork2(net, sitePin.getExternalWire(), pipMap);
 			
@@ -349,13 +348,13 @@ public class XdcRoutingInterface {
 		}
 		
 		// remove all invalid site pins sources for the net
-		pinsToRemove.forEach(pin -> net.removeSourceSitePin(pin));
+		pinsToRemove.forEach(net::removeSourceSitePin);
 				
 		// For out-of-context checkpoints, look for hierarchical ports that are routed to floating wires
 		if (implementationMode==ImplementationMode.OUT_OF_CONTEXT && net.getSourcePin().getCell().isPort()) {
 			
 			Cell port = net.getSourcePin().getCell();
-			String startWireName = oocPortMap.get(port.getName());
+			String startWireName = design.getPartPinMap().get(port.getName());
 			if (startWireName != null) {
 				String[] wireToks = startWireName.split("/");
 				assert (wireToks.length == 2);
@@ -397,7 +396,7 @@ public class XdcRoutingInterface {
 		searchQueue.add(start); 
 		visited.add(start.getWire());
 		
-		Set<String> emptySet = new HashSet<String>(1);
+		Set<String> emptySet = new HashSet<>(1);
 		
 		while (!searchQueue.isEmpty()) {
 			
@@ -457,7 +456,7 @@ public class XdcRoutingInterface {
 	 * to mark sink cell pins as routed, and add pseudo pins
 	 * to the design is necessary (for VCC and GND nets only)
 	 * 
-	 * @param net {@link CellNet} the is currently being routed
+	 * @param net {@link CellNet} that is currently being routed
 	 * @param sinkSitePin {@link SitePin} that the net routing has reached
 	 * @return {@code true} is connected to the net AND being used, {@code false} otherwise.
 	 * 	
@@ -536,26 +535,7 @@ public class XdcRoutingInterface {
 			staticSourceBels.add(bel);
 		}
 	}
-	
-	/**
-	 * Processes the "OOC_PORT" token in the placement.rsc of a RSCP. Specifically,
-	 * this function adds the OOC port and corresponding port wire to the oocPortMap
-	 * data structure for later processing. 
-	 * 
-	 * Expected Format: OOC_PORT portName Tile/Wire
-	 * @param toks An array of space separated string values parsed from the placement.rsc
-	 */
-	private void processOocPort(String[] toks) {
-	
-		assert (toks.length == 3) : String.format("Token error on line %d: Expected format is \"OOC_PORT\" PortName Tile/Wire ", this.currentLineNumber); 
-		
-		if (this.oocPortMap == null) {
-			this.oocPortMap = new HashMap<String, String>();
-		}
-		
-		oocPortMap.put(toks[1], toks[2]); 
-	}
-	
+
 	/**
 	 * Parse the used PIPS within a given {@link Site}, and store that information in the current {@link CellDesign}
 	 * data structure. These site pips are used to correctly import intrasite routing later in the parse process. 
@@ -571,7 +551,7 @@ public class XdcRoutingInterface {
 		String namePrefix = "intrasite:" + site.getType().name() + "/";
 
 		//create hashmap that shows pip used to input val
-		HashMap<String, String> pipToInputVal = new HashMap<String, String>();
+		HashMap<String, String> pipToInputVal = new HashMap<>();
 		
 		// Iterate over the list of used site pips, and store them in the site
 		for(int i = 2; i < toks.length; i++) {
@@ -905,22 +885,7 @@ public class XdcRoutingInterface {
 		return site;
 	}
 	
-	/**
-	 * Tries to retrieve the Tile object with the given name from the currently
-	 * loaded device. If no such tile exists, a {@link ParseException} is thrown.
-	 * 
-	 * @param tileName Name of the tile to get a handle of
-	 * @return {@link Tile} object
-	 */
-	private Tile tryGetTile(String tileName) {
-		Tile tile = device.getTile(tileName);
-		
-		if (tile == null) {
-			throw new ParseException("Tile \"" + tileName + "\" not found in device " + device.getPartName() + ". \n"  
-					+ "On line " + this.currentLineNumber + " of " + currentFile); 
-		}
-		return tile;
-	}
+
 	
 	/**
 	 * Tries to retrieve the CellNet object with the given name <br>
@@ -1053,21 +1018,7 @@ public class XdcRoutingInterface {
 	}
 	
 	
-	/**
-	 * Tries to retrieve the integer enumeration of a wire name in the currently loaded device <br>
-	 * If the wire does not exist, a ParseException is thrown <br>
-	 */
-	private int tryGetWireEnum(String wireName) {
-		
-		Integer wireEnum = wireEnumerator.getWireEnum(wireName);
-		
-		if (wireEnum == null) {
-			throw new ParseException(String.format("Wire: \"%s\" does not exist in the current device. \n"
-												 + "On line %d of %s", wireName, currentLineNumber, currentFile));
-		}
-		
-		return wireEnum;
-	}
+
 
 	/**
 	 * Writes the intrasite routing TCL commands for the design to the routing.xdc file.

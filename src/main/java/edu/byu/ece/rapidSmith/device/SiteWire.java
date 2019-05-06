@@ -24,10 +24,7 @@ import edu.byu.ece.rapidSmith.device.Connection.ReverseSiteWireConnection;
 import edu.byu.ece.rapidSmith.device.Connection.SiteWireConnection;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.singleton;
@@ -169,6 +166,17 @@ public class SiteWire implements Wire, Serializable {
 		if (belPin == null || !belPin.isOutput())
 			return null;
 		return belPin;
+	}
+
+	/**
+	 * Gets wires that make up a node. This is just the wire for site wires.
+	 * @return a set containing the wire
+	 */
+	@Override
+	public Set<Wire> getWiresInNode() {
+		Set<Wire> wires = new HashSet<>();
+		wires.add(this);
+		return wires;
 	}
 
 	@Override

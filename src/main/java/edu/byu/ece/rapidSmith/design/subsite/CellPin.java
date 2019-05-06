@@ -27,11 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import edu.byu.ece.rapidSmith.device.Bel;
-import edu.byu.ece.rapidSmith.device.BelId;
-import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.PinDirection;
-import edu.byu.ece.rapidSmith.device.SitePin;
+import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
 /**
@@ -329,6 +325,11 @@ public abstract class CellPin implements Serializable {
 	public abstract String getFullName();
 
 	/**
+	 * @return the name of the port the CellPin is attached to.
+	 */
+	//public abstract String getPortName();
+
+	/**
 	 * @return the direction of this pin from the cell's perspective
 	 */
 	public abstract PinDirection getDirection();  
@@ -336,7 +337,12 @@ public abstract class CellPin implements Serializable {
 	/** 
 	 * @return <code>true</code> if the pin is a pseudo pin. <code>false</code> otherwise.
 	 */
-	public abstract boolean isPseudoPin(); 
+	public abstract boolean isPseudoPin();
+
+	/**
+	 * @return <code>true</code> if the pin is a partition pin. <code>false</code> otherwise.
+	 */
+	public abstract boolean isPartitionPin();
 	
 	/**
 	 * Returns the BelPins that this pin can potentially be mapped onto. The BEL that this pin's parent
@@ -392,13 +398,15 @@ public abstract class CellPin implements Serializable {
 	 */
 	public abstract CellPinType getType();
 	
-	/**
-	 * If the 
-	 * @return 
-	 */
 	public abstract CellPin getExternalPin();
 
-	public void setMacroPinToGlobalNet(CellNet n) {
+	/**
+	 * @return the partition pin wire
+	 */
+	public abstract Wire getPartPinWire();
+
+	public void setPinToGlobalNet(CellNet n) {
+		// TODO: Throw error if not macro pin, part pin, or static-source LUT
 		setNet(n);
 	}
 

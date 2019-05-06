@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
  *  the cell's type.
  */
 public class Cell {
+	private static final long serialVersionUID = -7022378736571999208L;
 	/** Unique name of this instance */
 	private String name;
 	/** The CellDesign this cell exists in */
@@ -186,6 +187,14 @@ public class Cell {
 	}
 
 	/**
+	 * Returns true if this cell acts as a VCC or ground source.
+	 * @return
+	 */
+	public boolean isStaticSource() {
+		return isVccSource() || isGndSource();
+	}
+
+	/**
 	 * Returns true if this cell is a top-level port of the design
 	 */
 	public boolean isPort() {
@@ -290,6 +299,13 @@ public class Cell {
 
 	void unplace() {
 		this.bel = null;
+	}
+
+	/**
+	 * @return true if the cell has at least one partition pin.
+	 */
+	public boolean hasPartitionPin() {
+		return (pinMap.values().stream().anyMatch(CellPin::isPartitionPin));
 	}
 	
 	/**
