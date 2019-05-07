@@ -141,7 +141,7 @@ public class XdcPlacementInterface {
 	}
 
 	/**
-	 * Processes the "VCC_PART_PINS" or "GND_PART_PINS" token in the static_resources.rsc of a RSCP.
+	 * Processes the "VCC_PART_PINS" or "GND_PART_PINS" token in the static_resources.rsc of a RSCP. These are partition pins that need to be driven with VCC/GND and do not have a normal partition pin.
 	 * Expected Format: VCC_PART_PINS partPinName partPinName ...
 	 * @param toks An array of space separated string values parsed from the placement.rsc
 	 */
@@ -161,21 +161,24 @@ public class XdcPlacementInterface {
 			assert (portCell.getPins().size() == 1);
 			CellPin cellPin = portCell.getPins().iterator().next();
 			CellNet net = cellPin.getNet();
+			List<CellPin> pins = new ArrayList<>();
 
+			// TODO: In what situations will the net not be null?
+			// An RM synthesized and placed by Vivado has a null net.
 			// Detach the port's pin from its current net
-			assert (net != null);
-			net.disconnectFromPin(cellPin);
+			//assert (net != null);
+			if (net != null) {
+				net.disconnectFromPin(cellPin);
+				pins.addAll(net.getPins());
+				net.disconnectFromPins(pins);
+				design.removeNet(net);
+			}
 
 			// Re-assign the net's pins to either VCC or GND
 			CellNet staticNet = isVcc? design.getVccNet() : design.getGndNet();
-
-			// Assuming driver has already been removed
-			List<CellPin> pins = new ArrayList<>(net.getPins());
-			net.disconnectFromPins(pins);
-			design.removeNet(net);
 			staticNet.connectToPins(pins);
 
-			CellPin partPin = new PartitionPin( portName, null, PinDirection.IN);
+			CellPin partPin = new PartitionPin(portName, null, PinDirection.IN);
 			portCell.attachPartitionPin(partPin);
 
 			// Make the partition pin point to the appropriate global static net

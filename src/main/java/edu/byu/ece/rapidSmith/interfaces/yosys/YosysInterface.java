@@ -100,7 +100,8 @@ public final class YosysInterface {
 			String resourcesFile = rscpPath.resolve("static_resources.rsc").toString();
 			UsedStaticResources staticResources = new UsedStaticResources(design, device);
 			staticResources.parseResourcesRSC(resourcesFile);
-			vivadoCheckpoint.setStaticRoutemap(staticResources.getStaticRoutemap());
+			vivadoCheckpoint.setStaticRouteStringMap(staticResources.getStaticRouteStringMap());
+			vivadoCheckpoint.setReconfigStaticNetMap(staticResources.getReconfigStaticNetMap());
 			//design.setOocPortMap(staticResources.getOocPortMap());
 		}
 		

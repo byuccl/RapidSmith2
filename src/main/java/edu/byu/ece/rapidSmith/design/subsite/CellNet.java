@@ -496,6 +496,10 @@ public class CellNet implements Serializable {
 	 * @return {@code true} if this net is a clock net
 	 */
 	public boolean isClkNet() {
+		// Don't consider static nets as clock nets even if they have clock pins
+		if (isStaticNet())
+			return false;
+
 		for (CellPin p : this.pins) {
 			if (p.getType() == CellPinType.CLOCK || p.getType() == CellPinType.PARTITION_CLK) {
 				return true;

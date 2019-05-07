@@ -125,7 +125,7 @@ public final class VivadoInterface {
 			String resourcesFile = rscpPath.resolve("static_resources.rsc").toString();
 			UsedStaticResources staticResources = new UsedStaticResources(design, device);
 			staticResources.parseResourcesRSC(resourcesFile);
-			vivadoCheckpoint.setStaticRoutemap(staticResources.getStaticRoutemap());
+			vivadoCheckpoint.setStaticRouteStringMap(staticResources.getStaticRouteStringMap());
 			//design.setOocPortMap(staticResources.getOocPortMap());
 		}
 
@@ -153,11 +153,11 @@ public final class VivadoInterface {
 	 * @throws IOException
 	 */
 	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells) throws IOException {
-		writeTCP(tcpDirectory, design, device, libCells, false, ImplementationMode.REGULAR, null);
+		writeTCP(tcpDirectory, design, device, libCells, false, ImplementationMode.REGULAR, null, null);
 	}
 
 	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells, boolean intrasiteRouting, ImplementationMode mode) throws IOException {
-		writeTCP(tcpDirectory, design, device, libCells, intrasiteRouting, mode, null);
+		writeTCP(tcpDirectory, design, device, libCells, intrasiteRouting, mode, null, null);
 	}
 
 	/**
@@ -168,7 +168,7 @@ public final class VivadoInterface {
 	 * @param intrasiteRouting Whether to include commands to manually set intrasite routing in Vivado
 	 * @throws IOException
 	 */
-	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells, boolean intrasiteRouting, ImplementationMode mode, Map<String, MutablePair<String, String>> staticRoutemap) throws IOException {
+	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells, boolean intrasiteRouting, ImplementationMode mode, Map<String, String> reconfigStaticNetMap, Map<String, RouteStringTree> staticRouteStringMap) throws IOException {
 				
 		new File(tcpDirectory).mkdir();
 
@@ -188,7 +188,7 @@ public final class VivadoInterface {
 		String routingOut = Paths.get(tcpDirectory, "routing.xdc").toString();
 		String partpinRoutingOut = Paths.get(tcpDirectory, "partpin_routing.xdc").toString();
 
-		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, null, mode, staticRoutemap);
+		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, null, mode, reconfigStaticNetMap, staticRouteStringMap);
 		routingInterface.writeRoutingXDC(routingOut, partpinRoutingOut, design, intrasiteRouting);
 
 		// Write EDIF netlist

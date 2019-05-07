@@ -78,8 +78,20 @@ public class CellDesign extends AbstractDesign {
 	/**Map of out-of-context ports to their ooc tile and node **/
 	private Map<String, String> oocPortMap;
 	// TODO: Merge these maps. Map of maps. Static in the partial reconfig. context.
-	private Map <String, String> staticNetMap;
-	private Map <String, String> staticRoutemap;
+	//private Map <String, String> staticNetMap;
+	//private Map <String, String> staticRoutemap;
+	private Map<String, String> reconfigStaticNetMap;
+	private Map<String, RouteStringTree> staticRouteStringMap;
+
+	public Map<String, RouteStringTree> getStaticRouteStringMap() {
+		return staticRouteStringMap;
+	}
+
+	public void setStaticRouteStringMap(Map<String, RouteStringTree> staticRouteStringMap) {
+		this.staticRouteStringMap = staticRouteStringMap;
+	}
+
+
 
 	/**
 	 * Constructor which initializes all member data structures. Sets name and
@@ -960,21 +972,21 @@ public class CellDesign extends AbstractDesign {
 		this.oocPortMap = oocPortMap;
 	}
 
-	public Map<String, String> getStaticNetMap() {
-		return staticNetMap;
-	}
+	//public Map<String, String> getStaticNetMap() {
+	//	return staticNetMap;
+	//}
 
-	public void setStaticNetMap(Map<String, String> staticNetMap) {
-		this.staticNetMap = staticNetMap;
-	}
+	//public void setStaticNetMap(Map<String, String> staticNetMap) {
+	//	this.staticNetMap = staticNetMap;
+	//}
 
-	public Map<String, String> getStaticRoutemap() {
-		return staticRoutemap;
-	}
+	//public Map<String, String> getStaticRoutemap() {
+	//	return staticRoutemap;
+	//}
 
-	public void setStaticRoutemap(Map<String, String> staticRoutemap) {
-		this.staticRoutemap = staticRoutemap;
-	}
+	//public void setStaticRoutemap(Map<String, String> staticRoutemap) {
+	//	this.staticRoutemap = staticRoutemap;
+	//}
 
 	public Map<Wire, Set<CellNet>> getReservedWires() {
 		return reservedWires;
@@ -1048,6 +1060,14 @@ public class CellDesign extends AbstractDesign {
 
 	public void setReservedWires(Map<Wire, Set<CellNet>> reservedWires) {
 		this.reservedWires = reservedWires;
+	}
+
+	public Map<String, String> getReconfigStaticNetMap() {
+		return reconfigStaticNetMap;
+	}
+
+	public void setReconfigStaticNetMap(Map<String, String> reconfigStaticNetMap) {
+		this.reconfigStaticNetMap = reconfigStaticNetMap;
 	}
 }
 

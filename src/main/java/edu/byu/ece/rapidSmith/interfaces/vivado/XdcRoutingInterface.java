@@ -50,6 +50,7 @@ import edu.byu.ece.rapidSmith.device.TileWire;
 import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.device.WireEnumerator;
 import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.logging.log4j.core.appender.routing.Route;
 
 import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
 
@@ -72,8 +73,9 @@ public class XdcRoutingInterface {
 	private Map<Bel, BelRoutethrough> belRoutethroughMap;
 	private Pattern pipNamePattern;
 	private Map<String, String> oocPortMap; // Map from port name to the associated partition pin's node
-	private Map<String, MutablePair<String, String>> staticRoutemap;
-
+	//private Map<String, MutablePair<String, String>> staticRoutemap;
+	private Map<String, String> reconfigStaticNetMap;
+	private Map<String, RouteStringTree> staticRouteStringMap;
 
 
 	private ImplementationMode implementationMode;
@@ -87,7 +89,7 @@ public class XdcRoutingInterface {
 	 * @param pinMap A map from a {@link BelPin} to its corresponding {@link CellPin} (the cell
 	 * 				pin that is currently mapped onto the bel pin)  
 	 */
-	public XdcRoutingInterface(CellDesign design, Device device, Map<BelPin, CellPin> pinMap, ImplementationMode mode, Map<String, MutablePair<String, String>> staticRoutemap) {
+	public XdcRoutingInterface(CellDesign design, Device device, Map<BelPin, CellPin> pinMap, ImplementationMode mode, Map<String, String> reconfigStaticNetMap, Map<String, RouteStringTree> staticRouteStringMap) {
 		this.device = device;
 		this.wireEnumerator = device.getWireEnumerator();
 		this.design = design;
@@ -97,7 +99,9 @@ public class XdcRoutingInterface {
 		this.currentLineNumber = 0;
 		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)");
 		this.implementationMode = mode;
-		this.staticRoutemap = staticRoutemap;
+		//this.staticRoutemap = staticRoutemap;
+		this.reconfigStaticNetMap = reconfigStaticNetMap;
+		this.staticRouteStringMap = staticRouteStringMap;
 
 		this.oocPortMap = design.getOocPortMap();
 
@@ -1356,15 +1360,18 @@ public class XdcRoutingInterface {
 				String portName = net.getSourcePin().getPortName();
 
 				// Find the matching static net from the static-only design
-				MutablePair<String, String> netRoutePair = staticRoutemap.get(net.getName());
+				String staticNetName = reconfigStaticNetMap.get(net.getName());
+
+				//MutablePair<String, String> netRoutePair = staticRoutemap.get(net.getName());
 				String partialRoute = getVivadoRouteString(net);
 
 				// Merge the static and RM portions of the route
 				String partPinNode = oocPortMap.get(portName);
-				String mergedRoute = mergePartialStaticRoute(netRoutePair.getValue(), partialRoute, partPinNode, false);
+				mergePartialStaticRoute(net.getIntersiteRouteTree(), staticRouteStringMap.get(staticNetName));
+				//String mergedRoute = mergePartialStaticRoute(netRoutePair.getValue(), partialRoute, partPinNode, false);
 
 				// Update the value in the map
-				netRoutePair.setValue(mergedRoute);
+				//netRoutePair.setValue(mergedRoute);
 			}
 
 			for (CellNet net : sinkNets) {
@@ -1373,16 +1380,20 @@ public class XdcRoutingInterface {
 
 				for (CellPin partPin : net.getPartitionPins()) {
 					String portName = partPin.getPortName();
-					MutablePair<String, String> netRoutePair = staticRoutemap.get(net.getName());
+					///MutablePair<String, String> netRoutePair = staticRoutemap.get(net.getName());
+
+					// Find the matching static net from the static-only design
+					String staticNetName = reconfigStaticNetMap.get(net.getName());
 
 					// Merge the static and RM portions of the route
 					String partPinNode = oocPortMap.get(portName);
 
 					assert(partPinNode != null);
-					String mergedRoute = mergePartialStaticRoute(netRoutePair.getValue(), partialRoute, partPinNode, true);
+					mergePartialStaticRoute(net.getIntersiteRouteTree(), staticRouteStringMap.get(staticNetName));
+					//String mergedRoute = mergePartialStaticRoute(netRoutePair.getValue(), partialRoute, partPinNode, true);
 
 					// Update the value in the map
-					netRoutePair.setValue(mergedRoute);
+					//netRoutePair.setValue(mergedRoute);
 				}
 			}
 
@@ -1391,17 +1402,26 @@ public class XdcRoutingInterface {
 			//Set<MutablePair<String, String>> mergedRouteSet = staticRoutemap.values().stream()
 			//		.filter(v -> design.getNet(v.left).getIntersiteRouteTree() != null).collect(Collectors.toSet());
 
-			Set<MutablePair<String, String>> mergedRouteSet = staticRoutemap.entrySet()
-					.stream()
-					.filter(e -> design.getNet(e.getKey()).getIntersiteRouteTree() != null)
-					.map(Map.Entry::getValue)
-					.collect(Collectors.toSet());
+		//	Set<MutablePair<String, String>> mergedRouteSet = staticRoutemap.entrySet()
+		//			.stream()
+		//			.filter(e -> design.getNet(e.getKey()).getIntersiteRouteTree() != null)
+		//			.map(Map.Entry::getValue)
+		//			.collect(Collectors.toSet());
 
-			for (MutablePair<String, String> netRoutePair : mergedRouteSet) {
-				oocFileOut.write(String.format("set_property ROUTE %s [get_nets {%s}]\n", netRoutePair.getValue(), netRoutePair.getKey()));
-			}
+			//for (MutablePair<String, String> netRoutePair : mergedRouteSet) {
+			//	oocFileOut.write(String.format("set_property ROUTE %s [get_nets {%s}]\n", netRoutePair.getValue(), netRoutePair.getKey()));
+			//}
 			oocFileOut.close();
 		}
+
+	}
+
+	private void mergePartialStaticRoute(RouteTree moduleRouteTree, RouteStringTree staticRouteStringTree) {
+		// Convert the reconfigurable module's route tree to a route string tree
+		RouteStringTree moduleRouteStringTree = new RouteStringTree(moduleRouteTree, new RouteStringTree(moduleRouteTree.getWire().getFullName()));
+		System.out.println("Made the string tree");
+		//RouteStringTree root =  new RouteStringTree(routeTree.getWire().getFullName());
+		//RouteStringTree current = root;
 
 	}
 
@@ -1410,7 +1430,7 @@ public class XdcRoutingInterface {
 	 */
 	// TODO: Come up with a better way to do this. This is error-prone and can get tricky...
 	// Would it help to have a route string tree? Probably...
-	private String mergePartialStaticRoute(String staticRoute, String partialRoute, String partPinNode, boolean staticSink) {
+	private String mergePartialStaticRouteOld(String staticRoute, String partialRoute, String partPinNode, boolean staticSink) {
 		StringBuilder mergedRoute = new StringBuilder();
 		String[] toks;
 		if (staticSink) {

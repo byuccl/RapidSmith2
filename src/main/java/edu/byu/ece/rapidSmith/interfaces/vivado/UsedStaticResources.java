@@ -45,7 +45,31 @@ public class UsedStaticResources {
 	private final WireEnumerator wireEnumerator;
 
     // Map from port name(s) to a pair of the static net name and the static portion of the route string
-	private Map<String, MutablePair<String, String>> staticRoutemap;
+	//private Map<String, MutablePair<String, String>> staticRoutemap;
+
+	public Map<String, String> getReconfigStaticNetMap() {
+		return reconfigStaticNetMap;
+	}
+
+	public void setReconfigStaticNetMap(Map<String, String> reconfigStaticNetMap) {
+		this.reconfigStaticNetMap = reconfigStaticNetMap;
+	}
+
+	// Map from RM port name(s) to the static net's name.
+	private Map<String, String> reconfigStaticNetMap;
+
+	// Map from the static net name to the route string tree
+	private Map<String, RouteStringTree> staticRouteStringMap;
+
+	public Map<String, RouteStringTree> getStaticRouteStringMap() {
+		return staticRouteStringMap;
+	}
+
+	public void setStaticRouteStringMap(Map<String, RouteStringTree> staticRouteStringMap) {
+		this.staticRouteStringMap = staticRouteStringMap;
+	}
+
+
 
 	/**
 	 * Creates a new XdcRoutingInterface object.
@@ -57,6 +81,8 @@ public class UsedStaticResources {
 		this.device = device;
 		this.wireEnumerator = device.getWireEnumerator();
 		this.design = design;
+		this.reconfigStaticNetMap = new HashMap<>();
+		this.staticRouteStringMap = new HashMap<>();
 	}
 	
 	/**
@@ -148,11 +174,77 @@ public class UsedStaticResources {
 		}
 	}
 
+
+	/*
+	 * Converts a Vivado ROUTE string to a RS2 RouteTree data structure
+	 */
+	private int createIntersiteRouteTree(RouteStringTree branchRoot, int index, String[] toks) {
+
+		RouteStringTree current = branchRoot;
+
+		while ( index < toks.length ) {
+
+			// new branch
+			if (toks[index].equals("{") ) {
+				index++;
+				index = createIntersiteRouteTree(current, index, toks);
+			}
+			//end of a branch
+			else if (toks[index].equals("}") ) {
+				// TODO: Add to list of terminals?
+				return index + 1;
+			}
+			else {
+				current = current.addChild(toks[index]);
+				index++;
+			}
+		}
+		return index;
+	}
+
+	private void processStaticRoutes(String[] toks) {
+		assert(toks.length > 3);
+		ArrayList<String> portNames  = new ArrayList<>();
+		Set<CellNet> portNets = new HashSet<>();
+
+		// First token (after STATIC_RT) is name of the static-net
+		String staticNetName = toks[1];
+
+		// Next tokens are the names of the associated ports
+		int i = 2;
+		while (!toks[i].equals("{")) {
+			// Get the partition pin net. Note that it may be named differently than just the ooc port name.
+			Cell oocPort = design.getCell(toks[i]);
+			CellPin partPin = oocPort.getPin(toks[i]);
+			CellNet partPinNet = partPin.getNet();
+
+			assert (partPinNet != null);
+			portNets.add(partPinNet);
+
+			// TODO: Refactor this code a bit.
+			portNames.add(partPin.getNet().getName());
+			i++;
+		}
+
+		// Set the aliases for the cellnet. Note that these are only aliases within the context of the full design.
+		for (CellNet portNet : portNets) {
+			reconfigStaticNetMap.put(portNet.getName(), staticNetName);
+			portNet.setAliases(portNets);
+		}
+
+		// Create the Route String Tree
+		i++;
+		RouteStringTree root = new RouteStringTree(toks[i]);
+		createIntersiteRouteTree(root, i+1, toks);
+		staticRouteStringMap.put(staticNetName, root);
+
+	}
+
 	/**
 	 *
 	 * @param toks
 	 */
-	private void processStaticRoutes(String[] toks) {
+	private void processStaticRoutesOld(String[] toks) {
 		assert(toks.length > 3);
 		StringBuilder staticRouteString = new StringBuilder();
 		ArrayList<String> portNames  = new ArrayList<>();
@@ -219,17 +311,17 @@ public class UsedStaticResources {
 
 		MutablePair<String, String> netRoute = new MutablePair<>(staticNetName, staticRouteString.toString());
 
-		if (this.staticRoutemap == null)
-			this.staticRoutemap = new HashMap<>();
+		//if (this.staticRoutemap == null)
+		//	this.staticRoutemap = new HashMap<>();
 
-		for (String portName : portNames) {
-			staticRoutemap.put(portName, netRoute);
-		}
+		//for (String portName : portNames) {
+		//	staticRoutemap.put(portName, netRoute);
+		//}
 
 	}
 
-    public Map<String, MutablePair<String, String>> getStaticRoutemap() {
-        return staticRoutemap;
-    }
+  //  public Map<String, MutablePair<String, String>> getStaticRoutemap() {
+   //     return staticRoutemap;
+   // }
 
 }
