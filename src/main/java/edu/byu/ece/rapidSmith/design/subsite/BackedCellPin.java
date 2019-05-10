@@ -69,11 +69,6 @@ public class BackedCellPin extends CellPin {
 	}
 
 	@Override
-	public String getPortName() {
-		return null;
-	}
-
-	@Override
 	public PinDirection getDirection() {
 		return libraryPin.getDirection();
 	}
@@ -131,8 +126,10 @@ public class BackedCellPin extends CellPin {
 		return isInternal() ? getCell().getParent().getExternalPin(this) : null;
 	}
 
+
 	@Override
-	public Wire getWire() {
+	public Wire getPartPinWire() {
 		return null;
 	}
+
 }

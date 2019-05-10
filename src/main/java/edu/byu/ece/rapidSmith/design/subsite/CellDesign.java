@@ -22,6 +22,7 @@ package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.design.AbstractDesign;
 import edu.byu.ece.rapidSmith.device.Bel;
+import edu.byu.ece.rapidSmith.device.PinDirection;
 import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.interfaces.vivado.XdcConstraint;
@@ -69,6 +70,9 @@ public class CellDesign extends AbstractDesign {
 	private ImplementationMode mode;
 	/** Map of used PIPs to their Input Values in a Site **/
 	private Map<Site, Map<String, String>> pipInValues;
+	/** Map of partition pins (ooc ports) to their ooc tile and node **/
+	private Map<String, String> partPinMap;
+
 
 	// TODO: Should be un-modifiable?
 	//rivate Set<Wire> reservedWires;
@@ -221,7 +225,7 @@ public class CellDesign extends AbstractDesign {
 	public Stream<Cell> getLeafCells() {
 		return cellMap.values().stream().flatMap(c -> _flatten(c));
 	}
-
+	
 	/**
 	 * Returns a flattened view of the in-context cells in the netlist. Macro
 	 * cells are not returned in this list, only leaf and internal cells
@@ -542,6 +546,21 @@ public class CellDesign extends AbstractDesign {
 		return gndNet;
 	}
 
+
+	/**
+	 * Get all nets that have more than one port as a sink
+	 * @return
+	 */
+	public Collection<CellNet> getMultiPortSinkNets() {
+		Collection<CellNet> nets = new ArrayList<>();
+		for (CellNet net : getNets()) {
+			if (net.getPins().stream().filter(cellPin -> cellPin.getDirection().equals(PinDirection.IN) && cellPin.getCell().isPort()).count() > 1)
+				nets.add(net);
+		}
+		return nets;
+	}
+
+
 	/**
 	 * Returns the cell at the specified BEL in this design. Only internal and
 	 * leaf cells will be returned from this function. Macro cells will not be 
@@ -827,7 +846,7 @@ public class CellDesign extends AbstractDesign {
 
 		return sitePips.containsKey(sitePip);
 	}
-	
+
 	/**
 	 * Add a mapping of used PIPs to their input route in a site. 
 	 * @param ps {@link Site} to route
@@ -857,7 +876,7 @@ public class CellDesign extends AbstractDesign {
 			this.getPIPInputValsAtSite(site).putAll(pipInputVals);
 		}
 	}
-	
+
 	/**
 	 * Returns a mapping of used PIPs to their input route
 	 * @param ps {@link Site} object
@@ -921,6 +940,20 @@ public class CellDesign extends AbstractDesign {
 		}
 
 		return portConstraintMap;
+	}
+
+	/**
+	 * @return the partPinMap
+	 */
+	public Map<String, String> getPartPinMap() {
+		return partPinMap;
+	}
+
+	/**
+	 * @param partPinMap the partPinMap to set
+	 */
+	public void setPartPinMap(Map<String, String> partPinMap) {
+		this.partPinMap = partPinMap;
 	}
 
 	/**

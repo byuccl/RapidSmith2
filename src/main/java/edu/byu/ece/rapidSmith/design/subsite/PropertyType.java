@@ -27,7 +27,8 @@ import java.util.Map;
 /**
  * Type of a property specifying its source and type.
  */
-public final class PropertyType implements Serializable {
+public final class PropertyType  implements Serializable {
+	private static final long serialVersionUID = 4035028819392316516L;
 	private static final Map<String, PropertyType> propertyTypes = new HashMap<>();
 
 	/** A property stemming from XDL */
@@ -38,7 +39,6 @@ public final class PropertyType implements Serializable {
 	public static final PropertyType BELPROP = registerType("BELPROP");
 	/** EDIF Properties */
 	public static final PropertyType EDIF = registerType("EDIF");
-	private static final long serialVersionUID = 4035028819392316516L;
 
 	private final String name;
 

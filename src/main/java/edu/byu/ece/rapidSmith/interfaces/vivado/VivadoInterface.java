@@ -50,7 +50,7 @@ public final class VivadoInterface {
 	public static VivadoCheckpoint loadRSCP(String rscp) throws IOException {
 		return loadRSCP(rscp, false);
 	}
-
+	
 	/**
 	 * Parses a RSCP generated from Tincr, and creates an equivalent RapidSmith2 design.
 	 * 
@@ -58,6 +58,7 @@ public final class VivadoInterface {
 	 * @throws IOException
 	 */
 	public static VivadoCheckpoint loadRSCP (String rscp, boolean storeAdditionalInfo) throws IOException {
+	
 		Path rscpPath = Paths.get(rscp);
 		
 		if (!rscpPath.getFileName().toString().endsWith(".rscp")) {
@@ -100,18 +101,25 @@ public final class VivadoInterface {
 
 		// re-create the placement and routing information
 		String placementFile = rscpPath.resolve("placement.rsc").toString();
-		XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device, libCells);
+		XdcPlacementInterface placementInterface;
+		if (mode == ImplementationMode.OUT_OF_CONTEXT || mode == ImplementationMode.RECONFIG_MODULE)
+			placementInterface = new XdcPlacementInterface(design, device, libCells);
+		else
+			placementInterface = new XdcPlacementInterface(design, device);
 		placementInterface.parsePlacementXDC(placementFile);
 
+
 		// TODO: Do this?
-		design.setOocPortMap(placementInterface.getOocPortMap());
+		design.setPartPinMap(placementInterface.getPartPinMap());
 
 		String routingFile = rscpPath.resolve("routing.rsc").toString();
-		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap(), placementInterface.getOocPortMap());
+		//XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap(), placementInterface.getPartPinMap());
+		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap(), designInfo.getMode(), design.getReconfigStaticNetMap(), design.getStaticRouteStringMap());
 		routingInterface.parseRoutingXDC(routingFile);
 
 
 		VivadoCheckpoint vivadoCheckpoint = new VivadoCheckpoint(partName, design, device, libCells);
+
 
 		if (storeAdditionalInfo) {
 			vivadoCheckpoint.setRoutethroughBels(routingInterface.getRoutethroughsBels());
@@ -125,8 +133,8 @@ public final class VivadoInterface {
 			String resourcesFile = rscpPath.resolve("static_resources.rsc").toString();
 			UsedStaticResources staticResources = new UsedStaticResources(design, device);
 			staticResources.parseResourcesRSC(resourcesFile);
+			vivadoCheckpoint.setReconfigStaticNetMap(staticResources.getReconfigStaticNetMap());
 			vivadoCheckpoint.setStaticRouteStringMap(staticResources.getStaticRouteStringMap());
-			//design.setOocPortMap(staticResources.getOocPortMap());
 		}
 
 		return vivadoCheckpoint;
@@ -188,6 +196,7 @@ public final class VivadoInterface {
 		String routingOut = Paths.get(tcpDirectory, "routing.xdc").toString();
 		String partpinRoutingOut = Paths.get(tcpDirectory, "partpin_routing.xdc").toString();
 
+		// TODO: Only use this constructor if necessary?
 		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, null, mode, reconfigStaticNetMap, staticRouteStringMap);
 		routingInterface.writeRoutingXDC(routingOut, partpinRoutingOut, design, intrasiteRouting);
 

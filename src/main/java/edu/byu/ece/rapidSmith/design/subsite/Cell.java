@@ -20,7 +20,12 @@
 
 package edu.byu.ece.rapidSmith.design.subsite;
 
-import edu.byu.ece.rapidSmith.device.*;
+import edu.byu.ece.rapidSmith.device.Bel;
+import edu.byu.ece.rapidSmith.device.BelId;
+import edu.byu.ece.rapidSmith.device.BondedType;
+import edu.byu.ece.rapidSmith.device.PinDirection;
+import edu.byu.ece.rapidSmith.device.PortDirection;
+import edu.byu.ece.rapidSmith.device.Site;
 
 import java.io.Serializable;
 import java.util.*;
@@ -51,9 +56,7 @@ public class Cell implements Serializable {
 	private final Map<String, CellPin> pinMap;
 	/**	Set of pseudo pins attached to the cell */
 	private Set<CellPin> pseudoPins;
-	/** Whether or not the cell is a pseudo cell */
-	private boolean pseudo;
-
+	
 	// Macro specific cell categories.
 	/** Parent of this cell (for internal cells only)*/
 	private Cell parent;
@@ -61,50 +64,7 @@ public class Cell implements Serializable {
 	private Map<String, Cell> internalCells;
 	/** Mapping of net name to internal net*/
 	private Map<String, CellNet> internalNets;
-
-    public boolean isPseudo() {
-        return pseudo;
-    }
-
-	// Pseudo Cell
-	public Cell(String name, LibraryCell libCell, boolean pseudo) {
-		//assert (pseudo);
-		this.pseudo = pseudo;
-
-		Objects.requireNonNull(name);
-		Objects.requireNonNull(libCell);
-
-		this.name = name;
-		this.libCell = libCell;
-		this.bonded = BondedType.INTERNAL;
-
-		this.bel = null;
-
-		this.properties = new PropertyList(libCell.getDefaultPropertyMap());
-
-		this.pinMap = new HashMap<>();
-		for (LibraryPin pin : libCell.getLibraryPins()) {
-			this.pinMap.put(pin.getName(), new BackedCellPin(this, pin));
-		}
-
-		// for port cells, set the direction property
-		if(libCell.isPort()) {
-			this.properties.update(new Property("Dir", PropertyType.USER, PortDirection.getPortDirectionForImport(this)));
-
-			// For partial reconfiguration... ?
-		}
-
-		// additional initialization for macro cells
-		if (libCell.isMacro()) {
-			LibraryMacro macroCell = (LibraryMacro) libCell;
-			this.internalCells = macroCell.constructInternalCells(this);
-			this.internalNets = macroCell.constructInternalNets(this.name, this.internalCells);
-		}
-
-		this.design = null;
-	}
-
-
+	
 	/**
 	 * Creates a new cell with specified name and type.
 	 *
@@ -118,7 +78,6 @@ public class Cell implements Serializable {
 		this.name = name;
 		this.libCell = libCell;
 		this.bonded = BondedType.INTERNAL;
-		this.pseudo = false;
 
 		this.design = null;
 		this.bel = null;
@@ -133,8 +92,6 @@ public class Cell implements Serializable {
 		// for port cells, set the direction property
 		if(libCell.isPort()) {
 			this.properties.update(new Property("Dir", PropertyType.USER, PortDirection.getPortDirectionForImport(this)));
-
-			// For partial reconfiguration... ?
 		}
 		
 		// additional initialization for macro cells
@@ -207,7 +164,7 @@ public class Cell implements Serializable {
 	public final LibraryCell getLibCell() {
 		return libCell;
 	}
-
+	
 	/**
 	 * Returns the type of cell this is (i.e LUT6)
 	 */
@@ -222,10 +179,6 @@ public class Cell implements Serializable {
 		return getLibCell().isVccSource();
 	}
 
-	public boolean isStaticSource() {
-		return isVccSource() || isGndSource();
-	}
-
 	/**
 	 * Returns true if this cell acts as a ground source.
 	 */
@@ -234,12 +187,20 @@ public class Cell implements Serializable {
 	}
 
 	/**
+	 * Returns true if this cell acts as a VCC or ground source.
+	 * @return
+	 */
+	public boolean isStaticSource() {
+		return isVccSource() || isGndSource();
+	}
+
+	/**
 	 * Returns true if this cell is a top-level port of the design
 	 */
 	public boolean isPort() {
 		return getLibCell().isPort();
 	}
-
+	
 	/**
 	 * Returns {@code true} if the current cell is a macro cell, {@code false} otherwise.
 	 */
@@ -340,7 +301,14 @@ public class Cell implements Serializable {
 		this.bel = null;
 	}
 
-	public boolean attachPartitionPin(CellPin pin) {
+	/**
+	 * @return true if the cell has at least one partition pin.
+	 */
+	public boolean hasPartitionPin() {
+		return (pinMap.values().stream().anyMatch(CellPin::isPartitionPin));
+	}
+
+	public void attachPartitionPin(CellPin pin) {
 		if (!pin.isPartitionPin()) {
 			throw new IllegalArgumentException("Expected argument \"pin\" to be a partition pin.\n"
 					+ "Cell: " + getName() + " Pin: " + pin.getName());
@@ -358,12 +326,6 @@ public class Cell implements Serializable {
 
 		pin.setCell(this);
 		this.pinMap.put(pin.getName(), pin);
-		// this.pseudoPins.add(pin);
-		return true;
-	}
-
-	public boolean hasPartitionPin() {
-		return (pinMap.values().stream().anyMatch(CellPin::isPartitionPin));
 	}
 
 
@@ -575,6 +537,17 @@ public class Cell implements Serializable {
 		return pinMap.values().stream()
 				.filter(CellPin::isInpin)
 				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Returns all of the nets that drive input pins of this cell.
+	 * @return
+	 */
+	public final Set<CellNet> getInputNets() {
+		return pinMap.values().stream()
+				.filter(CellPin::isInpin)
+				.map(CellPin::getNet)
+				.collect(Collectors.toSet());
 	}
 
 	/**

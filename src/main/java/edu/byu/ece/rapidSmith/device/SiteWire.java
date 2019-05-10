@@ -27,7 +27,6 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.addAll;
 import static java.util.Collections.singleton;
 
 /**
@@ -186,6 +185,17 @@ public class SiteWire implements Wire, Serializable {
 		return belPin;
 	}
 
+	/**
+	 * Gets wires that make up a node. This is just the wire for site wires.
+	 * @return a set containing the wire
+	 */
+	@Override
+	public Set<Wire> getWiresInNode() {
+		Set<Wire> wires = new HashSet<>();
+		wires.add(this);
+		return wires;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -209,13 +219,6 @@ public class SiteWire implements Wire, Serializable {
 	@Override
 	public String toString() {
 		return site.getName() + " " + site.getTile().getDevice().getWireEnumerator().getWireName(wire);
-	}
-
-	@Override
-	public Set<Wire> getWiresInNode() {
-		Set<Wire> wires = new HashSet<>();
-		wires.add(this);
-		return wires;
 	}
 
 }

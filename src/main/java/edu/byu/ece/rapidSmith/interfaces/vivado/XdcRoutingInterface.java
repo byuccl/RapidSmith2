@@ -23,6 +23,7 @@ import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.device.families.FamilyInfo;
 import edu.byu.ece.rapidSmith.device.families.FamilyInfos;
+import edu.byu.ece.rapidSmith.interfaces.AbstractXdcInterface;
 
 import java.io.*;
 import java.util.*;
@@ -58,11 +59,11 @@ import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
  * This class is used for parsing and writing routing XDC files in a TINCR checkpoint.
  * Routing.xdc files are used to specify the physical wires that a net in Vivado uses.
  */
-public class XdcRoutingInterface {
+public class XdcRoutingInterface extends AbstractXdcInterface {
 
-	private final Device device;
+	//private final Device device;
 	private final CellDesign design;
-	private final WireEnumerator wireEnumerator;
+	//private final WireEnumerator wireEnumerator;
 	private final HashMap<SitePin, IntrasiteRoute> sitePinToRouteMap;
 	private final Map<BelPin, CellPin> belPinToCellPinMap;
 	private final Map<SiteType, Set<String>> staticSourceMap;
@@ -72,10 +73,12 @@ public class XdcRoutingInterface {
 	private String currentFile;
 	private Map<Bel, BelRoutethrough> belRoutethroughMap;
 	private Pattern pipNamePattern;
-	private Map<String, String> oocPortMap; // Map from port name to the associated partition pin's node
+	private Map<String, String> partPinMap;
+	//private Map<String, String> oocPortMap; // Map from port name to the associated partition pin's node
 	//private Map<String, MutablePair<String, String>> staticRoutemap;
 	private Map<String, String> reconfigStaticNetMap;
 	private Map<String, RouteStringTree> staticRouteStringMap;
+
 
 
 	private ImplementationMode implementationMode;
@@ -89,9 +92,31 @@ public class XdcRoutingInterface {
 	 * @param pinMap A map from a {@link BelPin} to its corresponding {@link CellPin} (the cell
 	 * 				pin that is currently mapped onto the bel pin)  
 	 */
+	public XdcRoutingInterface(CellDesign design, Device device, Map<BelPin, CellPin> pinMap, ImplementationMode mode) {
+		super(device, design);
+		//this.device = device;
+		//this.wireEnumerator = device.getWireEnumerator();
+		this.design = design;
+		this.sitePinToRouteMap = new HashMap<>();
+		this.staticSourceMap = new HashMap<>();
+		this.belPinToCellPinMap = pinMap;
+		//this.currentLineNumber = 0;
+		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)"); 
+		this.implementationMode = mode;
+	}
+
+	/**
+	 * Creates a new XdcRoutingInterface object.
+	 *
+	 * @param design {@link CellDesign} to add routing information to
+	 * @param device {@link Device} of the specified design
+	 * @param pinMap A map from a {@link BelPin} to its corresponding {@link CellPin} (the cell
+	 * 				pin that is currently mapped onto the bel pin)
+	 */
 	public XdcRoutingInterface(CellDesign design, Device device, Map<BelPin, CellPin> pinMap, ImplementationMode mode, Map<String, String> reconfigStaticNetMap, Map<String, RouteStringTree> staticRouteStringMap) {
-		this.device = device;
-		this.wireEnumerator = device.getWireEnumerator();
+		super(device, design);
+		//this.device = device;
+		//this.wireEnumerator = device.getWireEnumerator();
 		this.design = design;
 		this.sitePinToRouteMap = new HashMap<>();
 		this.staticSourceMap = new HashMap<>();
@@ -103,23 +128,7 @@ public class XdcRoutingInterface {
 		this.reconfigStaticNetMap = reconfigStaticNetMap;
 		this.staticRouteStringMap = staticRouteStringMap;
 
-		this.oocPortMap = design.getOocPortMap();
-
-	}
-
-	public XdcRoutingInterface(CellDesign design, Device device, Map<BelPin, CellPin> pinMap, Map<String, String> oocPortMap) {
-		this.device = device;
-		this.wireEnumerator = device.getWireEnumerator();
-		this.design = design;
-		this.sitePinToRouteMap = new HashMap<>();
-		this.staticSourceMap = new HashMap<>();
-		this.belPinToCellPinMap = pinMap;
-		this.currentLineNumber = 0;
-		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)");
-		this.implementationMode = design.getImplementationMode();
-
-		//TODO: Create part pins in placement interface?
-		this.oocPortMap = oocPortMap;
+		this.partPinMap = design.getPartPinMap();
 
 	}
 	
@@ -218,7 +227,7 @@ public class XdcRoutingInterface {
 						assert (gndStartWires[0].equals("START_WIRES"));
 						processStaticNet2(toks, gndStartWires);
 						break;
-					default : 
+					default :
 						throw new ParseException("Unrecognized Token: " + toks[0]);
 				}
 			}
@@ -313,7 +322,8 @@ public class XdcRoutingInterface {
 		
 		CellPin sourceCellPin = tryGetNetSource(net);
 		BelPin sourceBelPin = tryGetMappedBelPin(sourceCellPin);
-				
+
+		// TODO: Check this.
 		// There may be no source Bel Pin if the design was implemented out-of-context.
 		if (sourceBelPin == null) {
 			return;
@@ -400,8 +410,7 @@ public class XdcRoutingInterface {
 			net.getName() + " should have at least one source site pin";
 		
 		// Using the pip map, recreate each route as a RouteTree object
-		List<SitePin> pinsToRemove = new ArrayList<SitePin>(); 
-		//System.out.println(net.getSourceSitePins().size() + " " + net.getSourceSitePin().getName() + " " + net.getSourceSitePin().getExternalWire().getFullName());
+		List<SitePin> pinsToRemove = new ArrayList<>();
 		for (SitePin sitePin : net.getSourceSitePins()) {
 			RouteTree netRouteTree = recreateRoutingNetwork2(net, sitePin.getExternalWire(), pipMap);
 			
@@ -424,13 +433,13 @@ public class XdcRoutingInterface {
 		}
 		
 		// remove all invalid site pins sources for the net
-		pinsToRemove.forEach(pin -> net.removeSourceSitePin(pin));
+		pinsToRemove.forEach(net::removeSourceSitePin);
 				
 		// For out-of-context checkpoints, look for hierarchical ports that are routed from floating wires
 		if ((implementationMode == ImplementationMode.OUT_OF_CONTEXT || implementationMode == ImplementationMode.RECONFIG_MODULE) && net.getSourcePin().getCell().isPort()) {
 			
 			Cell port = net.getSourcePin().getCell();
-			String startWireName = oocPortMap.get(port.getName());
+			String startWireName = design.getPartPinMap().get(port.getName());
 			if (startWireName != null) {
 				String[] wireToks = startWireName.split("/");
 				assert (wireToks.length == 2);
@@ -479,7 +488,7 @@ public class XdcRoutingInterface {
 		searchQueue.add(start); 
 		visited.add(start.getWire());
 		
-		Set<String> emptySet = new HashSet<String>(1);
+		Set<String> emptySet = new HashSet<>(1);
 		
 		while (!searchQueue.isEmpty()) {
 			
@@ -627,7 +636,7 @@ public class XdcRoutingInterface {
 		}
 		else if (net.isStaticNet()) {
 			// implicit intrasite net. An Example is a GND/VCC net going to the A6 pin of a LUT.
-			// I does not actually show the bel pin as used, but it is being used.
+			// It does not actually show the bel pin as used, but it is being used.
 			// another example is the A1 pin on a SRL cell
 			//assert(net.isStaticNet()) : "Only static nets should connect to floating site pins: " + net.getName() + " " + sinkSitePin;
 			createStaticNetImplicitSinks(sinkSitePin, net);
@@ -816,7 +825,7 @@ public class XdcRoutingInterface {
 	private void createStaticNetImplicitSinks(SitePin sitePin, CellNet net) {
 		
 		IntrasiteRoute staticRoute = new IntrasiteRouteSitePinSource(sitePin, net, true);
-		buildIntrasiteRoute(staticRoute, design. getUsedSitePipsAtSite(sitePin.getSite()));
+		buildIntrasiteRoute(staticRoute, design.getUsedSitePipsAtSite(sitePin.getSite()));
 		
 		if (!staticRoute.isValid()) {
 			// NOTE: there are cases in ultrascale where a static net connects to a site pin, but the signal goes nowhere in the site
@@ -860,7 +869,7 @@ public class XdcRoutingInterface {
 	 * @param usedSiteWires Set of used pips within the site
 	 */
 	private void createIntrasiteRoute(CellNet net, BelPin pin, boolean isContained, Set<Integer> usedSiteWires) {
-		System.out.println("Net: " + net.getName());
+	
 		IntrasiteRoute route = new IntrasiteRouteBelPinSource(net, pin, isContained);
 		buildIntrasiteRoute(route, usedSiteWires);
 		
@@ -1024,7 +1033,7 @@ public class XdcRoutingInterface {
 	private void checkTokenLength(int tokenLength, int expectedLength) {
 		
 		if (tokenLength != expectedLength) {
-  			throw new ParseException(String.format("Incorrect number of tokens on line %d of %s.\n"
+			throw new ParseException(String.format("Incorrect number of tokens on line %d of %s.\n"
 												+ "Expected: %d Actual: %d", currentLineNumber, currentFile, tokenLength, expectedLength));
 		}
 	}
@@ -1047,30 +1056,7 @@ public class XdcRoutingInterface {
 		
 		return site;
 	}
-	
-	/**
-	 * Tries to retrieve the Tile object with the given name from the currently
-	 * loaded device. If no such tile exists, a {@link ParseException} is thrown.
-	 * 
-	 * @param tileName Name of the tile to get a handle of
-	 * @return {@link Tile} object
-	 */
-	private Tile tryGetTile(String tileName) {
-		Tile tile = device.getTile(tileName);
 
-		// TODO: Check that the node is exactly the right one. ie make sure the true tile name matches as well.
-		if (tile == null && implementationMode == ImplementationMode.RECONFIG_MODULE) {
-			// Assume the tile is outside the partial device boundaries.
-			tile = device.getTile("OOC_WIRE_X0Y0");
-		}
-
-		if (tile == null) {
-			throw new ParseException("Tile \"" + tileName + "\" not found in device " + device.getPartName() + ". \n"  
-					+ "On line " + this.currentLineNumber + " of " + currentFile); 
-		}
-		return tile;
-	}
-	
 	/**
 	 * Tries to retrieve the CellNet object with the given name <br>
 	 * from the currently loaded design. If the net does not exist <br>
@@ -1206,21 +1192,7 @@ public class XdcRoutingInterface {
 	}
 	
 	
-	/**
-	 * Tries to retrieve the integer enumeration of a wire name in the currently loaded device <br>
-	 * If the wire does not exist, a ParseException is thrown <br>
-	 */
-	private int tryGetWireEnum(String wireName) {
-		
-		Integer wireEnum = wireEnumerator.getWireEnum(wireName);
-		
-		if (wireEnum == null) {
-			throw new ParseException(String.format("Wire: \"%s\" does not exist in the current device. \n"
-												 + "On line %d of %s", wireName, currentLineNumber, currentFile));
-		}
-		
-		return wireEnum;
-	}
+
 
 	/**
 	 * Writes the intrasite routing TCL commands for the design to the routing.xdc file.
@@ -1261,22 +1233,11 @@ public class XdcRoutingInterface {
 
 				if (ffLatchCell != null) {
 					Property clkInvProperty = ffLatchCell.getProperties().get("IS_C_INVERTED");
-					String clkInvValueStr = "1'b0";
-
-					if (clkInvProperty != null) {
-						Object clkInvValue = clkInvProperty.getValue();
-						if (clkInvValue instanceof String) {
-							clkInvValueStr = (String) clkInvValue;
-						}
-						else if (clkInvValue instanceof Long || clkInvValue instanceof Integer) {
-							clkInvValueStr = "1'b" + clkInvValue;
-						}
-					}
-
+					String clkInvValue = (clkInvProperty == null) ? "1'b0" : clkInvProperty.getStringValue();
 
 					// For series 7, polarity selectors have two inputs and so the appropriate value must be
 					// included in the SITE_PIPS property.
-					if (clkInvValueStr.equals("1'b1"))
+					if (clkInvValue.equals("1'b1"))
 						sitePips.append("CLKINV:CLK_B");
 					else
 						sitePips.append("CLKINV:CLK");
@@ -1298,7 +1259,7 @@ public class XdcRoutingInterface {
 			fileout.write(String.format("set_property SITE_PIPS {%s} [get_sites {%s}]\n", sitePips.toString(), site.getName()));
 		}
 	}
-
+	
 	/**
 	 * Creates a routing.xdc file from the nets of the given design. <br>
 	 * This file can be imported into Vivado to constrain the physical location of nets. 
@@ -1357,40 +1318,43 @@ public class XdcRoutingInterface {
 
 			for (CellNet net : sourceNets) {
 				// TODO: Find matching IBUF net from static resources
-				String portName = net.getSourcePin().getPortName();
+				//String portName = net.getSourcePin().getPortName();
+				String portName = net.getSourcePin().getCell().getName();
 
 				// Find the matching static net from the static-only design
 				String staticNetName = reconfigStaticNetMap.get(net.getName());
 
 				//MutablePair<String, String> netRoutePair = staticRoutemap.get(net.getName());
-				String partialRoute = getVivadoRouteString(net);
+				//String partialRoute = getVivadoRouteString(net);
+				//System.out.println("Partial Route: " + partialRoute);
 
 				// Merge the static and RM portions of the route
-				String partPinNode = oocPortMap.get(portName);
-				mergePartialStaticRoute(net.getIntersiteRouteTree(), staticRouteStringMap.get(staticNetName));
-				//String mergedRoute = mergePartialStaticRoute(netRoutePair.getValue(), partialRoute, partPinNode, false);
+				String partPinNode = partPinMap.get(portName);
+				//System.out.println("Merge routes for net " + net.getName());
+				RouteStringTree mergedTree = mergePartialStaticRoute(net.getIntersiteRouteTree(), staticRouteStringMap.get(staticNetName), partPinNode, true);
 
-				// Update the value in the map
-				//netRoutePair.setValue(mergedRoute);
+				oocFileOut.write(String.format("set_property ROUTE %s [get_nets {%s}]\n", mergedTree.toRouteString(), reconfigStaticNetMap.get(net.getName())));
+
+
 			}
 
 			for (CellNet net : sinkNets) {
 				// TODO: Find matching OBUF net from static resources
-				String partialRoute = getVivadoRouteString(net);
+				//String partialRoute = getVivadoRouteString(net);
 
 				for (CellPin partPin : net.getPartitionPins()) {
-					String portName = partPin.getPortName();
+					String portName = partPin.getCell().getName();
 					///MutablePair<String, String> netRoutePair = staticRoutemap.get(net.getName());
 
 					// Find the matching static net from the static-only design
 					String staticNetName = reconfigStaticNetMap.get(net.getName());
 
 					// Merge the static and RM portions of the route
-					String partPinNode = oocPortMap.get(portName);
+					String partPinNode = partPinMap.get(portName);
 
 					assert(partPinNode != null);
-					mergePartialStaticRoute(net.getIntersiteRouteTree(), staticRouteStringMap.get(staticNetName));
-					//String mergedRoute = mergePartialStaticRoute(netRoutePair.getValue(), partialRoute, partPinNode, true);
+					RouteStringTree mergedTree = mergePartialStaticRoute(net.getIntersiteRouteTree(), staticRouteStringMap.get(staticNetName), partPinNode, false);
+					oocFileOut.write(String.format("set_property ROUTE %s [get_nets {%s}]\n", mergedTree.toRouteString(), reconfigStaticNetMap.get(net.getName())));
 
 					// Update the value in the map
 					//netRoutePair.setValue(mergedRoute);
@@ -1416,13 +1380,23 @@ public class XdcRoutingInterface {
 
 	}
 
-	private void mergePartialStaticRoute(RouteTree moduleRouteTree, RouteStringTree staticRouteStringTree) {
+	/**
+	 *
+	 * @param moduleRouteTree
+	 * @param staticRouteStringTree
+	 * @param partPinNode
+	 * @param rmSource whether or not the part pin acts as a source to this design (the reconfigurable module)
+	 */
+	private RouteStringTree mergePartialStaticRoute(RouteTree moduleRouteTree, RouteStringTree staticRouteStringTree, String partPinNode, boolean rmSource) {
 		// Convert the reconfigurable module's route tree to a route string tree
-		RouteStringTree moduleRouteStringTree = new RouteStringTree(moduleRouteTree, new RouteStringTree(moduleRouteTree.getWire().getFullName()));
-		System.out.println("Made the string tree");
-		//RouteStringTree root =  new RouteStringTree(routeTree.getWire().getFullName());
-		//RouteStringTree current = root;
+		RouteStringTree moduleRouteStringTree = createRouteStringTree(moduleRouteTree.getRoot());
+		RouteStringTree toMerge = rmSource ? staticRouteStringTree : moduleRouteStringTree;
+		RouteStringTree toAdd = rmSource ? moduleRouteStringTree : staticRouteStringTree;
 
+		// Merge the trees at the partition pin
+		toMerge.mergePartPinTree(toAdd, partPinNode);
+
+		return toMerge;
 	}
 
 	/**
@@ -1533,7 +1507,7 @@ public class XdcRoutingInterface {
 	 * TODO: refactor...this code is confusing to read
 	 */
 	private static String createVivadoRoutingString (RouteTree rt) {
-		RouteTree currentRoute = rt;
+		RouteTree currentRoute = rt; 
 		String routeString = "{ ";
 			
 		while ( true ) {
@@ -1549,7 +1523,7 @@ public class XdcRoutingInterface {
 						
 			// children may be changed in the following loop, so make a copy
 			ArrayList<RouteTree> children = new ArrayList<>(currentRoute.getChildren());
-
+			
 			if (children.size() == 0)
 				break;
 			
@@ -1596,6 +1570,69 @@ public class XdcRoutingInterface {
 		}
 		
 		return routeString + "} ";
+	}
+
+
+	/**
+	 * This code doesn't need to be so weird.
+	 * It was only like this for the { } formatting.
+	 * @param rt
+	 * @return
+	 */
+	private static RouteStringTree createRouteStringTree (RouteTree rt) {
+		RouteTree currentRoute = rt;
+		RouteStringTree root = null;
+		RouteStringTree stringTree = null;
+		// TODO: Don't use a string comparison.
+
+
+		while ( true ) {
+			// TODO: Don't use a string comparison.
+			String rstName;
+			if (currentRoute.getWire().getTile().getName().equals("OOC_WIRE_X0Y0"))
+				rstName = currentRoute.getWire().getName();
+			else
+				rstName = currentRoute.getWire().getFullName();
+
+			if (stringTree == null) {
+				stringTree = new RouteStringTree(rstName);
+				root = stringTree;
+			}
+			else {
+				stringTree = stringTree.addChild(new RouteStringTree(rstName));
+			}
+
+
+			// children may be changed in the following loop, so make a copy
+			ArrayList<RouteTree> children = new ArrayList<>(currentRoute.getChildren());
+
+			if (children.size() == 0)
+				break;
+
+			ArrayList<RouteTree> trueChildren = new ArrayList<>();
+			for (int i = 0; i < children.size(); i++) {
+				RouteTree child = children.get(i);
+				Connection c = child.getConnection();
+				if (c.isPip() || c.isRouteThrough()) {
+					trueChildren.add(child);
+				}
+				else { // if its a regular wire connection and we don't want to add this to the route tree
+					children.addAll(child.getChildren());
+				}
+			}
+
+			if (trueChildren.size() == 0)
+				break;
+
+			for(int i = 0; i < trueChildren.size() - 1; i++) {
+				stringTree.addChild(createRouteStringTree(trueChildren.get(i)));
+			}
+
+			currentRoute = trueChildren.get(trueChildren.size() - 1) ;
+
+		}
+
+		return root;
 	}
 	
 	/* **************

@@ -52,11 +52,10 @@ import java.util.Map.Entry;
  * </pre>
  * As can be seen, when creating a 3X3 device file, an extra column is added to the device.
  * The purpose of this column is to represent out-of-context wires for the partial device.
- * These are either IWIREs or OWIREs. OWIREs are wires that start <b>within</b> the partial
- * device, but leave the partial device boundaries. IWIREs are wires that start <b>outside</b>
- * the partial device boundaries, but enter the partial device. These OOC wires are all tile
- * wires that are added to the "OOC_WIRE" tile. All other tiles in the rightmost column are
- * set to be of type NULL so they take up as little memory as possible.
+ * These wires may start <b>within</b> the partial device and leave the partial device boundaries, or
+ * they may start <b>outside</b> the partial device boundaries, but enter the partial device.
+ * These OOC wires are all tile wires that are added to the "OOC_WIRE" tile. All other tiles in
+ * the rightmost column are set to be of type NULL so they take up as little memory as possible.
  * 
  * <p>
  * Run the Java class {@link PartialDeviceInstaller} to create a new partial device and
@@ -352,23 +351,6 @@ public class PartialDeviceGenerator {
 		List<String> wireNames = new ArrayList<> (Arrays.asList(we.getWires()));
 		Map<String, Integer> enumMap = we.getWireMap();
 
-		/*
-		// create a new tile wire for each output wire leaving the partial device
-		for (String wire : toOutputWires.keySet()) {
-			String wireName = "OWIRE:" + wire;
-			String wireName = "OWIRE:" + wire;
-			wireNames.add(wireName);
-			enumMap.put(wireName, enumMap.size());
-		}
-		
-		// create a new tile wire for each input wire entering the partial device
-		for (String wire : toInputWires.keySet()) {
-			String wireName = "IWIRE:" + wire;
-			wireNames.add(wireName);
-			enumMap.put(wireName, enumMap.size());
-		}
-		*/
-
 		// Create a new tile wire for all wires entering/leaving the partial device
 		Set<String> oocWires = new HashSet<>();
 		oocWires.addAll(toOutputWires.keySet());
@@ -399,7 +381,6 @@ public class PartialDeviceGenerator {
 		WireHashMap forwardMap = new WireHashMap();
 		
 		for (Entry<String, List<TileWire>> entry : toInput.entrySet()) {
-			//String wireName = "IWIRE:" + entry.getKey();
 			String wireName = entry.getKey();
 			WireConnection[] forwardConnections = new WireConnection[entry.getValue().size()];
 
@@ -426,7 +407,6 @@ public class PartialDeviceGenerator {
 		// create the connections for the output OOC wires
 		WireHashMap reverseMap = new WireHashMap();
 		for (Entry<String, List<TileWire>> entry : toOutput.entrySet()) {
-			//String wireName = "OWIRE:" + entry.getKey();
 			String wireName = entry.getKey();
 			WireConnection[] reverseConnections = new WireConnection[entry.getValue().size()];
 

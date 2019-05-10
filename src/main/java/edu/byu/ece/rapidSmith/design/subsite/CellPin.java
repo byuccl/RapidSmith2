@@ -185,21 +185,6 @@ public abstract class CellPin implements Serializable {
 			belPinMappingSet = new HashSet<>();
 		}
 		
-		//User added code
-		if(this.getNet() != null){
-			if(this.getNet().getAllSourcePins().size() == 1){ //if this is the only source pin
-				if(this.getNet().getSourcePin().equals(this)){ //if this is the net's source pin
-					//remap the SitePin
-					if(this.getNet().getSourceSitePin() != null){ //if there existed source site pin
-						if(!this.getCell().getSite().equals(this.getNet().getSourceSitePin().getSite())){ //and the site has changed (e.g. this cell is on a new site)
-							SitePin toAdd = this.getCell().getSite().getPin(this.getNet().getSourceSitePin().getName());
-							this.getNet().removeAllSourceSitePins(); //set to "same" site pin on the new site
-							this.getNet().addSourceSitePin(toAdd);
-						}
-					}
-				}
-			}
-		}
 		// Workaround to make the source site pin update when unplacing and unrouting a design:
 		CellNet net = this.getNet();
 		if(net != null){
@@ -282,6 +267,7 @@ public abstract class CellPin implements Serializable {
 			return null;
 		}
 		else {
+			assert (belPinMappingSet.size() == 1);
 			return belPinMappingSet.iterator().next();
 		}
 	}
@@ -311,7 +297,7 @@ public abstract class CellPin implements Serializable {
 	 * @param belPin BelPin to un-map
 	 */
 	public void clearPinMapping(BelPin belPin) {
-		if (belPinMappingSet != null && belPinMappingSet.contains(belPin)) {
+		if (belPinMappingSet != null) {
 			belPinMappingSet.remove(belPin);
 		}
 	}
@@ -339,7 +325,12 @@ public abstract class CellPin implements Serializable {
 	 */
 	public abstract String getFullName();
 
-	public abstract String getPortName();
+	//public abstract String getPortName();
+
+	/**
+	 * @return the name of the port the CellPin is attached to.
+	 */
+	//public abstract String getPortName();
 
 	/**
 	 * @return the direction of this pin from the cell's perspective
@@ -351,6 +342,9 @@ public abstract class CellPin implements Serializable {
 	 */
 	public abstract boolean isPseudoPin();
 
+	/**
+	 * @return <code>true</code> if the pin is a partition pin. <code>false</code> otherwise.
+	 */
 	public abstract boolean isPartitionPin();
 
 	/**
@@ -406,19 +400,13 @@ public abstract class CellPin implements Serializable {
 	 * @return The {@link CellPinType} of this pin. 
 	 */
 	public abstract CellPinType getType();
-	
-	/**
-	 * If the 
-	 * @return 
-	 */
+
 	public abstract CellPin getExternalPin();
 
-	public abstract Wire getWire();
-
-	// TODO: Deprecate
-	public void setMacroPinToGlobalNet(CellNet n) {
-		setNet(n);
-	}
+	/**
+	 * @return the partition pin wire
+	 */
+	public abstract Wire getPartPinWire();
 
 	public void setPinToGlobalNet(CellNet n) {
 		// TODO: Throw error if not macro pin, part pin, or static-source LUT

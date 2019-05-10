@@ -78,11 +78,6 @@ public class PseudoCellPin extends CellPin {
 	}
 
 	@Override
-	public String getPortName() {
-		return null;
-	}
-
-	@Override
 	public PinDirection getDirection() {
 		return direction;
 	}
@@ -95,6 +90,11 @@ public class PseudoCellPin extends CellPin {
 	@Override
 	public boolean isPartitionPin() {
 		return false;
+	}
+
+	@Override
+	public Wire getPartPinWire() {
+		return null;
 	}
 
 	@Override
@@ -129,11 +129,6 @@ public class PseudoCellPin extends CellPin {
 
 	@Override
 	public CellPin getExternalPin() {
-		return null;
-	}
-
-	@Override
-	public Wire getWire() {
 		return null;
 	}
 

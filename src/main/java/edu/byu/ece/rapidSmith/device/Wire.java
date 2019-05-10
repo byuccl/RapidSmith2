@@ -36,7 +36,7 @@ public interface Wire extends Serializable {
 	String getFullName();
 	Tile getTile();
 	Site getSite();
-
+	
 	/**
 	 * @deprecated Use {@link #getName} instead.
 	 */
@@ -55,7 +55,7 @@ public interface Wire extends Serializable {
 	Collection<Connection> getWireConnections();
 
 	Connection getWireConnection(Wire targetWire);
-	
+
 	WireConnection[] getWireConnectionsArray();
 
 	/**
@@ -100,6 +100,9 @@ public interface Wire extends Serializable {
 	 */
 	BelPin getSource();
 
+	/**
+	 * Returns all beginning and end wires that make up a node. Does not include intermediate wires.
+	 * @return
+	 */
 	Set<Wire> getWiresInNode();
-
 }

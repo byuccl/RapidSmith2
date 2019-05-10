@@ -307,7 +307,7 @@ public class LibraryMacro extends LibraryCell {
 	/**
 	 * Holds all necessary information to reconstruct an internal cell of a macro  
 	 */
-	private class InternalCell implements Serializable{
+	private class InternalCell implements Serializable {
 		private static final long serialVersionUID = 1079675840398922230L;
 		private final String name;
 		private final SimpleLibraryCell leafCell;

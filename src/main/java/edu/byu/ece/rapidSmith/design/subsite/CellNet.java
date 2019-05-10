@@ -300,10 +300,7 @@ public class CellNet implements Serializable {
 	 * @return all of the pins that source the net
 	 */
 	public List<CellPin> getAllSourcePins() {
-		return sourcePins.stream().collect(Collectors.toList());
-		//return getPins().stream()
-		//		.filter(CellPin::isOutpin)
-		//		.collect(Collectors.toList());
+		return new ArrayList<>(sourcePins);
 	}
 
 	/**
@@ -318,7 +315,7 @@ public class CellNet implements Serializable {
 			this.isMultiSourcedNet = getAllSourcePins().size() > 1;
 			this.multiSourceStatusSet = true;
 		}
-
+		
 		return this.isMultiSourcedNet;
 	}
 
@@ -360,7 +357,7 @@ public class CellNet implements Serializable {
 		
 		pins.add(pin);
 		pin.setNet(this);
-
+		
 		if(pin.isOutpin()){
 			sourcePins.add(pin);
 		}
@@ -611,7 +608,7 @@ public class CellNet implements Serializable {
 		if (this.sourceSitePinList == null) {
 			this.sourceSitePinList = new ArrayList<>(2);
 	}
-
+	
 		// Throw an exception if the net already has two source pins
 		if (this.sourceSitePinList.size() >= 2) {
 			throw new AssertionError("CellNets should have at most two source site pins, not more. If you think this is incorrect, create a new issue "
@@ -881,7 +878,6 @@ public class CellNet implements Serializable {
 
 	public void unrouteIntersite() {
 		intersiteRoutes = null;
-		//removeAllIntersiteSinkPins();
 		computeRouteStatus();
 	}
 	
@@ -1062,7 +1058,7 @@ public class CellNet implements Serializable {
 
 		return sinkTrees;
 	}
-	
+
 	/**
 	 * Returns a RouteTree object that is connected to the specified CellPin. If the CellPin
 	 * is connected to multiple RouteTree objects (because it is mapped to multiple BelPins)

@@ -29,7 +29,6 @@ import java.io.Serializable;
  * TODO: How to handle read-only properties?
  */
 final class LibraryCellProperty implements Serializable {
-
 	private static final long serialVersionUID = 1726711718270864375L;
 	private final String name;
 	private final String type;

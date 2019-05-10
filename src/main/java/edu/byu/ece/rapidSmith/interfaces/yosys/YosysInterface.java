@@ -85,26 +85,28 @@ public final class YosysInterface {
 		YosysEdifInterface yosysEdifInterface = new YosysEdifInterface();
 		design = yosysEdifInterface.parseEdif(edifFile, libCells, partName, transformCells);
 		design.setImplementationMode(mode);
-
 		VivadoCheckpoint vivadoCheckpoint = new VivadoCheckpoint(partName, design, device, libCells);
 
-
-		// Mark the used static resources
+		// If importing a reconfigurable module, process all of the static resources
 		if (mode == ImplementationMode.RECONFIG_MODULE) {
+			// Process partition pins
 			String placementFile = rscpPath.resolve("placement.rsc").toString();
 			XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device, libCells);
 			placementInterface.parsePlacementXDC(placementFile);
 			// TODO: Do this?
-			design.setOocPortMap(placementInterface.getOocPortMap());
+			design.setPartPinMap(placementInterface.getPartPinMap());
 
+			// Process other static resources (reserved sites, PIPs, partition pin routes)
 			String resourcesFile = rscpPath.resolve("static_resources.rsc").toString();
 			UsedStaticResources staticResources = new UsedStaticResources(design, device);
 			staticResources.parseResourcesRSC(resourcesFile);
-			vivadoCheckpoint.setStaticRouteStringMap(staticResources.getStaticRouteStringMap());
 			vivadoCheckpoint.setReconfigStaticNetMap(staticResources.getReconfigStaticNetMap());
+			vivadoCheckpoint.setStaticRouteStringMap(staticResources.getStaticRouteStringMap());
+			//vivadoCheckpoint.setStaticRoutemap(staticResources.getStaticRoutemap());
 			//design.setOocPortMap(staticResources.getOocPortMap());
 		}
-		
+
+
 		// parse the constraints into RapidSmith2
 		String constraintsFile = rscpPath.resolve("constraints.xdc").toString();
 		XdcConstraintsInterface constraintsInterface = new XdcConstraintsInterface(design, device);

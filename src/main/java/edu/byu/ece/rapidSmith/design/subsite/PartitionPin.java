@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Brigham Young University
+ * Copyright (c) 2019 Brigham Young University
  *
  * This file is part of the BYU RapidSmith Tools.
  *
@@ -26,18 +26,15 @@ import java.util.List;
 
 /**
  * This class represents a Partition Pin.
- * 
+ *
  * @author Dallon Glick
  */
 public class PartitionPin extends CellPin {
-
 
 	/** Unqiue Serial Version for this class */
 	private static final long serialVersionUID = -4765068478025538798L;
 	/** Name of the pseudo pin */
 	private final String name;
-	/** Name of the corresponding port */
-	private final String portName;
 	/** Direction of the pseudo pin relative to the cell*/
 	private final PinDirection direction;
 	/** {@link CellPinType} of the pin*/
@@ -46,26 +43,20 @@ public class PartitionPin extends CellPin {
 	private final Wire wire;
 
 	/**
-	 * PseudoCellPin Constructor. Creates a floating pseudo cell pin that does not
-	 * have a parent cell. To attach it to a cell, call {@link Cell#attachPseudoPin(CellPin)}
-	 * with this object as the argument. If you want to create and attach a pseudo pin to
-	 * a cell in a single function call, use {@link Cell#attachPseudoPin(String, PinDirection)}
-	 * instead of this constructor.
+	 * PartitionPin Constructor. Creates a partition pin that does not
+	 * have a parent cell.
 	 *
-	 * @param portName Name of the corresponding port
+	 * @param portCell the OOC port
 	 * @param pinDir Direction of the pin relative to cell it's attached to
 	 */
-	public PartitionPin(String portName, Wire wire, PinDirection pinDir) {
-		// Pass null to the super constructor to represent that this pin has not been attached to a cell 
-		super(null);
-		this.portName = portName;
-		//this.name = "partPin." + portName + "." + pinDir.toString();
-		this.name = portName;
+	public PartitionPin(Cell portCell, Wire wire, PinDirection pinDir) {
+		super(portCell);
+		this.name = portCell.getName();
 		this.direction = pinDir;
 		this.wire = wire;
 
-		// If the partition pin wire is an HCLK row, this is a special clock partition pin
-		// QUESTION: Is there a better way to identify this other than the name of the wire?
+		// If the partition pin wire is an HCLK row, it is a special clock partition pin
+		// TODO: Is there a better way to identify this other than the name of the wire?
 		this.pinType = (wire != null && wire.getName().contains("CLK_HROW")) ? CellPinType.PARTITION_CLK : CellPinType.PARTITION;
 	}
 
@@ -77,11 +68,6 @@ public class PartitionPin extends CellPin {
 	@Override
 	public String getFullName() {
 		return name;
-	}
-
-	@Override
-	public String getPortName() {
-		return portName;
 	}
 
 	@Override
@@ -100,7 +86,7 @@ public class PartitionPin extends CellPin {
 	}
 
 	@Override
-	public Wire getWire() {
+	public Wire getPartPinWire() {
 		return wire;
 	}
 

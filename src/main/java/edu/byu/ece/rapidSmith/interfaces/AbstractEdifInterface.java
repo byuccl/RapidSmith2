@@ -41,10 +41,8 @@ public abstract class AbstractEdifInterface {
 
 	static
 	{
-		//busNamePattern = Pattern.compile("(.*)\\[.+:(.+)\\]");
 		busNamePattern = Pattern.compile("(.*)\\[(.+):(.+)]");
 	}
-
 
 	public abstract CellDesign parseEdif(String edifFile, CellLibrary libCells, String partName);
 
@@ -56,7 +54,7 @@ public abstract class AbstractEdifInterface {
 	 * @param vccNets
 	 * @param gndNets
 	 */
-	protected void processEdifCells(CellDesign design, Collection<EdifCellInstance> edifCellInstances, CellLibrary libCells, List<CellNet> vccNets, List<CellNet> gndNets) {
+		protected void processEdifCells(CellDesign design, Collection<EdifCellInstance> edifCellInstances, CellLibrary libCells, List<CellNet> vccNets, List<CellNet> gndNets) {
 		if (edifCellInstances == null || edifCellInstances.size() == 0) {
 			if (!suppressWarnings) {
 				System.err.println("[Warning] No cells found in the edif netlist");
@@ -96,28 +94,6 @@ public abstract class AbstractEdifInterface {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Some EDIF netlists from Vivado can have identical port and cell names. This function renames the ports
-	 * so that there is no naming conflict in RapidSmith.
-	 *
-	 * @param design CellDesign
-	 * @param cell Cell to rename (should be a port cell)
-	 */
-	private void handleNamingConflict (CellDesign design, Cell cell) {
-		assert cell.isPort() : "Conflicting cell names should only happen with Port cells: " + cell.getName();
-
-		// print a warning to the user
-		if (!suppressWarnings) {
-			System.err.println("[Warning] A top-level port and another cell in the netlist have identical names: " + cell.getName()
-					+ ". The port cell will be renamed to " + cell.getName() + "_rsport");
-		}
-
-		// update the name of the cell
-		design.removeCell(cell);
-		Cell newPortCell = new Cell(cell.getName() + "_rsport", cell.getLibCell());
-		design.addCell(newPortCell);
 	}
 
 	/**
@@ -173,6 +149,28 @@ public abstract class AbstractEdifInterface {
 				design.addCell(portCell);
 			}
 		}
+	}
+
+	/**
+	 * Some EDIF netlists from Vivado can have identical port and cell names. This function renames the ports
+	 * so that there is no naming conflict in RapidSmith.
+	 *
+	 * @param design CellDesign
+	 * @param cell Cell to rename (should be a port cell)
+	 */
+	private void handleNamingConflict (CellDesign design, Cell cell) {
+		assert cell.isPort() : "Conflicting cell names should only happen with Port cells: " + cell.getName();
+
+		// print a warning to the user
+		if (!suppressWarnings) {
+			System.err.println("[Warning] A top-level port and another cell in the netlist have identical names: " + cell.getName()
+					+ ". The port cell will be renamed to " + cell.getName() + "_rsport");
+		}
+
+		// update the name of the cell
+		design.removeCell(cell);
+		Cell newPortCell = new Cell(cell.getName() + "_rsport", cell.getLibCell());
+		design.addCell(newPortCell);
 	}
 
 	/**
@@ -243,8 +241,6 @@ public abstract class AbstractEdifInterface {
 
 			// Connects to a top-level port
 			if (portRef.isTopLevelPortRef()) {
-
-
 
 				String portname = portRef.isSingleBitPortRef() ? port.getOldName() :
 						String.format("%s[%d]", getPortNamePrefix(port.getOldName()), reverseBusIndex(port.getWidth(), portRef.getBusMember(), portOffsetMap.get(port)));
@@ -406,9 +402,9 @@ public abstract class AbstractEdifInterface {
 			for (CellPin cp : c.getPins()) {
 				if (cp.getNet()!= null) {
 					if (cp.getNet() != globalGNDNet && cp.getNet().getType() == NetType.GND)
-						cp.setMacroPinToGlobalNet(globalGNDNet);
+						cp.setPinToGlobalNet(globalGNDNet);
 					else if (cp.getNet() != globalVCCNet && cp.getNet().getType() == NetType.VCC)
-						cp.setMacroPinToGlobalNet(globalVCCNet);
+						cp.setPinToGlobalNet(globalVCCNet);
 				}
 			}
 		}

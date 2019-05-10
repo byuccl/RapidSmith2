@@ -145,38 +145,6 @@ public class TileWire implements Wire, Serializable {
 	}
 
 	/**
-	 * Gets all wires that are part of the same node.
-	 * Only includes start and end wires (middle wires aren't included)
-	 * @return
-	 */
-	@Override
-	public Set<Wire> getWiresInNode() {
-		Set<Wire> wiresInNode = new HashSet<>();
-		wiresInNode.add(this);
-
-		// Note: RapidSmith2 doesn't represent the wire connections in-between the source and the sink.
-		// For example, in a long line with a length of 18, the sink LV_L9 will have two direct reverse connections,
-		// LV_L0 and LV_L18. These are the drivers. In reality, LV_L9 connects to LV_L10 and LV_L8, which connect to
-		// LV_L11 and LV_L7 respectively, etc.
-
-		Collection<Connection> directForwardConnections = getWireConnections().stream()
-				.filter(connection -> !connection.isPip()).collect(Collectors.toList());
-
-		Collection<Connection> directReverseConnections = getReverseWireConnections().stream()
-				.filter(connection -> !connection.isPip()).collect(Collectors.toList());
-
-		for (Connection conn : directForwardConnections) {
-			wiresInNode.add(conn.getSinkWire());
-		}
-
-		for (Connection conn : directReverseConnections) {
-			wiresInNode.add(conn.getSinkWire());
-		}
-
-		return wiresInNode;
-	}
-
-	/**
 	 * Always returns null.
 	 */
 	@Override
@@ -228,6 +196,33 @@ public class TileWire implements Wire, Serializable {
 	@Override
 	public BelPin getSource() {
 		return null;
+	}
+
+	/**
+	 * Gets wires that are part of the same node.
+	 * Only includes start and end wires (intermediate wires aren't included)
+	 * @return a set including the wires of the node
+	 */
+	@Override
+	public Set<Wire> getWiresInNode() {
+		Set<Wire> wiresInNode = new HashSet<>();
+		wiresInNode.add(this);
+
+		Collection<Connection> directForwardConnections = getWireConnections().stream()
+				.filter(connection -> !connection.isPip()).collect(Collectors.toList());
+
+		Collection<Connection> directReverseConnections = getReverseWireConnections().stream()
+				.filter(connection -> !connection.isPip()).collect(Collectors.toList());
+
+		for (Connection conn : directForwardConnections) {
+			wiresInNode.add(conn.getSinkWire());
+		}
+
+		for (Connection conn : directReverseConnections) {
+			wiresInNode.add(conn.getSinkWire());
+		}
+
+		return wiresInNode;
 	}
 
 	/**

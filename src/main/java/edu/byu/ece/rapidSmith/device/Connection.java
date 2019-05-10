@@ -68,6 +68,11 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
+		public boolean isDirectConnection() {
+			return !isPip() && !isRouteThrough();
+		}
+
+		@Override
 		public Site getRoutethroughSite() {
 			if (!isRouteThrough())
 				return null;
@@ -231,6 +236,11 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
+		public boolean isDirectConnection() {
+			return !isPip() && !isRouteThrough();
+		}
+
+		@Override
 		public boolean isPinConnection() {
 			return false;
 		}
@@ -323,6 +333,11 @@ public abstract class Connection implements Serializable {
 			SiteType siteType = sourceWire.getSiteType();
 			int sourceEnum = sourceWire.getWireEnum();
 			return sourceWire.getSite().isRoutethrough(siteType, sourceEnum, wc.getWire());
+		}
+
+		@Override
+		public boolean isDirectConnection() {
+			return !isPip() && !isRouteThrough();
 		}
 
 		@Override
@@ -424,6 +439,11 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
+		public boolean isDirectConnection() {
+			return !isPip() && !isRouteThrough();
+		}
+
+		@Override
 		public boolean isPinConnection() {
 			return false;
 		}
@@ -516,6 +536,11 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
+		public boolean isDirectConnection() {
+			return true;
+		}
+
+		@Override
 		public boolean isPinConnection() {
 			return true;
 		}
@@ -597,6 +622,11 @@ public abstract class Connection implements Serializable {
 		@Override
 		public boolean isRouteThrough() {
 			return false;
+		}
+
+		@Override
+		public boolean isDirectConnection() {
+			return true;
 		}
 
 		@Override
@@ -684,6 +714,11 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
+		public boolean isDirectConnection() {
+			return true;
+		}
+
+		@Override
 		public boolean isPinConnection() {
 			return false;
 		}
@@ -736,6 +771,8 @@ public abstract class Connection implements Serializable {
 	public abstract boolean isPip();
 
 	public abstract boolean isRouteThrough();
+
+	public abstract boolean isDirectConnection();
 
 	@Deprecated
 	public abstract boolean isPinConnection();

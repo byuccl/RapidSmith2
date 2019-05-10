@@ -108,37 +108,7 @@ public class DesignInfoInterface {
 		return this.mode;
 	}
 	
-	/*
-	/**
-	 * Reads the part name from the TINCR checkpoint file
-	 *  
-	 * @param partInfoFile Placement.xdc file
-	 * @param design Design to apply placement
-	 * @param device Device which the design is implemented on
-	 * @throws IOException
-	 *
-	public static String parseInfoFile (String tcp) throws IOException {
-		
-		BufferedReader br = null;
-		String part;
-		
-		try {
-			br = new BufferedReader(new FileReader(tcp));
-			String line = br.readLine();
-			part = line.split("=")[1];
-		}
-		catch (IndexOutOfBoundsException e) {
-			throw new ParseException("No part name found in the design.info file.");
-		}
-		finally {
-			if (br != null)
-				br.close();
-		}
-		
-		return part;
-	}
-	*/
-	
+
 	/**
 	 * Creates a design.info file given a partName<br>
 	 * 
