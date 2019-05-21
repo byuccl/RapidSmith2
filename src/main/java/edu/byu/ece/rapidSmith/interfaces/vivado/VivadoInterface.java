@@ -106,7 +106,8 @@ public final class VivadoInterface {
 		
 		if (storeAdditionalInfo) {
 			vivadoCheckpoint.setRoutethroughBels(routingInterface.getRoutethroughsBels());
-			vivadoCheckpoint.setStaticSourceBels(routingInterface.getStaticSourceBels());
+			vivadoCheckpoint.setVccSourceBels(routingInterface.getVccSourceBels());
+			vivadoCheckpoint.setGndSourceBels(routingInterface.getGndSourceBels());
 			vivadoCheckpoint.setBelPinToCellPinMap(placementInterface.getPinMap());
 		}
 		
