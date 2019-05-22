@@ -44,7 +44,8 @@ public class XdcRoutingInterface {
 	private final HashMap<SitePin, IntrasiteRoute> sitePinToRouteMap;
 	private final Map<BelPin, CellPin> belPinToCellPinMap;
 	private final Map<SiteType, Set<String>> staticSourceMap;
-	private Set<Bel> staticSourceBels;
+	private Set<Bel> gndSourceBels;
+	private Set<Bel> vccSourceBels;
 	private int currentLineNumber;
 	private String currentFile;
 	private Map<Bel, BelRoutethrough> belRoutethroughMap;
@@ -84,18 +85,28 @@ public class XdcRoutingInterface {
 				Collections.emptyMap() :
 					belRoutethroughMap;
 	}
-	
+
 	/**
-	 * Returns a set of BELs that are being used as a static source (VCC or GND).
+	 * Returns a set of BELs that are being used as a VCC source.
 	 * This is only valid after {@link XdcRoutingInterface::parseRoutingXDC} has been called.
 	 */
-	public Set<Bel> getStaticSourceBels() {
-		
-		return (staticSourceBels == null) ? 
+	public Set<Bel> getVccSourceBels() {
+		return (vccSourceBels == null) ?
 				Collections.emptySet() :
-				staticSourceBels;
+				vccSourceBels;
 	}
-		
+
+	/**
+	 * Returns a set of BELs that are being used as a GND source.
+	 * This is only valid after {@link XdcRoutingInterface::parseRoutingXDC} has been called.
+	 */
+	public Set<Bel> getGndSourceBels() {
+		return (gndSourceBels == null) ?
+				Collections.emptySet() :
+				gndSourceBels;
+	}
+
+
 	/**
 	 * Parses the specified routing.xdc file, and applies the physical wire information to the nets of the design
 	 * 
@@ -276,7 +287,7 @@ public class XdcRoutingInterface {
 	}
 	
 	private Map<String, Set<String>> buildPipMap(String[] toks, int startIndex) {
-		Map<String, Set<String>> pipMap = new HashMap<String, Set<String>>();
+		Map<String, Set<String>> pipMap = new HashMap<>();
 		
 		// build the pip map for connections
 		for (int i = startIndex; i < toks.length; i++ ) {			
@@ -285,12 +296,12 @@ public class XdcRoutingInterface {
 			if (m.matches()) {
 				String source = m.group(1) + "/" + m.group(2);
 				String sink = m.group(1) + "/" + m.group(4);
-				pipMap.computeIfAbsent(source, k -> new HashSet<String>()).add(sink);
+				pipMap.computeIfAbsent(source, k -> new HashSet<>()).add(sink);
 				
 				// if the PIP is a bi-directional pip, add both directions to the map...
 				// the correct pip direction will be determined later in the routing import.
 				if (m.group(3).equals("<<->>")) {
-					pipMap.computeIfAbsent(sink, k -> new HashSet<String>()).add(source);
+					pipMap.computeIfAbsent(sink, k -> new HashSet<>()).add(source);
 				}
 			}
 			else {
@@ -325,7 +336,7 @@ public class XdcRoutingInterface {
 			net.getName() + " should have at least one source site pin";
 		
 		// Using the pip map, recreate each route as a RouteTree object
-		List<SitePin> pinsToRemove = new ArrayList<SitePin>(); 
+		List<SitePin> pinsToRemove = new ArrayList<>();
 		//System.out.println(net.getSourceSitePins().size() + " " + net.getSourceSitePin().getName() + " " + net.getSourceSitePin().getExternalWire().getFullName());
 		for (SitePin sitePin : net.getSourceSitePins()) {
 			RouteTree netRouteTree = recreateRoutingNetwork2(net, sitePin.getExternalWire(), pipMap);
@@ -349,7 +360,7 @@ public class XdcRoutingInterface {
 		}
 		
 		// remove all invalid site pins sources for the net
-		pinsToRemove.forEach(pin -> net.removeSourceSitePin(pin));
+		pinsToRemove.forEach(net::removeSourceSitePin);
 				
 		// For out-of-context checkpoints, look for hierarchical ports that are routed to floating wires
 		if (implementationMode==ImplementationMode.OUT_OF_CONTEXT && net.getSourcePin().getCell().isPort()) {
@@ -390,21 +401,18 @@ public class XdcRoutingInterface {
 		RouteTree start = new RouteTree(startWire);
 		Queue<RouteTree> searchQueue = new ArrayDeque<>();
 		Set<Wire> visited = new HashSet<>();
-		
-		Set<RouteTree> terminals = new HashSet<>();
-		
+
 		// initialize the search queue and visited wire set
 		searchQueue.add(start); 
 		visited.add(start.getWire());
 		
-		Set<String> emptySet = new HashSet<String>(1);
+		Set<String> emptySet = new HashSet<>(1);
 		
 		while (!searchQueue.isEmpty()) {
 			
 			RouteTree routeTree = searchQueue.poll();
 			Wire sourceWire = routeTree.getWire();			
 			// add connecting wires that exist in the net to the search queue
-			int connectionCount = 0; 
 
 			for (Connection conn : routeTree.getWire().getWireConnections()) {
 				
@@ -417,31 +425,19 @@ public class XdcRoutingInterface {
 				if (conn.isPip()) { 
 					if (pipMap.getOrDefault(sourceWire.getFullName(), emptySet).contains(sinkWire.getFullName())) {
 						this.pipUsedInRoute = true;
-						connectionCount++;
 						RouteTree sinkTree = routeTree.connect(conn);
 						searchQueue.add(sinkTree);
 						visited.add(sinkWire);
 					}
 				}
 				else { // if (!visited.contains(sinkWire)) {
-					connectionCount++;
 					RouteTree sinkTree = routeTree.connect(conn);
 					searchQueue.add(sinkTree);
 					visited.add(sinkWire);
 				}
 			}
-			
-			// check to see if the current route tree object is connected to a valid sink site pin 
-			// the connection count is used to filter out routethrough site pins
-			SitePin sinkSitePin = routeTree.getConnectedSitePin();
-			
-			if (sinkSitePin != null && connectionCount == 0 && processSitePinSink(net, sinkSitePin)) {
-				terminals.add(routeTree);
-			}
 		}
-			
-		// prune useless paths from the route tree (i.e paths that go nowhere)
-		//start.prune(terminals);	
+
 		return start;
 	}
 	
@@ -451,38 +447,7 @@ public class XdcRoutingInterface {
 		int wireEnum = tryGetWireEnum(startWireToks[1]);
 		return new TileWire(tile, wireEnum);
 	}
-	
-	/**
-	 * When a route reaches a site pin, this function is called
-	 * to mark sink cell pins as routed, and add pseudo pins
-	 * to the design is necessary (for VCC and GND nets only)
-	 * 
-	 * @param net {@link CellNet} the is currently being routed
-	 * @param sinkSitePin {@link SitePin} that the net routing has reached
-	 * @return {@code true} is connected to the net AND being used, {@code false} otherwise.
-	 * 	
-	 */
-	private boolean processSitePinSink(CellNet net, SitePin sinkSitePin) {
-		// update the net with the routed cell pins
-		IntrasiteRoute internalRoute = sitePinToRouteMap.get(sinkSitePin);
-		
-		if (internalRoute != null) { 
-			internalRoute.setSinksAsRouted();
-		}
-		else if (net.isStaticNet()) {
-			// implicit intrasite net. An Example is a GND/VCC net going to the A6 pin of a LUT.
-			// It does not actually show the bel pin as used, but it is being used.
-			// another example is the A1 pin on a SRL cell
-			//assert(net.isStaticNet()) : "Only static nets should connect to floating site pins: " + net.getName() + " " + sinkSitePin;
-			createStaticNetImplicitSinks(sinkSitePin, net);
-		} 
-		else {
-			return false;
-		}
-		
-		return true;
-	}
-	
+
 	/**
 	 * Creates a map from {@link BelPin} to {@link BelRoutethrough} for all used routethroughs
 	 * found in the routing.rsc file. This map is used to successfully recreate intrasite routing
@@ -508,32 +473,40 @@ public class XdcRoutingInterface {
 			belRoutethroughMap.put(bel, new BelRoutethrough(inputPin, outputPin));
 		}
 	}
-	
+
 	/**
 	 * Creates routing data structures for static nets (GND/VCC) that are
 	 * source by static LUTs.
-	 * 
+	 *
 	 * @param toks A list of static source bels in the form: <br>
 	 * {@code STATIC_SOURCES site0/bel0/outputPin0 site1/bel1/outputPin1 ... siteN/belN/outputPinN}
 	 */
 	private void processStaticSources(String[] toks, boolean isVcc) {
-		
-		if (toks.length > 1) {
-			this.staticSourceBels = new HashSet<>();
+
+		if (isVcc && toks.length > 1) {
+			this.vccSourceBels = new HashSet<>();
 		}
-		
-		CellNet net = isVcc ? design.getVccNet() : design.getGndNet(); 
-		
+
+		if (!isVcc && toks.length > 1) {
+			this.gndSourceBels = new HashSet<>();
+		}
+
+		CellNet net = isVcc ? design.getVccNet() : design.getGndNet();
+
 		for (int i = 1; i < toks.length; i++) {
 			String[] staticToks = toks[i].split("/");
 			checkTokenLength(staticToks.length, 3);
-			
+
 			Site site = tryGetSite(staticToks[0]);
 			Bel bel = tryGetBel(site, staticToks[1]);
 			BelPin sourcePin = tryGetBelPin(bel, staticToks[2]);
 			boolean routeFound = tryCreateStaticIntrasiteRoute(net, sourcePin, design.getUsedSitePipsAtSite(site));
 			assert routeFound : site.getName() + "/" + bel.getName() + "/" + sourcePin.getName();
-			staticSourceBels.add(bel);
+
+			if (isVcc)
+				vccSourceBels.add(bel);
+			else
+				gndSourceBels.add(bel);
 		}
 	}
 	
@@ -550,7 +523,7 @@ public class XdcRoutingInterface {
 		assert (toks.length == 3) : String.format("Token error on line %d: Expected format is \"OOC_PORT\" PortName Tile/Wire ", this.currentLineNumber); 
 		
 		if (this.oocPortMap == null) {
-			this.oocPortMap = new HashMap<String, String>();
+			this.oocPortMap = new HashMap<>();
 		}
 		
 		oocPortMap.put(toks[1], toks[2]); 
@@ -571,7 +544,7 @@ public class XdcRoutingInterface {
 		String namePrefix = "intrasite:" + site.getType().name() + "/";
 
 		//create hashmap that shows pip used to input val
-		HashMap<String, String> pipToInputVal = new HashMap<String, String>();
+		HashMap<String, String> pipToInputVal = new HashMap<>();
 		
 		// Iterate over the list of used site pips, and store them in the site
 		for(int i = 2; i < toks.length; i++) {
@@ -659,32 +632,7 @@ public class XdcRoutingInterface {
 							.flatMap(bel -> bel.getSources().stream())
 							.iterator();
 	}
-	
-	/**
-	 * Creates intrasite routing data structures for the route starting at the specified
-	 * {@link SitePin}. In particular, this is for static nets (GND/VCC) that have
-	 * terminated at a site pin, but the site pin has not been registered earlier during parsing.
-	 * This is due to the net connecting to a BelPin, but not a CellPin. In this case, a <b>pseudo pin</b>
-	 * will be created and attached to a cell if one exists on the bel.  
-	 * 
-	 * @param sitePin {@link SitePin} object
-	 * @param net VCC or GND {@link CellNet} 
-	 */
-	private void createStaticNetImplicitSinks(SitePin sitePin, CellNet net) {
-		
-		IntrasiteRoute staticRoute = new IntrasiteRouteSitePinSource(sitePin, net, true);
-		buildIntrasiteRoute(staticRoute, design.getUsedSitePipsAtSite(sitePin.getSite()));
-		
-		if (!staticRoute.isValid()) {
-			// NOTE: there are cases in ultrascale where a static net connects to a site pin, but the signal goes nowhere in the site
-			// In this case, we simply return and don't apply the routing.
-			return;
-		}
-		staticRoute.applyRouting();
-		// we can set sinks as routed here because we only call this function if we reach a site pin
-		staticRoute.setSinksAsRouted();
-	}
-				
+
 	/**
 	 * Creates a route starting at the specified {@link SitePin}, which terminates at BelPins inside the site.
 	 * The search is guided by the specified used site pips of the site.
@@ -1455,7 +1403,7 @@ public class XdcRoutingInterface {
 				CellPin pin = belPinToCellPinMap.get(bp);
 
 				 // Fix Vivado EDIF errors where cell pins aren't included in the netlist, but are physically routed to
-				if (pin.getNet() == null) {	;
+				if (pin.getNet() == null) {
 					net.connectToPin(pin);
 				} 
 				else if (pin.getNet() != net) {

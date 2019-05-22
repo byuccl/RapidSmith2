@@ -21,6 +21,7 @@
 package edu.byu.ece.rapidSmith.interfaces.vivado;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,7 +44,8 @@ public final class VivadoCheckpoint {
 	private final String partName;
 	private Set<Bel> routethroughBels;
 	private Collection<BelRoutethrough> routethroughObjects;
-	private Collection<Bel> staticSourceBels;
+	private Collection<Bel> vccSourceBels;
+	private Collection<Bel> gndSourceBels;
 	private Map<BelPin, CellPin> belPinToCellPinMap;
 
 	public VivadoCheckpoint(String partName, CellDesign design, Device device, CellLibrary libCells) {
@@ -95,13 +97,28 @@ public final class VivadoCheckpoint {
 	public Set<Bel> getBelRoutethroughs() {
 		return routethroughBels;
 	}
-	
-	public void setStaticSourceBels(Collection<Bel> bels) {
-		this.staticSourceBels = bels;
-	}
-	
+
 	public Collection<Bel> getStaticSourceBels() {
-		return this.staticSourceBels;
+		Collection<Bel> staticSourceBels = new HashSet<>();
+		staticSourceBels.addAll(vccSourceBels);
+		staticSourceBels.addAll(gndSourceBels);
+		return staticSourceBels;
+	}
+
+	public Collection<Bel> getVccSourceBels() {
+		return vccSourceBels;
+	}
+
+	public void setVccSourceBels(Collection<Bel> vccSourceBels) {
+		this.vccSourceBels = vccSourceBels;
+	}
+
+	public Collection<Bel> getGndSourceBels() {
+		return gndSourceBels;
+	}
+
+	public void setGndSourceBels(Collection<Bel> gndSourceBels) {
+		this.gndSourceBels = gndSourceBels;
 	}
 	
 	public void setBelPinToCellPinMap(Map<BelPin, CellPin> pinMap) {
