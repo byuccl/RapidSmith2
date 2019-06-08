@@ -21,6 +21,7 @@
 package edu.byu.ece.rapidSmith.interfaces.vivado;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,7 +29,6 @@ import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Device;
-import org.apache.commons.lang3.tuple.MutablePair;
 
 /**
  * This class packages a TINCR checkpoint so that it can be returned to the user.
@@ -47,25 +47,8 @@ public final class VivadoCheckpoint {
 	public Map<Bel, BelRoutethrough> getBelRoutethroughMap() {
 		return belRoutethroughMap;
 	}
-
-	public Collection<Bel> getVccSourceBels() {
-		return vccSourceBels;
-	}
-
-	public void setVccSourceBels(Collection<Bel> vccSourceBels) {
-		this.vccSourceBels = vccSourceBels;
-	}
-
-	public Collection<Bel> getGndSourceBels() {
-		return gndSourceBels;
-	}
-
-	public void setGndSourceBels(Collection<Bel> gndSourceBels) {
-		this.gndSourceBels = gndSourceBels;
-	}
-
-	private Collection<Bel> vccSourceBels;
-	private Collection<Bel> gndSourceBels;
+    private Collection<Bel> vccSourceBels;
+    private Collection<Bel> gndSourceBels;
 	//private Collection<Bel> staticSourceBels;
 	private Map<BelPin, CellPin> belPinToCellPinMap;
 	//private Map<String, MutablePair<String, String>> staticRoutemap;
@@ -135,7 +118,30 @@ public final class VivadoCheckpoint {
 	}
 	
 	public Set<Bel> getBelRoutethroughs() {
-		return belRoutethroughMap.keySet();
+        return belRoutethroughMap.keySet();
+	}
+
+	public Collection<Bel> getStaticSourceBels() {
+		Collection<Bel> staticSourceBels = new HashSet<>();
+		staticSourceBels.addAll(vccSourceBels);
+		staticSourceBels.addAll(gndSourceBels);
+		return staticSourceBels;
+	}
+
+	public Collection<Bel> getVccSourceBels() {
+		return vccSourceBels;
+	}
+
+	public void setVccSourceBels(Collection<Bel> vccSourceBels) {
+		this.vccSourceBels = vccSourceBels;
+	}
+
+	public Collection<Bel> getGndSourceBels() {
+		return gndSourceBels;
+	}
+
+	public void setGndSourceBels(Collection<Bel> gndSourceBels) {
+		this.gndSourceBels = gndSourceBels;
 	}
 
 	public void setBelPinToCellPinMap(Map<BelPin, CellPin> pinMap) {

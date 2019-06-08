@@ -7,6 +7,8 @@
 /.gradle/
 /.idea/
 /*.iml
+/*.ipr
+/*.iws
 /build/
 /.settings/
 **/.Xil

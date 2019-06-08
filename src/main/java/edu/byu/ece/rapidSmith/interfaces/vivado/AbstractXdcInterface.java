@@ -22,7 +22,6 @@ public abstract class AbstractXdcInterface {
 		this.implementationMode = design.getImplementationMode();
 	}
 
-
 	/**
 	 * Tries to retrieve the Tile object with the given name from the currently
 	 * loaded device. If no such tile exists, a {@link Exceptions.ParseException} is thrown.

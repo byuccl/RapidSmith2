@@ -20,23 +20,19 @@
 
 package edu.byu.ece.rapidSmith.interfaces.vivado;
 
+import edu.byu.ece.rapidSmith.RSEnvironment;
+import edu.byu.ece.rapidSmith.design.subsite.*;
+import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.interfaces.StaticResourcesInterface;
+import edu.byu.ece.rapidSmith.util.Exceptions;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import edu.byu.ece.edif.core.EdifNameConflictException;
-import edu.byu.ece.edif.core.InvalidEdifNameException;
-import edu.byu.ece.rapidSmith.interfaces.yosys.YosysEdifInterface;
-import edu.byu.ece.rapidSmith.RSEnvironment;
-import edu.byu.ece.rapidSmith.design.subsite.*;
-import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.util.Exceptions;
-import edu.byu.ece.rapidSmith.util.Time;
-import org.apache.commons.lang3.tuple.MutablePair;
 
 /**
  * This class is used to interface Vivado and RapidSmith2. 
@@ -131,10 +127,10 @@ public final class VivadoInterface {
 		// Mark the used static resources
 		if (mode == ImplementationMode.RECONFIG_MODULE) {
 			String resourcesFile = rscpPath.resolve("static_resources.rsc").toString();
-			UsedStaticResources staticResources = new UsedStaticResources(design, device);
-			staticResources.parseResourcesRSC(resourcesFile);
-			vivadoCheckpoint.setReconfigStaticNetMap(staticResources.getReconfigStaticNetMap());
-			vivadoCheckpoint.setStaticRouteStringMap(staticResources.getStaticRouteStringMap());
+			StaticResourcesInterface staticInterface = new StaticResourcesInterface(design, device);
+			staticInterface.parseResourcesRSC(resourcesFile);
+			vivadoCheckpoint.setReconfigStaticNetMap(staticInterface.getReconfigStaticNetMap());
+			vivadoCheckpoint.setStaticRouteStringMap(staticInterface.getStaticRouteStringMap());
 		}
 
 		return vivadoCheckpoint;

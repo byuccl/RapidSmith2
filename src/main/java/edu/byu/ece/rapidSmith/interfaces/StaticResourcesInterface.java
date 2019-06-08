@@ -64,7 +64,6 @@ public class StaticResourcesInterface {
 						processReservedWires(toks);
 						break;
 					case "STATIC_RT" :
-						// FIXME: Everything doesn't really need to be split by whitespace for processStaticRoutes.
 						processStaticRoutes(toks);
 						break;
 					case "SITE_RTS":
@@ -126,9 +125,38 @@ public class StaticResourcesInterface {
 					// route through the RM.
 					design.addReservedWire(wire);
 				}
-
 			}
 		}
+	}
+
+	/**
+	 * Converts a Vivado ROUTE string to a RS2 RouteTree data structur
+	 * @param branchRoot
+	 * @param index
+	 * @param toks
+	 * @return
+	 */
+	private int createIntersiteRouteTree(RouteStringTree branchRoot, int index, String[] toks) {
+		RouteStringTree current = branchRoot;
+
+		while ( index < toks.length ) {
+
+			// new branch
+			if (toks[index].equals("{") ) {
+				index++;
+				index = createIntersiteRouteTree(current, index, toks);
+			}
+			//end of a branch
+			else if (toks[index].equals("}") ) {
+				// TODO: Add to list of terminals?
+				return index + 1;
+			}
+			else {
+				current = current.addChild(toks[index]);
+				index++;
+			}
+		}
+		return index;
 	}
 
 	/**
@@ -183,5 +211,9 @@ public class StaticResourcesInterface {
 
 	public void setStaticRouteStringMap(Map<String, RouteStringTree> staticRouteStringMap) {
 		this.staticRouteStringMap = staticRouteStringMap;
+	}
+
+	public Map<String, String> getReconfigStaticNetMap() {
+		return reconfigStaticNetMap;
 	}
 }
