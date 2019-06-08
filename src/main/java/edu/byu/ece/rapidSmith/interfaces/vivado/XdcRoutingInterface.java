@@ -23,7 +23,6 @@ import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.device.families.FamilyInfo;
 import edu.byu.ece.rapidSmith.device.families.FamilyInfos;
-import edu.byu.ece.rapidSmith.interfaces.AbstractXdcInterface;
 
 import java.io.*;
 import java.util.*;
@@ -49,11 +48,6 @@ import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.Tile;
 import edu.byu.ece.rapidSmith.device.TileWire;
 import edu.byu.ece.rapidSmith.device.Wire;
-import edu.byu.ece.rapidSmith.device.WireEnumerator;
-import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.logging.log4j.core.appender.routing.Route;
-
-import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
 
 /**
  * This class is used for parsing and writing routing XDC files in a TINCR checkpoint.

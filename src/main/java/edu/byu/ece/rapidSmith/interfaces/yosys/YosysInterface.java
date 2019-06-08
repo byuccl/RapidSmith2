@@ -23,6 +23,7 @@ package edu.byu.ece.rapidSmith.interfaces.yosys;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.interfaces.StaticResourcesInterface;
 import edu.byu.ece.rapidSmith.interfaces.vivado.*;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
@@ -90,19 +91,21 @@ public final class YosysInterface {
 		// If importing a reconfigurable module, process all of the static resources
 		if (mode == ImplementationMode.RECONFIG_MODULE) {
 			// Process partition pins
+			// TODO: Should the partition pin go in the routing.rsc? Placement may only define the tile for a partition pin
+			// and routing might determine the exact wire and node.
 			String placementFile = rscpPath.resolve("placement.rsc").toString();
 			XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device, libCells);
 			placementInterface.parsePlacementXDC(placementFile);
+
 			// TODO: Do this?
 			design.setPartPinMap(placementInterface.getPartPinMap());
 
 			// Process other static resources (reserved sites, PIPs, partition pin routes)
 			String resourcesFile = rscpPath.resolve("static_resources.rsc").toString();
-			UsedStaticResources staticResources = new UsedStaticResources(design, device);
-			staticResources.parseResourcesRSC(resourcesFile);
-			vivadoCheckpoint.setReconfigStaticNetMap(staticResources.getReconfigStaticNetMap());
-			vivadoCheckpoint.setStaticRouteStringMap(staticResources.getStaticRouteStringMap());
-			//vivadoCheckpoint.setStaticRoutemap(staticResources.getStaticRoutemap());
+			StaticResourcesInterface staticInterface = new StaticResourcesInterface(design, device);
+			staticInterface.parseResourcesRSC(resourcesFile);
+			vivadoCheckpoint.setReconfigStaticNetMap(staticInterface.getReconfigStaticNetMap());
+			vivadoCheckpoint.setStaticRouteStringMap(staticInterface.getStaticRouteStringMap());
 			//design.setOocPortMap(staticResources.getOocPortMap());
 		}
 

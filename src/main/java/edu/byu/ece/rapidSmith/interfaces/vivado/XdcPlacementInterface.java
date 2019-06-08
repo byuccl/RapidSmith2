@@ -34,7 +34,6 @@ import java.util.stream.Stream;
 import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.*;
-import edu.byu.ece.rapidSmith.interfaces.AbstractXdcInterface;
 
 import static edu.byu.ece.rapidSmith.util.Exceptions.*;
 

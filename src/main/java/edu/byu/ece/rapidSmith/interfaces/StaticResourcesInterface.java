@@ -1,4 +1,4 @@
-package edu.byu.ece.rapidSmith.interfaces.vivado;
+package edu.byu.ece.rapidSmith.interfaces;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -22,6 +22,10 @@ public class StaticResourcesInterface {
 	private final Device device;
 	private final CellDesign design;
 	private final WireEnumerator wireEnumerator;
+	/* Map from RM port name(s) to the static net's name */
+	private Map<String, String> reconfigStaticNetMap;
+	/* Map from the static net name to the route string tree */
+	private Map<String, RouteStringTree> staticRouteStringMap;
 
 	// Map from port name(s) to a pair of the static net name and the static portion of the route string
 	//private Map<String, MutablePair<String, String>> staticRoutemap;
@@ -133,7 +137,6 @@ public class StaticResourcesInterface {
 	 */
 	private void processStaticRoutes(String[] toks) {
 		assert(toks.length > 3);
-		StringBuilder staticRouteString = new StringBuilder();
 		ArrayList<String> portNames  = new ArrayList<>();
 		Set<CellNet> portNets = new HashSet<>();
 
@@ -151,7 +154,6 @@ public class StaticResourcesInterface {
 			assert (partPinNet != null);
 			portNets.add(partPinNet);
 
-
 			// TODO: Refactor this code a bit.
 			portNames.add(partPin.getNet().getName());
 			i++;
@@ -159,56 +161,27 @@ public class StaticResourcesInterface {
 
 		// Set the aliases for the cellnet. Note that these are only aliases within the context of the full design.
 		for (CellNet portNet : portNets) {
+			reconfigStaticNetMap.put(portNet.getName(), staticNetName);
 			portNet.setAliases(portNets);
 		}
 
-		// Iterate through the rest of the static route
-		for (; i < toks.length; i++) {
-
-			if (!toks[i].equals("{") && !toks[i].equals("}")) {
-				// Some wires in the static route will be outside of the partial device, but some of the wires will be
-				// within the partial device. These wires need to be marked as used so routers know they cannot be used.
-				String[] wireToks = toks[i].split("/");
-				Tile tile = device.getTile(wireToks[0]);
-				Integer wireEnum;
-
-				// If tile is null, try to get the wire from the partial device's OOC_WIRE tile
-				if (tile == null) {
-					tile = device.getTile("OOC_WIRE_X0Y0");
-					wireEnum = wireEnumerator.getWireEnum(wireToks[0] + "/" + wireToks[1]);
-				}
-				else {
-					wireEnum = wireEnumerator.getWireEnum(wireToks[1]);
-				}
-
-				// If the wire exists within the partial device, mark it as used
-				if (tile != null && wireEnum != null) {
-					Wire tileWire = new TileWire(tile, wireEnum);
-
-					// Set the tile wire as used so routers know to not use it
-					for (Wire wire : tileWire.getWiresInNode()) {
-						design.addReservedWire(wire, portNets);
-					}
-				}
-			}
-
-			// Append the "{", "}", or wire to the static route string
-			staticRouteString.append(toks[i]).append(" ");
-		}
-
-		//MutablePair<String, String> netRoute = new MutablePair<>(staticNetName, staticRouteString.toString());
-
-		//if (this.staticRoutemap == null)
-		//	this.staticRoutemap = new HashMap<>();
-
-		//for (String portName : portNames) {
-		//	staticRoutemap.put(portName, netRoute);
-		//}
+		// Create the Route String Tree
+		i++;
+		RouteStringTree root = new RouteStringTree(toks[i]);
+		createIntersiteRouteTree(root, i+1, toks);
+		staticRouteStringMap.put(staticNetName, root);
 
 	}
 
-	//public Map<String, MutablePair<String, String>> getStaticRoutemap() {
-	//	return staticRoutemap;
-	//}
+	public void setReconfigStaticNetMap(Map<String, String> reconfigStaticNetMap) {
+		this.reconfigStaticNetMap = reconfigStaticNetMap;
+	}
 
+	public Map<String, RouteStringTree> getStaticRouteStringMap() {
+		return staticRouteStringMap;
+	}
+
+	public void setStaticRouteStringMap(Map<String, RouteStringTree> staticRouteStringMap) {
+		this.staticRouteStringMap = staticRouteStringMap;
+	}
 }

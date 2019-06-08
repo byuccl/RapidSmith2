@@ -1,17 +1,11 @@
-package edu.byu.ece.rapidSmith.interfaces;
+package edu.byu.ece.rapidSmith.interfaces.vivado;
 
-import edu.byu.ece.edif.core.*;
-import edu.byu.ece.rapidSmith.design.NetType;
-import edu.byu.ece.rapidSmith.design.subsite.Property;
-import edu.byu.ece.rapidSmith.design.subsite.*;
-import edu.byu.ece.rapidSmith.device.*;
-import edu.byu.ece.rapidSmith.interfaces.vivado.XdcRoutingInterface;
+import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
+import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
+import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.device.Tile;
+import edu.byu.ece.rapidSmith.device.WireEnumerator;
 import edu.byu.ece.rapidSmith.util.Exceptions;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public abstract class AbstractXdcInterface {
 
