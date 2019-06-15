@@ -30,266 +30,275 @@ import java.util.*;
  * sinks.
  */
 public final class RouteStringTree implements Comparable<RouteStringTree>, Iterable<RouteStringTree> {
-	private RouteStringTree sourceTree;
-	private final String wireName;
-	private final Collection<RouteStringTree> sinkTrees = new ArrayList<>(1);
+    private final String wireName;
+    private final Collection<RouteStringTree> sinkTrees = new ArrayList<>(1);
+    private RouteStringTree sourceTree;
 
-	/**
-	 * Creates a new unsourced route string tree.
-	 * @param wireName the wire for the starting node in the new tree
-	 */
-	public RouteStringTree(String wireName) {
-		this.wireName = wireName;
-	}
+    /**
+     * Creates a new unsourced route string tree.
+     *
+     * @param wireName the wire for the starting node in the new tree
+     */
+    public RouteStringTree(String wireName) {
+        this.wireName = wireName;
+    }
 
-	public RouteStringTree(RouteTree routeTree, RouteStringTree parent) {
-		this.wireName = routeTree.getWire().getFullName();
-		for (RouteTree rt : routeTree.getChildren()) {
-			parent.addChild(new RouteStringTree(rt, parent));
-		}
-	}
+    public RouteStringTree(RouteTree routeTree, RouteStringTree parent) {
+        this.wireName = routeTree.getWire().getFullName();
+        for (RouteTree rt : routeTree.getChildren()) {
+            parent.addChild(new RouteStringTree(rt, parent));
+        }
+    }
 
-	/**
-	 * @return the wire of this node
-	 */
-	public String getWireName() {
-		return wireName;
-	}
+    /**
+     * @return the wire of this node
+     */
+    public String getWireName() {
+        return wireName;
+    }
 
-	/**
-	 * @return the node sourcing this node in the tree
-	 */
-	public RouteStringTree getSourceTree() {
-		return sourceTree;
-	}
+    /**
+     * @return the node sourcing this node in the tree
+     */
+    public RouteStringTree getSourceTree() {
+        return sourceTree;
+    }
 
-	/**
-	 * @return the root node of the entire route string tree
-	 */
-	public RouteStringTree getFirstSource() {
-		RouteStringTree parent = this;
-		while (parent.isSourced())
-			parent = parent.getSourceTree();
-		return parent;
-	}
+    private void setSourceTree(RouteStringTree sourceTree) {
+        this.sourceTree = sourceTree;
+    }
 
-	/**
-	 * @return true if this node is sourced, else false
-	 */
-	public boolean isSourced() {
-		return sourceTree != null;
-	}
+    /**
+     * @return the root node of the entire route string tree
+     */
+    public RouteStringTree getFirstSource() {
+        RouteStringTree parent = this;
+        while (parent.isSourced())
+            parent = parent.getSourceTree();
+        return parent;
+    }
 
-	private void setSourceTree(RouteStringTree sourceTree) {
-		this.sourceTree = sourceTree;
-	}
+    /**
+     * @return true if this node is sourced, else false
+     */
+    public boolean isSourced() {
+        return sourceTree != null;
+    }
 
-	/**
-	 * @return all route trees sourced by this node
-	 */
-	public Collection<RouteStringTree> getSinkTrees() {
-		return sinkTrees;
-	}
+    /**
+     * @return all route trees sourced by this node
+     */
+    public Collection<RouteStringTree> getSinkTrees() {
+        return sinkTrees;
+    }
 
-	/**
-	 * Returns true if this node is a leaf (i.e. it has no children).
-	 * For a fully routed net, a leaf tree should connect to either a SitePin
-	 * or BelPin.
-	 */
-	public boolean isLeaf() {
-		return sinkTrees.size() == 0;
-	}
+    /**
+     * Returns true if this node is a leaf (i.e. it has no children).
+     * For a fully routed net, a leaf tree should connect to either a SitePin
+     * or BelPin.
+     */
+    public boolean isLeaf() {
+        return sinkTrees.size() == 0;
+    }
 
-	@Override
-	public int compareTo(RouteStringTree o) {
-		return this.wireName.compareTo(o.wireName);
-	}
+    @Override
+    public int compareTo(RouteStringTree o) {
+        return this.wireName.compareTo(o.wireName);
+    }
 
-	@Override
-	public String toString() {
-		return wireName;
-	}
+    @Override
+    public String toString() {
+        return wireName;
+    }
 
-	/**
-	 * Converts this tree (and its children) into a route string for Vivado.
-	 * Assumes the tree is made up of only valid nodes for a Vivado route string.
-	 * @return the route string
-	 */
-	public String toRouteString() {
-		RouteStringTree currentRoute = this;
-		String routeString = "{ ";
+    /**
+     * Converts this tree (and its children) into a route string for Vivado.
+     * Assumes the tree is made up of only valid nodes for a Vivado route string.
+     *
+     * @return the route string
+     */
+    public String toRouteString() {
+        RouteStringTree currentRoute = this;
+        String routeString = "{ ";
 
-		while ( true ) {
-			routeString = routeString.concat(currentRoute.getWireName() + " ");
+        while (true) {
+            routeString = routeString.concat(currentRoute.getWireName() + " ");
 
-			ArrayList<RouteStringTree> sinkTrees = (ArrayList<RouteStringTree>) currentRoute.getSinkTrees();
+            ArrayList<RouteStringTree> sinkTrees = (ArrayList<RouteStringTree>) currentRoute.getSinkTrees();
 
-			if (sinkTrees.size() == 0)
-				break;
+            if (sinkTrees.size() == 0)
+                break;
 
-			for(int i = 0; i < sinkTrees.size() - 1; i++)
-				routeString = routeString.concat(sinkTrees.get(i).toRouteString());
+            for (int i = 0; i < sinkTrees.size() - 1; i++)
+                routeString = routeString.concat(sinkTrees.get(i).toRouteString());
 
-			currentRoute = sinkTrees.get(sinkTrees.size() - 1) ;
-		}
+            currentRoute = sinkTrees.get(sinkTrees.size() - 1);
+        }
 
-		return routeString + "} ";
-	}
+        return routeString + "} ";
+    }
 
-	/**
-	 * Prunes all nodes in the tree that are neither in the set of terminals nor
-	 * source a branch of the tree that ends in one of the terminals.
-	 * @param terminals the terminal nodes to keep
-	 * @return true if the node is either in terminals are sources a node in terminal,
-	 *   else false
-	 */
-	public boolean prune(Set<RouteStringTree> terminals) {
-		return pruneChildren(terminals);
-	}
+    /**
+     * Prunes all nodes in the tree that are neither in the set of terminals nor
+     * source a branch of the tree that ends in one of the terminals.
+     *
+     * @param terminals the terminal nodes to keep
+     * @return true if the node is either in terminals are sources a node in terminal,
+     * else false
+     */
+    public boolean prune(Set<RouteStringTree> terminals) {
+        return pruneChildren(terminals);
+    }
 
-	private boolean pruneChildren(Set<RouteStringTree> terminals) {
-		sinkTrees.removeIf(rt -> !rt.pruneChildren(terminals));
-		return !sinkTrees.isEmpty() || terminals.contains(this);
-	}
+    private boolean pruneChildren(Set<RouteStringTree> terminals) {
+        sinkTrees.removeIf(rt -> !rt.pruneChildren(terminals));
+        return !sinkTrees.isEmpty() || terminals.contains(this);
+    }
 
-	/**
-	 * Iterates over all trees in this route tree starting from this node.  Nodes
-	 * in this tree before this node are not traversed.  This iterator provides no
-	 * guarantee on the order of traversal, only that all nodes will be visited.
-	 */
-	@Override
-	public Iterator<RouteStringTree> iterator() {
-		return prefixIterator();
-	}
+    /**
+     * Iterates over all trees in this route tree starting from this node.  Nodes
+     * in this tree before this node are not traversed.  This iterator provides no
+     * guarantee on the order of traversal, only that all nodes will be visited.
+     */
+    @Override
+    public Iterator<RouteStringTree> iterator() {
+        return prefixIterator();
+    }
 
-	/**
-	 * Iterates over all trees in this route tree starting from this node in a
-	 * prefix order, ie. parent nodes are guaranteed to be visited prior to the
-	 * children. Nodes in the tree prior to this node are not traversed.
-	 */
-	public Iterator<RouteStringTree> prefixIterator() {
-		return new PrefixIterator();
-	}
+    /**
+     * Iterates over all trees in this route tree starting from this node in a
+     * prefix order, ie. parent nodes are guaranteed to be visited prior to the
+     * children. Nodes in the tree prior to this node are not traversed.
+     */
+    public Iterator<RouteStringTree> prefixIterator() {
+        return new PrefixIterator();
+    }
 
-	private class PrefixIterator implements Iterator<RouteStringTree> {
-		private final Stack<RouteStringTree> stack;
+    /**
+     * Find the equivalent route string tree that is in this tree's children
+     *
+     * @param toFind the route string tree to find
+     * @return found tree if successful, null otherwise
+     */
+    public RouteStringTree find(RouteStringTree toFind) {
+        for (RouteStringTree tree : this) {
+            if (tree.getWireName().equals(toFind.getWireName())) {
+                System.out.println(tree.getWireName());
+            }
 
-		PrefixIterator() {
-			this.stack = new Stack<>();
-			this.stack.push(RouteStringTree.this);
-		}
+            if (tree.equals(toFind))
+                return tree;
+        }
+        return null;
+    }
 
-		@Override
-		public boolean hasNext() {
-			return !stack.isEmpty();
-		}
+    /**
+     * Find the equivalent route string tree that is in this tree's children
+     *
+     * @param wireName name of the wire in the tree to find
+     * @return
+     */
+    public RouteStringTree find(String wireName) {
+        for (RouteStringTree tree : this) {
+            if (tree.getWireName().equals(wireName))
+                return tree;
+        }
+        return null;
+    }
 
-		@Override
-		public RouteStringTree next() {
-			if (!hasNext())
-				throw new NoSuchElementException();
-			RouteStringTree tree = stack.pop();
-			stack.addAll(tree.getSinkTrees());
-			return tree;
-		}
-	}
+    /**
+     * Hash is based on the wire name of this tree node.
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(wireName);
+    }
 
-	/**
-	 * Find the equivalent route string tree that is in this tree's children
-	 * @param toFind the route string tree to find
-	 * @return found tree if successful, null otherwise
-	 */
-	public RouteStringTree find(RouteStringTree toFind) {
-		for (RouteStringTree tree : this) {
-			if (tree.getWireName().equals(toFind.getWireName())) {
-				System.out.println(tree.getWireName());
-			}
+    /**
+     * Adds sink as a child of the tree.
+     *
+     * @param sink the sink route string tree to connect to
+     * @return sink
+     */
+    public RouteStringTree addChild(RouteStringTree sink) {
+        if (sink.getSourceTree() != null)
+            throw new Exceptions.DesignAssemblyException("Sink tree already sourced");
 
-			if (tree.equals(toFind))
-				return tree;
-		}
-		return null;
-	}
+        sinkTrees.add(sink);
+        sink.setSourceTree(this);
+        return sink;
+    }
 
-	/**
-	 * Find the equivalent route string tree that is in this tree's children
-	 * @param wireName name of the wire in the tree to find
-	 * @return
-	 */
-	public RouteStringTree find(String wireName) {
-		for (RouteStringTree tree : this) {
-			if (tree.getWireName().equals(wireName))
-				return tree;
-		}
-		return null;
-	}
+    /**
+     * Adds the trees as children to this tree.
+     *
+     * @param toAdd trees to add
+     */
+    public void addChildren(Collection<RouteStringTree> toAdd) {
+        this.sinkTrees.addAll(toAdd);
+    }
 
-	/**
-	 * Hash is based on the wire name of this tree node.
-	 */
-	@Override
-	public int hashCode() {
-		return Objects.hash(wireName);
-	}
+    /**
+     * Creates a new tree by the name of wireName and adds it as a child to this tree
+     *
+     * @param wireName name of new tree to add as a child.
+     * @return sink
+     */
+    public RouteStringTree addChild(String wireName) {
+        RouteStringTree sink = new RouteStringTree(wireName);
+        sinkTrees.add(sink);
+        sink.setSourceTree(this);
+        return sink;
+    }
 
-	/**
-	 * Adds sink as a child of the tree.
-	 * @param sink the sink route string tree to connect to
-	 * @return sink
-	 */
-	public RouteStringTree addChild(RouteStringTree sink) {
-		if (sink.getSourceTree() != null)
-			throw new Exceptions.DesignAssemblyException("Sink tree already sourced");
+    /**
+     * @return a deep copy of this tree beginning at this node
+     */
+    public RouteStringTree deepCopy() {
+        RouteStringTree copy = new RouteStringTree(this.wireName);
+        sinkTrees.forEach(rt -> copy.sinkTrees.add(rt.deepCopy()));
+        copy.sinkTrees.forEach(rt -> rt.sourceTree = this);
+        return copy;
+    }
 
-		sinkTrees.add(sink);
-		sink.setSourceTree(this);
-		return sink;
-	}
+    /**
+     * Adds all the children from another route string tree to the same node of this tree.
+     *
+     * @param toAdd the tree whose children to add
+     */
+    public void addChildrenFromTree(RouteStringTree toAdd) {
+        // Find the wire node that is in this tree
+        RouteStringTree wireNode = this.find(toAdd.getWireName());
 
-	/**
-	 * Adds the trees as children to this tree.
-	 * @param toAdd trees to add
-	 */
-	public void addChildren(Collection<RouteStringTree> toAdd) {
-		this.sinkTrees.addAll(toAdd);
-	}
+        if (wireNode == null) {
+            System.err.println("[Warning]: " + toAdd.getWireName() + " not found in route tree. No children will be added.");
+            return;
+        }
 
-	/**
-	 * Creates a new tree by the name of wireName and adds it as a child to this tree
-	 * @param wireName name of new tree to add as a child.
-	 * @return sink
-	 */
-	public RouteStringTree addChild(String wireName) {
-		RouteStringTree sink = new RouteStringTree(wireName);
-		sinkTrees.add(sink);
-		sink.setSourceTree(this);
-		return sink;
-	}
+        // Add all of the wire's children to this tree
+        wireNode.addChildren(toAdd.getSinkTrees());
+    }
 
-	/**
-	 * @return a deep copy of this tree beginning at this node
-	 */
-	public RouteStringTree deepCopy() {
-		RouteStringTree copy = new RouteStringTree(this.wireName);
-		sinkTrees.forEach(rt -> copy.sinkTrees.add(rt.deepCopy()));
-		copy.sinkTrees.forEach(rt -> rt.sourceTree = this);
-		return copy;
-	}
+    private class PrefixIterator implements Iterator<RouteStringTree> {
+        private final Stack<RouteStringTree> stack;
 
-	/**
-	 * Adds all the children from another route string tree to the same node of this tree.
-	 * @param toAdd the tree whose children to add
-	 */
-	public void addChildrenFromTree(RouteStringTree toAdd) {
-		// Find the wire node that is in this tree
-		RouteStringTree wireNode = this.find(toAdd.getWireName());
+        PrefixIterator() {
+            this.stack = new Stack<>();
+            this.stack.push(RouteStringTree.this);
+        }
 
-		if (wireNode == null) {
-			System.err.println("[Warning]: " + toAdd.getWireName() + " not found in route tree. No children will be added.");
-			return;
-		}
+        @Override
+        public boolean hasNext() {
+            return !stack.isEmpty();
+        }
 
-		// Add all of the wire's children to this tree
-		wireNode.addChildren(toAdd.getSinkTrees());
-	}
+        @Override
+        public RouteStringTree next() {
+            if (!hasNext())
+                throw new NoSuchElementException();
+            RouteStringTree tree = stack.pop();
+            stack.addAll(tree.getSinkTrees());
+            return tree;
+        }
+    }
 }
