@@ -399,9 +399,9 @@ public abstract class AbstractEdifInterface {
 			for (CellPin cp : c.getPins()) {
 				if (cp.getNet()!= null) {
 					if (cp.getNet() != globalGNDNet && cp.getNet().getType() == NetType.GND)
-						cp.setMacroPinToGlobalNet(globalGNDNet);
+						cp.setPinToGlobalNet(globalGNDNet);
 					else if (cp.getNet() != globalVCCNet && cp.getNet().getType() == NetType.VCC)
-						cp.setMacroPinToGlobalNet(globalVCCNet);
+						cp.setPinToGlobalNet(globalVCCNet);
 				}
 			}
 		}

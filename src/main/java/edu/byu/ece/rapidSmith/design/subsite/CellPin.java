@@ -27,11 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import edu.byu.ece.rapidSmith.device.Bel;
-import edu.byu.ece.rapidSmith.device.BelId;
-import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.PinDirection;
-import edu.byu.ece.rapidSmith.device.SitePin;
+import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
 /**
@@ -271,6 +267,7 @@ public abstract class CellPin implements Serializable {
 			return null;
 		}
 		else {
+			assert (belPinMappingSet.size() == 1);
 			return belPinMappingSet.iterator().next();
 		}
 	}
@@ -300,7 +297,7 @@ public abstract class CellPin implements Serializable {
 	 * @param belPin BelPin to un-map
 	 */
 	public void clearPinMapping(BelPin belPin) {
-		if (belPinMappingSet != null && belPinMappingSet.contains(belPin)) {
+		if (belPinMappingSet != null) {
 			belPinMappingSet.remove(belPin);
 		}
 	}
@@ -336,7 +333,12 @@ public abstract class CellPin implements Serializable {
 	/** 
 	 * @return <code>true</code> if the pin is a pseudo pin. <code>false</code> otherwise.
 	 */
-	public abstract boolean isPseudoPin(); 
+	public abstract boolean isPseudoPin();
+
+	/**
+	 * @return <code>true</code> if the pin is a partition pin. <code>false</code> otherwise.
+	 */
+	public abstract boolean isPartitionPin();
 	
 	/**
 	 * Returns the BelPins that this pin can potentially be mapped onto. The BEL that this pin's parent
@@ -393,12 +395,21 @@ public abstract class CellPin implements Serializable {
 	public abstract CellPinType getType();
 	
 	/**
-	 * If the 
-	 * @return 
+	 * @return the external pin
 	 */
 	public abstract CellPin getExternalPin();
 
-	public void setMacroPinToGlobalNet(CellNet n) {
+	/**
+	 * @return the partition pin wire (if the pin is a partition pin)
+	 */
+	public abstract Wire getPartPinWire();
+
+	/**
+	 * Manually set a pin to a global net. Not for normal use. Should only be used for macro pins, partition pins, or
+	 * static-source LUTs.
+	 * @param n the global net to set the pin to
+	 */
+	public void setPinToGlobalNet(CellNet n) {
 		setNet(n);
 	}
 
