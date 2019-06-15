@@ -309,10 +309,8 @@ public class CellNet implements Serializable {
 			pin.getCell().mapToInternalPins(pin).forEach(this::connectToLeafPin);
 			pin.setNet(this);
 		}
-		// If the cellpin drives a static net, but the cell is not a VCC or GND cell, do not
-		// attempt to disconnect. This can come up with static source LUTs, etc.
-		else if (!(pin.getNet().isStaticNet() && pin.isOutpin() && !pin.getCell().isStaticSource())) {
-			disconnectFromLeafPin(pin);
+		else {
+			connectToLeafPin(pin);
 		}
 	}
 	
@@ -407,7 +405,9 @@ public class CellNet implements Serializable {
 			pin.getCell().mapToInternalPins(pin).forEach(this::disconnectFromLeafPin);
 			pin.clearNet();
 		}
-		else {
+		// If the cellpin drives a static net, but the cell is not a VCC or GND cell, do not
+		// attempt to disconnect. This can come up with static source LUTs, etc.
+		else if (!(pin.getNet().isStaticNet() && pin.isOutpin() && !pin.getCell().isStaticSource())) {
 			disconnectFromLeafPin(pin);
 		}
 	}
