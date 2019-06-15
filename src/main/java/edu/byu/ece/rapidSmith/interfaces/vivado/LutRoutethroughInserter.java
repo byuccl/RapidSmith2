@@ -54,7 +54,7 @@ public class LutRoutethroughInserter {
 	private static final String ROUTETHROUGH_INIT_STRING = "2'h2";
 	private static final String ROUTETHROUGH_NAME = "rapidSmithRoutethrough";
 	private int routethroughID;
-	private Collection<CellNet> netsToAdd = new ArrayList<>();
+	private Collection<CellNet> netsToAdd;
 	
 	/**
 	 * Creates a new LutRoutethrough inserter object
@@ -182,17 +182,21 @@ public class LutRoutethroughInserter {
 		Cell buffer = new Cell(ROUTETHROUGH_NAME + routethroughID, libCells.get("LUT1") );
 		buffer.getProperties().update(new Property("INIT", PropertyType.EDIF, ROUTETHROUGH_INIT_STRING));
 		design.addCell(buffer);
+
+		// Add DONT_TOUCH to prevent Vivado from optimizing the route-through away
+		buffer.getProperties().update("DONT_TOUCH", PropertyType.EDIF, "TRUE");
 		
 		// break the netlist 
 		net.disconnectFromPins(sinks);
 		net.connectToPin(buffer.getPin("I0"));
 		
-		// add new net .. TODO: randomize the naming scheme more
+		// add new net and add a DONT_TOUCH property to it .. TODO: randomize the naming scheme more
 		CellNet routethroughNet = new CellNet(ROUTETHROUGH_NAME + "Net" + routethroughID++, NetType.WIRE);
 		routethroughNet.connectToPin(buffer.getPin("O"));
 		routethroughNet.connectToPins(sinks);
 		routethroughNet.setIsIntrasite(true); // mark the second portion of the net as intrasite
 		netsToAdd.add(routethroughNet);
+		routethroughNet.getProperties().update("DONT_TOUCH", PropertyType.EDIF, "TRUE");
 		
 		// place lut cell and map pins correctly
 		Bel rtBel = rtSource.getBel();

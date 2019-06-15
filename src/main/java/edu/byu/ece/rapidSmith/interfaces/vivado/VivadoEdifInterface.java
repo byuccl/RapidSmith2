@@ -349,6 +349,9 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 			
 			edifNet.addPortConnection(portRef);
 		}
+
+		// create an equivalent edif property for each RS2 property
+		edifNet.addPropertyList(createEdifPropertyList(cellNet.getProperties()));
 					
 		return edifNet;
 	}
