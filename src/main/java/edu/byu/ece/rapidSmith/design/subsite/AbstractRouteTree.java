@@ -98,15 +98,6 @@ public abstract class AbstractRouteTree<T extends AbstractRouteTree<T>> implemen
 	 */
 	@SuppressWarnings("unchecked")
 	public final <S extends T> S connect(Connection c) {
-		// TODO: Remove debug code
-		//boolean found = false;
-		//for (Connection conn :  this.wire.getWireConnections()) {
-		//	if (conn.equals(c))
-		//		found = true;
-		//}
-		//if (!found)
-		//	System.err.println("Impossible connection!");
-
 		S i = (S) newInstance(c.getSinkWire());
 		return connect(c, i);
 	}
@@ -118,16 +109,6 @@ public abstract class AbstractRouteTree<T extends AbstractRouteTree<T>> implemen
 	 * @return @{code child}
 	 */
 	public final <S extends T> S connect(Connection c, S child) {
-		//boolean found = false;
-		//for (Connection conn :  this.wire.getWireConnections()) {
-		//	if (conn.equals(c))
-		//		found = true;
-		//}
-		//if (!found)
-		//	System.err.println("Impossible connection!");
-
-
-
 		if (!c.getSinkWire().equals(child.getWire()))
 			throw new Exceptions.DesignAssemblyException("Connection does not match sink tree");
 

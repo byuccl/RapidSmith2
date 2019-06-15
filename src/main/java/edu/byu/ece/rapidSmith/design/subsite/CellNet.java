@@ -45,11 +45,6 @@ public class CellNet implements Serializable {
 	/** Unique Serialization ID for this class*/
 	private static final long serialVersionUID = 6082237548065721803L;
 
-	// TODO: Remove when no longer needed?
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	/** Unique name of the net */
 	private String name;
 	/**Type of net*/
@@ -140,7 +135,7 @@ public class CellNet implements Serializable {
 		this.isMultiSourcedNet = false;
 		this.multiSourceStatusSet = false;
 		this.sourcePins = new HashSet<>();
-		reservedWires = new HashSet<>();
+		this.reservedWires = new HashSet<>();
 		this.aliases = new HashSet<>();
 	}
 
@@ -151,6 +146,14 @@ public class CellNet implements Serializable {
 	 */
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * Sets the name of the net. Not for normal use.
+	 * @param name
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**

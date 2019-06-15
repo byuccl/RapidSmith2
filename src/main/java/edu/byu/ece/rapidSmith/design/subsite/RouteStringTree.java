@@ -20,27 +20,22 @@
 
 package edu.byu.ece.rapidSmith.design.subsite;
 
-import edu.byu.ece.rapidSmith.device.Connection;
-import edu.byu.ece.rapidSmith.device.Tile;
 import edu.byu.ece.rapidSmith.util.Exceptions;
-import org.apache.logging.log4j.core.appender.routing.Route;
 
 import java.util.*;
 
 /**
  * A tree describing a route in a design.  Each RouteStringTree object represents
- * a node in the tree (with its associated wire in the device) and contains the
- * sinks and connections to the sinks.
+ * a node in the tree (with its associated wire name in the device) and contains the
+ * sinks.
  */
 public final class RouteStringTree implements Comparable<RouteStringTree>, Iterable<RouteStringTree> {
-	private RouteStringTree sourceTree; // Do I want bidirectional checks?
+	private RouteStringTree sourceTree;
 	private final String wireName;
-	//private Connection connection;
-	//private int cost; // for routers
 	private final Collection<RouteStringTree> sinkTrees = new ArrayList<>(1);
 
 	/**
-	 * Creates a new unsourced route tree.
+	 * Creates a new unsourced route string tree.
 	 * @param wireName the wire for the starting node in the new tree
 	 */
 	public RouteStringTree(String wireName) {
@@ -52,44 +47,10 @@ public final class RouteStringTree implements Comparable<RouteStringTree>, Itera
 		for (RouteTree rt : routeTree.getChildren()) {
 			parent.addChild(new RouteStringTree(rt, parent));
 		}
-
 	}
-
-
-/*
-	public RouteStringTree(RouteTree routeTree) {
-		this.wireName = routeTree.getWire().getFullName();
-		for (RouteTree rt : routeTree.getChildren()) {
-			RouteTree trueChild = rt;
-			Connection c = rt.getConnection();
-
-			while (c.isDirectConnection()) {
-				assert (rou)
-			}
-
-			// Only add programmable connections
-			if (c.isPip() || c.isRouteThrough()) {
-				this.addChild(new RouteStringTree(rt));
-			}
-
-		}
-	}
-	*/
-
-
-//	/**
-//	 * Construct a Route String Tree given a Route Tree.
-//	 * @param routeTree
-//	 */
-//	public RouteStringTree(RouteTree routeTree) {
-//		this.wireName = routeTree.getWire().getFullName();
-//		for (RouteTree rt : routeTree.getChildren()) {
-//			this.addChild(new RouteStringTree(rt));
-//		}
-	//}
 
 	/**
-	 * @return the wire connected to this node
+	 * @return the wire of this node
 	 */
 	public String getWireName() {
 		return wireName;
@@ -103,7 +64,7 @@ public final class RouteStringTree implements Comparable<RouteStringTree>, Itera
 	}
 
 	/**
-	 * @return the root node of the entire route tree
+	 * @return the root node of the entire route string tree
 	 */
 	public RouteStringTree getFirstSource() {
 		RouteStringTree parent = this;
@@ -139,7 +100,6 @@ public final class RouteStringTree implements Comparable<RouteStringTree>, Itera
 		return sinkTrees.size() == 0;
 	}
 
-
 	@Override
 	public int compareTo(RouteStringTree o) {
 		return this.wireName.compareTo(o.wireName);
@@ -151,8 +111,9 @@ public final class RouteStringTree implements Comparable<RouteStringTree>, Itera
 	}
 
 	/**
-	 * This method assumes that the route string tree is made up of only valid nodes for a route string
-	 * @return
+	 * Converts this tree (and its children) into a route string for Vivado.
+	 * Assumes the tree is made up of only valid nodes for a Vivado route string.
+	 * @return the route string
 	 */
 	public String toRouteString() {
 		RouteStringTree currentRoute = this;
@@ -201,9 +162,6 @@ public final class RouteStringTree implements Comparable<RouteStringTree>, Itera
 		return prefixIterator();
 	}
 
-
-
-
 	/**
 	 * Iterates over all trees in this route tree starting from this node in a
 	 * prefix order, ie. parent nodes are guaranteed to be visited prior to the
@@ -238,12 +196,11 @@ public final class RouteStringTree implements Comparable<RouteStringTree>, Itera
 
 	/**
 	 * Find the equivalent route string tree that is in this tree's children
-	 * @param toFind
-	 * @return
+	 * @param toFind the route string tree to find
+	 * @return found tree if successful, null otherwise
 	 */
 	public RouteStringTree find(RouteStringTree toFind) {
 		for (RouteStringTree tree : this) {
-
 			if (tree.getWireName().equals(toFind.getWireName())) {
 				System.out.println(tree.getWireName());
 			}
@@ -268,43 +225,44 @@ public final class RouteStringTree implements Comparable<RouteStringTree>, Itera
 	}
 
 	/**
-	 * Hash is based on the wire of this node.
+	 * Hash is based on the wire name of this tree node.
 	 */
 	@Override
 	public int hashCode() {
 		return Objects.hash(wireName);
 	}
 
-	//@Override
-	//public boolean equals(RouteStringTree o) {
-	///	return (this.getWireName().equals(o.getWireName()));
-	//}
-
 	/**
-	 * Connects this route tree to tree sink through connection c.
-	 * @param sink the sink route tree to connect to
+	 * Adds sink as a child of the tree.
+	 * @param sink the sink route string tree to connect to
 	 * @return sink
 	 */
-	public RouteStringTree addChild( RouteStringTree sink) {
+	public RouteStringTree addChild(RouteStringTree sink) {
 		if (sink.getSourceTree() != null)
 			throw new Exceptions.DesignAssemblyException("Sink tree already sourced");
 
 		sinkTrees.add(sink);
 		sink.setSourceTree(this);
-		//sink.setConnection(c);
 		return sink;
 	}
 
+	/**
+	 * Adds the trees as children to this tree.
+	 * @param toAdd trees to add
+	 */
 	public void addChildren(Collection<RouteStringTree> toAdd) {
 		this.sinkTrees.addAll(toAdd);
 	}
 
+	/**
+	 * Creates a new tree by the name of wireName and adds it as a child to this tree
+	 * @param wireName name of new tree to add as a child.
+	 * @return sink
+	 */
 	public RouteStringTree addChild(String wireName) {
 		RouteStringTree sink = new RouteStringTree(wireName);
-
 		sinkTrees.add(sink);
 		sink.setSourceTree(this);
-		//sink.setConnection(c);
 		return sink;
 	}
 
@@ -319,74 +277,19 @@ public final class RouteStringTree implements Comparable<RouteStringTree>, Itera
 	}
 
 	/**
-	 * Adds
-	 * @param toAdd the tree whose part pin node's children are to be added
+	 * Adds all the children from another route string tree to the same node of this tree.
+	 * @param toAdd the tree whose children to add
 	 */
-	public void mergePartPinTree(RouteStringTree toAdd, String partPin) {
-		// Let's say the part pin is an input to the RM
-		// So I call this method on the static tree
+	public void addChildrenFromTree(RouteStringTree toAdd) {
+		// Find the wire node that is in this tree
+		RouteStringTree wireNode = this.find(toAdd.getWireName());
 
-		// Find the partition pin tree node of this tree
-		RouteStringTree partPinNode = this.find(partPin);
-
-		if (partPinNode == null) {
-			// TODO: Throw an error or a warning stating the node wasn't found
+		if (wireNode == null) {
+			System.err.println("[Warning]: " + toAdd.getWireName() + " not found in route tree. No children will be added.");
 			return;
 		}
 
-		// We just need to add the RM tree's children now
-		assert (toAdd.getWireName().equals(partPin));
-		partPinNode.addChildren(toAdd.getSinkTrees());
-
-
-		// If the part pin acts as an input to the RM
-			// Find partPin in static tree
-			// Add RM's partPin tree's children to the static tree's
-
-
-		// If the part pin acts as an output from the RM
-			// Find partPin in RM tree
-			// Add static partPin tree's children to the RM tree
-
-	}
-
-	public static RouteStringTree merge(RouteStringTree a, RouteStringTree b) {
-		for (RouteStringTree node : b) { // for every node in breadth-first traversal order
-
-			// Skip the root
-			if (node.getSourceTree() == null)
-				continue;
-
-			System.out.println("Find " + node.getSourceTree().getWireName());
-			RouteStringTree found = a.find(node.getSourceTree());  // find parent in tree1
-
-			// If there's no parent, it's the root.
-			if (found == null)  {
-				continue;
-			}
-
-			// If there is no node from tree 2 in tree 1
-			if (!found.getSinkTrees().contains(node))
-				found.addChild(node);
-		}
-		return a;
-
-		/*
-		List<RouteStringTree> aSinkTrees = new ArrayList<>(a.getSinkTrees());
-		List<RouteStringTree> bSinkTrees = new ArrayList<>(b.getSinkTrees());
-		List<RouteStringTree> toMerge = new ArrayList<>(aSinkTrees);
-		toMerge.retainAll(b.getSinkTrees());
-		List<RouteStringTree> toAdd = new ArrayList<>(bSinkTrees);
-		toAdd.removeAll(a.getSinkTrees());
-
-		for(RouteStringTree n : toMerge) {
-			merge(n, bSinkTrees.get(bSinkTrees.indexOf(n)));
-		}
-
-		for(RouteStringTree n : toAdd)
-			a.addChild(n.deepCopy());
-
-
-		*/
+		// Add all of the wire's children to this tree
+		wireNode.addChildren(toAdd.getSinkTrees());
 	}
 }

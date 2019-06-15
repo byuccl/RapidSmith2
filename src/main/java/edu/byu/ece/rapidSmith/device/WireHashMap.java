@@ -26,8 +26,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 /**
  * DO NOT USE THIS CLASS! This class was specially developed for the Device wire
  * connections hash map. It is specifically optimized for that purpose. Created

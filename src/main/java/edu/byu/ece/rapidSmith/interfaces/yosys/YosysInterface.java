@@ -96,8 +96,6 @@ public final class YosysInterface {
 			String placementFile = rscpPath.resolve("placement.rsc").toString();
 			XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device, libCells);
 			placementInterface.parsePlacementXDC(placementFile);
-
-			// TODO: Do this?
 			design.setPartPinMap(placementInterface.getPartPinMap());
 
 			// Process other static resources (reserved sites, PIPs, partition pin routes)
@@ -106,9 +104,7 @@ public final class YosysInterface {
 			staticInterface.parseResourcesRSC(resourcesFile);
 			vivadoCheckpoint.setReconfigStaticNetMap(staticInterface.getReconfigStaticNetMap());
 			vivadoCheckpoint.setStaticRouteStringMap(staticInterface.getStaticRouteStringMap());
-			//design.setOocPortMap(staticResources.getOocPortMap());
 		}
-
 
 		// parse the constraints into RapidSmith2
 		String constraintsFile = rscpPath.resolve("constraints.xdc").toString();

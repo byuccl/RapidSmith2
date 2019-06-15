@@ -5,9 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.*;
@@ -18,17 +16,13 @@ import static edu.byu.ece.rapidSmith.util.Exceptions.ParseException;
  * This file is used to specify which resources in a reconfigurable area that the static
  * design uses.
  */
-public class StaticResourcesInterface {
+public class StaticResourcesInterface extends AbstractXdcInterface {
 	private final Device device;
 	private final CellDesign design;
-	private final WireEnumerator wireEnumerator;
-	/* Map from RM port name(s) to the static net's name */
+	/** Map from RM port name(s) to the static net's name */
 	private Map<String, String> reconfigStaticNetMap;
-	/* Map from the static net name to the route string tree */
+	/** Map from the static net name to the route string tree */
 	private Map<String, RouteStringTree> staticRouteStringMap;
-
-	// Map from port name(s) to a pair of the static net name and the static portion of the route string
-	//private Map<String, MutablePair<String, String>> staticRoutemap;
 
 	/**
 	 * Creates a new XdcRoutingInterface object.
@@ -37,13 +31,15 @@ public class StaticResourcesInterface {
 	 * @param device {@link Device} of the specified design
 	 */
 	public StaticResourcesInterface(CellDesign design, Device device) {
+		super(device, design);
 		this.device = device;
-		this.wireEnumerator = device.getWireEnumerator();
 		this.design = design;
+		this.reconfigStaticNetMap = new HashMap<>();
+		this.staticRouteStringMap = new HashMap<>();
 	}
 
 	/**
-	 * Parses the specified static_resources.rsc file, and marks used resources in the design as used.
+	 * Parses the specified static_resources.rsc file.
 	 *
 	 * @param resourcesFile static_resources.rsc file
 	 * @throws IOException
@@ -67,42 +63,40 @@ public class StaticResourcesInterface {
 						processStaticRoutes(toks);
 						break;
 					case "SITE_RTS":
-						// TODO: Process the site routethroughs here
-						// Used static sources, LUT Routethroughs, & Site Routethroughs
-						// aren't expected to be found within a PR region.
-						if (toks.length > 1)
-							throw new ParseException("Unexpected Token Content: " + toks[0]);
+						processSiteRoutethroughs(toks);
 						break;
 					default :
 						throw new ParseException("Unrecognized Token: " + toks[0]);
 				}
 			}
 		}
+	}
 
-		// The nets that partition pin routes correspond with may have changed during placement import.
-		// Find such pins and update the static route map accordingly.
-		// TODO: Do this less dumb.
-		//	for (Cell port : design.getPorts().collect(Collectors.toList())) {
-		//	for (CellPin partPin : port.getPins().stream().filter(p -> p.isPartitionPin()).collect(Collectors.toList())) {
-		//		CellNet partPinNet = partPin.getNet();
+	/**
+	 * Processes a string array of sites being uses as route-throughs by the static design.
+	 * @param toks a String array of sites in the form: <br>
+	 * {@code SITE_RTS tile0/site0 tile1/site1 ... tileN/siteN} </br>
+	 */
+	private void processSiteRoutethroughs(String[] toks) {
+		for(int i = 1; i < toks.length; i++) {
+			String[] vals = toks[i].split("/");
+			assert vals.length == 2;
+			//String tileName = vals[0];
+			String siteName = vals[1];
 
-		//		if (!partPinNet.isStaticNet() && !staticRoutemap.containsKey(partPinNet.getName())) {
-		//			MutablePair<String, String> value = staticRoutemap.get(partPin.getPortName());
+			//Tile tile = tryGetTile(tileName);
+			Site site = tryGetSite(siteName);
 
-		//			assert (value != null);
-		//			staticRoutemap.remove(partPin.getPortName());
-		//			staticRoutemap.put(partPin.getNet().getName(), value);
-		//		}
-		//	}
-		//}
-
+			// Mark the site as reserved
+			design.addReservedSite(site);
+		}
 	}
 
 	/**
 	 * Processes a string array of reserved wire tokens.
 	 *
 	 * @param toks a String array of used wire tokens in the form: <br>
-	 * {@code RESERVED_WIRES tile0/wire1 tile1/wire2 ...}
+	 * {@code RESERVED_WIRES tile0/wire1 tile1/wire2 ...} </br>
 	 */
 	private void processReservedWires(String[] toks) {
 		for(int i = 1; i < toks.length; i++) {
@@ -111,9 +105,8 @@ public class StaticResourcesInterface {
 			String tileName = vals[0];
 			String wireName = vals[1];
 
-			// TODO: Try get Tile, wire
-			Tile tile = device.getTile(tileName);
-			Wire reservedWire = new TileWire(tile, wireEnumerator.getWireEnum(wireName));
+			Tile tile = tryGetTile(tileName);
+			Wire reservedWire = new TileWire(tile, tryGetWireEnum(wireName));
 
 			// Mark all wires in the node as reserved
 			for (Wire wire : reservedWire.getWiresInNode()) {
@@ -130,13 +123,13 @@ public class StaticResourcesInterface {
 	}
 
 	/**
-	 * Converts a Vivado ROUTE string to a RS2 RouteTree data structur
-	 * @param branchRoot
-	 * @param index
-	 * @param toks
-	 * @return
+	 * Creates a route string tree starting at branchRoot.
+	 * @param branchRoot The start wire
+	 * @param index index into the tokens
+	 * @param toks tokens containing wires in the form tile0/wire0 tile1/wire1 ... tileN/wireN
+	 * @return index into the tokens
 	 */
-	private int createIntersiteRouteTree(RouteStringTree branchRoot, int index, String[] toks) {
+	private int createIntersiteRouteStringTree(RouteStringTree branchRoot, int index, String[] toks) {
 		RouteStringTree current = branchRoot;
 
 		while ( index < toks.length ) {
@@ -144,7 +137,7 @@ public class StaticResourcesInterface {
 			// new branch
 			if (toks[index].equals("{") ) {
 				index++;
-				index = createIntersiteRouteTree(current, index, toks);
+				index = createIntersiteRouteStringTree(current, index, toks);
 			}
 			//end of a branch
 			else if (toks[index].equals("}") ) {
@@ -160,8 +153,12 @@ public class StaticResourcesInterface {
 	}
 
 	/**
+	 * Processes the static portion of partition pin routes, creating route string trees.
 	 *
-	 * @param toks
+	 * @param toks A string array of the form: <br>
+	 * <br>
+	 * {@code STATIC_RT staticNetName rmNetName0 rmNetName1 ... rmNetNameN {Tile0/Wire0 Tile1/Wire1 ... TileN/WireN}
+	 * The {@code tile/wire} elements are the wires that make up the static portion of a partition pin route.
 	 */
 	private void processStaticRoutes(String[] toks) {
 		assert(toks.length > 3);
@@ -196,21 +193,13 @@ public class StaticResourcesInterface {
 		// Create the Route String Tree
 		i++;
 		RouteStringTree root = new RouteStringTree(toks[i]);
-		createIntersiteRouteTree(root, i+1, toks);
+		createIntersiteRouteStringTree(root, i+1, toks);
 		staticRouteStringMap.put(staticNetName, root);
 
 	}
 
-	public void setReconfigStaticNetMap(Map<String, String> reconfigStaticNetMap) {
-		this.reconfigStaticNetMap = reconfigStaticNetMap;
-	}
-
 	public Map<String, RouteStringTree> getStaticRouteStringMap() {
 		return staticRouteStringMap;
-	}
-
-	public void setStaticRouteStringMap(Map<String, RouteStringTree> staticRouteStringMap) {
-		this.staticRouteStringMap = staticRouteStringMap;
 	}
 
 	public Map<String, String> getReconfigStaticNetMap() {

@@ -21,7 +21,6 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.device.*;
-import org.apache.logging.log4j.core.appender.routing.Route;
 
 import java.io.Serializable;
 import java.util.*;

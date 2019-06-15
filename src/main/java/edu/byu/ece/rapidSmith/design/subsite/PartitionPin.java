@@ -56,7 +56,7 @@ public class PartitionPin extends CellPin {
 		this.wire = wire;
 
 		// If the partition pin wire is an HCLK row, it is a special clock partition pin
-		// TODO: Is there a better way to identify this other than the name of the wire?
+		// Is there a better way to identify this other than the name of the wire?
 		this.pinType = (wire != null && wire.getName().contains("CLK_HROW")) ? CellPinType.PARTITION_CLK : CellPinType.PARTITION;
 	}
 

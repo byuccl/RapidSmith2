@@ -33,7 +33,6 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 /**
  * This class is used to interface Vivado and RapidSmith2. 
  * It parses RSCP checkpoints and creates equivalent RapidSmith {@link CellDesign}s.

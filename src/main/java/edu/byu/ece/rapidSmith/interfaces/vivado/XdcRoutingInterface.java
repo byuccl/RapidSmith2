@@ -48,9 +48,10 @@ import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.device.Tile;
 import edu.byu.ece.rapidSmith.device.TileWire;
 import edu.byu.ece.rapidSmith.device.Wire;
+import edu.byu.ece.rapidSmith.interfaces.AbstractXdcInterface;
 
 /**
- * This class is used for parsing and writing routing XDC files in a TINCR checkpoint.
+ * This class is used for parsing routing RSC files and writing routing XDC files in a TINCR checkpoint.
  * Routing.xdc files are used to specify the physical wires that a net in Vivado uses.
  */
 public class XdcRoutingInterface extends AbstractXdcInterface {
@@ -68,13 +69,8 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	private Map<Bel, BelRoutethrough> belRoutethroughMap;
 	private Pattern pipNamePattern;
 	private Map<String, String> partPinMap;
-	//private Map<String, String> oocPortMap; // Map from port name to the associated partition pin's node
-	//private Map<String, MutablePair<String, String>> staticRoutemap;
 	private Map<String, String> reconfigStaticNetMap;
 	private Map<String, RouteStringTree> staticRouteStringMap;
-
-
-
 	private ImplementationMode implementationMode;
 	private boolean pipUsedInRoute = false;
 	
@@ -118,12 +114,9 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 		this.currentLineNumber = 0;
 		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)");
 		this.implementationMode = mode;
-		//this.staticRoutemap = staticRoutemap;
 		this.reconfigStaticNetMap = reconfigStaticNetMap;
 		this.staticRouteStringMap = staticRouteStringMap;
-
 		this.partPinMap = design.getPartPinMap();
-
 	}
 	
 	/**
@@ -197,15 +190,11 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 						break;
 					case "GND_SOURCES" : processStaticSources(toks, false);
 						break;
-					case "VCC": 
-						String[] vccStartwires = br.readLine().split("\\s+");
-						assert (vccStartwires[0].equals("START_WIRES"));
-						processStaticNet2(toks, vccStartwires);
-						break; 
-					case "GND": 
-						String[] gndStartWires = br.readLine().split("\\s+");
-						assert (gndStartWires[0].equals("START_WIRES"));
-						processStaticNet2(toks, gndStartWires);
+					case "VCC":
+					case "GND":
+						String[] staticStartWires = br.readLine().split("\\s+");
+						assert (staticStartWires[0].equals("START_WIRES"));
+						processStaticNet2(toks, staticStartWires);
 						break;
 					default :
 						throw new ParseException("Unrecognized Token: " + toks[0]);
@@ -874,25 +863,6 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	}
 	
 	/**
-	 * Tries to retrieve the Site object with the given site name <br>
-	 * from the currently loaded device. If the site does not exist <br>
-	 * a {@link ParseException} is thrown <br>
-	 * 
-	 * @param siteName Name of the site to retrieve
-	 */
-	private Site tryGetSite(String siteName) {
-		
-		Site site = device.getSite(siteName);
-		
-		if (site == null) {
-			throw new ParseException("Site \"" + siteName + "\" not found in the current device. \n" 
-									+ "On line " + this.currentLineNumber + " of " + currentFile);
-		}
-		
-		return site;
-	}
-
-	/**
 	 * Tries to retrieve the CellNet object with the given name <br>
 	 * from the currently loaded design. If the net does not exist <br>
 	 * a ParseException is thrown.
@@ -962,27 +932,7 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 		
 		return source;
 	}
-	
-	/**
-	 * Tries to retrieve a BEL object from the currently loaded device. <br>
-	 * If the BEL does not exist, a ParseException is thrown. <br>
-	 * 
-	 * @param site Site where the BEL resides
-	 * @param belName Name of the BEL within the site
-	 * @return Bel
-	 */
-	private Bel tryGetBel(Site site, String belName) {
-		
-		Bel bel = site.getBel(belName);
-		
-		if (bel == null) {
-			throw new ParseException(String.format("Bel: \"%s/%s\" does not exist in the current device"
-												 + "On line %d of %s", site.getName(), belName, currentLineNumber, currentFile));
-		}
-		
-		return bel;
-	}
-	
+
 	/**
 	 * Tries to retrieve a BelPin object from the currently loaded device <br>
 	 * If the pin does not exist, a ParseException is thrown. <br>
@@ -1025,9 +975,6 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 		
 		return cellPin.getMappedBelPin();
 	}
-	
-	
-
 
 	/**
 	 * Writes the intrasite routing TCL commands for the design to the routing.xdc file.
@@ -1229,87 +1176,11 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 		RouteStringTree toAdd = rmSource ? moduleRouteStringTree : staticRouteStringTree;
 
 		// Merge the trees at the partition pin
-		toMerge.mergePartPinTree(toAdd, partPinNode);
+		assert (toAdd.getWireName().equals(partPinNode));
+		toMerge.addChildrenFromTree(toAdd);
 
 		return toMerge;
 	}
-
-	/**
-	 * Merges the partial and static route strings of a route.
-	 */
-	// TODO: Come up with a better way to do this. This is error-prone and can get tricky...
-	// Would it help to have a route string tree? Probably...
-	private String mergePartialStaticRouteOld(String staticRoute, String partialRoute, String partPinNode, boolean staticSink) {
-		StringBuilder mergedRoute = new StringBuilder();
-		String[] toks;
-		if (staticSink) {
-			// Remove the opening and closing curly braces from the static route string
-			staticRoute = staticRoute.substring(1, staticRoute.length()-2);
-
-			// Find the partition pin in the partialRoute
-			Pattern whitespacePattern = Pattern.compile("\\s+");
-			toks = whitespacePattern.split(partialRoute);
-
-			// TODO: Optimize this whole thing. Make a better way to know where the partition pins are
-			// in the static route string.
-			for (int i = 0; i < toks.length; i++) {
-				if (toks[i].equals(partPinNode)) {
-					//System.out.println("Found the partition pin node!");
-
-					// just insert the static portion
-
-					// TODO: If the partial device route has more sinks than just the partition pin, something
-					// might get messed up here with the curly braces...
-
-					toks[i] = staticRoute;
-
-					// We can't just break here because there may be more sinks past the partition pin
-					break;
-				}
-			}
-		}
-		else {
-			// Remove the opening and closing curly braces from the static route string
-			partialRoute = partialRoute.substring(1, partialRoute.length()-2);
-
-			// Find the partition pin in the partialRoute
-			Pattern whitespacePattern = Pattern.compile("\\s+");
-			toks = whitespacePattern.split(staticRoute);
-
-			// TODO: Optimize this whole thing. Make a better way to know where the partition pins are
-			// in the static route string.
-			for (int i = 0; i < toks.length; i++) {
-				if (toks[i].equals(partPinNode)) {
-					//System.out.println("Found the partition pin node!");
-
-					// if the static portion has the source, the partial portion will begin with the partition pin node
-					// (and ends in one or more sinks)
-					toks[i] = partialRoute;
-
-					break;
-				}
-			}
-		}
-
-		// The static portion of the route string will begin with the partition pin node if it the static portion of the net
-		// contains a sink outside of the partial device. It will end with the partition pin node if the static portion
-		// of the net contains the driver of the net.
-
-		// Put the tokens back into a single string
-		for (String tok : toks) {
-			mergedRoute.append(tok).append(" ");
-		}
-
-		return mergedRoute.toString();
-
-
-
-		//System.out.println("Static portion: " + staticRoute);
-		//System.out.println("RM portion: " + partialRoute);
-		//System.out.println("Merged Route String: " + mergedRoute);
-
-	}
-
 
 	/**
 	 * Creates the Vivado equivalent route string of the specified net. 

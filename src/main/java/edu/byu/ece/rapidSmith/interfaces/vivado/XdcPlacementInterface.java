@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Brigham Young University
+ * Copyright (c) 2019 Brigham Young University
  *
  * This file is part of the BYU RapidSmith Tools.
  *
@@ -34,6 +34,7 @@ import java.util.stream.Stream;
 import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.*;
+import edu.byu.ece.rapidSmith.interfaces.AbstractXdcInterface;
 
 import static edu.byu.ece.rapidSmith.util.Exceptions.*;
 
@@ -139,13 +140,13 @@ public class XdcPlacementInterface extends AbstractXdcInterface {
 
 		String[] wireToks = toks[2].split("/");
 		Tile tile = tryGetTile(wireToks[0]);
-		int wireEnum;
-
-		if (tile.getType() == TileType.valueOf(device.getFamily(), "OOC_WIRE"))
-			wireEnum = tryGetWireEnum(wireToks[0] + "/" + wireToks[1]);
-		else
-			wireEnum = tryGetWireEnum(wireToks[1]);
-
+		String wireName;
+		if (tile.getType() == TileType.valueOf(device.getFamily(), "OOC_WIRE")) {
+			wireName = wireToks[0] + "/" + wireToks[1];
+		} else {
+			wireName = wireToks[1];
+		}
+		int wireEnum = tryGetWireEnum(wireName);
 		TileWire partPinWire = new TileWire(tile, wireEnum);
 
 		String direction = toks[3];
@@ -445,46 +446,7 @@ public class XdcPlacementInterface extends AbstractXdcInterface {
 		
 		return pin;
 	}
-	
-	/**
-	 * Tries to retrieve the Site object with the given site name
-	 * from the currently loaded device. If the site does not exist
-	 * a ParseException is thrown
-	 * 
-	 * @param siteName Name of the site to retrieve
-	 */
-	private Site tryGetSite(String siteName) {
-		
-		Site site = device.getSite(siteName);
-		
-		if (site == null) {
-			throw new ParseException("Site \"" + siteName + "\" not found in the current device. \n"
-									+ "On line " + this.currentLineNumber + " of " + currentFile);
-		}
-		
-		return site;
-	}
-		
-	/**
-	 * Tries to retrieve a BEL object from the currently loaded device. 
-	 * If the BEL does not exist, a ParseException is thrown. 
-	 * 
-	 * @param site Site where the BEL resides
-	 * @param belName Name of the BEL within the site
-	 * @return Bel
-	 */
-	private Bel tryGetBel(Site site, String belName) {
-		
-		Bel bel = site.getBel(belName);
-		
-		if (bel == null) {
-			throw new ParseException(String.format("Bel: \"%s/%s\" does not exist in the current device"
-												 + "On line %d of %s", site.getName(), belName, currentLineNumber, currentFile));
-		}
-		
-		return bel;
-	}
-	
+
 	/**
 	 * Tries to retrieve a BelPin object from the currently loaded device
 	 * If the pin does not exist, a ParseException is thrown.
@@ -572,10 +534,8 @@ public class XdcPlacementInterface extends AbstractXdcInterface {
 	 * TODO: Add <is_lut>, <is_carry>, and <is_ff> tags to cell library
 	 */
 	private Stream<Cell> sortCellsForXdcExport(CellDesign design) {
-		
 		design.getDevice().getAllSitesOfType(SiteType.valueOf(design.getFamily(), "SLICEL"));
-		
-		
+
 		// cell bins
 		ArrayList<Cell> sorted = new ArrayList<>(design.getCells().size());		
 		ArrayList<Cell> lutCellsH5 = new ArrayList<>();
@@ -662,13 +622,6 @@ public class XdcPlacementInterface extends AbstractXdcInterface {
 	 */
 	public Map<String, String> getPartPinMap() {
 		return partPinMap;
-	}
-
-	/**
-	 * @param partPinMap the partPinMap to set
-	 */
-	public void setPartPinMap(Map<String, String> partPinMap) {
-		this.partPinMap = partPinMap;
 	}
 
 }

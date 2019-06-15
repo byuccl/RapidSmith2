@@ -72,6 +72,8 @@ public class CellDesign extends AbstractDesign {
 	private Map<Site, Map<String, String>> pipInValues;
 	/** Map of partition pins (ooc ports) to their ooc tile and node **/
 	private Map<String, String> partPinMap;
+	/** Set of reserved sites */
+	private Set<Site> reservedSites;
 
 
 	// TODO: Should be un-modifiable?
@@ -81,21 +83,10 @@ public class CellDesign extends AbstractDesign {
 	// TODO: Re-think these three
 	/**Map of out-of-context ports to their ooc tile and node **/
 	private Map<String, String> oocPortMap;
-	// TODO: Merge these maps. Map of maps. Static in the partial reconfig. context.
-	//private Map <String, String> staticNetMap;
-	//private Map <String, String> staticRoutemap;
+	/** Map from RM port name(s) to the static net's name */
 	private Map<String, String> reconfigStaticNetMap;
+	/** Map from the static net name to the route string tree */
 	private Map<String, RouteStringTree> staticRouteStringMap;
-
-	public Map<String, RouteStringTree> getStaticRouteStringMap() {
-		return staticRouteStringMap;
-	}
-
-	public void setStaticRouteStringMap(Map<String, RouteStringTree> staticRouteStringMap) {
-		this.staticRouteStringMap = staticRouteStringMap;
-	}
-
-
 
 	/**
 	 * Constructor which initializes all member data structures. Sets name and
@@ -130,6 +121,7 @@ public class CellDesign extends AbstractDesign {
 		pipInValues = new HashMap<>();
 		//reservedWires = new HashSet<>();
 		reservedWires = new HashMap<>();
+		reservedSites = new HashSet<>();
 	}
 
 	/**
@@ -1005,21 +997,9 @@ public class CellDesign extends AbstractDesign {
 		this.oocPortMap = oocPortMap;
 	}
 
-	//public Map<String, String> getStaticNetMap() {
-	//	return staticNetMap;
-	//}
-
-	//public void setStaticNetMap(Map<String, String> staticNetMap) {
-	//	this.staticNetMap = staticNetMap;
-	//}
-
-	//public Map<String, String> getStaticRoutemap() {
-	//	return staticRoutemap;
-	//}
-
-	//public void setStaticRoutemap(Map<String, String> staticRoutemap) {
-	//	this.staticRoutemap = staticRoutemap;
-	//}
+	public Map<String, RouteStringTree> getStaticRouteStringMap() {
+		return staticRouteStringMap;
+	}
 
 	public Map<Wire, Set<CellNet>> getReservedWires() {
 		return reservedWires;
@@ -1040,6 +1020,17 @@ public class CellDesign extends AbstractDesign {
 		}
 	}
 
+	/**
+	 * Adds a site to the list of reserved sites.
+	 * @param site
+	 */
+	public void addReservedSite(Site site) {
+		reservedSites.add(site);
+	}
+
+	public Set<Site> getReservedSites() {
+		return reservedSites;
+	}
 
 	public void addReservedWire(Wire reservedWire, Set<CellNet> nets) {
 		if (reservedWires.containsKey(reservedWire)) {
