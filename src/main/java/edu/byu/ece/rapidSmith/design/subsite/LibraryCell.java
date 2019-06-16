@@ -251,5 +251,5 @@ public abstract class LibraryCell implements Serializable {
 	 * @param anchor {@link Bel}
 	 */
 	abstract public Map<String, SiteProperty> getSharedSiteProperties(BelId anchor);
-
+		
 }
