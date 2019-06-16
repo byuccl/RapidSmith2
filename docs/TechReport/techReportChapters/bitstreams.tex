@@ -1,0 +1,25 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Section 11: Bitstreams in RapidSmith2
+%	This section describes how bitstreams are handled in RapidSmith2 (they currently
+%   aren't)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Bitstreams in RapidSmith2}
+
+In the original RapidSmith, bitstreams can be parsed, manipulated, and exported
+for Virtex 4, Virtex 5 and Virtex 6 Xilinx FPGA families.  Because of the
+proprietary nature of Xilinx bitstreams, RapidSmith provided only documented
+functionality when working with bitstreams (and was limited mainly to
+manipulation at the frame level including helping to assemble sequences of
+configuration commands which are interpreted by the FPGA configuration
+controller circuitry).  While this has proven valuable to many researchers, it
+does not provide the ability to create your own bitstream from scratch because
+it does not provide the specific meaning of each bit in a bitstream.
+
+If you desire to use RapidSmith's bitstream manipulation features, you should
+download and work with RapidSmith instead of RapidSmith2 (the RapidSmith bitstream
+packages have been removed from RapidSmith2).  If you do so, note that RapidSmith's
+bitstream packages have not been tested beyond Virtex 6.  The authors would be
+interested in upgrading RapidSmith's bitstream functionality to device families
+beyond Virtex 6 if users create it and are willing to contribute it to us for
+inclusion.

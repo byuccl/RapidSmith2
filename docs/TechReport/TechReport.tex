@@ -1,0 +1,220 @@
+\documentclass[10pt]{article}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	Included Packages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{times}
+\usepackage{amsmath}
+\usepackage{enumerate}
+
+\usepackage{hyperref}
+\usepackage[labelfont=bf]{subcaption}
+\usepackage{graphicx,latexsym,float}
+\usepackage{fancyhdr}
+\usepackage{alltt}
+\usepackage{listings}
+\usepackage{epstopdf}
+\usepackage{color}
+\usepackage[labelfont=bf]{caption}
+\usepackage{tabu}
+\usepackage{xspace}
+\usepackage{multicol}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	Document Formatting
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tabulinesep=1.2mm 
+\setlength{\textheight}{9.0in}
+\setlength{\oddsidemargin}{0in}
+\setlength{\evensidemargin}{0in}
+\setlength{\topmargin}{-0.25in}
+\setlength{\textwidth}{6.5in}
+
+%\setlength{\textfloatsep}{0.1cm}
+% add space between paragraphs
+%\setlength{\parskip}{0.5em}
+
+\pagestyle{fancy}
+\fancyhead[L]{}
+\fancyhead[R]{}
+\fancyhead[C]{}
+\fancyfoot[L]{}
+\fancyfoot[R]{}
+\fancyfoot[C]{}
+
+\fancyhead[L]{\slshape \rightmark}
+\fancyhead[R]{\thepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	Image Path
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\graphicspath{{./TechReportAndDocumentation_files/}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	New command definitions/redefinitions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% remake the texttt command so that line breaks will occur for certain
+% characters
+\renewcommand{\texttt}[1]{%
+  \begingroup
+  \ttfamily
+  \begingroup\lccode`~=`/\lowercase{\endgroup\def~}{/\discretionary{}{}{}}%
+  \begingroup\lccode`~=`[\lowercase{\endgroup\def~}{[\discretionary{}{}{}}%
+  \begingroup\lccode`~=`.\lowercase{\endgroup\def~}{.\discretionary{}{}{}}%
+  %\begingroup\lccode`~=`:\lowercase{\endgroup\def~}{:\discretionary{}{}{}}%
+  \catcode`/=\active\catcode`[=\active\catcode`.=\active
+  \scantokens{#1\noexpand}%
+  \endgroup
+}
+
+% Colors used for Java code
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3,
+  escapeinside={||}
+}
+
+\newcommand{\env}[1]{{\texttt{#1}}}
+\newcommand{\fil}[1]{{\em #1}}
+\newcommand{\cls}[1]{{\texttt{#1}}}
+\newcommand{\sig}[1]{{\em #1}}
+\newcommand{\pkg}[1]{{\texttt{#1}}}
+\newcommand{\opt}[1]{{\em #1}}
+\newcommand{\pgm}[1]{{\textbf{#1}}}
+\newcommand{\dir}[1]{{\em #1}}
+\newcommand{\sbr}[1]{{\em #1}}
+\newcommand{\MYhref}[3][blue]{\href{#2}{\color{#1}{#3}}}%
+
+\newcommand{\state}[1]{{\bf #1}}
+\newcommand{\AND}{\bullet}
+\newcommand{\nnp}{\newpage}
+\newcommand{\nni}{\noindent}
+\newcommand{\nnpi}{\newpage \noindent}
+\newcommand{\textQuote}[1]{\textquotedblright{#1}\textquotedblright}
+\newcommand{\bel}{\cls{Bel}\xspace}
+\newcommand{\bels}{\cls{Bel}s\xspace}
+\newcommand{\site}{\cls{Site}\xspace}
+\newcommand{\sites}{\cls{Site}s\xspace}
+\newcommand{\cell}{\cls{Cell}\xspace}
+\newcommand{\cells}{\cls{Cell}s\xspace}
+\newcommand{\cellpin}{\cls{CellPin}\xspace}
+\newcommand{\cellpins}{\cls{CellPin}s\xspace}
+\newcommand{\belpin}{\cls{BelPin}\xspace}
+\newcommand{\belpins}{\cls{BelPin}s\xspace}
+\newcommand{\tile}{\cls{Tile}\xspace}
+\newcommand{\tiles}{\cls{Tile}s\xspace}
+\newcommand{\cellnet}{\cls{CellNet}\xspace}
+\newcommand{\cellnets}{\cls{CellNet}s\xspace}
+\newcommand{\net}{\cls{Net}\xspace}
+\newcommand{\nets}{\cls{Net}s\xspace}
+\newcommand{\port}{\cls{Port}\xspace}
+\newcommand{\ports}{\cls{Port}s\xspace}
+\newcommand{\celldesign}{\cls{CellDesign}\xspace}
+\newcommand{\sitepin}{\cls{SitePin}\xspace}
+\newcommand{\sitepins}{\cls{SitePin}s\xspace}
+\newcommand{\routeTree}{\cls{RouteTree}\xspace}
+\newcommand{\routeTrees}{\cls{RouteTree}s\xspace}
+\newcommand{\pip}{\cls{PIP}\xspace}
+\newcommand{\pips}{\cls{PIP}s\xspace}
+
+\newenvironment{codei}{\vspace{-0.1in} \begin{center} \begin{minipage}{6in} \noindent \begin{alltt}}{\end{alltt} \end{minipage} \end{center}}
+\newenvironment{code}{\begin{center} \begin{minipage}{6in} \noindent \begin{alltt}}{\end{alltt} \end{minipage} \end{center}}
+
+\makeatletter
+
+\newcommand\problem{\@startsection{problem}{3}{\z@}%
+                                     {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                     {1.5ex \@plus .2ex}%
+                                     {\normalfont\normalsize\bfseries}}
+\makeatother
+
+\makeindex
+% show all sections (even subsections and subsubsections in the table of contents)
+\setcounter{tocdepth}{3}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	Document Start
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	Formatting
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\floatstyle{ruled}
+\newfloat{Program}{thp}{loa}[section]
+
+\date{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	Title
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{{\bf \Huge \sc{RAPIDSMITH2}}\\[0.1in]
+A Library for Low-level Manipulation 
+of Vivado Designs at the Cell/BEL Level\\[0.3in]
+Technical Report and Documentation\\[0.1in]
+}
+\author{\Large Brent Nelson, Thomas Townsend, and Travis Haroldsen\\[0.2in]
+\large NSF Center for High Performance Reconfigurable Computing (CHREC) \thanks{This work was supported in part by the I/UCRC program of the National
+ Science Foundation, grant numbers 0801876 and 1265957.}\\
+\large Department of Electrical and Computer Engineering  \\
+\large  Brigham Young University \\
+\large  Provo, UT, 84602 \\[0.7in]
+\large Last Modified: \today \\[0.05in]
+}
+
+
+\maketitle
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\columnwidth]{logo}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	Table of Contents
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	Tech Report Chapters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{techReportChapters/introduction.tex}
+\input{techReportChapters/background.tex}
+\input{techReportChapters/gettingStarted.tex}
+\input{techReportChapters/devices.tex}
+\input{techReportChapters/designs.tex}
+\input{techReportChapters/placement.tex}
+\input{techReportChapters/routing.tex}
+\input{techReportChapters/importExport.tex}
+\input{techReportChapters/examples.tex}
+\input{techReportChapters/installingNewDevices.tex}
+\input{techReportChapters/bitstreams.tex}
+\input{techReportChapters/license.tex}
+\input{techReportChapters/dependencies.tex}
+
+\appendix
+\input{techReportChapters/appendixA_Xdlrc.tex}
+\input{techReportChapters/appendixB_familyInfo.tex}
+\input{techReportChapters/appendixC_deviceInfo.tex}
+\input{techReportChapters/appendixD_RSCP.tex}
+
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	Document End
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
