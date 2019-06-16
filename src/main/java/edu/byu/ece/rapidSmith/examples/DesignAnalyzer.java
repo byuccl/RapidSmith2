@@ -80,7 +80,7 @@ public class DesignAnalyzer {
 			if (++i > 20)
 				break;
 			System.out.println("  Cell #" + i + " = " + c.toString());
-			if (c.isMacro()) {
+			if (c.isMacro()) { 
 				System.out.println("    Cell is macro");
 				continue;
 			}
@@ -91,7 +91,7 @@ public class DesignAnalyzer {
 			}
 		}
 	}
-
+	
 	/**
 	 * Print out a formatted representation of a design to help visualize it.  Another way of visualizing designs is illustrated
 	 * in the DotFilePrinterDemo program in the examples2 directory.  
@@ -100,10 +100,10 @@ public class DesignAnalyzer {
 	public static void prettyPrintDesign(CellDesign design) {
 		prettyPrintDesign(design, false);
 	}
-
+	
 	/**
 	 * Print out a formatted representation of a design to help visualize it.  Another way of visualizing designs is illustrated
-	 * in the DotFilePrinterDemo program in the examples2 directory.
+	 * in the DotFilePrinterDemo program in the examples2 directory.  
 	 * @param design The design to be pretty printed.
 	 * @param cellBelPinMappings to control printing of detailed cellBelPinMappings
 	 */
@@ -111,15 +111,15 @@ public class DesignAnalyzer {
 		// Print the cells
 		for (Cell c : design.getCells()) {
 			if (c.isMacro())
-			{
+			{				
 				// Mark the start of a macro cell section
 				System.out.println("\n====================================================");
-
+				
 				prettyPrintCell(c, cellBelPinMappings);
-
+				
 				// Print out names of internal nets
 				Collection<CellNet> internalNets = c.getInternalNets();
-
+	
 				if (internalNets != null && !internalNets.isEmpty())
 				{
 					for (Iterator<CellNet> it = internalNets.iterator(); it.hasNext(); )
@@ -128,10 +128,10 @@ public class DesignAnalyzer {
 						System.out.println("  Internal Net: " + internalNet.getName());
 					}
 				}
-
+				
 				// Print out the internal cells
 				Collection<Cell> internalCells = c.getInternalCells();
-
+				
 				if (internalCells != null && !internalCells.isEmpty())
 				{
 					for (Iterator<Cell> it = internalCells.iterator(); it.hasNext(); )
@@ -149,7 +149,7 @@ public class DesignAnalyzer {
 		// Print the nets
 		for (CellNet n : design.getNets()) {
 			System.out.println("\nNet: " + n.getName());
-
+			
 			// Print if it is an internal net
 			if (n.isInternal())
 				System.out.println("  *Internal Net*");
@@ -191,7 +191,7 @@ public class DesignAnalyzer {
 				if (Objects.equals(s, ""))
 					System.out.println("  <<<Unrouted>>>");
 				else
-					System.out.println("  Physical routing: \n   (" + createRoutingString("   ", n, n.getSourceRouteTree(), true, true) + "\n   )");
+					System.out.println("  Physical routing: \n   (" + createRoutingString("   ", n, n.getSourceRouteTree(), true, true) + "\n   )"); 
 			}
 		}
 	}		
@@ -222,7 +222,7 @@ public class DesignAnalyzer {
 		// Always print first wire at the head of a net's RouteTree. The format is "tileName/wireName".
 		if (head)
 			s = "<head>" + rt.getWire().getFullName();
-
+		
 
 		// The connection member of the RouteTree object describes the connection between this RouteTree and its predecessor.
 		// The connection may be a programmable connection (PIP or route-through) or it may be a non-programmable connection.  
@@ -234,19 +234,19 @@ public class DesignAnalyzer {
 			s += "=" + rt.getWire().getName();
 
 		// Now, let's look downstream and see where to go and what to print.
-		// If it is a leaf cell, it either:
-		//     (1) has a site pin attached,
-		//     (2) has a BEL pin attached, or
+		// If it is a leaf cell, it either: 
+		//     (1) has a site pin attached, 
+		//     (2) has a BEL pin attached, or 
 		//     (3) simply ends. Wires that end like this are called "used stubs" in Vivado's GUI.  They don't go anywhere.
 		if (rt.isLeaf()) {
 			SitePin sp = rt.getConnectedSitePin();
 			BelPin bp = rt.getConnectedBelPin();
 			if (sp != null) {
-				// If we are at a site pin then what we do differs depending on whether we are inside the site (and leaving) or outside the site (and entering).
-				if (inside) {
+				// If we are at a site pin then what we do differs depending on whether we are inside the site (and leaving) or outside the site (and entering). 
+				if (inside) {  
 					// Inside site, so look for correct intersite route tree to leave on
-					for (RouteTree rt1 : n.getIntersiteRouteTreeList())
-						if (sp.getExternalWire().equals(rt1.getWire()))
+					for (RouteTree rt1 : n.getIntersiteRouteTreeList()) 
+						if (sp.getExternalWire().equals(rt1.getWire())) 
 							return s + " SitePin{" + sp + "} <<entering general routing fabric>> " + createRoutingString(indnt, n, rt1, true, !inside);
 					////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					// An explanation on the above code is in order.
@@ -265,19 +265,19 @@ public class DesignAnalyzer {
 					// Case 4. We have not yet observed this last case: net connects to single SitePin, net has multiple intersite route trees.
 					//    + This doesn't make sense.
 					//
-					// The above code will handle case 1 and 2 just fine by searching - it will find the corresponding RouteTree for each SitePin hit.
-					// For case 3 it will find a RouteTree for one of the SitePin's but not the other (and fall out the bottom of the for-loop).
+					// The above code will handle case 1 and 2 just fine by searching - it will find the corresponding RouteTree for each SitePin hit.  
+					// For case 3 it will find a RouteTree for one of the SitePin's but not the other (and fall out the bottom of the for-loop).	
 					// This last case (3b) is handled below.
 					////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-					// Case 3b: If we get here, net connects to a SitePin but there is no corresponding RouteTree...
+					
+					// Case 3b: If we get here, net connects to a SitePin but there is no corresponding RouteTree... 
 					return s + " SitePin{" + sp + "} <<<<Connects to no corresponding RouteTree outside site>>>> ";
 				}
-				else
+				else 
 					// Outside site, so just follow the route from the general routing fabric and into a site
 					return s + " SitePin{" + sp + "} <<Leaving general routing fabric, entering site>> " + createRoutingString(indnt, n, n.getSinkRouteTree(sp), true, inside);
 			}
-			// If not a site pin, see if it is a BEL pin
+			// If not a site pin, see if it is a BEL pin  
 			else if (bp != null) {
 				// Print the attached BEL pin.
 				return s + " " + bp;
@@ -293,9 +293,9 @@ public class DesignAnalyzer {
 			for (Iterator<RouteTree> it = sinkTrees.iterator(); it.hasNext(); ) {
 				RouteTree sink = it.next();
 
-				// If there is only one sink tree then this is just the next wire segment in the route (not a branch).
-				// Don't enclose this in ()'s, just list it as the next wire segment.
-				if (sinkTrees.size() == 1)
+				// If there is only one sink tree then this is just the next wire segment in the route (not a branch).  
+				// Don't enclose this in ()'s, just list it as the next wire segment. 
+				if (sinkTrees.size() == 1) 
 					s += createRoutingString(indnt, n, sink, false, inside);
 				// Otherwise, this is a branch of the wire, so enclose it in ( )'s to mark that it represents a branch in the wire.
 				else {
@@ -333,20 +333,20 @@ public class DesignAnalyzer {
 	{
 		if (c.isMacro()) {
 			System.out.println("*Macro (Parent) Cell*");
-			System.out.println("Cell: " + c.getName() + " " +
+			System.out.println("Cell: " + c.getName() + " " + 
 					c.getLibCell().getName());
 		}
 		else {
 			if (c.isInternal()) {
 				System.out.println("\n*Internal Cell*");
-				System.out.println("Cell: " + c.getName() + " " +
+				System.out.println("Cell: " + c.getName() + " " + 
 						c.getLibCell().getName());
 			}
 			else {
-				System.out.println("\nCell: " + c.getName() + " " +
+				System.out.println("\nCell: " + c.getName() + " " + 
 						c.getLibCell().getName());
 			}
-			if (c.isPlaced())
+			if (c.isPlaced()) 
 				// Print out its placement
 				System.out.println("  <<<Placed on: " + c.getBel() + ">>>");
 			else System.out.println("  <<<Unplaced>>>");
@@ -354,8 +354,8 @@ public class DesignAnalyzer {
 
 		// Print out the external pins
 		for (CellPin cp : c.getPins()) {
-			System.out.println("  Pin: " + cp.getName() + " " +
-					cp.getDirection() + " " +
+			System.out.println("  Pin: " + cp.getName() + " " + 
+					cp.getDirection() + " " + 
 					(cp.getNet()!=null?cp.getNet().getName():"<unconnected>"));
 			if (!c.isMacro()) {
 				if (c.isPlaced()) {
@@ -375,13 +375,13 @@ public class DesignAnalyzer {
 			}
 		}
 		// Print the properties for a given cell if there are any
-		// For now, properties are strings.
+		// For now, properties are strings. 
 		for (Property p : c.getProperties()) {
 			String s = "  Property: " + p.toString();
 			System.out.println(s);
 		}
 	}
-
+	
 }
 
 // Other ideas:

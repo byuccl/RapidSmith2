@@ -20,17 +20,14 @@
 
 package edu.byu.ece.rapidSmith.examples;
 
-import edu.byu.ece.rapidSmith.design.subsite.*;
+import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
+import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.PIP;
-import edu.byu.ece.rapidSmith.device.Site;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoCheckpoint;
 import edu.byu.ece.rapidSmith.interfaces.vivado.VivadoInterface;
 import org.jdom2.JDOMException;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * A simple class to illustrate importing and exporting RapidSmith checkpoints.
@@ -42,37 +39,6 @@ public class ImportExportExample {
 	private static CellDesign design = null;
 	private static Device device = null;
 	private static CellLibrary libCells = null;
-
-	/**
-	 * Sets the used PIP (pipInVals) design data structure by using the
-	 * sink route trees. Travis' packer/placer currently do not set this data structure.
-	 */
-	private static void setUsedPips() {
-		// Do I care about the usedSitePipsMap data structure? Or just pipInValues?
-		// design.setUsedSitePipsAtSite(site, usedSitePips); - usedSitePipsMap
-		// design.addPIPInputValsAtSite(site, pipToInputVal); - pipInValues
-
-		for (CellNet net : design.getNets()) {
-
-			// Don't bother setting used PIP info for intrasite-only nets.
-			if (net.isIntrasite())
-				continue;
-
-			for (RouteTree routeTree : net.getSinkSitePinRouteTrees()) {
-				Site site = routeTree.getWire().getSite();
-
-				for (PIP pip : routeTree.getAllPips()) {
-					String pipName = pip.getStartWire().getName();
-					String[] vals = pipName.split("/");
-					assert vals.length == 2;
-					vals = vals[1].split("\\.");
-					assert vals.length == 2;
-					design.getPIPInputValsAtSite(site).put(vals[0], vals[1]);
-
-				}
-			}
-		}
-	}
 
 	/**
 	 * @param args
@@ -112,7 +78,6 @@ public class ImportExportExample {
 	{
 		importDesign();
 		manipulateDesign();
-		//setUsedPips();
 		exportDesign();
 	}
 
@@ -124,7 +89,7 @@ public class ImportExportExample {
 	{
 		// Load in in a TINCR checkpoint
 		System.out.println("Loading Design...");
-		VivadoCheckpoint vcp = VivadoInterface.loadRSCP(checkpointIn, true);
+		VivadoCheckpoint vcp = VivadoInterface.loadRSCP(checkpointIn);
 
 		// Get the pieces out of the checkpoint for use in manipulating it
 		ImportExportExample.design = vcp.getDesign();
@@ -138,7 +103,7 @@ public class ImportExportExample {
 	private void manipulateDesign()
 	{
 		System.out.println("\nPrinting out the design...");
-	//	DesignAnalyzer.prettyPrintDesign(design);
+		DesignAnalyzer.prettyPrintDesign(design);
 	}
 
 	/**

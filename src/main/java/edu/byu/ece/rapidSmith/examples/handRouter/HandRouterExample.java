@@ -5,8 +5,6 @@ import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.RouteTree;
 import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.PIP;
-import edu.byu.ece.rapidSmith.device.Tile;
 import edu.byu.ece.rapidSmith.device.TileWire;
 import edu.byu.ece.rapidSmith.device.WireEnumerator;
 import edu.byu.ece.rapidSmith.util.RapidSmithDebug;
@@ -31,8 +29,8 @@ public class HandRouterExample {
 		HandRouter hr = new HandRouter();
 			
 		// Create a new TileWire object to be the starting wire of the route
-		Wire startWire = new TileWire(device.getTile("INT_R_X27Y90"), we.getWireEnum("WW4BEG0"));
-
+		Wire startWire = new TileWire(device.getTile("CLBLL_L_X16Y152"), we.getWireEnum("CLBLL_L_C"));
+		
 		// Run the hand router, which returns a RapidSmith RouteTree object
 		RouteTree route = hr.route(startWire);
 		
