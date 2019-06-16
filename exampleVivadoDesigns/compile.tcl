@@ -40,8 +40,8 @@ proc compile {top} {
     puts "Synthesizing design..."
     synth_design -top $top -flatten_hierarchy full 
     
-    puts "Placing Design..."
-    place_design
+#    puts "Placing Design..."
+#    place_design
     
     puts "Routing Design..."
 #    route_design

@@ -4,7 +4,7 @@
   (keywordmap (keywordlevel 0))
 (status
  (written
-  (timeStamp 2018 04 27 12 04 51)
+  (timeStamp 2017 11 02 19 19 51)
   (program "Vivado" (version "2016.2"))
   (comment "Built on 'Thu Jun  2 16:32:40 MDT 2016'")
   (comment "Built by 'xbuild'")
@@ -137,6 +137,7 @@
 
   (design add
     (cellref add (libraryref work))
+    (property (rename PHYSOPT_ROUTE_DESIGN_CALLED "PHYSOPT.ROUTE_DESIGN_CALLED") (integer 1))
     (property part (string "xc7a100tcsg324-3"))
   )
 )
