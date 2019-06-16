@@ -170,6 +170,7 @@ public class YosysEdifInterface extends AbstractEdifInterface {
 			}
 			// Assume the sink is a LUT pin, etc.
 			else {
+
 				CellNet cyNet = pin.getNet();
 
 				// disconnect from source

@@ -604,7 +604,6 @@ public abstract class DesignVerificationTest {
 	/**
 	 * Verifies that each static source Bel in RapidSmith is also used as a static source in Vivado
 	 */
-	/*
 	@Test
 	@DisplayName("Static Bel Test")
 	public void staticSourceTest() {
@@ -618,7 +617,6 @@ public abstract class DesignVerificationTest {
 			}
 		}
 	}
-	*/
 	
 	/**
 	 * Verifies that the cell properties in RapidSmith match the cell properties in Vivado
