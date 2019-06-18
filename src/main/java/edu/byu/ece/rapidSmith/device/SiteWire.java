@@ -186,7 +186,7 @@ public class SiteWire implements Wire, Serializable {
 	}
 
 	/**
-	 * Gets wires that make up a node. This is just the wire for site wires.
+	 * Gets wires that make up a node. This is just the single wire for site wires.
 	 * @return a set containing the wire
 	 */
 	@Override

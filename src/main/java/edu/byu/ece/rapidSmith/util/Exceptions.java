@@ -118,6 +118,29 @@ public class Exceptions {
 		}
 	}
 
+
+	/**
+	 * Exception caused by errors occurring during design import/export, not due to parsing or environment issues.
+	 */
+	public static class ImportExportException extends RuntimeException {
+
+		public ImportExportException(String message) {
+			super(message);
+		}
+
+		public ImportExportException(String message, Throwable cause) {
+			super(message, cause);
+		}
+
+		public ImportExportException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+			super(message, cause, enableSuppression, writableStackTrace);
+		}
+
+		public ImportExportException(Throwable cause) {
+			super(cause);
+		}
+	}
+
 	/**
 	 *
 	 */
@@ -171,4 +194,7 @@ public class Exceptions {
 			super(cause);
 		}
 	}
+
+
+
 }

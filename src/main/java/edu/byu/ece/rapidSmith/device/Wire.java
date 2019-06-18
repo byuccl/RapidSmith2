@@ -102,7 +102,7 @@ public interface Wire extends Serializable {
 
 	/**
 	 * Returns all beginning and end wires that make up a node. Does not include intermediate wires.
-	 * @return
+	 * @return beginning and end wires of a node.
 	 */
 	Set<Wire> getWiresInNode();
 }
