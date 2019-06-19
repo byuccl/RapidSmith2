@@ -49,6 +49,10 @@ public final class XdcConstraint {
 			constraintPackagePin = new XdcConstraintPackagePin(matcher.group(1), matcher.group(2));
 		}
 	}
+
+	public XdcConstraint(String command, String options) {
+		this(command, options, null);
+	}
 	
 	/**
 	 * @return The name of the XDC constraint command
