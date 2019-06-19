@@ -202,6 +202,47 @@ public class CellNet implements Serializable {
 	}
 
 	/**
+	 * Returns the pseudo pins of the net. This structure should not be modified by the user.
+	 *
+	 * @return pseudo pins of this net
+	 */
+	public Collection<CellPin> getPseudoPins() {
+		return getPins().stream()
+				.filter(CellPin::isPseudoPin)
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Returns the partition pins of the net. This structure should not be modified by the user.
+	 *
+	 * @return Partition pins of the net
+	 */
+	public Collection<CellPin> getPartitionPins() {
+		return getPins().stream()
+				.filter(CellPin::isPartitionPin)
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Returns the partition pins of the net that act as sinks. This structure should not be modified by the user.
+	 * @return Sink partition pins of the net.
+	 */
+	public Collection<CellPin> getSinkPartitionPins() {
+		return getPins().stream()
+				.filter(CellPin::isPartitionPin)
+				.filter(p -> p != sourcePin)
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Returns whether or not the net has at least one associated partition pin.
+	 * @return
+	 */
+	public boolean hasPartitionPin() {
+		return getPins().stream().anyMatch(CellPin::isPartitionPin);
+	}
+
+	/**
 	 * Checks if this net has a source pin.
 	 *
 	 * @return true if this net has a source pin
@@ -226,7 +267,7 @@ public class CellNet implements Serializable {
 	 * @return all of the pins that source the net
 	 */
 	public List<CellPin> getAllSourcePins() {
-		return sourcePins.stream().collect(Collectors.toList());
+		return new ArrayList<>(sourcePins);
 	}
 
 	/**
@@ -262,10 +303,9 @@ public class CellNet implements Serializable {
 	 * @param pin the new {@link CellPin} to add
 	 */
 	public void connectToPin(CellPin pin) {
-		
 		// If the cellpin is part of a macro cell, add all of the internal pins
 		// to the net instead of the external macro pins
-		if (pin.getCell().isMacro()) {
+		if (!pin.isPartitionPin() && pin.getCell().isMacro()) {
 			pin.getCell().mapToInternalPins(pin).forEach(this::connectToLeafPin);
 			pin.setNet(this);
 		}
@@ -303,7 +343,6 @@ public class CellNet implements Serializable {
 	 * This operation has a complexity of O(n).
 	 */
 	public int getPseudoPinCount() {
-		
 		int pseudoPinCount = 0;
 		
 		for (CellPin pin : pins) {
@@ -366,7 +405,9 @@ public class CellNet implements Serializable {
 			pin.getCell().mapToInternalPins(pin).forEach(this::disconnectFromLeafPin);
 			pin.clearNet();
 		}
-		else {
+		// If the cellpin drives a static net, but the cell is not a VCC or GND cell, do not
+		// attempt to disconnect. This can come up with static source LUTs, etc.
+		else if (!(pin.getNet().isStaticNet() && pin.isOutpin() && !pin.getCell().isStaticSource())) {
 			disconnectFromLeafPin(pin);
 		}
 	}
@@ -417,12 +458,35 @@ public class CellNet implements Serializable {
 	 * @return {@code true} if this net is a clock net
 	 */
 	public boolean isClkNet() {
+		// Don't consider static nets as clock nets even if they have clock pins
+		if (isStaticNet())
+			return false;
+
 		for (CellPin p : this.pins) {
-			if (p.getType() == CellPinType.CLOCK) {
+			if (p.getType() == CellPinType.CLOCK || p.getType() == CellPinType.PARTITION_CLK) {
 				return true;
 			}
 		}
 		
+		return false;
+	}
+
+	/**
+	 * Checks if a net is a partition pin clock net (but not a true clock net).
+	 * Checks that the net is not a true clock net and checks if any attached partition
+	 * pins are of type {@link CellPinType#PARTITION_CLK}.
+	 *
+	 * @return {@code true} if this net is a partition pin clock net
+	 */
+	public boolean isPartPinCLKNet() {
+		for (CellPin p : this.pins) {
+			if (p.getType() == CellPinType.CLOCK) {
+				return false;
+			}
+			else if (p.getType() == CellPinType.PARTITION_CLK) {
+				return true;
+			}
+		}
 		return false;
 	}
 	
@@ -523,11 +587,11 @@ public class CellNet implements Serializable {
 	 * 		If the site pin was not a source pin for the net, {@code false} will be returned.
 	 */
 	public boolean removeSourceSitePin(SitePin sitePin) {
-		return this.sourceSitePinList == null ? false : this.sourceSitePinList.remove(sitePin); 
+		return this.sourceSitePinList != null && this.sourceSitePinList.remove(sitePin);
 	}
 	
 	/**
-	 * Removes all source site pins from the net. 
+	 * Removes all source site pins from the net.
 	 */
 	public void removeAllSourceSitePins(){
 		this.sourceSitePinList = null;

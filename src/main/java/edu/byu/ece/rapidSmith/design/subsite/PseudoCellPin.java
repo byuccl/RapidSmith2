@@ -22,10 +22,7 @@ package edu.byu.ece.rapidSmith.design.subsite;
 
 import java.util.List;
 
-import edu.byu.ece.rapidSmith.device.Bel;
-import edu.byu.ece.rapidSmith.device.BelId;
-import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.PinDirection;
+import edu.byu.ece.rapidSmith.device.*;
 
 /**
  * This class represents a PseudoCellPin: a pin that can be created dynamically
@@ -125,4 +122,13 @@ public class PseudoCellPin extends CellPin {
 		return null;
 	}
 
+	@Override
+	public boolean isPartitionPin() {
+		return false;
+	}
+
+	@Override
+	public Wire getPartPinWire() {
+		return null;
+	}
 }
