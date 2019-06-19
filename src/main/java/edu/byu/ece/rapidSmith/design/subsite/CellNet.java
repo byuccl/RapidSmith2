@@ -104,7 +104,7 @@ public class CellNet implements Serializable {
 		this.isInternal = false;
 		this.isMultiSourcedNet = false;
 		this.multiSourceStatusSet = false;
-		sourcePins = new HashSet<CellPin>();
+		sourcePins = new HashSet<>();
 	}
 
 	/**
