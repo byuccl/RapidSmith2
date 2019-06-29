@@ -21,16 +21,12 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.design.NetType;
-import edu.byu.ece.rapidSmith.device.PIP;
-import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.PinDirection;
-import edu.byu.ece.rapidSmith.device.SitePin;
+import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  *  Represents a net in a cell design.  Cell nets connect to pins on cells.

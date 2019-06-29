@@ -128,17 +128,6 @@ public class SiteWire implements Wire, Serializable {
 		return site.getWireConnections(siteType, wire);
 	}
 
-	/**
-	 * Gets wires that make up a node. This is just the single wire for site wires.
-	 * @return a set containing the wire
-	 */
-	@Override
-	public Set<Wire> getWiresInNode() {
-		Set<Wire> wires = new HashSet<>();
-		wires.add(this);
-		return wires;
-	}
-
 	@Override
 	public Collection<SitePin> getAllConnectedPins() {
 		return singleton(getConnectedPin());
