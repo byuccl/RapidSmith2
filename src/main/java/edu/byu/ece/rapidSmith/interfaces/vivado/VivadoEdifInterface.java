@@ -176,8 +176,6 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 					for (Cell internalCell : cell.getInternalCells()) {
 						uniqueLibraryCells.add(internalCell.getLibCell());
 					}
-					// TODO: Why did I do this before? didn't work with this.
-				//} else if (!cell.isGndSource() && !cell.isVccSource()) {
 				} else {
 					// If the macro cell has not been placed, include the full macro in the EDIF.
 					// If the full macro for unplaced LUTRAMs is not included in the EDIF, Vivado will
@@ -228,7 +226,6 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 					System.out.println("[Info] Macro cell " + cell.getName() + " is unplaced and will NOT be flattened.");
 
 				EdifCell edifLibCell = cellMap.get(cell.getLibCell());
-				assert (edifLibCell != null);
 				topLevelCell.addSubCell(createEdifCellInstance(cell, topLevelCell, edifLibCell));
 			}
 		}
@@ -352,7 +349,7 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 			
 			edifNet.addPortConnection(portRef);
 		}
-		// QUESTION: Why isn't this on master???
+
 		// create an equivalent edif property for each RS2 property
 		edifNet.addPropertyList(createEdifPropertyList(cellNet.getProperties()));
 

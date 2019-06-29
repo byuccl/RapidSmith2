@@ -126,10 +126,8 @@ public class BackedCellPin extends CellPin {
 		return isInternal() ? getCell().getParent().getExternalPin(this) : null;
 	}
 
-
 	@Override
 	public Wire getPartPinWire() {
 		return null;
 	}
-
 }

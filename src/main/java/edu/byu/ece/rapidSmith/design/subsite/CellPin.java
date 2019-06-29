@@ -325,13 +325,6 @@ public abstract class CellPin implements Serializable {
 	 */
 	public abstract String getFullName();
 
-	//public abstract String getPortName();
-
-	/**
-	 * @return the name of the port the CellPin is attached to.
-	 */
-	//public abstract String getPortName();
-
 	/**
 	 * @return the direction of this pin from the cell's perspective
 	 */
@@ -346,7 +339,7 @@ public abstract class CellPin implements Serializable {
 	 * @return <code>true</code> if the pin is a partition pin. <code>false</code> otherwise.
 	 */
 	public abstract boolean isPartitionPin();
-
+	
 	/**
 	 * Returns the BelPins that this pin can potentially be mapped onto. The BEL that this pin's parent
 	 * cell is placed on is used to determine the potential mappings. This function should 
@@ -400,16 +393,23 @@ public abstract class CellPin implements Serializable {
 	 * @return The {@link CellPinType} of this pin. 
 	 */
 	public abstract CellPinType getType();
-
+	
+	/**
+	 * @return the external pin
+	 */
 	public abstract CellPin getExternalPin();
 
 	/**
-	 * @return the partition pin wire
+	 * @return the partition pin wire (if the pin is a partition pin)
 	 */
 	public abstract Wire getPartPinWire();
 
+	/**
+	 * Manually set a pin to a global net. Not for normal use. Should only be used for macro pins, partition pins, or
+	 * static-source LUTs.
+	 * @param n the global net to set the pin to
+	 */
 	public void setPinToGlobalNet(CellNet n) {
-		// TODO: Throw error if not macro pin, part pin, or static-source LUT
 		setNet(n);
 	}
 

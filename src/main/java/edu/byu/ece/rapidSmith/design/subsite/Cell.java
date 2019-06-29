@@ -58,6 +58,7 @@ public class Cell implements Serializable {
 	private Set<CellPin> pseudoPins;
 	
 	// Macro specific cell categories.
+	
 	/** Parent of this cell (for internal cells only)*/
 	private Cell parent;
 	/** Mapping of cell name to internal cell*/
@@ -173,6 +174,14 @@ public class Cell implements Serializable {
 	}
 
 	/**
+	 * Returns true if this cell acts as a VCC or ground source.
+	 * @return
+	 */
+	public boolean isStaticSource() {
+		return isVccSource() || isGndSource();
+	}
+
+	/**
 	 * Returns true if this cell acts as a VCC source.
 	 */
 	public boolean isVccSource() {
@@ -184,14 +193,6 @@ public class Cell implements Serializable {
 	 */
 	public boolean isGndSource() {
 		return getLibCell().isGndSource();
-	}
-
-	/**
-	 * Returns true if this cell acts as a VCC or ground source.
-	 * @return
-	 */
-	public boolean isStaticSource() {
-		return isVccSource() || isGndSource();
 	}
 
 	/**
@@ -302,12 +303,19 @@ public class Cell implements Serializable {
 	}
 
 	/**
-	 * @return true if the cell has at least one partition pin.
+	 * Attaches an existing partition pin to this cell. The pin will be
+	 * updated to point to this cell as its new parent. Any BEL pin mappings
+	 * that were previously on the pin are now invalid and should be invalidated
+	 * before this function is called.
+	 *
+	 * @param pin PArtition pin to attach to the cell
+	 *
+	 * @throws IllegalArgumentException If {@code pin} already exists on this cell or
+	 * 			is not a pseudo pin, an exception is thrown.
+	 *
+	 * @return <code>true</code> if the pin was successfully attached
+	 * 			to the cell. <code>false</code> otherwise
 	 */
-	public boolean hasPartitionPin() {
-		return (pinMap.values().stream().anyMatch(CellPin::isPartitionPin));
-	}
-
 	public void attachPartitionPin(CellPin pin) {
 		if (!pin.isPartitionPin()) {
 			throw new IllegalArgumentException("Expected argument \"pin\" to be a partition pin.\n"
@@ -328,6 +336,12 @@ public class Cell implements Serializable {
 		this.pinMap.put(pin.getName(), pin);
 	}
 
+	/**
+	 * @return true if the cell has at least one partition pin.
+	 */
+	public boolean hasPartitionPin() {
+		return (pinMap.values().stream().anyMatch(CellPin::isPartitionPin));
+	}
 
 	/**
 	 * Creates a new pseudo pin, and attaches it to the cell. 
@@ -465,7 +479,7 @@ public class Cell implements Serializable {
 	public int getPseudoPinCount() {
 		return pseudoPins == null ? 0 : pseudoPins.size();
 	}
-		
+
 	/**
 	 * Returns the properties of this cell in a {@link PropertyList}.  The
 	 * properties describe the configuration of this cell and can be used

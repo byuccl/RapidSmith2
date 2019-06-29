@@ -21,7 +21,10 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.design.NetType;
-import edu.byu.ece.rapidSmith.device.*;
+import edu.byu.ece.rapidSmith.device.PIP;
+import edu.byu.ece.rapidSmith.device.BelPin;
+import edu.byu.ece.rapidSmith.device.PinDirection;
+import edu.byu.ece.rapidSmith.device.SitePin;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
 import java.io.Serializable;
@@ -44,7 +47,6 @@ public class CellNet implements Serializable {
 	
 	/** Unique Serialization ID for this class*/
 	private static final long serialVersionUID = 6082237548065721803L;
-
 	/** Unique name of the net */
 	private String name;
 	/**Type of net*/
@@ -130,8 +132,6 @@ public class CellNet implements Serializable {
 	private void init() {
 		this.pins = new HashSet<>();
 		this.isInternal = false;
-		//this.isClkNet = false;
-		//this.clkNetStatusSet = false;
 		this.isMultiSourcedNet = false;
 		this.multiSourceStatusSet = false;
 		this.sourcePins = new HashSet<>();
@@ -231,6 +231,17 @@ public class CellNet implements Serializable {
 	}
 
 	/**
+	 * Returns the sink pins of the net. This structure should not be modified by the user.
+	 * 
+	 * @return CellPin sinks of the net
+	 */
+	public Collection<CellPin> getSinkPins() {
+		return getPins().stream()
+				.filter(p -> p != sourcePin)
+				.collect(Collectors.toList());
+	}
+
+	/**
 	 * Returns the pseudo pins of the net. This structure should not be modified by the user.
 	 *
 	 * @return pseudo pins of this net
@@ -253,29 +264,22 @@ public class CellNet implements Serializable {
 	}
 
 	/**
-	 * Returns whether or not the net has at least one associated partition pin.
-	 * @return
+	 * Returns the partition pins of the net that act as sinks. This structure should not be modified by the user.
+	 * @return Sink partition pins of the net.
 	 */
-	public boolean hasPartitionPin() {
-		return getPins().stream().anyMatch(CellPin::isPartitionPin);
-	}
-
-	/**
-	 * Returns the sink pins of the net. This structure should not be modified by the user.
-	 * 
-	 * @return CellPin sinks of the net
-	 */
-	public Collection<CellPin> getSinkPins() {
-		return getPins().stream()
-				.filter(p -> p != sourcePin)
-				.collect(Collectors.toList());
-	}
-
 	public Collection<CellPin> getSinkPartitionPins() {
 		return getPins().stream()
 				.filter(CellPin::isPartitionPin)
 				.filter(p -> p != sourcePin)
 				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Returns whether or not the net has at least one associated partition pin.
+	 * @return
+	 */
+	public boolean hasPartitionPin() {
+		return getPins().stream().anyMatch(CellPin::isPartitionPin);
 	}
 
 	/**
@@ -380,7 +384,6 @@ public class CellNet implements Serializable {
 	 * This operation has a complexity of O(n).
 	 */
 	public int getPseudoPinCount() {
-		
 		int pseudoPinCount = 0;
 		
 		for (CellPin pin : pins) {
@@ -460,7 +463,7 @@ public class CellNet implements Serializable {
 		if(pin.isOutpin()){
 			sourcePins.remove(pin);
 		}
-
+		
 		if (sourcePin == pin) {
 			sourcePin = null;
 			List<CellPin> sourcePins = getAllSourcePins();
@@ -509,8 +512,6 @@ public class CellNet implements Serializable {
 		return false;
 	}
 
-	// TODO: In my usage of this, I call both isCLKNet and isPartPinCLKNet.
-	// This needlessly repeats work. Decide how to better organize
 	/**
 	 * Checks if a net is a partition pin clock net (but not a true clock net).
 	 * Checks that the net is not a true clock net and checks if any attached partition
@@ -527,9 +528,7 @@ public class CellNet implements Serializable {
 				return true;
 			}
 		}
-
 		return false;
-
 	}
 	
 	/**
@@ -629,7 +628,7 @@ public class CellNet implements Serializable {
 	 * 		If the site pin was not a source pin for the net, {@code false} will be returned.
 	 */
 	public boolean removeSourceSitePin(SitePin sitePin) {
-		return this.sourceSitePinList == null ? false : this.sourceSitePinList.remove(sitePin); 
+		return this.sourceSitePinList != null && this.sourceSitePinList.remove(sitePin);
 	}
 	
 	/**

@@ -132,4 +132,13 @@ public class PseudoCellPin extends CellPin {
 		return null;
 	}
 
+	@Override
+	public boolean isPartitionPin() {
+		return false;
+	}
+
+	@Override
+	public Wire getPartPinWire() {
+		return null;
+	}
 }

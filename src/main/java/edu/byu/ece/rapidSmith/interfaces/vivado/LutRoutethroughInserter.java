@@ -54,7 +54,7 @@ public class LutRoutethroughInserter {
 	private static final String ROUTETHROUGH_INIT_STRING = "2'h2";
 	private static final String ROUTETHROUGH_NAME = "rapidSmithRoutethrough";
 	private int routethroughID;
-	private Collection<CellNet> netsToAdd = new ArrayList<>();
+	private Collection<CellNet> netsToAdd;
 	
 	/**
 	 * Creates a new LutRoutethrough inserter object
@@ -190,7 +190,7 @@ public class LutRoutethroughInserter {
 		net.disconnectFromPins(sinks);
 		net.connectToPin(buffer.getPin("I0"));
 		
-		// add new net .. TODO: randomize the naming scheme more
+		// add new net and add a DONT_TOUCH property to it .. TODO: randomize the naming scheme more
 		CellNet routethroughNet = new CellNet(ROUTETHROUGH_NAME + "Net" + routethroughID++, NetType.WIRE);
 		routethroughNet.connectToPin(buffer.getPin("O"));
 		routethroughNet.connectToPins(sinks);
