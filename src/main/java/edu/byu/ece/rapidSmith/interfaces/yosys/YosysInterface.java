@@ -22,6 +22,7 @@ package edu.byu.ece.rapidSmith.interfaces.yosys;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.*;
+import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.interfaces.StaticResourcesInterface;
 import edu.byu.ece.rapidSmith.interfaces.vivado.*;
@@ -88,28 +89,32 @@ public final class YosysInterface {
 		design.setImplementationMode(mode);
 		VivadoCheckpoint vivadoCheckpoint = new VivadoCheckpoint(partName, design, device, libCells);
 
+		// parse the constraints into RapidSmith
+		String constraintsFile = rscpPath.resolve("constraints.xdc").toString();
+		XdcConstraintsInterface constraintsInterface = new XdcConstraintsInterface(design, device);
+		constraintsInterface.parseConstraintsXDC(constraintsFile);
+
+		// re-create the placement and routing information
+		String placementFile = rscpPath.resolve("placement.rsc").toString();
+		XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device);
+		placementInterface.parsePlacementXDC(placementFile);
+
+		String routingFile = rscpPath.resolve("routing.rsc").toString();
+		//XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap(), placementInterface.getPartPinMap());
+		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap(), designInfo.getMode(), libCells, design.getReconfigStaticNetMap(), design.getStaticRouteStringMap());
+		routingInterface.parseRoutingXDC(routingFile);
+		design.setPartPinMap(routingInterface.getPartPinMap());
+
+
 		// If importing a reconfigurable module, process all of the static resources
 		if (mode == ImplementationMode.RECONFIG_MODULE) {
-			// Process partition pins
-			// TODO: Should the partition pin go in the routing.rsc? Placement may only define the tile for a partition pin
-			// and routing might determine the exact wire and node.
-			String placementFile = rscpPath.resolve("placement.rsc").toString();
-			XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device, libCells);
-			placementInterface.parsePlacementXDC(placementFile);
-			design.setPartPinMap(placementInterface.getPartPinMap());
-
 			// Process other static resources (reserved sites, PIPs, partition pin routes)
-			String resourcesFile = rscpPath.resolve("static_resources.rsc").toString();
+			String resourcesFile = rscpPath.resolve("static.rsc").toString();
 			StaticResourcesInterface staticInterface = new StaticResourcesInterface(design, device);
 			staticInterface.parseResourcesRSC(resourcesFile);
 			vivadoCheckpoint.setReconfigStaticNetMap(staticInterface.getReconfigStaticNetMap());
 			vivadoCheckpoint.setStaticRouteStringMap(staticInterface.getStaticRouteStringMap());
 		}
-
-		// parse the constraints into RapidSmith2
-		String constraintsFile = rscpPath.resolve("constraints.xdc").toString();
-		XdcConstraintsInterface constraintsInterface = new XdcConstraintsInterface(design, device);
-		constraintsInterface.parseConstraintsXDC(constraintsFile);
 
 		return vivadoCheckpoint;
 	}

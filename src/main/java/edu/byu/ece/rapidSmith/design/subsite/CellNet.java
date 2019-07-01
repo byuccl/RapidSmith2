@@ -1164,8 +1164,7 @@ public class CellNet implements Serializable {
 	 * @return The current RouteStatus of the net
 	 * */
 	public RouteStatus computeRouteStatus() {
-		int subtractCount = (isStaticNet() || isSourcePinMapped()) ? 1 : 0;
-		
+		int subtractCount = (isStaticNet() || isSourcePinMapped() || sourcePin.isPartitionPin()) ? 1 : 0;
 
 		if(sourcePin == null){
 			routeStatus = RouteStatus.FULLY_ROUTED;

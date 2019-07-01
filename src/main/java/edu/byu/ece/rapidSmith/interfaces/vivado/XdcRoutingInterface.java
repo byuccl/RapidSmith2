@@ -19,6 +19,7 @@
  */
 package edu.byu.ece.rapidSmith.interfaces.vivado;
 
+import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.device.families.FamilyInfo;
@@ -58,6 +59,8 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 
 	//private final Device device;
 	private final CellDesign design;
+	private final CellLibrary libCells;
+
 	//private final WireEnumerator wireEnumerator;
 	private final HashMap<SitePin, IntrasiteRoute> sitePinToRouteMap;
 	private final Map<BelPin, CellPin> belPinToCellPinMap;
@@ -68,12 +71,15 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	private String currentFile;
 	private Map<Bel, BelRoutethrough> belRoutethroughMap;
 	private Pattern pipNamePattern;
-	private Map<String, String> partPinMap;
 	private Map<String, String> reconfigStaticNetMap;
 	private Map<String, RouteStringTree> staticRouteStringMap;
 	private ImplementationMode implementationMode;
 	private boolean pipUsedInRoute = false;
-	
+	/* Nets with more than one port / partition pin as a sink */
+	private Collection<CellNet> multiPortSinkNets;
+	private static final String BUFFER_INIT_STRING = "2'h2";
+	private Map<String, String> partPinMap; // Map from ooc port name to the associated partition pin's node
+
 	/**
 	 * Creates a new XdcRoutingInterface object.
 	 * 
@@ -93,6 +99,21 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 		//this.currentLineNumber = 0;
 		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)");
 		this.implementationMode = mode;
+		this.libCells = null;
+	}
+
+	public XdcRoutingInterface(CellDesign design, Device device, ImplementationMode mode) {
+		super(device, design);
+		//this.device = device;
+		//this.wireEnumerator = device.getWireEnumerator();
+		this.design = design;
+		this.sitePinToRouteMap = new HashMap<>();
+		this.staticSourceMap = new HashMap<>();
+		this.belPinToCellPinMap = null;
+		//this.currentLineNumber = 0;
+		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)");
+		this.implementationMode = mode;
+		this.libCells = null;
 	}
 
 	/**
@@ -103,7 +124,7 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	 * @param pinMap A map from a {@link BelPin} to its corresponding {@link CellPin} (the cell
 	 * 				pin that is currently mapped onto the bel pin)
 	 */
-	public XdcRoutingInterface(CellDesign design, Device device, Map<BelPin, CellPin> pinMap, ImplementationMode mode, Map<String, String> reconfigStaticNetMap, Map<String, RouteStringTree> staticRouteStringMap) {
+	public XdcRoutingInterface(CellDesign design, Device device, Map<BelPin, CellPin> pinMap, ImplementationMode mode, CellLibrary libCells, Map<String, String> reconfigStaticNetMap, Map<String, RouteStringTree> staticRouteStringMap) {
 		super(device, design);
 		//this.device = device;
 		//this.wireEnumerator = device.getWireEnumerator();
@@ -116,6 +137,26 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 		this.implementationMode = mode;
 		this.reconfigStaticNetMap = reconfigStaticNetMap;
 		this.staticRouteStringMap = staticRouteStringMap;
+		this.partPinMap = new HashMap<>();
+		this.libCells = libCells;
+
+	}
+
+	public XdcRoutingInterface(CellDesign design, Device device, ImplementationMode mode, CellLibrary libCells, Map<String, String> reconfigStaticNetMap, Map<String, RouteStringTree> staticRouteStringMap) {
+		super(device, design);
+		//this.device = device;
+		//this.wireEnumerator = device.getWireEnumerator();
+		this.design = design;
+		this.sitePinToRouteMap = new HashMap<>();
+		this.staticSourceMap = new HashMap<>();
+		this.belPinToCellPinMap = null;
+		this.currentLineNumber = 0;
+		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)");
+		this.implementationMode = mode;
+		this.reconfigStaticNetMap = reconfigStaticNetMap;
+		this.staticRouteStringMap = staticRouteStringMap;
+		this.partPinMap = new HashMap<>();
+		this.libCells = libCells;
 		this.partPinMap = design.getPartPinMap();
 	}
 	
@@ -152,7 +193,7 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	}
 		
 	/**
-	 * Parses the specified routing.xdc file, and applies the physical wire information to the nets of the design
+	 * Parses the specified routing.rsc file, and applies the physical wire information to the nets of the design
 	 * 
 	 * @param xdcFile routing.xdc file
 	 * @throws IOException
@@ -172,10 +213,9 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 				String[] toks = whitespacePattern.split(line);
 	
 				// TODO: I know the order these things appear in the file, so I probably don't need a big switch statement
-				// SITE_PIPS -> STATIC_SOURCES -> LUT_RTS -> INTRASITE/INTERSITE/ROUTE
+				// Partition Pins must be processed before anything else (ensure they appear first in routing.rsc)
 				// Update this if there is a performance issue, but it should be fine
 				switch (toks[0]) {
-				
 					case "SITE_PIPS" : processSitePips(toks);
 						break;
 					case "INTERSITE" : processIntersitePins(toks);
@@ -195,6 +235,14 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 						String[] staticStartWires = br.readLine().split("\\s+");
 						assert (staticStartWires[0].equals("START_WIRES"));
 						processStaticNet2(toks, staticStartWires);
+						break;
+					case "PART_PIN" : processPartPin(toks);
+						break;
+					case "VCC_PART_PINS":
+						processStaticPartPins(toks, true);
+						break;
+					case "GND_PART_PINS":
+						processStaticPartPins(toks, false);
 						break;
 					default :
 						throw new ParseException("Unrecognized Token: " + toks[0]);
@@ -221,7 +269,6 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	 * where space separated elements are different elements in the array
 	 */
 	private void processSitePips (String[] toks) {
-		
 		Site site = tryGetSite(toks[1]);
 		readUsedSitePips(site, toks);
 		createStaticSubsiteRouteTrees(site);
@@ -408,7 +455,7 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 		if ((implementationMode == ImplementationMode.OUT_OF_CONTEXT || implementationMode == ImplementationMode.RECONFIG_MODULE) && net.getSourcePin().getCell().isPort()) {
 			
 			Cell port = net.getSourcePin().getCell();
-			String startWireName = design.getPartPinMap().get(port.getName());
+			String startWireName = partPinMap.get(port.getName());
 			if (startWireName != null) {
 				String[] wireToks = startWireName.split("/");
 				assert (wireToks.length == 2);
@@ -1112,7 +1159,7 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 
 				// Merge the static and RM portions of the route
 				String partPinNode = partPinMap.get(portName);
-				//System.out.println("Merge routes for net " + net.getName());
+				assert (partPinNode != null);
 				RouteStringTree mergedTree = mergePartialStaticRoute(net.getIntersiteRouteTree(), staticRouteStringMap.get(staticNetName), partPinNode, true);
 
 				oocFileOut.write(String.format("set_property ROUTE %s [get_nets {%s}]\n", mergedTree.toRouteString(), reconfigStaticNetMap.get(net.getName())));
@@ -1340,6 +1387,202 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 
 		return root;
 	}
+
+
+	/**
+	 * Processes the "PART_PIN" token in the placement.rsc of a RSCP. Specifically,
+	 * this function adds the OOC port and corresponding port wire to the oocPortMap
+	 * data structure for later processing.
+	 *
+	 * Expected Format: PART_PIN PortName Tile/Wire Direction
+	 * @param toks An array of space separated string values parsed from the placement.rsc
+	 */
+	private void processPartPin(String[] toks) {
+		assert (toks.length == 4) : String.format("Token error on line %d: Expected format is \"PART_PIN\" PortName Tile/Wire Direction", this.currentLineNumber);
+
+		// Add the partition pin entry to the map
+		partPinMap.put(toks[1], toks[2]);
+
+		// Create and add the partition pin to the design
+		String portName = toks[1];
+		Cell portCell = tryGetCell(portName);
+
+		String[] wireToks = toks[2].split("/");
+		Tile tile = tryGetTile(wireToks[0]);
+		String wireName;
+		if (tile.getType() == TileType.valueOf(device.getFamily(), "OOC_WIRE")) {
+			wireName = wireToks[0] + "/" + wireToks[1];
+		} else {
+			wireName = wireToks[1];
+		}
+		int wireEnum = tryGetWireEnum(wireName);
+		TileWire partPinWire = new TileWire(tile, wireEnum);
+
+		String direction = toks[3];
+		PinDirection partPinDirection;
+		switch (direction) {
+			case "IN" : partPinDirection = PinDirection.IN; break;
+			case "OUT" : partPinDirection = PinDirection.OUT; break;
+			case "INOUT" :
+			default: throw new AssertionError("Invalid direction");
+		}
+
+		addPartitionPin(portCell, partPinWire, partPinDirection);
+
+		// Given the partition pin wire, mark all wires in the node as reserved
+		for (Wire wire : partPinWire.getWiresInNode()) {
+			CellPin partPin = portCell.getPin(portName);
+
+			// TODO: Add reserved wire
+			// design.addReservedWire(wire, partPin.getNet());
+		}
+	}
+
+	/**
+	 * Add the partition pin to the design, inserting any necessary LUT1 buffers and nets.
+	 * @param portCell the ooc port to attach the partition pin to.
+	 * @param partPinWire the partition pin's wire
+	 * @param partPinDirection the direction of the partition pin
+	 */
+	private void addPartitionPin(Cell portCell, TileWire partPinWire, PinDirection partPinDirection) {
+		assert (portCell.getPins().size() == 1);
+
+		if (multiPortSinkNets == null)
+			multiPortSinkNets = design.getMultiPortSinkNets();
+
+		CellPin portCellPin = portCell.getPins().iterator().next();
+		CellNet net = portCellPin.getNet();
+
+		switch (partPinDirection) {
+			case OUT: // If the partition pin is a driver from the RM's perspective
+				// Create the partition pin
+				CellPin partPin = new PartitionPin(portCell, partPinWire, partPinDirection);
+				portCell.attachPartitionPin(partPin);
+
+				// If the EDIF came from Vivado, there may be no net driving this partition pin
+				// This depends on the implementation steps that have been completed.
+				if (net == null) {
+					net = new CellNet(partPin.getCell().getName(), NetType.WIRE);
+					design.addNet(net);
+				}
+				else {
+					// Detach the port cell pin from the net
+					net.disconnectFromPin(portCellPin);
+				}
+
+				// Attach the partition pin to the net
+				// Case 1: The static side is driving the partition pin, but the RM has no active loads for it.
+				if (net.getFanOut() == 0) {
+					// Create a LUT1 buffer. The partition pin will drive this LUT, but the LUT's output will go nowhere.
+					Cell lutCell = new Cell("IN_BUF_Inserted_" + partPin.getCell().getName(), libCells.get("LUT1"));
+					design.addCell(lutCell);
+					lutCell.getProperties().update(new Property("INIT", PropertyType.EDIF, BUFFER_INIT_STRING));
+
+					// Aattach the net to the partition pin and LUT1 buffer.
+					net.connectToPin(partPin);
+					net.connectToPin(lutCell.getPin("I0"));
+
+				}
+				else {
+					// Normal case
+					net.connectToPin(partPin);
+				}
+				break;
+			case IN: // If the partition pin is a sink from the RM's perspective
+
+				// Create the partition pin and attach it to the port.
+				partPin = new PartitionPin(portCell, partPinWire, partPinDirection);
+				portCell.attachPartitionPin(partPin);
+
+				// If the EDIF came from Vivado, there may be no net driving this partition pin
+				// This depends on the implementation steps that have been completed.
+				if (net == null) {
+					net = design.getGndNet();
+				}
+				else {
+					// Detach the port cell pin from the net
+					net.disconnectFromPin(portCellPin);
+				}
+
+				// Attach the partition pin to the net
+
+				// Case 2: The RM is driving the partition pin with VCC or GND.
+				// Case 3: The RM is driving additional partition pins with the same net.
+				// Case 4: The RM is driving this partition pin with another partition pin / port
+				// Whether it is considered a port or partition pin depends only on whether or not the source net was
+				// processed first.
+				if (net.isStaticNet() || multiPortSinkNets.contains(net) || net.getSourcePin().isPartitionPin() || net.getSourcePin().getCell().isPort()) {
+					// Make a LUT1 buffer and drive it with the net.
+					String bufferName = net.getName() + "_InsertedInst_" + partPin.getCell().getName();
+					Cell lutCell = new Cell(bufferName, libCells.get("LUT1"));
+					lutCell.getProperties().update(new Property("INIT", PropertyType.EDIF, BUFFER_INIT_STRING));
+					design.addCell(lutCell);
+					net.connectToPin(lutCell.getPin("I0"));
+
+					// Make another net and connect it to the output of the LUT1 buffer and the partition pin.
+					CellNet partPinDriverNet = new CellNet(net.getName() + "_InsertedNet_" + partPin.getCell().getName(), NetType.WIRE);
+					design.addNet(partPinDriverNet);
+					partPinDriverNet.connectToPin(lutCell.getPin("O"));
+					partPinDriverNet.connectToPin(partPin);
+				}
+				else {
+					// Normal case
+					net.connectToPin(partPin);
+				}
+				break;
+			case INOUT:
+			default:
+				throw new AssertionError("Invalid direction");
+
+		}
+	}
+
+	/**
+	 * Processes the "VCC_PART_PINS" or "GND_PART_PINS" token in the static_resources.rsc of a RSCP.
+	 * Expected Format: VCC_PART_PINS partPinName partPinName ...
+	 * @param toks An array of space separated string values parsed from the placement.rsc
+	 */
+	private void processStaticPartPins(String[] toks, boolean isVcc) {
+		for (int i = 1; i < toks.length; i++) {
+			String oocPortVal = isVcc? "VCC" : "GND";
+			partPinMap.put(toks[i], oocPortVal);
+			String portName = toks[i];
+			Cell portCell = design.getCell(portName);
+
+			// Remove the port cell's pin from the design (they are outside of the partial device)
+			assert (portCell.getPins().size() == 1);
+			CellPin cellPin = portCell.getPins().iterator().next();
+			CellNet net = cellPin.getNet();
+
+			// Detach the port's pin from its current net
+			assert (net != null);
+			net.disconnectFromPin(cellPin);
+
+			// Re-assign the net's pins to either VCC or GND
+			CellNet staticNet = isVcc? design.getVccNet() : design.getGndNet();
+
+			// Assuming driver has already been removed
+			List<CellPin> pins = new ArrayList<>(net.getPins());
+			net.disconnectFromPins(pins);
+			design.removeNet(net);
+			staticNet.connectToPins(pins);
+
+			// There is no corresponding wire for a static partition pin
+			CellPin partPin = new PartitionPin(portCell, null, PinDirection.IN);
+			portCell.attachPartitionPin(partPin);
+
+			// Make the partition pin point to the appropriate global static net
+			partPin.setPinToGlobalNet(staticNet);
+		}
+	}
+
+	/**
+	 * @return the partPinMap
+	 */
+	public Map<String, String> getPartPinMap() {
+		return partPinMap;
+	}
+
 
 	/* **************
 	 * 	Nested Types

@@ -96,21 +96,14 @@ public final class VivadoInterface {
 
 		// re-create the placement and routing information
 		String placementFile = rscpPath.resolve("placement.rsc").toString();
-		XdcPlacementInterface placementInterface;
-		if (mode == ImplementationMode.OUT_OF_CONTEXT || mode == ImplementationMode.RECONFIG_MODULE)
-			placementInterface = new XdcPlacementInterface(design, device, libCells);
-		else
-			placementInterface = new XdcPlacementInterface(design, device);
+		XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device);
 		placementInterface.parsePlacementXDC(placementFile);
-
-
-		// TODO: Do this?
-		design.setPartPinMap(placementInterface.getPartPinMap());
 
 		String routingFile = rscpPath.resolve("routing.rsc").toString();
 		//XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap(), placementInterface.getPartPinMap());
-		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap(), designInfo.getMode(), design.getReconfigStaticNetMap(), design.getStaticRouteStringMap());
+		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap(), designInfo.getMode(), libCells, design.getReconfigStaticNetMap(), design.getStaticRouteStringMap());
 		routingInterface.parseRoutingXDC(routingFile);
+		design.setPartPinMap(routingInterface.getPartPinMap());
 
 
 		VivadoCheckpoint vivadoCheckpoint = new VivadoCheckpoint(partName, design, device, libCells);
@@ -125,7 +118,7 @@ public final class VivadoInterface {
 
 		// Mark the used static resources
 		if (mode == ImplementationMode.RECONFIG_MODULE) {
-			String resourcesFile = rscpPath.resolve("static_resources.rsc").toString();
+			String resourcesFile = rscpPath.resolve("static.rsc").toString();
 			StaticResourcesInterface staticInterface = new StaticResourcesInterface(design, device);
 			staticInterface.parseResourcesRSC(resourcesFile);
 			vivadoCheckpoint.setReconfigStaticNetMap(staticInterface.getReconfigStaticNetMap());
@@ -184,7 +177,7 @@ public final class VivadoInterface {
 		
 		// Write placement.xdc
 		String placementOut = Paths.get(tcpDirectory, "placement.xdc").toString();	
-		XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device, libCells);
+		XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device);
 		placementInterface.writePlacementXDC(placementOut);
 		
 		// Write routing.xdc
@@ -192,7 +185,7 @@ public final class VivadoInterface {
 		String partpinRoutingOut = Paths.get(tcpDirectory, "partpin_routing.xdc").toString();
 
 		// TODO: Only use this constructor if necessary?
-		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, null, mode, reconfigStaticNetMap, staticRouteStringMap);
+		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, mode, libCells, reconfigStaticNetMap, staticRouteStringMap);
 		routingInterface.writeRoutingXDC(routingOut, partpinRoutingOut, design, intrasiteRouting);
 
 		// Write EDIF netlist

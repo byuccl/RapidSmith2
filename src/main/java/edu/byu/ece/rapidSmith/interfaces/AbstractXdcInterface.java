@@ -1,5 +1,6 @@
 package edu.byu.ece.rapidSmith.interfaces;
 
+import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
 import edu.byu.ece.rapidSmith.device.*;
@@ -8,6 +9,7 @@ import edu.byu.ece.rapidSmith.util.Exceptions;
 public abstract class AbstractXdcInterface {
 
     protected final Device device;
+    protected final CellDesign design;
     protected final WireEnumerator wireEnumerator;
     protected int currentLineNumber;
     protected String currentFile;
@@ -15,6 +17,7 @@ public abstract class AbstractXdcInterface {
 
     public AbstractXdcInterface(Device device, CellDesign design) {
         this.device = device;
+        this.design = design;
         this.wireEnumerator = device.getWireEnumerator();
         this.currentLineNumber = 0;
         this.implementationMode = design.getImplementationMode();
@@ -96,6 +99,25 @@ public abstract class AbstractXdcInterface {
         }
 
         return bel;
+    }
+
+    /**
+     * Tries to retrieve the Cell object with the given name
+     * from the currently loaded design. If the cell does not exist,
+     * a ParseException is thrown
+     *
+     * @param cellName Name of the cell to retrieve
+     */
+    protected Cell tryGetCell(String cellName) {
+
+        Cell cell = design.getCell(cellName);
+
+        if (cell == null) {
+            throw new Exceptions.ParseException("Cell \"" + cellName + "\" not found in the current design. \n"
+                    + "On line " + this.currentLineNumber + " of " + currentFile);
+        }
+
+        return cell;
     }
 
 }

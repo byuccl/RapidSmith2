@@ -192,7 +192,6 @@ public abstract class AbstractEdifInterface {
 
 		// Go through the cell's nets and hook up inputs and outputs
 		for(EdifNet net : edifNets) {
-
 			//create a new net
 			CellNet cn = new CellNet(net.getOldName(), NetType.WIRE);
 
@@ -255,7 +254,10 @@ public abstract class AbstractEdifInterface {
 				}
 
 				// TODO: Change Yosys to use port names for the nets instead of changing it here!
-				net.setName(portname);
+				// This is not a valid solution! It breaks when importing a routed RM where buffers have been
+				// inserted for a signal that drives multiple part pins. See led[3] in timergame.
+				// TODO: Find a fix for Yosys
+				//net.setName(portname);
 
 				net.connectToPin(portCell.getPin("PAD"));
 
