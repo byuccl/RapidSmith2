@@ -52,7 +52,7 @@ import java.util.Map.Entry;
  * </pre>
  * As can be seen, when creating a 3X3 device file, an extra column is added to the device.
  * The purpose of this column is to represent out-of-context wires for the partial device.
- * These wires can may <b>within</b> the partial device and leave the partial device boundaries, or
+ * These wires may <b>within</b> the partial device and leave the partial device boundaries, or
  * they may start <b>outside</b> the partial device boundaries, but enter the partial device.
  * These OOC wires are all tile wires that are added to the "OOC_WIRE" tile. All other tiles in
  * the rightmost column are set to be of type NULL so they take up as little memory as possible.

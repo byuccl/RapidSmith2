@@ -24,12 +24,15 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.stream.Collectors;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
+import edu.byu.ece.rapidSmith.design.subsite.Cell;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
 import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
 import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.interfaces.StaticResourcesInterface;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
 /**
@@ -40,7 +43,9 @@ import edu.byu.ece.rapidSmith.util.Exceptions;
 public final class VivadoInterface {
 
 	private static final String CELL_LIBRARY_NAME = "cellLibrary.xml";
-	
+
+	/* Design Import */
+
 	public static VivadoCheckpoint loadRSCP(String rscp) throws IOException {
 		return loadRSCP(rscp, false);
 	}
@@ -99,9 +104,10 @@ public final class VivadoInterface {
 		placementInterface.parsePlacementXDC(placementFile);
  
 		String routingFile = rscpPath.resolve("routing.rsc").toString();
-		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap(), mode);
+		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap(), libCells);
 		routingInterface.parseRoutingXDC(routingFile);
-		
+		design.setPartPinMap(routingInterface.getPartPinMap());
+
 		VivadoCheckpoint vivadoCheckpoint = new VivadoCheckpoint(partName, design, device, libCells); 
 		
 		if (storeAdditionalInfo) {
@@ -110,8 +116,32 @@ public final class VivadoInterface {
 			vivadoCheckpoint.setGndSourceBels(routingInterface.getGndSourceBels());
 			vivadoCheckpoint.setBelPinToCellPinMap(placementInterface.getPinMap());
 		}
+
+		// Mark the used static resources
+		if (mode == ImplementationMode.RECONFIG_MODULE) {
+			String resourcesFile = rscpPath.resolve("static.rsc").toString();
+			StaticResourcesInterface staticInterface = new StaticResourcesInterface(design, device);
+			staticInterface.parseResourcesRSC(resourcesFile);
+			design.setRmStaticNetMap(staticInterface.getRmStaticNetMap());
+			design.setStaticRouteStringMap(staticInterface.getStaticRouteStringMap());
+		}
 		
 		return vivadoCheckpoint;
+	}
+
+	/* Design Export */
+
+	/**
+	 * Removes all static source LUTs from the design. These LUTs are implied and should not be included
+	 * in the EDIF netlist or be placed.
+	 */
+	private static void removeStaticSourceLUTs(CellDesign design) {
+		for (Cell staticSource : design.getCells().stream()
+				.filter(Cell::isLut)
+				.filter(c -> c.getPin("O").getNet() != null && c.getPin("O").getNet().isStaticNet())
+				.collect(Collectors.toList())) {
+			design.removeCell(staticSource);
+		}
 	}
 
 	/**
@@ -134,8 +164,10 @@ public final class VivadoInterface {
 	 * @throws IOException
 	 */
 	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells, boolean intrasiteRouting) throws IOException {
-				
 		new File(tcpDirectory).mkdir();
+
+		// Remove static-source LUTs
+		removeStaticSourceLUTs(design);
 		
 		// insert routethrough buffers
 		LutRoutethroughInserter inserter = new LutRoutethroughInserter(design, libCells);
@@ -148,9 +180,14 @@ public final class VivadoInterface {
 		
 		// Write routing.xdc
 		String routingOut = Paths.get(tcpDirectory, "routing.xdc").toString();
-		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, null, ImplementationMode.REGULAR);
-		routingInterface.writeRoutingXDC(routingOut, design, intrasiteRouting);
-		
+		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device);
+		if (design.getImplementationMode().equals(ImplementationMode.RECONFIG_MODULE)) {
+			String partpinRoutingOut = Paths.get(tcpDirectory, "partpin_routing.xdc").toString();
+			routingInterface.writeRoutingXDC(routingOut, partpinRoutingOut, design, intrasiteRouting);
+		} else {
+			routingInterface.writeRoutingXDC(routingOut, design, intrasiteRouting);
+		}
+
 		// Write EDIF netlist
 		String edifOut = Paths.get(tcpDirectory, "netlist.edf").toString();
 		VivadoEdifInterface vivadoEdifInterface = new VivadoEdifInterface();

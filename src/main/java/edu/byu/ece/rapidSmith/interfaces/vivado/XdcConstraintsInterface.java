@@ -25,9 +25,6 @@ import edu.byu.ece.rapidSmith.device.*;
 
 import java.io.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This class is used for parsing XDC constraint files and adding them into a RS2 design.
