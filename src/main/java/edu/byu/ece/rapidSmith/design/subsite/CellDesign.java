@@ -580,6 +580,18 @@ public class CellDesign extends AbstractDesign {
 	}
 
 	/**
+	 * Returns a collections of {@link Bel}s that currently have
+	 * a {@link Cell} object placed on them.
+	 */
+	public Collection<Bel> getUsedBels() {
+		Collection<Bel> usedBels = new ArrayList<>();
+		for (Site site : getUsedSites()) {
+			usedBels.addAll(placementMap.get(site).keySet());
+		}
+		return usedBels;
+	}
+
+	/**
 	 * Returns {@code true} if the specified {@link Cell} can be placed onto
 	 * the specified {@link Bel}.
 	 * 
