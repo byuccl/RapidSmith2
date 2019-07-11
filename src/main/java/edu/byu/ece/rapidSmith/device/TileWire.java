@@ -110,6 +110,23 @@ public class TileWire implements Wire, Serializable {
 	}
 
 	/**
+	 * Returns the connection to the given sink wire, if it exists
+	 * @param sinkWire the sink wire to get a connection to
+	 * @return the wire connection to sinkWire
+	 */
+	@Override
+	public Connection getWireConnection(Wire sinkWire) {
+		WireConnection[] wireConnections = tile.getWireConnections(wire);
+		if (wireConnections == null)
+			return null;
+
+		return Arrays.stream(wireConnections)
+				.map(wc -> new TileWireConnection(this, wc))
+				.filter(wc -> wc.getSinkWire().equals(sinkWire)).iterator().next();
+
+	}
+
+	/**
 	 * Gets wires that are part of the same node.
 	 * Only includes start and end wires (intermediate wires aren't included)
 	 * @return a set including the wires of the node

@@ -517,6 +517,17 @@ public class Cell {
 	}
 
 	/**
+	 * Returns the nets that drive input pins of this cell.
+	 * @return the set of input nets
+	 */
+	public final Set<CellNet> getInputNets() {
+		return pinMap.values().stream()
+				.filter(pin -> pin.getNet() != null && pin.isInpin())
+				.map(CellPin::getNet)
+				.collect(Collectors.toSet());
+	}
+
+	/**
 	 * Returns the pin on this cell with the specified name.
 	 */
 	public final CellPin getPin(String pinName) {

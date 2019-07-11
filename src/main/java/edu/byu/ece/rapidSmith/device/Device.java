@@ -623,6 +623,15 @@ public class Device implements Serializable {
 	}
 
 	/**
+	 * Returns whether the device has at least one tile of type.
+	 * @param type the Tile Type
+	 * @return if the type is present
+	 */
+	public boolean hasTileType(TileType type) {
+		return tileMap.values().stream().anyMatch(tile -> tile.getType().equals(type));
+	}
+
+	/**
 	 * Builds resources that are fully dependent upon other resources
 	 * provided during the loading and creation process.
 	 * <p>
@@ -645,6 +654,15 @@ public class Device implements Serializable {
 		for (Site site : sites.values()) {
 			site.setTypeUnchecked(site.getPossibleTypes()[0]);
 		}
+	}
+
+	/**
+	 * Checks if the device has at least one site of the given type.
+	 * @param type the site type to check the device for
+	 * @return if the site type is present
+	 */
+	public boolean hasSiteType(SiteType type) {
+		return getAllSitesOfType(type) != null;
 	}
 
 	/*

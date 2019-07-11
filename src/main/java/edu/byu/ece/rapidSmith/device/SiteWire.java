@@ -112,6 +112,23 @@ public class SiteWire implements Wire, Serializable {
 	}
 
 	/**
+	 * Returns the connection to the given sink wire, if it exists
+	 * @param sinkWire the sink wire to get a connection to
+	 * @return the wire connection to sinkWire
+	 */
+	@Override
+	public Connection getWireConnection(Wire sinkWire) {
+		WireConnection[] wireConnections = site.getWireConnections(siteType, wire);
+		if (wireConnections == null)
+			return null;
+
+		return Arrays.stream(wireConnections)
+				.map(wc -> new SiteWireConnection(this, wc))
+				.filter(wc -> wc.getSinkWire().equals(sinkWire)).iterator().next();
+
+	}
+
+	/**
 	 * Gets wires that make up a node. This is just the single wire for site wires.
 	 * @return a set containing the wire
 	 */

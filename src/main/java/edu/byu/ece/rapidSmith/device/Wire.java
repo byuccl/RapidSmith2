@@ -57,6 +57,13 @@ public interface Wire extends Serializable {
 	WireConnection[] getWireConnectionsArray();
 
 	/**
+	 * Returns the connection to the given sink wire, if it exists
+	 * @param sinkWire the sink wire to get a connection to
+	 * @return the wire connection to sinkWire
+	 */
+	Connection getWireConnection(Wire sinkWire);
+
+	/**
 	 * Returns the connected site pins for each possible type of the connected site.
 	 * @return all connected sites pins of this wire
 	 */

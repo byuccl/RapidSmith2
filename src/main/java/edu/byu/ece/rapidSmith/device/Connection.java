@@ -73,6 +73,16 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
+		public Site getSite() {
+			if (!isRouteThrough())
+				return null;
+
+			Tile tile = sourceWire.getTile();
+			SitePin sitePin = tile.getSitePinOfWire(sourceWire.getWireEnum());
+			return sitePin.getSite();
+		}
+
+		@Override
 		public boolean isPinConnection() {
 			return false;
 		}
@@ -156,6 +166,16 @@ public abstract class Connection implements Serializable {
 		@Override
 		public boolean isDirectConnection() {
 			return !isPip() && !isRouteThrough();
+		}
+
+		@Override
+		public Site getSite() {
+			if (!isRouteThrough())
+				return null;
+
+			Tile tile = sourceWire.getTile();
+			SitePin sitePin = tile.getSitePinOfWire(sourceWire.getWireEnum());
+			return sitePin.getSite();
 		}
 
 		@Override
@@ -246,6 +266,11 @@ public abstract class Connection implements Serializable {
 		@Override
 		public boolean isDirectConnection() {
 			return !isPip() && !isRouteThrough();
+		}
+
+		@Override
+		public Site getSite() {
+			return sourceWire.getSite();
 		}
 
 		@Override
@@ -347,6 +372,11 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
+		public Site getSite() {
+			return sourceWire.getSite();
+		}
+
+		@Override
 		public SitePin getSitePin() {
 			return null;
 		}
@@ -429,6 +459,11 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
+		public Site getSite() {
+			return pin.getSite();
+		}
+
+		@Override
 		public boolean isPinConnection() {
 			return true;
 		}
@@ -504,6 +539,11 @@ public abstract class Connection implements Serializable {
 		@Override
 		public boolean isDirectConnection() {
 			return true;
+		}
+
+		@Override
+		public Site getSite() {
+			return pin.getSite();
 		}
 
 		@Override
@@ -585,6 +625,11 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
+		public Site getSite() {
+			return belPin.getBel().getSite();
+		}
+
+		@Override
 		public boolean isPinConnection() {
 			return false;
 		}
@@ -635,6 +680,12 @@ public abstract class Connection implements Serializable {
 	public abstract boolean isRouteThrough();
 
 	public abstract boolean isDirectConnection();
+
+	/**
+	 * Get the single site associated with the connection, if there is one.
+	 * @return the site
+	 */
+	public abstract Site getSite();
 
 	@Deprecated
 	public abstract boolean isPinConnection();

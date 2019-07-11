@@ -561,16 +561,17 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	 * @param portCell the ooc port to attach the partition pin to.
 	 * @param partPinWire the partition pin's wire
 	 * @param partPinDirection the direction of the partition pin
+	 * @return The partition pin
 	 */
-	private void addPartitionPin(Cell portCell, TileWire partPinWire, PinDirection partPinDirection) {
+	private CellPin addPartitionPin(Cell portCell, TileWire partPinWire, PinDirection partPinDirection) {
 		assert (portCell.getPins().size() == 1);
 		CellPin portCellPin = portCell.getPins().iterator().next();
 		CellNet net = portCellPin.getNet();
-
+		CellPin partPin;
 		switch (partPinDirection) {
 			case OUT: // If the partition pin is a driver from the RM's perspective
 				// Create the partition pin
-				CellPin partPin = new PartitionPin(portCell, partPinWire, partPinDirection);
+				partPin = new PartitionPin(portCell, partPinWire, partPinDirection);
 				portCell.attachPartitionPin(partPin);
 
 				// If the EDIF came from Vivado, there may be no net driving this partition pin
@@ -647,8 +648,8 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 			case INOUT:
 			default:
 				throw new AssertionError("Invalid direction");
-
 		}
+		return partPin;
 	}
 
 	/**
@@ -689,10 +690,10 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 			default: throw new AssertionError("Invalid direction");
 		}
 
-		addPartitionPin(portCell, partPinWire, partPinDirection);
+		CellPin partPin = addPartitionPin(portCell, partPinWire, partPinDirection);
 
 		// Given the partition pin wire, mark all wires in the node as reserved
-		design.addReservedNode(partPinWire);
+		design.addReservedNode(partPinWire, partPin.getNet());
 	}
 
 	/**

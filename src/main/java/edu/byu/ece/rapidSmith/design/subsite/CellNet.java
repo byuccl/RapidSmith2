@@ -920,6 +920,40 @@ public class CellNet implements Serializable {
 									.map(sp -> sitePinToRTMap.get(sp))
 									.collect(Collectors.toList());
 	}
+
+	/**
+	 * Returns a list of {@link SitePin} objects that are sinks for the net.
+	 */
+	public List<SitePin> getSinkSitePins() {
+		if (sitePinToRTMap == null) {
+			return Collections.emptyList();
+		}
+
+		return sitePinToRTMap.keySet().stream().filter(SitePin::isInput).collect(Collectors.toList());
+	}
+
+	/**
+	 * Returns a {@link SitePin} object that maps to the passed in cell pin.
+	 * @param cellPin the cell pin to use to find the site pin
+	 * @return the SitePin that maps to the cellpin.
+	 */
+	public SitePin getSinkSitePin(CellPin cellPin) {
+		RouteTree routeTree = belPinToSinkRTMap.get(cellPin.getMappedBelPin());
+
+		if (routeTree == null) {
+			// There is no corresponding sink route tree, so there is no corresponding site pin
+			return null;
+		}
+
+		// Get the route tree that starts at the site pin
+		while (routeTree.getParent() != null) {
+			routeTree = routeTree.getParent();
+		}
+
+		// Get the connected site pin
+		// if null, it is an intra-site route and doesn't need to be routed to
+		return routeTree.getWire().getReverseConnectedPin();
+	}
 	
 	/**
 	 * Returns a RouteTree object that is connected to the specified CellPin. If the CellPin

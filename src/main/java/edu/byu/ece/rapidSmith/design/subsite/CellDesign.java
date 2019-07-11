@@ -71,8 +71,8 @@ public class CellDesign extends AbstractDesign {
 	private Map<Site, Map<String, String>> pipInValues;
 	/** Map of partition pins (ooc ports) to their ooc tile and node **/
 	private Map<String, String> partPinMap;
-	/** Set of reserved wires */
-	private Set<Wire> reservedWires;
+	/** MAp of wires to the specific net they are reserved for (if any) */
+	private Map<Wire, CellNet> reservedWires;
 	/** Set of reserved sites */
 	private Set<Site> reservedSites;
 	/** Map from RM port name(s) to the static net's name */
@@ -784,6 +784,21 @@ public class CellDesign extends AbstractDesign {
 	public  Set<Integer> getUsedSitePipsAtSite(Site ps) {
 		return this.usedSitePipsMap.getOrDefault(ps, Collections.emptySet());
 	}
+
+	/**
+	 * Returns whether or not a site PIP at the specified {@link Site} is used.
+	 * @param site the site containing the site PIP
+	 * @param sitePip the site PIP to check for usage
+	 * @return if the site PIP is used.
+	 */
+	public boolean isSitePipAtSiteUsed(Site site, String sitePip) {
+		Map<String, String> sitePips = pipInValues.get(site);
+
+		if (sitePips == null)
+			return false;
+
+		return sitePips.containsKey(sitePip);
+	}
 	
 	/**
 	 * Add a mapping of used PIPs to their input route in a site. 
@@ -894,7 +909,6 @@ public class CellDesign extends AbstractDesign {
 		return designCopy;
 	}
 
-
 	/**
 	 * Adds a site to the list of reserved sites.
 	 * @param site site to reserve
@@ -913,24 +927,70 @@ public class CellDesign extends AbstractDesign {
 		return reservedSites;
 	}
 
+	/**
+	 * Returns the reserved wires
+	 * @return set of reserved wires
+	 */
+	public Map<Wire, CellNet> getReservedWires() {
+		return reservedWires;
+	}
 
 	/**
-	 * Add a wire to the set of the design's reserved wires
-	 * @param reservedWire
+	 * Checks if a wire is available for use by a given net.
+	 * @param net the net to check
+	 * @param wire the wire to check
+	 * @return whether the net can use the wire
+	 */
+	public boolean isWireAvailable(CellNet net, Wire wire) {
+		if (!reservedWires.containsKey(wire))
+			return true;
+		CellNet reservedNet = reservedWires.get(wire);
+		return net.equals(reservedNet);
+	}
+
+	/**
+	 * Adds a wire to the design's list of reserved wires for the given net.
+	 * Use this to reserve a wire specifically for the net.
+	 * @param reservedWire the wire to reserve
+	 * @param net the net the wire is reserved for
+	 */
+	public void addReservedWire(Wire reservedWire, CellNet net) {
+		if (reservedWires == null)
+			reservedWires = new HashMap<>();
+		reservedWires.put(reservedWire, net);
+	}
+
+	/**
+	 * Add a wire to the set of the design's reserved wires.
+	 * Use this to reserve the wire for no particular net.
+	 * @param reservedWire the wire to reserve
 	 */
 	public void addReservedWire(Wire reservedWire) {
 		if (reservedWires == null)
-			reservedWires = new HashSet<>();
-		reservedWires.add(reservedWire);
+			reservedWires = new HashMap<>();
+		reservedWires.put(reservedWire, null);
 	}
 
 	/**
 	 * Adds all wires in a node (except intermediate wires) to the designs's set of reserved wires.
+	 * Use this to reserve the node for no particular net.
 	 * @param wireInNode a wire in the node
 	 */
 	public void addReservedNode(Wire wireInNode) {
 		for (Wire wire : wireInNode.getWiresInNode()) {
 			addReservedWire(wire);
+		}
+	}
+
+	/**
+	 * Adds all wires in a node (except intermediate wires) to the designs's set of reserved wires.
+	 * Use this to reserve the node for no particular net.
+	 * @param wireInNode a wire in the node
+	 * @param net the net to reserve the node for
+	 */
+	public void addReservedNode(Wire wireInNode, CellNet net) {
+		for (Wire wire : wireInNode.getWiresInNode()) {
+			addReservedWire(wire, net);
 		}
 	}
 
@@ -962,5 +1022,21 @@ public class CellDesign extends AbstractDesign {
 
 	public void setStaticRouteStringMap(Map<String, RouteStringTree> staticRouteStringMap) {
 		this.staticRouteStringMap = staticRouteStringMap;
+	}
+
+	/**
+	 * Returns a flattened view of the in-context cells in the netlist. Macro
+	 * cells are not returned in this list, only leaf and internal cells
+	 * are returned.
+	 * WARNING: Ports are assumed to be out-of-context. This is true for 7-Series RMs, but is
+	 * not necessarily true for ultrascale RMs.
+	 */
+	public Stream<Cell> getInContextLeafCells() {
+		// TODO: For non 7-series designs, determine which ports are in-context and which are out-of-context
+		// TODO: Also check ImplementationMode.OUT_OF_CONTEXT
+		if (this.mode.equals(ImplementationMode.RECONFIG_MODULE))
+			return (cellMap.values().stream().flatMap(c -> _flatten(c))).filter(it -> !it.isPort());
+		else
+			return cellMap.values().stream().flatMap(c -> _flatten(c));
 	}
 }

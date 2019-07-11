@@ -103,7 +103,8 @@ public class StaticResourcesInterface extends AbstractXdcInterface {
 			Tile tile = tryGetTile(tileName);
 			Wire reservedWire = new TileWire(tile, tryGetWireEnum(wireName));
 
-			// Mark all wires in the node as reserved
+			// Mark all wires in the node as reserved. These wires are used by the static design for other nets not
+			// in the RM; i.e., they just route through the RM.
 			design.addReservedNode(reservedWire);
 		}
 	}
