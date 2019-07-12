@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Brigham Young University
+ * Copyright (c) 2019 Brigham Young University
  *
  * This file is part of the BYU RapidSmith Tools.
  *
@@ -26,25 +26,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import edu.byu.ece.rapidSmith.design.subsite.Cell;
-import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.design.subsite.CellPin;
-import edu.byu.ece.rapidSmith.design.subsite.Property;
-import edu.byu.ece.rapidSmith.design.subsite.PropertyType;
-import edu.byu.ece.rapidSmith.device.Bel;
-import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.Device;
-import edu.byu.ece.rapidSmith.device.PackagePin;
-import edu.byu.ece.rapidSmith.device.Site;
-import edu.byu.ece.rapidSmith.device.SiteType;
+import edu.byu.ece.rapidSmith.design.subsite.*;
+import edu.byu.ece.rapidSmith.device.*;
+import edu.byu.ece.rapidSmith.interfaces.AbstractXdcInterface;
 
 import static edu.byu.ece.rapidSmith.util.Exceptions.*;
 
@@ -55,17 +44,15 @@ import static edu.byu.ece.rapidSmith.util.Exceptions.*;
  * @author Thomas Townsend
  *
  */
-public class XdcPlacementInterface {
-
+public class XdcPlacementInterface extends AbstractXdcInterface {
 	private final CellDesign design;
-	private final Device device;
 	private int currentLineNumber;
 	private String currentFile;
 	private final Map<BelPin, CellPin> belPinToCellPinMap;
-	
+
 	public XdcPlacementInterface(CellDesign design, Device device) {
+		super(device, design);
 		this.design = design;
-		this.device = device;
 		belPinToCellPinMap = new HashMap<>();
 	}
 	
@@ -102,10 +89,9 @@ public class XdcPlacementInterface {
 					throw new ParseException(String.format("Unrecognized Token: %s \nOn %d of %s", toks[0], currentLineNumber, currentFile));
 			}
 		}
-
 		br.close();
 	}
-	
+
 	private void applyCellPlacement(String[] toks) {
 		
 		Cell cell = tryGetCell(toks[1]);
@@ -195,26 +181,7 @@ public class XdcPlacementInterface {
 	public Map<BelPin, CellPin> getPinMap() {
 		return belPinToCellPinMap;
 	}
-	
-	/**
-	 * Tries to retrieve the Cell object with the given name
-	 * from the currently loaded design. If the cell does not exist,
-	 * a ParseException is thrown
-	 * 
-	 * @param cellName Name of the cell to retrieve
-	 */
-	private Cell tryGetCell(String cellName) {
-		
-		Cell cell = design.getCell(cellName);
-		
-		if (cell == null) {
-			throw new ParseException("Cell \"" + cellName + "\" not found in the current design. \n" 
-									+ "On line " + this.currentLineNumber + " of " + currentFile);
-		}
-		
-		return cell;
-	}
-	
+
 	private Cell tryGetPlacedCell(String cellName) {
 		Cell cell = tryGetCell(cellName);
 		
@@ -245,46 +212,7 @@ public class XdcPlacementInterface {
 		
 		return pin;
 	}
-	
-	/**
-	 * Tries to retrieve the Site object with the given site name
-	 * from the currently loaded device. If the site does not exist
-	 * a ParseException is thrown
-	 * 
-	 * @param siteName Name of the site to retrieve
-	 */
-	private Site tryGetSite(String siteName) {
-		
-		Site site = device.getSite(siteName);
-		
-		if (site == null) {
-			throw new ParseException("Site \"" + siteName + "\" not found in the current device. \n" 
-									+ "On line " + this.currentLineNumber + " of " + currentFile);
-		}
-		
-		return site;
-	}
-		
-	/**
-	 * Tries to retrieve a BEL object from the currently loaded device. 
-	 * If the BEL does not exist, a ParseException is thrown. 
-	 * 
-	 * @param site Site where the BEL resides
-	 * @param belName Name of the BEL within the site
-	 * @return Bel
-	 */
-	private Bel tryGetBel(Site site, String belName) {
-		
-		Bel bel = site.getBel(belName);
-		
-		if (bel == null) {
-			throw new ParseException(String.format("Bel: \"%s/%s\" does not exist in the current device"
-												 + "On line %d of %s", site.getName(), belName, currentLineNumber, currentFile));
-		}
-		
-		return bel;
-	}
-	
+
 	/**
 	 * Tries to retrieve a BelPin object from the currently loaded device
 	 * If the pin does not exist, a ParseException is thrown.
@@ -361,6 +289,30 @@ public class XdcPlacementInterface {
 					}
 				}
 			}
+			// If OOC mode, write the partition pin location properties.
+			// This tells Vivado the tile where the Partition Pin should be placed (but not the exact wire).
+			// Note that there is a “bug” where Vivado won't let you set the ROUTE string for nets where the source is
+			// a port (or partition pin). So, Vivado has to route these nets ultimately.
+			if (design.getImplementationMode() == ImplementationMode.OUT_OF_CONTEXT)
+			{
+				// Iterate through the ooc port map to construct the properties
+				Map<String, String> oocPortMap = design.getPartPinMap();
+
+				if (oocPortMap != null) {
+					for (Map.Entry<String, String> entry : oocPortMap.entrySet()) {
+						fileout.write("set_property HD.PARTPIN_LOCS {");
+
+						// Write the tile the partition pin is located in
+						String[] toks = entry.getValue().split("/");
+						String tileName = toks[0];
+						fileout.write(tileName);
+
+						// Write the corresponding port name
+						fileout.write("} [get_ports ");
+						fileout.write(entry.getKey() + "]\n");
+					}
+				}
+			}
 		}
 	}
 
@@ -372,10 +324,8 @@ public class XdcPlacementInterface {
 	 * TODO: Add <is_lut>, <is_carry>, and <is_ff> tags to cell library
 	 */
 	private Stream<Cell> sortCellsForXdcExport(CellDesign design) {
-		
 		design.getDevice().getAllSitesOfType(SiteType.valueOf(design.getFamily(), "SLICEL"));
-		
-		
+
 		// cell bins
 		ArrayList<Cell> sorted = new ArrayList<>(design.getCells().size());		
 		ArrayList<Cell> lutCellsH5 = new ArrayList<>();
@@ -396,7 +346,7 @@ public class XdcPlacementInterface {
 			Cell cell = cellIt.next();
 			
 			// only add cells that are placed to the list
-			if ( !cell.isPlaced() ) {
+			if (!cell.isPlaced()) {
 				continue;
 			}
 			
@@ -456,4 +406,5 @@ public class XdcPlacementInterface {
 				ff5Cells.stream())
 				.flatMap(Function.identity());
 	}
+
 }

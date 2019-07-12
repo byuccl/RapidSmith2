@@ -23,6 +23,7 @@ package edu.byu.ece.rapidSmith.interfaces.yosys;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.interfaces.StaticResourcesInterface;
 import edu.byu.ece.rapidSmith.interfaces.vivado.*;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
@@ -80,16 +81,35 @@ public final class YosysInterface {
 		
 		// create the RS2 netlist
 		String edifFile = rscpPath.resolve("netlist.edf").toString();
-
 		CellDesign design;
 		YosysEdifInterface yosysEdifInterface = new YosysEdifInterface();
 		design = yosysEdifInterface.parseEdif(edifFile, libCells, partName, transformCells);
 		design.setImplementationMode(mode);
-		
+
 		// parse the constraints into RapidSmith2
 		String constraintsFile = rscpPath.resolve("constraints.xdc").toString();
 		XdcConstraintsInterface constraintsInterface = new XdcConstraintsInterface(design, device);
 		constraintsInterface.parseConstraintsXDC(constraintsFile);
+
+		// re-create the placement and routing information
+		String placementFile = rscpPath.resolve("placement.rsc").toString();
+		XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device);
+		placementInterface.parsePlacementXDC(placementFile);
+
+		String routingFile = rscpPath.resolve("routing.rsc").toString();
+		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap(), libCells);
+		routingInterface.parseRoutingXDC(routingFile);
+		design.setPartPinMap(routingInterface.getPartPinMap());
+
+		// If importing a reconfigurable module, process all of the static resources
+		if (mode == ImplementationMode.RECONFIG_MODULE) {
+			// Process other static resources (reserved sites, PIPs, partition pin routes)
+			String resourcesFile = rscpPath.resolve("static.rsc").toString();
+			StaticResourcesInterface staticInterface = new StaticResourcesInterface(design, device);
+			staticInterface.parseResourcesRSC(resourcesFile);
+			design.setRmStaticNetMap(staticInterface.getRmStaticNetMap());
+			design.setStaticRouteStringMap(staticInterface.getStaticRouteStringMap());
+		}
 
 		return new VivadoCheckpoint(partName, design, device, libCells);
 	}

@@ -23,6 +23,7 @@ package edu.byu.ece.rapidSmith.design.subsite;
 import edu.byu.ece.rapidSmith.design.AbstractDesign;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.Site;
+import edu.byu.ece.rapidSmith.device.Wire;
 import edu.byu.ece.rapidSmith.interfaces.vivado.XdcConstraint;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
@@ -68,6 +69,16 @@ public class CellDesign extends AbstractDesign {
 	private ImplementationMode mode;
 	/** Map of used PIPs to their Input Values in a Site **/
 	private Map<Site, Map<String, String>> pipInValues;
+	/** Map of partition pins (ooc ports) to their ooc tile and node **/
+	private Map<String, String> partPinMap;
+	/** Set of reserved wires */
+	private Set<Wire> reservedWires;
+	/** Set of reserved sites */
+	private Set<Site> reservedSites;
+	/** Map from RM port name(s) to the static net's name */
+	private Map<String, String> rmStaticNetMap;
+	/** Map from the static net name to the route string tree */
+	private Map<String, RouteStringTree> staticRouteStringMap;
 	
 	/**
 	 * Constructor which initializes all member data structures. Sets name and
@@ -716,7 +727,7 @@ public class CellDesign extends AbstractDesign {
 	}
 
 	/**
-	 * Unroutes the INTERSITE portions of all nets currently in the design.
+	 * Unroutes the INTERSITE and INTRASITE portions of all nets currently in the design.
 	 * This function is currently not recommended for use. Further testing is needed.
 	 */
 	public void unrouteDesignFull() {
@@ -869,5 +880,75 @@ public class CellDesign extends AbstractDesign {
 		}
 
 		return designCopy;
+	}
+
+
+	/**
+	 * Adds a site to the list of reserved sites.
+	 * @param site site to reserve
+	 */
+	public void addReservedSite(Site site) {
+		if (reservedSites == null)
+			reservedSites = new HashSet<>();
+		reservedSites.add(site);
+	}
+
+	/**
+	 * Returns the reserved sites
+	 * @return reserved sites
+	 */
+	public Set<Site> getReservedSites() {
+		return reservedSites;
+	}
+
+
+	/**
+	 * Add a wire to the set of the design's reserved wires
+	 * @param reservedWire
+	 */
+	public void addReservedWire(Wire reservedWire) {
+		if (reservedWires == null)
+			reservedWires = new HashSet<>();
+		reservedWires.add(reservedWire);
+	}
+
+	/**
+	 * Adds all wires in a node (except intermediate wires) to the designs's set of reserved wires.
+	 * @param wireInNode a wire in the node
+	 */
+	public void addReservedNode(Wire wireInNode) {
+		for (Wire wire : wireInNode.getWiresInNode()) {
+			addReservedWire(wire);
+		}
+	}
+
+	/**
+	 * @return the partPinMap
+	 */
+	public Map<String, String> getPartPinMap() {
+		return partPinMap;
+	}
+
+	/**
+	 * @param partPinMap the partPinMap to set
+	 */
+	public void setPartPinMap(Map<String, String> partPinMap) {
+		this.partPinMap = partPinMap;
+	}
+
+	public Map<String, String> getRmStaticNetMap() {
+		return rmStaticNetMap;
+	}
+
+	public void setRmStaticNetMap(Map<String, String> rmStaticNetMap) {
+		this.rmStaticNetMap = rmStaticNetMap;
+	}
+
+	public Map<String, RouteStringTree> getStaticRouteStringMap() {
+		return staticRouteStringMap;
+	}
+
+	public void setStaticRouteStringMap(Map<String, RouteStringTree> staticRouteStringMap) {
+		this.staticRouteStringMap = staticRouteStringMap;
 	}
 }
