@@ -68,6 +68,11 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
+		public boolean isDirectConnection() {
+			return !isPip() && !isRouteThrough();
+		}
+
+		@Override
 		public boolean isPinConnection() {
 			return false;
 		}
@@ -146,6 +151,11 @@ public abstract class Connection implements Serializable {
 		public boolean isRouteThrough() {
 			Device device = sourceWire.getTile().getDevice();
 			return device.isRouteThrough(wc.getWire(), sourceWire.getWireEnum());
+		}
+
+		@Override
+		public boolean isDirectConnection() {
+			return !isPip() && !isRouteThrough();
 		}
 
 		@Override
@@ -231,6 +241,11 @@ public abstract class Connection implements Serializable {
 			SiteType siteType = sourceWire.getSiteType();
 			int sourceEnum = sourceWire.getWireEnum();
 			return sourceWire.getSite().isRoutethrough(siteType, sourceEnum, wc.getWire());
+		}
+
+		@Override
+		public boolean isDirectConnection() {
+			return !isPip() && !isRouteThrough();
 		}
 
 		@Override
@@ -322,6 +337,11 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
+		public boolean isDirectConnection() {
+			return !isPip() && !isRouteThrough();
+		}
+
+		@Override
 		public boolean isPinConnection() {
 			return false;
 		}
@@ -404,6 +424,11 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
+		public boolean isDirectConnection() {
+			return true;
+		}
+
+		@Override
 		public boolean isPinConnection() {
 			return true;
 		}
@@ -474,6 +499,11 @@ public abstract class Connection implements Serializable {
 		@Override
 		public boolean isRouteThrough() {
 			return false;
+		}
+
+		@Override
+		public boolean isDirectConnection() {
+			return true;
 		}
 
 		@Override
@@ -550,6 +580,11 @@ public abstract class Connection implements Serializable {
 		}
 
 		@Override
+		public boolean isDirectConnection() {
+			return true;
+		}
+
+		@Override
 		public boolean isPinConnection() {
 			return false;
 		}
@@ -598,6 +633,8 @@ public abstract class Connection implements Serializable {
 	public abstract boolean isPip();
 
 	public abstract boolean isRouteThrough();
+
+	public abstract boolean isDirectConnection();
 
 	@Deprecated
 	public abstract boolean isPinConnection();
