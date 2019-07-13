@@ -289,6 +289,30 @@ public class XdcPlacementInterface extends AbstractXdcInterface {
 					}
 				}
 			}
+			// If OOC mode, write the partition pin location properties.
+			// This tells Vivado the tile where the Partition Pin should be placed (but not the exact wire).
+			// Note that there is a “bug” where Vivado won't let you set the ROUTE string for nets where the source is
+			// a port (or partition pin). So, Vivado has to route these nets ultimately.
+			if (design.getImplementationMode() == ImplementationMode.OUT_OF_CONTEXT)
+			{
+				// Iterate through the ooc port map to construct the properties
+				Map<String, String> oocPortMap = design.getPartPinMap();
+
+				if (oocPortMap != null) {
+					for (Map.Entry<String, String> entry : oocPortMap.entrySet()) {
+						fileout.write("set_property HD.PARTPIN_LOCS {");
+
+						// Write the tile the partition pin is located in
+						String[] toks = entry.getValue().split("/");
+						String tileName = toks[0];
+						fileout.write(tileName);
+
+						// Write the corresponding port name
+						fileout.write("} [get_ports ");
+						fileout.write(entry.getKey() + "]\n");
+					}
+				}
+			}
 		}
 	}
 

@@ -1099,7 +1099,7 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 		}
 		return source;
 	}
-	
+
 	/**
 	 * Tries to retrieve a BelPin object from the currently loaded device <br>
 	 * If the pin does not exist, a ParseException is thrown. <br>
@@ -1291,13 +1291,13 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 
 		return toMerge;
 	}
-	
+
 	/**
 	 * Creates a routing.xdc file from the nets of the given design. <br>
 	 * This file can be imported into Vivado to constrain the physical location of nets. 
 	 * 
 	 * @param xdcOut Location to write the routing.xdc file
-	 *               @param oocXdcOut Location to write the part_pin_routing.xdc file
+	 * @param oocXdcOut Location to write the part_pin_routing.xdc file
 	 * @param design Design with nets to export
 	 * @param intrasiteRouting Whether to export commands to manually set the intrasite routing in Vivado
 	 * @throws IOException if the file {@code xdcOut} could not be opened

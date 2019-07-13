@@ -79,7 +79,7 @@ public class CellDesign extends AbstractDesign {
 	private Map<String, String> rmStaticNetMap;
 	/** Map from the static net name to the route string tree */
 	private Map<String, RouteStringTree> staticRouteStringMap;
-	
+
 	/**
 	 * Constructor which initializes all member data structures. Sets name and
 	 * partName to null.
@@ -799,7 +799,7 @@ public class CellDesign extends AbstractDesign {
 
 		return sitePips.containsKey(sitePip);
 	}
-	
+
 	/**
 	 * Add a mapping of used PIPs to their input route in a site. 
 	 * @param ps {@link Site} to route
