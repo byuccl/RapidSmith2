@@ -46,7 +46,7 @@ public abstract class AbstractRouteTree<T extends AbstractRouteTree<T>> implemen
 		return wire;
 	}
 
-	public final Collection<T> getChildren() {
+	public Collection<T> getChildren() {
 		return Collections.unmodifiableCollection(children);
 	}
 
@@ -169,6 +169,25 @@ public abstract class AbstractRouteTree<T extends AbstractRouteTree<T>> implemen
 		toPrune.add(toKeep);
 		return prune(toPrune);
 	}
+
+	/**
+	 * Gets all the leaf nodes for a tree.
+	 * @return a collection of all the leaves.
+	 */
+
+	public <S extends T> Collection<T> getLeaves() {
+		Collection<T> leaves = new ArrayList<>();
+
+		for (T rt : this) {
+			if (rt.isLeaf()) {
+				leaves.add(rt);
+			}
+		}
+
+		return leaves;
+	}
+
+
 
 	/**
 	 * Prunes all branches not containing a node in set {@code toKeep}.

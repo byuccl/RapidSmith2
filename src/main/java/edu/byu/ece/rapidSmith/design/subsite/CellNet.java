@@ -21,10 +21,8 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.design.NetType;
-import edu.byu.ece.rapidSmith.device.PIP;
-import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.PinDirection;
-import edu.byu.ece.rapidSmith.device.SitePin;
+import edu.byu.ece.rapidSmith.device.*;
+import edu.byu.ece.rapidSmith.device.families.FamilyInfos;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
 import java.io.Serializable;
@@ -58,7 +56,7 @@ public class CellNet implements Serializable {
 	private CellPin sourcePin;
 	/** Properties for the Net*/
 	private final PropertyList properties;
-	/** Set of CellPins that have been marked as routed in the design*/
+	/** Set of CellPins that have been marked as completely routed in the design*/
 	private Set<CellPin> routedSinks; 
 	/** Set to true if this net is contained within a single site's boundaries*/
 	private boolean isIntrasite;
@@ -471,6 +469,19 @@ public class CellNet implements Serializable {
 		return false;
 	}
 
+	public boolean isClkBufferNet() {
+        if (isStaticNet())
+            return false;
+
+        for (CellPin p : this.pins) {
+            if (p.getLibraryPin().getLibraryCell().getName().equals("BUFG")) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 	/**
 	 * Checks if a net is a partition pin clock net (but not a true clock net).
 	 * Checks that the net is not a true clock net and checks if any attached partition
@@ -705,28 +716,62 @@ public class CellNet implements Serializable {
 	public void addRoutedSinks(Collection<CellPin> cellPin) {
 		cellPin.forEach(this::addRoutedSink);
 	}
-	
+
+
+    /**
+     * Marks the specified pin as being routed without checking for corresponding CI/CYINIT pins. It is up to the user
+     * to keep the routed sinks up-to-date.
+     *
+     * @param cellPin CellPin object to mark as routed
+     */
+	public void basicAddRoutedSink(CellPin cellPin) {
+        if (!pins.contains(cellPin)) {
+            throw new IllegalArgumentException("CellPin " + cellPin.getFullName() + " not attached to net " + this.getName()
+                    + " Cannot be added to the routed sinks of the net!");
+        }
+
+        if (cellPin.getDirection().equals(PinDirection.OUT)) {
+            throw new IllegalArgumentException(String.format("CellPin %s is an output pin. Cannot be added as a routed sink!", cellPin.getName()));
+        }
+
+        if(routedSinks == null) {
+            routedSinks = new HashSet<>();
+        }
+        routedSinks.add(cellPin);
+    }
+
 	/**
-	 * Marks the specified pin as being routed. It is up to the user to keep the
-	 * routed sinks up-to-date. 
+	 * Marks the specified pin as being routed. Checks for corresponding CI/CYINIT pins. It is up to the user to keep
+     * the routed sinks up-to-date.
 	 * 
 	 * @param cellPin CellPin object to mark as routed
 	 */
 	public void addRoutedSink(CellPin cellPin) {
-		
-		if (!pins.contains(cellPin)) {
-			throw new IllegalArgumentException("CellPin " + cellPin.getFullName() + " not attached to net " + this.getName()
-					+ " Cannot be added to the routed sinks of the net!");
-		}
-		
-		if (cellPin.getDirection().equals(PinDirection.OUT)) {
-			throw new IllegalArgumentException(String.format("CellPin %s is an output pin. Cannout be added as a routed sink!", cellPin.getName()));
-		}
-		
-		if(routedSinks == null) {
-			routedSinks = new HashSet<>();
-		}
-		routedSinks.add(cellPin);
+        basicAddRoutedSink(cellPin);
+
+        /*
+		if (!isStaticNet())
+		    System.out.println("nroaml");
+
+		// For CARRY cells, when a CI/CYINIT pin is routed to, the corresponding CYINIT/CI should not contribute to
+        // the overall route status of the net. While in Vivado these corresponding CYINIT/CI pins still show as
+        // being not routed, we consider them routed here for simplicity.
+        Cell cell = cellPin.getCell();
+        if (cell.getType().contains("CARRY")) {
+            if (cellPin.getName().equals("CI")) {
+                CellPin cyinitPin = cell.getPin("CYINIT");
+                if (cyinitPin.getNet() != null) {
+                    cyinitPin.getNet().basicAddRoutedSink(cyinitPin);
+                }
+            } else if (cellPin.getName().equals("CYINIT")) {
+                CellPin ciPin = cell.getPin("CI");
+                if (ciPin.getNet() != null) {
+                    ciPin.getNet().basicAddRoutedSink(ciPin);
+                }
+            }
+        }
+        */
+
 	}
 	
 	/**
@@ -848,7 +893,7 @@ public class CellNet implements Serializable {
 	}
 	
 	/**
-	 * Adds a RouteTree object that connects to the specified BelPin. 
+	 * Adds a RouteTree object that connects to the specified BelPin sink.
 	 * 
 	 * @param bp Connecting BelPin
 	 * @param route RouteTree leading to that BelPin
@@ -862,7 +907,9 @@ public class CellNet implements Serializable {
 	}
 	
 	/**
-	 * Adds a RouteTree object that starts at the specified SitePin
+	 * Adds a RouteTree object that starts at the specified SitePin.
+	 * Note: This method has a bad name, as the route trees aren't necessarily sinks.
+	 * In fact, a net may completely begin at one of these trees.
 	 * 
 	 * @param sp Source SitePin
 	 * @param route RouteTree sourced by the SitePin
@@ -922,6 +969,24 @@ public class CellNet implements Serializable {
 	}
 
 	/**
+	 * Returns a set of all the sink sites for the net.
+	 */
+	public Set<Site> getSinkSites() {
+		return getSinkSitePins().stream()
+				.map(SitePin::getSite)
+				.collect(Collectors.toSet());
+	}
+
+	/**
+	 * Returns a set of all the sink tiles for the net.
+	 */
+	public Set<Tile> getSinkTiles() {
+		return getSinkSitePins().stream()
+				.map(sitePin -> sitePin.getSite().getTile())
+				.collect(Collectors.toSet());
+	}
+
+	/**
 	 * Returns a list of {@link SitePin} objects that are sinks for the net.
 	 */
 	public List<SitePin> getSinkSitePins() {
@@ -933,27 +998,61 @@ public class CellNet implements Serializable {
 	}
 
 	/**
+	 * Returns a list of {@link SitePin} objects that map to the passed in cell pin.
+	 * This is usually only one SitePin, but is more than one in some cases (such as with some LUT RAM pins).
+	 * @param cellPin the cell pin to use to find the site pin
+	 * @return the SitePin that maps to the cellpin.
+	 */
+	public List<SitePin> getSinkSitePins(CellPin cellPin) {
+		List<SitePin> sitePins = null;
+		for (BelPin belPin : cellPin.getMappedBelPins()) {
+			RouteTree routeTree = belPinToSinkRTMap.get(belPin);
+
+			// Get the route tree that starts at the site pin
+			while (routeTree.getParent() != null) {
+				routeTree = routeTree.getParent();
+			}
+
+			SitePin sitePin = routeTree.getWire().getReverseConnectedPin();
+			if (sitePin != null) {
+				if (sitePins == null)
+					sitePins = new ArrayList<>();
+				sitePins.add(sitePin);
+			}
+		}
+		return sitePins;
+	}
+
+	/**
 	 * Returns a {@link SitePin} object that maps to the passed in cell pin.
 	 * @param cellPin the cell pin to use to find the site pin
 	 * @return the SitePin that maps to the cellpin.
 	 */
+	/*
 	public SitePin getSinkSitePin(CellPin cellPin) {
-		RouteTree routeTree = belPinToSinkRTMap.get(cellPin.getMappedBelPin());
 
-		if (routeTree == null) {
-			// There is no corresponding sink route tree, so there is no corresponding site pin
-			return null;
+		if (cellPin.getMappedBelPinCount() > 1) {
+			System.out.println("What???");
 		}
 
-		// Get the route tree that starts at the site pin
-		while (routeTree.getParent() != null) {
-			routeTree = routeTree.getParent();
+		BelPin belPin = cellPin.getMappedBelPin();
+
+		if (belPin != null) {
+			RouteTree routeTree = belPinToSinkRTMap.get(cellPin.getMappedBelPin());
+
+			// Get the route tree that starts at the site pin
+			while (routeTree.getParent() != null) {
+				routeTree = routeTree.getParent();
+			}
+
+			// Get the connected site pin
+			// if null, it is an intra-site route and doesn't need to be routed to
+			return routeTree.getWire().getReverseConnectedPin();
 		}
 
-		// Get the connected site pin
-		// if null, it is an intra-site route and doesn't need to be routed to
-		return routeTree.getWire().getReverseConnectedPin();
+		return null;
 	}
+	*/
 	
 	/**
 	 * Returns a RouteTree object that is connected to the specified CellPin. If the CellPin
@@ -1063,7 +1162,20 @@ public class CellNet implements Serializable {
 	 * */
 	public RouteStatus computeRouteStatus() {
 		int subtractCount = (isStaticNet() || isSourcePinMapped()) ? 1 : 0;
-		
+
+		// Nets route to CI and CYINIT pins of CARRY cells in the netlist, even though only one of these pins is ever
+        // physically routed to at a time. The other pin will belong to the GND net, but it won't ever be routed to.
+        // Because of this, the extra CI/CYINIT pin should no contirube to the route status of the GND net.
+        // TODO: Does this apply to VCC as well?
+
+        if (isGNDNet()) {
+            // Count one per cell in order to get the number to remove
+            subtractCount += pins.stream().filter(cellPin -> cellPin.getCell().getType().contains("CARRY"))
+                    .filter(cellPin -> cellPin.getName().equals("CI") || cellPin.getName().equals("CYINIT"))
+                    .map(CellPin::getCell)
+                    .collect(Collectors.toSet())
+                    .size();
+        }
 
 		if(sourcePin == null){
 			routeStatus = RouteStatus.FULLY_ROUTED;

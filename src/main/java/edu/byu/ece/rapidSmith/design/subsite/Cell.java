@@ -54,6 +54,8 @@ public class Cell {
 	private final Map<String, CellPin> pinMap;
 	/**	Set of pseudo pins attached to the cell */
 	private Set<CellPin> pseudoPins;
+	/** Whether the cell is a pseudo cell */
+	private boolean pseudo;
 	
 	// Macro specific cell categories.
 	
@@ -63,19 +65,25 @@ public class Cell {
 	private Map<String, Cell> internalCells;
 	/** Mapping of net name to internal net*/
 	private Map<String, CellNet> internalNets;
-	
+
+
+	public Cell(String name, LibraryCell libCell) {
+		this(name, libCell, false);
+	}
+
 	/**
 	 * Creates a new cell with specified name and type.
 	 *
 	 * @param name name of the new cell
 	 * @param libCell the library cell to base this cell on
 	 */
-	public Cell(String name, LibraryCell libCell) {
+	public Cell(String name, LibraryCell libCell, boolean pseudo) {
 		Objects.requireNonNull(name);
 		Objects.requireNonNull(libCell);
 
 		this.name = name;
 		this.libCell = libCell;
+		this.pseudo = pseudo;
 		this.bonded = BondedType.INTERNAL;
 
 		this.design = null;
@@ -678,5 +686,9 @@ public class Cell {
 	@Override
 	public String toString() {
 		return "Cell{" + getName() + " " + (isPlaced() ? "@" + getBel().getFullName() : "") + "}";
+	}
+
+	public boolean isPseudo() {
+		return pseudo;
 	}
 }

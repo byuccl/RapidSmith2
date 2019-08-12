@@ -65,6 +65,24 @@ public final class Zynq implements FamilyInfo {
         return CLB_TILES;
     }
 
+    private static final HashSet<TileType> _CLB_L_TILES = new HashSet<>();
+
+    public static final Set<TileType> CLB_L_TILES = Collections.unmodifiableSet(_CLB_L_TILES);
+
+    @Override
+    public Set<TileType> clblTiles() {
+        return CLB_L_TILES;
+    }
+
+    private static final HashSet<TileType> _CLB_R_TILES = new HashSet<>();
+
+    public static final Set<TileType> CLB_R_TILES = Collections.unmodifiableSet(_CLB_R_TILES);
+
+    @Override
+    public Set<TileType> clbrTiles() {
+        return CLB_R_TILES;
+    }
+
     private static final HashSet<TileType> _SWITCHBOX_TILES = new HashSet<>();
 
     public static final Set<TileType> SWITCHBOX_TILES = Collections.unmodifiableSet(_SWITCHBOX_TILES);
@@ -637,6 +655,10 @@ public final class Zynq implements FamilyInfo {
         _CLB_TILES.add(TileTypes.CLBLL_R);
         _CLB_TILES.add(TileTypes.CLBLM_L);
         _CLB_TILES.add(TileTypes.CLBLM_R);
+        _CLB_L_TILES.add(TileTypes.CLBLL_L);
+        _CLB_L_TILES.add(TileTypes.CLBLM_L);
+        _CLB_R_TILES.add(TileTypes.CLBLL_R);
+        _CLB_R_TILES.add(TileTypes.CLBLM_R);
         _SWITCHBOX_TILES.add(TileTypes.INT_L);
         _SWITCHBOX_TILES.add(TileTypes.INT_R);
         _BRAM_TILES.add(TileTypes.BRAM_L);

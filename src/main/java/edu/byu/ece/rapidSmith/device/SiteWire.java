@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 import static java.util.Collections.singleton;
 
 /**
- *
+ * A wire inside a site.
  */
 public class SiteWire implements Wire, Serializable {
 

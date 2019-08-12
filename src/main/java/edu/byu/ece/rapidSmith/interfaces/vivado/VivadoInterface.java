@@ -24,14 +24,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
-import edu.byu.ece.rapidSmith.design.subsite.Cell;
-import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
-import edu.byu.ece.rapidSmith.design.subsite.CellLibrary;
-import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
-import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.design.subsite.*;
+import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.interfaces.StaticResourcesInterface;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
@@ -49,14 +49,165 @@ public final class VivadoInterface {
 	public static VivadoCheckpoint loadRSCP(String rscp) throws IOException {
 		return loadRSCP(rscp, false);
 	}
-	
+
+	/**
+	 * Creates a route tree, starting from an input site pin and ending at a BelPin.
+	 * Used for pesudo VCC pins.
+	 * @param net
+	 * @param sinkPin
+	 */
+	private static void createSinkRouteTree(CellNet net, BelPin sinkPin) {
+		// The BelPin must be a sink Lut BEL Pin
+		// TODO: Fix getWiresInNode for site wires.
+		// TODO: Add some safety checks.
+		Wire lutPinWire = sinkPin.getWire().getReverseWireConnections().iterator().next().getSinkWire();
+		SitePin sitePin = lutPinWire.getReverseConnectedPin();
+
+		RouteTree rt = new RouteTree(sitePin.getInternalWire());
+		rt.connect(lutPinWire.getWireConnections().iterator().next());
+
+		net.addSinkRouteTree(sitePin, rt);
+		net.addSinkRouteTree(sinkPin, rt);
+	}
+
+	private static void addPseudoVccPins(VivadoCheckpoint vivadoCheckpoint) {
+		CellDesign design = vivadoCheckpoint.getDesign();
+		CellNet vccNet = design.getVccNet();
+
+
+		// If a 5LUT Bel and a 6LUT Bel are both used, we must tie A6 to VCC
+
+		// Get ALL used LUT bels (including bels with no logical counterpart)
+		Collection<Bel> usedLut6Bels = new ArrayList<>(design.getUsedBels().stream()
+				.filter(bel -> bel.getName().matches("[A-D]6LUT"))
+				.collect(Collectors.toList()));
+		/*
+		usedLut6Bels.addAll(vivadoCheckpoint.getVccSourceBels().stream()
+		.filter(bel -> bel.getName().matches("[A-D]6LUT"))
+		.collect(Collectors.toList()));
+		usedLut6Bels.addAll(vivadoCheckpoint.getGndSourceBels().stream()
+				.filter(bel -> bel.getName().matches("[A-D]6LUT"))
+				.collect(Collectors.toList()));
+		usedLut6Bels.addAll(vivadoCheckpoint.getBelRoutethroughs().stream()
+				.filter(bel -> bel.getName().matches("[A-D]6LUT"))
+				.collect(Collectors.toList()));
+				*/
+
+
+		Collection<Bel> usedLut5Bels = new ArrayList<>();
+		usedLut5Bels.addAll(design.getUsedBels().stream()
+				.filter(bel -> bel.getName().matches("[A-D]5LUT"))
+				.collect(Collectors.toList()));
+		/*
+		usedLut5Bels.addAll(vivadoCheckpoint.getVccSourceBels().stream()
+				.filter(bel -> bel.getName().matches("[A-D]5LUT"))
+				.collect(Collectors.toList()));
+		usedLut5Bels.addAll(vivadoCheckpoint.getGndSourceBels().stream()
+				.filter(bel -> bel.getName().matches("[A-D]5LUT"))
+				.collect(Collectors.toList()));
+		usedLut5Bels.addAll(vivadoCheckpoint.getBelRoutethroughs().stream()
+				.filter(bel -> bel.getName().matches("[A-D]5LUT"))
+				.collect(Collectors.toList()));
+		*/
+
+
+		for (Bel bel : usedLut6Bels) {
+			Cell cell = design.getCellAtBel(bel);
+			assert (cell != null);
+
+			switch (cell.getType()) {
+				case "SRLC32E":
+					CellPin pin = cell.attachPseudoPin("pseudoA1", PinDirection.IN);
+					BelPin belPin = bel.getBelPin("A1");
+					pin.mapToBelPin(belPin);
+					vccNet.connectToPin(pin);
+					createSinkRouteTree(vccNet, belPin);
+					break;
+				case "SRLC16E":
+				case "SRL16E":
+					CellPin a1pin = cell.attachPseudoPin("pseudoA1", PinDirection.IN);
+					belPin = bel.getBelPin("A1");
+					a1pin.mapToBelPin(belPin);
+					vccNet.connectToPin(a1pin);
+					createSinkRouteTree(vccNet, belPin);
+					CellPin a6pin = cell.attachPseudoPin("pseudoA6", PinDirection.IN);
+					belPin = bel.getBelPin("A6");
+					a6pin.mapToBelPin(belPin);
+					vccNet.connectToPin(a6pin);
+					createSinkRouteTree(vccNet, belPin);
+					break;
+				case "RAMS32":
+				case "RAMD32":
+					CellPin wa6pin = cell.attachPseudoPin("pseudoWA6", PinDirection.IN);
+					belPin = bel.getBelPin("WA6");
+					wa6pin.mapToBelPin(belPin);
+					vccNet.connectToPin(wa6pin);
+					createSinkRouteTree(vccNet, belPin);
+					a6pin = cell.attachPseudoPin("pseudoA6", PinDirection.IN);
+					belPin = bel.getBelPin("A6");
+					a6pin.mapToBelPin(belPin);
+					vccNet.connectToPin(a6pin);
+					createSinkRouteTree(vccNet, belPin);
+					break;
+				default:
+					break;
+			}
+		}
+
+		for (Bel bel : usedLut5Bels) {
+			Cell cell = design.getCellAtBel(bel);
+
+			assert (cell != null);
+
+			// Check to see if both the LUT6 and LUT5 BEL are used
+			Bel lut6Bel = bel.getSite().getBel(bel.getName().charAt(0) + "6LUT");
+			Cell lut6Cell = design.getCellAtBel(lut6Bel);
+			if (usedLut6Bels.contains(lut6Bel)) {
+				BelPin belPin = lut6Bel.getBelPin("A6");
+
+				boolean macroPseudoPin = false;
+				// Pseudo pins may have already been created for macro cells
+				// TODO: Get rid of this duplication of efforts.
+				for (CellPin pseudoPin : lut6Cell.getPseudoPins()) {
+					if (pseudoPin.getMappedBelPin().equals(belPin))
+						macroPseudoPin = true;
+				}
+
+				if (!macroPseudoPin) {
+					CellPin pin = lut6Cell.attachPseudoPin("pseudoA6", PinDirection.IN);
+
+					// Assume that vcc can be routed to this pin.
+					pin.mapToBelPin(belPin);
+					vccNet.connectToPin(pin);
+					createSinkRouteTree(vccNet, belPin);
+				}
+			}
+
+			if (cell.getType().equals("SRLC16E") || cell.getType().equals("SRL16E")) {
+				CellPin pin = cell.attachPseudoPin("pseudoA1", PinDirection.IN);
+				BelPin belPin = bel.getBelPin("A1");
+				pin.mapToBelPin(belPin);
+				vccNet.connectToPin(pin);
+				createSinkRouteTree(vccNet, belPin);
+			}
+
+		}
+
+	}
+
+	public static VivadoCheckpoint loadRSCP (String rscp, boolean storeAdditionalInfo) throws IOException {
+		return loadRSCP(rscp, storeAdditionalInfo, false);
+	}
+
 	/**
 	 * Parses a RSCP generated from Tincr, and creates an equivalent RapidSmith2 design.
-	 * 
 	 * @param rscp Path to the RSCP to import
+	 * @param storeAdditionalInfo
+	 * @param addPseudoVccPins Whether to detect and add pseudo VCC pins based off of the placement.
+	 * @return
 	 * @throws IOException
 	 */
-	public static VivadoCheckpoint loadRSCP (String rscp, boolean storeAdditionalInfo) throws IOException {
+	public static VivadoCheckpoint loadRSCP (String rscp, boolean storeAdditionalInfo, boolean addPseudoVccPins) throws IOException {
 	
 		Path rscpPath = Paths.get(rscp);
 		
@@ -102,7 +253,7 @@ public final class VivadoInterface {
 		String placementFile = rscpPath.resolve("placement.rsc").toString();
 		XdcPlacementInterface placementInterface = new XdcPlacementInterface(design, device);
 		placementInterface.parsePlacementXDC(placementFile);
- 
+
 		String routingFile = rscpPath.resolve("routing.rsc").toString();
 		XdcRoutingInterface routingInterface = new XdcRoutingInterface(design, device, placementInterface.getPinMap(), libCells);
 		routingInterface.parseRoutingXDC(routingFile);
@@ -115,6 +266,33 @@ public final class VivadoInterface {
 			vivadoCheckpoint.setVccSourceBels(routingInterface.getVccSourceBels());
 			vivadoCheckpoint.setGndSourceBels(routingInterface.getGndSourceBels());
 			vivadoCheckpoint.setBelPinToCellPinMap(placementInterface.getPinMap());
+
+			// Create pseudo cells for the routethroughs and static source BELs
+			for (Bel bel : vivadoCheckpoint.getBelRoutethroughs()) {
+				// assuming LUT Bel
+				Cell cell = new Cell("Pseudo_" + bel.getSite().getName() + "_" + bel.getName(), libCells.get("LUT1"), true);
+				design.addCell(cell);
+				design.placeCell(cell, bel);
+			}
+
+			for (Bel bel : vivadoCheckpoint.getVccSourceBels()) {
+				// assuming LUT Bel
+				Cell cell = new Cell("Pseudo_" + bel.getSite().getName() + "_" + bel.getName(), libCells.get("LUT1"), true);
+				design.addCell(cell);
+				design.placeCell(cell, bel);
+			}
+
+			for (Bel bel : vivadoCheckpoint.getGndSourceBels()) {
+				// assuming LUT Bel
+				Cell cell = new Cell("Pseudo_" + bel.getSite().getName() + "_" + bel.getName(), libCells.get("LUT1"), true);
+				design.addCell(cell);
+				design.placeCell(cell, bel);
+			}
+		}
+
+		if (addPseudoVccPins) {
+			// Detect and add pseudo VCC pins based off of the placement.
+			addPseudoVccPins(vivadoCheckpoint);
 		}
 
 		// Mark the used static resources
@@ -144,6 +322,14 @@ public final class VivadoInterface {
 		}
 	}
 
+	private static void removePseudoLuts(CellDesign design) {
+		for (Cell staticSource : design.getCells().stream()
+				.filter(Cell::isPseudo)
+				.collect(Collectors.toList())) {
+			design.removeCell(staticSource);
+		}
+	}
+
 	/**
 	 * Export the RapidSmith2 design into an existing TINCR checkpoint file.
 	 *
@@ -165,6 +351,8 @@ public final class VivadoInterface {
 	 */
 	public static void writeTCP(String tcpDirectory, CellDesign design, Device device, CellLibrary libCells, boolean intrasiteRouting) throws IOException {
 		new File(tcpDirectory).mkdir();
+
+		removePseudoLuts(design);
 
 		// Remove static-source LUTs
 		removeStaticSourceLUTs(design);

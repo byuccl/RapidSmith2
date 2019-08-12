@@ -66,6 +66,24 @@ public final class Virtex6 implements FamilyInfo {
         return CLB_TILES;
     }
 
+    private static final HashSet<TileType> _CLB_L_TILES = new HashSet<>();
+
+    public static final Set<TileType> CLB_L_TILES = Collections.unmodifiableSet(_CLB_L_TILES);
+
+    @Override
+    public Set<TileType> clblTiles() {
+        return CLB_L_TILES;
+    }
+
+    private static final HashSet<TileType> _CLB_R_TILES = new HashSet<>();
+
+    public static final Set<TileType> CLB_R_TILES = Collections.unmodifiableSet(_CLB_R_TILES);
+
+    @Override
+    public Set<TileType> clbrTiles() {
+        return CLB_R_TILES;
+    }
+
     private static final HashSet<TileType> _SWITCHBOX_TILES = new HashSet<>();
 
     public static final Set<TileType> SWITCHBOX_TILES = Collections.unmodifiableSet(_SWITCHBOX_TILES);
@@ -534,6 +552,8 @@ public final class Virtex6 implements FamilyInfo {
         /* ------ CLASSIFICATIONS GO HERE ------ */
         _CLB_TILES.add(TileTypes.CLBLL);
         _CLB_TILES.add(TileTypes.CLBLM);
+        _CLB_L_TILES.add(TileTypes.CLBLL);
+        _CLB_R_TILES.add(TileTypes.CLBLM);
         _SWITCHBOX_TILES.add(TileTypes.INT);
         _BRAM_TILES.add(TileTypes.BRAM);
         _DSP_TILES.add(TileTypes.DSP);

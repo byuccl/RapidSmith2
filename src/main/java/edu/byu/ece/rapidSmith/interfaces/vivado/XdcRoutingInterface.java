@@ -220,13 +220,9 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	 * where space separated elements are different elements in the array
 	 */
 	private void processIntersitePins(String[] toks) {
-		
-		CellNet net = tryGetCellNet(toks[1]);		
-		
+		CellNet net = tryGetCellNet(toks[1]);
 		for (int index = 2 ; index < toks.length; index++) {
-			
 			String[] sitePinToks = toks[index].split("/");
-			
 			assert (sitePinToks.length == 2);
 			
 			Site site = tryGetSite(sitePinToks[0]);
@@ -236,16 +232,12 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 				createIntrasiteRoute(pin, net, design.getUsedSitePipsAtSite(site));
 			}
 			else { // pin is an output of the site
-				
 				if (net.getSourceSitePin() != null) {
 					net.addSourceSitePin(pin);
 					continue;
 				}
 				
 				// Most nets only have one source site pin, but CARRY4 cells can have "more than one" reported from vivado
-				//if (net.getSourceSitePin() == null) {
-				//	net.setSourceSitePin(pin);
-				//}
 				net.addSourceSitePin(pin);
 				CellPin sourceCellPin = tryGetNetSource(net);
 				BelPin sourceBelPin = tryGetMappedBelPin(sourceCellPin);
@@ -348,6 +340,10 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	 */
 	private void processIntersiteRoutePips(String[] toks) {
 		CellNet net = tryGetCellNet(toks[1]);
+
+		if (net.getName().equals("u2/gen_pipe[5].Pipe/Xo_reg_n_0_[16]"))
+			System.out.println("test 2");
+
 		Map<String, Set<String>> pipMap = buildPipMap(toks, 2);
 
 		// There is a bug in Vivado where site pins for some nets starting at PAD's are
@@ -363,7 +359,6 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 		
 		// Using the pip map, recreate each route as a RouteTree object
 		List<SitePin> pinsToRemove = new ArrayList<>();
-		//System.out.println(net.getSourceSitePins().size() + " " + net.getSourceSitePin().getName() + " " + net.getSourceSitePin().getExternalWire().getFullName());
 		for (SitePin sitePin : net.getSourceSitePins()) {
 			RouteTree netRouteTree = recreateRoutingNetwork2(net, sitePin.getExternalWire(), pipMap);
 			
@@ -444,7 +439,7 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 		while (!searchQueue.isEmpty()) {
 			
 			RouteTree routeTree = searchQueue.poll();
-			Wire sourceWire = routeTree.getWire();			
+			Wire sourceWire = routeTree.getWire();
 			// add connecting wires that exist in the net to the search queue
 
 			for (Connection conn : routeTree.getWire().getWireConnections()) {
@@ -469,6 +464,11 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 					visited.add(sinkWire);
 				}
 			}
+
+			// check to see if the current route tree object is connected to a valid sink site pin
+			SitePin sinkSitePin = routeTree.getConnectedSitePin();
+			if (sinkSitePin != null)
+				processSitePinSink(net, sinkSitePin);
 		}
 
 		return start;
@@ -479,6 +479,32 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 		Tile tile = tryGetTile(startWireToks[0]);
 		int wireEnum = tryGetWireEnum(startWireToks[1]);
 		return new TileWire(tile, wireEnum);
+	}
+
+	/**
+	 * When a route reaches a site pin, this function is called
+	 * to mark sink cell pins as routed, and add pseudo pins
+	 * to the design is necessary (for VCC and GND nets only)
+	 *
+	 * @param net {@link CellNet} the is currently being routed
+	 * @param sinkSitePin {@link SitePin} that the net routing has reached
+	 * @return {@code true} is connected to the net AND being used, {@code false} otherwise.
+	 *
+	 */
+	private void processSitePinSink(CellNet net, SitePin sinkSitePin) {
+		// update the net with the routed cell pins
+		IntrasiteRoute internalRoute = sitePinToRouteMap.get(sinkSitePin);
+
+		if (internalRoute != null) {
+			internalRoute.setSinksAsRouted();
+		}
+		else if (net.isStaticNet()) {
+			// implicit intrasite net. An Example is a GND/VCC net going to the A6 pin of a LUT.
+			// It does not actually show the bel pin as used, but it is being used.
+			// another example is the A1 pin on a SRL cell
+			//assert(net.isStaticNet()) : "Only static nets should connect to floating site pins: " + net.getName() + " " + sinkSitePin;
+			createStaticNetImplicitSinks(sinkSitePin, net);
+		}
 	}
 
 	/**
@@ -509,7 +535,7 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 
 	/**
 	 * Creates routing data structures for static nets (GND/VCC) that are
-	 * source by static LUTs.
+	 * sourced by static LUTs.
 	 *
 	 * @param toks A list of static source bels in the form: <br>
 	 * {@code STATIC_SOURCES site0/bel0/outputPin0 site1/bel1/outputPin1 ... siteN/belN/outputPinN}
@@ -785,7 +811,7 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	 * Searches through the specified {@link Site} for VCC and GND BELs,
 	 * and tries to create intrasite routing starting from those BELs if they are used.
 	 * There is no way in Vivado to tell if they are used, so we have to search 
-	 * each one. If the search reaches a {@link BelPin}, this mean the BEL source is being
+	 * each one. If the search reaches a {@link BelPin}, this means the BEL source is being
 	 * used and the site is completed. 
 	 *   
 	 * @param site {@link Site} object
@@ -834,6 +860,31 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	}
 
 	/**
+	 * Creates intrasite routing data structures for the route starting at the specified
+	 * {@link SitePin}. In particular, this is for static nets (GND/VCC) that have
+	 * terminated at a site pin, but the site pin has not been registered earlier during parsing.
+	 * This is due to the net connecting to a BelPin, but not a CellPin. In this case, a <b>pseudo pin</b>
+	 * will be created and attached to a cell if one exists on the bel.
+	 *
+	 * @param sitePin {@link SitePin} object
+	 * @param net VCC or GND {@link CellNet}
+	 */
+	private void createStaticNetImplicitSinks(SitePin sitePin, CellNet net) {
+
+		IntrasiteRoute staticRoute = new IntrasiteRouteSitePinSource(sitePin, net, true);
+		buildIntrasiteRoute(staticRoute, design.getUsedSitePipsAtSite(sitePin.getSite()));
+
+		if (!staticRoute.isValid()) {
+			// NOTE: there are cases in ultrascale where a static net connects to a site pin, but the signal goes nowhere in the site
+			// In this case, we simply return and don't apply the routing.
+			return;
+		}
+		staticRoute.applyRouting();
+		// we can set sinks as routed here because we only call this function if we reach a site pin
+		staticRoute.setSinksAsRouted();
+	}
+
+	/**
 	 * Creates a route starting at the specified {@link SitePin}, which terminates at BelPins inside the site.
 	 * The search is guided by the specified used site pips of the site.
 	 * If no valid route is found, an exception is thrown because this function.
@@ -854,10 +905,11 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 		
 		route.applyRouting();
 		sitePinToRouteMap.put(pin, route);
+        //route.setSinksAsRouted();
 	}
 	
 	/**
-	 * Creates a route starting at the specified {@link BelPin}, and terminates in either BelPins of {@link SitePin}s.
+	 * Creates a route starting at the specified {@link BelPin}, and terminates in either BelPins or {@link SitePin}s.
 	 * The search is guided by the used site pips of the site. If no valid route is found, an exception is thrown 
 	 * 
 	 * @param pin Bel Pin to start the route
@@ -1393,7 +1445,6 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	 * @return Vivado ROUTE string
 	 */
 	public static String getVivadoRouteString(CellNet net) {
-		
 		if (net.getIntersiteRouteTreeList().size() == 1) {
 			RouteTree route = net.getIntersiteRouteTree();
 			return createVivadoRoutingString(route.getRoot());
@@ -1532,12 +1583,24 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 		}
 
 		@Override
-		public void applyRouting() {
+		public void applyRouting() { // for source site pins
 
 			net.addSinkRouteTree(source, route);
 
 			for (BelPin pin : this.belPinSinks) {
 				net.addSinkRouteTree(pin, route);
+				//net.addRoutedSink();
+
+				//assert (belPinToCellPinMap.containsKey(pin));
+
+				// TODO: Something is still wrong. When are errors occurring??
+				// These weren't being set as routed before, resulting in incorrect route status upon design import
+				//net.addRoutedSink(belPinToCellPinMap.get(pin));
+
+				//belPinSinks.stream()
+				//		.filter(belPinToCellPinMap::containsKey)
+				//		.map(belPinToCellPinMap::get)
+				////		.forEach(net::addRoutedSink);
 				 
 				if (allowUnusedBelPins && !belPinToCellPinMap.containsKey(pin)) {
 					createAndAttachPseudoPin(pin);
@@ -1630,7 +1693,6 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 			
 			if (isContained) {
 				return false;
-				// throw new AssertionError("Contained instrasite route should not reach site pin: " + sitePin );
 			}
 						
 			sitePinSinks.add(sitePin);
@@ -1676,7 +1738,6 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 					assert pin.getNet().isStaticNet() : "Net mismatch should only happen for static nets";
 					assert belPinSinks.size() == 1 : "Only one bel pin expected";
 					net = pin.getNet();
-					
 				}
 				
 				net.addSinkRouteTree(bp, route);
@@ -1701,10 +1762,11 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 		}
 		
 		@Override
-		public void setSinksAsRouted() {
-			// by definition, if the source of a intrasite is a bel pin,
+		public void setSinksAsRouted() { // called when doing an output intersite pin
+			// by definition, if the source of a intra-site net is a bel pin,
 			// then all bel pin sinks are routed
-			for (BelPin belPin : belPinSinks) {
+			//assert (belPinSinks.size() == 0);
+			for (BelPin belPin : belPinSinks) { // Isn't this always going to be 0? No. When not 0?
 				CellPin cellPin = belPinToCellPinMap.get(belPin);
 				net.addRoutedSink(cellPin);
 			}

@@ -1214,7 +1214,7 @@ public final class DeviceGenerator {
 				for (String sitePin : site.getSinks().keySet()) {
 					Integer wire = getExternalWireForSitePin(altType, sitePin);
 					if (wire == null)
-						System.out.println("There be an error here");
+						System.err.println("ERROR: Expected an external wire from site pin " + sitePin);
 					altExternalPinWires.put(sitePin, wire);
 				}
 

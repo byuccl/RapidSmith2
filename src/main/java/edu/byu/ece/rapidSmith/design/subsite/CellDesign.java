@@ -204,7 +204,7 @@ public class CellDesign extends AbstractDesign {
 	 * are returned.
 	 */
 	public Stream<Cell> getLeafCells() {
-		return cellMap.values().stream().flatMap(c -> _flatten(c));
+		return cellMap.values().stream().flatMap(this::_flatten);
 	}
 	
 	/**
@@ -241,7 +241,7 @@ public class CellDesign extends AbstractDesign {
 	 * Returns a stream of {@link Cell} objects that are top-level ports of the design.
 	 */
 	public Stream<Cell> getPorts(){
-		return cellMap.values().stream().filter(c -> c.isPort());
+		return cellMap.values().stream().filter(Cell::isPort);
 	}
 	
 	/**
@@ -494,8 +494,6 @@ public class CellDesign extends AbstractDesign {
 
 	/**
 	 * Returns the power(VCC) net of the design
-	 * 
-	 * @return
 	 */
 	public CellNet getVccNet() {
 		return vccNet;
@@ -503,8 +501,6 @@ public class CellDesign extends AbstractDesign {
 	
 	/**
 	 * Returns the ground(GND) net of the design
-	 * 
-	 * @return
 	 */
 	public CellNet getGndNet() {
 		return gndNet;
@@ -808,7 +804,18 @@ public class CellDesign extends AbstractDesign {
 	public void addPIPInputValsAtSite(Site ps, Map<String, String> pipInVals){
 		this.pipInValues.put(ps, pipInVals);
 	}
-	
+
+	public void addPipInputValAtSite(Site site, String pip, String inputVal) {
+		if (this.getPIPInputValsAtSite(site) == null) {
+			Map<String, String> pipToInputVals = new HashMap<>();
+			pipToInputVals.put(pip, inputVal);
+			this.pipInValues.put(site, pipToInputVals);
+		}
+		else {
+			this.getPIPInputValsAtSite(site).put(pip, inputVal);
+		}
+	}
+
 	/**
 	 * Returns a mapping of used PIPs to their input route
 	 * @param ps {@link Site} object

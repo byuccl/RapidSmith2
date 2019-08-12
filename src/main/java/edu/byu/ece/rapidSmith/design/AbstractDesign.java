@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Brigham Young University
+ * Copyright (c) 2019 Brigham Young University
  *
  * This file is part of the BYU RapidSmith Tools.
  *

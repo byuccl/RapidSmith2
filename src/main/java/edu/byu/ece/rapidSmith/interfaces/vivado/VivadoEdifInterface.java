@@ -343,6 +343,7 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 						
 			Cell parentCell = cellPin.getCell();
 
+			System.out.println(parentCell.getName());
 			EdifPortRef portRef = parentCell.isPort() ?
 									createEdifPortRefFromPort(parentCell, edifParentCell, edifNet, portInfoMap.get(parentCell).getMin()) : 
 									createEdifPortRefFromCellPin(cellPin, edifParentCell, edifNet) ;
@@ -374,8 +375,16 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 		EdifPort edifPort = edifParent.getPort(toks[0]);
 		
 		if (edifPort == null) {
+			if (toks[0].equals("clock_N"))
+
 			edifPort = edifParent.getPort(getEdifName(toks[0]));
 		}
+
+		if (edifPort == null) {
+			System.out.println("uhgdf");
+		}
+
+		// What if edif port is STILL null?
 		
 		int portIndex = 1;
 		if (toks.length == 2 && edifPort.getWidth() > 1) {

@@ -34,6 +34,8 @@ public interface FamilyInfo {
 	List<TileType> tileTypes();
 	List<SiteType> siteTypes();
 	Set<TileType> clbTiles();
+	Set<TileType> clblTiles();
+	Set<TileType> clbrTiles();
 	Set<TileType> switchboxTiles();
 	Set<TileType> bramTiles();
 	Set<TileType> dspTiles();

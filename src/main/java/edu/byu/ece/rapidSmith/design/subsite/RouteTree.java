@@ -65,6 +65,25 @@ public class RouteTree extends AbstractRouteTree<RouteTree> {
 	}
 
 	/**
+	 * Gets all the leaf nodes for a tree.
+	 * @return a collection of all the leaves.
+	 */
+	/*
+	public Collection<? extends RouteTree> getLeaves() {
+		Collection<? extends RouteTree> leaves = new ArrayList<>();
+
+		for (? rt : this) {
+			if (rt.isLeaf()) {
+				leaves.add(rt);
+			}
+		}
+
+		return leaves;
+	}
+*/
+
+
+	/**
 	 * @return the {@link Connection} connecting this node to its parent or null if this
 	 * node is a root
 	 */
@@ -118,7 +137,7 @@ public class RouteTree extends AbstractRouteTree<RouteTree> {
 	}
 	
 	/**
-	 * @deprecated use {@link #connect(Connection, AbstractRouteTree)}
+	 * @deprecated use {@link #connect(Connection, RouteTree)}
 	 */
 	@Deprecated
 	public final RouteTree addConnection(Connection c, RouteTree sink) {
@@ -204,10 +223,10 @@ public class RouteTree extends AbstractRouteTree<RouteTree> {
 				RouteTree copyChild = origChild.newInstance(origChild.getWire());
 				pair.copy.connect(origChild.getConnection(), copyChild);
 				q.add(new CopyPair(origChild, copyChild));
-	}
-	}
-		return (S) copy;
+			}
 		}
+		return (S) copy;
+	}
 
 	private static class CopyPair {
 		RouteTree orig;
