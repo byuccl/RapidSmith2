@@ -22,7 +22,6 @@ package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.design.NetType;
 import edu.byu.ece.rapidSmith.device.*;
-import edu.byu.ece.rapidSmith.device.families.FamilyInfos;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
 import java.io.Serializable;
@@ -468,6 +467,38 @@ public class CellNet implements Serializable {
 		
 		return false;
 	}
+
+    /**
+     * Checks if a net is a local clk net and should use local routing resources (despite being a clock net).
+     * Specifically, checks if at least one sink pin is of type {@link CellPinType#CLOCK}, but is not sourced
+     * by a BUFG pin. This will need to be updated if additional pins are found to drive global clk nets.
+     * @return {@code true} if this net is a local clock net
+     */
+	public boolean isLocalClkNet() {
+        if (sourcePins.size() != 1)
+            return false;
+
+        if (sourcePin.getCell().getType().equals("BUFG"))
+            return false;
+
+        return isClkNet();
+    }
+
+    /**
+     * Checks if the net is a global clock net and should use global clock routing resources.
+     * Specifically, checks that the source pin is a BUFG output pin and that at least one of the sink pins is of type
+     * {@link CellPinType#CLOCK}. This will need to be updated if additional pins are found to drive global clk nets.
+     * @return {@code true} if this net is a global clock net
+     */
+    public boolean isGlobalClkNet() {
+        if (sourcePins.size() != 1)
+            return false;
+
+        if (!sourcePin.getCell().getType().equals("BUFG"))
+            return false;
+
+        return isClkNet();
+    }
 
 	public boolean isClkBufferNet() {
         if (isStaticNet())
@@ -1144,6 +1175,8 @@ public class CellNet implements Serializable {
 	 * @return The {@link RouteStatus} of the current net
 	 */
 	public RouteStatus getRouteStatus() {
+		if (routeStatus == null)
+			return computeRouteStatus();
 		return routeStatus;
 	}
 	
