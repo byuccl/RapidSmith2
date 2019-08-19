@@ -40,7 +40,6 @@ import java.util.stream.Collectors;
  *  
  */
 public class CellNet implements Serializable {
-	
 	/** Unique Serialization ID for this class*/
 	private static final long serialVersionUID = 6082237548065721803L;
 	/** Unique name of the net */
@@ -63,23 +62,8 @@ public class CellNet implements Serializable {
 	private boolean isInternal;
 	/** Route status of the net*/
 	private RouteStatus routeStatus;
-    /** Aliases for this cellnet */
+    /** Aliases for this cell net */
     private Set<CellNet> aliases;
-
-	public Set<SitePin> getLoneSinkSitePins() {
-		return loneSinkSitePins;
-	}
-
-	public void setLoneSinkSitePins(Set<SitePin> loneSinkSitePins) {
-		this.loneSinkSitePins = loneSinkSitePins;
-	}
-
-	public void addLoneSinkSitePin(SitePin sitePin) {
-		loneSinkSitePins.add(sitePin);
-	}
-
-	/** Sink site pins that have no corresponding cell pin */
-    private Set<SitePin> loneSinkSitePins;
 	
 	// Physical route information
 	/** List of pins where the net leaves its source site*/ 
@@ -105,7 +89,6 @@ public class CellNet implements Serializable {
 	 */
 	public CellNet(String name, NetType type) {
 		Objects.requireNonNull(name);
-
 		this.name = name;
 		this.type = type;
 		this.isIntrasite = false;
@@ -120,7 +103,6 @@ public class CellNet implements Serializable {
 		this.multiSourceStatusSet = false;
 		sourcePins = new HashSet<>();
         aliases = new HashSet<>();
-		loneSinkSitePins = new HashSet<>();
 	}
 
 	/**
@@ -383,8 +365,7 @@ public class CellNet implements Serializable {
 	/**
 	 * Disconnects the net from all of its current pins
 	 */
-	public void detachNet() { 
-		
+	public void detachNet() {
 		pins.forEach(CellPin::clearNet);
 		
 		if (sourcePin != null) {
@@ -519,6 +500,10 @@ public class CellNet implements Serializable {
         return isClkNet();
     }
 
+	/**
+	 * Checks if the net is a clock buffer net. Specifically, checks if at least one pin is in a BUFG cell.
+	 * @return whether the net is a clock buffer net.
+	 */
 	public boolean isClkBufferNet() {
         if (isStaticNet())
             return false;
@@ -768,7 +753,6 @@ public class CellNet implements Serializable {
 		cellPin.forEach(this::addRoutedSink);
 	}
 
-
     /**
      * Marks the specified pin as being routed without checking for corresponding CI/CYINIT pins. It is up to the user
      * to keep the routed sinks up-to-date.
@@ -799,30 +783,6 @@ public class CellNet implements Serializable {
 	 */
 	public void addRoutedSink(CellPin cellPin) {
         basicAddRoutedSink(cellPin);
-
-        /*
-		if (!isStaticNet())
-		    System.out.println("nroaml");
-
-		// For CARRY cells, when a CI/CYINIT pin is routed to, the corresponding CYINIT/CI should not contribute to
-        // the overall route status of the net. While in Vivado these corresponding CYINIT/CI pins still show as
-        // being not routed, we consider them routed here for simplicity.
-        Cell cell = cellPin.getCell();
-        if (cell.getType().contains("CARRY")) {
-            if (cellPin.getName().equals("CI")) {
-                CellPin cyinitPin = cell.getPin("CYINIT");
-                if (cyinitPin.getNet() != null) {
-                    cyinitPin.getNet().basicAddRoutedSink(cyinitPin);
-                }
-            } else if (cellPin.getName().equals("CYINIT")) {
-                CellPin ciPin = cell.getPin("CI");
-                if (ciPin.getNet() != null) {
-                    ciPin.getNet().basicAddRoutedSink(ciPin);
-                }
-            }
-        }
-        */
-
 	}
 	
 	/**
@@ -851,8 +811,11 @@ public class CellNet implements Serializable {
 		routeStatus = RouteStatus.UNROUTED;
 	}
 
+	/**
+	 * Unroutes the inter-site portions of a net. This method is experimental and does not
+	 * work completely correctly yet.
+	 */
 	public void unrouteIntersite() {
-		//intersiteRoutes = null;
 		// TODO: Mark inter-site sinks as unrouted.
 		computeRouteStatus();
 	}
@@ -1055,10 +1018,6 @@ public class CellNet implements Serializable {
 	 * @return the SitePin that maps to the cellpin.
 	 */
 	public List<SitePin> getSinkSitePins(CellPin cellPin) {
-
-		//if (cellPin.getName().equals("pseudoCK"))
-	//		System.out.println("HAPPY?");
-
 		List<SitePin> sitePins = null;
 		for (BelPin belPin : cellPin.getMappedBelPins()) {
 			RouteTree routeTree = belPinToSinkRTMap.get(belPin);
@@ -1085,37 +1044,6 @@ public class CellNet implements Serializable {
     public void setAliases(Set<CellNet> aliases) {
         this.aliases = aliases;
     }
-
-	/**
-	 * Returns a {@link SitePin} object that maps to the passed in cell pin.
-	 * @param cellPin the cell pin to use to find the site pin
-	 * @return the SitePin that maps to the cellpin.
-	 */
-	/*
-	public SitePin getSinkSitePin(CellPin cellPin) {
-
-		if (cellPin.getMappedBelPinCount() > 1) {
-			System.out.println("What???");
-		}
-
-		BelPin belPin = cellPin.getMappedBelPin();
-
-		if (belPin != null) {
-			RouteTree routeTree = belPinToSinkRTMap.get(cellPin.getMappedBelPin());
-
-			// Get the route tree that starts at the site pin
-			while (routeTree.getParent() != null) {
-				routeTree = routeTree.getParent();
-			}
-
-			// Get the connected site pin
-			// if null, it is an intra-site route and doesn't need to be routed to
-			return routeTree.getWire().getReverseConnectedPin();
-		}
-
-		return null;
-	}
-	*/
 	
 	/**
 	 * Returns a RouteTree object that is connected to the specified CellPin. If the CellPin
@@ -1143,8 +1071,7 @@ public class CellNet implements Serializable {
 	 * @param cellPin sink CellPin
 	 * @return A Set of RouteTree objects that cellPin is connected to.
 	 */
-	public Set <RouteTree> getSinkRouteTrees(CellPin cellPin) {
-		
+	public Set<RouteTree> getSinkRouteTrees(CellPin cellPin) {
 		Set<RouteTree> connectedRouteTrees = new HashSet<>();
 		
 		for (BelPin belPin : cellPin.getMappedBelPins()) {
@@ -1213,8 +1140,8 @@ public class CellNet implements Serializable {
 	}
 
 	/**
-	 * Not for normal use. For aliases mainly.
-	 * @param routeStatus
+	 * Manually set the route status of the net. Not for normal use.
+	 * @param routeStatus the route status of the net
 	 */
 	public void setRouteStatus(RouteStatus routeStatus) {
 		this.routeStatus = routeStatus;

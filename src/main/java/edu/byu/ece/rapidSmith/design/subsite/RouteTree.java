@@ -65,25 +65,6 @@ public class RouteTree extends AbstractRouteTree<RouteTree> {
 	}
 
 	/**
-	 * Gets all the leaf nodes for a tree.
-	 * @return a collection of all the leaves.
-	 */
-	/*
-	public Collection<? extends RouteTree> getLeaves() {
-		Collection<? extends RouteTree> leaves = new ArrayList<>();
-
-		for (? rt : this) {
-			if (rt.isLeaf()) {
-				leaves.add(rt);
-			}
-		}
-
-		return leaves;
-	}
-*/
-
-
-	/**
 	 * @return the {@link Connection} connecting this node to its parent or null if this
 	 * node is a root
 	 */

@@ -340,10 +340,6 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	 */
 	private void processIntersiteRoutePips(String[] toks) {
 		CellNet net = tryGetCellNet(toks[1]);
-
-		if (net.getName().equals("u2/gen_pipe[5].Pipe/Xo_reg_n_0_[16]"))
-			System.out.println("test 2");
-
 		Map<String, Set<String>> pipMap = buildPipMap(toks, 2);
 
 		// There is a bug in Vivado where site pins for some nets starting at PAD's are
@@ -423,7 +419,6 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	 * @return {@link RouteTree} representing the physical intersite route of the net
 	 */
 	private RouteTree recreateRoutingNetwork2(CellNet net, Wire startWire, Map<String, Set<String>> pipMap) {
-				
 		// initialize the routing data structure with the start wire
 		this.pipUsedInRoute = false;
 		RouteTree start = new RouteTree(startWire);

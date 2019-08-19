@@ -30,8 +30,6 @@ import java.util.stream.Collectors;
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.*;
-import edu.byu.ece.rapidSmith.device.families.FamilyInfo;
-import edu.byu.ece.rapidSmith.device.families.FamilyInfos;
 import edu.byu.ece.rapidSmith.interfaces.StaticResourcesInterface;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
@@ -78,37 +76,11 @@ public final class VivadoInterface {
 		// If a 5LUT Bel and a 6LUT Bel are both used, we must tie A6 to VCC
 
 		// Get ALL used LUT bels (including bels with no logical counterpart)
-		Collection<Bel> usedLut6Bels = new ArrayList<>(design.getUsedBels().stream()
-				.filter(bel -> bel.getName().matches("[A-D]6LUT"))
-				.collect(Collectors.toList()));
-		/*
-		usedLut6Bels.addAll(vivadoCheckpoint.getVccSourceBels().stream()
-		.filter(bel -> bel.getName().matches("[A-D]6LUT"))
-		.collect(Collectors.toList()));
-		usedLut6Bels.addAll(vivadoCheckpoint.getGndSourceBels().stream()
-				.filter(bel -> bel.getName().matches("[A-D]6LUT"))
-				.collect(Collectors.toList()));
-		usedLut6Bels.addAll(vivadoCheckpoint.getBelRoutethroughs().stream()
-				.filter(bel -> bel.getName().matches("[A-D]6LUT"))
-				.collect(Collectors.toList()));
-				*/
+		Collection<Bel> usedLut6Bels = design.getUsedBels().stream()
+				.filter(bel -> bel.getName().matches("[A-D]6LUT")).collect(Collectors.toList());
 
-
-		Collection<Bel> usedLut5Bels = new ArrayList<>();
-		usedLut5Bels.addAll(design.getUsedBels().stream()
-				.filter(bel -> bel.getName().matches("[A-D]5LUT"))
-				.collect(Collectors.toList()));
-		/*
-		usedLut5Bels.addAll(vivadoCheckpoint.getVccSourceBels().stream()
-				.filter(bel -> bel.getName().matches("[A-D]5LUT"))
-				.collect(Collectors.toList()));
-		usedLut5Bels.addAll(vivadoCheckpoint.getGndSourceBels().stream()
-				.filter(bel -> bel.getName().matches("[A-D]5LUT"))
-				.collect(Collectors.toList()));
-		usedLut5Bels.addAll(vivadoCheckpoint.getBelRoutethroughs().stream()
-				.filter(bel -> bel.getName().matches("[A-D]5LUT"))
-				.collect(Collectors.toList()));
-		*/
+		Collection<Bel> usedLut5Bels = design.getUsedBels().stream()
+				.filter(bel -> bel.getName().matches("[A-D]5LUT")).collect(Collectors.toList());
 
 
 		for (Bel bel : usedLut6Bels) {
@@ -195,7 +167,6 @@ public final class VivadoInterface {
 
 		// We have added pins, so we need to recalculate the route status
         vccNet.computeRouteStatus();
-
 	}
 
 	public static VivadoCheckpoint loadRSCP (String rscp, boolean storeAdditionalInfo) throws IOException {
@@ -211,7 +182,6 @@ public final class VivadoInterface {
 	 * @throws IOException
 	 */
 	public static VivadoCheckpoint loadRSCP (String rscp, boolean storeAdditionalInfo, boolean addPseudoVccPins) throws IOException {
-	
 		Path rscpPath = Paths.get(rscp);
 		
 		if (!rscpPath.getFileName().toString().endsWith(".rscp")) {
@@ -270,7 +240,6 @@ public final class VivadoInterface {
 			vivadoCheckpoint.setGndSourceBels(routingInterface.getGndSourceBels());
 			vivadoCheckpoint.setBelPinToCellPinMap(placementInterface.getPinMap());
 			addPseudoCells(vivadoCheckpoint, device, design, libCells);
-
 		}
 
 		if (addPseudoVccPins) {
@@ -335,17 +304,13 @@ public final class VivadoInterface {
 				design.placeCell(cell, bel);
 				BelPin belPin = bel.getBelPin("CK");
 				pseudoCK.mapToBelPin(bel.getBelPin("CK"));
-				//design.getGndNet().connectToPin(pseudoCK);
 				design.getVccNet().connectToPin(pseudoCK);
 
 				// Add a stand-in route-tree connecting the cell-pin sink and the sitepin.
 				String namePrefix = "intrasite:" + site.getType().name() + "/";
-			//	Collection<Wire> siteWires = site.getWires();
-
 				RouteTree routeTree = new RouteTree(site.getWire(namePrefix + "CLK.CLK"));
 				design.getVccNet().addSinkRouteTree(belPin, routeTree);
 
-				//design.getVccNet().addLoneSinkSitePin(site.getPin("CLK"));
 			} else {
 				// assuming LUT Bel
 				Cell cell = new Cell("Pseudo_" + bel.getSite().getName() + "_" + bel.getName(), libCells.get("LUT1"), true);

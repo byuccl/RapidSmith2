@@ -54,7 +54,7 @@ public class Cell {
 	private final Map<String, CellPin> pinMap;
 	/**	Set of pseudo pins attached to the cell */
 	private Set<CellPin> pseudoPins;
-	/** Whether the cell is a pseudo cell */
+	/** Whether the cell is a pseudo cell, which cannot be placed. */
 	private boolean pseudo;
 	
 	// Macro specific cell categories.
@@ -66,31 +66,26 @@ public class Cell {
 	/** Mapping of net name to internal net*/
 	private Map<String, CellNet> internalNets;
 
-
 	public Cell(String name, LibraryCell libCell) {
 		this(name, libCell, false);
 	}
 
 	/**
 	 * Creates a new cell with specified name and type.
-	 *
 	 * @param name name of the new cell
 	 * @param libCell the library cell to base this cell on
+	 * @param pseudo whether the cell is a pseudo cell.
 	 */
 	public Cell(String name, LibraryCell libCell, boolean pseudo) {
 		Objects.requireNonNull(name);
 		Objects.requireNonNull(libCell);
-
 		this.name = name;
 		this.libCell = libCell;
 		this.pseudo = pseudo;
 		this.bonded = BondedType.INTERNAL;
-
 		this.design = null;
 		this.bel = null;
-
 		this.properties = new PropertyList(libCell.getDefaultPropertyMap());
-		
 		this.pinMap = new HashMap<>();
 		for (LibraryPin pin : libCell.getLibraryPins()) {
 			this.pinMap.put(pin.getName(), new BackedCellPin(this, pin));
@@ -118,7 +113,6 @@ public class Cell {
 
 	void setName(String name) {
 		assert name != null;
-
 		this.name = name;
 	}
 	
@@ -693,6 +687,10 @@ public class Cell {
 		return "Cell{" + getName() + " " + (isPlaced() ? "@" + getBel().getFullName() : "") + "}";
 	}
 
+	/**
+	 * Gets whether the cell is a pseudo cell.
+	 * @return true if a pseudo cell.
+	 */
 	public boolean isPseudo() {
 		return pseudo;
 	}

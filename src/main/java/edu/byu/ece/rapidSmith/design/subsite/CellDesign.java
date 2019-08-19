@@ -217,7 +217,7 @@ public class CellDesign extends AbstractDesign {
 	 * @return A {@link Stream} of internal cells
 	 */
 	private Stream<Cell> _flatten(Cell cell) {
-		return cell.isMacro() ? cell.getInternalCells().stream() : Collections.singletonList(cell).stream();
+		return cell.isMacro() ? cell.getInternalCells().stream() : Stream.of(cell);
 	}
 	
 	/**
@@ -1052,8 +1052,8 @@ public class CellDesign extends AbstractDesign {
 		// TODO: For non 7-series designs, determine which ports are in-context and which are out-of-context
 		// TODO: Also check ImplementationMode.OUT_OF_CONTEXT
 		if (this.mode.equals(ImplementationMode.RECONFIG_MODULE))
-			return (cellMap.values().stream().flatMap(c -> _flatten(c))).filter(it -> !it.isPort());
+			return (cellMap.values().stream().flatMap(this::_flatten)).filter(it -> !it.isPort());
 		else
-			return cellMap.values().stream().flatMap(c -> _flatten(c));
+			return cellMap.values().stream().flatMap(this::_flatten);
 	}
 }
