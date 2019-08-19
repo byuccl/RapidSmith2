@@ -903,7 +903,6 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 		
 		route.applyRouting();
 		sitePinToRouteMap.put(pin, route);
-        //route.setSinksAsRouted();
 	}
 	
 	/**
@@ -1581,25 +1580,12 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 		}
 
 		@Override
-		public void applyRouting() { // for source site pins
-
+		public void applyRouting() {
 			net.addSinkRouteTree(source, route);
 
 			for (BelPin pin : this.belPinSinks) {
 				net.addSinkRouteTree(pin, route);
-				//net.addRoutedSink();
 
-				//assert (belPinToCellPinMap.containsKey(pin));
-
-				// TODO: Something is still wrong. When are errors occurring??
-				// These weren't being set as routed before, resulting in incorrect route status upon design import
-				//net.addRoutedSink(belPinToCellPinMap.get(pin));
-
-				//belPinSinks.stream()
-				//		.filter(belPinToCellPinMap::containsKey)
-				//		.map(belPinToCellPinMap::get)
-				////		.forEach(net::addRoutedSink);
-				 
 				if (allowUnusedBelPins && !belPinToCellPinMap.containsKey(pin)) {
 					createAndAttachPseudoPin(pin);
 				}
@@ -1760,11 +1746,10 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 		}
 		
 		@Override
-		public void setSinksAsRouted() { // called when doing an output intersite pin
+		public void setSinksAsRouted() {
 			// by definition, if the source of a intra-site net is a bel pin,
 			// then all bel pin sinks are routed
-			//assert (belPinSinks.size() == 0);
-			for (BelPin belPin : belPinSinks) { // Isn't this always going to be 0? No. When not 0?
+			for (BelPin belPin : belPinSinks) {
 				CellPin cellPin = belPinToCellPinMap.get(belPin);
 				net.addRoutedSink(cellPin);
 			}

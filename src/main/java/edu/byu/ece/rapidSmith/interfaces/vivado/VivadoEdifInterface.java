@@ -343,7 +343,6 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 						
 			Cell parentCell = cellPin.getCell();
 
-			System.out.println(parentCell.getName());
 			EdifPortRef portRef = parentCell.isPort() ?
 									createEdifPortRefFromPort(parentCell, edifParentCell, edifNet, portInfoMap.get(parentCell).getMin()) : 
 									createEdifPortRefFromCellPin(cellPin, edifParentCell, edifNet) ;

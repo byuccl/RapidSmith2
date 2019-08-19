@@ -210,10 +210,17 @@ public class Device implements Serializable {
 		return tiles[row][column];
 	}
 
+	/**
+	 * Gets the tiles within the specified row-column range.
+	 * @param minRow minimum tile row
+	 * @param minCol minimum column row
+	 * @param maxRow maximum tile row
+	 * @param maxCol maximum column row
+	 * @return a collection of the tiles within the range
+	 */
 	public Collection<Tile> getTiles(int minRow, int minCol, int maxRow, int maxCol) {
 		Collection<Tile> rangeTiles = new ArrayList<>();
 
-		// Assuming safe input values
 		for (int row = minRow; row <= maxRow; row++) {
 			rangeTiles.addAll(Arrays.asList(tiles[row]).subList(minCol, maxCol + 1));
 		}

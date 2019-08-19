@@ -62,8 +62,8 @@ public class CellNet implements Serializable {
 	private boolean isInternal;
 	/** Route status of the net*/
 	private RouteStatus routeStatus;
-    /** Aliases for this cell net */
-    private Set<CellNet> aliases;
+	/** Aliases for this cell net */
+	private Set<CellNet> aliases;
 	
 	// Physical route information
 	/** List of pins where the net leaves its source site*/ 
@@ -102,7 +102,7 @@ public class CellNet implements Serializable {
 		this.isMultiSourcedNet = false;
 		this.multiSourceStatusSet = false;
 		sourcePins = new HashSet<>();
-        aliases = new HashSet<>();
+		aliases = new HashSet<>();
 	}
 
 	/**
@@ -475,14 +475,14 @@ public class CellNet implements Serializable {
      * @return {@code true} if this net is a local clock net
      */
 	public boolean isLocalClkNet() {
-        if (sourcePins.size() != 1)
-            return false;
+		if (sourcePins.size() != 1)
+			return false;
 
-        if (sourcePin.getCell().getType().equals("BUFG"))
-            return false;
+		if (sourcePin.getCell().getType().equals("BUFG"))
+			return false;
 
-        return isClkNet();
-    }
+		return isClkNet();
+	}
 
     /**
      * Checks if the net is a global clock net and should use global clock routing resources.
@@ -490,15 +490,15 @@ public class CellNet implements Serializable {
      * {@link CellPinType#CLOCK}. This will need to be updated if additional pins are found to drive global clk nets.
      * @return {@code true} if this net is a global clock net
      */
-    public boolean isGlobalClkNet() {
-        if (sourcePins.size() != 1)
-            return false;
+	public boolean isGlobalClkNet() {
+		if (sourcePins.size() != 1)
+			return false;
 
-        if (!sourcePin.getCell().getType().equals("BUFG"))
-            return false;
+		if (!sourcePin.getCell().getType().equals("BUFG"))
+			return false;
 
-        return isClkNet();
-    }
+		return isClkNet();
+	}
 
 	/**
 	 * Checks if the net is a clock buffer net. Specifically, checks if at least one pin is in a BUFG cell.
@@ -1037,11 +1037,19 @@ public class CellNet implements Serializable {
 		return sitePins;
 	}
 
+	/**
+	 * Gets the aliases of the net.
+	 * @return the set of aliases.
+	 */
     public Set<CellNet> getAliases() {
         return aliases;
     }
 
-    public void setAliases(Set<CellNet> aliases) {
+	/**
+	 * Sets the aliases of the net.
+	 * @param aliases the set of aliases.
+	 */
+	public void setAliases(Set<CellNet> aliases) {
         this.aliases = aliases;
     }
 	

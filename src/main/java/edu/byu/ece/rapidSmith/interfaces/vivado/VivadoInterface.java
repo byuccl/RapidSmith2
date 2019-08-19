@@ -68,6 +68,10 @@ public final class VivadoInterface {
 		net.addSinkRouteTree(sinkPin, rt);
 	}
 
+	/**
+	 * Searches the design and adds pseudo cell pins for physical-only vcc routes that need to be made.
+	 * @param vivadoCheckpoint the Vivado checkpoint containing the device and design
+	 */
 	private static void addPseudoVccPins(VivadoCheckpoint vivadoCheckpoint) {
 		CellDesign design = vivadoCheckpoint.getDesign();
 		CellNet vccNet = design.getVccNet();
@@ -166,7 +170,7 @@ public final class VivadoInterface {
 		}
 
 		// We have added pins, so we need to recalculate the route status
-        vccNet.computeRouteStatus();
+		vccNet.computeRouteStatus();
 	}
 
 	public static VivadoCheckpoint loadRSCP (String rscp, boolean storeAdditionalInfo) throws IOException {
@@ -261,10 +265,6 @@ public final class VivadoInterface {
 
 	private static void addPseudoCells(VivadoCheckpoint vivadoCheckpoint, Device device, CellDesign design, CellLibrary libCells) {
 		// Create pseudo cells for the routethroughs and static source BELs
-		//for (Bel bel : vivadoCheckpoint.getBelRoutethroughs()) {
-
-		//}
-
 		for (Bel bel : vivadoCheckpoint.getVccSourceBels()) {
 			// assuming LUT Bel
 			Cell cell = new Cell("Pseudo_" + bel.getSite().getName() + "_" + bel.getName(), libCells.get("LUT1"), true);
@@ -336,6 +336,11 @@ public final class VivadoInterface {
 		}
 	}
 
+	/**
+	 * Removes pseudo lut cells from the design. Pseudo cells are only used when pseudo pins are needed for
+	 * physical routing.
+	 * @param design the design
+	 */
 	private static void removePseudoLuts(CellDesign design) {
 		for (Cell staticSource : design.getCells().stream()
 				.filter(Cell::isPseudo)

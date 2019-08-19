@@ -187,8 +187,6 @@ public abstract class AbstractRouteTree<T extends AbstractRouteTree<T>> implemen
 		return leaves;
 	}
 
-
-
 	/**
 	 * Prunes all branches not containing a node in set {@code toKeep}.
 	 * @param toKeep set of nodes to preserve in the tree
