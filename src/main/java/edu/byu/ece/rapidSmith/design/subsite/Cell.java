@@ -407,6 +407,11 @@ public class Cell {
 		
 		pin.setCell(this);
 		this.pinMap.put(pin.getName(), pin);
+
+		if ( pseudoPins == null ) {
+			pseudoPins = new HashSet<>(5);
+		}
+
 		this.pseudoPins.add(pin);
 		return true;
 	}

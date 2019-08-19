@@ -24,14 +24,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.*;
+import edu.byu.ece.rapidSmith.device.families.FamilyInfo;
+import edu.byu.ece.rapidSmith.device.families.FamilyInfos;
 import edu.byu.ece.rapidSmith.interfaces.StaticResourcesInterface;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
@@ -193,6 +193,9 @@ public final class VivadoInterface {
 
 		}
 
+		// We have added pins, so we need to recalculate the route status
+        vccNet.computeRouteStatus();
+
 	}
 
 	public static VivadoCheckpoint loadRSCP (String rscp, boolean storeAdditionalInfo) throws IOException {
@@ -266,28 +269,8 @@ public final class VivadoInterface {
 			vivadoCheckpoint.setVccSourceBels(routingInterface.getVccSourceBels());
 			vivadoCheckpoint.setGndSourceBels(routingInterface.getGndSourceBels());
 			vivadoCheckpoint.setBelPinToCellPinMap(placementInterface.getPinMap());
+			addPseudoCells(vivadoCheckpoint, device, design, libCells);
 
-			// Create pseudo cells for the routethroughs and static source BELs
-			for (Bel bel : vivadoCheckpoint.getBelRoutethroughs()) {
-				// assuming LUT Bel
-				Cell cell = new Cell("Pseudo_" + bel.getSite().getName() + "_" + bel.getName(), libCells.get("LUT1"), true);
-				design.addCell(cell);
-				design.placeCell(cell, bel);
-			}
-
-			for (Bel bel : vivadoCheckpoint.getVccSourceBels()) {
-				// assuming LUT Bel
-				Cell cell = new Cell("Pseudo_" + bel.getSite().getName() + "_" + bel.getName(), libCells.get("LUT1"), true);
-				design.addCell(cell);
-				design.placeCell(cell, bel);
-			}
-
-			for (Bel bel : vivadoCheckpoint.getGndSourceBels()) {
-				// assuming LUT Bel
-				Cell cell = new Cell("Pseudo_" + bel.getSite().getName() + "_" + bel.getName(), libCells.get("LUT1"), true);
-				design.addCell(cell);
-				design.placeCell(cell, bel);
-			}
 		}
 
 		if (addPseudoVccPins) {
@@ -305,6 +288,72 @@ public final class VivadoInterface {
 		}
 		
 		return vivadoCheckpoint;
+	}
+
+	private static void addPseudoCells(VivadoCheckpoint vivadoCheckpoint, Device device, CellDesign design, CellLibrary libCells) {
+		// Create pseudo cells for the routethroughs and static source BELs
+		//for (Bel bel : vivadoCheckpoint.getBelRoutethroughs()) {
+
+		//}
+
+		for (Bel bel : vivadoCheckpoint.getVccSourceBels()) {
+			// assuming LUT Bel
+			Cell cell = new Cell("Pseudo_" + bel.getSite().getName() + "_" + bel.getName(), libCells.get("LUT1"), true);
+			design.addCell(cell);
+			design.placeCell(cell, bel);
+		}
+
+		for (Bel bel : vivadoCheckpoint.getGndSourceBels()) {
+			// assuming LUT Bel
+			Cell cell = new Cell("Pseudo_" + bel.getSite().getName() + "_" + bel.getName(), libCells.get("LUT1"), true);
+			design.addCell(cell);
+			design.placeCell(cell, bel);
+		}
+
+		List<String> ffBels = new ArrayList<>(Arrays.asList("D5FF", "DFF", "C5FF", "CFF", "B5FF", "BFF", "A5FF", "AFF"));
+
+		// We must create pseudo cells for inferred latches, but not lut routethroughs since they are handled
+		// differently at the moment
+		for (BelRoutethrough belRoutethrough : vivadoCheckpoint.getRoutethroughObjects()) {
+			Bel bel = belRoutethrough.getBel();
+			Site site = bel.getSite();
+
+			if (ffBels.contains(bel.getName())) {
+				Cell cell = new Cell("Pseudo_" + site.getName() + "_" + bel.getName(), libCells.get("FDRE"), true);
+				design.addCell(cell);
+
+				// Don't assign anything to the D, Q, or CE pins since they should be handled within the site.
+				// The CLK will come into the site at the clock pin. For routers to know to route to this pin, a
+				// pseudo cell pin must be added to the cell.
+
+				// Note: I cannot check the CLK site PIP to see if it is used and which nets are involved.
+				// Additionally, the RSCP does not report that the clk pin is used. So, am I forced to resort
+				// to assume VCC is coming into the CLK pin, and is then inverted at the SITE PIP, brining GND
+				// to the FF BELs.
+				PseudoCellPin pseudoCK = new PseudoCellPin("pseudoCK", PinDirection.IN);
+				cell.attachPseudoPin(pseudoCK);
+				design.placeCell(cell, bel);
+				BelPin belPin = bel.getBelPin("CK");
+				pseudoCK.mapToBelPin(bel.getBelPin("CK"));
+				//design.getGndNet().connectToPin(pseudoCK);
+				design.getVccNet().connectToPin(pseudoCK);
+
+				// Add a stand-in route-tree connecting the cell-pin sink and the sitepin.
+				String namePrefix = "intrasite:" + site.getType().name() + "/";
+			//	Collection<Wire> siteWires = site.getWires();
+
+				RouteTree routeTree = new RouteTree(site.getWire(namePrefix + "CLK.CLK"));
+				design.getVccNet().addSinkRouteTree(belPin, routeTree);
+
+				//design.getVccNet().addLoneSinkSitePin(site.getPin("CLK"));
+			} else {
+				// assuming LUT Bel
+				Cell cell = new Cell("Pseudo_" + bel.getSite().getName() + "_" + bel.getName(), libCells.get("LUT1"), true);
+				design.addCell(cell);
+				design.placeCell(cell, bel);
+			}
+		}
+
 	}
 
 	/* Design Export */

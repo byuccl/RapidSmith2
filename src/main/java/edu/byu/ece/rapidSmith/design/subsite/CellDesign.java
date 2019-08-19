@@ -71,8 +71,8 @@ public class CellDesign extends AbstractDesign {
 	private Map<Site, Map<String, String>> pipInValues;
 	/** Map of partition pins (ooc ports) to their ooc tile and node **/
 	private Map<String, String> partPinMap;
-	/** MAp of wires to the specific net they are reserved for (if any) */
-	private Map<Wire, CellNet> reservedWires;
+	/** MAp of wires to the specific net(s) they are reserved for (if any) */
+	private Map<Wire, Set<CellNet>> reservedWires;
 	/** Set of reserved sites */
 	private Set<Site> reservedSites;
 	/** Map from RM port name(s) to the static net's name */
@@ -111,6 +111,7 @@ public class CellDesign extends AbstractDesign {
 		usedSitePipsMap = new HashMap<>();
 		mode = ImplementationMode.REGULAR;
 		pipInValues = new HashMap<>();
+		reservedWires = new HashMap<>();
 	}
 
 	/**
@@ -938,7 +939,7 @@ public class CellDesign extends AbstractDesign {
 	 * Returns the reserved wires
 	 * @return set of reserved wires
 	 */
-	public Map<Wire, CellNet> getReservedWires() {
+	public Map<Wire, Set<CellNet>> getReservedWires() {
 		return reservedWires;
 	}
 
@@ -949,10 +950,10 @@ public class CellDesign extends AbstractDesign {
 	 * @return whether the net can use the wire
 	 */
 	public boolean isWireAvailable(CellNet net, Wire wire) {
-		if (!reservedWires.containsKey(wire))
-			return true;
-		CellNet reservedNet = reservedWires.get(wire);
-		return net.equals(reservedNet);
+		if (reservedWires.containsKey(wire)) {
+			return reservedWires.get(wire) != null && reservedWires.get(wire).contains(net);
+		}
+		return true;
 	}
 
 	/**
@@ -962,9 +963,15 @@ public class CellDesign extends AbstractDesign {
 	 * @param net the net the wire is reserved for
 	 */
 	public void addReservedWire(Wire reservedWire, CellNet net) {
-		if (reservedWires == null)
-			reservedWires = new HashMap<>();
-		reservedWires.put(reservedWire, net);
+		if (reservedWires.containsKey(reservedWire)) {
+			// Assume the wires are aliases and can all reserve the same wire
+			reservedWires.get(reservedWire).add(net);
+		}
+		else {
+			Set<CellNet> nets = new HashSet<>();
+			nets.add(net);
+			reservedWires.put(reservedWire, nets);
+		}
 	}
 
 	/**
@@ -973,9 +980,12 @@ public class CellDesign extends AbstractDesign {
 	 * @param reservedWire the wire to reserve
 	 */
 	public void addReservedWire(Wire reservedWire) {
-		if (reservedWires == null)
-			reservedWires = new HashMap<>();
-		reservedWires.put(reservedWire, null);
+		if (reservedWires.containsKey(reservedWire) &&  reservedWires.get(reservedWire) != null) {
+			System.err.println("[WARNING]: " + reservedWire.getFullName() + " is already reserved by at least one net " +
+					"and cannot be reserved for no particular net");
+		} else {
+			reservedWires.put(reservedWire, null);
+		}
 	}
 
 	/**

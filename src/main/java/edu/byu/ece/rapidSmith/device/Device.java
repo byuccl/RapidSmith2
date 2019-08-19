@@ -210,6 +210,16 @@ public class Device implements Serializable {
 		return tiles[row][column];
 	}
 
+	public Collection<Tile> getTiles(int minRow, int minCol, int maxRow, int maxCol) {
+		Collection<Tile> rangeTiles = new ArrayList<>();
+
+		// Assuming safe input values
+		for (int row = minRow; row <= maxRow; row++) {
+			rangeTiles.addAll(Arrays.asList(tiles[row]).subList(minCol, maxCol + 1));
+		}
+		return rangeTiles;
+	}
+
 	/**
 	 * Returns the tile in the device with the specified name.
 	 *

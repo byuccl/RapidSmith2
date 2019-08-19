@@ -63,6 +63,23 @@ public class CellNet implements Serializable {
 	private boolean isInternal;
 	/** Route status of the net*/
 	private RouteStatus routeStatus;
+    /** Aliases for this cellnet */
+    private Set<CellNet> aliases;
+
+	public Set<SitePin> getLoneSinkSitePins() {
+		return loneSinkSitePins;
+	}
+
+	public void setLoneSinkSitePins(Set<SitePin> loneSinkSitePins) {
+		this.loneSinkSitePins = loneSinkSitePins;
+	}
+
+	public void addLoneSinkSitePin(SitePin sitePin) {
+		loneSinkSitePins.add(sitePin);
+	}
+
+	/** Sink site pins that have no corresponding cell pin */
+    private Set<SitePin> loneSinkSitePins;
 	
 	// Physical route information
 	/** List of pins where the net leaves its source site*/ 
@@ -71,9 +88,9 @@ public class CellNet implements Serializable {
 	private RouteTree source;
 	/** List of intersite RouteTree objects for the net*/
 	private List<RouteTree> intersiteRoutes;
-	/** Maps a connecting BelPin of the net, to the RouteTree connected to the BelPin*/
+	/** Maps a connecting BelPin of the net, to the RouteTree connected to the BelPin */
 	private Map<BelPin, RouteTree> belPinToSinkRTMap;
-	/** Maps a connecting SitePin of the net, to the RouteTree connected to the SitePin*/
+	/** Maps a connecting SitePin of the net, to the RouteTree connected to the SitePin */
 	private Map<SitePin, RouteTree> sitePinToRTMap;
 	
 	//speed up source pin call
@@ -102,6 +119,8 @@ public class CellNet implements Serializable {
 		this.isMultiSourcedNet = false;
 		this.multiSourceStatusSet = false;
 		sourcePins = new HashSet<>();
+        aliases = new HashSet<>();
+		loneSinkSitePins = new HashSet<>();
 	}
 
 	/**
@@ -505,9 +524,10 @@ public class CellNet implements Serializable {
             return false;
 
         for (CellPin p : this.pins) {
-            if (p.getLibraryPin().getLibraryCell().getName().equals("BUFG")) {
+            if (p.isPseudoPin() || p.isPartitionPin())
+                continue;
+            if (p.getLibraryPin().getLibraryCell().getName().equals("BUFG"))
                 return true;
-            }
         }
 
         return false;
@@ -832,7 +852,8 @@ public class CellNet implements Serializable {
 	}
 
 	public void unrouteIntersite() {
-		intersiteRoutes = null;
+		//intersiteRoutes = null;
+		// TODO: Mark inter-site sinks as unrouted.
 		computeRouteStatus();
 	}
 	
@@ -842,7 +863,6 @@ public class CellNet implements Serializable {
 	 * @param source
 	 */
 	public void setSourceRouteTree(RouteTree source) {
-		
 		this.source = source;
 	}
 	
@@ -1035,6 +1055,10 @@ public class CellNet implements Serializable {
 	 * @return the SitePin that maps to the cellpin.
 	 */
 	public List<SitePin> getSinkSitePins(CellPin cellPin) {
+
+		//if (cellPin.getName().equals("pseudoCK"))
+	//		System.out.println("HAPPY?");
+
 		List<SitePin> sitePins = null;
 		for (BelPin belPin : cellPin.getMappedBelPins()) {
 			RouteTree routeTree = belPinToSinkRTMap.get(belPin);
@@ -1053,6 +1077,14 @@ public class CellNet implements Serializable {
 		}
 		return sitePins;
 	}
+
+    public Set<CellNet> getAliases() {
+        return aliases;
+    }
+
+    public void setAliases(Set<CellNet> aliases) {
+        this.aliases = aliases;
+    }
 
 	/**
 	 * Returns a {@link SitePin} object that maps to the passed in cell pin.
@@ -1179,6 +1211,14 @@ public class CellNet implements Serializable {
 			return computeRouteStatus();
 		return routeStatus;
 	}
+
+	/**
+	 * Not for normal use. For aliases mainly.
+	 * @param routeStatus
+	 */
+	public void setRouteStatus(RouteStatus routeStatus) {
+		this.routeStatus = routeStatus;
+	}
 	
 	/**
 	 * Computes and stores the route status of the net. This function should be called to recompute the status
@@ -1194,7 +1234,7 @@ public class CellNet implements Serializable {
 	 * @return The current RouteStatus of the net
 	 * */
 	public RouteStatus computeRouteStatus() {
-		int subtractCount = (isStaticNet() || isSourcePinMapped()) ? 1 : 0;
+		int subtractCount = (isStaticNet() || sourcePin.isPartitionPin() || isSourcePinMapped()) ? 1 : 0;
 
 		// Nets route to CI and CYINIT pins of CARRY cells in the netlist, even though only one of these pins is ever
         // physically routed to at a time. The other pin will belong to the GND net, but it won't ever be routed to.

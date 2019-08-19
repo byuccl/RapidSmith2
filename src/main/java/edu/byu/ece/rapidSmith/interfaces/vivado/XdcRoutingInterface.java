@@ -723,7 +723,7 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	}
 
 	/**
-	 * Processes the "VCC_PART_PINS" or "GND_PART_PINS" token in the static_resources.rsc of a RSCP.
+	 * Processes the "VCC_PART_PINS" or "GND_PART_PINS" token in the routing.rsc of an RM RSCP.
 	 * Expected Format: VCC_PART_PINS partPinName partPinName ...
 	 * @param toks An array of space separated string values parsed from the placement.rsc
 	 */
@@ -739,18 +739,21 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 			CellPin cellPin = portCell.getPins().iterator().next();
 			CellNet net = cellPin.getNet();
 
-			// Detach the port's pin from its current net
-			assert (net != null);
-			net.disconnectFromPin(cellPin);
-
-			// Re-assign the net's pins to either VCC or GND
 			CellNet staticNet = isVcc? design.getVccNet() : design.getGndNet();
 
-			// Assuming driver has already been removed
-			List<CellPin> pins = new ArrayList<>(net.getPins());
-			net.disconnectFromPins(pins);
-			design.removeNet(net);
-			staticNet.connectToPins(pins);
+			// Detach the port's pin from its current net
+			//assert (net != null);
+			// The net might be null if the design is already routed?
+			if (net != null) {
+				net.disconnectFromPin(cellPin);
+
+				// Re-assign the net's pins to either VCC or GND
+				// Assuming driver has already been removed
+				List<CellPin> pins = new ArrayList<>(net.getPins());
+				net.disconnectFromPins(pins);
+				design.removeNet(net);
+				staticNet.connectToPins(pins);
+			}
 
 			// There is no corresponding wire for a static partition pin
 			CellPin partPin = new PartitionPin(portCell, null, PinDirection.IN);
