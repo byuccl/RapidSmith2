@@ -174,7 +174,6 @@ public abstract class AbstractRouteTree<T extends AbstractRouteTree<T>> implemen
 	 * Gets all the leaf nodes for a tree.
 	 * @return a collection of all the leaves.
 	 */
-
 	public <S extends T> Collection<T> getLeaves() {
 		Collection<T> leaves = new ArrayList<>();
 
@@ -183,7 +182,6 @@ public abstract class AbstractRouteTree<T extends AbstractRouteTree<T>> implemen
 				leaves.add(rt);
 			}
 		}
-
 		return leaves;
 	}
 
