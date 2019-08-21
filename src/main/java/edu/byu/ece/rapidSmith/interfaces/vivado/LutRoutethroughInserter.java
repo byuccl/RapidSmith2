@@ -200,7 +200,6 @@ public class LutRoutethroughInserter {
 		
 		// place lut cell and map pins correctly
 		Bel rtBel = rtSource.getBel();
-
 		design.placeCell(buffer, rtBel);
 		buffer.getPin("I0").mapToBelPin(rtSource);
 		buffer.getPin("O").mapToBelPin(buffer.getPin("O").getPossibleBelPins().get(0));

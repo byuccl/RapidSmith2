@@ -110,7 +110,7 @@ public class TileWire implements Wire, Serializable {
 	}
 
 	/**
-	 * Returns the connection to the given sink wire, if it exists
+	 * Returns the connection to the given sink wire, if it exists.
 	 * @param sinkWire the sink wire to get a connection to
 	 * @return the wire connection to sinkWire
 	 */
@@ -123,7 +123,6 @@ public class TileWire implements Wire, Serializable {
 		return Arrays.stream(wireConnections)
 				.map(wc -> new TileWireConnection(this, wc))
 				.filter(wc -> wc.getSinkWire().equals(sinkWire)).iterator().next();
-
 	}
 
 	/**

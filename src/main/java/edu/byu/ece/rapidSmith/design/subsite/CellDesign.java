@@ -71,7 +71,7 @@ public class CellDesign extends AbstractDesign {
 	private Map<Site, Map<String, String>> pipInValues;
 	/** Map of partition pins (ooc ports) to their ooc tile and node **/
 	private Map<String, String> partPinMap;
-	/** MAp of wires to the specific net(s) they are reserved for (if any) */
+	/** Map of wires to the specific net(s) they are reserved for (if any) */
 	private Map<Wire, Set<CellNet>> reservedWires;
 	/** Set of reserved sites */
 	private Set<Site> reservedSites;
@@ -806,6 +806,12 @@ public class CellDesign extends AbstractDesign {
 		this.pipInValues.put(ps, pipInVals);
 	}
 
+	/**
+	 * Adds a PIP and its input value to the specified site.
+	 * @param site the {@link Site} containing the PIP
+	 * @param pip the name of the PIP
+	 * @param inputVal the input value of the PIP
+	 */
 	public void addPipInputValAtSite(Site site, String pip, String inputVal) {
 		if (this.getPIPInputValsAtSite(site) == null) {
 			Map<String, String> pipToInputVals = new HashMap<>();

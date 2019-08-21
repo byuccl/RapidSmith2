@@ -468,12 +468,12 @@ public class CellNet implements Serializable {
 		return false;
 	}
 
-    /**
-     * Checks if a net is a local clk net and should use local routing resources (despite being a clock net).
-     * Specifically, checks if at least one sink pin is of type {@link CellPinType#CLOCK}, but is not sourced
-     * by a BUFG pin. This will need to be updated if additional pins are found to drive global clk nets.
-     * @return {@code true} if this net is a local clock net
-     */
+	/**
+	 * Checks if a net is a local clk net and should use local routing resources (despite being a clock net).
+	 * Specifically, checks if at least one sink pin is of type {@link CellPinType#CLOCK}, but is not sourced
+	 * by a BUFG pin. This will need to be updated if additional pins are found to drive global clk nets.
+	 * @return {@code true} if this net is a local clock net
+	 */
 	public boolean isLocalClkNet() {
 		if (sourcePins.size() != 1)
 			return false;
@@ -484,12 +484,12 @@ public class CellNet implements Serializable {
 		return isClkNet();
 	}
 
-    /**
-     * Checks if the net is a global clock net and should use global clock routing resources.
-     * Specifically, checks that the source pin is a BUFG output pin and that at least one of the sink pins is of type
-     * {@link CellPinType#CLOCK}. This will need to be updated if additional pins are found to drive global clk nets.
-     * @return {@code true} if this net is a global clock net
-     */
+	/**
+	 * Checks if the net is a global clock net and should use global clock routing resources.
+	 * Specifically, checks that the source pin is a BUFG output pin and that at least one of the sink pins is of type
+	 * {@link CellPinType#CLOCK}. This will need to be updated if additional pins are found to drive global clk nets.
+	 * @return {@code true} if this net is a global clock net
+	 */
 	public boolean isGlobalClkNet() {
 		if (sourcePins.size() != 1)
 			return false;
@@ -505,18 +505,18 @@ public class CellNet implements Serializable {
 	 * @return whether the net is a clock buffer net.
 	 */
 	public boolean isClkBufferNet() {
-        if (isStaticNet())
-            return false;
+		if (isStaticNet())
+			return false;
 
-        for (CellPin p : this.pins) {
-            if (p.isPseudoPin() || p.isPartitionPin())
-                continue;
-            if (p.getLibraryPin().getLibraryCell().getName().equals("BUFG"))
-                return true;
-        }
+		for (CellPin p : this.pins) {
+			if (p.isPseudoPin() || p.isPartitionPin())
+				continue;
+			if (p.getLibraryPin().getLibraryCell().getName().equals("BUFG"))
+				return true;
+		}
 
-        return false;
-    }
+		return false;
+	}
 
 	/**
 	 * Checks if a net is a partition pin clock net (but not a true clock net).
@@ -548,7 +548,6 @@ public class CellNet implements Serializable {
 	 * @return <code>true</code> if the net is a clock net. <code>false</code> otherwise.
 	 */
 	public boolean isClkNetXDL() {
-		
 		Collection<CellPin> cellPins = getPins();
 		for (CellPin p : cellPins) {
 			if (p.getName().contains("CK") || p.getName().contains("CLK") || p.getName().equals("C") ) {
@@ -562,7 +561,6 @@ public class CellNet implements Serializable {
 	 * Returns true if the net is a VCC (logic high) net
 	 */
 	public boolean isVCCNet() {
-
 		return type.equals(NetType.VCC);
 	}
 
@@ -570,7 +568,6 @@ public class CellNet implements Serializable {
 	 * Returns true if the net is a GND (logic low) net
 	 */
 	public boolean isGNDNet() {
-
 		return type.equals(NetType.GND);
 	}
 
@@ -596,7 +593,7 @@ public class CellNet implements Serializable {
 	/**
 	 * Returns true if the net is either a VCC or GND net. 
 	 * 
-	 * @return 
+	 * @return true if VCC or GND
 	 */
 	public boolean isStaticNet() {
 		return type == NetType.VCC || type == NetType.GND;
@@ -615,7 +612,7 @@ public class CellNet implements Serializable {
 	public void addSourceSitePin(SitePin sitePin) {
 		if (this.sourceSitePinList == null) {
 			this.sourceSitePinList = new ArrayList<>(2);
-	}
+		}
 	
 		// Throw an exception if the net already has two source pins
 		if (this.sourceSitePinList.size() >= 2) {
@@ -753,36 +750,36 @@ public class CellNet implements Serializable {
 		cellPin.forEach(this::addRoutedSink);
 	}
 
-    /**
-     * Marks the specified pin as being routed without checking for corresponding CI/CYINIT pins. It is up to the user
-     * to keep the routed sinks up-to-date.
-     *
-     * @param cellPin CellPin object to mark as routed
-     */
+	/**
+	 * Marks the specified pin as being routed without checking for corresponding CI/CYINIT pins. It is up to the user
+	 * to keep the routed sinks up-to-date.
+	 *
+	 * @param cellPin CellPin object to mark as routed
+	 */
 	public void basicAddRoutedSink(CellPin cellPin) {
-        if (!pins.contains(cellPin)) {
-            throw new IllegalArgumentException("CellPin " + cellPin.getFullName() + " not attached to net " + this.getName()
-                    + " Cannot be added to the routed sinks of the net!");
-        }
+		if (!pins.contains(cellPin)) {
+			throw new IllegalArgumentException("CellPin " + cellPin.getFullName() + " not attached to net " + this.getName()
+					+ " Cannot be added to the routed sinks of the net!");
+		}
 
-        if (cellPin.getDirection().equals(PinDirection.OUT)) {
-            throw new IllegalArgumentException(String.format("CellPin %s is an output pin. Cannot be added as a routed sink!", cellPin.getName()));
-        }
+		if (cellPin.getDirection().equals(PinDirection.OUT)) {
+			throw new IllegalArgumentException(String.format("CellPin %s is an output pin. Cannot be added as a routed sink!", cellPin.getName()));
+		}
 
-        if(routedSinks == null) {
-            routedSinks = new HashSet<>();
-        }
-        routedSinks.add(cellPin);
-    }
+		if(routedSinks == null) {
+			routedSinks = new HashSet<>();
+		}
+		routedSinks.add(cellPin);
+	}
 
 	/**
 	 * Marks the specified pin as being routed. Checks for corresponding CI/CYINIT pins. It is up to the user to keep
-     * the routed sinks up-to-date.
+	 * the routed sinks up-to-date.
 	 * 
 	 * @param cellPin CellPin object to mark as routed
 	 */
 	public void addRoutedSink(CellPin cellPin) {
-        basicAddRoutedSink(cellPin);
+		basicAddRoutedSink(cellPin);
 	}
 	
 	/**
@@ -1041,17 +1038,17 @@ public class CellNet implements Serializable {
 	 * Gets the aliases of the net.
 	 * @return the set of aliases.
 	 */
-    public Set<CellNet> getAliases() {
-        return aliases;
-    }
+	public Set<CellNet> getAliases() {
+		return aliases;
+	}
 
 	/**
 	 * Sets the aliases of the net.
 	 * @param aliases the set of aliases.
 	 */
 	public void setAliases(Set<CellNet> aliases) {
-        this.aliases = aliases;
-    }
+		this.aliases = aliases;
+	}
 	
 	/**
 	 * Returns a RouteTree object that is connected to the specified CellPin. If the CellPin
@@ -1172,18 +1169,17 @@ public class CellNet implements Serializable {
 		int subtractCount = (isStaticNet() || sourcePin.isPartitionPin() || isSourcePinMapped()) ? 1 : 0;
 
 		// Nets route to CI and CYINIT pins of CARRY cells in the netlist, even though only one of these pins is ever
-        // physically routed to at a time. The other pin will belong to the GND net, but it won't ever be routed to.
-        // Because of this, the extra CI/CYINIT pin should no contirube to the route status of the GND net.
-        // TODO: Does this apply to VCC as well?
-
-        if (isGNDNet()) {
-            // Count one per cell in order to get the number to remove
-            subtractCount += pins.stream().filter(cellPin -> cellPin.getCell().getType().contains("CARRY"))
-                    .filter(cellPin -> cellPin.getName().equals("CI") || cellPin.getName().equals("CYINIT"))
-                    .map(CellPin::getCell)
-                    .collect(Collectors.toSet())
-                    .size();
-        }
+		// physically routed to at a time. The other pin will belong to the GND net, but it won't ever be routed to.
+		// Because of this, the extra CI/CYINIT pin should not contribute to the route status of the GND net.
+		// TODO: Does this apply to VCC as well?
+		if (isGNDNet()) {
+			// Count one per cell in order to get the number to remove
+			subtractCount += pins.stream().filter(cellPin -> cellPin.getCell().getType().contains("CARRY"))
+					.filter(cellPin -> cellPin.getName().equals("CI") || cellPin.getName().equals("CYINIT"))
+					.map(CellPin::getCell)
+					.collect(Collectors.toSet())
+					.size();
+		}
 
 		if(sourcePin == null){
 			routeStatus = RouteStatus.FULLY_ROUTED;

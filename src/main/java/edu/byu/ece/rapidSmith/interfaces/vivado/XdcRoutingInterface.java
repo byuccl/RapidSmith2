@@ -477,9 +477,8 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	}
 
 	/**
-	 * When a route reaches a site pin, this function is called
-	 * to mark sink cell pins as routed, and add pseudo pins
-	 * to the design is necessary (for VCC and GND nets only)
+	 * When a route reaches a site pin, this function is called to mark sink cell pins as routed, and add pseudo pins
+	 * to the design if necessary (for VCC and GND nets only).
 	 *
 	 * @param net {@link CellNet} the is currently being routed
 	 * @param sinkSitePin {@link SitePin} that the net routing has reached
@@ -497,7 +496,6 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 			// implicit intrasite net. An Example is a GND/VCC net going to the A6 pin of a LUT.
 			// It does not actually show the bel pin as used, but it is being used.
 			// another example is the A1 pin on a SRL cell
-			//assert(net.isStaticNet()) : "Only static nets should connect to floating site pins: " + net.getName() + " " + sinkSitePin;
 			createStaticNetImplicitSinks(sinkSitePin, net);
 		}
 	}
@@ -529,9 +527,7 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	}
 
 	/**
-	 * Creates routing data structures for static nets (GND/VCC) that are
-	 * sourced by static LUTs.
-	 *
+	 * Creates routing data structures for static nets (GND/VCC) that are sourced by static LUTs.
 	 * @param toks A list of static source bels in the form: <br>
 	 * {@code STATIC_SOURCES site0/bel0/outputPin0 site1/bel1/outputPin1 ... siteN/belN/outputPinN}
 	 */
@@ -737,8 +733,7 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 			CellNet staticNet = isVcc? design.getVccNet() : design.getGndNet();
 
 			// Detach the port's pin from its current net
-			//assert (net != null);
-			// The net might be null if the design is already routed?
+			// The net might be null if the design is already routed
 			if (net != null) {
 				net.disconnectFromPin(cellPin);
 
