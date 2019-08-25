@@ -129,14 +129,27 @@ public class SiteWire implements Wire, Serializable {
 	}
 
 	/**
-	 * Gets wires that make up a node. This is just the single wire for site wires.
+	 * Gets wires that make up a node.
+	 * Only includes start and end wires (intermediate wires aren't included)
 	 * @return a set containing the wire
 	 */
 	@Override
 	public Set<Wire> getWiresInNode() {
-		Set<Wire> wires = new HashSet<>();
-		wires.add(this);
-		return wires;
+		Set<Wire> wiresInNode = new HashSet<>();
+		wiresInNode.add(this);
+		Collection<Connection> directForwardConnections = getWireConnections().stream()
+				.filter(connection -> !connection.isPip()).collect(Collectors.toList());
+		Collection<Connection> directReverseConnections = getReverseWireConnections().stream()
+				.filter(connection -> !connection.isPip()).collect(Collectors.toList());
+
+		for (Connection conn : directForwardConnections) {
+			wiresInNode.add(conn.getSinkWire());
+		}
+		for (Connection conn : directReverseConnections) {
+			wiresInNode.add(conn.getSinkWire());
+		}
+
+		return wiresInNode;
 	}
 
 	@Override

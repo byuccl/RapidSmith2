@@ -56,7 +56,6 @@ public final class VivadoInterface {
 	 */
 	private static void createSinkRouteTree(CellNet net, BelPin sinkPin) {
 		// The BelPin must be a sink Lut BEL Pin
-		// TODO: Fix getWiresInNode for site wires.
 		// TODO: Add some safety checks.
 		Wire lutPinWire = sinkPin.getWire().getReverseWireConnections().iterator().next().getSinkWire();
 		SitePin sitePin = lutPinWire.getReverseConnectedPin();
