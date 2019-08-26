@@ -1087,6 +1087,23 @@ public class CellNet implements Serializable {
 		
 		return connectedRouteTrees;
 	}
+
+	/**
+	 * Returns all sink RouteTrees of this net.
+	 * @return a list of the sink RouteTrees
+	 */
+	public List<RouteTree> getSinkRouteTrees() {
+		if (routedSinks == null || routedSinks.isEmpty())
+			return Collections.emptyList();
+
+		List<RouteTree> sinkTrees = new ArrayList<>();
+		for (CellPin sink : routedSinks) {
+			if (this.getSinkRouteTree(sink) != null)
+				sinkTrees.add(this.getSinkRouteTree(sink));
+		}
+
+		return sinkTrees;
+	}
 	
 	/**
 	 * Gets the RouteTree object connected to the specified BelPin of the net
