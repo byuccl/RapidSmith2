@@ -82,6 +82,16 @@ public class FamilyInfos {
         }
 
         @Override
+        public Set<TileType> clblTiles() {
+            return Collections.emptySet();
+        }
+
+        @Override
+        public Set<TileType> clbrTiles() {
+            return Collections.emptySet();
+        }
+
+        @Override
         public Set<TileType> switchboxTiles() {
             return Collections.emptySet();
         }

@@ -21,10 +21,7 @@
 package edu.byu.ece.rapidSmith.design.subsite;
 
 import edu.byu.ece.rapidSmith.design.NetType;
-import edu.byu.ece.rapidSmith.device.PIP;
-import edu.byu.ece.rapidSmith.device.BelPin;
-import edu.byu.ece.rapidSmith.device.PinDirection;
-import edu.byu.ece.rapidSmith.device.SitePin;
+import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
 import java.io.Serializable;
@@ -43,7 +40,6 @@ import java.util.stream.Collectors;
  *  
  */
 public class CellNet implements Serializable {
-	
 	/** Unique Serialization ID for this class*/
 	private static final long serialVersionUID = 6082237548065721803L;
 	/** Unique name of the net */
@@ -58,7 +54,7 @@ public class CellNet implements Serializable {
 	private CellPin sourcePin;
 	/** Properties for the Net*/
 	private final PropertyList properties;
-	/** Set of CellPins that have been marked as routed in the design*/
+	/** Set of CellPins that have been marked as completely routed in the design*/
 	private Set<CellPin> routedSinks; 
 	/** Set to true if this net is contained within a single site's boundaries*/
 	private boolean isIntrasite;
@@ -66,6 +62,8 @@ public class CellNet implements Serializable {
 	private boolean isInternal;
 	/** Route status of the net*/
 	private RouteStatus routeStatus;
+	/** Aliases for this cell net */
+	private Set<CellNet> aliases;
 	
 	// Physical route information
 	/** List of pins where the net leaves its source site*/ 
@@ -74,9 +72,9 @@ public class CellNet implements Serializable {
 	private RouteTree source;
 	/** List of intersite RouteTree objects for the net*/
 	private List<RouteTree> intersiteRoutes;
-	/** Maps a connecting BelPin of the net, to the RouteTree connected to the BelPin*/
+	/** Maps a connecting BelPin of the net, to the RouteTree connected to the BelPin */
 	private Map<BelPin, RouteTree> belPinToSinkRTMap;
-	/** Maps a connecting SitePin of the net, to the RouteTree connected to the SitePin*/
+	/** Maps a connecting SitePin of the net, to the RouteTree connected to the SitePin */
 	private Map<SitePin, RouteTree> sitePinToRTMap;
 	
 	//speed up source pin call
@@ -91,7 +89,6 @@ public class CellNet implements Serializable {
 	 */
 	public CellNet(String name, NetType type) {
 		Objects.requireNonNull(name);
-
 		this.name = name;
 		this.type = type;
 		this.isIntrasite = false;
@@ -105,6 +102,7 @@ public class CellNet implements Serializable {
 		this.isMultiSourcedNet = false;
 		this.multiSourceStatusSet = false;
 		sourcePins = new HashSet<>();
+		aliases = new HashSet<>();
 	}
 
 	/**
@@ -367,8 +365,7 @@ public class CellNet implements Serializable {
 	/**
 	 * Disconnects the net from all of its current pins
 	 */
-	public void detachNet() { 
-		
+	public void detachNet() {
 		pins.forEach(CellPin::clearNet);
 		
 		if (sourcePin != null) {
@@ -472,6 +469,56 @@ public class CellNet implements Serializable {
 	}
 
 	/**
+	 * Checks if a net is a local clk net and should use local routing resources (despite being a clock net).
+	 * Specifically, checks if at least one sink pin is of type {@link CellPinType#CLOCK}, but is not sourced
+	 * by a BUFG pin. This will need to be updated if additional pins are found to drive global clk nets.
+	 * @return {@code true} if this net is a local clock net
+	 */
+	public boolean isLocalClkNet() {
+		if (sourcePins.size() != 1)
+			return false;
+
+		if (sourcePin.getCell().getType().equals("BUFG"))
+			return false;
+
+		return isClkNet();
+	}
+
+	/**
+	 * Checks if the net is a global clock net and should use global clock routing resources.
+	 * Specifically, checks that the source pin is a BUFG output pin and that at least one of the sink pins is of type
+	 * {@link CellPinType#CLOCK}. This will need to be updated if additional pins are found to drive global clk nets.
+	 * @return {@code true} if this net is a global clock net
+	 */
+	public boolean isGlobalClkNet() {
+		if (sourcePins.size() != 1)
+			return false;
+
+		if (!sourcePin.getCell().getType().equals("BUFG"))
+			return false;
+
+		return isClkNet();
+	}
+
+	/**
+	 * Checks if the net is a clock buffer net. Specifically, checks if at least one pin is in a BUFG cell.
+	 * @return whether the net is a clock buffer net.
+	 */
+	public boolean isClkBufferNet() {
+		if (isStaticNet())
+			return false;
+
+		for (CellPin p : this.pins) {
+			if (p.isPseudoPin() || p.isPartitionPin())
+				continue;
+			if (p.getLibraryPin().getLibraryCell().getName().equals("BUFG"))
+				return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Checks if a net is a partition pin clock net (but not a true clock net).
 	 * Checks that the net is not a true clock net and checks if any attached partition
 	 * pins are of type {@link CellPinType#PARTITION_CLK}.
@@ -501,7 +548,6 @@ public class CellNet implements Serializable {
 	 * @return <code>true</code> if the net is a clock net. <code>false</code> otherwise.
 	 */
 	public boolean isClkNetXDL() {
-		
 		Collection<CellPin> cellPins = getPins();
 		for (CellPin p : cellPins) {
 			if (p.getName().contains("CK") || p.getName().contains("CLK") || p.getName().equals("C") ) {
@@ -515,7 +561,6 @@ public class CellNet implements Serializable {
 	 * Returns true if the net is a VCC (logic high) net
 	 */
 	public boolean isVCCNet() {
-
 		return type.equals(NetType.VCC);
 	}
 
@@ -523,7 +568,6 @@ public class CellNet implements Serializable {
 	 * Returns true if the net is a GND (logic low) net
 	 */
 	public boolean isGNDNet() {
-
 		return type.equals(NetType.GND);
 	}
 
@@ -549,7 +593,7 @@ public class CellNet implements Serializable {
 	/**
 	 * Returns true if the net is either a VCC or GND net. 
 	 * 
-	 * @return 
+	 * @return true if VCC or GND
 	 */
 	public boolean isStaticNet() {
 		return type == NetType.VCC || type == NetType.GND;
@@ -568,7 +612,7 @@ public class CellNet implements Serializable {
 	public void addSourceSitePin(SitePin sitePin) {
 		if (this.sourceSitePinList == null) {
 			this.sourceSitePinList = new ArrayList<>(2);
-	}
+		}
 	
 		// Throw an exception if the net already has two source pins
 		if (this.sourceSitePinList.size() >= 2) {
@@ -705,28 +749,37 @@ public class CellNet implements Serializable {
 	public void addRoutedSinks(Collection<CellPin> cellPin) {
 		cellPin.forEach(this::addRoutedSink);
 	}
-	
+
 	/**
-	 * Marks the specified pin as being routed. It is up to the user to keep the
-	 * routed sinks up-to-date. 
-	 * 
+	 * Marks the specified pin as being routed without checking for corresponding CI/CYINIT pins. It is up to the user
+	 * to keep the routed sinks up-to-date.
+	 *
 	 * @param cellPin CellPin object to mark as routed
 	 */
-	public void addRoutedSink(CellPin cellPin) {
-		
+	public void basicAddRoutedSink(CellPin cellPin) {
 		if (!pins.contains(cellPin)) {
 			throw new IllegalArgumentException("CellPin " + cellPin.getFullName() + " not attached to net " + this.getName()
 					+ " Cannot be added to the routed sinks of the net!");
 		}
-		
+
 		if (cellPin.getDirection().equals(PinDirection.OUT)) {
-			throw new IllegalArgumentException(String.format("CellPin %s is an output pin. Cannout be added as a routed sink!", cellPin.getName()));
+			throw new IllegalArgumentException(String.format("CellPin %s is an output pin. Cannot be added as a routed sink!", cellPin.getName()));
 		}
-		
+
 		if(routedSinks == null) {
 			routedSinks = new HashSet<>();
 		}
 		routedSinks.add(cellPin);
+	}
+
+	/**
+	 * Marks the specified pin as being routed. Checks for corresponding CI/CYINIT pins. It is up to the user to keep
+	 * the routed sinks up-to-date.
+	 * 
+	 * @param cellPin CellPin object to mark as routed
+	 */
+	public void addRoutedSink(CellPin cellPin) {
+		basicAddRoutedSink(cellPin);
 	}
 	
 	/**
@@ -755,8 +808,12 @@ public class CellNet implements Serializable {
 		routeStatus = RouteStatus.UNROUTED;
 	}
 
+	/**
+	 * Unroutes the inter-site portions of a net. This method is experimental and does not
+	 * work completely correctly yet.
+	 */
 	public void unrouteIntersite() {
-		intersiteRoutes = null;
+		// TODO: Mark inter-site sinks as unrouted.
 		computeRouteStatus();
 	}
 	
@@ -766,7 +823,6 @@ public class CellNet implements Serializable {
 	 * @param source
 	 */
 	public void setSourceRouteTree(RouteTree source) {
-		
 		this.source = source;
 	}
 	
@@ -848,7 +904,7 @@ public class CellNet implements Serializable {
 	}
 	
 	/**
-	 * Adds a RouteTree object that connects to the specified BelPin. 
+	 * Adds a RouteTree object that connects to the specified BelPin sink.
 	 * 
 	 * @param bp Connecting BelPin
 	 * @param route RouteTree leading to that BelPin
@@ -862,7 +918,9 @@ public class CellNet implements Serializable {
 	}
 	
 	/**
-	 * Adds a RouteTree object that starts at the specified SitePin
+	 * Adds a RouteTree object that starts at the specified SitePin.
+	 * Note: This method has a bad name, as the route trees aren't necessarily sinks.
+	 * In fact, a net may completely begin at one of these trees.
 	 * 
 	 * @param sp Source SitePin
 	 * @param route RouteTree sourced by the SitePin
@@ -920,6 +978,77 @@ public class CellNet implements Serializable {
 									.map(sp -> sitePinToRTMap.get(sp))
 									.collect(Collectors.toList());
 	}
+
+	/**
+	 * Returns a set of all the sink sites for the net.
+	 */
+	public Set<Site> getSinkSites() {
+		return getSinkSitePins().stream()
+				.map(SitePin::getSite)
+				.collect(Collectors.toSet());
+	}
+
+	/**
+	 * Returns a set of all the sink tiles for the net.
+	 */
+	public Set<Tile> getSinkTiles() {
+		return getSinkSitePins().stream()
+				.map(sitePin -> sitePin.getSite().getTile())
+				.collect(Collectors.toSet());
+	}
+
+	/**
+	 * Returns a list of {@link SitePin} objects that are sinks for the net.
+	 */
+	public List<SitePin> getSinkSitePins() {
+		if (sitePinToRTMap == null) {
+			return Collections.emptyList();
+		}
+
+		return sitePinToRTMap.keySet().stream().filter(SitePin::isInput).collect(Collectors.toList());
+	}
+
+	/**
+	 * Returns a list of {@link SitePin} objects that map to the passed in cell pin.
+	 * This is usually only one SitePin, but is more than one in some cases (such as with some LUT RAM pins).
+	 * @param cellPin the cell pin to use to find the site pin
+	 * @return the SitePin that maps to the cellpin.
+	 */
+	public List<SitePin> getSinkSitePins(CellPin cellPin) {
+		List<SitePin> sitePins = null;
+		for (BelPin belPin : cellPin.getMappedBelPins()) {
+			RouteTree routeTree = belPinToSinkRTMap.get(belPin);
+
+			// Get the route tree that starts at the site pin
+			while (routeTree.getParent() != null) {
+				routeTree = routeTree.getParent();
+			}
+
+			SitePin sitePin = routeTree.getWire().getReverseConnectedPin();
+			if (sitePin != null) {
+				if (sitePins == null)
+					sitePins = new ArrayList<>();
+				sitePins.add(sitePin);
+			}
+		}
+		return sitePins;
+	}
+
+	/**
+	 * Gets the aliases of the net.
+	 * @return the set of aliases.
+	 */
+	public Set<CellNet> getAliases() {
+		return aliases;
+	}
+
+	/**
+	 * Sets the aliases of the net.
+	 * @param aliases the set of aliases.
+	 */
+	public void setAliases(Set<CellNet> aliases) {
+		this.aliases = aliases;
+	}
 	
 	/**
 	 * Returns a RouteTree object that is connected to the specified CellPin. If the CellPin
@@ -947,8 +1076,7 @@ public class CellNet implements Serializable {
 	 * @param cellPin sink CellPin
 	 * @return A Set of RouteTree objects that cellPin is connected to.
 	 */
-	public Set <RouteTree> getSinkRouteTrees(CellPin cellPin) {
-		
+	public Set<RouteTree> getSinkRouteTrees(CellPin cellPin) {
 		Set<RouteTree> connectedRouteTrees = new HashSet<>();
 		
 		for (BelPin belPin : cellPin.getMappedBelPins()) {
@@ -958,6 +1086,23 @@ public class CellNet implements Serializable {
 		}
 		
 		return connectedRouteTrees;
+	}
+
+	/**
+	 * Returns all sink RouteTrees of this net.
+	 * @return a list of the sink RouteTrees
+	 */
+	public List<RouteTree> getSinkRouteTrees() {
+		if (routedSinks == null || routedSinks.isEmpty())
+			return Collections.emptyList();
+
+		List<RouteTree> sinkTrees = new ArrayList<>();
+		for (CellPin sink : routedSinks) {
+			if (this.getSinkRouteTree(sink) != null)
+				sinkTrees.add(this.getSinkRouteTree(sink));
+		}
+
+		return sinkTrees;
 	}
 	
 	/**
@@ -1011,7 +1156,17 @@ public class CellNet implements Serializable {
 	 * @return The {@link RouteStatus} of the current net
 	 */
 	public RouteStatus getRouteStatus() {
+		if (routeStatus == null)
+			return computeRouteStatus();
 		return routeStatus;
+	}
+
+	/**
+	 * Manually set the route status of the net. Not for normal use.
+	 * @param routeStatus the route status of the net
+	 */
+	public void setRouteStatus(RouteStatus routeStatus) {
+		this.routeStatus = routeStatus;
 	}
 	
 	/**
@@ -1028,8 +1183,20 @@ public class CellNet implements Serializable {
 	 * @return The current RouteStatus of the net
 	 * */
 	public RouteStatus computeRouteStatus() {
-		int subtractCount = (isStaticNet() || isSourcePinMapped()) ? 1 : 0;
-		
+		int subtractCount = (isStaticNet() || sourcePin.isPartitionPin() || isSourcePinMapped()) ? 1 : 0;
+
+		// Nets route to CI and CYINIT pins of CARRY cells in the netlist, even though only one of these pins is ever
+		// physically routed to at a time. The other pin will belong to the GND net, but it won't ever be routed to.
+		// Because of this, the extra CI/CYINIT pin should not contribute to the route status of the GND net.
+		// TODO: Does this apply to VCC as well?
+		if (isGNDNet()) {
+			// Count one per cell in order to get the number to remove
+			subtractCount += pins.stream().filter(cellPin -> cellPin.getCell().getType().contains("CARRY"))
+					.filter(cellPin -> cellPin.getName().equals("CI") || cellPin.getName().equals("CYINIT"))
+					.map(CellPin::getCell)
+					.collect(Collectors.toSet())
+					.size();
+		}
 
 		if(sourcePin == null){
 			routeStatus = RouteStatus.FULLY_ROUTED;

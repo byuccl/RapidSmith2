@@ -371,10 +371,17 @@ public final class VivadoEdifInterface extends AbstractEdifInterface {
 		
 		assert(toks.length == 1 || toks.length == 2);
 
+		// Try to get the port with no brackets []
 		EdifPort edifPort = edifParent.getPort(toks[0]);
-		
+
+		// Try to get the name by making sure the name is EDIF compatible
 		if (edifPort == null) {
 			edifPort = edifParent.getPort(getEdifName(toks[0]));
+		}
+
+		// If all else fails, try to get the port using the name of the RapidSmith2 port
+		if (edifPort == null) {
+			edifPort = edifParent.getPort(getEdifName(port.getName()));
 		}
 		
 		int portIndex = 1;

@@ -118,7 +118,7 @@ public class RouteTree extends AbstractRouteTree<RouteTree> {
 	}
 	
 	/**
-	 * @deprecated use {@link #connect(Connection, AbstractRouteTree)}
+	 * @deprecated use {@link #connect(Connection, RouteTree)}
 	 */
 	@Deprecated
 	public final RouteTree addConnection(Connection c, RouteTree sink) {
@@ -204,10 +204,10 @@ public class RouteTree extends AbstractRouteTree<RouteTree> {
 				RouteTree copyChild = origChild.newInstance(origChild.getWire());
 				pair.copy.connect(origChild.getConnection(), copyChild);
 				q.add(new CopyPair(origChild, copyChild));
-	}
-	}
-		return (S) copy;
+			}
 		}
+		return (S) copy;
+	}
 
 	private static class CopyPair {
 		RouteTree orig;

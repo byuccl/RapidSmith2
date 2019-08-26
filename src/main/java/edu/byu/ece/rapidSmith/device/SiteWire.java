@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 import static java.util.Collections.singleton;
 
 /**
- *
+ * A wire inside a site.
  */
 public class SiteWire implements Wire, Serializable {
 
@@ -112,14 +112,44 @@ public class SiteWire implements Wire, Serializable {
 	}
 
 	/**
-	 * Gets wires that make up a node. This is just the single wire for site wires.
+	 * Returns the connection to the given sink wire, if it exists
+	 * @param sinkWire the sink wire to get a connection to
+	 * @return the wire connection to sinkWire
+	 */
+	@Override
+	public Connection getWireConnection(Wire sinkWire) {
+		WireConnection[] wireConnections = site.getWireConnections(siteType, wire);
+		if (wireConnections == null)
+			return null;
+
+		return Arrays.stream(wireConnections)
+				.map(wc -> new SiteWireConnection(this, wc))
+				.filter(wc -> wc.getSinkWire().equals(sinkWire)).iterator().next();
+
+	}
+
+	/**
+	 * Gets wires that make up a node.
+	 * Only includes start and end wires (intermediate wires aren't included)
 	 * @return a set containing the wire
 	 */
 	@Override
 	public Set<Wire> getWiresInNode() {
-		Set<Wire> wires = new HashSet<>();
-		wires.add(this);
-		return wires;
+		Set<Wire> wiresInNode = new HashSet<>();
+		wiresInNode.add(this);
+		Collection<Connection> directForwardConnections = getWireConnections().stream()
+				.filter(connection -> !connection.isPip()).collect(Collectors.toList());
+		Collection<Connection> directReverseConnections = getReverseWireConnections().stream()
+				.filter(connection -> !connection.isPip()).collect(Collectors.toList());
+
+		for (Connection conn : directForwardConnections) {
+			wiresInNode.add(conn.getSinkWire());
+		}
+		for (Connection conn : directReverseConnections) {
+			wiresInNode.add(conn.getSinkWire());
+		}
+
+		return wiresInNode;
 	}
 
 	@Override

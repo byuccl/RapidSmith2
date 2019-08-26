@@ -211,6 +211,23 @@ public class Device implements Serializable {
 	}
 
 	/**
+	 * Gets the tiles within the specified row-column range.
+	 * @param minRow minimum tile row
+	 * @param minCol minimum column row
+	 * @param maxRow maximum tile row
+	 * @param maxCol maximum column row
+	 * @return a collection of the tiles within the range
+	 */
+	public Collection<Tile> getTiles(int minRow, int minCol, int maxRow, int maxCol) {
+		Collection<Tile> rangeTiles = new ArrayList<>();
+
+		for (int row = minRow; row <= maxRow; row++) {
+			rangeTiles.addAll(Arrays.asList(tiles[row]).subList(minCol, maxCol + 1));
+		}
+		return rangeTiles;
+	}
+
+	/**
 	 * Returns the tile in the device with the specified name.
 	 *
 	 * @param tile the name of the tile to get.
@@ -623,6 +640,15 @@ public class Device implements Serializable {
 	}
 
 	/**
+	 * Returns whether the device has at least one tile of type.
+	 * @param type the Tile Type
+	 * @return if the type is present
+	 */
+	public boolean hasTileType(TileType type) {
+		return tileMap.values().stream().anyMatch(tile -> tile.getType().equals(type));
+	}
+
+	/**
 	 * Builds resources that are fully dependent upon other resources
 	 * provided during the loading and creation process.
 	 * <p>
@@ -645,6 +671,15 @@ public class Device implements Serializable {
 		for (Site site : sites.values()) {
 			site.setTypeUnchecked(site.getPossibleTypes()[0]);
 		}
+	}
+
+	/**
+	 * Checks if the device has at least one site of the given type.
+	 * @param type the site type to check the device for
+	 * @return if the site type is present
+	 */
+	public boolean hasSiteType(SiteType type) {
+		return getAllSitesOfType(type) != null;
 	}
 
 	/*

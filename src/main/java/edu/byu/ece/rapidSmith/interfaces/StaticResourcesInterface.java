@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.*;
@@ -103,7 +104,8 @@ public class StaticResourcesInterface extends AbstractXdcInterface {
 			Tile tile = tryGetTile(tileName);
 			Wire reservedWire = new TileWire(tile, tryGetWireEnum(wireName));
 
-			// Mark all wires in the node as reserved
+			// Mark all wires in the node as reserved. These wires are used by the static design for other nets not
+			// in the RM; i.e., they just route through the RM.
 			design.addReservedNode(reservedWire);
 		}
 	}
@@ -165,9 +167,12 @@ public class StaticResourcesInterface extends AbstractXdcInterface {
 			i++;
 		}
 
-		// Add all rm net names to the rm -> static net name map
+		// Add all rm net names to the rm -> static net name map.
+		// Also add aliases (within the context of the full-device design) for the net.
 		for (CellNet portNet : portNets) {
 			rmStaticNetMap.put(portNet.getName(), staticNetName);
+			Set<CellNet> aliases = portNets.stream().filter(cellNet -> cellNet != portNet).collect(Collectors.toSet());
+			portNet.setAliases(aliases);
 		}
 
 		// Create the Route String Tree

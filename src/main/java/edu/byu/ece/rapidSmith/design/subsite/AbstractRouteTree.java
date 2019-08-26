@@ -46,7 +46,7 @@ public abstract class AbstractRouteTree<T extends AbstractRouteTree<T>> implemen
 		return wire;
 	}
 
-	public final Collection<T> getChildren() {
+	public Collection<T> getChildren() {
 		return Collections.unmodifiableCollection(children);
 	}
 
@@ -73,6 +73,14 @@ public abstract class AbstractRouteTree<T extends AbstractRouteTree<T>> implemen
 	 */
 	public final BelPin getConnectedBelPin() {
 		return wire.getTerminal();
+	}
+
+	/**
+	 * Returns the {@link BelPin} that drives the wire of the RouteTree. If no BelPin
+	 * object is connected, null is returned.
+	 */
+	public final BelPin getConnectedSourceBelPin() {
+		return wire.getSource();
 	}
 
 	/**
@@ -168,6 +176,21 @@ public abstract class AbstractRouteTree<T extends AbstractRouteTree<T>> implemen
 		Set<T> toPrune = new HashSet<>();
 		toPrune.add(toKeep);
 		return prune(toPrune);
+	}
+
+	/**
+	 * Gets all the leaf nodes for a tree.
+	 * @return a collection of all the leaves.
+	 */
+	public <S extends T> Collection<T> getLeaves() {
+		Collection<T> leaves = new ArrayList<>();
+
+		for (T rt : this) {
+			if (rt.isLeaf()) {
+				leaves.add(rt);
+			}
+		}
+		return leaves;
 	}
 
 	/**

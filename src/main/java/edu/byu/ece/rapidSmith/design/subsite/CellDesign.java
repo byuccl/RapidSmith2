@@ -71,15 +71,15 @@ public class CellDesign extends AbstractDesign {
 	private Map<Site, Map<String, String>> pipInValues;
 	/** Map of partition pins (ooc ports) to their ooc tile and node **/
 	private Map<String, String> partPinMap;
-	/** Set of reserved wires */
-	private Set<Wire> reservedWires;
+	/** Map of wires to the specific net(s) they are reserved for (if any) */
+	private Map<Wire, Set<CellNet>> reservedWires;
 	/** Set of reserved sites */
 	private Set<Site> reservedSites;
 	/** Map from RM port name(s) to the static net's name */
 	private Map<String, String> rmStaticNetMap;
 	/** Map from the static net name to the route string tree */
 	private Map<String, RouteStringTree> staticRouteStringMap;
-	
+
 	/**
 	 * Constructor which initializes all member data structures. Sets name and
 	 * partName to null.
@@ -111,6 +111,7 @@ public class CellDesign extends AbstractDesign {
 		usedSitePipsMap = new HashMap<>();
 		mode = ImplementationMode.REGULAR;
 		pipInValues = new HashMap<>();
+		reservedWires = new HashMap<>();
 	}
 
 	/**
@@ -204,7 +205,7 @@ public class CellDesign extends AbstractDesign {
 	 * are returned.
 	 */
 	public Stream<Cell> getLeafCells() {
-		return cellMap.values().stream().flatMap(c -> _flatten(c));
+		return cellMap.values().stream().flatMap(this::_flatten);
 	}
 	
 	/**
@@ -216,7 +217,7 @@ public class CellDesign extends AbstractDesign {
 	 * @return A {@link Stream} of internal cells
 	 */
 	private Stream<Cell> _flatten(Cell cell) {
-		return cell.isMacro() ? cell.getInternalCells().stream() : Collections.singletonList(cell).stream();
+		return cell.isMacro() ? cell.getInternalCells().stream() : Stream.of(cell);
 	}
 	
 	/**
@@ -241,7 +242,7 @@ public class CellDesign extends AbstractDesign {
 	 * Returns a stream of {@link Cell} objects that are top-level ports of the design.
 	 */
 	public Stream<Cell> getPorts(){
-		return cellMap.values().stream().filter(c -> c.isPort());
+		return cellMap.values().stream().filter(Cell::isPort);
 	}
 	
 	/**
@@ -494,8 +495,6 @@ public class CellDesign extends AbstractDesign {
 
 	/**
 	 * Returns the power(VCC) net of the design
-	 * 
-	 * @return
 	 */
 	public CellNet getVccNet() {
 		return vccNet;
@@ -503,8 +502,6 @@ public class CellDesign extends AbstractDesign {
 	
 	/**
 	 * Returns the ground(GND) net of the design
-	 * 
-	 * @return
 	 */
 	public CellNet getGndNet() {
 		return gndNet;
@@ -784,7 +781,22 @@ public class CellDesign extends AbstractDesign {
 	public  Set<Integer> getUsedSitePipsAtSite(Site ps) {
 		return this.usedSitePipsMap.getOrDefault(ps, Collections.emptySet());
 	}
-	
+
+	/**
+	 * Returns whether or not a site PIP at the specified {@link Site} is used.
+	 * @param site the site containing the site PIP
+	 * @param sitePip the site PIP to check for usage
+	 * @return if the site PIP is used.
+	 */
+	public boolean isSitePipAtSiteUsed(Site site, String sitePip) {
+		Map<String, String> sitePips = pipInValues.get(site);
+
+		if (sitePips == null)
+			return false;
+
+		return sitePips.containsKey(sitePip);
+	}
+
 	/**
 	 * Add a mapping of used PIPs to their input route in a site. 
 	 * @param ps {@link Site} to route
@@ -793,7 +805,39 @@ public class CellDesign extends AbstractDesign {
 	public void addPIPInputValsAtSite(Site ps, Map<String, String> pipInVals){
 		this.pipInValues.put(ps, pipInVals);
 	}
-	
+
+	/**
+	 * Adds a PIP and its input value to the specified site.
+	 * @param site the {@link Site} containing the PIP
+	 * @param pip the name of the PIP
+	 * @param inputVal the input value of the PIP
+	 */
+	public void addPipInputValAtSite(Site site, String pip, String inputVal) {
+		if (this.getPIPInputValsAtSite(site) == null) {
+			Map<String, String> pipToInputVals = new HashMap<>();
+			pipToInputVals.put(pip, inputVal);
+			this.pipInValues.put(site, pipToInputVals);
+		}
+		else {
+			this.getPIPInputValsAtSite(site).put(pip, inputVal);
+		}
+	}
+
+	/**
+	 * Adds PIPs and their input values to the specified site.
+	 * @param site the {@link Site} containing the PIPs
+	 * @param pipInputVals a map from PIP names to their input values
+	 */
+	public void addPipInputValsAtSite(Site site, Map<String, String> pipInputVals) {
+		if (this.getPIPInputValsAtSite(site) == null) {
+			Map<String, String> pipToInputVals = new HashMap<>(pipInputVals);
+			this.pipInValues.put(site, pipToInputVals);
+		}
+		else {
+			this.getPIPInputValsAtSite(site).putAll(pipInputVals);
+		}
+	}
+
 	/**
 	 * Returns a mapping of used PIPs to their input route
 	 * @param ps {@link Site} object
@@ -894,7 +938,6 @@ public class CellDesign extends AbstractDesign {
 		return designCopy;
 	}
 
-
 	/**
 	 * Adds a site to the list of reserved sites.
 	 * @param site site to reserve
@@ -913,24 +956,79 @@ public class CellDesign extends AbstractDesign {
 		return reservedSites;
 	}
 
+	/**
+	 * Returns the reserved wires
+	 * @return set of reserved wires
+	 */
+	public Map<Wire, Set<CellNet>> getReservedWires() {
+		return reservedWires;
+	}
 
 	/**
-	 * Add a wire to the set of the design's reserved wires
-	 * @param reservedWire
+	 * Checks if a wire is available for use by a given net.
+	 * @param net the net to check
+	 * @param wire the wire to check
+	 * @return whether the net can use the wire
+	 */
+	public boolean isWireAvailable(CellNet net, Wire wire) {
+		if (reservedWires.containsKey(wire)) {
+			return reservedWires.get(wire) != null && reservedWires.get(wire).contains(net);
+		}
+		return true;
+	}
+
+	/**
+	 * Adds a wire to the design's list of reserved wires for the given net.
+	 * Use this to reserve a wire specifically for the net.
+	 * @param reservedWire the wire to reserve
+	 * @param net the net the wire is reserved for
+	 */
+	public void addReservedWire(Wire reservedWire, CellNet net) {
+		if (reservedWires.containsKey(reservedWire)) {
+			// Assume the wires are aliases and can all reserve the same wire
+			reservedWires.get(reservedWire).add(net);
+		}
+		else {
+			Set<CellNet> nets = new HashSet<>();
+			nets.add(net);
+			reservedWires.put(reservedWire, nets);
+		}
+	}
+
+	/**
+	 * Add a wire to the set of the design's reserved wires.
+	 * Use this to reserve the wire for no particular net.
+	 * @param reservedWire the wire to reserve
 	 */
 	public void addReservedWire(Wire reservedWire) {
-		if (reservedWires == null)
-			reservedWires = new HashSet<>();
-		reservedWires.add(reservedWire);
+		if (reservedWires.containsKey(reservedWire) &&  reservedWires.get(reservedWire) != null) {
+			System.err.println("[WARNING]: " + reservedWire.getFullName() + " is already reserved by at least one net " +
+					"and cannot be reserved for no particular net");
+		} else {
+			reservedWires.put(reservedWire, null);
+		}
 	}
 
 	/**
 	 * Adds all wires in a node (except intermediate wires) to the designs's set of reserved wires.
+	 * Use this to reserve the node for no particular net.
 	 * @param wireInNode a wire in the node
 	 */
 	public void addReservedNode(Wire wireInNode) {
 		for (Wire wire : wireInNode.getWiresInNode()) {
 			addReservedWire(wire);
+		}
+	}
+
+	/**
+	 * Adds all wires in a node (except intermediate wires) to the designs's set of reserved wires.
+	 * Use this to reserve the node for no particular net.
+	 * @param wireInNode a wire in the node
+	 * @param net the net to reserve the node for
+	 */
+	public void addReservedNode(Wire wireInNode, CellNet net) {
+		for (Wire wire : wireInNode.getWiresInNode()) {
+			addReservedWire(wire, net);
 		}
 	}
 
@@ -963,4 +1061,5 @@ public class CellDesign extends AbstractDesign {
 	public void setStaticRouteStringMap(Map<String, RouteStringTree> staticRouteStringMap) {
 		this.staticRouteStringMap = staticRouteStringMap;
 	}
+	
 }

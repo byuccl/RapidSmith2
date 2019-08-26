@@ -472,6 +472,18 @@ public class Tile implements Serializable {
 				Math.abs(tile.tileYCoordinate - tileYCoordinate);
 	}
 
+	/**
+	 * Calculates the Manhattan distance between this tile and the given tile.
+	 * It calculates the distance based on the absolute indices of the tiles.
+	 *
+	 * @param compareTile The tile to compare against.
+	 * @return The integer Manhattan distance between this and the given tile.
+	 */
+	public int getIndexManhattanDistance(Tile compareTile) {
+		return Math.abs(compareTile.getColumn() - column ) +
+				Math.abs(compareTile.getRow() - row);
+	}
+
 	@Override
 	public int hashCode() {
 		return column*1000+row;

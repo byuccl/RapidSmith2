@@ -406,5 +406,4 @@ public class XdcPlacementInterface extends AbstractXdcInterface {
 				ff5Cells.stream())
 				.flatMap(Function.identity());
 	}
-
 }

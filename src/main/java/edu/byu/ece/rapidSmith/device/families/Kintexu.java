@@ -65,6 +65,24 @@ public final class Kintexu implements FamilyInfo {
         return CLB_TILES;
     }
 
+    private static final HashSet<TileType> _CLB_L_TILES = new HashSet<>();
+
+    public static final Set<TileType> CLB_L_TILES = Collections.unmodifiableSet(_CLB_L_TILES);
+
+    @Override
+    public Set<TileType> clblTiles() {
+        return CLB_L_TILES;
+    }
+
+    private static final HashSet<TileType> _CLB_R_TILES = new HashSet<>();
+
+    public static final Set<TileType> CLB_R_TILES = Collections.unmodifiableSet(_CLB_R_TILES);
+
+    @Override
+    public Set<TileType> clbrTiles() {
+        return CLB_R_TILES;
+    }
+
     private static final HashSet<TileType> _SWITCHBOX_TILES = new HashSet<>();
 
     public static final Set<TileType> SWITCHBOX_TILES = Collections.unmodifiableSet(_SWITCHBOX_TILES);
@@ -697,6 +715,10 @@ public final class Kintexu implements FamilyInfo {
         _CLB_TILES.add(TileTypes.CLE_M_R);
         _CLB_TILES.add(TileTypes.CLEL_L);
         _CLB_TILES.add(TileTypes.CLEL_R);
+        _CLB_L_TILES.add(TileTypes.CLE_M);
+        _CLB_L_TILES.add(TileTypes.CLEL_L);
+        _CLB_R_TILES.add(TileTypes.CLE_M_R);
+        _CLB_R_TILES.add(TileTypes.CLEL_R);
         _SWITCHBOX_TILES.add(TileTypes.INT);
         _BRAM_TILES.add(TileTypes.BRAM);
         _DSP_TILES.add(TileTypes.DSP);
