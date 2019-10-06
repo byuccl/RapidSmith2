@@ -205,6 +205,11 @@ public class FasmBelInterface extends AbstractFasmInterface{
         }
         Cell lutCell = design.getCellAtBel(lutBel);
 
+        if (lutCell != null && vccSourceBels.contains(lutBel)) {
+            System.err.println("ERROR: VCC LUT still has a cell: " + lutCell.getName());
+            return;
+        }
+
         // Get the properly formatted physical LUT Equation
         LutEquation lutEquation = getLutEquation(lutBel);
 
@@ -344,7 +349,7 @@ public class FasmBelInterface extends AbstractFasmInterface{
                 break;
             default:
                 System.err.println("WARNING: Unrecognized FF/Latch Cell Type for cell " + cell.getName() + ":"
-                        + cell.getType() + ". No FASM isntructions will be printed for the cell.");
+                        + cell.getType() + ". No FASM instructions will be printed for the cell.");
                 break;
         }
 

@@ -111,8 +111,8 @@ public final class VivadoInterface {
 		routingInterface.parseRoutingXDC(routingFile);
 		design.setPartPinMap(routingInterface.getPartPinMap());
 
-		VivadoCheckpoint vivadoCheckpoint = new VivadoCheckpoint(partName, design, device, libCells); 
-		
+		VivadoCheckpoint vivadoCheckpoint = new VivadoCheckpoint(partName, design, device, libCells);
+
 		if (storeAdditionalInfo) {
 			vivadoCheckpoint.setRoutethroughBels(routingInterface.getRoutethroughsBels());
 			vivadoCheckpoint.setVccSourceBels(routingInterface.getVccSourceBels());
@@ -129,12 +129,15 @@ public final class VivadoInterface {
 		// Mark the used static resources
 		if (mode == ImplementationMode.RECONFIG_MODULE) {
 			String resourcesFile = rscpPath.resolve("static.rsc").toString();
-			StaticResourcesInterface staticInterface = new StaticResourcesInterface(design, device);
+			StaticResourcesInterface staticInterface = new StaticResourcesInterface(design, device, routingInterface.getRoutethroughsBels());
 			staticInterface.parseResourcesRSC(resourcesFile);
 			design.setRmStaticNetMap(staticInterface.getRmStaticNetMap());
 			design.setStaticRouteStringMap(staticInterface.getStaticRouteStringMap());
+			vivadoCheckpoint.setStaticPips(staticInterface.getStaticPips());
+			vivadoCheckpoint.setRoutethroughBels(staticInterface.getBelRoutethroughMap());
 		}
-		
+
+
 		return vivadoCheckpoint;
 	}
 

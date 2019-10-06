@@ -106,7 +106,9 @@ public abstract class AbstractFasmInterface {
      * @return whether the PIP is a psuedo PIP
      */
     protected boolean isPseudoPip(Wire startWire, Wire endWire) {
-        // All PIPs in CLB tiles are "always-on" pseudo PIPs
+        // PIPs in CLB switch-boxes are "always-on" pseudo PIPs.
+        // Site route-through PIPs are "hint" pseudo PIPs.
+        // Either way, they have no bit pattern.
         if (startWire.getTile().getType().toString().contains("CLB")) {
             return true;
         }

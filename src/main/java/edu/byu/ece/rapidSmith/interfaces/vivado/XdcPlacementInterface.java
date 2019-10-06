@@ -214,26 +214,6 @@ public class XdcPlacementInterface extends AbstractXdcInterface {
 	}
 
 	/**
-	 * Tries to retrieve a BelPin object from the currently loaded device
-	 * If the pin does not exist, a ParseException is thrown.
-	 * 
-	 * @param bel Bel which the pin is attached
-	 * @param pinName Name of the bel pin
-	 * @return BelPin
-	 */
-	private BelPin tryGetBelPin(Bel bel, String pinName) {
-		
-		BelPin pin = bel.getBelPin(pinName);
-		
-		if (pin == null) {
-			throw new ParseException(String.format("BelPin: \"%s/%s\" does not exist in the current device.\n"
-												 + "On line %d of %s", bel.getName(), pinName, currentLineNumber, currentFile));
-		}
-		
-		return pin;
-	}
-		
-	/**
 	 * Creates a placement.xdc file from the cells of the given design 
 	 * This file can be imported into Vivado to constrain the cells to a physical location
 	 * 

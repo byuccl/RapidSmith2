@@ -85,10 +85,10 @@ public class PartialDeviceGenerator {
 		}
 
 		// Get the top left and bottom right tiles
-		int topLeftRow = (tileA.getRow() < tileB.getRow()) ? tileA.getRow() : tileB.getRow();
-		int topLeftCol = (tileA.getColumn() < tileB.getColumn()) ? tileA.getColumn() : tileB.getColumn();
-		int bottRightRow = (tileA.getRow() > tileB.getRow()) ? tileA.getRow() : tileB.getRow();
-		int bottRightCol = (tileA.getColumn() > tileB.getColumn()) ? tileA.getColumn() : tileB.getColumn();
+		int topLeftRow = Math.min(tileA.getRow(), tileB.getRow());
+		int topLeftCol = Math.min(tileA.getColumn(), tileB.getColumn());
+		int bottRightRow = Math.max(tileA.getRow(), tileB.getRow());
+		int bottRightCol = Math.max(tileA.getColumn(), tileB.getColumn());
 
 		Tile topLeft = oldDevice.getTile(topLeftRow, topLeftCol);
 		Tile bottomRight = oldDevice.getTile(bottRightRow, bottRightCol);

@@ -115,6 +115,22 @@ public class CellDesign extends AbstractDesign {
 	}
 
 	/**
+	 * Returns a flattened view of the in-context cells in the netlist. Macro
+	 * cells are not returned in this list, only leaf and internal cells
+	 * are returned.
+	 * WARNING: Ports are assumed to be out-of-context. This is true for 7-Series RMs, but is
+	 * not necessarily true for ultrascale RMs.
+	 */
+	public Stream<Cell> getInContextLeafCells() {
+		// TODO: For non 7-series designs, determine which ports are in-context and which are out-of-context
+		// TODO: Also check ImplementationMode.OUT_OF_CONTEXT
+		if (this.mode.equals(ImplementationMode.RECONFIG_MODULE))
+			return (cellMap.values().stream().flatMap(c -> _flatten(c))).filter(it -> !it.isPort());
+		else
+			return cellMap.values().stream().flatMap(c -> _flatten(c));
+	}
+
+	/**
 	 * Sets the implementation mode of the design. There are currently two options
 	 * for the design mode: 
 	 * <ul>
@@ -1061,5 +1077,5 @@ public class CellDesign extends AbstractDesign {
 	public void setStaticRouteStringMap(Map<String, RouteStringTree> staticRouteStringMap) {
 		this.staticRouteStringMap = staticRouteStringMap;
 	}
-	
+
 }

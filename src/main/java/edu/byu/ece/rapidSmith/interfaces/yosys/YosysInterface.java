@@ -22,6 +22,7 @@ package edu.byu.ece.rapidSmith.interfaces.yosys;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.*;
+import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.interfaces.StaticResourcesInterface;
 import edu.byu.ece.rapidSmith.interfaces.vivado.*;
@@ -30,6 +31,8 @@ import edu.byu.ece.rapidSmith.util.Exceptions;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class is used to interface Yosys and RapidSmith2.
@@ -101,6 +104,8 @@ public final class YosysInterface {
 		routingInterface.parseRoutingXDC(routingFile);
 		design.setPartPinMap(routingInterface.getPartPinMap());
 
+		VivadoCheckpoint vivadoCheckpoint = new VivadoCheckpoint(partName, design, device, libCells);
+
 		// If importing a reconfigurable module, process all of the static resources
 		if (mode == ImplementationMode.RECONFIG_MODULE) {
 			// Process other static resources (reserved sites, PIPs, partition pin routes)
@@ -109,9 +114,11 @@ public final class YosysInterface {
 			staticInterface.parseResourcesRSC(resourcesFile);
 			design.setRmStaticNetMap(staticInterface.getRmStaticNetMap());
 			design.setStaticRouteStringMap(staticInterface.getStaticRouteStringMap());
+			vivadoCheckpoint.setRoutethroughBels(staticInterface.getBelRoutethroughMap());
 		}
 
-		return new VivadoCheckpoint(partName, design, device, libCells);
+
+		return vivadoCheckpoint;
 	}
 
 }
