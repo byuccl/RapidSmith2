@@ -363,6 +363,35 @@ public class FasmBelInterface extends AbstractFasmInterface{
 
     /* LUT RAMs (Distributed RAMs) */
 
+	private void printRam32Init(Bel bel, String fullBelName) throws IOException {
+		Cell cell = design.getCellAtBel(bel);
+		assert (cell.isInternal());
+		String internalCellName = cell.getName().substring(cell.getName().lastIndexOf('/') + 1);
+		Cell parentCell = cell.getParent();
+
+		// TODO: Don't assume String INIT or that the property is in HEX.
+		String ramInit = parentCell.getProperties().get("INIT").getStringValue();
+
+		// Remove the leading 'h
+		ramInit = ramInit.substring(ramInit.lastIndexOf("h") + 1);
+
+		// Switch on the LUT RAM Macro type
+		switch (parentCell.getType()) {
+			case "RAM32X1S":
+				// Just contains a single RAMS32 (SP)
+				assert (internalCellName.equals("SP"));
+				// The cell should be on a LUT6 BEL, so we set only the top 32 bits.
+				printLutInitString(hexToBinaryInitString(ramInit), fullBelName, true);
+				break;
+			default:
+				System.err.println("WARNING: Unexpected macro type for LUT RAM macro " + parentCell.getName() + ": "
+						+ parentCell.getType() + ". " + "No LUT RAM INIT instruction will be written for "
+						+ cell.getName() + ".");
+				break;
+		}
+	}
+
+
     /**
      * Prints the INIT property for a 64-LUTRAM. Only RAMD64E tested.
      * Should be used only for internal LUTRAM cells (not the macros)
@@ -438,9 +467,9 @@ public class FasmBelInterface extends AbstractFasmInterface{
                 // QUESTION: Is it safe to assume a MEM5 will always be paired with a MEM6? (probably not)
                 if (bel.getType().equals("LUT_OR_MEM5"))
                     break;
-
                 fileout.write(fullBelName + "RAM 1\n");
                 fileout.write(fullBelName + "SMALL 1\n");
+				printRam32Init(bel, fullBelName);
                 break;
             case "RAMD64E":
                 assert (bel.getType().equals("LUT_OR_MEM6"));

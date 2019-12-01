@@ -22,7 +22,6 @@ package edu.byu.ece.rapidSmith.interfaces.yosys;
 
 import edu.byu.ece.rapidSmith.RSEnvironment;
 import edu.byu.ece.rapidSmith.design.subsite.*;
-import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.interfaces.StaticResourcesInterface;
 import edu.byu.ece.rapidSmith.interfaces.vivado.*;
@@ -31,8 +30,6 @@ import edu.byu.ece.rapidSmith.util.Exceptions;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This class is used to interface Yosys and RapidSmith2.
@@ -114,7 +111,16 @@ public final class YosysInterface {
 			staticInterface.parseResourcesRSC(resourcesFile);
 			design.setRmStaticNetMap(staticInterface.getRmStaticNetMap());
 			design.setStaticRouteStringMap(staticInterface.getStaticRouteStringMap());
+			vivadoCheckpoint.setStaticPips(staticInterface.getStaticPips());
 			vivadoCheckpoint.setRoutethroughBels(staticInterface.getBelRoutethroughMap());
+		}
+
+		for (CellNet net : design.getNets()) {
+			if (!net.isIntrasite()) {
+				net.removeRoutedSinks();
+				if (!net.getPins().isEmpty())
+					net.computeRouteStatus();
+			}
 		}
 
 

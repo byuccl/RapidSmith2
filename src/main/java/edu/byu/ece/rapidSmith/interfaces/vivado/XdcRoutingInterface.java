@@ -224,7 +224,7 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 			
 			Site site = tryGetSite(sitePinToks[0]);
 			SitePin pin = tryGetSitePin(site, sitePinToks[1]);
-			
+
 			if (pin.isInput()) { // of a site
 				createIntrasiteRoute(pin, net, design.getUsedSitePipsAtSite(site));
 			}

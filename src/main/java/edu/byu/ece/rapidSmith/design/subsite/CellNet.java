@@ -751,12 +751,11 @@ public class CellNet implements Serializable {
 	}
 
 	/**
-	 * Marks the specified pin as being routed without checking for corresponding CI/CYINIT pins. It is up to the user
-	 * to keep the routed sinks up-to-date.
-	 *
+	 * Marks the specified pin as being routed. It is up to the user to keep the routed sinks up-to-date.
+	 * 
 	 * @param cellPin CellPin object to mark as routed
 	 */
-	public void basicAddRoutedSink(CellPin cellPin) {
+	public void addRoutedSink(CellPin cellPin) {
 		if (!pins.contains(cellPin)) {
 			throw new IllegalArgumentException("CellPin " + cellPin.getFullName() + " not attached to net " + this.getName()
 					+ " Cannot be added to the routed sinks of the net!");
@@ -771,17 +770,6 @@ public class CellNet implements Serializable {
 		}
 		routedSinks.add(cellPin);
 	}
-
-	/**
-	 * Marks the specified pin as being routed. Checks for corresponding CI/CYINIT pins. It is up to the user to keep
-	 * the routed sinks up-to-date.
-	 * 
-	 * @param cellPin CellPin object to mark as routed
-	 */
-	public void addRoutedSink(CellPin cellPin) {
-		// TODO: Remove basicAddRoutedSink unless there is a use for it...
-		basicAddRoutedSink(cellPin);
-	}
 	
 	/**
 	 * Marks a cellPin attached to the net as unrouted. 
@@ -792,6 +780,10 @@ public class CellNet implements Serializable {
 	 */
 	public boolean removeRoutedSink(CellPin cellPin) {
 		return routedSinks.remove(cellPin);
+	}
+
+	public void removeRoutedSinks() {
+		routedSinks = null;
 	}
 	
 	/**
@@ -927,7 +919,6 @@ public class CellNet implements Serializable {
 	 * @param route RouteTree sourced by the SitePin
 	 */
 	public void addSinkRouteTree(SitePin sp, RouteTree route) {
-		
 		if (sitePinToRTMap == null) {
 			sitePinToRTMap = new HashMap<>();
 		}

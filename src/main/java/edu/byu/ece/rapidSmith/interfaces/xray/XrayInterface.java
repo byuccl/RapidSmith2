@@ -3,7 +3,6 @@ package edu.byu.ece.rapidSmith.interfaces.xray;
 import edu.byu.ece.rapidSmith.design.subsite.BelRoutethrough;
 import edu.byu.ece.rapidSmith.design.subsite.CellDesign;
 import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
-import edu.byu.ece.rapidSmith.design.subsite.RouteStringTree;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.Device;
 import edu.byu.ece.rapidSmith.device.PIP;

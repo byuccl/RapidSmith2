@@ -112,6 +112,7 @@ public class CellDesign extends AbstractDesign {
 		mode = ImplementationMode.REGULAR;
 		pipInValues = new HashMap<>();
 		reservedWires = new HashMap<>();
+		reservedSites = new HashSet<>();
 	}
 
 	/**
@@ -436,15 +437,9 @@ public class CellDesign extends AbstractDesign {
 			throw new Exceptions.DesignAssemblyException("Net with name already exists in design.");
 
 		if (net.isVCCNet()) {
-			// if (vccNet != null) {
-			// 	throw new DesignAssemblyException("VCC net already exists in design.");
-			// }
 			vccNet = net;
 		}
 		else if (net.isGNDNet()) {
-			// if (gndNet != null) {
-			// 	throw new DesignAssemblyException("GND net already exists in design.");
-			// }
 			gndNet = net;
 		} 
 		
@@ -959,8 +954,6 @@ public class CellDesign extends AbstractDesign {
 	 * @param site site to reserve
 	 */
 	public void addReservedSite(Site site) {
-		if (reservedSites == null)
-			reservedSites = new HashSet<>();
 		reservedSites.add(site);
 	}
 

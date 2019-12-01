@@ -64,7 +64,8 @@ public class FasmRoutingInterface extends AbstractFasmInterface {
 					// HCLK buffer should still be enabled, even though the net is terminating on a LUT that drives
 					// nothing else.
 					if ((net.isClkNet() || net.isPartPinCLKNet())
-							&& (tileType.equals(hclkR) || tileType.equals(hclkL))) {
+							&& (tileType.equals(hclkR) || tileType.equals(hclkL))
+							&& source.getName().contains("HCLK_CK_BUFHCLK")) {
 						// Add the HCLK Enable Buffer wires to a set to avoid writing their instructions multiple times
 						hclkBufferEnableWires.add(source);
 					}
