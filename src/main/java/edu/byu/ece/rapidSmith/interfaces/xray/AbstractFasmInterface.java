@@ -13,13 +13,15 @@ import java.util.regex.Pattern;
 public abstract class AbstractFasmInterface {
     protected final Device device;
     protected final CellDesign design;
+    private final FamilyType familyType;
     private final FamilyInfo familyInfo;
     private final ImplementationMode implementationMode;
 
     AbstractFasmInterface(Device device, CellDesign design) {
         this.device = device;
         this.design = design;
-        familyInfo = FamilyInfos.get(device.getFamily());
+        familyType = device.getFamily();
+        familyInfo = FamilyInfos.get(familyType);
         implementationMode = design.getImplementationMode();
     }
 
@@ -106,9 +108,19 @@ public abstract class AbstractFasmInterface {
      * @return whether the PIP is a psuedo PIP
      */
     protected boolean isPseudoPip(Wire startWire, Wire endWire) {
-        // All PIPs in CLB tiles are "always-on" pseudo PIPs
-        if (startWire.getTile().getType().toString().contains("CLB")) {
+        TileType tileType = startWire.getTile().getType();
+        // PIPs in CLB switch-boxes are "always-on" pseudo PIPs.
+        // Site route-through PIPs are "hint" pseudo PIPs.
+        // Either way, they have no bit pattern.
+        if (tileType.toString().contains("CLB")) {
             return true;
+        }
+
+        // Check for always-on HCLK PIPs
+        if (tileType.equals(TileType.valueOf(familyType, "HCLK_L")) || tileType.equals(TileType.valueOf(familyType, "HCLK_R"))) {
+            if (endWire.getName().contains("HCLK_CK_INOUT")) {
+                return true;
+            }
         }
 
         // Check if it is an INT pseudo PIP

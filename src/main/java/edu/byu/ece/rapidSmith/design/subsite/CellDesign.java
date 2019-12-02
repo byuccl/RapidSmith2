@@ -112,6 +112,23 @@ public class CellDesign extends AbstractDesign {
 		mode = ImplementationMode.REGULAR;
 		pipInValues = new HashMap<>();
 		reservedWires = new HashMap<>();
+		reservedSites = new HashSet<>();
+	}
+
+	/**
+	 * Returns a flattened view of the in-context cells in the netlist. Macro
+	 * cells are not returned in this list, only leaf and internal cells
+	 * are returned.
+	 * WARNING: Ports are assumed to be out-of-context. This is true for 7-Series RMs, but is
+	 * not necessarily true for ultrascale RMs.
+	 */
+	public Stream<Cell> getInContextLeafCells() {
+		// TODO: For non 7-series designs, determine which ports are in-context and which are out-of-context
+		// TODO: Also check ImplementationMode.OUT_OF_CONTEXT
+		if (this.mode.equals(ImplementationMode.RECONFIG_MODULE))
+			return (cellMap.values().stream().flatMap(c -> _flatten(c))).filter(it -> !it.isPort());
+		else
+			return cellMap.values().stream().flatMap(c -> _flatten(c));
 	}
 
 	/**
@@ -420,15 +437,9 @@ public class CellDesign extends AbstractDesign {
 			throw new Exceptions.DesignAssemblyException("Net with name already exists in design.");
 
 		if (net.isVCCNet()) {
-			// if (vccNet != null) {
-			// 	throw new DesignAssemblyException("VCC net already exists in design.");
-			// }
 			vccNet = net;
 		}
 		else if (net.isGNDNet()) {
-			// if (gndNet != null) {
-			// 	throw new DesignAssemblyException("GND net already exists in design.");
-			// }
 			gndNet = net;
 		} 
 		
@@ -943,8 +954,6 @@ public class CellDesign extends AbstractDesign {
 	 * @param site site to reserve
 	 */
 	public void addReservedSite(Site site) {
-		if (reservedSites == null)
-			reservedSites = new HashSet<>();
 		reservedSites.add(site);
 	}
 
@@ -1061,5 +1070,5 @@ public class CellDesign extends AbstractDesign {
 	public void setStaticRouteStringMap(Map<String, RouteStringTree> staticRouteStringMap) {
 		this.staticRouteStringMap = staticRouteStringMap;
 	}
-	
+
 }

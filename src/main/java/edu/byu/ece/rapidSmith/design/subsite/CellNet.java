@@ -751,12 +751,11 @@ public class CellNet implements Serializable {
 	}
 
 	/**
-	 * Marks the specified pin as being routed without checking for corresponding CI/CYINIT pins. It is up to the user
-	 * to keep the routed sinks up-to-date.
-	 *
+	 * Marks the specified pin as being routed. It is up to the user to keep the routed sinks up-to-date.
+	 * 
 	 * @param cellPin CellPin object to mark as routed
 	 */
-	public void basicAddRoutedSink(CellPin cellPin) {
+	public void addRoutedSink(CellPin cellPin) {
 		if (!pins.contains(cellPin)) {
 			throw new IllegalArgumentException("CellPin " + cellPin.getFullName() + " not attached to net " + this.getName()
 					+ " Cannot be added to the routed sinks of the net!");
@@ -771,16 +770,6 @@ public class CellNet implements Serializable {
 		}
 		routedSinks.add(cellPin);
 	}
-
-	/**
-	 * Marks the specified pin as being routed. Checks for corresponding CI/CYINIT pins. It is up to the user to keep
-	 * the routed sinks up-to-date.
-	 * 
-	 * @param cellPin CellPin object to mark as routed
-	 */
-	public void addRoutedSink(CellPin cellPin) {
-		basicAddRoutedSink(cellPin);
-	}
 	
 	/**
 	 * Marks a cellPin attached to the net as unrouted. 
@@ -791,6 +780,10 @@ public class CellNet implements Serializable {
 	 */
 	public boolean removeRoutedSink(CellPin cellPin) {
 		return routedSinks.remove(cellPin);
+	}
+
+	public void removeRoutedSinks() {
+		routedSinks = null;
 	}
 	
 	/**
@@ -926,7 +919,6 @@ public class CellNet implements Serializable {
 	 * @param route RouteTree sourced by the SitePin
 	 */
 	public void addSinkRouteTree(SitePin sp, RouteTree route) {
-		
 		if (sitePinToRTMap == null) {
 			sitePinToRTMap = new HashMap<>();
 		}
@@ -1184,15 +1176,17 @@ public class CellNet implements Serializable {
 	 * */
 	public RouteStatus computeRouteStatus() {
 		int subtractCount = (isStaticNet() || sourcePin.isPartitionPin() || isSourcePinMapped()) ? 1 : 0;
-
-		// Nets route to CI and CYINIT pins of CARRY cells in the netlist, even though only one of these pins is ever
+		int cyInitCiCount = 0;
+		// Nets from Vivado route to CI and CYINIT pins of CARRY cells in the netlist, even though only one of these pins is ever
 		// physically routed to at a time. The other pin will belong to the GND net, but it won't ever be routed to.
 		// Because of this, the extra CI/CYINIT pin should not contribute to the route status of the GND net.
+		// However, we must be aware that the extra pins may have been removed from the net within RS2.
 		// TODO: Does this apply to VCC as well?
 		if (isGNDNet()) {
 			// Count one per cell in order to get the number to remove
-			subtractCount += pins.stream().filter(cellPin -> cellPin.getCell().getType().contains("CARRY"))
-					.filter(cellPin -> cellPin.getName().equals("CI") || cellPin.getName().equals("CYINIT"))
+			cyInitCiCount = pins.stream().filter(cellPin -> cellPin.getCell().getType().contains("CARRY"))
+					.filter(cellPin -> (cellPin.getName().equals("CI") && pins.contains(cellPin.getCell().getPin("CYINIT")))
+							|| cellPin.getName().equals("CYINIT") && pins.contains(cellPin.getCell().getPin("CI")))
 					.map(CellPin::getCell)
 					.collect(Collectors.toSet())
 					.size();
@@ -1207,7 +1201,8 @@ public class CellNet implements Serializable {
 			routeStatus = RouteStatus.UNROUTED;
 		}
 		// A net is considered fully routed in all sink cell pins have been routed to
-		else if (getRoutedSinks().size() == pins.size() - subtractCount) {
+		else if (getRoutedSinks().size() == pins.size() - subtractCount
+				|| getRoutedSinks().size() == pins.size() - subtractCount - cyInitCiCount) {
 			routeStatus = RouteStatus.FULLY_ROUTED;
 		}
 		// A net is otherwise considered partially routed

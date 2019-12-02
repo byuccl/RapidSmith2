@@ -29,6 +29,7 @@ import edu.byu.ece.rapidSmith.design.subsite.*;
 import edu.byu.ece.rapidSmith.device.Bel;
 import edu.byu.ece.rapidSmith.device.BelPin;
 import edu.byu.ece.rapidSmith.device.Device;
+import edu.byu.ece.rapidSmith.device.PIP;
 
 /**
  * This class packages a TINCR checkpoint so that it can be returned to the user.
@@ -42,11 +43,13 @@ public final class VivadoCheckpoint {
 	private final Device device;
 	private final CellDesign design;
 	private final String partName;
-	private Set<Bel> routethroughBels;
-	private Collection<BelRoutethrough> routethroughObjects;
+	private Map<Bel, BelRoutethrough> belRoutethroughMap;
 	private Collection<Bel> vccSourceBels;
 	private Collection<Bel> gndSourceBels;
 	private Map<BelPin, CellPin> belPinToCellPinMap;
+
+	/** PIPs used by the static design */
+	private Collection<PIP> staticPips;
 
 	public VivadoCheckpoint(String partName, CellDesign design, Device device, CellLibrary libCells) {
 		this.partName = partName;
@@ -86,16 +89,19 @@ public final class VivadoCheckpoint {
 	}
 	
 	public void setRoutethroughBels(Map<Bel, BelRoutethrough> rtBels) {
-		this.routethroughBels = rtBels.keySet();
-		this.routethroughObjects = rtBels.values();
+		belRoutethroughMap = rtBels;
 	}
 	
 	public Collection<BelRoutethrough> getRoutethroughObjects() {
-		return routethroughObjects;
+		return belRoutethroughMap.values();
 	}
 	
 	public Set<Bel> getBelRoutethroughs() {
-		return routethroughBels;
+		return belRoutethroughMap.keySet();
+	}
+
+	public Map<Bel, BelRoutethrough> getBelRoutethroughMap() {
+		return belRoutethroughMap;
 	}
 
 	public Collection<Bel> getStaticSourceBels() {
@@ -127,5 +133,13 @@ public final class VivadoCheckpoint {
 	
 	public Map<BelPin, CellPin> getBelPinToCellPinMap() {
 		return this.belPinToCellPinMap;
+	}
+
+	public Collection<PIP> getStaticPips() {
+		return staticPips;
+	}
+
+	public void setStaticPips(Collection<PIP> staticPips) {
+		this.staticPips = staticPips;
 	}
 }
