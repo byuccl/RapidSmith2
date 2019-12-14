@@ -101,6 +101,8 @@ public final class YosysInterface {
 		routingInterface.parseRoutingXDC(routingFile);
 		design.setPartPinMap(routingInterface.getPartPinMap());
 
+		VivadoCheckpoint vivadoCheckpoint = new VivadoCheckpoint(partName, design, device, libCells);
+
 		// If importing a reconfigurable module, process all of the static resources
 		if (mode == ImplementationMode.RECONFIG_MODULE) {
 			// Process other static resources (reserved sites, PIPs, partition pin routes)
@@ -109,9 +111,20 @@ public final class YosysInterface {
 			staticInterface.parseResourcesRSC(resourcesFile);
 			design.setRmStaticNetMap(staticInterface.getRmStaticNetMap());
 			design.setStaticRouteStringMap(staticInterface.getStaticRouteStringMap());
+			vivadoCheckpoint.setStaticPips(staticInterface.getStaticPips());
+			vivadoCheckpoint.setRoutethroughBels(staticInterface.getBelRoutethroughMap());
 		}
 
-		return new VivadoCheckpoint(partName, design, device, libCells);
+		for (CellNet net : design.getNets()) {
+			if (!net.isIntrasite()) {
+				net.removeRoutedSinks();
+				if (!net.getPins().isEmpty())
+					net.computeRouteStatus();
+			}
+		}
+
+
+		return vivadoCheckpoint;
 	}
 
 }

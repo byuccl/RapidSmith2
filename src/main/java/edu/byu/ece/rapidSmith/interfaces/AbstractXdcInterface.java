@@ -6,6 +6,8 @@ import edu.byu.ece.rapidSmith.design.subsite.ImplementationMode;
 import edu.byu.ece.rapidSmith.device.*;
 import edu.byu.ece.rapidSmith.util.Exceptions;
 
+import java.util.regex.Pattern;
+
 public abstract class AbstractXdcInterface {
 
     protected final Device device;
@@ -14,6 +16,7 @@ public abstract class AbstractXdcInterface {
     protected int currentLineNumber;
     protected String currentFile;
     protected ImplementationMode implementationMode;
+    protected Pattern pipNamePattern;
 
     public AbstractXdcInterface(Device device, CellDesign design) {
         this.device = device;
@@ -21,6 +24,25 @@ public abstract class AbstractXdcInterface {
         this.wireEnumerator = device.getWireEnumerator();
         this.currentLineNumber = 0;
         this.implementationMode = design.getImplementationMode();
+        this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)");
+    }
+
+    /**
+     * Tries to retrieve a BelPin object from the currently loaded device <br>
+     * If the pin does not exist, a ParseException is thrown. <br>
+     *
+     * @param bel Bel which the pin is attached
+     * @param pinName Name of the bel pin
+     * @return BelPin
+     */
+    protected BelPin tryGetBelPin(Bel bel, String pinName) {
+        BelPin pin = bel.getBelPin(pinName);
+
+        if (pin == null) {
+            throw new Exceptions.ParseException(String.format("BelPin: \"%s/%s\" does not exist in the current device"
+                    + "On line %d of %s", bel.getName(), pinName, currentLineNumber, currentFile));
+        }
+        return pin;
     }
 
     /**

@@ -188,6 +188,8 @@ public class YosysEdifInterface extends AbstractEdifInterface {
 	 * @param muxCell the starting XORCY cell of a CARRY4 chain
 	 */
 	private void buildCarryChain(CellDesign design, CellLibrary libCells, Cell muxCell) {
+		Collection<CellNet> netsToRemove = new ArrayList<>();
+
 		// Get the corresponding XORCY cell if it exists
 		Cell xorCell = getXorCell(muxCell);
 
@@ -208,12 +210,14 @@ public class YosysEdifInterface extends AbstractEdifInterface {
 
 			if (muxCell != null) {
 				// Get a map to the MUXCY/XORCY cells this MUXCY drives
-				Map<String, Cell> sinkCells = muxCell.getPin("O").getNet().getSinkPins().stream()
+				CellNet oNet = muxCell.getPin("O").getNet();
+				Map<String, Cell> sinkCells = oNet.getSinkPins().stream()
 						.filter(p -> p.getName().equals("CI"))
 						.collect(Collectors.toMap(p -> p.getCell().getType(), CellPin::getCell));
 
 				addMuxCellToCarryCell(muxCell, carryCell, carryIndex, chainStart);
 				design.removeCell(muxCell);
+				netsToRemove.add(oNet);
 
 				muxCell = sinkCells.get("MUXCY");
 				xorCell = sinkCells.get("XORCY");
@@ -234,6 +238,12 @@ public class YosysEdifInterface extends AbstractEdifInterface {
 			}
 			else
 				carryIndex++;
+			}
+
+			for (CellNet net : netsToRemove) {
+				// Don't remove nets that have been altered to drive a CARRY4 from another CARRY4
+				if (net.getPins().isEmpty())
+					design.removeNet(net);
 			}
 
 		}

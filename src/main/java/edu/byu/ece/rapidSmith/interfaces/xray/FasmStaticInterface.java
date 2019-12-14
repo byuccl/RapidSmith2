@@ -19,11 +19,13 @@ import java.util.stream.Collectors;
 public class FasmStaticInterface extends AbstractFasmInterface {
 	private final BufferedWriter fileout;
 	private final Map<String, RouteStringTree> staticRouteStringMap;
+	private final Collection<PIP> staticPips;
 
-	public FasmStaticInterface(Device device, CellDesign design, BufferedWriter fileout) {
+	public FasmStaticInterface(Device device, CellDesign design, Collection<PIP> staticPips, BufferedWriter fileout) {
 		super(device, design);
 		this.staticRouteStringMap = design.getStaticRouteStringMap();
 		this.fileout = fileout;
+		this.staticPips = staticPips;
 	}
 
 	private Wire getWire(String fullWireName) {
@@ -45,10 +47,10 @@ public class FasmStaticInterface extends AbstractFasmInterface {
 	 * The instruction is in the format "tile.source_wire sink_wire"
 	 * @param pip the PIP to write a FASM instruction for.
 	 */
-	private void writePipInstruction(Connection pip) throws IOException {
-		Wire source = pip.getSourceWire();
+	private void writePipInstruction(PIP pip) throws IOException {
+		Wire source = pip.getStartWire();
 		Tile sourceTile = source.getTile();
-		Wire sink = pip.getSinkWire();
+		Wire sink = pip.getEndWire();
 
 		if (!isPseudoPip(source, sink)) {
 			fileout.write(sourceTile.getName() + "." + sink.getName() + " " + source.getName() + "\n");
@@ -61,8 +63,15 @@ public class FasmStaticInterface extends AbstractFasmInterface {
 	 * @throws IOException
 	 */
 	public void writeStaticDesignPips() throws IOException {
+		// Take care of PIPs used by the static design (not for partition pin routes)
+		fileout.write("# Static Design PIPs:\n");
+		for (PIP pip : staticPips) {
+			writePipInstruction(pip);
+		}
+
+		// Take care of PIPs used in partition pin routes
 		for (Map.Entry<String, RouteStringTree> entry : staticRouteStringMap.entrySet()) {
-			fileout.write("# Static Design Net: " + entry.getKey() + "\n");
+			fileout.write("# Static Design Partition Pin Net: " + entry.getKey() + "\n");
 
 			// Write instructions for every PIP that is present in the partial device
 			for (RouteStringTree stringTree : entry.getValue()) {
@@ -78,9 +87,9 @@ public class FasmStaticInterface extends AbstractFasmInterface {
 					if (parentWire != null && childWire != null) {
 						// Find the PIP that connects these wires
 
-						Connection conn = getPipConn(parentWire, childWire);
-						if (conn != null) {
-							writePipInstruction(conn);
+						PIP pip = getPipConn(parentWire, childWire);
+						if (pip != null) {
+							writePipInstruction(pip);
 						}
 					}
 				}
@@ -172,7 +181,7 @@ public class FasmStaticInterface extends AbstractFasmInterface {
 	 * @param childWire the end wire
 	 * @return the PIP connection
 	 */
-	private Connection getPipConn(Wire parentWire, Wire childWire) {
+	private PIP getPipConn(Wire parentWire, Wire childWire) {
 		// The matching forward PIP will be in parentConns and the matching reverse
 		// PIP will be in childReverseConns
 		Collection<Connection> parentConns = getNodeForwardPips(parentWire);
@@ -195,12 +204,6 @@ public class FasmStaticInterface extends AbstractFasmInterface {
 		}
 
 		assert (possibleConnections.size() == 1);
-		return possibleConnections.iterator().next();
-
-
-
+		return possibleConnections.iterator().next().getPip();
 	}
-
-
-
 }

@@ -51,7 +51,6 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	private int currentLineNumber;
 	private String currentFile;
 	private Map<Bel, BelRoutethrough> belRoutethroughMap;
-	private Pattern pipNamePattern;
 	/** Map of partition pins (ooc ports) to their ooc tile and node **/
 	private Map<String, String> partPinMap;
 	private ImplementationMode implementationMode;
@@ -77,7 +76,6 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 		this.staticSourceMap = new HashMap<>();
 		this.belPinToCellPinMap = pinMap;
 		this.currentLineNumber = 0;
-		this.pipNamePattern = Pattern.compile("(.*)/.*\\.([^<]*)((?:<<)?->>?)(.*)"); 
 		this.implementationMode = design.getImplementationMode();
 		this.libCells = libCells;
 
@@ -203,7 +201,6 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	 * where space separated elements are different elements in the array
 	 */
 	private void processSitePips (String[] toks) {
-		
 		Site site = tryGetSite(toks[1]);
 		readUsedSitePips(site, toks);
 		createStaticSubsiteRouteTrees(site);
@@ -227,7 +224,7 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 			
 			Site site = tryGetSite(sitePinToks[0]);
 			SitePin pin = tryGetSitePin(site, sitePinToks[1]);
-			
+
 			if (pin.isInput()) { // of a site
 				createIntrasiteRoute(pin, net, design.getUsedSitePipsAtSite(site));
 			}
@@ -509,7 +506,6 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	 * {@code LUT_RTS site0/bel0/inputPin0/outputPin0 site1/bel1/inputPin1/outputPin1 ...}
 	 */
 	private void processLutRoutethroughs(String[] toks) {
-
 		this.belRoutethroughMap = new HashMap<>();
 		
 		for (int i = 1; i < toks.length; i++) {
@@ -763,9 +759,7 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 	 * {@code SITE_PIPS siteName pip0:input0 pip1:input1 ... pipN:inputN}
 	 */
 	private void readUsedSitePips(Site site, String[] toks) {
-
 		HashSet<Integer> usedSitePips = new HashSet<>();
-
 		String namePrefix = "intrasite:" + site.getType().name() + "/";
 
 		//create hashmap that shows pip used to input val
@@ -1142,24 +1136,6 @@ public class XdcRoutingInterface extends AbstractXdcInterface {
 									+ "On line " + this.currentLineNumber + " of " + currentFile);
 		}
 		return source;
-	}
-
-	/**
-	 * Tries to retrieve a BelPin object from the currently loaded device <br>
-	 * If the pin does not exist, a ParseException is thrown. <br>
-	 * 
-	 * @param bel Bel which the pin is attached
-	 * @param pinName Name of the bel pin
-	 * @return BelPin
-	 */
-	private BelPin tryGetBelPin(Bel bel, String pinName) {
-		BelPin pin = bel.getBelPin(pinName);
-		
-		if (pin == null) {
-			throw new ParseException(String.format("BelPin: \"%s/%s\" does not exist in the current device"
-												 + "On line %d of %s", bel.getName(), pinName, currentLineNumber, currentFile));
-		}
-		return pin;
 	}
 	
 	/**

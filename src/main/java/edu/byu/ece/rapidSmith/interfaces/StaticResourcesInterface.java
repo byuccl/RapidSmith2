@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,9 @@ public class StaticResourcesInterface extends AbstractXdcInterface {
 	private Map<String, String> rmStaticNetMap;
 	/** Map from the static net name to the route string tree */
 	private Map<String, RouteStringTree> staticRouteStringMap;
+	private Map<Bel, BelRoutethrough> belRoutethroughMap;
+	/** PIPs used by the static design */
+	private Collection<PIP> staticPips;
 
 	/**
 	 * Creates a new XdcRoutingInterface object.
@@ -30,11 +34,22 @@ public class StaticResourcesInterface extends AbstractXdcInterface {
 	 * @param design {@link CellDesign} to add routing information to
 	 * @param device {@link Device} of the specified design
 	 */
+	public StaticResourcesInterface(CellDesign design, Device device, Map<Bel, BelRoutethrough> belRoutethroughMap) {
+		super(device, design);
+		this.design = design;
+		this.rmStaticNetMap = new HashMap<>();
+		this.staticRouteStringMap = new HashMap<>();
+		this.belRoutethroughMap = belRoutethroughMap;
+		staticPips = new ArrayList<>();
+	}
+
 	public StaticResourcesInterface(CellDesign design, Device device) {
 		super(device, design);
 		this.design = design;
 		this.rmStaticNetMap = new HashMap<>();
 		this.staticRouteStringMap = new HashMap<>();
+		this.belRoutethroughMap = new HashMap<>();
+		staticPips = new ArrayList<>();
 	}
 
 	/**
@@ -55,14 +70,20 @@ public class StaticResourcesInterface extends AbstractXdcInterface {
 				String[] toks = whitespacePattern.split(line);
 
 				switch (toks[0]) {
-					case "RESERVED_WIRES" :
-						processReservedWires(toks);
+					case "RESERVED_PIPS" :
+						processReservedPips(toks);
 						break;
 					case "STATIC_RT" :
 						processStaticRoutes(toks);
 						break;
-					case "SITE_RTS":
-						processSiteRoutethroughs(toks);
+					case "SITE_RT":
+						processSiteRoutethrough(toks);
+						break;
+					case "SITE_PIPS":
+						processSitePips(toks);
+						break;
+					case "SITE_LUTS":
+						processSiteLuts(toks);
 						break;
 					default :
 						throw new ParseException("Unrecognized Token: " + toks[0]);
@@ -72,41 +93,117 @@ public class StaticResourcesInterface extends AbstractXdcInterface {
 	}
 
 	/**
-	 * Processes a string array of sites being uses as route-throughs by the static design.
-	 * @param toks a String array of sites in the form: <br>
-	 * {@code SITE_RTS tile0/site0 tile1/site1 ... tileN/siteN} </br>
+	 * Processes a single site being used as a route-through.
+	 * @param toks a String array of the form: <br>
+	 * {@code SITE_RT site routethroughPip} </br>
 	 */
-	private void processSiteRoutethroughs(String[] toks) {
-		for(int i = 1; i < toks.length; i++) {
-			String[] vals = toks[i].split("/");
-			assert vals.length == 2;
-			String siteName = vals[1];
-			Site site = tryGetSite(siteName);
+	private void processSiteRoutethrough(String[] toks) {
+		assert toks.length == 3;
+		String siteName = toks[1];
+		Site site = tryGetSite(siteName);
 
-			// Mark the site as reserved
-			design.addReservedSite(site);
+		// Reserve the site
+		design.addReservedSite(site);
+
+		// Currently don't do anything with the site route-through PIP in toks[2].
+		// In the future, we could create a mapping from these to the
+		// individual LUT route-throughs and site PIPs that make up
+		// a site route-through PIP.
+	}
+
+	/**
+	 * Processes the site PIPs used in a site route-through.
+	 * If a mapping from site route-throughs to PIPs and LUT route-throughs is added, this method can be removed.
+	 * @param toks a String array of the form: <br>
+	 * {@code SITE_PIPS site pip1 pip2 ...} </br>
+	 */
+	private void processSitePips(String[] toks) {
+		Site site = tryGetSite(toks[1]);
+		HashSet<Integer> usedSitePips = new HashSet<>();
+		HashMap<String, String> pipToInputVal = new HashMap<>();
+		String namePrefix = "intrasite:" + site.getType().name() + "/";
+
+		for(int i = 2; i < toks.length; i++) {
+			String pipWireName = (namePrefix + toks[i].replace(":", "."));
+			Integer wireEnum = tryGetWireEnum(pipWireName);
+			SiteWire sw = new SiteWire(site, wireEnum);
+			Collection<Connection> connList = sw.getWireConnections();
+			assert (connList.size() == 1 || connList.size() == 0) : "Site Pip wires should have one or no connections " + sw.getName() + " " + connList.size() ;
+
+			if (connList.size() == 1) {
+				Connection conn = connList.iterator().next();
+				assert (conn.isPip()) : "Site Pip connection should be a PIP connection!";
+				usedSitePips.add(wireEnum);
+				usedSitePips.add(conn.getSinkWire().getWireEnum());
+			}
+
+			// If the created wire has no connections, it is a polarity selector that has been removed from the site.
+			// We still need the input value in order to correctly import intra-site routing changes back into Vivado.
+			String[] vals = toks[i].split(":");
+			assert vals.length == 2;
+			pipToInputVal.put(vals[0], vals[1]);
+		}
+
+		design.setUsedSitePipsAtSite(site, usedSitePips);
+		design.addPIPInputValsAtSite(site, pipToInputVal);
+	}
+
+	/**
+	 * Processes the LUT route-throughs used in a site route-through.
+	 * If a mapping from site route-throughs to PIPs and LUT route-throughs is added, this method can be removed.
+	 * @param toks a String array of the form: <br>
+	 * {@code SITE_PIPS site lutRoutethrough1 lutRoutethrough2 ...} </br>
+	 */
+	private void processSiteLuts(String[] toks) {
+		Site site = tryGetSite(toks[1]);
+		for (int i = 2; i < toks.length; i++) {
+			String[] routethroughToks = toks[i].split("/");
+			Bel bel = tryGetBel(site, routethroughToks[0]);
+			BelPin inputPin = tryGetBelPin(bel, routethroughToks[1]);
+			BelPin outputPin = tryGetBelPin(bel, routethroughToks[2]);
+			belRoutethroughMap.put(bel, new BelRoutethrough(inputPin, outputPin));
 		}
 	}
 
 	/**
-	 * Processes a string array of reserved wire tokens.
+	 * Processes a string array of reserved pip tokens.
 	 *
-	 * @param toks a String array of used wire tokens in the form: <br>
-	 * {@code RESERVED_WIRES tile0/wire1 tile1/wire2 ...} </br>
+	 * @param toks a String array of used pip tokens in the form: <br>
+	 * {@code RESERVED_WIRES pip0 pip1 ...} </br>
 	 */
-	private void processReservedWires(String[] toks) {
+	private void processReservedPips(String[] toks) {
 		for(int i = 1; i < toks.length; i++) {
-			String[] vals = toks[i].split("/");
-			assert vals.length == 2;
-			String tileName = vals[0];
-			String wireName = vals[1];
+			Matcher m = pipNamePattern.matcher(toks[i]);
 
-			Tile tile = tryGetTile(tileName);
-			Wire reservedWire = new TileWire(tile, tryGetWireEnum(wireName));
+			if (m.matches()) {
+				String tileName = m.group(1);
+				String direction = m.group(3);
+				// No use for the direction in m.group(3)
+				String source = m.group(2);
+				String sink = m.group(4);
 
-			// Mark all wires in the node as reserved. These wires are used by the static design for other nets not
-			// in the RM; i.e., they just route through the RM.
-			design.addReservedNode(reservedWire);
+				// If it's bi-directional, we must figure out what direction is being used.
+				if (direction.equals("<<->>")) {
+
+				}
+
+
+					Tile tile = tryGetTile(tileName);
+				Wire sourceWire = new TileWire(tile, tryGetWireEnum(source));
+				Wire sinkWire = new TileWire(tile, tryGetWireEnum(sink));
+				PIP pip = new PIP(sourceWire, sinkWire);
+
+				// Add to a list of static PIPs so it is easy to include this info in a FASM
+				staticPips.add(pip);
+
+				// Mark all wires in the node as reserved. These wires are used by the static design for other nets not
+				// in the RM; i.e., they just route through the RM.
+				design.addReservedNode(sourceWire);
+				design.addReservedNode(sinkWire);
+			}
+			else {
+				throw new ParseException("Invalid Pip String configuration: " + toks[i]);
+			}
 		}
 	}
 
@@ -117,26 +214,44 @@ public class StaticResourcesInterface extends AbstractXdcInterface {
 	 * @param toks tokens containing wires in the form tile0/wire0 tile1/wire1 ... tileN/wireN
 	 * @return index into the tokens
 	 */
-	private int createIntersiteRouteStringTree(RouteStringTree branchRoot, int index, String[] toks) {
+	private int createIntersiteRouteStringTree(CellNet net, RouteStringTree branchRoot, int index, String[] toks) {
 		RouteStringTree current = branchRoot;
 
-		while ( index < toks.length ) {
+		while (index < toks.length) {
 
 			// new branch
 			if (toks[index].equals("{") ) {
 				index++;
-				index = createIntersiteRouteStringTree(current, index, toks);
+				index = createIntersiteRouteStringTree(net, current, index, toks);
 			}
 			//end of a branch
 			else if (toks[index].equals("}") ) {
 				return index + 1;
 			}
 			else {
+				reserveWire(net, toks[index]);
 				current = current.addChild(toks[index]);
 				index++;
 			}
 		}
 		return index;
+	}
+
+	/**
+	 * Reserves the given wire if it can be found within the device
+	 * @param wireName
+	 */
+	private void reserveWire(CellNet net, String wireName) {
+		String[] vals = wireName.split("/");
+		assert vals.length == 2;
+
+		Tile tile = device.getTile(vals[0]);
+		if (tile != null) {
+			Wire wire = tile.getWire(vals[1]);
+			if (wire != null) {
+				design.addReservedNode(wire, net);
+			}
+		}
 	}
 
 	/**
@@ -169,18 +284,19 @@ public class StaticResourcesInterface extends AbstractXdcInterface {
 
 		// Add all rm net names to the rm -> static net name map.
 		// Also add aliases (within the context of the full-device design) for the net.
+		CellNet rmNet = null;
 		for (CellNet portNet : portNets) {
+			rmNet = (rmNet == null) ? portNet : rmNet;
 			rmStaticNetMap.put(portNet.getName(), staticNetName);
 			Set<CellNet> aliases = portNets.stream().filter(cellNet -> cellNet != portNet).collect(Collectors.toSet());
 			portNet.setAliases(aliases);
 		}
 
-		// Create the Route String Tree
+		// Create the Route String Tree and reserve used wires
 		i++;
 		RouteStringTree root = new RouteStringTree(toks[i]);
-		createIntersiteRouteStringTree(root, i+1, toks);
+		createIntersiteRouteStringTree(rmNet, root, i+1, toks);
 		staticRouteStringMap.put(staticNetName, root);
-
 	}
 
 	public Map<String, RouteStringTree> getStaticRouteStringMap() {
@@ -189,5 +305,13 @@ public class StaticResourcesInterface extends AbstractXdcInterface {
 
 	public Map<String, String> getRmStaticNetMap() {
 		return rmStaticNetMap;
+	}
+
+	public Collection<PIP> getStaticPips() {
+		return staticPips;
+	}
+
+	public Map<Bel, BelRoutethrough> getBelRoutethroughMap() {
+		return belRoutethroughMap;
 	}
 }
